@@ -28,25 +28,26 @@ document.getElementById("value1").focus();
 
 <body bgcolor="#ffffb8" link="#a03830" vlink="#a03830" alink="#ff3830" onload="setFocus()">
 
-<hr width="95%">
+<p align='center'><font size='5' face='SansSerif'>Test Form</font></p>
 
-<center>
-
+<p align='center'><font size='3' face='SansSerif'>
 <a href='local://openfile/now' onclick="fileSelected()" id="FileSelection">Select File</a>
 <br>
 <a href='local://openfolder/now' onclick="folderSelected()" id="FolderSelection">Select Folder</a>
-<br>
+</font></p>
 
+<center>
+<font size='3' face='SansSerif'>
 <form action="local://script/test.pl" method="get">
+Value 1:<br>
 <input type="text" id="value1" name="value1"><br>
+Value 2:<br>
 <input type="text" name="value2"><br>
+<br>
 <input type="submit" value="Submit with File & Folder">
 </form>
-
+</font>
 </center>
 
-<hr width="95%">
-
-<br>
 </body>
 </html>

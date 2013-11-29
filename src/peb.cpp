@@ -102,6 +102,8 @@ int main ( int argc, char **argv )
     QString windowIcon = settings.value ( "gui/icon" ).toString();
     QString fixedWidth = settings.value ( "gui/fixed_width" ).toString();
     QString fixedHeight = settings.value ( "gui/fixed_heigth" ).toString();
+    QString stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
+    QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
 
     QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() + "/icons/" + windowIcon ) );
     QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
@@ -125,7 +127,17 @@ int main ( int argc, char **argv )
                                screenRect.height()/2 - toplevel.height()/2 ) );
     }
 
-//    toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint );
+    if ( stayOnTop == "yes" ) {
+        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint );
+    }
+
+    if ( stayOnTop == "yes" and framelessWindow == "yes" ) {
+        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint );
+    }
+
+    if ( stayOnTop != "yes" and framelessWindow == "yes" ) {
+        toplevel.setWindowFlags ( Qt::FramelessWindowHint );
+    }
 
     toplevel.show();
     app.exec();
@@ -144,7 +156,6 @@ TopLevel::TopLevel()
     QString mainWindowTitle = settings.value ( "gui/window_title" ).toString();
     QString startPage = settings.value ( "gui/start_page" ).toString();
     QString maximizedWindow = settings.value ( "gui/maximized_window" ).toString();
-    QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
     QString fullScreen = settings.value ( "gui/full_screen" ).toString();
     QString contextMenu = settings.value ( "gui/context_menu" ).toString();
     QString fixedWidth = settings.value ( "gui/fixed_width" ).toString();
@@ -196,10 +207,6 @@ TopLevel::TopLevel()
 
     if ( maximizedWindow == "yes" ) {
         showMaximized();
-    }
-
-    if ( framelessWindow == "yes" ) {
-        setWindowFlags ( Qt::FramelessWindowHint );
     }
 
     if ( fullScreen == "yes" ) {
@@ -380,7 +387,6 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
 
         QProcess handler;
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-//        env.remove("MAIL");
         QString scriptRaw = request.url().toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
         QString script = scriptRaw.replace ( "/", "" );
         qDebug() << "Script:" << script;
@@ -406,7 +412,6 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
         fileName = "";
         folderName = "";
 
-//        if ( handler.waitForFinished(-1) ){ // endless wait
         if ( handler.waitForFinished() ){
             frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + "/output.htm" ) );
             return true;
