@@ -12,10 +12,10 @@
 // 3. Foundation for nice, reusable and recognizable GUIs;
 // 4. Cross-platform GUI solution;
 // 5. Physical portability on USB sticks without installation procedures.
-// Like similar solutions (node-webkit etc.), PEB exposes a small set of desktop functionalities
-// to the user of the hosted scripts. These are accessible from special URLs and currently are:
+// PEB also exposes some desktop functionalities to the user of the hosted scripts.
+// These are accessible from special URLs and currently are:
 // open file, open folder and close browser.
-// File to open and folder to open are accessible to every script as $ARGV[0] and $ARGV[1] respectively.
+// File to open and folder to open are accessible for every script as $ARGV[0] and $ARGV[1].
 // Printing current page by clicking a special URL is also supported.
 
 // This small project is still in its very beginning and
@@ -51,6 +51,7 @@
 // http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html
+// http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebview.html
 // http://stackoverflow.com/questions/9685615/qt-and-linux-pipes
 // http://stackoverflow.com/questions/14987007/what-is-the-expected-encoding-for-qwebviewsethtml
 // http://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage
@@ -66,6 +67,7 @@
 // http://stackoverflow.com/questions/11238151/how-to-implement-a-back-action-in-a-qwebview-qwebpage
 // http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm
 // http://www.stringreplace.com/c-plus-plus/qt-string-replace-method/
+// http://fr.openclassrooms.com/forum/sujet/qt-icone-et-titre-non-charge-d-un-qwebview-54256
 // http://en.wikipedia.org/wiki/Common_Gateway_Interface
 // http://en.wikipedia.org/wiki/INI_file
 
@@ -116,7 +118,6 @@ int main ( int argc, char **argv )
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::AutoLoadImages, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::setObjectCacheCapacities ( 0, 0, 0 );
-    QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::clearMemoryCaches();
 
     TopLevel toplevel;
@@ -132,7 +133,7 @@ int main ( int argc, char **argv )
     }
 
     if ( stayOnTop == "yes" and framelessWindow == "yes" ) {
-        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint|Qt::FramelessWindowHint );
+        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint );
     }
 
     if ( stayOnTop != "yes" and framelessWindow == "yes" ) {
@@ -144,16 +145,16 @@ int main ( int argc, char **argv )
 };
 
 Page::Page()
-    : QWebPage(0)
+    : QWebPage ( 0 )
 {
 }
 
 TopLevel::TopLevel()
-    : QWebView(0)
+    : QWebView ( 0 )
 {
     QString settingsFileName = QApplication::applicationDirPath() + "/peb.ini";
     QSettings settings ( settingsFileName, QSettings::NativeFormat );
-    QString mainWindowTitle = settings.value ( "gui/window_title" ).toString();
+    QString windowTitle = settings.value ( "gui/window_title" ).toString();
     QString startPage = settings.value ( "gui/start_page" ).toString();
     QString maximizedWindow = settings.value ( "gui/maximized_window" ).toString();
     QString fullScreen = settings.value ( "gui/full_screen" ).toString();
@@ -166,18 +167,12 @@ TopLevel::TopLevel()
     main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
     main_page -> mainFrame() -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
 //    main_page -> action ( QWebPage::Reload ) -> setVisible ( false );
-    main_page -> action ( QWebPage::OpenLink ) -> setVisible ( false );
 //    main_page -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( false );
+    main_page -> action ( QWebPage::OpenLink ) -> setVisible ( false );
     main_page -> action ( QWebPage::OpenLinkInNewWindow ) -> setVisible ( false );
     main_page -> action ( QWebPage::DownloadLinkToDisk ) -> setVisible ( false );
     main_page -> action ( QWebPage::SetTextDirectionLeftToRight )-> setVisible ( false );
     main_page -> action ( QWebPage::SetTextDirectionRightToLeft )-> setVisible ( false );
-
-    QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
-    QObject::connect ( closeAppShortcut, SIGNAL ( activated() ), this, SLOT ( closeAppSlot() ) );
-
-    QShortcut * reloadShortcut = new QShortcut ( QKeySequence ( "Ctrl+R" ), this );
-    QObject::connect ( reloadShortcut, SIGNAL ( activated() ), this, SLOT ( reloadSlot() ) );
 
     QShortcut * maximizeShortcut = new QShortcut ( QKeySequence ( "Ctrl+M" ), this );
     QObject::connect ( maximizeShortcut, SIGNAL ( activated() ), this, SLOT ( maximizeSlot() ) );
@@ -191,11 +186,21 @@ TopLevel::TopLevel()
     QShortcut * printShortcut = new QShortcut ( QKeySequence ("Ctrl+P"), this );
     QObject::connect ( printShortcut, SIGNAL ( activated() ), this, SLOT ( printPageSlot() ) );
 
+    QShortcut * reloadShortcut = new QShortcut ( QKeySequence ( "Ctrl+R" ), this );
+    QObject::connect ( reloadShortcut, SIGNAL ( activated() ), this, SLOT ( reloadSlot() ) );
+
     QShortcut * backShortcut = new QShortcut ( Qt::Key_F9, this );
     QObject::connect ( backShortcut, SIGNAL ( activated() ), this, SLOT ( backSlot() ) );
 
     QShortcut * forwardShortcut = new QShortcut ( Qt::Key_F10, this );
     QObject::connect ( forwardShortcut, SIGNAL ( activated() ), this, SLOT ( forwardSlot() ) );
+
+    QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
+    QObject::connect ( closeAppShortcut, SIGNAL ( activated() ), this, SLOT ( closeAppSlot() ) );
+
+    if ( windowTitle == "dynamic" ) {
+        QObject::connect ( main_page, SIGNAL ( loadFinished(bool) ), this, SLOT (changeTitle(bool) ) );
+    }
 
     if ( fixedWidth != "false" and fixedHeight != "false" ) {
         int fixedWidthInt = fixedWidth.toInt();
@@ -203,7 +208,9 @@ TopLevel::TopLevel()
         setFixedSize ( fixedWidthInt, fixedHeightInt );
     }
 
-    setWindowTitle ( mainWindowTitle );
+    if ( windowTitle != "dynamic" ) {
+        setWindowTitle ( windowTitle );
+    }
 
     if ( maximizedWindow == "yes" ) {
         showMaximized();
@@ -218,7 +225,7 @@ TopLevel::TopLevel()
     }
 
     if ( startPage == "html" ) {
-        QUrl startUrl = "file://"+qApp->applicationDirPath()+"/html/index.html";
+        QUrl startUrl = "file://" + qApp->applicationDirPath() + "/html/index.htm";
         setUrl ( startUrl );
         setFocus();
     }
@@ -228,7 +235,7 @@ TopLevel::TopLevel()
         handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
         handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
         // call handler and add your input as argument
-        handler.start ( "perl", QStringList() << qApp->applicationDirPath() + "/scripts/startpage.pl" );
+        handler.start ( "perl", QStringList() << qApp->applicationDirPath() + "/scripts/index.pl" );
         qDebug() << "Startpage handler started.";
         // wait until handler has finished
         if ( handler.waitForFinished() ){
@@ -237,24 +244,20 @@ TopLevel::TopLevel()
         handler.close();
         QWebSettings::clearMemoryCaches();
     }
-
 }
 
-bool Page::acceptNavigationRequest( QWebFrame *frame,
-                                    const QNetworkRequest &request,
-                                    QWebPage::NavigationType type )
+bool Page::acceptNavigationRequest ( QWebFrame *frame,
+                                     const QNetworkRequest &request,
+                                     QWebPage::NavigationType type )
 {
-
     QString settingsFileName = QApplication::applicationDirPath() + "/peb.ini";
     QSettings settings ( settingsFileName, QSettings::NativeFormat );
     QString windowIcon = settings.value ( "gui/icon" ).toString();
-
     QUrl allowedBase = ( QUrl ( "local://script/" ) );
 
     if ( type == QWebPage::NavigationTypeLinkClicked ) {
     QUrl OpenFileBase ( QUrl ( "local://openfile/" ) );
     if ( OpenFileBase.isParentOf ( request.url() ) ) {
-
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
@@ -271,7 +274,6 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
     if ( type == QWebPage::NavigationTypeLinkClicked ) {
     QUrl OpenFolderBase ( QUrl ( "local://openfolder/" ) );
     if ( OpenFolderBase.isParentOf ( request.url() ) ) {
-
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
@@ -290,16 +292,16 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
     if ( PrintBase.isParentOf ( request.url() ) ) {
         qDebug() << "Printing requested.";
         QPrinter printer;
-        printer.setOrientation(QPrinter::Portrait);
-        printer.setPageSize(QPrinter::A4);
-        printer.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
-        printer.setResolution(QPrinter::HighResolution);
-        printer.setColorMode(QPrinter::Color);
-        printer.setPrintRange(QPrinter::AllPages);
-        printer.setNumCopies(1);
-//        printer.setPrinterName("Print to File (PDF)");
-//        printer.setOutputFormat(QPrinter::PdfFormat);
-//        printer.setOutputFileName("output.pdf");
+        printer.setOrientation ( QPrinter::Portrait );
+        printer.setPageSize ( QPrinter::A4 );
+        printer.setPageMargins ( 10, 10, 10, 10, QPrinter::Millimeter );
+        printer.setResolution ( QPrinter::HighResolution );
+        printer.setColorMode ( QPrinter::Color );
+        printer.setPrintRange ( QPrinter::AllPages );
+        printer.setNumCopies ( 1 );
+//        printer.setPrinterName ( "Print to File (PDF)" );
+//        printer.setOutputFormat ( QPrinter::PdfFormat );
+//        printer.setOutputFileName ( "output.pdf" );
         QPrintDialog* dialog = new QPrintDialog ( &printer );
         dialog->setWindowFlags ( Qt::WindowStaysOnTopHint );
         if ( dialog->exec() == QDialog::Accepted )
@@ -323,7 +325,9 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
     if ( type == QWebPage::NavigationTypeLinkClicked ) {
     QUrl ExternalBase ( QUrl ( "external:" ) );
     if ( ExternalBase.isParentOf ( request.url() ) ) {
-        QString externalApplication = request.url().toString ( QUrl::RemoveScheme );
+        QString externalApplication = request.url()
+                .toString ( QUrl::RemoveScheme )
+                .replace ( "/", "" );
         qDebug() << "External application: " << externalApplication;
         QProcess externalProcess;
         externalProcess.setWorkingDirectory ( qApp->applicationDirPath() );
@@ -351,21 +355,31 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
     if ( base.isParentOf ( request.url() ) ) {
         qDebug() << "Local link clicked:" << request.url().toString();
 
-        QString link = request.url().toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority );
-        QString fileRaw = request.url().toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        QString file = fileRaw.replace ( "/", "" );
+        QProcess handler;
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        QString link = request.url()
+                .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority );
+        QString file = request.url()
+                .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
+                .replace ( "/", "" );
         qDebug() << "File:" << file;
-        QString extension = file.section(".", 1, 1);
+        QString extension = file.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
 
         if ( extension == "pl" ) {
-            QProcess handler;
+            QString interpreter = "perl";
+            qDebug() << "Interpreter:" << interpreter;
+            env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
+            env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
+//            env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
+            env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+            handler.setProcessEnvironment ( env );
             handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
             handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
             // call handler and add your input as argument
-            handler.start ( "perl", QStringList() << qApp->applicationDirPath() + "/scripts/" + link );
+            handler.start ( interpreter, QStringList() << qApp->applicationDirPath() + "/scripts/" + link );
             // wait until handler has finished
-            if (!handler.waitForFinished())
+            if ( !handler.waitForFinished() )
                 return 1;
             frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + "/output.htm" ) );
             handler.close();
@@ -387,15 +401,19 @@ bool Page::acceptNavigationRequest( QWebFrame *frame,
 
         QProcess handler;
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        QString scriptRaw = request.url().toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        QString script = scriptRaw.replace ( "/", "" );
+        QString script = request.url()
+                .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
+                .replace ( "/", "" );
         qDebug() << "Script:" << script;
         QString extension = script.section(".", 1, 1);
         qDebug() << "Extension:" << extension;
+
         if ( extension == "pl" ) {
             QString interpreter = "perl";
-            QString queryRaw = request.url().toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemovePath );
-            QString query = queryRaw.replace ( "?", "" );
+            qDebug() << "Interpreter:" << interpreter;
+            QString query = request.url()
+                    .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemovePath )
+                    .replace ( "?", "" );
             env.insert ( "QUERY_STRING", query );
             env.insert ( "REQUEST_METHOD", "GET" );
             env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );

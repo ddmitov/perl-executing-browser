@@ -14,9 +14,9 @@ public:
     Page();
 
 protected:
-    bool acceptNavigationRequest( QWebFrame *frame,
-                                  const QNetworkRequest &request,
-                                  QWebPage::NavigationType type );
+    bool acceptNavigationRequest ( QWebFrame *frame,
+                                   const QNetworkRequest &request,
+                                   QWebPage::NavigationType type );
 };
 
 class TopLevel : public QWebView
@@ -66,19 +66,27 @@ public slots:
         }
     };
 
+    void changeTitle(bool ok)
+    {
+        if(ok)
+        {
+        setWindowTitle ( TopLevel::title() );
+        }
+    }
+
     void printPageSlot()
     {
         QPrinter printer;
-        printer.setOrientation(QPrinter::Portrait);
-        printer.setPageSize(QPrinter::A4);
-        printer.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
-        printer.setResolution(QPrinter::HighResolution);
-        printer.setColorMode(QPrinter::Color);
-        printer.setPrintRange(QPrinter::AllPages);
-        printer.setNumCopies(1);
-//        printer.setPrinterName("Print to File (PDF)");
-//        printer.setOutputFormat(QPrinter::PdfFormat);
-//        printer.setOutputFileName("output.pdf");
+        printer.setOrientation ( QPrinter::Portrait );
+        printer.setPageSize ( QPrinter::A4 );
+        printer.setPageMargins ( 10, 10, 10, 10, QPrinter::Millimeter );
+        printer.setResolution ( QPrinter::HighResolution );
+        printer.setColorMode ( QPrinter::Color );
+        printer.setPrintRange ( QPrinter::AllPages );
+        printer.setNumCopies ( 1 );
+//        printer.setPrinterName ( "Print to File (PDF)" );
+//        printer.setOutputFormat ( QPrinter::PdfFormat );
+//        printer.setOutputFileName ( "output.pdf" );
         QPrintDialog* dialog = new QPrintDialog ( &printer );
         dialog->setWindowFlags ( Qt::WindowStaysOnTopHint );
         QSize dialogSize = dialog->sizeHint();

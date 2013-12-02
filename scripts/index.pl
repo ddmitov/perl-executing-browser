@@ -32,7 +32,7 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='external:/usr/bin/gedit peb.ini'>External Program with an argument</a>\n";
+print "<a href='external:/gedit peb.ini'>External Program with an argument</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -45,6 +45,12 @@ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='local://openfolder/now'>Open Folder</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='local://script/index.pl'>Reload - link to itself</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";

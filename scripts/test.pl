@@ -9,12 +9,10 @@ print "<html>\n";
 
 print "<head>\n";
 
-print "<title>Perl Executing Browser Test</title>\n";
+print "<title>Perl Executing Browser - Test Results</title>\n";
 print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
 
 print "</head>\n";
-
-print "<body text=#000000 bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
 
 print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
 
@@ -23,7 +21,11 @@ print "Perl Executing Browser Test\n";
 print "</font></p>\n";
 
 print "<p align='left'><font size='3' face='SansSerif'>\n";
-print "<a href='local://script/startpage.pl'>Back to the dynamic startpage</a>\n";
+print "<a href='local://script/index.pl'>Back to the dynamic startpage</a>\n";
+print "</font></p>\n";
+
+print "<p align='left'><font size='3' face='SansSerif'>\n";
+print "<a href='local://script/index.htm'>Back to the static startpage</a>\n";
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
@@ -49,7 +51,7 @@ foreach my $p (param()) {
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "NEW AND MODIFIED ENVIRONMENT VARIABLES:\n";
+print "MODIFIED AND NEW ENVIRONMENT VARIABLES:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
 if (defined $PATH){
@@ -77,3 +79,6 @@ foreach my $key (sort(keys(%ENV))) {
 	print "$key = $ENV{$key}<br>\n";
 }
 print "</font></p>\n";
+
+print "</body>\n";
+print "</html>\n";
