@@ -7,7 +7,7 @@ which is capable of executing Perl (possibly PHP/Python) scripts locally without
 providing them with a nice HTML4/5 interface for both input and output and
 using CGI protocol GET method for communication between web forms and scripts.  
 
-PEB can be used as an easy to deploy GUI for Perl (possibly PHP/Python) scripts and could give:  
+PEB can be used as an easy to deploy GUI for Perl (possibly PHP/Python) scripts and could give:
 1. Less deployment complexity without additional dependencies;  
 2. More security for private data that does not need to be accessible over a network;  
 3. Foundation for nice, reusable and recognizable GUIs;  
@@ -29,4 +29,3 @@ Documentation and proper examples are still missing...
 This software is licensed under the terms of GNU GPL v.3 and is  
 provided without warranties of any kind!  
 Dimitar D. Mitov, 2013, ddmitov (dot) yahoo (dot) com  
-  
