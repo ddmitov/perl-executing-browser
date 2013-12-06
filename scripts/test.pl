@@ -17,7 +17,7 @@ print "</head>\n";
 print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "Perl Executing Browser Test\n";
+print "Test Results\n";
 print "</font></p>\n";
 
 print "<p align='left'><font size='3' face='SansSerif'>\n";
@@ -34,8 +34,8 @@ print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
 if (defined @ARGV){
 	my ($file, $folder) = @ARGV;
-	print "ARGV 0 - FILE: $file<br>\n";
-	print "ARGV 1 - FOLDER: $folder<br>\n";
+	print "\$ARGV[0] - FILE: $file<br>\n";
+	print "\$ARGV[1] - FOLDER: $folder<br>\n";
 }
 print "</font></p>\n";
 

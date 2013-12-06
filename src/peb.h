@@ -5,6 +5,7 @@
 #include <qwebpage.h>
 #include <QtGui>
 #include <QApplication>
+#include <QWebElement>
 
 class Page : public QWebPage
 {
@@ -41,21 +42,6 @@ public slots:
         showMinimized();
     };
 
-    void reloadSlot()
-    {
-        reload();
-    };
-
-    void backSlot()
-    {
-        back();
-    };
-
-    void forwardSlot()
-    {
-        forward();
-    };
-
     void toggleFullScreenSlot()
     {
         if (isFullScreen()){
@@ -66,12 +52,38 @@ public slots:
         }
     };
 
-    void changeTitle(bool ok)
+    void pageLoadedDynamicTitle (bool ok)
     {
         if(ok)
         {
-        setWindowTitle ( TopLevel::title() );
+            setWindowTitle ( TopLevel::title() );
+            QFile::remove ( QDir::tempPath() + "/output.htm" );
         }
+    }
+
+    void pageLoadedStaticTitle (bool ok)
+    {
+        if(ok)
+        {
+            QFile::remove ( QDir::tempPath() + "/output.htm" );
+        }
+    }
+
+    void contextMenuEvent ( QContextMenuEvent* event )
+    {
+        QMenu *menu = main_page -> createStandardContextMenu();
+        menu -> addSeparator();
+        QAction* minimizeAct = menu -> addAction ( "Minimize" );
+        connect ( minimizeAct, SIGNAL ( triggered() ), this, SLOT ( minimizeSlot() ) );
+        QAction* maximizeAct = menu->addAction ( "Maximize" );
+        connect ( maximizeAct, SIGNAL ( triggered() ), this, SLOT ( maximizeSlot() ) );
+        QAction* toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
+        connect ( toggleFullScreenAct, SIGNAL ( triggered() ), this, SLOT ( toggleFullScreenSlot() ) );
+        QAction* printAct = menu -> addAction ( "Print" );
+        connect ( printAct, SIGNAL ( triggered() ), this, SLOT ( printPageSlot() ) );
+        QAction* closeAct = menu -> addAction ( "Close" );
+        connect ( closeAct, SIGNAL ( triggered() ), this, SLOT ( closeAppSlot() ) );
+        menu -> exec ( QPoint ( event -> x(), event -> y() ) );
     }
 
     void printPageSlot()
@@ -84,9 +96,9 @@ public slots:
         printer.setColorMode ( QPrinter::Color );
         printer.setPrintRange ( QPrinter::AllPages );
         printer.setNumCopies ( 1 );
-//        printer.setPrinterName ( "Print to File (PDF)" );
-//        printer.setOutputFormat ( QPrinter::PdfFormat );
-//        printer.setOutputFileName ( "output.pdf" );
+        //        printer.setPrinterName ( "Print to File (PDF)" );
+        //        printer.setOutputFormat ( QPrinter::PdfFormat );
+        //        printer.setOutputFileName ( "output.pdf" );
         QPrintDialog* dialog = new QPrintDialog ( &printer );
         dialog->setWindowFlags ( Qt::WindowStaysOnTopHint );
         QSize dialogSize = dialog->sizeHint();
@@ -95,7 +107,7 @@ public slots:
                             screenRect.height()/2 - dialogSize.height()/2 ));
         if ( dialog->exec() == QDialog::Accepted )
         {
-             TopLevel::print ( &printer );
+            TopLevel::print ( &printer );
         }
         dialog->close();
         dialog->deleteLater();
