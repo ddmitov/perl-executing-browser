@@ -33,6 +33,9 @@ current version should be considered alpha pre-release.
 Do not use it for production purposes!  
 Many features have to be polished and some have to be created from scratch.  
 Documentation and proper examples are still missing...  
+Compiled and tested successfully using:  
+1. Qt Creator 2.5.0 and Qt 4.8.2 under 32 bit Debian Linux,  
+2. Qt Creator 2.8.1 and Qt 5.1.1 under 32 bit Debian Linux.  
   
 This software is licensed under the terms of GNU GPL v.3 and  
 is provided without warranties of any kind!  

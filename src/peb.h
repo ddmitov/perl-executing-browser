@@ -1,11 +1,21 @@
 #ifndef PEB_H
 #define PEB_H
 
-#include <qwebview.h>
-#include <qwebpage.h>
-#include <QtGui>
-#include <QApplication>
+#include <qglobal.h>
+#if QT_VERSION >= 0x050000
+    // Qt5 code:
+    #include <QtWidgets>
+#else
+    // Qt4 code:
+    #include <QtGui>
+    #include <QApplication>
+#endif
+
+#include <QWebView>
+#include <QWebPage>
 #include <QWebElement>
+#include <QPrintDialog>
+#include <QPrinter>
 
 class Page : public QWebPage
 {

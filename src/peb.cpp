@@ -33,6 +33,9 @@
 // Do not use it for production purposes!
 // Many features have to be polished and some have to be created from scratch.
 // Documentation and proper examples are still missing...
+// Compiled and tested successfully using:
+// 1. Qt Creator 2.5.0 and Qt 4.8.2 under 32 bit Debian Linux,
+// 2. Qt Creator 2.8.1 and Qt 5.1.1 under 32 bit Debian Linux.
 
 // This software is licensed under the terms of GNU GPL v.3 and
 // is provided without warranties of any kind!
@@ -89,12 +92,25 @@
 // Special thanks to the staff of the Library of the New Bulgarian University,
 // where much of the coding effort took place!
 
-#include <QProcess>
-#include <QtGui>
+#include <qglobal.h>
+#if QT_VERSION >= 0x050000
+    // Qt5 code:
+    #include <QtWidgets>
+#else
+    // Qt4 code:
+    #include <QtGui>
+    #include <QApplication>
+#endif
+
 #include <QtNetwork/QNetworkRequest>
-#include <qwebframe.h>
+#include <QWebView>
+#include <QWebPage>
+#include <QWebFrame>
 #include <QWebHistory>
-#include <qdebug.h>
+#include <QProcess>
+#include <QPrintDialog>
+#include <QPrinter>
+#include <QDebug>
 #include "peb.h"
 
 QString fileName;
@@ -127,7 +143,13 @@ int main ( int argc, char **argv )
     QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
 
     QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() + "/icons/" + windowIcon ) );
+
+    #if QT_VERSION >= 0x050000
+    QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
+    #else
     QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
+    #endif
+
     QWebSettings::globalSettings() -> setDefaultTextEncoding ( QString ( "utf-8" ) );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::PluginsEnabled, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::JavascriptEnabled, true );
@@ -161,6 +183,7 @@ int main ( int argc, char **argv )
 
     toplevel.show();
     app.exec();
+
 };
 
 Page::Page()
@@ -410,8 +433,12 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                 qDebug() << "Interpreter:" << interpreter;
                 env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
                 env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
-                //            env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
-                env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                #ifdef Q_WS_WIN
+                    env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
+                #endif
+                #ifdef Q_OS_LINUX
+                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                #endif
                 handler.setProcessEnvironment ( env );
                 handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
                 handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
@@ -458,8 +485,12 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                 env.insert ( "REQUEST_METHOD", "GET" );
                 env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
                 env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
-                //            env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
-                env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                #ifdef Q_WS_WIN
+                    env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
+                #endif
+                #ifdef Q_OS_LINUX
+                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                #endif
                 handler.setProcessEnvironment ( env );
                 handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
                 handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
