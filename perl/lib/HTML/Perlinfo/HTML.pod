@@ -1,0 +1,147 @@
+=pod
+
+=head1 NAME
+
+HTML::Perlinfo::HTML - HTML documentation for the perlinfo library
+
+=head1 SUMMARY
+
+HTML::Perlinfo validates as XHTML 1.0 Transitional. 
+
+In the perlinfo library, L<HTML::Perlinfo> and L<HTML::Perlinfo::Modules> use the internal module HTML::Perlinfo::Common for HTML generation. This document provides information on that HTML and its manipulation.  
+
+=head1 CUSTOMIZING THE HTML
+
+You can capture the HTML output by assigning it to a scalar. Then you can alter the HTML before printing it or doing something else with it. Here is an example that uses the perlinfo function from L<HTML::Perlinfo>:  
+
+    use HTML::Perlinfo;
+
+    my $example = perlinfo();    # Now I can do whatever I want with $example
+    $example =~ s/Perl/Java/ig;  # Make everyone laugh  
+    print $example;       
+
+Another option is to use object attributes which make altering some HTML elements less helter skelter. 
+
+=head1 OBJECT ATTRIBUTES
+
+These object attributes allow you to change the HTML CSS settings to achieve a stylish effect. Please see your favorite HTML guide for acceptable CSS values. Refer to the HTML source code of the perlinfo page for the defaults.
+
+Attribute name/Corresponding CSS element
+
+ title              / page title (only non-CSS element)
+ bg_image           / background_image
+ bg_position        / background_position
+ bg_repeat          / background_repeat
+ bg_attribute       / background_attribute 
+ bg_color           / background_color
+ ft_family          / font_familty 
+ ft_color           / font_color
+ lk_color           / link color
+ lk_decoration      / link text-decoration  
+ lk_bgcolor         / link background-color 
+ lk_hvdecoration    / link hover text-decoration 
+ header_bgcolor     / table header background-color 
+ header_ftcolor     / table header font color
+ leftcol_bgcolor    / background-color of leftmost table cell  
+ leftcol_ftcolor    / font color of left table cell
+ rightcol_bgcolor   / background-color of right table cell  
+ rightcol_ftcolor   / font color of right table cell
+
+=head2 CSS EXAMPLE
+
+    $p = HTML::Perlinfo->new(
+		bg_image  => 'http://i104.photobucket.com/albums/m176/perlinfo/camel.gif',
+		bg_repeat => 'yes-repeat'
+    );
+    $p->info_all;
+
+=head1 print_htmlhead 
+
+This method prints the head container tags containing the style sheet, along with a few other html tags. It is useful to call this method when full_page is set to 0 and you are piecing together multiple perlinfo pages into one page. For example:
+
+    $m = HTML::Perlinfo::Modules->new( full_page => 0 );    # Just the bare essentials please
+
+    $m->print_htmlhead;  # Print the beginning of an html document
+
+    $m->print_modules(  from =>'/home/paco', 
+                        section  => 'The Modules in Paco's Home Directory' 
+     ); 
+
+    $m->print_modules(  from =>'/home/cowboy', 
+                        section  => 'The Modules in Cowboy's Home Directory' 
+     ); 
+
+When full_page is set to 1 (the default value), print_htmlhead is called internally. Note that you can still set CSS values in the constructor even when full_page is set to 0 and see the results in print_htmlhead.
+
+    $m = HTML::Perlinfo::Modules->new(
+        full_page => 0,
+        bg_color  => 'gray'  
+     );
+
+    $m->print_htmlhead;  # Prints a HTML document with a gray background
+
+Of course, you don't have to use the print_htmlhead method. You could insert your own HTML with your own style sheet when you set full_page to 0. 
+
+=head1 full_page
+
+Do you want only a fragment of HTML and not a page with body tags (among other things)? Then the full_page option is what you need to use (or a regular expression, as explained above). This option allows you to add your own header/footer if you so desire. By default, the value is 1. Set it to 0 to output the HTML report with as little HTML as possible. 
+
+    $p = HTML::Perlinfo->new( full_page  => 0  ); # Change value to 1 to get a full HTML page
+
+=head1 links
+
+By default, there will be useful links in most of the presented HTML in the perlinfo library. These links are for pages on search.cpan.org. Even the info_config method lists links to the config options in the core Config module.      
+
+To manipulate links in the perlinfo library, you can use the links attribute in the info methods. Not to be confused with the "link" attribute in the HTML::Perlinfo::Module (which allows you to provide your own links for modules), this attribute's primary purpose is to turn on linking or turn it off. Of course, you can achieve the same effect by using regular expressions, as explained above. But using the links attribute makes your code cleaner. 
+
+There are several arguments (in an array reference) you can supply to the links attribute.
+
+The number 1 turns on all default links and 0 will remove them.
+
+For example, to remove the default links in the info_all method, you would say:
+	
+	$p->info_all( links=>[0] ); # contains no links. Good for printing!
+
+The example above removes all default links and it even ignores the L<link|HTML::Perlinfo::Modules#link> parameter in the print_modules method of L<HTML::Perlinfo::Modules>.  
+
+The named parameters for the links attribute are 'docs' and 'local' which controls links associated with modules, programs in the Perl utilities section, and the Config section and everywhere else. The value for either parameter can be either '1' or '0'. 
+
+=over
+
+=item docs
+
+Using 'docs', you can control the display of the default links to module and program documentation on search.cpan.org. But the link parameter in L<HTML::Perlinfo::Modules> can override this directive. By overridding 'docs=>0', you can show documentation for certain modules and not show documentation for any others. This is useful, for example, when you have homegrown modules without any documentation but want to show links to documentation for CPAN modules on the same page. Observe:
+
+	$p->print_modules( links => [docs=>0], link => [qr/Apache::/, 'http://www.myexample.com/perldoc/'] );
+
+In the above example, only links to Apache modules would appear. Other modules would not have links to any documentation. Note that had you simply set the value for links to zero, then the other attribute concerning Apache modules would have been irrelevant, since no links whatsoever would have appeared. In other words, you can mix and match these two atttibutes to achieve many different and wonderous effects. Have fun! Be imaginative!  
+
+For more information on print_modules and its link parameter, please see L<HTML::Perlinfo::Modules>. 
+
+=item local
+
+With the 'local' parameter set to 1, the local location of a module or program will be a link. This is useful if you want to see the local installation directory of a module in your browser. (From there, you could also look at the contents of said files.) 
+
+Note that this link would only work if you use the perlinfo library from the command-line and then view the resulting page on the same machine. Hence these local links are not present by default.    
+
+You can even use 'docs' along with 'local'. 
+
+	$p->info_all( links => [docs=>0,local=>1] )
+
+=back
+
+=head1 NOTES
+
+L<HTML::Perlinfo::Modules> allows you to color code specific modules. 
+
+More HTML options should be available in future revisions. Want to see a new feature/change? Then contact me about it. 
+
+=head1 AUTHOR
+
+Mike Accardo <accardo@cpan.org>
+
+=head1 COPYRIGHT
+
+   Copyright (c) 2009, Mike Accardo. All Rights Reserved.
+
+=cut
