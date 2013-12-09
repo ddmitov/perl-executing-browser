@@ -120,7 +120,7 @@ int main ( int argc, char **argv )
 {
     QApplication app ( argc, argv );
 
-    QString settingsFileName = QApplication::applicationDirPath() + "/peb.ini";
+    QString settingsFileName = QApplication::applicationDirPath() + QDir::separator () + "peb.ini";
     QSettings settings ( settingsFileName, QSettings::NativeFormat );
 
     QFile settingsFile ( settingsFileName );
@@ -142,7 +142,9 @@ int main ( int argc, char **argv )
     QString stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
     QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
 
-    QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() + "/icons/" + windowIcon ) );
+    QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() +
+                                          QDir::separator () + "icons" +
+                                          QDir::separator () + windowIcon ) );
 
     #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
@@ -283,25 +285,35 @@ TopLevel::TopLevel()
     if ( startPageExtension == "pl" ) {
         QString interpreter = "perl";
         qDebug() << "Interpreter:" << interpreter;
-        env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
-        env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
-        //            env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
-        env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+        env.insert ( "PERL5LIB", qApp->applicationDirPath() +
+                     QDir::separator () + "perl" +
+                     QDir::separator () + "lib" );
+        env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
+        #ifdef Q_WS_WIN
+            env.insert ("PATH", env.value ( "Path" ) + ";" +
+                        qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
+        #endif
+        #ifdef Q_OS_LINUX
+            env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                         qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
+        #endif
         handler.setProcessEnvironment ( env );
-        handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
+        handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
         handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
         qDebug() << "TEMP folder:" << QDir::tempPath();
         // call handler and add your input as argument
-        handler.start ( interpreter, QStringList() << qApp->applicationDirPath() + "/scripts/" + startPage );
+        handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
+                        QDir::separator () + "scripts" + QDir::separator () + startPage );
         // wait until handler has finished
         if ( handler.waitForFinished() ){
-            setUrl ( QUrl::fromLocalFile ( QDir::tempPath() + "/output.htm" ) );
+            setUrl ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
         }
         handler.close();
     }
 
     if ( startPageExtension == "htm" or startPageExtension == "html" ) {
-        setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + "/html/" + startPage ) );
+        setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
+                                       "html" + QDir::separator () + startPage ) );
     }
 
     QWebSettings::clearMemoryCaches();
@@ -312,7 +324,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                                      const QNetworkRequest &request,
                                      QWebPage::NavigationType type )
 {
-    QString settingsFileName = QApplication::applicationDirPath() + "/peb.ini";
+    QString settingsFileName = QApplication::applicationDirPath() + QDir::separator () + "peb.ini";
     QSettings settings ( settingsFileName, QSettings::NativeFormat );
     QString windowIcon = settings.value ( "gui/icon" ).toString();
     QUrl allowedBase = ( QUrl ( "local://script/" ) );
@@ -324,7 +336,8 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             dialog.setFileMode ( QFileDialog::AnyFile );
             dialog.setViewMode ( QFileDialog::Detail );
             dialog.setOption ( QFileDialog::DontUseNativeDialog );
-            dialog.setWindowIcon ( QIcon ( qApp -> applicationDirPath() + "/icons/" + windowIcon ) );
+            dialog.setWindowIcon ( QIcon ( qApp -> applicationDirPath() + QDir::separator () +
+                                           "icons" + QDir::separator () + windowIcon ) );
             fileName = dialog.getOpenFileName ( 0, "Select File", QDir::currentPath(), "All files (*)" );
             qDebug() << "File open request for:" << fileName;
             dialog.close();
@@ -340,7 +353,8 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             dialog.setFileMode ( QFileDialog::AnyFile );
             dialog.setViewMode ( QFileDialog::Detail );
             dialog.setOption ( QFileDialog::DontUseNativeDialog );
-            dialog.setWindowIcon ( QIcon ( qApp->applicationDirPath() + "/icons/" + windowIcon ) );
+            dialog.setWindowIcon ( QIcon ( qApp->applicationDirPath() + QDir::separator () +
+                                           "icons" + QDir::separator () + windowIcon ) );
             folderName = dialog.getExistingDirectory ( 0, "Select Folder", QDir::currentPath() );
             qDebug() << "Folder open request for:" << folderName;
             dialog.close();
@@ -431,29 +445,34 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             if ( extension == "pl" ) {
                 QString interpreter = "perl";
                 qDebug() << "Interpreter:" << interpreter;
-                env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
-                env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
+                env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
+                             "perl" + QDir::separator () + "lib" );
+                env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
                 #ifdef Q_WS_WIN
-                    env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
+                    env.insert ( "PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() +
+                                 QDir::separator () + "scripts" ); //win32
                 #endif
                 #ifdef Q_OS_LINUX
-                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() +
+                                 QDir::separator () + "scripts" ); //linux
                 #endif
                 handler.setProcessEnvironment ( env );
-                handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
-                handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
+                handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
+                handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
                 qDebug() << "TEMP folder:" << QDir::tempPath();
                 // call handler and add your input as argument
-                handler.start ( interpreter, QStringList() << qApp->applicationDirPath() + "/scripts/" + link );
+                handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
+                                QDir::separator () + "scripts" + QDir::separator () + link );
                 // wait until handler has finished
                 if ( !handler.waitForFinished() )
                     return 1;
-                frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + "/output.htm" ) );
+                frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
                 handler.close();
             }
 
             if ( extension == "htm" or extension == "html" ) {
-                frame->load ( QUrl::fromLocalFile ( qApp->applicationDirPath() + "/html/" + link ) );
+                frame->load ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
+                                                    "html" + QDir::separator () + link ) );
             }
 
             QWebSettings::clearMemoryCaches();
@@ -483,27 +502,32 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                         .replace ( "?", "" );
                 env.insert ( "QUERY_STRING", query );
                 env.insert ( "REQUEST_METHOD", "GET" );
-                env.insert ( "PERL5LIB", qApp->applicationDirPath() + "/perl/lib/" );
-                env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() + "/" );
+                env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
+                             "perl" + QDir::separator () + "lib" );
+                env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
                 #ifdef Q_WS_WIN
-                    env.insert ("PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() + "/scripts/" ); //win32
+                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
+                                 qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
                 #endif
                 #ifdef Q_OS_LINUX
-                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() + "/scripts/" ); //linux
+                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                                 qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
                 #endif
                 handler.setProcessEnvironment ( env );
-                handler.setWorkingDirectory ( qApp->applicationDirPath() + "/scripts/" );
-                handler.setStandardOutputFile ( QDir::tempPath() + "/output.htm" );
+                handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
+                handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
                 qDebug() << "TEMP folder:" << QDir::tempPath();
                 // call handler and add your input as argument
-                handler.start ( interpreter, QStringList() << qApp->applicationDirPath() + "/scripts/" + script << fileName << folderName );
+                handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
+                                QDir::separator () + "scripts" + QDir::separator () +
+                                script << fileName << folderName );
             }
 
             fileName = "";
             folderName = "";
 
             if ( handler.waitForFinished() ){
-                frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + "/output.htm" ) );
+                frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
                 return true;
             }
 

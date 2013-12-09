@@ -9,9 +9,13 @@ print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
 
 print "</head>\n";
 
-print "<body text=#000000 bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830' onLoad=\"putFocus(0,2);\">\n";
-
 print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='local://script/perlinfo.pl'>Perl Info</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='local://script/form.htm'>Form of a Locally Executed Perl Script</a>\n";
@@ -64,8 +68,6 @@ print "<hr width='95%'>\n";
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='local://close/now'>Close</a>\n";
 print "</font></p>\n";
-
-print "<hr width='95%'>\n";
 
 print "</body>\n";
 
