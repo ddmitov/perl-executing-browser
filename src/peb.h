@@ -36,6 +36,28 @@ class TopLevel : public QWebView
 
 public slots:
 
+    void helpSlot()
+    {
+        QWebView *helpWebView = new QWebView;
+        QWebPage *helpWebPage = new QWebPage ( helpWebView );
+        helpWebView->setAttribute ( Qt::WA_DeleteOnClose, true );
+        helpWebView->setPage ( helpWebPage );
+        helpWebView->setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
+                                       "html" + QDir::separator () + "help.htm" ) );
+        helpWebView->show ();
+    };
+
+    void configSlot()
+    {
+        QWebView *configWebView = new QWebView;
+        QWebPage *configWebPage = new QWebPage ( configWebView );
+        configWebView->setAttribute ( Qt::WA_DeleteOnClose, true );
+        configWebView->setPage ( configWebPage );
+        configWebView->setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
+                                       "html" + QDir::separator () + "config.htm" ) );
+        configWebView->show ();
+    };
+
     void closeAppSlot()
     {
         QFile::remove ( QDir::tempPath() + "/output.htm" );

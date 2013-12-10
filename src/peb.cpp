@@ -2,19 +2,22 @@
 // Perl Executing Browser, v.0.1
 // peb-webkit
 
-// Perl Executing Browser is a Qt4/5 WebKit-powered browser,
+// Perl Executing Browser (PEB) is a Qt4/5 WebKit-powered browser,
 // which is capable of executing Perl (possibly PHP/Python) scripts locally without a webserver,
 // providing them with a nice HTML4/5 interface for both input and output and
 // using CGI protocol GET method for communication between HTML forms and scripts.
 
-// PEB can be used as an easy to deploy GUI for Perl (possibly PHP/Python) scripts and could give:
-// 1. Less deployment complexity without additional dependencies;
-// 2. More privacy for private data that does not need to be accessible over a network;
-// 3. Foundation for nice, reusable and recognizable GUIs;
-// 4. Cross-platform GUI solution;
-// 5. Physical portability on USB sticks without installation procedures.
+// PEB can be used as an easy GUI framework for Perl (possibly PHP/Python) scripts and
+// has the following design objectives:
+// 1. Easy creation of nice and reusable GUIs for scripts;
+// 2. Zero installation solution:
+//    pack your Perl modules or even your version of Perl with your copy of PEB browser and
+//    the necessary Qt libraries and run your application from everywhere, even from USB sticks;
+// 3. Cross-platform availability:
+//    use it on every platform where Perl and Qt4 or Qt5 could be compiled;
+// 4. More privacy for private data that does not need to be accessible over a network.
 
-// PEB also exposes some desktop functionalities to the user of the hosted scripts.
+// PEB also exposes some desktop functionalities to the end user of the hosted scripts.
 // These are accessible from special URLs and currently are:
 // open file, open folder and close browser.
 // File to open and folder to open are accessible for every script as $ARGV[0] and $ARGV[1].
@@ -22,7 +25,7 @@
 
 // PEB is primarily intended as a basic framework for small personal databases,
 // data collection whithout a constant network connectivity or simply as
-// a fast and easy GUI for a wide variety of home-grown scripts.
+// a fast and easy GUI for a wide variety of scripts.
 // Network connections are in no way out of reach, but they have to be
 // implemented entirely in the scripts that PEB is going to execute.
 // PEB could be usefull on desktop computers, as well as tablets and smartphone devices -
@@ -39,7 +42,7 @@
 
 // This software is licensed under the terms of GNU GPL v.3 and
 // is provided without warranties of any kind!
-// Dimitar D. Mitov, 2013, ddmitov (dot) yahoo (dot) com
+// Dimitar D. Mitov, 2013, ddmitov (at) yahoo (dot) com
 
 // REFERENCES:
 // https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
@@ -55,11 +58,13 @@
 // http://qt-project.org/forums/viewthread/8270
 // http://qt-project.org/forums/viewthread/18292
 // http://qt-project.org/forums/viewthread/6102
+// http://qt-project.org/forums/viewthread/17635
 // http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
 // http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
 // http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
 // http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen
 // http://www.qtcentre.org/threads/4322-How-to-delete-File
+// http://www.qtcentre.org/threads/53731-compiling-under-qt4-AND-qt5
 // http://www.qtcentre.org/archive/index.php/t-31264.html
 // http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
 // http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
@@ -238,6 +243,12 @@ TopLevel::TopLevel()
 
     QShortcut * minimizeShortcut = new QShortcut ( Qt::Key_Escape, this );
     QObject::connect ( minimizeShortcut, SIGNAL ( activated() ), this, SLOT ( minimizeSlot() ) );
+
+    QShortcut * helpShortcut = new QShortcut ( Qt::Key_F1, this );
+    QObject::connect ( helpShortcut, SIGNAL ( activated() ), this, SLOT ( helpSlot() ) );
+
+    QShortcut * configShortcut = new QShortcut ( Qt::Key_F2, this );
+    QObject::connect ( configShortcut, SIGNAL ( activated() ), this, SLOT ( configSlot() ) );
 
     QShortcut * toggleFullScreenShortcut = new QShortcut ( Qt::Key_F11, this );
     QObject::connect ( toggleFullScreenShortcut, SIGNAL ( activated() ), this, SLOT ( toggleFullScreenSlot() ) );
