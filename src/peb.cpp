@@ -1,6 +1,5 @@
 
 // Perl Executing Browser, v.0.1
-// peb-webkit
 
 // Perl Executing Browser (PEB) is a Qt4/5 WebKit-powered browser,
 // which is capable of executing Perl (possibly PHP/Python) scripts locally without a webserver,
