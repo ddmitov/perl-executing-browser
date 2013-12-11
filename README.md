@@ -26,7 +26,7 @@ File to open and folder to open are accessible for every script as $ARGV[0] and 
 Printing current page by clicking a special URL is also supported.  
   
 PEB is primarily intended as a basic framework for small personal databases,  
-but many other use cases are also possible.  
+but many other use scenarios are also possible.  
 Network connections are in no way out of reach, but they have to be  
 implemented entirely in the scripts that PEB is going to execute.  
   
