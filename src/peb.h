@@ -60,7 +60,7 @@ public slots:
 
     void closeAppSlot()
     {
-        QFile::remove ( QDir::tempPath() + "/output.htm" );
+        QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
         qApp->exit();
     };
 
@@ -84,20 +84,20 @@ public slots:
         }
     };
 
-    void pageLoadedDynamicTitle (bool ok)
+    void pageLoadedDynamicTitle ( bool ok )
     {
-        if(ok)
+        if ( ok )
         {
             setWindowTitle ( TopLevel::title() );
-            QFile::remove ( QDir::tempPath() + "/output.htm" );
+            QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
         }
     }
 
-    void pageLoadedStaticTitle (bool ok)
+    void pageLoadedStaticTitle ( bool ok )
     {
-        if(ok)
+        if ( ok )
         {
-            QFile::remove ( QDir::tempPath() + "/output.htm" );
+            QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
         }
     }
 
