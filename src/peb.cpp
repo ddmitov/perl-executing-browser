@@ -323,6 +323,7 @@ TopLevel::TopLevel()
     if ( startPageExtension == "htm" or startPageExtension == "html" ) {
         setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
                                        "html" + QDir::separator () + startPage ) );
+        QWebSettings::clearMemoryCaches();
     }
 
     QWebSettings::clearMemoryCaches();
@@ -428,7 +429,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
              !( QUrl ( "local://openfolder/" ) ).isParentOf ( request.url() ) &&
              !( QUrl ( "local://print/" ) ).isParentOf ( request.url() ) &&
              !( QUrl ( "local://close/" ) ).isParentOf ( request.url() ) &&
-             !( QUrl ( "external:" ) ).isParentOf ( request.url() )) {
+             !( QUrl ( "external:" ) ).isParentOf ( request.url() ) ) {
             qDebug() << "External browser called for navigation to:" << request.url().toString();
             QDesktopServices::openUrl ( request.url() );
             return false;
