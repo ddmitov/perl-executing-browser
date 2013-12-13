@@ -36,32 +36,60 @@ class TopLevel : public QWebView
 
 public slots:
 
-    void helpSlot()
-    {
-        QWebView *helpWebView = new QWebView;
-        QWebPage *helpWebPage = new QWebPage ( helpWebView );
-        helpWebView->setAttribute ( Qt::WA_DeleteOnClose, true );
-        helpWebView->setPage ( helpWebPage );
-        helpWebView->setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
-                                       "html" + QDir::separator () + "help.htm" ) );
-        helpWebView->show ();
-    };
-
-    void configSlot()
-    {
-        QWebView *configWebView = new QWebView;
-        QWebPage *configWebPage = new QWebPage ( configWebView );
-        configWebView->setAttribute ( Qt::WA_DeleteOnClose, true );
-        configWebView->setPage ( configWebPage );
-        configWebView->setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
-                                       "html" + QDir::separator () + "config.htm" ) );
-        configWebView->show ();
-    };
-
     void closeAppSlot()
     {
         QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
         qApp->exit();
+    };
+
+    void homeSlot()
+    {
+        // Reading settings from INI file:
+        QSettings settings ( QApplication::applicationDirPath() +
+                             QDir::separator () + "peb.ini", QSettings::NativeFormat );
+        QString startPage = settings.value ( "gui/start_page" ).toString();
+
+        qDebug() << "Start page requested from hotkey:" << startPage;
+        QString startPageExtension = startPage.section ( ".", 1, 1 );
+        qDebug() << "Extension:" << startPageExtension;
+
+        if ( startPageExtension == "pl" ) {
+            QProcess handler;
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+            QString interpreter = "perl";
+            qDebug() << "Interpreter:" << interpreter;
+            env.insert ( "PERL5LIB", qApp->applicationDirPath() +
+                         QDir::separator () + "perl" +
+                         QDir::separator () + "lib" );
+            env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
+#ifdef Q_WS_WIN
+            env.insert ("PATH", env.value ( "Path" ) + ";" +
+                        qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
+#endif
+#ifdef Q_OS_LINUX
+            env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                         qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
+#endif
+            handler.setProcessEnvironment ( env );
+            handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
+            handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
+            qDebug() << "TEMP folder:" << QDir::tempPath();
+            // call handler and add your input as argument
+            handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
+                            QDir::separator () + "scripts" + QDir::separator () + startPage );
+            // wait until handler has finished
+            if ( handler.waitForFinished() ){
+                setUrl ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
+                QWebSettings::clearMemoryCaches();
+            }
+            handler.close();
+        }
+
+        if ( startPageExtension == "htm" or startPageExtension == "html" ) {
+            setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
+                                           "html" + QDir::separator () + startPage ) );
+            QWebSettings::clearMemoryCaches();
+        }
     };
 
     void maximizeSlot()
@@ -111,6 +139,8 @@ public slots:
         connect ( maximizeAct, SIGNAL ( triggered() ), this, SLOT ( maximizeSlot() ) );
         QAction* toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
         connect ( toggleFullScreenAct, SIGNAL ( triggered() ), this, SLOT ( toggleFullScreenSlot() ) );
+        QAction* homeAct = menu -> addAction ( "Home" );
+        connect ( homeAct, SIGNAL ( triggered() ), this, SLOT ( homeSlot() ) );
         QAction* printAct = menu -> addAction ( "Print" );
         connect ( printAct, SIGNAL ( triggered() ), this, SLOT ( printPageSlot() ) );
         QAction* closeAct = menu -> addAction ( "Close" );

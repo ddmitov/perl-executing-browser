@@ -166,11 +166,11 @@ int main ( int argc, char **argv )
                                           QDir::separator () + "icons" +
                                           QDir::separator () + windowIcon ) );
 
-    #if QT_VERSION >= 0x050000
+#if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
-    #else
+#else
     QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
-    #endif
+#endif
 
     QWebSettings::globalSettings() -> setDefaultTextEncoding ( QString ( "utf-8" ) );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::PluginsEnabled, true );
@@ -247,14 +247,11 @@ TopLevel::TopLevel()
     QShortcut * minimizeShortcut = new QShortcut ( Qt::Key_Escape, this );
     QObject::connect ( minimizeShortcut, SIGNAL ( activated() ), this, SLOT ( minimizeSlot() ) );
 
-    QShortcut * helpShortcut = new QShortcut ( Qt::Key_F1, this );
-    QObject::connect ( helpShortcut, SIGNAL ( activated() ), this, SLOT ( helpSlot() ) );
-
-    QShortcut * configShortcut = new QShortcut ( Qt::Key_F2, this );
-    QObject::connect ( configShortcut, SIGNAL ( activated() ), this, SLOT ( configSlot() ) );
-
     QShortcut * toggleFullScreenShortcut = new QShortcut ( Qt::Key_F11, this );
     QObject::connect ( toggleFullScreenShortcut, SIGNAL ( activated() ), this, SLOT ( toggleFullScreenSlot() ) );
+
+    QShortcut * homeShortcut = new QShortcut ( Qt::Key_F12, this );
+    QObject::connect ( homeShortcut, SIGNAL ( activated() ), this, SLOT ( homeSlot() ) );
 
     QShortcut * printShortcut = new QShortcut ( QKeySequence ("Ctrl+P"), this );
     QObject::connect ( printShortcut, SIGNAL ( activated() ), this, SLOT ( printPageSlot() ) );
@@ -290,27 +287,27 @@ TopLevel::TopLevel()
         setContextMenuPolicy ( Qt::NoContextMenu );
     }
 
-    QProcess handler;
-    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
     qDebug() << "Start page:" << startPage;
     QString startPageExtension = startPage.section ( ".", 1, 1 );
     qDebug() << "Extension:" << startPageExtension;
 
     if ( startPageExtension == "pl" ) {
+        QProcess handler;
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
         QString interpreter = "perl";
         qDebug() << "Interpreter:" << interpreter;
         env.insert ( "PERL5LIB", qApp->applicationDirPath() +
                      QDir::separator () + "perl" +
                      QDir::separator () + "lib" );
         env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
-        #ifdef Q_WS_WIN
-            env.insert ("PATH", env.value ( "Path" ) + ";" +
-                        qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
-        #endif
-        #ifdef Q_OS_LINUX
-            env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-                         qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
-        #endif
+#ifdef Q_WS_WIN
+        env.insert ("PATH", env.value ( "Path" ) + ";" +
+                    qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
+#endif
+#ifdef Q_OS_LINUX
+        env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                     qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
+#endif
         handler.setProcessEnvironment ( env );
         handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
         handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
@@ -321,6 +318,7 @@ TopLevel::TopLevel()
         // wait until handler has finished
         if ( handler.waitForFinished() ){
             setUrl ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
+            QWebSettings::clearMemoryCaches();
         }
         handler.close();
     }
@@ -330,8 +328,6 @@ TopLevel::TopLevel()
                                        "html" + QDir::separator () + startPage ) );
         QWebSettings::clearMemoryCaches();
     }
-
-    QWebSettings::clearMemoryCaches();
 
 }
 
