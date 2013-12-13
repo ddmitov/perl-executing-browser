@@ -116,16 +116,26 @@
 #include <QDebug>
 #include "peb.h"
 
+// Declaring global filename and foldername variables:
 QString fileName;
 QString folderName;
+// Declaring global settings variables:
+QString windowIcon;
+QString fixedWidth;
+QString fixedHeight;
+QString stayOnTop;
+QString framelessWindow;
+QString browserTitle;
+QString startPage;
+QString maximizedWindow;
+QString fullScreen;
+QString contextMenu;
 
 int main ( int argc, char **argv )
 {
     QApplication app ( argc, argv );
 
     QString settingsFileName = QApplication::applicationDirPath() + QDir::separator () + "peb.ini";
-    QSettings settings ( settingsFileName, QSettings::NativeFormat );
-
     QFile settingsFile ( settingsFileName );
     if( !settingsFile.exists() )
     {
@@ -139,11 +149,18 @@ int main ( int argc, char **argv )
         qApp->exit();
     }
 
-    QString windowIcon = settings.value ( "gui/icon" ).toString();
-    QString fixedWidth = settings.value ( "gui/fixed_width" ).toString();
-    QString fixedHeight = settings.value ( "gui/fixed_heigth" ).toString();
-    QString stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
-    QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
+    // Reading settings from INI file:
+    QSettings settings ( settingsFileName, QSettings::NativeFormat );
+    windowIcon = settings.value ( "gui/icon" ).toString();
+    fixedWidth = settings.value ( "gui/fixed_width" ).toString();
+    fixedHeight = settings.value ( "gui/fixed_heigth" ).toString();
+    stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
+    framelessWindow = settings.value ( "gui/frameless_window" ).toString();
+    browserTitle = settings.value ( "gui/browser_title" ).toString();
+    startPage = settings.value ( "gui/start_page" ).toString();
+    maximizedWindow = settings.value ( "gui/maximized_window" ).toString();
+    fullScreen = settings.value ( "gui/full_screen" ).toString();
+    contextMenu = settings.value ( "gui/context_menu" ).toString();
 
     QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() +
                                           QDir::separator () + "icons" +
@@ -199,17 +216,6 @@ Page::Page()
 TopLevel::TopLevel()
     : QWebView ( 0 )
 {
-    // Reading settings from peb.ini file
-    QString settingsFileName = QApplication::applicationDirPath() + "/peb.ini";
-    QSettings settings ( settingsFileName, QSettings::NativeFormat );
-    QString windowTitle = settings.value ( "gui/window_title" ).toString();
-    QString startPage = settings.value ( "gui/start_page" ).toString();
-    QString maximizedWindow = settings.value ( "gui/maximized_window" ).toString();
-    QString fullScreen = settings.value ( "gui/full_screen" ).toString();
-    QString contextMenu = settings.value ( "gui/context_menu" ).toString();
-    QString fixedWidth = settings.value ( "gui/fixed_width" ).toString();
-    QString fixedHeight = settings.value ( "gui/fixed_heigth" ).toString();
-
     main_page = new Page();
     setPage ( main_page );
     main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
@@ -221,7 +227,6 @@ TopLevel::TopLevel()
 
     // Context menu settings:
     main_page -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( true );
-    //main_page -> action ( QWebPage::CopyLinkToClipboard ) -> setText ( QString::fromUtf8 ( "Copy Address" ) );
     main_page -> action ( QWebPage::Back ) -> setVisible ( false );
     main_page -> action ( QWebPage::Forward ) -> setVisible ( false );
     main_page -> action ( QWebPage::Stop ) -> setVisible ( false );
@@ -257,7 +262,7 @@ TopLevel::TopLevel()
     QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
     QObject::connect ( closeAppShortcut, SIGNAL ( activated() ), this, SLOT ( closeAppSlot() ) );
 
-    if ( windowTitle == "dynamic" ) {
+    if ( browserTitle == "dynamic" ) {
         QObject::connect ( main_page, SIGNAL ( loadFinished (bool) ), this, SLOT ( pageLoadedDynamicTitle (bool) ) );
     } else {
         QObject::connect ( main_page, SIGNAL ( loadFinished (bool) ), this, SLOT ( pageLoadedStaticTitle (bool) ) );
@@ -269,8 +274,8 @@ TopLevel::TopLevel()
         setFixedSize ( fixedWidthInt, fixedHeightInt );
     }
 
-    if ( windowTitle != "dynamic" ) {
-        setWindowTitle ( windowTitle );
+    if ( browserTitle != "dynamic" ) {
+        setWindowTitle ( browserTitle );
     }
 
     if ( maximizedWindow == "yes" ) {
@@ -334,9 +339,6 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                                      const QNetworkRequest &request,
                                      QWebPage::NavigationType type )
 {
-    QString settingsFileName = QApplication::applicationDirPath() + QDir::separator () + "peb.ini";
-    QSettings settings ( settingsFileName, QSettings::NativeFormat );
-    QString windowIcon = settings.value ( "gui/icon" ).toString();
     QUrl allowedBase = ( QUrl ( "local://script/" ) );
 
     if ( type == QWebPage::NavigationTypeLinkClicked ) {
