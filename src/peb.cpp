@@ -70,8 +70,6 @@
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html
 // http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebpage.html
-// http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebview.html
-// http://stackoverflow.com/questions/9685615/qt-and-linux-pipes
 // http://stackoverflow.com/questions/14987007/what-is-the-expected-encoding-for-qwebviewsethtml
 // http://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage
 // http://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application

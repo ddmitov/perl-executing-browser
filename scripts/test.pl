@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD);
-use CGI qw(:standard);
+use CGI qw (:standard);
 
 print "<html>\n";
 
@@ -32,28 +32,33 @@ print "<p align='left'><font size='4' face='SansSerif'>\n";
 print "FILE AND FOLDER TO OPEN:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
+
 if (defined @ARGV){
 	my ($file, $folder) = @ARGV;
 	print "\$ARGV[0] - FILE: $file<br>\n";
 	print "\$ARGV[1] - FOLDER: $folder<br>\n";
 }
+
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
 print "FORM DATA:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
+
 my %form;
 foreach my $p (param()) {
 	$form{$p} = param($p);
 	print "$p = $form{$p}<br>\n";
 }
+
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
 print "MODIFIED AND NEW ENVIRONMENT VARIABLES:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
+
 if (defined $PATH){
 	print "PATH = $PATH<br>\n";
 }
@@ -69,15 +74,18 @@ if (defined $QUERY_STRING){
 if (defined $REQUEST_METHOD){
 	print "REQUEST_METHOD = $REQUEST_METHOD<br>\n";
 }
+
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
 print "ALL ENVIRONMENT VARIABLES:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
+
 foreach my $key (sort(keys(%ENV))) {
 	print "$key = $ENV{$key}<br>\n";
 }
+
 print "</font></p>\n";
 
 print "</body>\n";
