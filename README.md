@@ -6,7 +6,7 @@ which is capable of executing Perl scripts locally without a webserver,
 providing them with a nice HTML4/5 interface for both input and output and  
 using CGI protocol GET method for communication between HTML forms and scripts.  
   
-PEB can be used as an easy to set up HTML/CSS/JavaScript GUI framework for  
+PEB can be used as an easy to set up HTML/CSS/JavaScript GUI for  
 Perl (possibly PHP/Python) scripts and has the following design objectives:  
 1. Zero installation solution:  
     pack your Perl modules or even your version of Perl with your copy of PEB browser and  
@@ -24,8 +24,8 @@ open file, open folder and close browser.
 File to open and folder to open are accessible for every script as $ARGV[0] and $ARGV[1].  
 Printing current page by clicking a special URL is also supported.  
   
-PEB was started as a basic GUI framework for offline personal databases,  
-but is not limited by design or functionality to this use only.  
+PEB was started as a simple GUI for personal databases,  
+but is not limited by design to this use only.  
 Network connections are in no way out of reach, but they have to be  
 implemented entirely in the scripts that PEB is going to execute.  
   
