@@ -74,7 +74,6 @@ public slots:
             handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
             handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
             qDebug() << "TEMP folder:" << QDir::tempPath();
-            // call handler and add your input as argument
             handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                             QDir::separator () + "scripts" + QDir::separator () + startPage );
             // wait until handler has finished
@@ -158,7 +157,6 @@ public slots:
         printer.setColorMode ( QPrinter::Color );
         printer.setPrintRange ( QPrinter::AllPages );
         printer.setNumCopies ( 1 );
-        //        printer.setPrinterName ( "Print to File (PDF)" );
         //        printer.setOutputFormat ( QPrinter::PdfFormat );
         //        printer.setOutputFileName ( "output.pdf" );
         QPrintDialog* dialog = new QPrintDialog ( &printer );

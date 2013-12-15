@@ -310,7 +310,6 @@ TopLevel::TopLevel()
         handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
         handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
         qDebug() << "TEMP folder:" << QDir::tempPath();
-        // call handler and add your input as argument
         handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                         QDir::separator () + "scripts" + QDir::separator () + startPage );
         // wait until handler has finished
@@ -345,7 +344,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             dialog.setWindowIcon ( QIcon ( qApp -> applicationDirPath() + QDir::separator () +
                                            "icons" + QDir::separator () + windowIcon ) );
             fileName = dialog.getOpenFileName ( 0, "Select File", QDir::currentPath(), "All files (*)" );
-            qDebug() << "File open request for:" << fileName;
+            qDebug() << "File to open:" << fileName;
             dialog.close();
             dialog.deleteLater();
             return true;
@@ -362,7 +361,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             dialog.setWindowIcon ( QIcon ( qApp->applicationDirPath() + QDir::separator () +
                                            "icons" + QDir::separator () + windowIcon ) );
             folderName = dialog.getExistingDirectory ( 0, "Select Folder", QDir::currentPath() );
-            qDebug() << "Folder open request for:" << folderName;
+            qDebug() << "Folder to open:" << folderName;
             dialog.close();
             dialog.deleteLater();
             return true;
@@ -381,14 +380,13 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             printer.setColorMode ( QPrinter::Color );
             printer.setPrintRange ( QPrinter::AllPages );
             printer.setNumCopies ( 1 );
-            //        printer.setPrinterName ( "Print to File (PDF)" );
-            //        printer.setOutputFormat ( QPrinter::PdfFormat );
-            //        printer.setOutputFileName ( "output.pdf" );
+//            printer.setOutputFormat ( QPrinter::PdfFormat );
+//            printer.setOutputFileName ( "output.pdf" );
             QPrintDialog* dialog = new QPrintDialog ( &printer );
             dialog->setWindowFlags ( Qt::WindowStaysOnTopHint );
             if ( dialog->exec() == QDialog::Accepted )
             {
-                frame->print(&printer);
+                frame->print( &printer );
             }
             dialog->close();
             dialog->deleteLater();
@@ -454,19 +452,18 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                 env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
                              "perl" + QDir::separator () + "lib" );
                 env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
-                #ifdef Q_WS_WIN
-                    env.insert ( "PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() +
-                                 QDir::separator () + "scripts" ); //win32
-                #endif
-                #ifdef Q_OS_LINUX
-                    env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() +
-                                 QDir::separator () + "scripts" ); //linux
-                #endif
+#ifdef Q_WS_WIN
+                env.insert ( "PATH", env.value ( "Path" ) + ";" + qApp->applicationDirPath() +
+                             QDir::separator () + "scripts" ); //win32
+#endif
+#ifdef Q_OS_LINUX
+                env.insert ( "PATH", env.value ( "PATH" ) + ":" + qApp->applicationDirPath() +
+                             QDir::separator () + "scripts" ); //linux
+#endif
                 handler.setProcessEnvironment ( env );
                 handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
                 handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
                 qDebug() << "TEMP folder:" << QDir::tempPath();
-                // call handler and add your input as argument
                 handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                                 QDir::separator () + "scripts" + QDir::separator () + link );
                 // wait until handler has finished
@@ -511,19 +508,18 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
                 env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
                              "perl" + QDir::separator () + "lib" );
                 env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
-                #ifdef Q_WS_WIN
-                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
-                                 qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
-                #endif
-                #ifdef Q_OS_LINUX
-                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-                                 qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
-                #endif
+#ifdef Q_WS_WIN
+                env.insert ( "PATH", env.value ( "Path" ) + ";" +
+                             qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
+#endif
+#ifdef Q_OS_LINUX
+                env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                             qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
+#endif
                 handler.setProcessEnvironment ( env );
                 handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
                 handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
                 qDebug() << "TEMP folder:" << QDir::tempPath();
-                // call handler and add your input as argument
                 handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                                 QDir::separator () + "scripts" + QDir::separator () +
                                 script << fileName << folderName );
