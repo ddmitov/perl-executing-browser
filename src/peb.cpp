@@ -177,6 +177,7 @@ int main ( int argc, char **argv )
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::LinksIncludedInFocusChain, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::AutoLoadImages, true );
+    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::setObjectCacheCapacities ( 0, 0, 0 );
     QWebSettings::clearMemoryCaches();
@@ -433,7 +434,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
     if ( type == QWebPage::NavigationTypeLinkClicked ) {
         QUrl base ( allowedBase );
         if ( base.isParentOf ( request.url() ) ) {
-            qDebug() << "Local link clicked:" << request.url().toString();
+            qDebug() << "Local link:" << request.url().toString();
 
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();

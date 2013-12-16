@@ -60,6 +60,12 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='local://script/sqlite.pl'>SQLite example</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='local://print/now'>Print</a>\n";
 print "</font></p>\n";
 
