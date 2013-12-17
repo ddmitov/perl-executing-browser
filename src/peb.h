@@ -36,10 +36,14 @@
 //    virtual QNetworkReply * createRequest ( Operation op,
 //                                            const QNetworkRequest &req,
 //                                            QIODevice *outgoingData = 0 ) {
-//        qDebug() << "Trying to read POST data...";
-//        QByteArray outgoingByteArray = outgoingData -> getSourceData();
-//        QString postData ( outgoingByteArray );
-//        qDebug() << "POST data" << postData;
+//        qDebug() << "Checking for POST data...";
+
+//        if ( outgoingData -> size() > 0 ){
+//            QByteArray outgoingByteArray = outgoingData -> readAll();
+//            QString postData ( outgoingByteArray );
+//            qDebug() << "POST data" << postData;
+//        }
+
 //        return QNetworkAccessManager::createRequest ( op, req );
 //    }
 //};
