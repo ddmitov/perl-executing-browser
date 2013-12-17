@@ -17,6 +17,34 @@
 #include <QPrintDialog>
 #include <QPrinter>
 
+
+//#include <QApplication>
+//#include <QUrl>
+//#include <QtWebKit/QWebPage>
+//#include <QtWebKit/QWebFrame>
+//#include <QtNetwork/QNetworkAccessManager>
+//#include <QtNetwork/QNetworkRequest>
+//#include <QtNetwork/QNetworkReply>
+//#include <QDebug>
+
+//class NAM : public QNetworkAccessManager {
+
+//    Q_OBJECT
+
+//protected:
+
+//    virtual QNetworkReply * createRequest ( Operation op,
+//                                            const QNetworkRequest &req,
+//                                            QIODevice *outgoingData = 0 ) {
+//        qDebug() << "Trying to read POST data...";
+//        QByteArray outgoingByteArray = outgoingData -> getSourceData();
+//        QString postData ( outgoingByteArray );
+//        qDebug() << "POST data" << postData;
+//        return QNetworkAccessManager::createRequest ( op, req );
+//    }
+//};
+
+
 class Page : public QWebPage
 {
     Q_OBJECT

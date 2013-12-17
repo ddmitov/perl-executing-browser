@@ -177,7 +177,9 @@ int main ( int argc, char **argv )
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::LinksIncludedInFocusChain, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::AutoLoadImages, true );
-    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
+    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
+    QWebSettings::globalSettings()-> setAttribute ( QWebSettings::DeveloperExtrasEnabled, true );
+    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalStorageEnabled, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::setObjectCacheCapacities ( 0, 0, 0 );
     QWebSettings::clearMemoryCaches();
@@ -217,6 +219,12 @@ TopLevel::TopLevel()
 {
     main_page = new Page();
     setPage ( main_page );
+
+
+//    NAM *nam = new NAM();
+//    main_page -> setNetworkAccessManager ( nam );
+
+
     main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
     // Disabling horizontal scroll bar:
     main_page -> mainFrame() -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
