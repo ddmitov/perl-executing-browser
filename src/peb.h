@@ -11,43 +11,42 @@
     #include <QApplication>
 #endif
 
-#include <QWebView>
-#include <QWebPage>
-#include <QWebElement>
+#include <QApplication>
+#include <QUrl>
+#include <QtWebKit/QWebPage>
+#include <QtWebKit/QWebView>
+#include <QtWebKit/QWebFrame>
+#include <QtWebKit/QWebElement>
+#include <QtNetwork/QNetworkAccessManager>
+#include <QtNetwork/QNetworkRequest>
+#include <QtNetwork/QNetworkReply>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QDebug>
 
+class NAM : public QNetworkAccessManager {
 
-//#include <QApplication>
-//#include <QUrl>
-//#include <QtWebKit/QWebPage>
-//#include <QtWebKit/QWebFrame>
-//#include <QtNetwork/QNetworkAccessManager>
-//#include <QtNetwork/QNetworkRequest>
-//#include <QtNetwork/QNetworkReply>
-//#include <QDebug>
+    Q_OBJECT
 
-//class NAM : public QNetworkAccessManager {
+protected:
 
-//    Q_OBJECT
+    virtual QNetworkReply * createRequest ( Operation operation,
+                                            const QNetworkRequest &request,
+                                            QIODevice *outgoingData = 0 ) {
 
-//protected:
+        //        if ( op == PostOperation ){
 
-//    virtual QNetworkReply * createRequest ( Operation op,
-//                                            const QNetworkRequest &req,
-//                                            QIODevice *outgoingData = 0 ) {
-//        qDebug() << "Checking for POST data...";
+        //        }
 
-//        if ( outgoingData -> size() > 0 ){
-//            QByteArray outgoingByteArray = outgoingData -> readAll();
-//            QString postData ( outgoingByteArray );
-//            qDebug() << "POST data" << postData;
-//        }
+        if ( outgoingData ){
+            QByteArray outgoingByteArray = outgoingData -> readAll();
+            QString postData ( outgoingByteArray );
+            qDebug() << "POST data:" << postData;
+        }
 
-//        return QNetworkAccessManager::createRequest ( op, req );
-//    }
-//};
-
+        return QNetworkAccessManager::createRequest ( operation, request );
+    }
+};
 
 class Page : public QWebPage
 {

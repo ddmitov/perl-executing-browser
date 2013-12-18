@@ -93,6 +93,14 @@
 // Special thanks to the staff of the Library of the New Bulgarian University,
 // where much of the coding effort took place!
 
+// Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
+// "How to read POST data “sent” from my own QtWebKit application?":
+// http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
+// I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
+// for their code for capturing POST data from HTML pages, which I adopted and modified:
+// http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
+// http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
+
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
     // Qt5 code:
@@ -221,8 +229,8 @@ TopLevel::TopLevel()
     setPage ( main_page );
 
 
-//    NAM *nam = new NAM();
-//    main_page -> setNetworkAccessManager ( nam );
+    NAM *nam = new NAM();
+    main_page -> setNetworkAccessManager ( nam );
 
 
     main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
@@ -494,7 +502,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
 
     if ( type == QWebPage::NavigationTypeFormSubmitted ) {
         QUrl base ( allowedBase );
-        if ( base.isParentOf( request.url() ) ) {
+        if ( base.isParentOf ( request.url() ) ) {
             qDebug() << "Form submitted to:" << request.url().toString();
 
             QProcess handler;

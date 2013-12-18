@@ -18,7 +18,13 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='local://script/form.htm'>Form of a Locally Executed Perl Script</a>\n";
+print "<a href='local://script/get.htm'>Form of a Locally Executed Perl Script - GET method</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='local://script/post.htm'>Form of a Locally Executed Perl Script - POST method</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
