@@ -63,6 +63,7 @@
 // http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen
 // http://www.qtcentre.org/threads/4322-How-to-delete-File
 // http://www.qtcentre.org/threads/53731-compiling-under-qt4-AND-qt5
+// http://www.qtcentre.org/threads/30060-QtWebkit-problems-with-custom-QNetworkAccessManager-QNetworkReply
 // http://www.qtcentre.org/archive/index.php/t-31264.html
 // http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
 // http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
@@ -116,6 +117,9 @@
 #include <QWebPage>
 #include <QWebFrame>
 #include <QWebHistory>
+
+#include <QWebSecurityOrigin>
+
 #include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
@@ -185,7 +189,8 @@ int main ( int argc, char **argv )
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::LinksIncludedInFocusChain, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
     QWebSettings::globalSettings() -> setAttribute ( QWebSettings::AutoLoadImages, true );
-    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
+    QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
+    QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
     QWebSettings::globalSettings()-> setAttribute ( QWebSettings::DeveloperExtrasEnabled, true );
     //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalStorageEnabled, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
@@ -220,6 +225,7 @@ int main ( int argc, char **argv )
 Page::Page()
     : QWebPage ( 0 )
 {
+    QWebSecurityOrigin::addLocalScheme ( "local" );
 }
 
 TopLevel::TopLevel()
