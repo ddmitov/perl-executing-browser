@@ -16,7 +16,7 @@ Perl (possibly PHP/Python) scripts and has the following design objectives:
 * 2. Cross-platform availability:  
     use it on every platform and device (desktop, tablet, smartphone),  
     where Perl and Qt4 or Qt5 could be compiled;  
-* 3. Scripts control network connectivity:  
+* 3. Scripts control everything, including network access:  
     a) If no network connectivity is wanted or needed,  
     no services are started, no ports are opened, no firewall notifications are triggered,  
     no need for administrative privileges and everything remains in the userspace, but  
