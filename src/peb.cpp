@@ -65,6 +65,7 @@
 // http://www.qtcentre.org/threads/53731-compiling-under-qt4-AND-qt5
 // http://www.qtcentre.org/threads/30060-QtWebkit-problems-with-custom-QNetworkAccessManager-QNetworkReply
 // http://www.qtcentre.org/archive/index.php/t-31264.html
+// http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
 // http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
 // http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
 // http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
@@ -98,7 +99,7 @@
 // "How to read POST data “sent” from my own QtWebKit application?":
 // http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
 // I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
-// for their code for capturing POST data from HTML pages, which I adopted and modified:
+// for their code, which I adopted and modified:
 // http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
 // http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
 
@@ -234,10 +235,8 @@ TopLevel::TopLevel()
     main_page = new Page();
     setPage ( main_page );
 
-
     NAM *nam = new NAM();
     main_page -> setNetworkAccessManager ( nam );
-
 
     main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
     // Disabling horizontal scroll bar:
@@ -351,13 +350,14 @@ TopLevel::TopLevel()
 
 }
 
-bool Page::acceptNavigationRequest ( QWebFrame *frame,
+bool Page::acceptNavigationRequest (QWebFrame *frame,
                                      const QNetworkRequest &request,
-                                     QWebPage::NavigationType type )
+                                     QWebPage::NavigationType types )
 {
+
     QUrl allowedBase = ( QUrl ( "local://script/" ) );
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl OpenFileBase ( QUrl ( "local://openfile/" ) );
         if ( OpenFileBase.isParentOf ( request.url() ) ) {
             QFileDialog dialog;
@@ -374,7 +374,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl OpenFolderBase ( QUrl ( "local://openfolder/" ) );
         if ( OpenFolderBase.isParentOf ( request.url() ) ) {
             QFileDialog dialog;
@@ -391,7 +391,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl PrintBase ( QUrl ( "local://print/" ) );
         if ( PrintBase.isParentOf ( request.url() ) ) {
             qDebug() << "Printing requested.";
@@ -417,7 +417,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl CloseBase ( QUrl ( "local://close/" ) );
         if ( CloseBase.isParentOf ( request.url() ) ) {
             qDebug() << "Application termination requested from URL.";
@@ -425,7 +425,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl ExternalBase ( QUrl ( "external:" ) );
         if ( ExternalBase.isParentOf ( request.url() ) ) {
             QString externalApplication = request.url()
@@ -439,7 +439,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl base ( allowedBase );
         if ( !base.isParentOf ( request.url() ) &&
              !( QUrl ( "local://openfile/" ) ).isParentOf ( request.url() ) &&
@@ -453,7 +453,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeLinkClicked ) {
+    if ( types == QWebPage::NavigationTypeLinkClicked ) {
         QUrl base ( allowedBase );
         if ( base.isParentOf ( request.url() ) ) {
             qDebug() << "Local link:" << request.url().toString();
@@ -506,7 +506,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    if ( type == QWebPage::NavigationTypeFormSubmitted ) {
+    if ( types == QWebPage::NavigationTypeFormSubmitted ) {
         QUrl base ( allowedBase );
         if ( base.isParentOf ( request.url() ) ) {
             qDebug() << "Form submitted to:" << request.url().toString();
@@ -552,7 +552,7 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
             folderName = "";
 
             if ( handler.waitForFinished() ){
-                frame->load ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
+                frame -> load ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
                 return true;
             }
 
@@ -562,5 +562,5 @@ bool Page::acceptNavigationRequest ( QWebFrame *frame,
         }
     }
 
-    return QWebPage::acceptNavigationRequest ( frame, request, type );
+    return QWebPage::acceptNavigationRequest ( frame, request, types );
 }

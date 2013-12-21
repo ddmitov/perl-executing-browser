@@ -11,7 +11,6 @@
     #include <QApplication>
 #endif
 
-#include <QApplication>
 #include <QUrl>
 #include <QtWebKit/QWebPage>
 #include <QtWebKit/QWebView>
@@ -20,9 +19,12 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QDebug>
+
+
 
 class NAM : public QNetworkAccessManager {
 
@@ -34,31 +36,116 @@ protected:
                                             const QNetworkRequest &request,
                                             QIODevice *outgoingData = 0 ) {
 
-        //        if ( op == PostOperation ){
+        if ( operation == PostOperation ){
 
-        //        }
+            QString postData;
+            QByteArray outgoingByteArray;
+            if ( outgoingData ){
+                outgoingByteArray = outgoingData -> readAll();
+                QString postDataRaw ( outgoingByteArray );
+                postData = postDataRaw;
+                qDebug() << "POST data:" << postData;
+            }
 
-        if ( outgoingData ){
-            QByteArray outgoingByteArray = outgoingData -> readAll();
-            QString postData ( outgoingByteArray );
-            qDebug() << "POST data:" << postData;
+            QUrl allowedBase = ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) );
+            if ( allowedBase.isParentOf ( request.url() ) ) {
+                qDebug() << "Form submitted to:" << request.url().toString();
+
+                QProcess handler;
+                QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+                QString script = request.url()
+                        .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
+                        .replace ( "/", "" );
+                qDebug() << "Script:" << script;
+                QString extension = script.section(".", 1, 1);
+                qDebug() << "Extension:" << extension;
+
+                if ( extension == "pl" ) {
+                    QString interpreter = "perl";
+                    qDebug() << "Interpreter:" << interpreter;
+
+                    if ( postData.size() > 0 ){
+                        env.insert ( "REQUEST_METHOD", "POST" );
+                        QString postDataSize = QString::number ( postData.size() );
+                        env.insert ( "CONTENT_LENGTH", postDataSize );
+                    } else {
+                        env.insert ( "REQUEST_METHOD", "GET" );
+                        QString query = request.url()
+                                .toString ( QUrl::RemoveScheme |
+                                            QUrl::RemoveAuthority |
+                                            QUrl::RemovePath )
+                                .replace ( "?", "" );
+                        env.insert ( "QUERY_STRING", query );
+                    }
+
+                    env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
+                                 "perl" + QDir::separator () + "lib" );
+                    env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
+#ifdef Q_WS_WIN
+                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
+                                 qApp->applicationDirPath() +
+                                 QDir::separator () + "scripts" ); //win32
+#endif
+#ifdef Q_OS_LINUX
+                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+                                 qApp->applicationDirPath() +
+                                 QDir::separator () + "scripts" ); //linux
+#endif
+                    handler.setProcessEnvironment ( env );
+                    handler.setWorkingDirectory ( qApp->applicationDirPath() +
+                                                  QDir::separator () + "scripts" );
+                    handler.setStandardOutputFile ( QDir::tempPath() +
+                                                    QDir::separator () + "output.htm" );
+                    qDebug() << "TEMP folder:" << QDir::tempPath();
+                    handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
+                                    QDir::separator () + "scripts" + QDir::separator () +
+                                    //script << fileName << folderName );
+                                    script );
+
+                    if ( postData.size() > 0 ){
+                        handler.write ( outgoingByteArray );
+                        handler.closeWriteChannel();
+                    }
+
+                }
+
+                //fileName = "";
+                //folderName = "";
+
+                if ( handler.waitForFinished() ){
+                    handler.close();
+                    QWebSettings::clearMemoryCaches();
+                    return QNetworkAccessManager::createRequest (
+                                QNetworkAccessManager::GetOperation,
+                                QNetworkRequest ( QUrl::fromLocalFile ( QDir::tempPath() +
+                                                                        QDir::separator () +
+                                                                        "output.htm" ) ) );
+                }
+
+            }
+
         }
 
         return QNetworkAccessManager::createRequest ( operation, request );
+
     }
 };
+
+
 
 class Page : public QWebPage
 {
     Q_OBJECT
 
 public:
+
     Page();
 
 protected:
+
     bool acceptNavigationRequest ( QWebFrame *frame,
                                    const QNetworkRequest &request,
-                                   QWebPage::NavigationType type );
+                                   QWebPage::NavigationType types );
 };
 
 class TopLevel : public QWebView
@@ -102,22 +189,28 @@ public slots:
                          qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
 #endif
             handler.setProcessEnvironment ( env );
-            handler.setWorkingDirectory ( qApp->applicationDirPath() + QDir::separator () + "scripts" );
-            handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () + "output.htm" );
+            handler.setWorkingDirectory ( qApp->applicationDirPath() +
+                                          QDir::separator () + "scripts" );
+            handler.setStandardOutputFile ( QDir::tempPath() +
+                                            QDir::separator () + "output.htm" );
             qDebug() << "TEMP folder:" << QDir::tempPath();
             handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                             QDir::separator () + "scripts" + QDir::separator () + startPage );
             // wait until handler has finished
             if ( handler.waitForFinished() ){
-                setUrl ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () + "output.htm" ) );
+                setUrl ( QUrl::fromLocalFile ( QDir::tempPath() +
+                                               QDir::separator () +
+                                               "output.htm" ) );
                 QWebSettings::clearMemoryCaches();
             }
             handler.close();
         }
 
         if ( startPageExtension == "htm" or startPageExtension == "html" ) {
-            setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() + QDir::separator () +
-                                           "html" + QDir::separator () + startPage ) );
+            setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() +
+                                           QDir::separator () +
+                                           "html" + QDir::separator ()
+                                           + startPage ) );
             QWebSettings::clearMemoryCaches();
         }
     };
@@ -205,9 +298,11 @@ public slots:
     };
 
 public:
+
     TopLevel();
 
 private:
+
     Page *main_page;
 
 };

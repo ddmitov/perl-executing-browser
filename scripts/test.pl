@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD);
+use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
 print "<html>\n";
@@ -73,6 +73,9 @@ if (defined $QUERY_STRING){
 }
 if (defined $REQUEST_METHOD){
 	print "REQUEST_METHOD = $REQUEST_METHOD<br>\n";
+}
+if (defined $CONTENT_LENGTH){
+	print "CONTENT_LENGTH = $CONTENT_LENGTH<br>\n";
 }
 
 print "</font></p>\n";
