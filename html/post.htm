@@ -42,9 +42,7 @@ function goBack()
 
 <font size='3' face='SansSerif'>
 
-
 <form action="http://perl-executing-browser-pseudodomain/test.pl" method="post">
-
 
 Value 1:<br>
 <input type="text" id="value1" name="value1"><br>
@@ -52,9 +50,9 @@ Value 2:<br>
 <input type="text" name="value2"><br>
 <br>
 
-<a href='local://openfile/now' onclick="fileSelected()" id="FileSelection">Select File</a>
+<a href='http://perl-executing-browser-pseudodomain/openfile/now' onclick="fileSelected()" id="FileSelection">Select File</a>
 <br>
-<a href='local://openfolder/now' onclick="folderSelected()" id="FolderSelection">Select Folder</a>
+<a href='http://perl-executing-browser-pseudodomain/openfolder/now' onclick="folderSelected()" id="FolderSelection">Select Folder</a>
 <br><br>
 
 <input type="submit" value="Submit with File & Folder">
