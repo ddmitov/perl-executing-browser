@@ -24,11 +24,6 @@
 #include <QPrinter>
 #include <QDebug>
 
-// Declaring global filename and foldername variables:
-// http://stackoverflow.com/questions/2029272/how-to-declare-a-global-variable-that-could-be-used-in-the-entire-program
-extern QString fileName;
-extern QString folderName;
-
 class NAM : public QNetworkAccessManager {
 
     Q_OBJECT
@@ -39,6 +34,7 @@ protected:
                                             const QNetworkRequest & request,
                                             QIODevice * outgoingData = 0 ) {
 
+        // POST method form data:
         if ( operation == PostOperation ){
 
             QString postData;
@@ -59,10 +55,15 @@ protected:
                 qDebug() << "Script:" << script;
                 QString extension = script.section(".", 1, 1);
                 qDebug() << "Extension:" << extension;
-
                 QString interpreter;
                 if ( extension == "pl" ) {
                     interpreter = "perl";
+                }
+                if ( extension == "php" ) {
+                    interpreter = "php-cgi";
+                }
+                if ( extension == "py" ) {
+                    interpreter = "python";
                 }
                 qDebug() << "Interpreter:" << interpreter;
 
@@ -74,21 +75,16 @@ protected:
                         QString postDataSize = QString::number ( postData.size() );
                         env.insert ( "CONTENT_LENGTH", postDataSize );
                     }
-                    if ( extension == "pl" ) {
-                        env.insert ( "PERL5LIB", qApp->applicationDirPath() + QDir::separator () +
-                                 "perl" + QDir::separator () + "lib" );
-                    }
-                    env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
-#ifdef Q_WS_WIN
-                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
-                                 qApp->applicationDirPath() +
-                                 QDir::separator () + "scripts" ); //win32
-#endif
-#ifdef Q_OS_LINUX
-                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-                                 qApp->applicationDirPath() +
-                                 QDir::separator () + "scripts" ); //linux
-#endif
+//#ifdef Q_WS_WIN
+//                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
+//                                 qApp->applicationDirPath() +
+//                                 QDir::separator () + "scripts" ); //win32
+//#endif
+//#ifdef Q_OS_LINUX
+//                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
+//                                 qApp->applicationDirPath() +
+//                                 QDir::separator () + "scripts" ); //linux
+//#endif
                     handler.setProcessEnvironment ( env );
                     handler.setWorkingDirectory ( qApp->applicationDirPath() +
                                                   QDir::separator () + "scripts" );
@@ -98,18 +94,16 @@ protected:
                     qDebug() << "===============";
                     handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
                                     QDir::separator () + "scripts" + QDir::separator () +
-                                    //script << fileName << folderName );
                                     script );
                     if ( postData.size() > 0 ){
                         handler.write ( outgoingByteArray );
                         handler.closeWriteChannel();
                     }
 
-                    //fileName = "";
-                    //folderName = "";
-
                     if ( handler.waitForFinished() ){
                         handler.close();
+                        qputenv ( "FILE_TO_OPEN", "" );
+                        qputenv ( "FOLDER_TO_OPEN", "" );
                         QWebSettings::clearMemoryCaches();
                         return QNetworkAccessManager::createRequest (
                                     QNetworkAccessManager::GetOperation,
@@ -117,9 +111,12 @@ protected:
                                                                             QDir::separator() +
                                                                             "output.htm" ) ) );
                     }
+
                 }
             }
+
         }
+
         return QNetworkAccessManager::createRequest ( operation, request );
     }
 };
@@ -143,6 +140,9 @@ class TopLevel : public QWebView
 {
     Q_OBJECT
 
+signals:
+    void startPageRequested();
+
 public slots:
 
     void closeAppSlot()
@@ -158,27 +158,26 @@ public slots:
                              QDir::separator () + "peb.ini", QSettings::NativeFormat );
         QString startPage = settings.value ( "gui/start_page" ).toString();
 
-        qDebug() << "Start page requested from hotkey:" << startPage;
+        qDebug() << "Start page:" << startPage;
         QString startPageExtension = startPage.section ( ".", 1, 1 );
         qDebug() << "Extension:" << startPageExtension;
-
+        QString interpreter;
         if ( startPageExtension == "pl" ) {
+            interpreter = "perl";
+        }
+        if ( startPageExtension == "php" ) {
+            interpreter = "php-cgi";
+        }
+        if ( startPageExtension == "py" ) {
+            interpreter = "python";
+        }
+        qDebug() << "Interpreter:" << interpreter;
+
+        if ( startPageExtension == "pl" or
+             startPageExtension == "php" or
+             startPageExtension == "py" ) {
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-            QString interpreter = "perl";
-            qDebug() << "Interpreter:" << interpreter;
-            env.insert ( "PERL5LIB", qApp->applicationDirPath() +
-                         QDir::separator () + "perl" +
-                         QDir::separator () + "lib" );
-            env.insert ( "DOCUMENT_ROOT", qApp->applicationDirPath() );
-#ifdef Q_WS_WIN
-            env.insert ("PATH", env.value ( "Path" ) + ";" +
-                        qApp->applicationDirPath() + QDir::separator () + "scripts" ); //win32
-#endif
-#ifdef Q_OS_LINUX
-            env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-                         qApp->applicationDirPath() + QDir::separator () + "scripts" ); //linux
-#endif
             handler.setProcessEnvironment ( env );
             handler.setWorkingDirectory ( qApp->applicationDirPath() +
                                           QDir::separator () + "scripts" );
@@ -193,7 +192,6 @@ public slots:
                 setUrl ( QUrl::fromLocalFile ( QDir::tempPath() +
                                                QDir::separator () +
                                                "output.htm" ) );
-                QWebSettings::clearMemoryCaches();
             }
             handler.close();
         }
@@ -204,8 +202,8 @@ public slots:
                                            "html" + QDir::separator ()
                                            + startPage ) );
             qDebug() << "===============";
-            QWebSettings::clearMemoryCaches();
         }
+        QWebSettings::clearMemoryCaches();
     };
 
     void maximizeSlot()
@@ -276,18 +274,18 @@ public slots:
         printer.setNumCopies ( 1 );
         //        printer.setOutputFormat ( QPrinter::PdfFormat );
         //        printer.setOutputFileName ( "output.pdf" );
-        QPrintDialog* dialog = new QPrintDialog ( &printer );
-        dialog->setWindowFlags ( Qt::WindowStaysOnTopHint );
+        QPrintDialog* dialog = new QPrintDialog ( & printer );
+        dialog -> setWindowFlags ( Qt::WindowStaysOnTopHint );
         QSize dialogSize = dialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
-        dialog->move(QPoint(screenRect.width()/2 - dialogSize.width()/2,
-                            screenRect.height()/2 - dialogSize.height()/2 ));
+        dialog -> move(QPoint ( screenRect.width() / 2 - dialogSize.width() / 2,
+                            screenRect.height() / 2 - dialogSize.height() / 2 ) );
         if ( dialog->exec() == QDialog::Accepted )
         {
-            TopLevel::print ( &printer );
+            TopLevel::print ( & printer );
         }
-        dialog->close();
-        dialog->deleteLater();
+        dialog -> close();
+        dialog -> deleteLater();
     };
 
 public:

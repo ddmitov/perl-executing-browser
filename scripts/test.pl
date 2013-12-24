@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
+use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
 print "<html>\n";
@@ -28,17 +28,6 @@ print "<p align='left'><font size='3' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/index.htm'>Back to the static startpage</a>\n";
 print "</font></p>\n";
 
-print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "FILE AND FOLDER TO OPEN:\n";
-print "</font></p>\n";
-print "<p align='left'><font size='3' face='SansSerif'>\n";
-
-if (defined @ARGV){
-	my ($file, $folder) = @ARGV;
-	print "\$ARGV[0] - FILE: $file<br>\n";
-	print "\$ARGV[1] - FOLDER: $folder<br>\n";
-}
-
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
@@ -62,11 +51,17 @@ print "<p align='left'><font size='3' face='SansSerif'>\n";
 if (defined $PATH){
 	print "PATH = $PATH<br>\n";
 }
-if (defined $PERL5LIB){
-	print "PERL5LIB = $PERL5LIB<br>\n";
-}
 if (defined $DOCUMENT_ROOT){
 	print "DOCUMENT_ROOT = $DOCUMENT_ROOT<br>\n";
+}
+if (defined $FILE_TO_OPEN){
+	print "FILE_TO_OPEN = $FILE_TO_OPEN<br>\n";
+}
+if (defined $FOLDER_TO_OPEN){
+	print "FOLDER_TO_OPEN = $FOLDER_TO_OPEN<br>\n";
+}
+if (defined $PERL5LIB){
+	print "PERL5LIB = $PERL5LIB<br>\n";
 }
 if (defined $QUERY_STRING){
 	print "QUERY_STRING = $QUERY_STRING<br>\n";
