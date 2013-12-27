@@ -36,8 +36,9 @@ Do not use it for production purposes!
 No feature or implementation should be considered final at this point.  
 Proper documentation and examples are still missing.  
 Compiled and tested successfully using:  
-1. Qt Creator 2.5.0 and Qt 4.8.2 under 32 bit Debian Linux,  
-2. Qt Creator 2.8.1 and Qt 5.1.1 under 32 bit Debian Linux.  
+1. Qt Creator 2.5.0 and Qt 4.8.2 on 32 bit Debian Linux,  
+2. Qt Creator 2.8.1 and Qt 5.1.1 on 32 bit Debian Linux,  
+3. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux.  
   
 This software is licensed under the terms of GNU GPL v.3 and  
 is provided without warranties of any kind!  

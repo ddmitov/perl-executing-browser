@@ -65,9 +65,9 @@ protected:
                 if ( extension == "py" ) {
                     interpreter = "python";
                 }
-                qDebug() << "Interpreter:" << interpreter;
 
                 if ( extension == "pl" or extension == "php" or extension == "py" ) {
+                    qDebug() << "Interpreter:" << interpreter;
                     QProcess handler;
                     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                     if ( postData.size() > 0 ){
@@ -75,16 +75,6 @@ protected:
                         QString postDataSize = QString::number ( postData.size() );
                         env.insert ( "CONTENT_LENGTH", postDataSize );
                     }
-//#ifdef Q_WS_WIN
-//                    env.insert ( "PATH", env.value ( "Path" ) + ";" +
-//                                 qApp->applicationDirPath() +
-//                                 QDir::separator () + "scripts" ); //win32
-//#endif
-//#ifdef Q_OS_LINUX
-//                    env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-//                                 qApp->applicationDirPath() +
-//                                 QDir::separator () + "scripts" ); //linux
-//#endif
                     handler.setProcessEnvironment ( env );
                     handler.setWorkingDirectory ( qApp->applicationDirPath() +
                                                   QDir::separator () + "scripts" );
@@ -141,6 +131,7 @@ class TopLevel : public QWebView
     Q_OBJECT
 
 signals:
+
     void startPageRequested();
 
 public slots:
@@ -171,11 +162,11 @@ public slots:
         if ( startPageExtension == "py" ) {
             interpreter = "python";
         }
-        qDebug() << "Interpreter:" << interpreter;
 
         if ( startPageExtension == "pl" or
              startPageExtension == "php" or
              startPageExtension == "py" ) {
+            qDebug() << "Interpreter:" << interpreter;
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             handler.setProcessEnvironment ( env );
@@ -274,9 +265,9 @@ public slots:
         printer.setNumCopies ( 1 );
         //        printer.setOutputFormat ( QPrinter::PdfFormat );
         //        printer.setOutputFileName ( "output.pdf" );
-        QPrintDialog* dialog = new QPrintDialog ( & printer );
+        QPrintDialog * dialog = new QPrintDialog ( & printer );
         dialog -> setWindowFlags ( Qt::WindowStaysOnTopHint );
-        QSize dialogSize = dialog->sizeHint();
+        QSize dialogSize = dialog -> sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
         dialog -> move(QPoint ( screenRect.width() / 2 - dialogSize.width() / 2,
                             screenRect.height() / 2 - dialogSize.height() / 2 ) );

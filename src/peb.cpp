@@ -105,7 +105,7 @@
 // where much of the coding effort took place!
 
 // Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
-// "How to read POST data “sent” from my own QtWebKit application?":
+// "How to read POST data "sent" from my own QtWebKit application?":
 // http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
 // I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
 // for their code, which I adopted and modified:
@@ -181,20 +181,25 @@ int main ( int argc, char **argv )
 #ifdef Q_OS_LINUX
     QByteArray oldPath = qgetenv ( "PATH" ); //linux
 #endif
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     QByteArray oldPath = qgetenv ( "Path" ); //win32
 #endif
     path.append ( oldPath );
 #ifdef Q_OS_LINUX
     path.append ( ":" ); //linux
 #endif
-#ifdef Q_WS_WIN
+#ifdef Q_OS_WIN
     path.append ( ";" ); //win32
 #endif
     path.append ( qApp->applicationDirPath() );
     path.append ( QDir::separator() );
-    path.append ( "scripts" );
-    qputenv ( "PATH", path );
+    path.append ( "perl" );
+#ifdef Q_OS_LINUX
+    qputenv ( "PATH", path ); //linux
+#endif
+#ifdef Q_OS_WIN
+    qputenv ( "Path", path ); //win32
+#endif
 
     QByteArray documentRoot;
     documentRoot.append ( qApp -> applicationDirPath() );
@@ -250,9 +255,24 @@ int main ( int argc, char **argv )
     TopLevel toplevel;
 
     if ( fixedWidth != "false" and fixedHeight != "false" ) {
+        int fixedWidthInt = fixedWidth.toInt();
+        int fixedHeightInt = fixedHeight.toInt();
+        toplevel.setFixedSize ( fixedWidthInt, fixedHeightInt );
         QRect screenRect = QDesktopWidget().screen()->rect();
         toplevel.move ( QPoint(screenRect.width()/2 - toplevel.width()/2,
                                screenRect.height()/2 - toplevel.height()/2 ) );
+    }
+
+    if ( fixedWidth == "false" and fixedHeight == "false" ) {
+        toplevel.showMaximized();
+    }
+
+    if ( maximizedWindow == "yes" ) {
+        toplevel.showMaximized();
+    }
+
+    if ( fullScreen == "yes" ) {
+        toplevel.showFullScreen();
     }
 
     if ( stayOnTop == "yes" ) {
@@ -269,6 +289,8 @@ int main ( int argc, char **argv )
 
     toplevel.show();
     app.exec();
+
+    return true;
 
 };
 
@@ -344,22 +366,8 @@ TopLevel::TopLevel()
                            this, SLOT ( pageLoadedStaticTitle (bool) ) );
     }
 
-    if ( fixedWidth != "false" and fixedHeight != "false" ) {
-        int fixedWidthInt = fixedWidth.toInt();
-        int fixedHeightInt = fixedHeight.toInt();
-        setFixedSize ( fixedWidthInt, fixedHeightInt );
-    }
-
     if ( browserTitle != "dynamic" ) {
         setWindowTitle ( browserTitle );
-    }
-
-    if ( maximizedWindow == "yes" ) {
-        showMaximized();
-    }
-
-    if ( fullScreen == "yes" ) {
-        showFullScreen();
     }
 
     if ( contextMenu == "no" ) {
@@ -514,9 +522,9 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             if ( extension == "py" ) {
                 interpreter = "python";
             }
-            qDebug() << "Interpreter:" << interpreter;
 
             if ( extension == "pl" or extension == "php" or extension == "py" ) {
+                qDebug() << "Interpreter:" << interpreter;
                 QProcess handler;
                 QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                 handler.setProcessEnvironment ( env );
@@ -574,9 +582,9 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             if ( extension == "py" ) {
                 interpreter = "python";
             }
-            qDebug() << "Interpreter:" << interpreter;
 
             if ( extension == "pl" or extension == "php" or extension == "py" ) {
+                qDebug() << "Interpreter:" << interpreter;
                 QProcess handler;
                 QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                 env.insert ( "REQUEST_METHOD", "GET" );
@@ -621,5 +629,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         }
     }
 
-    return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
+    QNetworkRequest emptyRequest;
+    return QWebPage::acceptNavigationRequest ( frame, emptyRequest, navigationType );
 }
