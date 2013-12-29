@@ -36,6 +36,7 @@ current version should be considered alpha pre-release.
 Do not use it for production purposes!  
 No feature or implementation should be considered final at this point.  
 Proper documentation and examples are still missing.  
+  
 Compiled and tested successfully using:  
 1. Qt Creator 2.5.0 and Qt 4.8.2 on 32 bit Debian Linux,  
 2. Qt Creator 2.8.1 and Qt 5.1.1 on 32 bit Debian Linux,  
