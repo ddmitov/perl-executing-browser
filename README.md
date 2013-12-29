@@ -4,18 +4,19 @@ Perl Executing Browser, v.0.1
 Perl Executing Browser (PEB) is a Qt4/5 WebKit browser  
 capable of executing Perl scripts locally without a webserver,  
 providing them with a nice HTML4/5 interface for both input and output and  
-using CGI protocol GET and POST methods for communication between HTML forms and scripts.  
+using CGI protocol GET and POST methods for communication between GUI and scripts.  
   
-PEB can be used as an easy to set up HTML/CSS/JavaScript GUI for  
-Perl (possibly PHP/Python) scripts and has the following design objectives:  
-* 1. Zero installation solution:  
+Perl Executing Browser has the following design objectives:  
+* 1. Easy to set up and adapt HTML/CSS/JavaScript GUI for  
+    Perl (possibly PHP, Python and other) scripts;
+* 2. Zero installation solution:  
     pack your Perl modules or even your version of Perl with  
     a copy of PEB browser and its Qt libraries and  
     run your application from everywhere, even from USB sticks;  
-* 2. Cross-platform availability:  
+* 3. Cross-platform availability:  
     use it on every platform and device (desktop, tablet, smartphone),  
     where Perl and Qt4 or Qt5 could be compiled;  
-* 3. Scripts control everything, including network access:  
+* 4. Scripts control everything, including network access:  
     a) if no network connectivity is wanted or needed,  
     no services are started, no ports are opened, no firewall notifications are triggered,  
     no need for administrative privileges and everything remains in the userspace, but  
@@ -38,7 +39,8 @@ Proper documentation and examples are still missing.
 Compiled and tested successfully using:  
 1. Qt Creator 2.5.0 and Qt 4.8.2 on 32 bit Debian Linux,  
 2. Qt Creator 2.8.1 and Qt 5.1.1 on 32 bit Debian Linux,  
-3. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux.  
+3. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
+4. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
   
 This software is licensed under the terms of GNU GPL v.3 and  
 is provided without warranties of any kind!  

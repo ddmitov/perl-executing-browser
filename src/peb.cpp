@@ -55,6 +55,8 @@
 // http://qt-project.org/doc/qt-5.0/qtcore/qurl.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qstring.html
 // http://qt-project.org/doc/qt-4.8/qwebhistory.html
+// http://qt-project.org/doc/qt-4.8/qdir.html
+// http://qt-project.org/doc/qt-4.8/mainwindows-menus.html
 // http://qt-project.org/wiki/How_to_Use_QSettings
 // http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
 // http://qt-project.org/forums/viewthread/23835
@@ -72,6 +74,7 @@
 // http://www.qtcentre.org/threads/4322-How-to-delete-File
 // http://www.qtcentre.org/threads/53731-compiling-under-qt4-AND-qt5
 // http://www.qtcentre.org/threads/30060-QtWebkit-problems-with-custom-QNetworkAccessManager-QNetworkReply
+// http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character
 // http://www.qtcentre.org/archive/index.php/t-31264.html
 // http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
 // http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
@@ -122,11 +125,11 @@
     #include <QApplication>
 #endif
 
-#include <QtNetwork/QNetworkRequest>
-#include <QWebView>
 #include <QWebPage>
+#include <QWebView>
 #include <QWebFrame>
 #include <QWebHistory>
+#include <QtNetwork/QNetworkRequest>
 #include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
@@ -135,21 +138,20 @@
 
 // Declaring global variables for the settings:
 QString windowIcon;
-QString fixedWidth;
-QString fixedHeight;
-QString stayOnTop;
+QString windowSize;
 QString framelessWindow;
+QString stayOnTop;
 QString browserTitle;
 QString startPage;
-QString maximizedWindow;
-QString fullScreen;
+
 QString contextMenu;
 
 int main ( int argc, char **argv )
 {
     QApplication app ( argc, argv );
 
-    QString settingsFileName = QApplication::applicationDirPath() + QDir::separator () + "peb.ini";
+    QString settingsFileName = QDir::toNativeSeparators (
+                QApplication::applicationDirPath() + QDir::separator () + "peb.ini" );
     QFile settingsFile ( settingsFileName );
     if( !settingsFile.exists() )
     {
@@ -164,16 +166,13 @@ int main ( int argc, char **argv )
     }
 
     // Reading settings from INI file:
-    QSettings settings ( settingsFileName, QSettings::NativeFormat );
+    QSettings settings ( settingsFileName, QSettings::IniFormat );
     windowIcon = settings.value ( "gui/icon" ).toString();
-    fixedWidth = settings.value ( "gui/fixed_width" ).toString();
-    fixedHeight = settings.value ( "gui/fixed_heigth" ).toString();
-    stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
+    windowSize = settings.value ( "gui/window_size" ).toString();
     framelessWindow = settings.value ( "gui/frameless_window" ).toString();
+    stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
     browserTitle = settings.value ( "gui/browser_title" ).toString();
     startPage = settings.value ( "gui/start_page" ).toString();
-    maximizedWindow = settings.value ( "gui/maximized_window" ).toString();
-    fullScreen = settings.value ( "gui/full_screen" ).toString();
     contextMenu = settings.value ( "gui/context_menu" ).toString();
 
     // Environment variables:
@@ -217,9 +216,11 @@ int main ( int argc, char **argv )
     perl5Lib.append ( "lib" );
     qputenv ( "PERL5LIB", perl5Lib );
 
-    QApplication::setWindowIcon ( QIcon ( qApp->applicationDirPath() +
-                                          QDir::separator () + "icons" +
-                                          QDir::separator () + windowIcon ) );
+    QString iconPath = QDir::toNativeSeparators ( qApp->applicationDirPath() +
+                                                  QDir::separator () + "icons" +
+                                                  QDir::separator () + windowIcon );
+    QApplication::setWindowIcon ( QIcon ( iconPath ) );
+    qDebug() << "Icon:" << iconPath;
 
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
@@ -241,37 +242,35 @@ int main ( int argc, char **argv )
             setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::AutoLoadImages, true );
-    QWebSettings::globalSettings()->
+    QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
-    QWebSettings::globalSettings()->
+    QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
-    QWebSettings::globalSettings()->
+    QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::DeveloperExtrasEnabled, true );
-    //QWebSettings::globalSettings()-> setAttribute ( QWebSettings::LocalStorageEnabled, true );
+    //QWebSettings::globalSettings() -> setAttribute ( QWebSettings::LocalStorageEnabled, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::setObjectCacheCapacities ( 0, 0, 0 );
     QWebSettings::clearMemoryCaches();
 
     TopLevel toplevel;
 
-    if ( fixedWidth != "false" and fixedHeight != "false" ) {
-        int fixedWidthInt = fixedWidth.toInt();
-        int fixedHeightInt = fixedHeight.toInt();
-        toplevel.setFixedSize ( fixedWidthInt, fixedHeightInt );
-        QRect screenRect = QDesktopWidget().screen()->rect();
-        toplevel.move ( QPoint(screenRect.width()/2 - toplevel.width()/2,
-                               screenRect.height()/2 - toplevel.height()/2 ) );
+    if ( windowSize != "maximized" or windowSize != "fullscreen" ) {
+        int fixedWidth = windowSize.section ( "x", 0, 0 ).toInt();
+        int fixedHeight = windowSize.section ( "x", 1, 1 ).toInt();
+        if ( fixedWidth > 100 and fixedHeight > 100 ) {
+            toplevel.setFixedSize ( fixedWidth, fixedHeight );
+            QRect screenRect = QDesktopWidget().screen() -> rect();
+            toplevel.move ( QPoint ( screenRect.width()/2 - toplevel.width()/2,
+                                     screenRect.height()/2 - toplevel.height()/2 ) );
+        }
     }
 
-    if ( fixedWidth == "false" and fixedHeight == "false" ) {
+    if ( windowSize == "maximized") {
         toplevel.showMaximized();
     }
 
-    if ( maximizedWindow == "yes" ) {
-        toplevel.showMaximized();
-    }
-
-    if ( fullScreen == "yes" ) {
+    if ( windowSize == "fullscreen" ) {
         toplevel.showFullScreen();
     }
 
@@ -283,7 +282,7 @@ int main ( int argc, char **argv )
         toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint );
     }
 
-    if ( stayOnTop != "yes" and framelessWindow == "yes" ) {
+    if ( stayOnTop == "no" and framelessWindow == "yes" ) {
         toplevel.setWindowFlags ( Qt::FramelessWindowHint );
     }
 
@@ -312,7 +311,7 @@ TopLevel::TopLevel()
     // Disabling horizontal scroll bar:
     main_page -> mainFrame() -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
     // Disabling history:
-    QWebHistory* history = main_page -> history();
+    QWebHistory * history = main_page -> history();
     history -> setMaximumItemCount ( 0 );
 
     // Context menu settings:
@@ -513,14 +512,30 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             QString extension = file.section ( ".", 1, 1 );
             qDebug() << "Extension:" << extension;
             QString interpreter;
+
             if ( extension == "pl" ) {
+#ifdef Q_OS_WIN
+                interpreter = "perl.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "perl";
+#endif
             }
             if ( extension == "php" ) {
+#ifdef Q_OS_WIN
+                interpreter = "php-cgi.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "php-cgi";
+#endif
             }
             if ( extension == "py" ) {
+#ifdef Q_OS_WIN
+                interpreter = "python.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "python";
+#endif
             }
 
             if ( extension == "pl" or extension == "php" or extension == "py" ) {
@@ -573,14 +588,30 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             QString extension = script.section(".", 1, 1);
             qDebug() << "Extension:" << extension;
             QString interpreter;
+
             if ( extension == "pl" ) {
+#ifdef Q_OS_WIN
+                interpreter = "perl.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "perl";
+#endif
             }
             if ( extension == "php" ) {
+#ifdef Q_OS_WIN
+                interpreter = "php-cgi.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "php-cgi";
+#endif
             }
             if ( extension == "py" ) {
+#ifdef Q_OS_WIN
+                interpreter = "python.exe";
+#endif
+#ifdef Q_OS_LINUX
                 interpreter = "python";
+#endif
             }
 
             if ( extension == "pl" or extension == "php" or extension == "py" ) {

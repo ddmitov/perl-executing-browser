@@ -56,14 +56,30 @@ protected:
                 QString extension = script.section(".", 1, 1);
                 qDebug() << "Extension:" << extension;
                 QString interpreter;
+
                 if ( extension == "pl" ) {
+#ifdef Q_OS_WIN
+                    interpreter = "perl.exe";
+#endif
+#ifdef Q_OS_LINUX
                     interpreter = "perl";
+#endif
                 }
                 if ( extension == "php" ) {
+#ifdef Q_OS_WIN
+                    interpreter = "php-cgi.exe";
+#endif
+#ifdef Q_OS_LINUX
                     interpreter = "php-cgi";
+#endif
                 }
                 if ( extension == "py" ) {
+#ifdef Q_OS_WIN
+                    interpreter = "python.exe";
+#endif
+#ifdef Q_OS_LINUX
                     interpreter = "python";
+#endif
                 }
 
                 if ( extension == "pl" or extension == "php" or extension == "py" ) {
@@ -146,26 +162,40 @@ public slots:
     {
         // Reading settings from INI file:
         QSettings settings ( QApplication::applicationDirPath() +
-                             QDir::separator () + "peb.ini", QSettings::NativeFormat );
+                             QDir::separator () + "peb.ini", QSettings::IniFormat );
         QString startPage = settings.value ( "gui/start_page" ).toString();
 
         qDebug() << "Start page:" << startPage;
-        QString startPageExtension = startPage.section ( ".", 1, 1 );
-        qDebug() << "Extension:" << startPageExtension;
+        QString extension = startPage.section ( ".", 1, 1 );
+        qDebug() << "Extension:" << extension;
         QString interpreter;
-        if ( startPageExtension == "pl" ) {
+
+        if ( extension == "pl" ) {
+#ifdef Q_OS_WIN
+            interpreter = "perl.exe";
+#endif
+#ifdef Q_OS_LINUX
             interpreter = "perl";
+#endif
         }
-        if ( startPageExtension == "php" ) {
+        if ( extension == "php" ) {
+#ifdef Q_OS_WIN
+            interpreter = "php-cgi.exe";
+#endif
+#ifdef Q_OS_LINUX
             interpreter = "php-cgi";
+#endif
         }
-        if ( startPageExtension == "py" ) {
+        if ( extension == "py" ) {
+#ifdef Q_OS_WIN
+            interpreter = "python.exe";
+#endif
+#ifdef Q_OS_LINUX
             interpreter = "python";
+#endif
         }
 
-        if ( startPageExtension == "pl" or
-             startPageExtension == "php" or
-             startPageExtension == "py" ) {
+        if ( extension == "pl" or extension == "php" or extension == "py" ) {
             qDebug() << "Interpreter:" << interpreter;
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -187,7 +217,7 @@ public slots:
             handler.close();
         }
 
-        if ( startPageExtension == "htm" or startPageExtension == "html" ) {
+        if ( extension == "htm" or extension == "html" ) {
             setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() +
                                            QDir::separator () +
                                            "html" + QDir::separator ()
@@ -234,23 +264,38 @@ public slots:
         }
     }
 
-    void contextMenuEvent ( QContextMenuEvent* event )
+    void contextMenuEvent ( QContextMenuEvent * event )
     {
-        QMenu *menu = main_page -> createStandardContextMenu();
+        // Reading settings from INI file:
+        QSettings settings ( QApplication::applicationDirPath() +
+                             QDir::separator () + "peb.ini", QSettings::IniFormat );
+        QString windowSize = settings.value ( "gui/window_size" ).toString();
+        QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
+        QMenu * menu = main_page -> createStandardContextMenu();
         menu -> addSeparator();
-        QAction* minimizeAct = menu -> addAction ( "Minimize" );
-        connect ( minimizeAct, SIGNAL ( triggered() ), this, SLOT ( minimizeSlot() ) );
-        QAction* maximizeAct = menu->addAction ( "Maximize" );
-        connect ( maximizeAct, SIGNAL ( triggered() ), this, SLOT ( maximizeSlot() ) );
-        QAction* toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
-        connect ( toggleFullScreenAct, SIGNAL ( triggered() ), this, SLOT ( toggleFullScreenSlot() ) );
-        QAction* homeAct = menu -> addAction ( "Home" );
-        connect ( homeAct, SIGNAL ( triggered() ), this, SLOT ( homeSlot() ) );
-        QAction* printAct = menu -> addAction ( "Print" );
-        connect ( printAct, SIGNAL ( triggered() ), this, SLOT ( printPageSlot() ) );
-        QAction* closeAct = menu -> addAction ( "Close" );
-        connect ( closeAct, SIGNAL ( triggered() ), this, SLOT ( closeAppSlot() ) );
-        menu -> exec ( QPoint ( event -> x(), event -> y() ) );
+        if ( windowSize == "maximized" or windowSize == "fullscreen" ) {
+            QAction * maximizeAct = menu->addAction ( "Maximize" );
+            connect ( maximizeAct, SIGNAL ( triggered() ),
+                      this, SLOT ( maximizeSlot() ) );
+            QAction * toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
+            connect ( toggleFullScreenAct, SIGNAL ( triggered() ),
+                      this, SLOT ( toggleFullScreenSlot() ) );
+        }
+        if ( framelessWindow == "no" ) {
+            QAction * minimizeAct = menu -> addAction ( "Minimize" );
+            connect ( minimizeAct, SIGNAL ( triggered() ),
+                      this, SLOT ( minimizeSlot() ) );
+        }
+        QAction * homeAct = menu -> addAction ( "Home" );
+        connect ( homeAct, SIGNAL ( triggered() ),
+                  this, SLOT ( homeSlot() ) );
+        QAction * printAct = menu -> addAction ( "Print" );
+        connect ( printAct, SIGNAL ( triggered() ),
+                  this, SLOT ( printPageSlot() ) );
+        QAction * closeAct = menu -> addAction ( "Close" );
+        connect ( closeAct, SIGNAL ( triggered() ),
+                  this, SLOT ( closeAppSlot() ) );
+        menu -> exec ( event -> globalPos() );
     }
 
     void printPageSlot()
@@ -269,8 +314,8 @@ public slots:
         dialog -> setWindowFlags ( Qt::WindowStaysOnTopHint );
         QSize dialogSize = dialog -> sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
-        dialog -> move(QPoint ( screenRect.width() / 2 - dialogSize.width() / 2,
-                            screenRect.height() / 2 - dialogSize.height() / 2 ) );
+        dialog -> move ( QPoint ( screenRect.width() / 2 - dialogSize.width() / 2,
+                                  screenRect.height() / 2 - dialogSize.height() / 2 ) );
         if ( dialog->exec() == QDialog::Accepted )
         {
             TopLevel::print ( & printer );
