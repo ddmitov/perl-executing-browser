@@ -1,6 +1,7 @@
 #!/usr/bin/perl -w
 
 # http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
+# UTF-8 encoded file
 
 use strict;
 use warnings;

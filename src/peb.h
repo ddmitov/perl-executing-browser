@@ -70,7 +70,7 @@ protected:
                     interpreter = "php-cgi.exe";
 #endif
 #ifdef Q_OS_LINUX
-                    interpreter = "php-cgi";
+                    interpreter = "php";
 #endif
                 }
                 if ( extension == "py" ) {
@@ -92,15 +92,16 @@ protected:
                         env.insert ( "CONTENT_LENGTH", postDataSize );
                     }
                     handler.setProcessEnvironment ( env );
-                    handler.setWorkingDirectory ( qApp->applicationDirPath() +
+                    handler.setWorkingDirectory ( QApplication::applicationDirPath() +
                                                   QDir::separator () + "scripts" );
                     handler.setStandardOutputFile ( QDir::tempPath() +
                                                     QDir::separator () + "output.htm" );
                     qDebug() << "TEMP folder:" << QDir::tempPath();
                     qDebug() << "===============";
-                    handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
-                                    QDir::separator () + "scripts" + QDir::separator () +
-                                    script );
+                    handler.start ( interpreter, QStringList() <<
+                                    QApplication::applicationDirPath() +
+                                    QDir::separator () + "scripts" +
+                                    QDir::separator () + script );
                     if ( postData.size() > 0 ){
                         handler.write ( outgoingByteArray );
                         handler.closeWriteChannel();
@@ -140,6 +141,7 @@ protected:
     bool acceptNavigationRequest ( QWebFrame * frame,
                                    const QNetworkRequest & request,
                                    QWebPage::NavigationType type );
+
 };
 
 class TopLevel : public QWebView
@@ -155,7 +157,7 @@ public slots:
     void closeAppSlot()
     {
         QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
-        qApp->exit();
+        QApplication::exit();
     };
 
     void homeSlot()
@@ -183,7 +185,7 @@ public slots:
             interpreter = "php-cgi.exe";
 #endif
 #ifdef Q_OS_LINUX
-            interpreter = "php-cgi";
+            interpreter = "php";
 #endif
         }
         if ( extension == "py" ) {
@@ -200,14 +202,16 @@ public slots:
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             handler.setProcessEnvironment ( env );
-            handler.setWorkingDirectory ( qApp->applicationDirPath() +
+            handler.setWorkingDirectory ( QApplication::applicationDirPath() +
                                           QDir::separator () + "scripts" );
             handler.setStandardOutputFile ( QDir::tempPath() +
                                             QDir::separator () + "output.htm" );
             qDebug() << "TEMP folder:" << QDir::tempPath();
             qDebug() << "===============";
-            handler.start ( interpreter, QStringList() << qApp->applicationDirPath() +
-                            QDir::separator () + "scripts" + QDir::separator () + startPage );
+            handler.start ( interpreter, QStringList() <<
+                            QApplication::applicationDirPath() +
+                            QDir::separator () + "scripts" +
+                            QDir::separator () + startPage );
             // wait until handler has finished
             if ( handler.waitForFinished() ){
                 setUrl ( QUrl::fromLocalFile ( QDir::tempPath() +
@@ -218,10 +222,9 @@ public slots:
         }
 
         if ( extension == "htm" or extension == "html" ) {
-            setUrl ( QUrl::fromLocalFile ( qApp->applicationDirPath() +
-                                           QDir::separator () +
-                                           "html" + QDir::separator ()
-                                           + startPage ) );
+            setUrl ( QUrl::fromLocalFile ( QApplication::applicationDirPath() +
+                                           QDir::separator () + "html" +
+                                           QDir::separator () + startPage ) );
             qDebug() << "===============";
         }
         QWebSettings::clearMemoryCaches();
@@ -274,9 +277,11 @@ public slots:
         QMenu * menu = main_page -> createStandardContextMenu();
         menu -> addSeparator();
         if ( windowSize == "maximized" or windowSize == "fullscreen" ) {
-            QAction * maximizeAct = menu->addAction ( "Maximize" );
-            connect ( maximizeAct, SIGNAL ( triggered() ),
-                      this, SLOT ( maximizeSlot() ) );
+            if ( framelessWindow == "no" ) {
+                QAction * maximizeAct = menu -> addAction ( "Maximize" );
+                connect ( maximizeAct, SIGNAL ( triggered() ),
+                          this, SLOT ( maximizeSlot() ) );
+            }
             QAction * toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
             connect ( toggleFullScreenAct, SIGNAL ( triggered() ),
                       this, SLOT ( toggleFullScreenSlot() ) );
@@ -316,7 +321,7 @@ public slots:
         QRect screenRect = QDesktopWidget().screen()->rect();
         dialog -> move ( QPoint ( screenRect.width() / 2 - dialogSize.width() / 2,
                                   screenRect.height() / 2 - dialogSize.height() / 2 ) );
-        if ( dialog->exec() == QDialog::Accepted )
+        if ( dialog -> exec() == QDialog::Accepted )
         {
             TopLevel::print ( & printer );
         }
