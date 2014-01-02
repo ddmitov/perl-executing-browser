@@ -49,11 +49,11 @@ protected:
             }
 
             qDebug() << "Form submitted to:" << request.url().toString();
-            QString script = request.url()
+            QString scriptpath = request.url()
                     .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
                     .replace ( "/", "" );
-            qDebug() << "Script:" << script;
-            QString extension = script.section(".", 1, 1);
+            qDebug() << "Script path:" << QApplication::applicationDirPath() + scriptpath;
+            QString extension = scriptpath.section(".", 1, 1);
             qDebug() << "Extension:" << extension;
             QString interpreter;
 
@@ -92,16 +92,21 @@ protected:
                     env.insert ( "CONTENT_LENGTH", postDataSize );
                 }
                 handler.setProcessEnvironment ( env );
-                handler.setWorkingDirectory ( QApplication::applicationDirPath() +
-                                              QDir::separator () + "scripts" );
-                handler.setStandardOutputFile ( QDir::tempPath() +
-                                                QDir::separator () + "output.htm" );
+                handler.setWorkingDirectory (
+                            QDir::toNativeSeparators (
+                                QApplication::applicationDirPath() +
+                                QDir::separator () + "scripts" ) );
+                handler.setStandardOutputFile (
+                            QDir::toNativeSeparators (
+                                QDir::tempPath() +
+                                QDir::separator () + "output.htm" ) );
                 qDebug() << "TEMP folder:" << QDir::tempPath();
                 qDebug() << "===============";
                 handler.start ( interpreter, QStringList() <<
-                                QApplication::applicationDirPath() +
-                                QDir::separator () + "scripts" +
-                                QDir::separator () + script );
+                                QDir::toNativeSeparators (
+                                    QApplication::applicationDirPath() +
+                                    QDir::separator () + "scripts" +
+                                    QDir::separator () + scriptpath ) );
                 if ( postData.size() > 0 ){
                     handler.write ( outgoingByteArray );
                     handler.closeWriteChannel();
@@ -114,9 +119,11 @@ protected:
                     QWebSettings::clearMemoryCaches();
                     return QNetworkAccessManager::createRequest (
                                 QNetworkAccessManager::GetOperation,
-                                QNetworkRequest ( QUrl::fromLocalFile ( QDir::tempPath() +
-                                                                        QDir::separator() +
-                                                                        "output.htm" ) ) );
+                                QNetworkRequest ( QUrl::fromLocalFile (
+                                                      QDir::toNativeSeparators (
+                                                          QDir::tempPath() +
+                                                          QDir::separator() +
+                                                          "output.htm" ) ) ) );
                 }
 
             }
@@ -155,15 +162,19 @@ public slots:
 
     void closeAppSlot()
     {
-        QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
+        QFile::remove (
+                    QDir::toNativeSeparators (
+                        QDir::tempPath() + QDir::separator () + "output.htm" ) );
         QApplication::exit();
     };
 
     void homeSlot()
     {
         // Reading settings from INI file:
-        QSettings settings ( QApplication::applicationDirPath() +
-                             QDir::separator () + "peb.ini", QSettings::IniFormat );
+        QSettings settings (
+                    QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + "peb.ini"), QSettings::IniFormat );
         QString startPage = settings.value ( "gui/start_page" ).toString();
 
         qDebug() << "Start page:" << startPage;
@@ -201,29 +212,38 @@ public slots:
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             handler.setProcessEnvironment ( env );
-            handler.setWorkingDirectory ( QApplication::applicationDirPath() +
-                                          QDir::separator () + "scripts" );
-            handler.setStandardOutputFile ( QDir::tempPath() +
-                                            QDir::separator () + "output.htm" );
+            handler.setWorkingDirectory (
+                        QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() +
+                            QDir::separator () + "scripts" ) );
+            handler.setStandardOutputFile (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath() +
+                            QDir::separator () + "output.htm" ) );
             qDebug() << "TEMP folder:" << QDir::tempPath();
             qDebug() << "===============";
             handler.start ( interpreter, QStringList() <<
-                            QApplication::applicationDirPath() +
-                            QDir::separator () + "scripts" +
-                            QDir::separator () + startPage );
+                            QDir::toNativeSeparators (
+                                QApplication::applicationDirPath() +
+                                QDir::separator () + "scripts" +
+                                QDir::separator () + startPage ) );
             // wait until handler has finished
             if ( handler.waitForFinished() ){
-                setUrl ( QUrl::fromLocalFile ( QDir::tempPath() +
-                                               QDir::separator () +
-                                               "output.htm" ) );
+                setUrl ( QUrl::fromLocalFile (
+                             QDir::toNativeSeparators (
+                                 QDir::tempPath() +
+                                 QDir::separator () +
+                                 "output.htm" ) ) );
             }
             handler.close();
         }
 
         if ( extension == "htm" or extension == "html" ) {
-            setUrl ( QUrl::fromLocalFile ( QApplication::applicationDirPath() +
-                                           QDir::separator () + "html" +
-                                           QDir::separator () + startPage ) );
+            setUrl ( QUrl::fromLocalFile (
+                         QDir::toNativeSeparators (
+                             QApplication::applicationDirPath() +
+                             QDir::separator () + "html" +
+                             QDir::separator () + startPage ) ) );
             qDebug() << "===============";
         }
         QWebSettings::clearMemoryCaches();
@@ -254,7 +274,9 @@ public slots:
         if ( ok )
         {
             setWindowTitle ( TopLevel::title() );
-            QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
+            QFile::remove (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath() + QDir::separator () + "output.htm" ) );
         }
     }
 
@@ -262,15 +284,19 @@ public slots:
     {
         if ( ok )
         {
-            QFile::remove ( QDir::tempPath() + QDir::separator () + "output.htm" );
+            QFile::remove (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath() + QDir::separator () + "output.htm" ) );
         }
     }
 
     void contextMenuEvent ( QContextMenuEvent * event )
     {
         // Reading settings from INI file:
-        QSettings settings ( QApplication::applicationDirPath() +
-                             QDir::separator () + "peb.ini", QSettings::IniFormat );
+        QSettings settings (
+                    QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + "peb.ini" ), QSettings::IniFormat );
         QString windowSize = settings.value ( "gui/window_size" ).toString();
         QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
         QMenu * menu = main_page -> createStandardContextMenu();

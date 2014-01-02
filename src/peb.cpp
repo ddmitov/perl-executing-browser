@@ -4,23 +4,24 @@
 // Perl Executing Browser (PEB) is a Qt4/5 WebKit browser
 // capable of executing Perl scripts locally without a webserver,
 // providing them with a nice HTML4/5 interface for both input and output and
-// using CGI protocol GET and POST methods for communication between HTML forms and scripts.
+// using CGI protocol GET and POST methods for communication with the scripts.
 
-// PEB can be used as an easy to set up HTML/CSS/JavaScript GUI for
-// Perl (possibly PHP/Python) scripts and has the following design objectives:
-// * 1. Zero installation solution:
-//    pack your Perl modules or even your version of Perl with
-//    a copy of PEB browser and its Qt libraries and
-//    run your application from everywhere, even from USB sticks;
-// * 2. Cross-platform availability:
-//    use it on every platform and device (desktop, tablet, smartphone),
-//    where Perl and Qt4 or Qt5 could be compiled;
-// * 3. Scripts control everything, including network access:
-//    a) if no network connectivity is wanted or needed,
-//    no services are started, no ports are opened, no firewall notifications are triggered,
-//    no need for administrative privileges and everything remains in the userspace, but
-//    b) if network connection is essential, it should be implemented entirely in the scripts
-//    that PEB is going to execute with a high level of control and flexibility.
+// Perl Executing Browser has the following design objectives:
+// * 1. Easy to set up and adapt HTML/CSS/JavaScript GUI for
+//     Perl (possibly PHP, Python and other) scripts;
+// * 2. Zero installation solution:
+//     pack your Perl modules or even your version of Perl with
+//     a copy of PEB browser and its Qt libraries and
+//     run your application from everywhere, even from USB sticks;
+// * 3. Cross-platform availability:
+//     use it on every platform and device (desktop, tablet, smartphone),
+//     where Perl and Qt4 or Qt5 could be compiled;
+// * 4. Scripts control everything, including network access:
+//     a) if no network connectivity is wanted or needed,
+//     no services are started, no ports are opened, no firewall notifications are triggered,
+//     no need for administrative privileges and everything remains in the userspace, but
+//     b) if network connection is essential, it should be implemented entirely in the scripts
+//     that PEB is going to execute with a high level of control and flexibility.
 
 // PEB also exposes some desktop functionalities,
 // which are accessible from special URLs and currently are:
@@ -35,13 +36,12 @@
 // Do not use it for production purposes!
 // No feature or implementation should be considered final at this point.
 // Proper documentation and examples are still missing.
-// Compiled and tested successfully using:
-// 1. Qt Creator 2.5.0 and Qt 4.8.2 under 32 bit Debian Linux,
-// 2. Qt Creator 2.8.1 and Qt 5.1.1 under 32 bit Debian Linux.
 
-// This software is licensed under the terms of GNU GPL v.3 and
-// is provided without warranties of any kind!
-// Dimitar D. Mitov, 2013, ddmitov (at) yahoo (dot) com
+// Compiled and tested successfully using:
+// 1. Qt Creator 2.5.0 and Qt 4.8.2 on 32 bit Debian Linux,
+// 2. Qt Creator 2.8.1 and Qt 5.1.1 on 32 bit Debian Linux,
+// 3. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,
+// 4. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,
 
 // This software is licensed under the terms of GNU GPL v.3 and
 // is provided without warranties of any kind!
@@ -150,11 +150,15 @@ int main ( int argc, char **argv )
 {
     QApplication app ( argc, argv );
 
+    qDebug() << "Perl Executing Browser v.0.1 started.";
+
     QString settingsFileName = QDir::toNativeSeparators (
-                QApplication::applicationDirPath() + QDir::separator () + "peb.ini" );
+                QApplication::applicationDirPath() + QDir::separator() + "peb.ini" );
+
     QFile settingsFile ( settingsFileName );
     if( !settingsFile.exists() )
     {
+        qDebug() << "'peb.ini' is missing. Please restore the missing file.";
         QMessageBox msgBox;
         msgBox.setIcon( QMessageBox::Critical );
         msgBox.setWindowTitle ( "Critical file missing" );
@@ -217,8 +221,8 @@ int main ( int argc, char **argv )
     qputenv ( "PERL5LIB", perl5Lib );
 
     QString iconPath = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
-                                                  QDir::separator () + "icons" +
-                                                  QDir::separator () + windowIcon );
+                                                  QDir::separator() + "icons" +
+                                                  QDir::separator() + windowIcon );
     QApplication::setWindowIcon ( QIcon ( iconPath ) );
     qDebug() << "Icon:" << iconPath;
 
@@ -392,8 +396,8 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator () + "icons" +
-                                       QDir::separator () + windowIcon ) );
+                                       QDir::separator() + "icons" +
+                                       QDir::separator() + windowIcon ) );
         QString fileNameString = dialog.getOpenFileName ( 0, "Select File",
                                                           QDir::currentPath(), "All files (*)" );
         QByteArray fileName;
@@ -416,8 +420,8 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator () + "icons" +
-                                       QDir::separator () + windowIcon ) );
+                                       QDir::separator() + "icons" +
+                                       QDir::separator() + windowIcon ) );
         QString folderNameString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath() );
         QByteArray folderName;
@@ -493,10 +497,10 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
          .isParentOf ( request.url() ) ) {
 
         qDebug() << "Local link:" << request.url().toString();
-        QString file = request.url()
+        QString filepath = request.url()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        qDebug() << "File:" << file;
-        QString extension = file.section ( ".", 1, 1 );
+        qDebug() << "File path:" << QApplication::applicationDirPath() + filepath;
+        QString extension = filepath.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
 
@@ -536,27 +540,65 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
                                 QUrl::RemovePath )
                     .replace ( "?", "" );
             env.insert ( "QUERY_STRING", query );
+
+            // Support for long-running scripts:
+            QString longrunOutputFileName;
+            if ( filepath.contains ( "longrun" ) ) {
+                env.insert ( "TMPDIR", QDir::tempPath() );
+                longrunOutputFileName = QDir::toNativeSeparators (
+                            QDir::tempPath() + QDir::separator() + filepath
+                            .replace ( QDir::separator(), "-") +
+                            "-longrun-output.htm" );
+                env.insert ( "OUTPUT_FILE", longrunOutputFileName );
+                QString longrunSignalFileName = QDir::toNativeSeparators (
+                            QDir::tempPath() + QDir::separator() + filepath
+                            .replace ( QDir::separator(), "-" ) +
+                            "-longrun-signal.txt" );
+                env.insert ( "SIGNAL_FILE", longrunSignalFileName );
+            }
+
             handler.setProcessEnvironment ( env );
-            handler.setWorkingDirectory ( QApplication::applicationDirPath() +
-                                          QDir::separator () + "scripts" );
-            handler.setStandardOutputFile ( QDir::tempPath() + QDir::separator () +
-                                            "output.htm" );
+            handler.setWorkingDirectory (
+                        QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() + QDir::separator() + "scripts" ) );
+            handler.setStandardOutputFile (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath() + QDir::separator() + "output.htm" ) );
             qDebug() << "TEMP folder:" << QDir::tempPath();
             qDebug() << "===============";
-            handler.start ( interpreter, QStringList() << QApplication::applicationDirPath() +
-                            QDir::separator () + "scripts" + QDir::separator () + file );
+            handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
+                                QApplication::applicationDirPath() +
+                                QDir::separator() + "scripts" +
+                                QDir::separator() + filepath ) );
             // wait until handler has finished
             if ( !handler.waitForFinished() )
                 return 1;
-            frame -> load ( QUrl::fromLocalFile ( QDir::tempPath() + QDir::separator () +
-                                                  "output.htm" ) );
+
+            // Support for long-running scripts:
+            if ( filepath.contains ( "longrun" ) ) {
+                QFile longrunOutputFile ( longrunOutputFileName );
+                if( !longrunOutputFile.exists() ) {
+                    return 1;
+                }
+                frame -> load ( QUrl::fromLocalFile ( longrunOutputFileName ) );
+            }
+
+            if ( !filepath.contains ( "longrun" ) ) {
+                frame -> load ( QUrl::fromLocalFile (
+                                    QDir::toNativeSeparators (
+                                        QDir::tempPath() + QDir::separator() +
+                                        "output.htm" ) ) );
+            }
+
             handler.close();
         }
 
         if ( extension == "htm" or extension == "html" ) {
-            frame -> load ( QUrl::fromLocalFile ( QApplication::applicationDirPath() +
-                                                  QDir::separator () + "html" +
-                                                  QDir::separator () + file ) );
+            frame -> load ( QUrl::fromLocalFile (
+                                QDir::toNativeSeparators (
+                                    QApplication::applicationDirPath() +
+                                    QDir::separator() + "html" +
+                                    QDir::separator() + filepath ) ) );
             qDebug() << "===============";
         }
 
@@ -573,11 +615,16 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
                                   QUrl::RemovePath )
          .replace ( "?", "" ).length() > 0 ) {
 
-        qDebug() << "Form submitted to:" << request.url().toString();
-        QString script = request.url()
+        qDebug() << "Form submitted to:" << request.url().toString ( QUrl::RemoveQuery );
+        QString scriptpath = request.url()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        qDebug() << "Script:" << script;
-        QString extension = script.section(".", 1, 1);
+        qDebug() << "Script path:" << QApplication::applicationDirPath() + scriptpath;
+        qDebug() << "Query string:" << request.url()
+                    .toString ( QUrl::RemoveScheme |
+                                QUrl::RemoveAuthority |
+                                QUrl::RemovePath )
+                    .replace ( "?", "" );
+        QString extension = scriptpath.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
 
@@ -620,28 +667,35 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             //#ifdef Q_WS_WIN
             //                env.insert ( "PATH", env.value ( "Path" ) + ";" +
             //                             QApplication::applicationDirPath() +
-            //                             QDir::separator () + "scripts" ); //win32
+            //                             QDir::separator() + "scripts" ); //win32
             //#endif
             //#ifdef Q_OS_LINUX
             //                env.insert ( "PATH", env.value ( "PATH" ) + ":" +
             //                             QApplication::applicationDirPath() +
-            //                             QDir::separator () + "scripts" ); //linux
+            //                             QDir::separator() + "scripts" ); //linux
             //#endif
             handler.setProcessEnvironment ( env );
-            handler.setWorkingDirectory ( QApplication::applicationDirPath() +
-                                          QDir::separator () + "scripts" );
-            handler.setStandardOutputFile ( QDir::tempPath() +
-                                            QDir::separator () + "output.htm" );
+            handler.setWorkingDirectory (
+                        QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() +
+                            QDir::separator() + "scripts" ) );
+            handler.setStandardOutputFile (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath() +
+                            QDir::separator() + "output.htm" ) );
             qDebug() << "TEMP folder:" << QDir::tempPath();
             qDebug() << "===============";
-            handler.start ( interpreter, QStringList() << QApplication::applicationDirPath() +
-                            QDir::separator () + "scripts" + QDir::separator () +
-                            script );
+            handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
+                                QApplication::applicationDirPath() +
+                                QDir::separator() + "scripts" +
+                                QDir::separator() + scriptpath ) );
             // wait until handler has finished
             if ( !handler.waitForFinished() )
                 return 1;
-            frame -> load ( QUrl::fromLocalFile ( QDir::tempPath() +
-                                                  QDir::separator () + "output.htm" ) );
+            frame -> load ( QUrl::fromLocalFile (
+                                QDir::toNativeSeparators(
+                                    QDir::tempPath() +
+                                    QDir::separator() + "output.htm" ) ) );
             handler.close();
             qputenv ( "FILE_TO_OPEN", "" );
             qputenv ( "FOLDER_TO_OPEN", "" );
