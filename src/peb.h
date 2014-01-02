@@ -35,7 +35,9 @@ protected:
                                             QIODevice * outgoingData = 0 ) {
 
         // POST method form data:
-        if ( operation == PostOperation ){
+        if ( operation == PostOperation and
+             ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
+             .isParentOf ( request.url() ) ){
 
             QString postData;
             QByteArray outgoingByteArray;
@@ -46,80 +48,77 @@ protected:
                 qDebug() << "POST data:" << postData;
             }
 
-            QUrl allowedBase = ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) );
-            if ( allowedBase.isParentOf ( request.url() ) ) {
-                qDebug() << "Form submitted to:" << request.url().toString();
-                QString script = request.url()
-                        .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
-                        .replace ( "/", "" );
-                qDebug() << "Script:" << script;
-                QString extension = script.section(".", 1, 1);
-                qDebug() << "Extension:" << extension;
-                QString interpreter;
+            qDebug() << "Form submitted to:" << request.url().toString();
+            QString script = request.url()
+                    .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
+                    .replace ( "/", "" );
+            qDebug() << "Script:" << script;
+            QString extension = script.section(".", 1, 1);
+            qDebug() << "Extension:" << extension;
+            QString interpreter;
 
-                if ( extension == "pl" ) {
+            if ( extension == "pl" ) {
 #ifdef Q_OS_WIN
-                    interpreter = "perl.exe";
+                interpreter = "perl.exe";
 #endif
 #ifdef Q_OS_LINUX
-                    interpreter = "perl";
+                interpreter = "perl";
 #endif
-                }
-                if ( extension == "php" ) {
+            }
+            if ( extension == "php" ) {
 #ifdef Q_OS_WIN
-                    interpreter = "php-cgi.exe";
+                interpreter = "php-cgi.exe";
 #endif
 #ifdef Q_OS_LINUX
-                    interpreter = "php";
+                interpreter = "php";
 #endif
-                }
-                if ( extension == "py" ) {
+            }
+            if ( extension == "py" ) {
 #ifdef Q_OS_WIN
-                    interpreter = "python.exe";
+                interpreter = "python.exe";
 #endif
 #ifdef Q_OS_LINUX
-                    interpreter = "python";
+                interpreter = "python";
 #endif
+            }
+
+            if ( extension == "pl" or extension == "php" or extension == "py" ) {
+                qDebug() << "Interpreter:" << interpreter;
+                QProcess handler;
+                QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+                if ( postData.size() > 0 ){
+                    env.insert ( "REQUEST_METHOD", "POST" );
+                    QString postDataSize = QString::number ( postData.size() );
+                    env.insert ( "CONTENT_LENGTH", postDataSize );
+                }
+                handler.setProcessEnvironment ( env );
+                handler.setWorkingDirectory ( QApplication::applicationDirPath() +
+                                              QDir::separator () + "scripts" );
+                handler.setStandardOutputFile ( QDir::tempPath() +
+                                                QDir::separator () + "output.htm" );
+                qDebug() << "TEMP folder:" << QDir::tempPath();
+                qDebug() << "===============";
+                handler.start ( interpreter, QStringList() <<
+                                QApplication::applicationDirPath() +
+                                QDir::separator () + "scripts" +
+                                QDir::separator () + script );
+                if ( postData.size() > 0 ){
+                    handler.write ( outgoingByteArray );
+                    handler.closeWriteChannel();
                 }
 
-                if ( extension == "pl" or extension == "php" or extension == "py" ) {
-                    qDebug() << "Interpreter:" << interpreter;
-                    QProcess handler;
-                    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-                    if ( postData.size() > 0 ){
-                        env.insert ( "REQUEST_METHOD", "POST" );
-                        QString postDataSize = QString::number ( postData.size() );
-                        env.insert ( "CONTENT_LENGTH", postDataSize );
-                    }
-                    handler.setProcessEnvironment ( env );
-                    handler.setWorkingDirectory ( QApplication::applicationDirPath() +
-                                                  QDir::separator () + "scripts" );
-                    handler.setStandardOutputFile ( QDir::tempPath() +
-                                                    QDir::separator () + "output.htm" );
-                    qDebug() << "TEMP folder:" << QDir::tempPath();
-                    qDebug() << "===============";
-                    handler.start ( interpreter, QStringList() <<
-                                    QApplication::applicationDirPath() +
-                                    QDir::separator () + "scripts" +
-                                    QDir::separator () + script );
-                    if ( postData.size() > 0 ){
-                        handler.write ( outgoingByteArray );
-                        handler.closeWriteChannel();
-                    }
-
-                    if ( handler.waitForFinished() ){
-                        handler.close();
-                        qputenv ( "FILE_TO_OPEN", "" );
-                        qputenv ( "FOLDER_TO_OPEN", "" );
-                        QWebSettings::clearMemoryCaches();
-                        return QNetworkAccessManager::createRequest (
-                                    QNetworkAccessManager::GetOperation,
-                                    QNetworkRequest ( QUrl::fromLocalFile ( QDir::tempPath() +
-                                                                            QDir::separator() +
-                                                                            "output.htm" ) ) );
-                    }
-
+                if ( handler.waitForFinished() ){
+                    handler.close();
+                    qputenv ( "FILE_TO_OPEN", "" );
+                    qputenv ( "FOLDER_TO_OPEN", "" );
+                    QWebSettings::clearMemoryCaches();
+                    return QNetworkAccessManager::createRequest (
+                                QNetworkAccessManager::GetOperation,
+                                QNetworkRequest ( QUrl::fromLocalFile ( QDir::tempPath() +
+                                                                        QDir::separator() +
+                                                                        "output.htm" ) ) );
                 }
+
             }
 
         }
