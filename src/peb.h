@@ -50,8 +50,7 @@ protected:
 
             qDebug() << "Form submitted to:" << request.url().toString();
             QString scriptpath = request.url()
-                    .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery )
-                    .replace ( "/", "" );
+                    .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
             qDebug() << "Script path:" << QApplication::applicationDirPath() + scriptpath;
             QString extension = scriptpath.section(".", 1, 1);
             qDebug() << "Extension:" << extension;
@@ -92,10 +91,15 @@ protected:
                     env.insert ( "CONTENT_LENGTH", postDataSize );
                 }
                 handler.setProcessEnvironment ( env );
+
+                QFileInfo script ( scriptpath );
+                QString scriptDirectory = QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() +
+                            script.absoluteDir().absolutePath () );
                 handler.setWorkingDirectory (
-                            QDir::toNativeSeparators (
-                                QApplication::applicationDirPath() +
-                                QDir::separator () + "scripts" ) );
+                            QDir::toNativeSeparators ( scriptDirectory ) );
+                qDebug() << "Working directory:" << scriptDirectory;
+
                 handler.setStandardOutputFile (
                             QDir::toNativeSeparators (
                                 QDir::tempPath() +
@@ -105,7 +109,6 @@ protected:
                 handler.start ( interpreter, QStringList() <<
                                 QDir::toNativeSeparators (
                                     QApplication::applicationDirPath() +
-                                    QDir::separator () + "scripts" +
                                     QDir::separator () + scriptpath ) );
                 if ( postData.size() > 0 ){
                     handler.write ( outgoingByteArray );
@@ -175,10 +178,10 @@ public slots:
                     QDir::toNativeSeparators (
                         QApplication::applicationDirPath() +
                         QDir::separator () + "peb.ini"), QSettings::IniFormat );
-        QString startPage = settings.value ( "gui/start_page" ).toString();
+        QString startPagePathName = settings.value ( "gui/start_page" ).toString();
 
-        qDebug() << "Start page:" << startPage;
-        QString extension = startPage.section ( ".", 1, 1 );
+        qDebug() << "Start page:" << startPagePathName;
+        QString extension = startPagePathName.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
 
@@ -212,10 +215,15 @@ public slots:
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             handler.setProcessEnvironment ( env );
+
+            QFileInfo startPage ( startPagePathName );
+            QString startPageDirectory = QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        startPage.absoluteDir().absolutePath () );
             handler.setWorkingDirectory (
-                        QDir::toNativeSeparators (
-                            QApplication::applicationDirPath() +
-                            QDir::separator () + "scripts" ) );
+                        QDir::toNativeSeparators ( startPageDirectory ) );
+            qDebug() << "Working directory:" << startPageDirectory;
+
             handler.setStandardOutputFile (
                         QDir::toNativeSeparators (
                             QDir::tempPath() +
@@ -225,8 +233,7 @@ public slots:
             handler.start ( interpreter, QStringList() <<
                             QDir::toNativeSeparators (
                                 QApplication::applicationDirPath() +
-                                QDir::separator () + "scripts" +
-                                QDir::separator () + startPage ) );
+                                QDir::separator () + startPagePathName ) );
             // wait until handler has finished
             if ( handler.waitForFinished() ){
                 setUrl ( QUrl::fromLocalFile (
@@ -242,8 +249,7 @@ public slots:
             setUrl ( QUrl::fromLocalFile (
                          QDir::toNativeSeparators (
                              QApplication::applicationDirPath() +
-                             QDir::separator () + "html" +
-                             QDir::separator () + startPage ) ) );
+                             QDir::separator () + startPagePathName ) ) );
             qDebug() << "===============";
         }
         QWebSettings::clearMemoryCaches();

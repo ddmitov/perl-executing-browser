@@ -7,16 +7,16 @@
 // using CGI protocol GET and POST methods for communication with the scripts.
 
 // Perl Executing Browser has the following design objectives:
-// * 1. Easy to set up and adapt HTML/CSS/JavaScript GUI for
+//* 1. Easy to set up and adapt HTML/CSS/JavaScript GUI for
 //     Perl (possibly PHP, Python and other) scripts;
-// * 2. Zero installation solution:
+//* 2. Zero installation solution:
 //     pack your Perl modules or even your version of Perl with
 //     a copy of PEB browser and its Qt libraries and
 //     run your application from everywhere, even from USB sticks;
-// * 3. Cross-platform availability:
+//* 3. Cross-platform availability:
 //     use it on every platform and device (desktop, tablet, smartphone),
 //     where Perl and Qt4 or Qt5 could be compiled;
-// * 4. Scripts control everything, including network access:
+//* 4. Scripts control everything, including network access:
 //     a) if no network connectivity is wanted or needed,
 //     no services are started, no ports are opened, no firewall notifications are triggered,
 //     no need for administrative privileges and everything remains in the userspace, but
@@ -49,14 +49,16 @@
 
 // REFERENCES:
 // https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
+// http://qt-project.org/doc/qt-4.8/qwebhistory.html
+// http://qt-project.org/doc/qt-4.8/qdir.html
+// http://qt-project.org/doc/qt-4.8/mainwindows-menus.html
+// http://qt-project.org/doc/qt-4.8/qfileinfo.html
+// http://qt-project.org/doc/qt-4.8/qdir.html
 // http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qurl.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qstring.html
-// http://qt-project.org/doc/qt-4.8/qwebhistory.html
-// http://qt-project.org/doc/qt-4.8/qdir.html
-// http://qt-project.org/doc/qt-4.8/mainwindows-menus.html
 // http://qt-project.org/wiki/How_to_Use_QSettings
 // http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
 // http://qt-project.org/forums/viewthread/23835
@@ -82,8 +84,8 @@
 // http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html
-// http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebpage.html
 // http://harmattan-dev.nokia.com/docs/library/html/qt4/qtglobal.html
+// http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebpage.html
 // http://stackoverflow.com/questions/14987007/what-is-the-expected-encoding-for-qwebviewsethtml
 // http://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage
 // http://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application
@@ -159,6 +161,7 @@ int main ( int argc, char **argv )
     if( !settingsFile.exists() )
     {
         qDebug() << "'peb.ini' is missing. Please restore the missing file.";
+        qDebug() << "Exiting.";
         QMessageBox msgBox;
         msgBox.setIcon( QMessageBox::Critical );
         msgBox.setWindowTitle ( "Critical file missing" );
@@ -408,7 +411,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.close();
         dialog.deleteLater();
         return true;
-
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -432,7 +434,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.close();
         dialog.deleteLater();
         return true;
-
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -459,15 +460,14 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog -> close();
         dialog -> deleteLater();
         return true;
-
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/close/" ) )
          .isParentOf ( request.url() ) ) {
         qDebug() << "Application termination requested from URL.";
+        qDebug() << "Exiting.";
         QApplication::exit();
-
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -540,27 +540,16 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
                                 QUrl::RemovePath )
                     .replace ( "?", "" );
             env.insert ( "QUERY_STRING", query );
-
-            // Support for long-running scripts:
-            QString longrunOutputFileName;
-            if ( filepath.contains ( "longrun" ) ) {
-                env.insert ( "TMPDIR", QDir::tempPath() );
-                longrunOutputFileName = QDir::toNativeSeparators (
-                            QDir::tempPath() + QDir::separator() + filepath
-                            .replace ( QDir::separator(), "-") +
-                            "-longrun-output.htm" );
-                env.insert ( "OUTPUT_FILE", longrunOutputFileName );
-                QString longrunSignalFileName = QDir::toNativeSeparators (
-                            QDir::tempPath() + QDir::separator() + filepath
-                            .replace ( QDir::separator(), "-" ) +
-                            "-longrun-signal.txt" );
-                env.insert ( "SIGNAL_FILE", longrunSignalFileName );
-            }
-
             handler.setProcessEnvironment ( env );
+
+            QFileInfo file ( filepath );
+            QString fileDirectory = QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        file.absoluteDir().absolutePath () );
             handler.setWorkingDirectory (
-                        QDir::toNativeSeparators (
-                            QApplication::applicationDirPath() + QDir::separator() + "scripts" ) );
+                        QDir::toNativeSeparators ( fileDirectory ) );
+            qDebug() << "Working directory:" << fileDirectory;
+
             handler.setStandardOutputFile (
                         QDir::toNativeSeparators (
                             QDir::tempPath() + QDir::separator() + "output.htm" ) );
@@ -568,28 +557,14 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             qDebug() << "===============";
             handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                 QApplication::applicationDirPath() +
-                                QDir::separator() + "scripts" +
                                 QDir::separator() + filepath ) );
             // wait until handler has finished
             if ( !handler.waitForFinished() )
                 return 1;
-
-            // Support for long-running scripts:
-            if ( filepath.contains ( "longrun" ) ) {
-                QFile longrunOutputFile ( longrunOutputFileName );
-                if( !longrunOutputFile.exists() ) {
-                    return 1;
-                }
-                frame -> load ( QUrl::fromLocalFile ( longrunOutputFileName ) );
-            }
-
-            if ( !filepath.contains ( "longrun" ) ) {
-                frame -> load ( QUrl::fromLocalFile (
-                                    QDir::toNativeSeparators (
-                                        QDir::tempPath() + QDir::separator() +
-                                        "output.htm" ) ) );
-            }
-
+            frame -> load ( QUrl::fromLocalFile (
+                                QDir::toNativeSeparators (
+                                    QDir::tempPath() + QDir::separator() +
+                                    "output.htm" ) ) );
             handler.close();
         }
 
@@ -597,7 +572,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             frame -> load ( QUrl::fromLocalFile (
                                 QDir::toNativeSeparators (
                                     QApplication::applicationDirPath() +
-                                    QDir::separator() + "html" +
                                     QDir::separator() + filepath ) ) );
             qDebug() << "===============";
         }
@@ -664,21 +638,16 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
                                 QUrl::RemovePath )
                     .replace ( "?", "" );
             env.insert ( "QUERY_STRING", query );
-            //#ifdef Q_WS_WIN
-            //                env.insert ( "PATH", env.value ( "Path" ) + ";" +
-            //                             QApplication::applicationDirPath() +
-            //                             QDir::separator() + "scripts" ); //win32
-            //#endif
-            //#ifdef Q_OS_LINUX
-            //                env.insert ( "PATH", env.value ( "PATH" ) + ":" +
-            //                             QApplication::applicationDirPath() +
-            //                             QDir::separator() + "scripts" ); //linux
-            //#endif
             handler.setProcessEnvironment ( env );
+
+            QFileInfo script ( scriptpath );
+            QString scriptDirectory = QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        script.absoluteDir().absolutePath () );
             handler.setWorkingDirectory (
-                        QDir::toNativeSeparators (
-                            QApplication::applicationDirPath() +
-                            QDir::separator() + "scripts" ) );
+                        QDir::toNativeSeparators ( scriptDirectory ) );
+            qDebug() << "Working directory:" << scriptDirectory;
+
             handler.setStandardOutputFile (
                         QDir::toNativeSeparators (
                             QDir::tempPath() +
@@ -687,7 +656,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             qDebug() << "===============";
             handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                 QApplication::applicationDirPath() +
-                                QDir::separator() + "scripts" +
                                 QDir::separator() + scriptpath ) );
             // wait until handler has finished
             if ( !handler.waitForFinished() )
