@@ -21,11 +21,11 @@ print "Test Results\n";
 print "</font></p>\n";
 
 print "<p align='left'><font size='3' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/index.pl'>Back to the dynamic startpage</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/index.pl'>Back to the dynamic startpage</a>\n";
 print "</font></p>\n";
 
 print "<p align='left'><font size='3' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/index.htm'>Back to the static startpage</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/html/index.htm'>Back to the static startpage</a>\n";
 print "</font></p>\n";
 
 print "</font></p>\n";

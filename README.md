@@ -45,5 +45,5 @@ Compiled and tested successfully using:
   
 This software is licensed under the terms of GNU GPL v.3 and  
 is provided without warranties of any kind!  
-Dimitar D. Mitov, 2013, ddmitov (at) yahoo (dot) com  
+Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  
   
