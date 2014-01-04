@@ -223,11 +223,10 @@ int main ( int argc, char **argv )
     perl5Lib.append ( "lib" );
     qputenv ( "PERL5LIB", perl5Lib );
 
-    QString iconPath = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
-                                                  QDir::separator() + "icons" +
+    QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
                                                   QDir::separator() + windowIcon );
-    QApplication::setWindowIcon ( QIcon ( iconPath ) );
-    qDebug() << "Icon:" << iconPath;
+    QApplication::setWindowIcon ( QIcon ( iconPathName ) );
+    qDebug() << "Icon:" << iconPathName;
 
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
@@ -399,7 +398,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator() + "icons" +
                                        QDir::separator() + windowIcon ) );
         QString fileNameString = dialog.getOpenFileName ( 0, "Select File",
                                                           QDir::currentPath(), "All files (*)" );
@@ -422,7 +420,6 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator() + "icons" +
                                        QDir::separator() + windowIcon ) );
         QString folderNameString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath() );
