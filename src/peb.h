@@ -96,8 +96,7 @@ protected:
                 QString scriptDirectory = QDir::toNativeSeparators (
                             QApplication::applicationDirPath() +
                             script.absoluteDir().absolutePath () );
-                handler.setWorkingDirectory (
-                            QDir::toNativeSeparators ( scriptDirectory ) );
+                handler.setWorkingDirectory ( scriptDirectory );
                 qDebug() << "Working directory:" << scriptDirectory;
 
                 handler.setStandardOutputFile (
@@ -141,6 +140,17 @@ class Page : public QWebPage
 {
     Q_OBJECT
 
+public slots:
+    void sysTrayAbout()
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon( QMessageBox::Information );
+        msgBox.setWindowTitle ( "About" );
+        msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
+        msgBox.setDefaultButton( QMessageBox::Ok );
+        msgBox.exec();
+    }
+
 public:
 
     Page();
@@ -151,7 +161,14 @@ protected:
                                    const QNetworkRequest & request,
                                    QWebPage::NavigationType type );
 
+private:
+    QAction *quitAction;
+    QAction *aboutAction;
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
+
 };
+
 
 class TopLevel : public QWebView
 {
@@ -179,8 +196,8 @@ public slots:
                         QApplication::applicationDirPath() +
                         QDir::separator () + "peb.ini"), QSettings::IniFormat );
         QString startPagePathName = settings.value ( "gui/start_page" ).toString();
-
-        qDebug() << "Start page:" << startPagePathName;
+        qDebug() << "Start page:" << QApplication::applicationDirPath() +
+                    QDir::separator () + startPagePathName;
         QString extension = startPagePathName.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
@@ -218,10 +235,8 @@ public slots:
 
             QFileInfo startPage ( startPagePathName );
             QString startPageDirectory = QDir::toNativeSeparators (
-                        QApplication::applicationDirPath() +
                         startPage.absoluteDir().absolutePath () );
-            handler.setWorkingDirectory (
-                        QDir::toNativeSeparators ( startPageDirectory ) );
+            handler.setWorkingDirectory ( startPageDirectory );
             qDebug() << "Working directory:" << startPageDirectory;
 
             handler.setStandardOutputFile (

@@ -54,6 +54,7 @@
 // http://qt-project.org/doc/qt-4.8/mainwindows-menus.html
 // http://qt-project.org/doc/qt-4.8/qfileinfo.html
 // http://qt-project.org/doc/qt-4.8/qdir.html
+// http://qt-project.org/doc/qt-4.8/desktop-systray.html
 // http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
 // http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
@@ -97,6 +98,7 @@
 // http://stackoverflow.com/questions/3518090/how-to-get-the-query-string-from-a-qurl
 // http://stackoverflow.com/questions/6955281/how-to-stop-qhttp-qtwebkit-from-caching-pages
 // http://stackoverflow.com/questions/3211771/how-to-convert-int-to-qstring
+// http://stackoverflow.com/questions/18707113/qsystemtrayicon-and-windows8
 // https://github.com/rsdn/avalon/blob/master/web_view.cpp
 // https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
 // http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -119,12 +121,12 @@
 
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
-    // Qt5 code:
-    #include <QtWidgets>
+// Qt5 code:
+#include <QtWidgets>
 #else
-    // Qt4 code:
-    #include <QtGui>
-    #include <QApplication>
+// Qt4 code:
+#include <QtGui>
+#include <QApplication>
 #endif
 
 #include <QWebPage>
@@ -224,7 +226,7 @@ int main ( int argc, char **argv )
     qputenv ( "PERL5LIB", perl5Lib );
 
     QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
-                                                  QDir::separator() + windowIcon );
+                                                      QDir::separator() + windowIcon );
     QApplication::setWindowIcon ( QIcon ( iconPathName ) );
     qDebug() << "Icon:" << iconPathName;
 
@@ -293,15 +295,32 @@ int main ( int argc, char **argv )
     }
 
     toplevel.show();
+
     app.exec();
 
     return true;
 
-};
+}
 
 Page::Page()
     : QWebPage ( 0 )
 {
+    trayIcon = new QSystemTrayIcon();
+    trayIcon -> setIcon ( QIcon ( windowIcon ) );
+    trayIcon -> setToolTip ( "Camel Calf" );
+
+    aboutAction = new QAction ( tr ("&About"), this );
+    connect ( aboutAction, SIGNAL ( triggered() ), this, SLOT ( sysTrayAbout() ) );
+    quitAction = new QAction ( tr ("&Quit"), this );
+    connect ( quitAction, SIGNAL ( triggered() ), qApp, SLOT ( quit() ) );
+
+    trayIconMenu = new QMenu();
+    trayIconMenu -> addAction ( aboutAction );
+    trayIconMenu -> addSeparator();
+    trayIconMenu -> addAction ( quitAction );
+
+    trayIcon -> setContextMenu ( trayIconMenu );
+    trayIcon -> show();
 }
 
 TopLevel::TopLevel()
@@ -385,8 +404,8 @@ TopLevel::TopLevel()
 }
 
 bool Page::acceptNavigationRequest (QWebFrame * frame,
-                                     const QNetworkRequest & request,
-                                     QWebPage::NavigationType navigationType )
+                                    const QNetworkRequest & request,
+                                    QWebPage::NavigationType navigationType )
 {
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -543,8 +562,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             QString fileDirectory = QDir::toNativeSeparators (
                         QApplication::applicationDirPath() +
                         file.absoluteDir().absolutePath () );
-            handler.setWorkingDirectory (
-                        QDir::toNativeSeparators ( fileDirectory ) );
+            handler.setWorkingDirectory ( fileDirectory );
             qDebug() << "Working directory:" << fileDirectory;
 
             handler.setStandardOutputFile (
@@ -641,8 +659,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
             QString scriptDirectory = QDir::toNativeSeparators (
                         QApplication::applicationDirPath() +
                         script.absoluteDir().absolutePath () );
-            handler.setWorkingDirectory (
-                        QDir::toNativeSeparators ( scriptDirectory ) );
+            handler.setWorkingDirectory ( scriptDirectory );
             qDebug() << "Working directory:" << scriptDirectory;
 
             handler.setStandardOutputFile (
