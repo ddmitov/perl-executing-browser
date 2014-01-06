@@ -51,7 +51,31 @@ protected:
             qDebug() << "Form submitted to:" << request.url().toString();
             QString scriptpath = request.url()
                     .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-            qDebug() << "Script path:" << QApplication::applicationDirPath() + scriptpath;
+
+            qDebug() << "Script path:" << QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() + scriptpath );
+            QFile file ( QDir::toNativeSeparators (
+                             QApplication::applicationDirPath() + scriptpath ) );
+            if( !file.exists() )
+            {
+                qDebug() << QDir::toNativeSeparators (
+                                QApplication::applicationDirPath() + scriptpath ) <<
+                            " is missing.";
+                qDebug() << "Please restore the missing script.";
+                QMessageBox msgBox;
+                msgBox.setIcon( QMessageBox::Critical );
+                msgBox.setWindowTitle ( "Missing script" );
+                msgBox.setText ( QDir::toNativeSeparators (
+                                     QApplication::applicationDirPath() + scriptpath ) +
+                                 " is missing.<br>Please restore the missing script." );
+                msgBox.setDefaultButton( QMessageBox::Ok );
+                msgBox.exec();
+                QNetworkRequest emptyRequest;
+                return QNetworkAccessManager::createRequest (
+                            QNetworkAccessManager::GetOperation,
+                            emptyRequest );
+            }
+
             QString extension = scriptpath.section(".", 1, 1);
             qDebug() << "Extension:" << extension;
             QString interpreter;
@@ -144,9 +168,15 @@ public slots:
 
     void sysTrayAbout()
     {
+        QSettings settings (
+                    QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + "peb.ini"), QSettings::IniFormat );
+        QString windowIcon = settings.value ( "gui/icon" ).toString();
         QMessageBox msgBox;
         msgBox.setIcon( QMessageBox::Information );
         msgBox.setWindowTitle ( "About" );
+        msgBox.setIconPixmap ( QPixmap ( windowIcon ) );
         msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
         msgBox.setDefaultButton( QMessageBox::Ok );
         msgBox.exec();
@@ -197,8 +227,9 @@ public slots:
                         QApplication::applicationDirPath() +
                         QDir::separator () + "peb.ini"), QSettings::IniFormat );
         QString startPagePathName = settings.value ( "gui/start_page" ).toString();
-        qDebug() << "Start page:" << QApplication::applicationDirPath() +
-                    QDir::separator () + startPagePathName;
+        qDebug() << "Start page:" << QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + startPagePathName );
         QString extension = startPagePathName.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
@@ -386,9 +417,15 @@ public slots:
 
     void sysTrayAbout()
     {
+        QSettings settings (
+                    QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + "peb.ini"), QSettings::IniFormat );
+        QString windowIcon = settings.value ( "gui/icon" ).toString();
         QMessageBox msgBox;
         msgBox.setIcon( QMessageBox::Information );
         msgBox.setWindowTitle ( "About" );
+        msgBox.setIconPixmap ( QPixmap ( windowIcon ) );
         msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
         msgBox.setDefaultButton( QMessageBox::Ok );
         msgBox.exec();

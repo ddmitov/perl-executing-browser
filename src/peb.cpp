@@ -184,6 +184,30 @@ int main ( int argc, char **argv )
     startPage = settings.value ( "gui/start_page" ).toString();
     contextMenu = settings.value ( "gui/context_menu" ).toString();
 
+    QFile file ( QDir::toNativeSeparators (
+                     QApplication::applicationDirPath() +
+                     QDir::separator () + startPage ) );
+    if( !file.exists() )
+    {
+        qDebug() << QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        QDir::separator () + startPage ) <<
+                    "is missing.";
+        qDebug() << "Please restore the missing start page.";
+        qDebug() << "Exiting.";
+        QMessageBox msgBox;
+        msgBox.setIcon( QMessageBox::Critical );
+        msgBox.setWindowTitle ( "Missing start page" );
+        msgBox.setText ( QDir::toNativeSeparators (
+                             QApplication::applicationDirPath() +
+                             QDir::separator () + startPage ) +
+                         " is missing.<br>Please restore the missing start page." );
+        msgBox.setDefaultButton( QMessageBox::Ok );
+        msgBox.exec();
+        return 1;
+        QApplication::exit();
+    }
+
     // Environment variables:
     QByteArray path;
 #ifdef Q_OS_LINUX
@@ -518,7 +542,27 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
         qDebug() << "Local link:" << request.url().toString();
         QString filepath = request.url()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        qDebug() << "File path:" << QApplication::applicationDirPath() + filepath;
+
+        qDebug() << "File path:" << QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() + filepath );
+        QFile file ( QDir::toNativeSeparators (
+                         QApplication::applicationDirPath() + filepath ) );
+        if( !file.exists() )
+        {
+            qDebug() << QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() + filepath ) <<
+                        "is missing.";
+            qDebug() << "Please restore the missing file.";
+            QMessageBox msgBox;
+            msgBox.setIcon( QMessageBox::Critical );
+            msgBox.setWindowTitle ( "Missing file" );
+            msgBox.setText ( QDir::toNativeSeparators (
+                                 QApplication::applicationDirPath() + filepath ) +
+                             " is missing.<br>Please restore the missing file." );
+            msgBox.setDefaultButton( QMessageBox::Ok );
+            msgBox.exec();
+        }
+
         QString extension = filepath.section ( ".", 1, 1 );
         qDebug() << "Extension:" << extension;
         QString interpreter;
@@ -601,16 +645,38 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
     // GET method form data:
     if ( navigationType == QWebPage::NavigationTypeFormSubmitted and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url() ) and
-         request.url().toString ( QUrl::RemoveScheme |
-                                  QUrl::RemoveAuthority |
-                                  QUrl::RemovePath )
+         .isParentOf ( request.url() ) and request.url()
+         .toString ( QUrl::RemoveScheme |
+                     QUrl::RemoveAuthority |
+                     QUrl::RemovePath )
          .replace ( "?", "" ).length() > 0 ) {
 
         qDebug() << "Form submitted to:" << request.url().toString ( QUrl::RemoveQuery );
         QString scriptpath = request.url()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-        qDebug() << "Script path:" << QApplication::applicationDirPath() + scriptpath;
+
+        qDebug() << "Script path:" << QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() + scriptpath );
+        QFile file ( QDir::toNativeSeparators (
+                         QApplication::applicationDirPath() + scriptpath ) );
+        if( !file.exists() )
+        {
+            qDebug() << QDir::toNativeSeparators (
+                            QApplication::applicationDirPath() + scriptpath ) <<
+                        "is missing.";
+            qDebug() << "Please restore the missing script.";
+            QMessageBox msgBox;
+            msgBox.setIcon( QMessageBox::Critical );
+            msgBox.setWindowTitle ( "Missing script" );
+            msgBox.setText ( QDir::toNativeSeparators (
+                                 QApplication::applicationDirPath() + scriptpath ) +
+                             " is missing.<br>Please restore the missing script." );
+            msgBox.setDefaultButton( QMessageBox::Ok );
+            msgBox.exec();
+            QNetworkRequest emptyRequest;
+            return QWebPage::acceptNavigationRequest ( frame, emptyRequest, navigationType );
+        }
+
         qDebug() << "Query string:" << request.url()
                     .toString ( QUrl::RemoveScheme |
                                 QUrl::RemoveAuthority |
