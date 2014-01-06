@@ -309,15 +309,18 @@ Page::Page()
     trayIcon -> setIcon ( QIcon ( windowIcon ) );
     trayIcon -> setToolTip ( "Camel Calf" );
 
-    aboutAction = new QAction ( tr ("&About"), this );
+    aboutAction = new QAction ( tr ( "&About" ), this );
     connect ( aboutAction, SIGNAL ( triggered() ), this, SLOT ( sysTrayAbout() ) );
-    quitAction = new QAction ( tr ("&Quit"), this );
+    aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
+    connect ( aboutQtAction, SIGNAL ( triggered() ), qApp, SLOT ( aboutQt() ) );
+    quitAction = new QAction ( tr ( "&Quit" ), this );
     connect ( quitAction, SIGNAL ( triggered() ), qApp, SLOT ( quit() ) );
 
     trayIconMenu = new QMenu();
-    trayIconMenu -> addAction ( aboutAction );
-    trayIconMenu -> addSeparator();
     trayIconMenu -> addAction ( quitAction );
+    trayIconMenu -> addSeparator();
+    trayIconMenu -> addAction ( aboutAction );
+    trayIconMenu -> addAction ( aboutQtAction );
 
     trayIcon -> setContextMenu ( trayIconMenu );
     trayIcon -> show();

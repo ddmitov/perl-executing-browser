@@ -141,6 +141,7 @@ class Page : public QWebPage
     Q_OBJECT
 
 public slots:
+
     void sysTrayAbout()
     {
         QMessageBox msgBox;
@@ -162,13 +163,13 @@ protected:
                                    QWebPage::NavigationType type );
 
 private:
-    QAction *quitAction;
-    QAction *aboutAction;
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
+    QAction * quitAction;
+    QAction * aboutAction;
+    QAction * aboutQtAction;
+    QSystemTrayIcon * trayIcon;
+    QMenu * trayIconMenu;
 
 };
-
 
 class TopLevel : public QWebView
 {
@@ -186,7 +187,7 @@ public slots:
                     QDir::toNativeSeparators (
                         QDir::tempPath() + QDir::separator () + "output.htm" ) );
         QApplication::exit();
-    };
+    }
 
     void homeSlot()
     {
@@ -268,17 +269,17 @@ public slots:
             qDebug() << "===============";
         }
         QWebSettings::clearMemoryCaches();
-    };
+    }
 
     void maximizeSlot()
     {
         showMaximized();
-    };
+    }
 
     void minimizeSlot()
     {
         showMinimized();
-    };
+    }
 
     void toggleFullScreenSlot()
     {
@@ -324,28 +325,36 @@ public slots:
         menu -> addSeparator();
         if ( windowSize == "maximized" or windowSize == "fullscreen" ) {
             if ( framelessWindow == "no" ) {
-                QAction * maximizeAct = menu -> addAction ( "Maximize" );
+                QAction * maximizeAct = menu -> addAction ( "&Maximize" );
                 connect ( maximizeAct, SIGNAL ( triggered() ),
                           this, SLOT ( maximizeSlot() ) );
             }
-            QAction * toggleFullScreenAct = menu -> addAction ( "Toggle Fullscreen" );
+            QAction * toggleFullScreenAct = menu -> addAction ( "Toggle &Fullscreen" );
             connect ( toggleFullScreenAct, SIGNAL ( triggered() ),
                       this, SLOT ( toggleFullScreenSlot() ) );
         }
         if ( framelessWindow == "no" ) {
-            QAction * minimizeAct = menu -> addAction ( "Minimize" );
+            QAction * minimizeAct = menu -> addAction ( "Mi&nimize" );
             connect ( minimizeAct, SIGNAL ( triggered() ),
                       this, SLOT ( minimizeSlot() ) );
         }
-        QAction * homeAct = menu -> addAction ( "Home" );
+        QAction * homeAct = menu -> addAction ( "&Home" );
         connect ( homeAct, SIGNAL ( triggered() ),
                   this, SLOT ( homeSlot() ) );
-        QAction * printAct = menu -> addAction ( "Print" );
+        QAction * printAct = menu -> addAction ( "&Print" );
         connect ( printAct, SIGNAL ( triggered() ),
                   this, SLOT ( printPageSlot() ) );
-        QAction * closeAct = menu -> addAction ( "Close" );
+        QAction * closeAct = menu -> addAction ( "&Quit" );
         connect ( closeAct, SIGNAL ( triggered() ),
                   this, SLOT ( closeAppSlot() ) );
+        menu -> addSeparator();
+        QAction * aboutAction = menu -> addAction ( "&About" );
+        connect ( aboutAction, SIGNAL ( triggered() ),
+                  this, SLOT ( sysTrayAbout() ) );
+        QAction * aboutQtAction = menu -> addAction ( "About Q&t" );
+        connect ( aboutQtAction, SIGNAL ( triggered() ),
+                  qApp, SLOT ( aboutQt() ) );
+
         menu -> exec ( event -> globalPos() );
     }
 
@@ -373,7 +382,17 @@ public slots:
         }
         dialog -> close();
         dialog -> deleteLater();
-    };
+    }
+
+    void sysTrayAbout()
+    {
+        QMessageBox msgBox;
+        msgBox.setIcon( QMessageBox::Information );
+        msgBox.setWindowTitle ( "About" );
+        msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
+        msgBox.setDefaultButton( QMessageBox::Ok );
+        msgBox.exec();
+    }
 
 public:
 
