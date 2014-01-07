@@ -48,13 +48,13 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/openfile/now'>Open File</a>\n";
+print "<a href='openfile://now'>Open File</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/openfolder/now'>Open Folder</a>\n";
+print "<a href='openfolder://now'>Open Folder</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -78,13 +78,13 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/print/now'>Print</a>\n";
+print "<a href='print://now'>Print</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/close/now'>Close</a>\n";
+print "<a href='close://now'>Quit</a>\n";
 print "</font></p>\n";
 
 print "</body>\n";

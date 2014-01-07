@@ -345,7 +345,6 @@ Page::Page()
     trayIconMenu -> addSeparator();
     trayIconMenu -> addAction ( aboutAction );
     trayIconMenu -> addAction ( aboutQtAction );
-
     trayIcon -> setContextMenu ( trayIconMenu );
     trayIcon -> show();
 }
@@ -436,8 +435,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
 {
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         ( QUrl ( "http://perl-executing-browser-pseudodomain/openfile/" ) )
-         .isParentOf ( request.url() ) ) {
+         request.url().toString().contains ( "openfile:" ) ) {
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
@@ -458,8 +456,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         ( QUrl ( "http://perl-executing-browser-pseudodomain/openfolder/" ) )
-         .isParentOf ( request.url() ) ) {
+         request.url().toString().contains ( "openfolder:" ) ) {
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
@@ -480,8 +477,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         ( QUrl ( "http://perl-executing-browser-pseudodomain/print/" ) )
-         .isParentOf ( request.url() ) ) {
+         request.url().toString().contains ( "print:" ) ) {
         qDebug() << "Printing requested.";
         qDebug() << "===============";
         QPrinter printer;
@@ -506,16 +502,14 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         ( QUrl ( "http://perl-executing-browser-pseudodomain/close/" ) )
-         .isParentOf ( request.url() ) ) {
+         request.url().toString().contains ( "close:" ) ) {
         qDebug() << "Application termination requested from URL.";
         qDebug() << "Exiting.";
         QApplication::exit();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         ( QUrl ( "external:" ) )
-         .isParentOf ( request.url() ) ) {
+         request.url().toString().contains ( "external:" ) ) {
         QString externalApplication = request.url()
                 .toString ( QUrl::RemoveScheme )
                 .replace ( "/", "" );
@@ -527,9 +521,18 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ( "http" ) and
          !( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url() ) ) {
         qDebug() << "External browser called for:" << request.url().toString();
+        qDebug() << "===============";
+        QDesktopServices::openUrl ( request.url() );
+        return false;
+    }
+
+    if ( navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ( "file" ) ) {
+        qDebug() << "Opening file with default application:" << request.url().toString();
         qDebug() << "===============";
         QDesktopServices::openUrl ( request.url() );
         return false;
