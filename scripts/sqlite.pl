@@ -15,8 +15,8 @@ my $db = DBI->connect("dbi:SQLite:$database_full_pathname","","", {sqlite_unicod
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
 $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Linus', 'Torvalds')");
 $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Richard', 'Stallman')");
-$db->do ("INSERT INTO user\(name, surname) VALUES ( 'Петър', 'Петров')");
-$db->do ("INSERT INTO user\(name, surname) VALUES ( 'Иван', 'Иванов')");
+$db->do ("INSERT INTO user\(name, surname) VALUES ( 'Линус', 'Торвалдс')");
+$db->do ("INSERT INTO user\(name, surname) VALUES ( 'Ричард', 'Столман')");
 
 my $all = $db->selectall_arrayref ("SELECT * FROM USER");
 

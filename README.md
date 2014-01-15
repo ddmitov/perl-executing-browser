@@ -8,20 +8,23 @@ using CGI protocol GET and POST methods for communication with the scripts.
   
 Perl Executing Browser has the following design objectives:  
 * 1. Easy to set up and adapt HTML/CSS/JavaScript GUI for  
-    Perl (possibly PHP, Python and other) scripts;
-* 2. Zero installation solution:  
-    pack your Perl modules or even your version of Perl with  
-    a copy of PEB browser and its Qt libraries and  
-    run your application from everywhere, even from USB sticks;  
+    fast CGI-like Perl (possibly PHP, Python and other) scripts;
+* 2. Zero installation when needed:  
+    pack your Perl modules and even your version of Perl with  
+    a copy of PEB and its Qt libraries and  
+    run your application from every folder, even from USB sticks;  
 * 3. Cross-platform availability:  
     use it on every platform and device (desktop, tablet, smartphone),  
     where Perl and Qt4 or Qt5 could be compiled;  
-* 4. Scripts control everything, including network access:  
+* 4. Maximal flexibility of the network access:  
     a) if no network connectivity is wanted or needed,  
     no services are started, no ports are opened, no firewall notifications are triggered,  
     no need for administrative privileges and everything remains in the userspace, but  
-    b) if network connection is essential, it should be implemented entirely in the scripts  
-    that PEB is going to execute with a high level of control and flexibility.  
+    b) if network connection is essential, PEB can be configured as  
+    a client or both as a client and a server for a network-based database  
+    in a variety of combinations and topologies.  
+    Webserver functionality is provided by a minimally modified version of  
+    Mongoose web server.  
   
 PEB also exposes some desktop functionalities,  
 which are accessible from special URLs and currently are:  
@@ -30,7 +33,7 @@ File to open and folder to open are accessible for every script as
 environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
 Printing current page by clicking a special URL is also supported.  
   
-PEB was initially started as a simple GUI for personal databases.  
+PEB was started as a simple GUI for personal databases.  
 This small project is still in its very beginning and  
 current version should be considered alpha pre-release.  
 Do not use it for production purposes!  

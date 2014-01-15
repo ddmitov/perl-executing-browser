@@ -19,9 +19,11 @@
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
+#include <QtNetwork/QTcpSocket>
 #include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QSystemTrayIcon>
 #include <QDebug>
 
 class NAM : public QNetworkAccessManager {
@@ -151,13 +153,12 @@ protected:
                                                           QDir::separator() +
                                                           "output.htm" ) ) ) );
                 }
-
             }
-
         }
 
         return QNetworkAccessManager::createRequest ( operation, request );
     }
+
 };
 
 class Page : public QWebPage
@@ -182,6 +183,65 @@ public slots:
         msgBox.exec();
     }
 
+    void ping()
+    {
+        QTcpSocket localWebServerPing;
+        localWebServerPing.connectToHost ( "127.0.0.1", 8080 );
+        QTcpSocket webConnectivityPing;
+        webConnectivityPing.connectToHost ( "www.google.com", 80 );
+
+        if ( localWebServerPing.waitForConnected ( 1000 ) ) {
+            qDebug() << "Local web server is running.";
+        } else {
+            qDebug() << "Local web server is not running. Will try to restart it.";
+            QProcess server;
+            server.startDetached ( QString ( QApplication::applicationDirPath() +
+                                             QDir::separator() + "mongoose" ) );
+        }
+        if ( webConnectivityPing.waitForConnected ( 1000 ) ){
+            qDebug() << "Web connectivity is available.";
+            qDebug() << "===============";
+        } else {
+            qDebug() << "Web connectivity is not available.";
+            qDebug() << "===============";
+        }
+    }
+
+    void displayLongRunningScriptOutput()
+    {
+        QString output = longRunningScriptHandler.readAllStandardOutput();
+        QString longRunningScriptOutputFilePath = QDir::toNativeSeparators (
+                    QDir::tempPath() +
+                    QDir::separator() +
+                    "longrun_output.htm" );
+        QFile longRunningScriptOutputFile ( longRunningScriptOutputFilePath );
+        if ( longRunningScriptOutputFile.exists () ){
+            longRunningScriptOutputFile.remove();
+        }
+        if ( longRunningScriptOutputFile.open ( QIODevice::ReadWrite ) ) {
+            QTextStream stream ( & longRunningScriptOutputFile );
+            stream << output << endl;
+        }
+        qDebug() << "Output from long-running script received.";
+        qDebug() << "===============";
+        Page::currentFrame() -> setUrl ( QUrl::fromLocalFile (
+                                             longRunningScriptOutputFilePath ) );
+        longRunningScriptOutputFile.remove();
+    }
+
+    void longRunningScriptFinished()
+    {
+        qDebug() << "Long-running script finished.";
+        qDebug() << "===============";
+        longRunningScriptHandler.close();
+    }
+
+    void displayLongRunningScriptError()
+    {
+        QString error = longRunningScriptHandler.readAllStandardError();
+        qDebug() << error;
+    }
+
 public:
 
     Page();
@@ -198,6 +258,7 @@ private:
     QAction * aboutQtAction;
     QSystemTrayIcon * trayIcon;
     QMenu * trayIconMenu;
+    QProcess longRunningScriptHandler;
 
 };
 
@@ -216,6 +277,7 @@ public slots:
         QFile::remove (
                     QDir::toNativeSeparators (
                         QDir::tempPath() + QDir::separator () + "output.htm" ) );
+        setUrl ( QUrl ( "http://localhost:8080/close" ) );
         QApplication::exit();
     }
 
@@ -385,7 +447,6 @@ public slots:
         QAction * aboutQtAction = menu -> addAction ( "About Q&t" );
         connect ( aboutQtAction, SIGNAL ( triggered() ),
                   qApp, SLOT ( aboutQt() ) );
-
         menu -> exec ( event -> globalPos() );
     }
 
