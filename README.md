@@ -1,7 +1,7 @@
   
 Perl Executing Browser, v.0.1  
   
-Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of 
+Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of  
 executing Perl scripts locally with or without a webserver,  
 providing them even when executed locally with a nice HTML4/5 interface  
 for both input and output and using CGI protocol GET and POST methods  
