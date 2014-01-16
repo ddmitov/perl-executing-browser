@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl scripts locally with or even without a webserver. Serverless execution of local scripts can go side by side with traditional access to local or remote webservers. CGI protocol GET and POST methods are used for communication with scripts executed without a webserver.  
+Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl scripts locally with or even without a webserver. Serverless execution of local scripts can go side by side with a traditional access to local or remote webservers. CGI protocol GET and POST methods are used for communication with scripts executed without a webserver.  
   
 Design Objectives
 ----------------------------------------------------------------------------------------
@@ -13,7 +13,7 @@ Design Objectives
     pack your Perl modules and even your version of Perl with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
 * **3. Cross-platform availability:**  
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt4 or Qt5 could be compiled;  
-* **4. Maximal flexibility of the network access:**  
+* **4. Flexible network access:**  
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
     **b)** if network connection is essential, PEB can be configured as a client or both as a client and server for network databases in a variety of combinations and topologies.  
     Webserver functionality is provided by a minimally modified version of Mongoose web server.  
