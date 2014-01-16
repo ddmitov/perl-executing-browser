@@ -1,10 +1,10 @@
 
- PERL EXECUTING BROWSER - REFERENCES AND THANKS:
+ PERL EXECUTING BROWSER - REFERENCES, ACKNOWLEDGEMENTS AND THANKS:
  
  Being in debt to each and every one, who
- shared usefull knowledge on the following sites or
- prepared the official Qt documentation,
- I thank them all! Their effort and good will is highly appreciated!
+ prepared the official Qt documentation or
+ shared usefull knowledge on a variety of forums and blogs,
+ I thank them all! Their expertise, effort and good will are highly appreciated!
 
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
  http://qt-project.org/doc/qt-4.8/qwebhistory.html
@@ -21,6 +21,8 @@
  http://qt-project.org/doc/qt-5.0/qtcore/qurl.html
  http://qt-project.org/doc/qt-5.0/qtcore/qstring.html
  http://qt-project.org/doc/qt-5.0/qtcore/qfile.html
+ http://qt-project.org/doc/qt-5.0/qtwidgets/qapplication.html
+ http://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html
  http://qt-project.org/wiki/How_to_Use_QSettings
  http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
  http://qt-project.org/forums/viewthread/23835
@@ -63,6 +65,7 @@
  http://stackoverflow.com/questions/3211771/how-to-convert-int-to-qstring
  http://stackoverflow.com/questions/18707113/qsystemtrayicon-and-windows8
  http://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt
+ http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -73,12 +76,16 @@
  http://en.wikipedia.org/wiki/Common_Gateway_Interface
  http://en.wikipedia.org/wiki/INI_file
 
+ Amata mea Argeia - gratiam magnam tibi ago!
+ Patientia tua in studiis meis computatoriis auxilium meum maximum!
+
  Special thanks to the staff of the Library of the New Bulgarian University,
  where much of the coding effort took place!
 
  Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
  "How to read POST data "sent" from my own QtWebKit application?":
  http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
+
  I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
  for their code, which I adopted and modified:
  http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources

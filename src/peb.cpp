@@ -190,6 +190,12 @@ int main ( int argc, char **argv )
 
     TopLevel toplevel;
 
+    QObject::connect ( qApp, SIGNAL ( lastWindowClosed() ),
+                       & toplevel, SLOT ( closeAppContextMenuSlot() ) );
+
+    QObject::connect ( qApp, SIGNAL ( aboutToQuit() ),
+                       & toplevel, SLOT ( closeAppContextMenuSlot() ) );
+
     if ( windowSize != "maximized" or windowSize != "fullscreen" ) {
         int fixedWidth = windowSize.section ( "x", 0, 0 ).toInt();
         int fixedHeight = windowSize.section ( "x", 1, 1 ).toInt();
@@ -245,7 +251,7 @@ Page::Page()
               qApp, SLOT ( aboutQt() ) );
     quitAction = new QAction ( tr ( "&Quit" ), this );
     connect ( quitAction, SIGNAL ( triggered() ),
-              qApp, SLOT ( quit() ) );
+              this, SLOT ( closeAppSlot() ) );
 
     trayIconMenu = new QMenu();
     trayIconMenu -> addAction ( aboutAction );
@@ -260,12 +266,15 @@ Page::Page()
     connect ( timer, SIGNAL ( timeout() ), this, SLOT ( ping() ) );
     timer -> start ( 5000 );
 
-    connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardOutput() ),
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardOutput() ),
                        this, SLOT ( displayLongRunningScriptOutput() ) );
-    connect ( & longRunningScriptHandler, SIGNAL ( finished ( int, QProcess::ExitStatus ) ),
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( finished ( int, QProcess::ExitStatus ) ),
                        this, SLOT ( longRunningScriptFinished() ) );
-    connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError() ),
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError() ),
                        this, SLOT ( displayLongRunningScriptError() ) );
+
+    QObject::connect ( this, SIGNAL ( closeFromURL() ),
+                       this, SLOT ( closeAppSlot() ) );
 
 }
 
@@ -328,7 +337,7 @@ TopLevel::TopLevel()
 
     QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
     QObject::connect ( closeAppShortcut, SIGNAL ( activated() ),
-                       this, SLOT ( closeAppSlot() ) );
+                       this, SLOT ( closeAppContextMenuSlot() ) );
 
     if ( browserTitle == "dynamic" ) {
         QObject::connect ( main_page, SIGNAL ( loadFinished (bool) ),
@@ -350,9 +359,9 @@ TopLevel::TopLevel()
 
 }
 
-bool Page::acceptNavigationRequest (QWebFrame * frame,
-                                    const QNetworkRequest & request,
-                                    QWebPage::NavigationType navigationType )
+bool Page::acceptNavigationRequest ( QWebFrame * frame,
+                                     const QNetworkRequest & request,
+                                     QWebPage::NavigationType navigationType )
 {
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -430,7 +439,7 @@ bool Page::acceptNavigationRequest (QWebFrame * frame,
          request.url().toString().contains ( "close:" ) ) {
         qDebug() << "Application termination requested from URL.";
         qDebug() << "Exiting.";
-        QApplication::exit();
+        emit closeFromURL();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and

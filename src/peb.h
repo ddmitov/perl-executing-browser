@@ -165,6 +165,9 @@ class Page : public QWebPage
 {
     Q_OBJECT
 
+signals:
+    void closeFromURL();
+
 public slots:
 
     void sysTrayAbout()
@@ -199,10 +202,10 @@ public slots:
                                              QDir::separator() + "mongoose" ) );
         }
         if ( webConnectivityPing.waitForConnected ( 1000 ) ){
-            qDebug() << "Web connectivity is available.";
+            qDebug() << "Web connection is available.";
             qDebug() << "===============";
         } else {
-            qDebug() << "Web connectivity is not available.";
+            qDebug() << "Web connection is not available.";
             qDebug() << "===============";
         }
     }
@@ -239,7 +242,17 @@ public slots:
     void displayLongRunningScriptError()
     {
         QString error = longRunningScriptHandler.readAllStandardError();
-        qDebug() << error;
+        qDebug() << "Long-running script error:" << error;
+        qDebug() << "===============";
+    }
+
+    void closeAppSlot()
+    {
+        QFile::remove (
+                    QDir::toNativeSeparators (
+                        QDir::tempPath() + QDir::separator () + "output.htm" ) );
+        Page::currentFrame() -> setUrl ( QUrl ( "http://localhost:8080/close" ) );
+        QApplication::exit();
     }
 
 public:
@@ -253,6 +266,7 @@ protected:
                                    QWebPage::NavigationType type );
 
 private:
+
     QAction * quitAction;
     QAction * aboutAction;
     QAction * aboutQtAction;
@@ -272,7 +286,7 @@ signals:
 
 public slots:
 
-    void closeAppSlot()
+    void closeAppContextMenuSlot()
     {
         QFile::remove (
                     QDir::toNativeSeparators (
@@ -439,7 +453,7 @@ public slots:
                   this, SLOT ( printPageSlot() ) );
         QAction * closeAct = menu -> addAction ( "&Quit" );
         connect ( closeAct, SIGNAL ( triggered() ),
-                  this, SLOT ( closeAppSlot() ) );
+                  this, SLOT ( closeAppContextMenuSlot() ) );
         menu -> addSeparator();
         QAction * aboutAction = menu -> addAction ( "&About" );
         connect ( aboutAction, SIGNAL ( triggered() ),
