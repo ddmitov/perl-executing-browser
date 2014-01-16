@@ -26,7 +26,8 @@
 #include <QSystemTrayIcon>
 #include <QDebug>
 
-class NAM : public QNetworkAccessManager {
+class NAM : public QNetworkAccessManager
+{
 
     Q_OBJECT
 
@@ -227,7 +228,7 @@ public slots:
         }
         qDebug() << "Output from long-running script received.";
         qDebug() << "===============";
-        Page::currentFrame() -> setUrl ( QUrl::fromLocalFile (
+        Page::mainFrame() -> setUrl ( QUrl::fromLocalFile (
                                              longRunningScriptOutputFilePath ) );
         longRunningScriptOutputFile.remove();
     }
@@ -445,9 +446,11 @@ public slots:
             connect ( minimizeAct, SIGNAL ( triggered() ),
                       this, SLOT ( minimizeSlot() ) );
         }
-        QAction * homeAct = menu -> addAction ( "&Home" );
-        connect ( homeAct, SIGNAL ( triggered() ),
-                  this, SLOT ( homeSlot() ) );
+        if (! TopLevel::url().toString().contains ( "longrun" ) ){
+            QAction * homeAct = menu -> addAction ( "&Home" );
+            connect ( homeAct, SIGNAL ( triggered() ),
+                      this, SLOT ( homeSlot() ) );
+        }
         QAction * printAct = menu -> addAction ( "&Print" );
         connect ( printAct, SIGNAL ( triggered() ),
                   this, SLOT ( printPageSlot() ) );
@@ -512,7 +515,7 @@ public:
 
 private:
 
-    Page *main_page;
+    Page * main_page;
 
 };
 

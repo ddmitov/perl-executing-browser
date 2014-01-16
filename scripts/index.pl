@@ -88,23 +88,11 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>env.pl</a>\n";
+#print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl' target='_blank'>Long-running</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl'>Long-Running Script</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://localhost:8080/close'>Close Server</a>\n";
-print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl'>Long-running</a>\n";
-print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='print://now'>Print</a>\n";

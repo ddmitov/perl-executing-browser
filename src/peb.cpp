@@ -37,6 +37,7 @@
 #include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QDateTime>
 #include <QDebug>
 #include "peb.h"
 
@@ -53,7 +54,12 @@ int main ( int argc, char **argv )
 {
     QApplication app ( argc, argv );
 
-    qDebug() << "Perl Executing Browser v.0.1 started.";
+    // Get current date and time:
+    QDateTime dateTime = QDateTime::currentDateTime();
+    QString dateTimeString = dateTime.toString();
+    qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
+    qDebug() << "Application File Path is" << QApplication::applicationFilePath ();
+    qDebug() << "===============";
 
     QString settingsFileName = QDir::toNativeSeparators (
                 QApplication::applicationDirPath() + QDir::separator() + "peb.ini" );
@@ -155,7 +161,9 @@ int main ( int argc, char **argv )
     QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
                                                       QDir::separator() + windowIcon );
     QApplication::setWindowIcon ( QIcon ( iconPathName ) );
-    qDebug() << "Icon:" << iconPathName;
+    qDebug() << "===============";
+    qDebug() << "Application icon:" << iconPathName;
+    qDebug() << "===============";
 
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale ( QTextCodec::codecForName ( "UTF8" ) );
@@ -195,37 +203,6 @@ int main ( int argc, char **argv )
 
     QObject::connect ( qApp, SIGNAL ( aboutToQuit() ),
                        & toplevel, SLOT ( closeAppContextMenuSlot() ) );
-
-    if ( windowSize != "maximized" or windowSize != "fullscreen" ) {
-        int fixedWidth = windowSize.section ( "x", 0, 0 ).toInt();
-        int fixedHeight = windowSize.section ( "x", 1, 1 ).toInt();
-        if ( fixedWidth > 100 and fixedHeight > 100 ) {
-            toplevel.setFixedSize ( fixedWidth, fixedHeight );
-            QRect screenRect = QDesktopWidget().screen() -> rect();
-            toplevel.move ( QPoint ( screenRect.width()/2 - toplevel.width()/2,
-                                     screenRect.height()/2 - toplevel.height()/2 ) );
-        }
-    }
-
-    if ( windowSize == "maximized") {
-        toplevel.showMaximized();
-    }
-
-    if ( windowSize == "fullscreen" ) {
-        toplevel.showFullScreen();
-    }
-
-    if ( stayOnTop == "yes" ) {
-        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint );
-    }
-
-    if ( stayOnTop == "yes" and framelessWindow == "yes" ) {
-        toplevel.setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint );
-    }
-
-    if ( stayOnTop == "no" and framelessWindow == "yes" ) {
-        toplevel.setWindowFlags ( Qt::FramelessWindowHint );
-    }
 
     toplevel.show();
 
@@ -281,6 +258,37 @@ Page::Page()
 TopLevel::TopLevel()
     : QWebView ( 0 )
 {
+
+    if ( windowSize != "maximized" or windowSize != "fullscreen" ) {
+        int fixedWidth = windowSize.section ( "x", 0, 0 ).toInt();
+        int fixedHeight = windowSize.section ( "x", 1, 1 ).toInt();
+        if ( fixedWidth > 100 and fixedHeight > 100 ) {
+            setFixedSize ( fixedWidth, fixedHeight );
+            QRect screenRect = QDesktopWidget().screen() -> rect();
+            move ( QPoint ( screenRect.width()/2 - width()/2,
+                                     screenRect.height()/2 - height()/2 ) );
+        }
+    }
+
+    if ( windowSize == "maximized") {
+        showMaximized();
+    }
+
+    if ( windowSize == "fullscreen" ) {
+        showFullScreen();
+    }
+
+    if ( stayOnTop == "yes" ) {
+        setWindowFlags ( Qt::WindowStaysOnTopHint );
+    }
+
+    if ( stayOnTop == "yes" and framelessWindow == "yes" ) {
+        setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint );
+    }
+
+    if ( stayOnTop == "no" and framelessWindow == "yes" ) {
+        setWindowFlags ( Qt::FramelessWindowHint );
+    }
 
     main_page = new Page();
     setPage ( main_page );
