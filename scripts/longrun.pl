@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 ############
-my $waiting = 40;
+my $waiting = 10;
 ############
 
 $|=1; # Disable in-built Perl buffering
@@ -79,6 +79,11 @@ print <<HTML;
 <p align='center'><font size='5' face='SansSerif'>
 <br>
 Waited for output $waiting seconds!
+
+
+<br><a href='http://www.youtube.com/'>Allowed External Link</a><br>
+<a href='close://now'>Quit</a>
+
 
 </font></p>
 

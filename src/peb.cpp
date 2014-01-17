@@ -1,5 +1,5 @@
-// Perl Executing Browser, v.0.1
 
+// Perl Executing Browser, v.0.1
 // This software is licensed under the terms of GNU GPL v.3 and
 // is provided without warranties of any kind!
 // Dimitar D. Mitov, 2013, ddmitov (at) yahoo (dot) com
@@ -275,35 +275,35 @@ TopLevel::TopLevel()
         setWindowFlags ( Qt::FramelessWindowHint );
     }
 
-    main_page = new Page();
-    setPage ( main_page );
+    mainPage = new Page();
+    setPage ( mainPage );
 
-    NAM *nam = new NAM();
-    main_page -> setNetworkAccessManager ( nam );
+    NAM * nam = new NAM();
+    mainPage -> setNetworkAccessManager ( nam );
 
     //main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
 
     // Disabling horizontal scroll bar:
-    main_page -> mainFrame() -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+    mainPage -> mainFrame() -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
     // Disabling history:
-    QWebHistory * history = main_page -> history();
+    QWebHistory * history = mainPage -> history();
     history -> setMaximumItemCount ( 0 );
 
     // Context menu settings:
-    main_page -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( true );
-    main_page -> action ( QWebPage::Back ) -> setVisible ( false );
-    main_page -> action ( QWebPage::Forward ) -> setVisible ( false );
-    main_page -> action ( QWebPage::Stop ) -> setVisible ( false );
-    main_page -> action ( QWebPage::OpenLink ) -> setVisible ( false );
-    main_page -> action ( QWebPage::OpenLinkInNewWindow ) -> setVisible ( false );
-    main_page -> action ( QWebPage::OpenFrameInNewWindow ) -> setVisible ( false );
-    main_page -> action ( QWebPage::DownloadLinkToDisk ) -> setVisible ( false );
-    main_page -> action ( QWebPage::SetTextDirectionLeftToRight ) -> setVisible ( false );
-    main_page -> action ( QWebPage::SetTextDirectionRightToLeft ) -> setVisible ( false );
-    main_page -> action ( QWebPage::OpenImageInNewWindow ) -> setVisible ( false );
-    main_page -> action ( QWebPage::DownloadImageToDisk ) -> setVisible ( false );
-    main_page -> action ( QWebPage::CopyImageToClipboard ) -> setVisible ( false );
-    main_page -> action ( QWebPage::Reload ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( true );
+    mainPage -> action ( QWebPage::Back ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Forward ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Stop ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenLink ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenLinkInNewWindow ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenFrameInNewWindow ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::DownloadLinkToDisk ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::SetTextDirectionLeftToRight ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::SetTextDirectionRightToLeft ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenImageInNewWindow ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::DownloadImageToDisk ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::CopyImageToClipboard ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Reload ) -> setVisible ( false );
 
     QObject::connect ( this, SIGNAL ( startPageRequested() ),
                        this, SLOT ( homeSlot() ) );
@@ -333,10 +333,10 @@ TopLevel::TopLevel()
                        this, SLOT ( closeAppContextMenuSlot() ) );
 
     if ( browserTitle == "dynamic" ) {
-        QObject::connect ( main_page, SIGNAL ( loadFinished (bool) ),
+        QObject::connect ( mainPage, SIGNAL ( loadFinished (bool) ),
                            this, SLOT ( pageLoadedDynamicTitle (bool) ) );
     } else {
-        QObject::connect ( main_page, SIGNAL ( loadFinished (bool) ),
+        QObject::connect ( mainPage, SIGNAL ( loadFinished (bool) ),
                            this, SLOT ( pageLoadedStaticTitle (bool) ) );
     }
 
@@ -457,6 +457,15 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         if ( request.url().authority().contains ( "localhost" ) ){
             qDebug() << "Local webserver link:" << request.url().toString();
             qDebug() << "===============";
+            return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
+        }
+        if ( request.url().authority().contains ( "www.youtube.com" ) ){
+            qDebug() << "Allowed web link:" << request.url().toString();
+            qDebug() << "===============";
+            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
+            trayIcon -> showMessage (
+                        "Allowed web link:",
+                        request.url().toString(), icon, 10 * 1000 );
             return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
         } else {
             qDebug() << "External browser called for:" << request.url().toString();
@@ -591,6 +600,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                 longRunningScriptHandler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                                      QApplication::applicationDirPath() +
                                                      QDir::separator() + filepath ) );
+                newWindow = new TopLevel;
             } else {
                 handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                     QApplication::applicationDirPath() +

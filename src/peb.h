@@ -228,8 +228,14 @@ public slots:
         }
         qDebug() << "Output from long-running script received.";
         qDebug() << "===============";
-        Page::mainFrame() -> setUrl ( QUrl::fromLocalFile (
-                                             longRunningScriptOutputFilePath ) );
+
+        // http://qt-project.org/forums/viewthread/17635
+        newWindow -> setUrl ( QUrl::fromLocalFile ( longRunningScriptOutputFilePath ) );
+        newWindow -> show();
+
+//        Page::currentFrame() -> setUrl ( QUrl::fromLocalFile (
+//                                             longRunningScriptOutputFilePath ) );
+
         longRunningScriptOutputFile.remove();
     }
 
@@ -274,6 +280,7 @@ private:
     QSystemTrayIcon * trayIcon;
     QMenu * trayIconMenu;
     QProcess longRunningScriptHandler;
+    QWebView * newWindow;
 
 };
 
@@ -397,7 +404,7 @@ public slots:
         else{
             showFullScreen();
         }
-    };
+    }
 
     void pageLoadedDynamicTitle ( bool ok )
     {
@@ -429,7 +436,7 @@ public slots:
                         QDir::separator () + "peb.ini" ), QSettings::IniFormat );
         QString windowSize = settings.value ( "gui/window_size" ).toString();
         QString framelessWindow = settings.value ( "gui/frameless_window" ).toString();
-        QMenu * menu = main_page -> createStandardContextMenu();
+        QMenu * menu = mainPage -> createStandardContextMenu();
         menu -> addSeparator();
         if ( windowSize == "maximized" or windowSize == "fullscreen" ) {
             if ( framelessWindow == "no" ) {
@@ -515,7 +522,7 @@ public:
 
 private:
 
-    Page * main_page;
+    Page * mainPage;
 
 };
 
