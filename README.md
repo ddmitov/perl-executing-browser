@@ -46,7 +46,7 @@ Compiling
   
 Compiled and tested successfully using:  
 1. Qt Creator 2.5.0 and Qt 4.8.2 on 32 bit Debian Linux  
-(main development and testing platform),
+(main development and testing platform),  
 2. Qt Creator 2.8.1 and Qt 5.1.1 on 32 bit Debian Linux,  
 3. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
 4. Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
