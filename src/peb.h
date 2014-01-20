@@ -214,10 +214,14 @@ public slots:
     void displayLongRunningScriptOutput()
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
+        QString filepathForConversion = lastRequest.url().path();
+        QString extension = filepathForConversion.section ( ".", 1, 1 );
         QString longRunningScriptOutputFilePath = QDir::toNativeSeparators (
-                    QDir::tempPath() +
-                    QDir::separator() +
-                    "longrun_output.htm" );
+                    QDir::tempPath() + QDir::separator() + filepathForConversion
+                    .replace ( QDir::separator(), "_" )
+                    .replace ( QRegExp ( "(\\s+)" ), "_" )
+                    .replace ( "." + extension, "" ) +
+                    "_output.htm" );
         QFile longRunningScriptOutputFile ( longRunningScriptOutputFilePath );
         if ( longRunningScriptOutputFile.exists () ){
             longRunningScriptOutputFile.remove();
@@ -227,14 +231,16 @@ public slots:
             stream << output << endl;
         }
         qDebug() << "Output from long-running script received.";
+        qDebug() << "Long-running script output file:" << longRunningScriptOutputFilePath;
         qDebug() << "===============";
-
-        newWindow -> setUrl ( QUrl::fromLocalFile ( longRunningScriptOutputFilePath ) );
-        newWindow -> show();
-
-//        Page::currentFrame() -> setUrl ( QUrl::fromLocalFile (
-//                                             longRunningScriptOutputFilePath ) );
-
+        if ( longRunningScriptOutputInNewWindow == false ) {
+            Page::currentFrame() -> setUrl ( QUrl::fromLocalFile (
+                                                 longRunningScriptOutputFilePath ) );
+        }
+        if ( longRunningScriptOutputInNewWindow == true ) {
+            newWindow -> setUrl ( QUrl::fromLocalFile ( longRunningScriptOutputFilePath ) );
+            newWindow -> show();
+        }
         longRunningScriptOutputFile.remove();
     }
 
@@ -284,6 +290,8 @@ private:
     QAction * aboutQtAction;
     QProcess longRunningScriptHandler;
     QWebView * newWindow;
+    QNetworkRequest lastRequest;
+    bool longRunningScriptOutputInNewWindow;
 
 };
 

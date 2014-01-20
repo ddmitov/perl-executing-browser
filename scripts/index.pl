@@ -45,7 +45,7 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.youtube.com/'>Allowed External Link</a>\n";
+print "<a href='http://www.youtube.com/'>Allowed External Link in This Browser</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -94,11 +94,17 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-#print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl' target='_blank'>Long-running</a>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl'>Long-Running Script</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl'>Long-Running Script in This Window</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl' target='_blank'>Long-running Script In New Window</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='print://now'>Print</a>\n";

@@ -21,9 +21,20 @@ Design Objectives
 Features
 ----------------------------------------------------------------------------------------
   
-PEB is capable of executing long-running scripts - i.e. scripts running for arbitrary long time, far beyond any server timeouts for CGI or FastCGI scripts.  
-  
-PEB exposes some desktop functionalities, which are accessible from special URLs and currently are: open file, open folder and close browser. File to open and folder to open are accessible for every script as environment variables FILE_TO_OPEN and FOLDER_TO_OPEN. Printing current page by clicking a special URL is also supported.  
+* Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
+* Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
+* Can open a file or a folder on the local file system using special URLs. Selected file or folder are accessible for every locally executed script as environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
+* Can print current page by clicking a special URL.  
+* Browser can also be closed by clicking a special URL.  
+* Can open local documents and start user-specified programs.
+* Can load Perl modules from directory when they are not installed system-wide.  
+* Can start local webserver (Mongoose) and load scripts and pages from localhost.  
+* Can load a predefined website and be used as a site-specific browser or a client for a web service.  
+* Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
+* (Highly) configurable from INI file.  
+* Can be used in fullscreen mode, frameless mode or fixed size window. 100% of the browser screen area is dedicated to web interfaces; unobtrusive context menu.  
+* System Tray Icon & Menu with baloon messages.  
+... to be continued
   
 History
 ----------------------------------------------------------------------------------------

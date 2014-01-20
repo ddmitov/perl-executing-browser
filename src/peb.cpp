@@ -364,15 +364,17 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
 
     if ( frame != Page::currentFrame() and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url() ) ){
-        QMessageBox msgBox;
-        msgBox.setWindowTitle ( "Open in New Window Requested" );
-        msgBox.setIconPixmap ( QPixmap ( icon ) );
-        msgBox.setText
-                ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
-        msgBox.setDefaultButton( QMessageBox::Ok );
-        msgBox.exec();
-        return true;
+         .isParentOf ( request.url() ) ) {
+        if (! request.url().path().contains ( "longrun" ) ){
+            QMessageBox msgBox;
+            msgBox.setWindowTitle ( "Open in New Window Requested" );
+            msgBox.setIconPixmap ( QPixmap ( icon ) );
+            msgBox.setText
+                    ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
+            msgBox.setDefaultButton( QMessageBox::Ok );
+            msgBox.exec();
+            return true;
+        }
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -622,7 +624,14 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                 trayIcon -> showMessage (
                             "Long-running script:",
                             "Long-running script started.", icon, 10 * 1000 );
-                newWindow = new TopLevel;
+                if ( frame == Page::currentFrame() ) {
+                    longRunningScriptOutputInNewWindow = false;
+                }
+                if ( frame != Page::currentFrame() ) {
+                    longRunningScriptOutputInNewWindow = true;
+                    lastRequest = request;
+                    newWindow = new TopLevel;
+                }
             } else {
                 handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                     QApplication::applicationDirPath() +
