@@ -3,13 +3,12 @@
  
  Being in debt to each and every one, who
  prepared the official Qt documentation or
- shared usefull knowledge on a variety of forums and blogs,
+ shared usefull knowledge on a variety of forums, blogs and other sites,
  I thank them all! Their expertise, effort and good will are highly appreciated!
 
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
  http://qt-project.org/doc/qt-4.8/qwebhistory.html
  http://qt-project.org/doc/qt-4.8/qdir.html
- http://qt-project.org/doc/qt-4.8/mainwindows-menus.html
  http://qt-project.org/doc/qt-4.8/qfileinfo.html
  http://qt-project.org/doc/qt-4.8/qdir.html
  http://qt-project.org/doc/qt-4.8/desktop-systray.html
@@ -25,6 +24,7 @@
  http://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html
  http://qt-project.org/wiki/How_to_Use_QSettings
  http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
+ http://qt-project.org/wiki/Open_Web_Page_in_QWebView_Bulgarian
  http://qt-project.org/forums/viewthread/23835
  http://qt-project.org/forums/viewthread/5318
  http://qt-project.org/forums/viewthread/8270
@@ -34,6 +34,7 @@
  http://qt-project.org/forums/viewthread/10672
  http://qt-project.org/forums/viewthread/4433
  http://qt-project.org/forums/viewthread/9346
+ http://qt-project.org/forums/viewthread/17635
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
  http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
@@ -67,6 +68,7 @@
  http://stackoverflow.com/questions/18707113/qsystemtrayicon-and-windows8
  http://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt
  http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button
+ http://stackoverflow.com/questions/11749262/qt-close-a-running-window-through-code
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

@@ -167,6 +167,7 @@ class Page : public QWebPage
     Q_OBJECT
 
 signals:
+
     void closeFromURL();
 
 public slots:
@@ -177,11 +178,10 @@ public slots:
                     QDir::toNativeSeparators (
                         QApplication::applicationDirPath() +
                         QDir::separator () + "peb.ini"), QSettings::IniFormat );
-        QString windowIcon = settings.value ( "gui/icon" ).toString();
+        QString icon = settings.value ( "gui/icon" ).toString();
         QMessageBox msgBox;
-        msgBox.setIcon( QMessageBox::Information );
         msgBox.setWindowTitle ( "About" );
-        msgBox.setIconPixmap ( QPixmap ( windowIcon ) );
+        msgBox.setIconPixmap ( QPixmap ( icon ) );
         msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
         msgBox.setDefaultButton( QMessageBox::Ok );
         msgBox.exec();
@@ -229,7 +229,6 @@ public slots:
         qDebug() << "Output from long-running script received.";
         qDebug() << "===============";
 
-        // http://qt-project.org/forums/viewthread/17635
         newWindow -> setUrl ( QUrl::fromLocalFile ( longRunningScriptOutputFilePath ) );
         newWindow -> show();
 
@@ -244,6 +243,10 @@ public slots:
         qDebug() << "Long-running script finished.";
         qDebug() << "===============";
         longRunningScriptHandler.close();
+        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
+        trayIcon -> showMessage (
+                    "Long-running script:",
+                    "Long-running script finished.", icon, 10 * 1000 );
     }
 
     void displayLongRunningScriptError()
@@ -274,11 +277,11 @@ protected:
 
 private:
 
+    QSystemTrayIcon * trayIcon;
+    QMenu * trayIconMenu;
     QAction * quitAction;
     QAction * aboutAction;
     QAction * aboutQtAction;
-    QSystemTrayIcon * trayIcon;
-    QMenu * trayIconMenu;
     QProcess longRunningScriptHandler;
     QWebView * newWindow;
 
@@ -461,9 +464,15 @@ public slots:
         QAction * printAct = menu -> addAction ( "&Print" );
         connect ( printAct, SIGNAL ( triggered() ),
                   this, SLOT ( printPageSlot() ) );
-        QAction * closeAct = menu -> addAction ( "&Quit" );
-        connect ( closeAct, SIGNAL ( triggered() ),
-                  this, SLOT ( closeAppContextMenuSlot() ) );
+        if (! TopLevel::url().toString().contains ( "longrun" ) ){
+            QAction * quitAct = menu -> addAction ( "&Quit" );
+            connect ( quitAct, SIGNAL ( triggered() ),
+                      this, SLOT ( closeAppContextMenuSlot() ) );
+        } else {
+            QAction * closeWindowAct = menu -> addAction ( "&Close window" );
+            connect ( closeWindowAct, SIGNAL ( triggered() ),
+                      this, SLOT ( close() ) );
+        }
         menu -> addSeparator();
         QAction * aboutAction = menu -> addAction ( "&About" );
         connect ( aboutAction, SIGNAL ( triggered() ),

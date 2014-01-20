@@ -24,16 +24,21 @@
 #include <QPrinter>
 #include <QDateTime>
 #include <QDebug>
+
+#include <QSystemTrayIcon>
+#include <QIcon>
+
 #include "peb.h"
 
 // Declaring global variables for the settings:
-QString windowIcon;
+QString icon;
 QString windowSize;
 QString framelessWindow;
 QString stayOnTop;
 QString browserTitle;
 QString startPage;
 QString contextMenu;
+int classInitializationCounter = 0;
 
 int main ( int argc, char **argv )
 {
@@ -66,7 +71,7 @@ int main ( int argc, char **argv )
 
     // Reading settings from INI file:
     QSettings settings ( settingsFileName, QSettings::IniFormat );
-    windowIcon = settings.value ( "gui/icon" ).toString();
+    icon = settings.value ( "gui/icon" ).toString();
     windowSize = settings.value ( "gui/window_size" ).toString();
     framelessWindow = settings.value ( "gui/frameless_window" ).toString();
     stayOnTop = settings.value ( "gui/stay_on_top" ).toString();
@@ -144,7 +149,7 @@ int main ( int argc, char **argv )
     qputenv ( "PERL5LIB", perl5Lib );
 
     QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
-                                                      QDir::separator() + windowIcon );
+                                                      QDir::separator() + icon );
     QApplication::setWindowIcon ( QIcon ( iconPathName ) );
     qDebug() << "===============";
     qDebug() << "Application icon:" << iconPathName;
@@ -162,6 +167,8 @@ int main ( int argc, char **argv )
             setAttribute ( QWebSettings::PluginsEnabled, true );
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::JavascriptEnabled, true );
+    QWebSettings::globalSettings() ->
+            setAttribute ( QWebSettings::JavascriptCanOpenWindows, false );
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::SpatialNavigationEnabled, true );
     QWebSettings::globalSettings() ->
@@ -182,18 +189,13 @@ int main ( int argc, char **argv )
     QWebSettings::clearMemoryCaches();
 
     TopLevel toplevel;
-
     QObject::connect ( qApp, SIGNAL ( lastWindowClosed() ),
                        & toplevel, SLOT ( closeAppContextMenuSlot() ) );
-
     QObject::connect ( qApp, SIGNAL ( aboutToQuit() ),
                        & toplevel, SLOT ( closeAppContextMenuSlot() ) );
-
     toplevel.show();
 
-    app.exec();
-
-    return true;
+    return app.exec();
 
 }
 
@@ -202,27 +204,29 @@ Page::Page()
 {
 
     trayIcon = new QSystemTrayIcon();
-    trayIcon -> setIcon ( QIcon ( windowIcon ) );
-    trayIcon -> setToolTip ( "Camel Calf" );
-
-    aboutAction = new QAction ( tr ( "&About" ), this );
-    connect ( aboutAction, SIGNAL ( triggered() ),
-              this, SLOT ( sysTrayAbout() ) );
-    aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
-    connect ( aboutQtAction, SIGNAL ( triggered() ),
-              qApp, SLOT ( aboutQt() ) );
-    quitAction = new QAction ( tr ( "&Quit" ), this );
-    connect ( quitAction, SIGNAL ( triggered() ),
-              this, SLOT ( closeAppSlot() ) );
-
-    trayIconMenu = new QMenu();
-    trayIconMenu -> addAction ( aboutAction );
-    trayIconMenu -> addAction ( aboutQtAction );
-    trayIconMenu -> addSeparator();
-    trayIconMenu -> addAction ( quitAction );
-
-    trayIcon -> setContextMenu ( trayIconMenu );
-    trayIcon -> show();
+    if ( classInitializationCounter == 0 ){
+        QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath() +
+                                                          QDir::separator() + icon );
+        trayIcon -> setIcon ( QIcon ( iconPathName ) );
+        trayIcon -> setToolTip ( "Camel Calf" );
+        aboutAction = new QAction ( tr ( "&About" ), this );
+        connect ( aboutAction, SIGNAL ( triggered() ),
+                  this, SLOT ( sysTrayAbout() ) );
+        aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
+        connect ( aboutQtAction, SIGNAL ( triggered() ),
+                  qApp, SLOT ( aboutQt() ) );
+        quitAction = new QAction ( tr ( "&Quit" ), this );
+        connect ( quitAction, SIGNAL ( triggered() ),
+                  this, SLOT ( closeAppSlot() ) );
+        trayIconMenu = new QMenu();
+        trayIconMenu -> addAction ( aboutAction );
+        trayIconMenu -> addAction ( aboutQtAction );
+        trayIconMenu -> addSeparator();
+        trayIconMenu -> addAction ( quitAction );
+        trayIcon -> setContextMenu ( trayIconMenu );
+        trayIcon -> show();
+        classInitializationCounter++;
+    }
 
     QTimer * timer = new QTimer ( this );
     connect ( timer, SIGNAL ( timeout() ), this, SLOT ( ping() ) );
@@ -234,7 +238,6 @@ Page::Page()
                        this, SLOT ( longRunningScriptFinished() ) );
     QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError() ),
                        this, SLOT ( displayLongRunningScriptError() ) );
-
     QObject::connect ( this, SIGNAL ( closeFromURL() ),
                        this, SLOT ( closeAppSlot() ) );
 
@@ -333,11 +336,11 @@ TopLevel::TopLevel()
                        this, SLOT ( closeAppContextMenuSlot() ) );
 
     if ( browserTitle == "dynamic" ) {
-        QObject::connect ( mainPage, SIGNAL ( loadFinished (bool) ),
-                           this, SLOT ( pageLoadedDynamicTitle (bool) ) );
+        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
+                           this, SLOT ( pageLoadedDynamicTitle ( bool ) ) );
     } else {
-        QObject::connect ( mainPage, SIGNAL ( loadFinished (bool) ),
-                           this, SLOT ( pageLoadedStaticTitle (bool) ) );
+        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
+                           this, SLOT ( pageLoadedStaticTitle ( bool ) ) );
     }
 
     if ( browserTitle != "dynamic" ) {
@@ -348,7 +351,9 @@ TopLevel::TopLevel()
         setContextMenuPolicy ( Qt::NoContextMenu );
     }
 
-    emit startPageRequested();
+    if ( classInitializationCounter == 1 ){
+        emit startPageRequested();
+    }
 
 }
 
@@ -356,6 +361,19 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                      const QNetworkRequest & request,
                                      QWebPage::NavigationType navigationType )
 {
+
+    if ( frame != Page::currentFrame() and
+         ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
+         .isParentOf ( request.url() ) ){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle ( "Open in New Window Requested" );
+        msgBox.setIconPixmap ( QPixmap ( icon ) );
+        msgBox.setText
+                ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
+        msgBox.setDefaultButton( QMessageBox::Ok );
+        msgBox.exec();
+        return true;
+    }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ( "openfile:" ) ) {
@@ -365,7 +383,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator() + windowIcon ) );
+                                       QDir::separator() + icon ) );
         QString fileNameString = dialog.getOpenFileName ( 0, "Select File",
                                                           QDir::currentPath(), "All files (*)" );
         QByteArray fileName;
@@ -388,7 +406,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath() +
-                                       QDir::separator() + windowIcon ) );
+                                       QDir::separator() + icon ) );
         QString folderNameString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath() );
         QByteArray folderName;
@@ -600,6 +618,10 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                 longRunningScriptHandler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                                      QApplication::applicationDirPath() +
                                                      QDir::separator() + filepath ) );
+                QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
+                trayIcon -> showMessage (
+                            "Long-running script:",
+                            "Long-running script started.", icon, 10 * 1000 );
                 newWindow = new TopLevel;
             } else {
                 handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
