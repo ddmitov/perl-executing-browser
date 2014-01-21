@@ -113,7 +113,13 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='close://now'>Quit</a>\n";
+print "<a href='closewindow://now'>Close Window</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='quit://now'>Quit Application</a>\n";
 print "</font></p>\n";
 
 print "</body>\n";

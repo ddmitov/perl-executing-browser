@@ -82,7 +82,7 @@ Waited for output $waiting seconds!
 
 
 <br><a href='http://www.youtube.com/'>Allowed External Link</a><br>
-<a href='close://now'>Quit</a>
+<a href='closewindow://now'>Close window</a>
 
 
 </font></p>

@@ -168,7 +168,13 @@ class Page : public QWebPage
 
 signals:
 
-    void closeFromURL ();
+    void quitFromURL ();
+
+    void closeWindowFromURL ();
+
+    void maximizeFromSystemTraySignal ();
+
+    void minimizeFromSystemTraySignal ();
 
 public slots:
 
@@ -244,7 +250,7 @@ public slots:
         longRunningScriptOutputFile.remove ();
     }
 
-    void longRunningScriptFinished()
+    void longRunningScriptFinished ()
     {
         qDebug () << "Long-running script finished.";
         qDebug () << "===============";
@@ -255,20 +261,30 @@ public slots:
                     "Long-running script finished.", icon, 10 * 1000 );
     }
 
-    void displayLongRunningScriptError()
+    void displayLongRunningScriptError ()
     {
         QString error = longRunningScriptHandler.readAllStandardError ();
         qDebug () << "Long-running script error:" << error;
         qDebug () << "===============";
     }
 
-    void closeAppSlot()
+    void quitAppSlot ()
     {
         QFile::remove (
                     QDir::toNativeSeparators (
                         QDir::tempPath () + QDir::separator () + "output.htm" ) );
         Page::currentFrame() -> setUrl ( QUrl ( "http://localhost:8080/close" ) );
         QApplication::exit();
+    }
+
+    void maximizeFromSystemTraySlot ()
+    {
+        emit maximizeFromSystemTraySignal ();
+    }
+
+    void minimizeFromSystemTraySlot ()
+    {
+        emit minimizeFromSystemTraySignal ();
     }
 
 public:
@@ -285,9 +301,11 @@ private:
 
     QSystemTrayIcon * trayIcon;
     QMenu * trayIconMenu;
-    QAction * quitAction;
+    QAction * maximizeAction;
+    QAction * minimizeAction;
     QAction * aboutAction;
     QAction * aboutQtAction;
+    QAction * quitAction;
     QProcess longRunningScriptHandler;
     QWebView * newWindow;
     QNetworkRequest lastRequest;
@@ -464,7 +482,7 @@ public slots:
             connect ( minimizeAct, SIGNAL ( triggered () ),
                       this, SLOT ( minimizeSlot () ) );
         }
-        if (! TopLevel::url ().toString ().contains ( "longrun" ) ){
+        if ( ! TopLevel::url ().toString ().contains ( "longrun" ) ){
             QAction * homeAct = menu -> addAction ( "&Home" );
             connect ( homeAct, SIGNAL ( triggered () ),
                       this, SLOT ( homeSlot () ) );
@@ -472,14 +490,13 @@ public slots:
         QAction * printAct = menu -> addAction ( "&Print" );
         connect ( printAct, SIGNAL ( triggered () ),
                   this, SLOT ( printPageSlot() ) );
-        if (! TopLevel::url ().toString ().contains ( "longrun" ) ){
+        QAction * closeWindowAct = menu -> addAction ( "&Close window" );
+        connect ( closeWindowAct, SIGNAL ( triggered () ),
+                  this, SLOT ( close () ) );
+        if ( ! TopLevel::url ().toString ().contains ( "longrun" ) ){
             QAction * quitAct = menu -> addAction ( "&Quit" );
             connect ( quitAct, SIGNAL ( triggered () ),
                       this, SLOT ( closeAppContextMenuSlot () ) );
-        } else {
-            QAction * closeWindowAct = menu -> addAction ( "&Close window" );
-            connect ( closeWindowAct, SIGNAL ( triggered () ),
-                      this, SLOT ( close () ) );
         }
         menu -> addSeparator();
         QAction * aboutAction = menu -> addAction ( "&About" );

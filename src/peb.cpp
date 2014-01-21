@@ -38,7 +38,9 @@ QString stayOnTop;
 QString browserTitle;
 QString startPage;
 QString contextMenu;
-int classInitializationCounter = 0;
+bool sysTrayIconInitializedOnce = false;
+bool startPageInitializedOnce = false;
+bool pingInitializedOnce = false;
 
 int main ( int argc, char **argv )
 {
@@ -189,9 +191,9 @@ int main ( int argc, char **argv )
     QWebSettings::clearMemoryCaches ();
 
     TopLevel toplevel;
-    QObject::connect ( qApp, SIGNAL ( lastWindowClosed() ),
+    QObject::connect ( qApp, SIGNAL ( lastWindowClosed () ),
                        & toplevel, SLOT ( closeAppContextMenuSlot () ) );
-    QObject::connect ( qApp, SIGNAL ( aboutToQuit() ),
+    QObject::connect ( qApp, SIGNAL ( aboutToQuit () ),
                        & toplevel, SLOT ( closeAppContextMenuSlot () ) );
     toplevel.show ();
 
@@ -204,33 +206,47 @@ Page::Page()
 {
 
     trayIcon = new QSystemTrayIcon ();
-    if ( classInitializationCounter == 0 ){
+    if ( sysTrayIconInitializedOnce == false ) {
         QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath () +
                                                           QDir::separator () + icon );
         trayIcon -> setIcon ( QIcon ( iconPathName ) );
         trayIcon -> setToolTip ( "Camel Calf" );
+
+        maximizeAction = new QAction ( tr ( "Ma&ximize" ), this );
+        QObject::connect ( maximizeAction, SIGNAL ( triggered () ),
+                  this, SLOT ( maximizeFromSystemTraySlot () ) );
+        minimizeAction = new QAction ( tr ( "&Minimize" ), this );
+        QObject::connect ( minimizeAction, SIGNAL ( triggered () ),
+                  this, SLOT ( minimizeFromSystemTraySlot () ) );
         aboutAction = new QAction ( tr ( "&About" ), this );
-        connect ( aboutAction, SIGNAL ( triggered () ),
+        QObject::connect ( aboutAction, SIGNAL ( triggered () ),
                   this, SLOT ( sysTrayAbout () ) );
         aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
-        connect ( aboutQtAction, SIGNAL ( triggered () ),
+        QObject::connect ( aboutQtAction, SIGNAL ( triggered () ),
                   qApp, SLOT ( aboutQt () ) );
         quitAction = new QAction ( tr ( "&Quit" ), this );
-        connect ( quitAction, SIGNAL ( triggered () ),
-                  this, SLOT ( closeAppSlot () ) );
+        QObject::connect ( quitAction, SIGNAL ( triggered () ),
+                  this, SLOT ( quitAppSlot () ) );
+
         trayIconMenu = new QMenu ();
+        trayIconMenu -> addAction ( maximizeAction );
+        trayIconMenu -> addAction ( minimizeAction );
+        trayIconMenu -> addSeparator ();
         trayIconMenu -> addAction ( aboutAction );
         trayIconMenu -> addAction ( aboutQtAction );
         trayIconMenu -> addSeparator ();
         trayIconMenu -> addAction ( quitAction );
         trayIcon -> setContextMenu ( trayIconMenu );
         trayIcon -> show ();
-        classInitializationCounter++;
+        sysTrayIconInitializedOnce = true;
     }
 
-    QTimer * timer = new QTimer ( this );
-    connect ( timer, SIGNAL ( timeout () ), this, SLOT ( ping () ) );
-    timer -> start ( 5000 );
+    if ( pingInitializedOnce == false ) {
+        QTimer * timer = new QTimer ( this );
+        connect ( timer, SIGNAL ( timeout () ), this, SLOT ( ping () ) );
+        timer -> start ( 5000 );
+        pingInitializedOnce = true;
+    }
 
     QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardOutput () ),
                        this, SLOT ( displayLongRunningScriptOutput () ) );
@@ -238,8 +254,8 @@ Page::Page()
                        this, SLOT ( longRunningScriptFinished () ) );
     QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError () ),
                        this, SLOT ( displayLongRunningScriptError() ) );
-    QObject::connect ( this, SIGNAL ( closeFromURL () ),
-                       this, SLOT ( closeAppSlot () ) );
+    QObject::connect ( this, SIGNAL ( quitFromURL () ),
+                       this, SLOT ( quitAppSlot () ) );
 
 }
 
@@ -279,6 +295,14 @@ TopLevel::TopLevel()
     }
 
     mainPage = new Page ();
+
+    QObject::connect ( mainPage, SIGNAL ( closeWindowFromURL() ),
+                       this, SLOT ( close () ) );
+    QObject::connect ( mainPage, SIGNAL ( minimizeFromSystemTraySignal () ),
+                       this, SLOT ( minimizeSlot () ) );
+    QObject::connect ( mainPage, SIGNAL ( maximizeFromSystemTraySignal () ),
+                       this, SLOT ( maximizeSlot () ) );
+
     setPage ( mainPage );
 
     NAM * nam = new NAM();
@@ -351,8 +375,9 @@ TopLevel::TopLevel()
         setContextMenuPolicy ( Qt::NoContextMenu );
     }
 
-    if ( classInitializationCounter == 1 ){
+    if ( startPageInitializedOnce == false ){
         emit startPageRequested();
+        startPageInitializedOnce = true;
     }
 
 }
@@ -449,10 +474,17 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "close:" ) ) {
+         request.url ().toString ().contains ( "quit:" ) ) {
         qDebug () << "Application termination requested from URL.";
         qDebug () << "Exiting.";
-        emit closeFromURL();
+        emit quitFromURL ();
+    }
+
+    if ( navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url ().toString ().contains ( "closewindow:" ) ) {
+        qDebug () << "Window closing requested from URL.";
+        qDebug () << "===============";
+        emit closeWindowFromURL ();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
