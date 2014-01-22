@@ -27,6 +27,12 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/html/index.htm' target='_blank'>Static Start Page in a New Window</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>\n";
 print "</font></p>\n";
 
@@ -45,7 +51,7 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.youtube.com/'>Allowed External Link in This Browser</a>\n";
+print "<a href='http://www.perl.com/'>Allowed External Link in This Browser</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -63,16 +69,28 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='openfile://now'>Open File</a>\n";
+print "<a href='openfile://now'>Open Existing File</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='openfolder://now'>Open Folder</a>\n";
+print "<a href='openfolder://now'>Open Existing Folder</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
+
+#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
+#~ print "<a href='newfile://now'>Create New File</a>\n";
+#~ print "</font></p>\n";
+
+#~ print "<hr width='95%'>\n";
+
+#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
+#~ print "<a href='newfolder://now'>Create New Folder</a>\n";
+#~ print "</font></p>\n";
+
+#~ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>SQLite example</a>\n";
@@ -85,7 +103,6 @@ print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
-
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://localhost:8080'>Localhost</a>\n";

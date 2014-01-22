@@ -2,7 +2,7 @@
 
 <head>
 
-<title>Perl Executing Browser - Static Startpage</title>
+<title>Perl Executing Browser - Static Startpage with Iframe</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 
 </head>
@@ -10,16 +10,19 @@
 <body text='#000000' bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>
 
 <p align='center'><font size='5' face='SansSerif'>
-<a href='http://perl-executing-browser-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>
+<a href='http://perl-executing-browser-pseudodomain/scripts/index.pl' target='iframe_a'>Dynamic Start Page</a>
 </font></p>
-
-<hr width='95%'>
 
 <p align='center'><font size='5' face='SansSerif'>
-<a href='http://perl-executing-browser-pseudodomain/html/post.htm'>Form of a Locally Executed Perl Script - POST method</a>
+<a href='http://perl-executing-browser-pseudodomain/html/get.htm' target='iframe_a'>Form of a Locally Executed Perl Script - GET method</a>
 </font></p>
 
-<hr width='95%'>
+<p align='center'><font size='5' face='SansSerif'>
+<a href='http://perl-executing-browser-pseudodomain/html/post.htm' target='iframe_a'>Form of a Locally Executed Perl Script - POST method</a>
+</font></p>
+
+<!-- http://www.w3schools.com/html/html_iframe.asp -->
+<iframe src='get.htm' frameborder='0' width='100%' height='80%' name='iframe_a'></iframe>
 
 </body>
 

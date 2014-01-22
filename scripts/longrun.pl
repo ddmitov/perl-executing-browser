@@ -81,7 +81,7 @@ print <<HTML;
 Waited for output $waiting seconds!
 
 
-<br><a href='http://www.youtube.com/'>Allowed External Link</a><br>
+<br><a href='http://www.perl.com/'>Allowed External Link</a><br>
 <a href='closewindow://now'>Close window</a>
 
 

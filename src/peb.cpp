@@ -2,7 +2,7 @@
 // Perl Executing Browser, v.0.1
 // This software is licensed under the terms of GNU GPL v.3 and
 // is provided without warranties of any kind!
-// Dimitar D. Mitov, 2013, ddmitov (at) yahoo (dot) com
+// Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
 
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
@@ -195,6 +195,7 @@ int main ( int argc, char **argv )
                        & toplevel, SLOT ( closeAppContextMenuSlot () ) );
     QObject::connect ( qApp, SIGNAL ( aboutToQuit () ),
                        & toplevel, SLOT ( closeAppContextMenuSlot () ) );
+    toplevel.setWindowIcon ( QIcon ( icon ) );
     toplevel.show ();
 
     return app.exec ();
@@ -218,24 +219,23 @@ Page::Page()
         minimizeAction = new QAction ( tr ( "&Minimize" ), this );
         QObject::connect ( minimizeAction, SIGNAL ( triggered () ),
                   this, SLOT ( minimizeFromSystemTraySlot () ) );
+        quitAction = new QAction ( tr ( "&Quit" ), this );
+        QObject::connect ( quitAction, SIGNAL ( triggered () ),
+                  this, SLOT ( quitAppSlot () ) );
         aboutAction = new QAction ( tr ( "&About" ), this );
         QObject::connect ( aboutAction, SIGNAL ( triggered () ),
                   this, SLOT ( sysTrayAbout () ) );
         aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
         QObject::connect ( aboutQtAction, SIGNAL ( triggered () ),
                   qApp, SLOT ( aboutQt () ) );
-        quitAction = new QAction ( tr ( "&Quit" ), this );
-        QObject::connect ( quitAction, SIGNAL ( triggered () ),
-                  this, SLOT ( quitAppSlot () ) );
 
         trayIconMenu = new QMenu ();
         trayIconMenu -> addAction ( maximizeAction );
         trayIconMenu -> addAction ( minimizeAction );
+        trayIconMenu -> addAction ( quitAction );
         trayIconMenu -> addSeparator ();
         trayIconMenu -> addAction ( aboutAction );
         trayIconMenu -> addAction ( aboutQtAction );
-        trayIconMenu -> addSeparator ();
-        trayIconMenu -> addAction ( quitAction );
         trayIcon -> setContextMenu ( trayIconMenu );
         trayIcon -> show ();
         sysTrayIconInitializedOnce = true;
@@ -296,12 +296,13 @@ TopLevel::TopLevel()
 
     mainPage = new Page ();
 
-    QObject::connect ( mainPage, SIGNAL ( closeWindowFromURL() ),
-                       this, SLOT ( close () ) );
-    QObject::connect ( mainPage, SIGNAL ( minimizeFromSystemTraySignal () ),
-                       this, SLOT ( minimizeSlot () ) );
     QObject::connect ( mainPage, SIGNAL ( maximizeFromSystemTraySignal () ),
                        this, SLOT ( maximizeSlot () ) );
+    QObject::connect ( mainPage, SIGNAL ( minimizeFromSystemTraySignal () ),
+                       this, SLOT ( minimizeSlot () ) );
+
+//    QObject::connect ( mainPage, SIGNAL ( sysTrayMessageSignal () ),
+//                       mainPage, SLOT ( sysTrayMessageSlot () ) );
 
     setPage ( mainPage );
 
@@ -338,23 +339,18 @@ TopLevel::TopLevel()
     QShortcut * maximizeShortcut = new QShortcut ( QKeySequence ( "Ctrl+M" ), this );
     QObject::connect ( maximizeShortcut, SIGNAL ( activated () ),
                        this, SLOT ( maximizeSlot () ) );
-
     QShortcut * minimizeShortcut = new QShortcut ( Qt::Key_Escape, this );
     QObject::connect ( minimizeShortcut, SIGNAL ( activated () ),
                        this, SLOT ( minimizeSlot () ) );
-
     QShortcut * toggleFullScreenShortcut = new QShortcut ( Qt::Key_F11, this );
     QObject::connect ( toggleFullScreenShortcut, SIGNAL ( activated () ),
                        this, SLOT ( toggleFullScreenSlot () ) );
-
     QShortcut * homeShortcut = new QShortcut ( Qt::Key_F12, this );
     QObject::connect ( homeShortcut, SIGNAL ( activated () ),
                        this, SLOT ( homeSlot () ) );
-
     QShortcut * printShortcut = new QShortcut ( QKeySequence ("Ctrl+P"), this );
     QObject::connect ( printShortcut, SIGNAL ( activated () ),
                        this, SLOT ( printPageSlot () ) );
-
     QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
     QObject::connect ( closeAppShortcut, SIGNAL ( activated () ),
                        this, SLOT ( closeAppContextMenuSlot () ) );
@@ -375,8 +371,8 @@ TopLevel::TopLevel()
         setContextMenuPolicy ( Qt::NoContextMenu );
     }
 
-    if ( startPageInitializedOnce == false ){
-        emit startPageRequested();
+    if ( startPageInitializedOnce == false ) {
+        emit startPageRequested ();
         startPageInitializedOnce = true;
     }
 
@@ -390,15 +386,26 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     if ( frame != Page::currentFrame() and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url () ) ) {
-        if ( ! request.url ().path ().contains ( "longrun" ) ){
-            QMessageBox msgBox;
-            msgBox.setWindowTitle ( "Open in New Window Requested" );
-            msgBox.setIconPixmap ( QPixmap ( icon ) );
-            msgBox.setText
-                    ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
-            msgBox.setDefaultButton ( QMessageBox::Ok );
-            msgBox.exec ();
-            return true;
+        if ( ! Page::mainFrame() -> childFrames ().contains ( frame ) ) {
+            if ( ! request.url ().path ().contains ( "longrun" ) ) {
+
+                newWindow = new TopLevel;
+                newWindow -> setUrl ( QUrl::fromLocalFile (
+                                          QDir::toNativeSeparators (
+                                              QApplication::applicationDirPath () +
+                                              QDir::separator () + request.url (). path () ) ) );
+                newWindow -> show ();
+
+//                QMessageBox msgBox;
+//                msgBox.setWindowTitle ( "Open in New Window Requested" );
+//                msgBox.setIconPixmap ( QPixmap ( icon ) );
+//                msgBox.setText
+//                        ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
+//                msgBox.setDefaultButton ( QMessageBox::Ok );
+//                msgBox.exec ();
+
+                return true;
+            }
         }
     }
 
@@ -436,6 +443,10 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                        QDir::separator () + icon ) );
         QString folderNameString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath () );
+
+//        QString folderNameString = dialog.getSaveFileName ( 0, "Create New File",
+//                                                                 QDir::currentPath () );
+
         QByteArray folderName;
         folderName.append ( folderNameString );
         qputenv ( "FOLDER_TO_OPEN", folderName );
@@ -482,9 +493,9 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url ().toString ().contains ( "closewindow:" ) ) {
-        qDebug () << "Window closing requested from URL.";
+        qDebug () << "Close window requested from URL.";
         qDebug () << "===============";
-        emit closeWindowFromURL ();
+        emit closeWindow ();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -511,7 +522,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             qDebug () << "===============";
             return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
         }
-        if ( request.url ().authority ().contains ( "www.youtube.com" ) ){
+        if ( request.url ().authority ().contains ( "www.perl.com" ) ){
             qDebug () << "Allowed web link:" << request.url ().toString ();
             qDebug () << "===============";
             QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
@@ -664,6 +675,10 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                     longRunningScriptOutputInNewWindow = true;
                     lastRequest = request;
                     newWindow = new TopLevel;
+
+//                    QObject::connect ( newWindow, SIGNAL ( sysTrayMessageSignal () ),
+//                                       this, SLOT ( sysTrayMessageSlot () ) );
+
                 }
             } else {
                 handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (

@@ -170,11 +170,13 @@ signals:
 
     void quitFromURL ();
 
-    void closeWindowFromURL ();
-
     void maximizeFromSystemTraySignal ();
 
     void minimizeFromSystemTraySignal ();
+
+    void homeFromSystemTraySignal ();
+
+    void closeWindow ();
 
 public slots:
 
@@ -301,11 +303,13 @@ private:
 
     QSystemTrayIcon * trayIcon;
     QMenu * trayIconMenu;
+
     QAction * maximizeAction;
     QAction * minimizeAction;
+    QAction * quitAction;
     QAction * aboutAction;
     QAction * aboutQtAction;
-    QAction * quitAction;
+
     QProcess longRunningScriptHandler;
     QWebView * newWindow;
     QNetworkRequest lastRequest;
@@ -410,13 +414,13 @@ public slots:
                          QDir::toNativeSeparators (
                              QApplication::applicationDirPath () +
                              QDir::separator () + startPagePathName ) ) );
-            qDebug () << "===============";
         }
         QWebSettings::clearMemoryCaches ();
     }
 
     void maximizeSlot ()
     {
+        raise ();
         showMaximized ();
     }
 

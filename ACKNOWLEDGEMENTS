@@ -23,6 +23,7 @@
  http://qt-project.org/doc/qt-5.0/qtcore/qfile.html
  http://qt-project.org/doc/qt-5.0/qtwidgets/qapplication.html
  http://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html
+ https://qt-project.org/doc/qt-5/qwebframe.html
  http://qt-project.org/wiki/How_to_Use_QSettings
  http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
  http://qt-project.org/wiki/Open_Web_Page_in_QWebView_Bulgarian
@@ -70,6 +71,7 @@
  http://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt
  http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button
  http://stackoverflow.com/questions/11749262/qt-close-a-running-window-through-code
+ http://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
