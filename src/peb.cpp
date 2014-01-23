@@ -23,41 +23,32 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #include <QDateTime>
-#include <QDebug>
-
 #include <QSystemTrayIcon>
 #include <QIcon>
-
+#include <QDebug>
 #include "peb.h"
 
-// Declaring global variables for the settings:
-QString icon;
-QString windowSize;
-QString framelessWindow;
-QString stayOnTop;
-QString browserTitle;
-QString startPage;
-QString contextMenu;
-bool sysTrayIconInitializedOnce = false;
-bool startPageInitializedOnce = false;
-bool pingInitializedOnce = false;
+bool pingStarted = false;
+bool systemTrayIconStarted = false;
+bool startPageLoaded = false;
 
-int main ( int argc, char **argv )
+int main ( int argc, char ** argv )
 {
+
     QApplication app ( argc, argv );
 
     // Get current date and time:
     QDateTime dateTime = QDateTime::currentDateTime ();
-    QString dateTimeString = dateTime.toString();
+    QString dateTimeString = dateTime.toString ();
     qDebug () << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
-    qDebug () << "Application File Path is" << QApplication::applicationFilePath ();
+    qDebug () << "Application file path is" << QApplication::applicationFilePath ();
     qDebug () << "===============";
 
     QString settingsFileName = QDir::toNativeSeparators (
-                QApplication::applicationDirPath() + QDir::separator() + "peb.ini" );
+                QApplication::applicationDirPath () + QDir::separator () + "peb.ini" );
 
     QFile settingsFile ( settingsFileName );
-    if( !settingsFile.exists () )
+    if ( ! settingsFile.exists () )
     {
         qDebug () << "'peb.ini' is missing. Please restore the missing file.";
         qDebug () << "Exiting.";
@@ -73,18 +64,13 @@ int main ( int argc, char **argv )
 
     // Reading settings from INI file:
     QSettings settings ( settingsFileName, QSettings::IniFormat );
-    icon = settings.value ( "gui/icon" ).toString ();
-    windowSize = settings.value ( "gui/window_size" ).toString ();
-    framelessWindow = settings.value ( "gui/frameless_window" ).toString ();
-    stayOnTop = settings.value ( "gui/stay_on_top" ).toString ();
-    browserTitle = settings.value ( "gui/browser_title" ).toString ();
-    startPage = settings.value ( "gui/start_page" ).toString ();
-    contextMenu = settings.value ( "gui/context_menu" ).toString ();
+    QString icon = settings.value ( "gui/icon" ). toString ();
+    QString startPage = settings.value ( "gui/start_page" ). toString ();
 
     QFile file ( QDir::toNativeSeparators (
                      QApplication::applicationDirPath () +
                      QDir::separator () + startPage ) );
-    if( ! file.exists () )
+    if ( ! file.exists () )
     {
         qDebug () << QDir::toNativeSeparators (
                          QApplication::applicationDirPath () +
@@ -191,11 +177,7 @@ int main ( int argc, char **argv )
     QWebSettings::clearMemoryCaches ();
 
     TopLevel toplevel;
-    QObject::connect ( qApp, SIGNAL ( lastWindowClosed () ),
-                       & toplevel, SLOT ( closeAppContextMenuSlot () ) );
-    QObject::connect ( qApp, SIGNAL ( aboutToQuit () ),
-                       & toplevel, SLOT ( closeAppContextMenuSlot () ) );
-    toplevel.setWindowIcon ( QIcon ( icon ) );
+    toplevel.setWindowIcon ( QIcon ( iconPathName ) );
     toplevel.show ();
 
     return app.exec ();
@@ -206,56 +188,64 @@ Page::Page()
     : QWebPage ( 0 )
 {
 
-    trayIcon = new QSystemTrayIcon ();
-    if ( sysTrayIconInitializedOnce == false ) {
-        QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath () +
-                                                          QDir::separator () + icon );
+    // Reading settings from INI file:
+    QString settingsFileName = QDir::toNativeSeparators (
+                QApplication::applicationDirPath () + QDir::separator() + "peb.ini" );
+    QSettings settings ( settingsFileName, QSettings::IniFormat );
+    icon = settings.value ( "gui/icon" ) .toString ();
+    iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath () +
+                                                      QDir::separator () + icon );
+
+    QObject::connect ( this, SIGNAL ( checkFileExistenceSignal () ),
+                       this, SLOT ( checkFileExistenceSlot () ) );
+    QObject::connect ( this, SIGNAL ( defineInterpreterSignal () ),
+                       this, SLOT ( defineInterpreterSlot () ) );
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardOutput () ),
+                       this, SLOT ( displayLongRunningScriptOutputSlot () ) );
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( finished ( int, QProcess::ExitStatus ) ),
+                       this, SLOT ( longRunningScriptFinishedSlot () ) );
+    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError () ),
+                       this, SLOT ( displayLongRunningScriptErrorSlot() ) );
+    QObject::connect ( this, SIGNAL ( quitFromURLSignal () ),
+                       this, SLOT ( quitApplicationSlot () ) );
+    QObject::connect ( qApp, SIGNAL ( lastWindowClosed () ),
+                       this, SLOT ( quitApplicationSlot () ) );
+    QObject::connect ( qApp, SIGNAL ( aboutToQuit () ),
+                       this, SLOT ( quitApplicationSlot () ) );
+
+    if ( systemTrayIconStarted == false )
+    {
+        trayIcon = new QSystemTrayIcon ();
         trayIcon -> setIcon ( QIcon ( iconPathName ) );
         trayIcon -> setToolTip ( "Camel Calf" );
 
-        maximizeAction = new QAction ( tr ( "Ma&ximize" ), this );
-        QObject::connect ( maximizeAction, SIGNAL ( triggered () ),
-                  this, SLOT ( maximizeFromSystemTraySlot () ) );
-        minimizeAction = new QAction ( tr ( "&Minimize" ), this );
-        QObject::connect ( minimizeAction, SIGNAL ( triggered () ),
-                  this, SLOT ( minimizeFromSystemTraySlot () ) );
-        quitAction = new QAction ( tr ( "&Quit" ), this );
-        QObject::connect ( quitAction, SIGNAL ( triggered () ),
-                  this, SLOT ( quitAppSlot () ) );
         aboutAction = new QAction ( tr ( "&About" ), this );
         QObject::connect ( aboutAction, SIGNAL ( triggered () ),
-                  this, SLOT ( sysTrayAbout () ) );
+                           this, SLOT ( aboutFromSystemTraySlot () ) );
         aboutQtAction = new QAction ( tr ( "About Q&t" ), this );
         QObject::connect ( aboutQtAction, SIGNAL ( triggered () ),
-                  qApp, SLOT ( aboutQt () ) );
+                           qApp, SLOT ( aboutQt () ) );
+        quitAction = new QAction ( tr ( "&Quit" ), this );
+        QObject::connect ( quitAction, SIGNAL ( triggered () ),
+                           this, SLOT ( quitApplicationSlot () ) );
 
         trayIconMenu = new QMenu ();
-        trayIconMenu -> addAction ( maximizeAction );
-        trayIconMenu -> addAction ( minimizeAction );
-        trayIconMenu -> addAction ( quitAction );
-        trayIconMenu -> addSeparator ();
         trayIconMenu -> addAction ( aboutAction );
         trayIconMenu -> addAction ( aboutQtAction );
         trayIcon -> setContextMenu ( trayIconMenu );
+        trayIconMenu -> addSeparator ();
+        trayIconMenu -> addAction ( quitAction );
         trayIcon -> show ();
-        sysTrayIconInitializedOnce = true;
+        systemTrayIconStarted = true;
     }
 
-    if ( pingInitializedOnce == false ) {
+    if ( pingStarted == false )
+    {
         QTimer * timer = new QTimer ( this );
-        connect ( timer, SIGNAL ( timeout () ), this, SLOT ( ping () ) );
+        connect ( timer, SIGNAL ( timeout () ), this, SLOT ( pingSlot () ) );
         timer -> start ( 5000 );
-        pingInitializedOnce = true;
+        pingStarted = true;
     }
-
-    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardOutput () ),
-                       this, SLOT ( displayLongRunningScriptOutput () ) );
-    QObject::connect ( & longRunningScriptHandler, SIGNAL ( finished ( int, QProcess::ExitStatus ) ),
-                       this, SLOT ( longRunningScriptFinished () ) );
-    QObject::connect ( & longRunningScriptHandler, SIGNAL ( readyReadStandardError () ),
-                       this, SLOT ( displayLongRunningScriptError() ) );
-    QObject::connect ( this, SIGNAL ( quitFromURL () ),
-                       this, SLOT ( quitAppSlot () ) );
 
 }
 
@@ -263,56 +253,110 @@ TopLevel::TopLevel()
     : QWebView ( 0 )
 {
 
-    if ( windowSize != "maximized" or windowSize != "fullscreen" ) {
-        int fixedWidth = windowSize.section ( "x", 0, 0 ).toInt ();
-        int fixedHeight = windowSize.section ( "x", 1, 1 ).toInt ();
-        if ( fixedWidth > 100 and fixedHeight > 100 ) {
+    // Reading settings from INI file:
+    QString settingsFileName = QDir::toNativeSeparators (
+                QApplication::applicationDirPath () + QDir::separator() + "peb.ini" );
+    QSettings settings ( settingsFileName, QSettings::IniFormat );
+    startPage = settings.value ( "gui/start_page" ). toString ();
+    icon = settings.value ( "gui/icon" ) .toString ();
+    windowSize = settings.value ( "gui/window_size" ) .toString ();
+    framelessWindow = settings.value ( "gui/frameless_window" ) .toString ();
+    stayOnTop = settings.value ( "gui/stay_on_top" ) .toString ();
+    browserTitle = settings.value ( "gui/browser_title" ) .toString ();
+    contextMenu = settings.value ( "gui/context_menu" ) .toString ();
+    iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath () +
+                                                      QDir::separator () + icon );
+
+    QObject::connect ( this, SIGNAL ( loadStartPageSignal () ),
+                       this, SLOT ( loadStartPageSlot () ) );
+    QShortcut * maximizeShortcut = new QShortcut ( QKeySequence ( "Ctrl+M" ), this );
+    QObject::connect ( maximizeShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( maximizeSlot () ) );
+    QShortcut * minimizeShortcut = new QShortcut ( Qt::Key_Escape, this );
+    QObject::connect ( minimizeShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( minimizeSlot () ) );
+    QShortcut * toggleFullScreenShortcut = new QShortcut ( Qt::Key_F11, this );
+    QObject::connect ( toggleFullScreenShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( toggleFullScreenSlot () ) );
+    QShortcut * homeShortcut = new QShortcut ( Qt::Key_F12, this );
+    QObject::connect ( homeShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( loadStartPageSlot () ) );
+    QShortcut * printShortcut = new QShortcut ( QKeySequence ("Ctrl+P"), this );
+    QObject::connect ( printShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( printPageSlot () ) );
+    QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
+    QObject::connect ( closeAppShortcut, SIGNAL ( activated () ),
+                       this, SLOT ( quitApplicationFromContextMenuSlot () ) );
+
+    if ( windowSize != "maximized" or windowSize != "fullscreen" )
+    {
+        int fixedWidth = windowSize.section ( "x", 0, 0 ) .toInt ();
+        int fixedHeight = windowSize.section ( "x", 1, 1 ) .toInt ();
+        if ( fixedWidth > 100 and fixedHeight > 100 )
+        {
             setFixedSize ( fixedWidth, fixedHeight );
-            QRect screenRect = QDesktopWidget().screen () -> rect();
+            QRect screenRect = QDesktopWidget () .screen () -> rect ();
             move ( QPoint ( screenRect.width () / 2 - width () / 2,
                             screenRect.height () / 2 - height () / 2 ) );
         }
     }
-
-    if ( windowSize == "maximized") {
+    if ( windowSize == "maximized")
+    {
         showMaximized();
     }
-
-    if ( windowSize == "fullscreen" ) {
+    if ( windowSize == "fullscreen" )
+    {
         showFullScreen();
     }
-
-    if ( stayOnTop == "yes" ) {
+    if ( stayOnTop == "yes" )
+    {
         setWindowFlags ( Qt::WindowStaysOnTopHint );
     }
-
-    if ( stayOnTop == "yes" and framelessWindow == "yes" ) {
+    if ( stayOnTop == "yes" and framelessWindow == "yes" )
+    {
         setWindowFlags ( Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint );
     }
-
-    if ( stayOnTop == "no" and framelessWindow == "yes" ) {
+    if ( stayOnTop == "no" and framelessWindow == "yes" )
+    {
         setWindowFlags ( Qt::FramelessWindowHint );
+    }
+    if ( browserTitle != "dynamic" )
+    {
+        setWindowTitle ( browserTitle );
+    }
+    if ( contextMenu == "no" )
+    {
+        setContextMenuPolicy ( Qt::NoContextMenu );
     }
 
     mainPage = new Page ();
 
-    QObject::connect ( mainPage, SIGNAL ( maximizeFromSystemTraySignal () ),
-                       this, SLOT ( maximizeSlot () ) );
-    QObject::connect ( mainPage, SIGNAL ( minimizeFromSystemTraySignal () ),
-                       this, SLOT ( minimizeSlot () ) );
-
-//    QObject::connect ( mainPage, SIGNAL ( sysTrayMessageSignal () ),
-//                       mainPage, SLOT ( sysTrayMessageSlot () ) );
+    QObject::connect ( mainPage, SIGNAL ( aboutFromSystemTraySignal () ),
+                       this, SLOT ( aboutSlot () ) );
+    QObject::connect ( mainPage, SIGNAL ( closeWindowSignal () ),
+                       this, SLOT ( close () ) );
+    QObject::connect ( this, SIGNAL ( quitApplicationFromContextMenuSignal () ),
+                       mainPage, SLOT ( quitApplicationSlot () ) );
+    if ( browserTitle == "dynamic" )
+    {
+        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
+                           this, SLOT ( pageLoadedDynamicTitleSlot ( bool ) ) );
+    } else {
+        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
+                           this, SLOT ( pageLoadedStaticTitleSlot ( bool ) ) );
+    }
 
     setPage ( mainPage );
 
-    NAM * nam = new NAM();
+    ModifiedNetworkAccessManager * nam = new ModifiedNetworkAccessManager ();
     mainPage -> setNetworkAccessManager ( nam );
 
     //main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
 
-    // Disabling horizontal scroll bar:
-    mainPage -> mainFrame () -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAlwaysOff );
+    // Scroll bars:
+    mainPage -> mainFrame () -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAsNeeded );
+    mainPage -> mainFrame () -> setScrollBarPolicy ( Qt::Vertical, Qt::ScrollBarAsNeeded );
+
     // Disabling history:
     QWebHistory * history = mainPage -> history ();
     history -> setMaximumItemCount ( 0 );
@@ -333,47 +377,10 @@ TopLevel::TopLevel()
     mainPage -> action ( QWebPage::CopyImageToClipboard ) -> setVisible ( false );
     mainPage -> action ( QWebPage::Reload ) -> setVisible ( false );
 
-    QObject::connect ( this, SIGNAL ( startPageRequested () ),
-                       this, SLOT ( homeSlot () ) );
-
-    QShortcut * maximizeShortcut = new QShortcut ( QKeySequence ( "Ctrl+M" ), this );
-    QObject::connect ( maximizeShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( maximizeSlot () ) );
-    QShortcut * minimizeShortcut = new QShortcut ( Qt::Key_Escape, this );
-    QObject::connect ( minimizeShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( minimizeSlot () ) );
-    QShortcut * toggleFullScreenShortcut = new QShortcut ( Qt::Key_F11, this );
-    QObject::connect ( toggleFullScreenShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( toggleFullScreenSlot () ) );
-    QShortcut * homeShortcut = new QShortcut ( Qt::Key_F12, this );
-    QObject::connect ( homeShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( homeSlot () ) );
-    QShortcut * printShortcut = new QShortcut ( QKeySequence ("Ctrl+P"), this );
-    QObject::connect ( printShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( printPageSlot () ) );
-    QShortcut * closeAppShortcut = new QShortcut ( QKeySequence ( "Ctrl+X" ), this );
-    QObject::connect ( closeAppShortcut, SIGNAL ( activated () ),
-                       this, SLOT ( closeAppContextMenuSlot () ) );
-
-    if ( browserTitle == "dynamic" ) {
-        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
-                           this, SLOT ( pageLoadedDynamicTitle ( bool ) ) );
-    } else {
-        QObject::connect ( mainPage, SIGNAL ( loadFinished ( bool ) ),
-                           this, SLOT ( pageLoadedStaticTitle ( bool ) ) );
-    }
-
-    if ( browserTitle != "dynamic" ) {
-        setWindowTitle ( browserTitle );
-    }
-
-    if ( contextMenu == "no" ) {
-        setContextMenuPolicy ( Qt::NoContextMenu );
-    }
-
-    if ( startPageInitializedOnce == false ) {
-        emit startPageRequested ();
-        startPageInitializedOnce = true;
+    if ( startPageLoaded == false )
+    {
+        emit loadStartPageSignal ();
+        startPageLoaded = true;
     }
 
 }
@@ -383,24 +390,27 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                      QWebPage::NavigationType navigationType )
 {
 
-    if ( frame != Page::currentFrame() and
+    if ( frame != Page::currentFrame () and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url () ) ) {
-        if ( ! Page::mainFrame() -> childFrames ().contains ( frame ) ) {
-            if ( ! request.url ().path ().contains ( "longrun" ) ) {
-
+         .isParentOf ( request.url () ) )
+    {
+        if ( ! Page::mainFrame() -> childFrames () .contains ( frame ) )
+        {
+            if ( ! request.url () .path () .contains ( "longrun" ) )
+            {
                 newWindow = new TopLevel;
+                newWindow -> setWindowIcon ( QIcon ( iconPathName ) );
                 newWindow -> setUrl ( QUrl::fromLocalFile (
                                           QDir::toNativeSeparators (
                                               QApplication::applicationDirPath () +
-                                              QDir::separator () + request.url (). path () ) ) );
+                                              QDir::separator () + request.url () .path () ) ) );
                 newWindow -> show ();
 
 //                QMessageBox msgBox;
 //                msgBox.setWindowTitle ( "Open in New Window Requested" );
-//                msgBox.setIconPixmap ( QPixmap ( icon ) );
+//                msgBox.setIconPixmap ( QPixmap ( iconPathName ) );
 //                msgBox.setText
-//                        ( "Opening URL in a new window is not allowed in<br>Perl Executing Browser." );
+//                        ( "Opening URL in a new window is not allowed!" );
 //                msgBox.setDefaultButton ( QMessageBox::Ok );
 //                msgBox.exec ();
 
@@ -410,57 +420,50 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "openfile:" ) ) {
+         request.url () .toString () .contains ( "openfile:" ) )
+    {
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
-        dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath () +
-                                       QDir::separator() + icon ) );
-        QString fileNameString = dialog.getOpenFileName ( 0, "Select File",
+        dialog.setWindowIcon ( QIcon ( iconPathName ) );
+        fileNameToOpenString = dialog.getOpenFileName ( 0, "Select File",
                                                           QDir::currentPath (), "All files (*)" );
         QByteArray fileName;
-        fileName.append ( fileNameString );
+        fileName.append ( fileNameToOpenString );
         qputenv ( "FILE_TO_OPEN", fileName );
         qDebug () << "File to open:" << fileName;
         qDebug () << "===============";
-        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-        trayIcon -> showMessage ( "File to open:", fileNameString, icon, 10 * 1000 );
         dialog.close ();
         dialog.deleteLater ();
         return true;
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "openfolder:" ) ) {
+         request.url () .toString () .contains ( "openfolder:" ) )
+    {
         QFileDialog dialog;
         dialog.setFileMode ( QFileDialog::AnyFile );
         dialog.setViewMode ( QFileDialog::Detail );
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
-        dialog.setWindowIcon ( QIcon ( QApplication::applicationDirPath () +
-                                       QDir::separator () + icon ) );
-        QString folderNameString = dialog.getExistingDirectory ( 0, "Select Folder",
+        dialog.setWindowIcon ( QIcon ( iconPathName ) );
+        folderNameToOpenString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath () );
-
-//        QString folderNameString = dialog.getSaveFileName ( 0, "Create New File",
-//                                                                 QDir::currentPath () );
-
         QByteArray folderName;
-        folderName.append ( folderNameString );
+        folderName.append ( folderNameToOpenString );
         qputenv ( "FOLDER_TO_OPEN", folderName );
         qDebug () << "Folder to open:" << folderName;
         qDebug () << "===============";
-        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-        trayIcon -> showMessage ( "Folder to open:", folderNameString, icon, 10 * 1000 );
         dialog.close ();
         dialog.deleteLater ();
         return true;
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "print:" ) ) {
+         request.url () .toString () .contains ( "print:" ) )
+    {
         qDebug () << "Printing requested.";
         qDebug () << "===============";
         QPrinter printer;
@@ -485,75 +488,70 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "quit:" ) ) {
+         request.url () .toString () .contains ( "quit:" ) )
+    {
         qDebug () << "Application termination requested from URL.";
         qDebug () << "Exiting.";
-        emit quitFromURL ();
+        emit quitFromURLSignal ();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "closewindow:" ) ) {
+         request.url () .toString () .contains ( "closewindow:" ) )
+    {
         qDebug () << "Close window requested from URL.";
         qDebug () << "===============";
-        emit closeWindow ();
+        emit closeWindowSignal ();
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().toString ().contains ( "external:" ) ) {
-        QString externalApplication = request.url ()
+         request.url () .toString () .contains ( "external:" ) )
+    {
+        externalApplication = request.url ()
                 .toString ( QUrl::RemoveScheme )
                 .replace ( "/", "" );
         qDebug () << "External application: " << externalApplication;
         qDebug () << "===============";
-        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-        trayIcon -> showMessage (
-                    "External application:", externalApplication, icon, 10 * 1000 );
         QProcess externalProcess;
         externalProcess.startDetached ( externalApplication );
         return false;
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().scheme ().contains ( "http" ) and
+         request.url () .scheme () .contains ( "http" ) and
          ! ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url () ) ){
-        if ( request.url ().authority ().contains ( "localhost" ) ){
-            qDebug () << "Local webserver link:" << request.url ().toString ();
+         .isParentOf ( request.url () ) )
+    {
+        if ( request.url () .authority () .contains ( "localhost" ) )
+        {
+            qDebug () << "Local webserver link:" << request.url () .toString ();
             qDebug () << "===============";
             return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
         }
-        if ( request.url ().authority ().contains ( "www.perl.com" ) ){
-            qDebug () << "Allowed web link:" << request.url ().toString ();
+        if ( request.url () .authority () .contains ( "www.perl.com" ) )
+        {
+            allowedWebLink = request.url () .toString ();
+            qDebug () << "Allowed web link:" << allowedWebLink;
             qDebug () << "===============";
-            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-            trayIcon -> showMessage (
-                        "Allowed web link:",
-                        request.url ().toString (), icon, 10 * 1000 );
             return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
         } else {
-            qDebug () << "External browser called for:" << request.url ().toString ();
+            externalWebLink = request.url () .toString ();
+            qDebug () << "External browser called for:" << externalWebLink;
             qDebug () << "===============";
-            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-            trayIcon -> showMessage (
-                        "External browser called for:",
-                        request.url ().toString (), icon, 10 * 1000 );
             QDesktopServices::openUrl ( request.url () );
             return false;
         }
     }
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url ().scheme ().contains ( "file" ) ) {
-        QString filepath = request.url ().toString ( QUrl::RemoveScheme );
+         request.url () .scheme () .contains ( "file" ) )
+    {
+        QString filepath = request.url () .toString ( QUrl::RemoveScheme );
         QFile file ( QDir::toNativeSeparators ( filepath ) );
         if ( file.exists() )
         {
-            qDebug () << "Opening file with default application:" << request.url().toString();
+            defaultApplicationFile = request.url() .toString();
+            qDebug () << "Opening file with default application:" << defaultApplicationFile;
             qDebug () << "===============";
-            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-            trayIcon -> showMessage (
-                        "Opening file with default application:",
-                        request.url ().toString (), icon, 10 * 1000 );
             QDesktopServices::openUrl ( request.url() );
             return false;
         }
@@ -561,65 +559,28 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
 
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url () ) ) {
+         .isParentOf ( request.url () ) )
+    {
 
-        if ( request.url ().path ().contains ( "longrun" ) ){
+        if ( request.url () .path () .contains ( "longrun" ) )
+        {
             qDebug () << "Long-running script detected.";
         }
-        qDebug () << "Local link:" << request.url ().toString ();
-        QString filepath = request.url ()
+        qDebug () << "Local link:" << request.url () .toString ();
+        filepath = request.url ()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority |
                             QUrl::RemoveQuery | QUrl::RemoveFragment );
         qDebug () << "File path:" << QDir::toNativeSeparators (
                          QApplication::applicationDirPath() + filepath );
 
-        QFile file ( QDir::toNativeSeparators (
-                         QApplication::applicationDirPath () + filepath ) );
-        if( ! file.exists() )
-        {
-            qDebug () << QDir::toNativeSeparators (
-                             QApplication::applicationDirPath() + filepath ) <<
-                         "is missing.";
-            qDebug () << "Please restore the missing file.";
-            QMessageBox msgBox;
-            msgBox.setIcon ( QMessageBox::Critical );
-            msgBox.setWindowTitle ( "Missing file" );
-            msgBox.setText ( QDir::toNativeSeparators (
-                                 QApplication::applicationDirPath () + filepath ) +
-                             " is missing.<br>Please restore the missing file." );
-            msgBox.setDefaultButton ( QMessageBox::Ok );
-            msgBox.exec();
-        }
+        emit checkFileExistenceSignal ();
 
-        QString extension = filepath.section ( ".", 1, 1 );
+        extension = filepath.section ( ".", 1, 1 );
         qDebug () << "Extension:" << extension;
-        QString interpreter;
-        if ( extension == "pl" ) {
-#ifdef Q_OS_WIN
-            interpreter = "perl.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "perl";
-#endif
-        }
-        if ( extension == "php" ) {
-#ifdef Q_OS_WIN
-            interpreter = "php-cgi.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "php";
-#endif
-        }
-        if ( extension == "py" ) {
-#ifdef Q_OS_WIN
-            interpreter = "python.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "python";
-#endif
-        }
+        emit defineInterpreterSignal ();
 
-        if ( extension == "pl" or extension == "php" or extension == "py" ) {
+        if ( extension == "pl" or extension == "php" or extension == "py" )
+        {
             qDebug () << "Interpreter:" << interpreter;
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -633,7 +594,8 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
 
             QProcess handler;
 
-            if ( request.url ().path ().contains ( "longrun" ) ){
+            if ( request.url () .path () .contains ( "longrun" ) )
+            {
                 longRunningScriptHandler.setProcessEnvironment ( env );
             } else {
                 handler.setProcessEnvironment ( env );
@@ -642,12 +604,13 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             QFileInfo file ( filepath );
             QString fileDirectory = QDir::toNativeSeparators (
                         QApplication::applicationDirPath() +
-                        file.absoluteDir().absolutePath () );
+                        file.absoluteDir() .absolutePath () );
             qDebug () << "Working directory:" << fileDirectory;
             qDebug () << "TEMP folder:" << QDir::tempPath();
             qDebug () << "===============";
 
-            if ( request.url ().path ().contains ( "longrun" ) ){
+            if ( request.url () .path () .contains ( "longrun" ) )
+            {
                 longRunningScriptHandler.setWorkingDirectory ( fileDirectory );
             } else {
                 handler.setWorkingDirectory ( fileDirectory );
@@ -659,26 +622,22 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                 QDir::tempPath () + QDir::separator () + "error.txt" ) );
             }
 
-            if ( request.url ().path ().contains ( "longrun" ) ){
+            if ( request.url () .path () .contains ( "longrun" ) )
+            {
                 longRunningScriptHandler.start ( interpreter, QStringList() <<
                                                  QDir::toNativeSeparators (
                                                      QApplication::applicationDirPath () +
                                                      QDir::separator () + filepath ) );
-                QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon ( 0 );
-                trayIcon -> showMessage (
-                            "Long-running script:",
-                            "Long-running script started.", icon, 10 * 1000 );
-                if ( frame == Page::currentFrame () ) {
+                if ( frame == Page::currentFrame () )
+                {
                     longRunningScriptOutputInNewWindow = false;
                 }
-                if ( frame != Page::currentFrame () ) {
+                if ( frame != Page::currentFrame () )
+                {
                     longRunningScriptOutputInNewWindow = true;
                     lastRequest = request;
-                    newWindow = new TopLevel;
-
-//                    QObject::connect ( newWindow, SIGNAL ( sysTrayMessageSignal () ),
-//                                       this, SLOT ( sysTrayMessageSlot () ) );
-
+                    newLongRunWindow = new TopLevel;
+                    newLongRunWindow -> setWindowIcon ( QIcon ( iconPathName ) );
                 }
             } else {
                 handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
@@ -695,7 +654,8 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             }
         }
 
-        if ( extension == "htm" or extension == "html" ) {
+        if ( extension == "htm" or extension == "html" )
+        {
             frame -> load ( QUrl::fromLocalFile (
                                 QDir::toNativeSeparators (
                                     QApplication::applicationDirPath () +
@@ -714,69 +674,31 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
          .toString ( QUrl::RemoveScheme |
                      QUrl::RemoveAuthority |
                      QUrl::RemovePath )
-         .replace ( "?", "" ).length() > 0 ) {
+         .replace ( "?", "" ).length() > 0 )
+    {
 
-        qDebug () << "Form submitted to:" << request.url ().toString ( QUrl::RemoveQuery );
-        QString scriptpath = request.url ()
+        qDebug () << "Form submitted to:" << request.url () .toString ( QUrl::RemoveQuery );
+
+        filepath = request.url ()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
 
         qDebug () << "Script path:" << QDir::toNativeSeparators (
-                         QApplication::applicationDirPath () + scriptpath );
-        QFile file ( QDir::toNativeSeparators (
-                         QApplication::applicationDirPath () + scriptpath ) );
-        if( ! file.exists () )
-        {
-            qDebug () << QDir::toNativeSeparators (
-                             QApplication::applicationDirPath () + scriptpath ) <<
-                         "is missing.";
-            qDebug () << "Please restore the missing script.";
-            QMessageBox msgBox;
-            msgBox.setIcon ( QMessageBox::Critical );
-            msgBox.setWindowTitle ( "Missing script" );
-            msgBox.setText ( QDir::toNativeSeparators (
-                                 QApplication::applicationDirPath() + scriptpath ) +
-                             " is missing.<br>Please restore the missing script." );
-            msgBox.setDefaultButton ( QMessageBox::Ok );
-            msgBox.exec ();
-            QNetworkRequest emptyRequest;
-            return QWebPage::acceptNavigationRequest ( frame, emptyRequest, navigationType );
-        }
+                         QApplication::applicationDirPath () + filepath );
+
+        emit checkFileExistenceSignal ();
 
         qDebug () << "Query string:" << request.url()
                      .toString ( QUrl::RemoveScheme |
                                  QUrl::RemoveAuthority |
                                  QUrl::RemovePath )
                      .replace ( "?", "" );
-        QString extension = scriptpath.section ( ".", 1, 1 );
+
+        extension = filepath.section ( ".", 1, 1 );
         qDebug () << "Extension:" << extension;
-        QString interpreter;
+        emit defineInterpreterSignal ();
 
-        if ( extension == "pl" ) {
-#ifdef Q_OS_WIN
-            interpreter = "perl.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "perl";
-#endif
-        }
-        if ( extension == "php" ) {
-#ifdef Q_OS_WIN
-            interpreter = "php-cgi.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "php";
-#endif
-        }
-        if ( extension == "py" ) {
-#ifdef Q_OS_WIN
-            interpreter = "python.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "python";
-#endif
-        }
-
-        if ( extension == "pl" or extension == "php" or extension == "py" ) {
+        if ( extension == "pl" or extension == "php" or extension == "py" )
+        {
             qDebug () << "Interpreter:" << interpreter;
             QProcess handler;
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -789,10 +711,10 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             env.insert ( "QUERY_STRING", query );
             handler.setProcessEnvironment ( env );
 
-            QFileInfo script ( scriptpath );
+            QFileInfo script ( filepath );
             QString scriptDirectory = QDir::toNativeSeparators (
                         QApplication::applicationDirPath () +
-                        script.absoluteDir ().absolutePath () );
+                        script.absoluteDir () .absolutePath () );
             handler.setWorkingDirectory ( scriptDirectory );
             qDebug () << "Working directory:" << scriptDirectory;
 
@@ -804,7 +726,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             qDebug () << "===============";
             handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                 QApplication::applicationDirPath () +
-                                QDir::separator () + scriptpath ) );
+                                QDir::separator () + filepath ) );
             // wait until handler has finished
             if ( ! handler.waitForFinished () )
                 return 1;

@@ -4,7 +4,7 @@ use strict;
 use warnings;
 
 ############
-my $waiting = 10;
+my $waiting = 40;
 ############
 
 $|=1; # Disable in-built Perl buffering

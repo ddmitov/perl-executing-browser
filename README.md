@@ -15,8 +15,8 @@ Design Objectives
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
 * **4. Flexible network access:**  
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
-    **b)** if network connection is essential, PEB can be configured as a client or both as a client and server for network databases in a variety of combinations and topologies.  
-    Webserver functionality is provided by a minimally modified version of Mongoose web server.  
+    **b)** if network connection is essential, PEB can be configured as a client or both as a client and server for network services in a variety of combinations and topologies.  
+    Local webserver functionality, if needed, is provided by a minimally modified version of Mongoose web server.  
   
 Features
 ----------------------------------------------------------------------------------------
@@ -31,9 +31,9 @@ Features
 * Can start local webserver (Mongoose) and load scripts and pages from localhost.  
 * Can load a predefined website and be used as a site-specific browser or a client for a web service.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
-* (Highly) configurable from INI file.  
-* Can be used in fullscreen mode, frameless mode or fixed size window. 100% of the browser screen area is dedicated to web interfaces with an unobtrusive context menu.  
-* System tray icon & menu with baloon messages.  
+* Configurable from INI file.  
+* Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
+* System tray icon & menu.  
 ... to be continued
   
 History

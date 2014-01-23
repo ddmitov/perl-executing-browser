@@ -6,6 +6,7 @@ use strict;
 use warnings;
 
 
+# to be removed from the output by the browser when executed in serverless mode
 print "Content-Type: text/html\r\n\r\n";
 
 
@@ -22,6 +23,9 @@ print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/perlinfo.pl'>Perl Info</a>\n";
+print "</font>\n";
+print "<p align='center'><font size='3' face='SansSerif'>\n";
+print "Non-core module loaded from directory, without system-wide installation.\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -51,6 +55,12 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='external:/gedit peb.ini'>External Program with an argument</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://www.perl.com/'>Allowed External Link in This Browser</a>\n";
 print "</font></p>\n";
 
@@ -58,12 +68,6 @@ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='https://www.google.com/'>External Link in Default Browser</a>\n";
-print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='external:/leafpad peb.ini'>External Program with an argument</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -93,16 +97,22 @@ print "<hr width='95%'>\n";
 #~ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>SQLite example</a>\n";
+print "<a href='print://now'>Print</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'>BG Volumina</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>SQLite example</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
+
+#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
+#~ print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'>BG Volumina</a>\n";
+#~ print "</font></p>\n";
+
+#~ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://localhost:8080'>Localhost</a>\n";
@@ -118,13 +128,6 @@ print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl' target='_blank'>Long-running Script In New Window</a>\n";
-print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='print://now'>Print</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
