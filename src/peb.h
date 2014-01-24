@@ -343,6 +343,12 @@ protected:
 
 private:
 
+    QString userAgentForUrl ( const QUrl & url ) const
+    {
+        Q_UNUSED ( url );
+        return "PerlExecutingBrowser/0.1 AppleWebKit/535.2 (KHTML, like Gecko)";
+    }
+
     QString icon;
     QString iconPathName;
 
@@ -583,10 +589,15 @@ public slots:
 
     void aboutSlot ()
     {
+        QString qtVersion = QT_VERSION_STR;
+        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
         QMessageBox msgBox;
         msgBox.setWindowTitle ( "About" );
         msgBox.setIconPixmap ( QPixmap ( iconPathName ) );
-        msgBox.setText ( "Perl Executing Browser v. 0.1,<br>code name Camel Calf" );
+        msgBox.setText ( "Perl Executing Browser v. 0.1,<br>"
+                         "code name Camel Calf<br>"
+                         "Qt version: " + qtVersion + "<br>"
+                         "Qt WebKit version: " + qtWebKitVersion );
         msgBox.setDefaultButton ( QMessageBox::Ok );
         msgBox.exec ();
     }
@@ -599,6 +610,18 @@ public slots:
 public:
 
     TopLevel ();
+
+//    // http://qt-project.org/forums/viewthread/17635
+//    // http://www.qtcentre.org/threads/52787
+//    QWebView * createWindow ( QWebPage::WebWindowType type )
+//    {
+//        Q_UNUSED ( type );
+
+//        QWebView * webView = new TopLevel;
+//        webView -> setAttribute ( Qt::WA_DeleteOnClose, true );
+//        webView -> show ();
+//        return webView;
+//    }
 
 private:
 

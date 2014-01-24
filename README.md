@@ -32,6 +32,7 @@ Features
 * Can load a predefined website and be used as a site-specific browser or a client for a web service.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Configurable from INI file.  
+* Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
 * Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
 * Can open HTML file in a new window.  
 * System tray icon & menu.  

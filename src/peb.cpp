@@ -41,7 +41,9 @@ int main ( int argc, char ** argv )
     QDateTime dateTime = QDateTime::currentDateTime ();
     QString dateTimeString = dateTime.toString ();
     qDebug () << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
-    qDebug () << "Application file path is" << QApplication::applicationFilePath ();
+    qDebug () << "Application file path:" << QApplication::applicationFilePath ();
+    qDebug () << "Qt version:" << QT_VERSION_STR;
+    qDebug () << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug () << "===============";
 
     QString settingsFileName = QDir::toNativeSeparators (
@@ -119,15 +121,9 @@ int main ( int argc, char ** argv )
 #ifdef Q_OS_WIN
     qputenv ( "Path", path ); //win32
 #endif
-
     QByteArray documentRoot;
     documentRoot.append ( QApplication::applicationDirPath () );
     qputenv ( "DOCUMENT_ROOT", documentRoot );
-
-    qputenv ( "FILE_TO_OPEN", "" );
-
-    qputenv ( "FOLDER_TO_OPEN", "" );
-
     QByteArray perl5Lib;
     perl5Lib.append ( QApplication::applicationDirPath () );
     perl5Lib.append ( QDir::separator () );
@@ -135,6 +131,8 @@ int main ( int argc, char ** argv )
     perl5Lib.append ( QDir::separator () );
     perl5Lib.append ( "lib" );
     qputenv ( "PERL5LIB", perl5Lib );
+    qputenv ( "FILE_TO_OPEN", "" );
+    qputenv ( "FOLDER_TO_OPEN", "" );
 
     QString iconPathName = QDir::toNativeSeparators ( QApplication::applicationDirPath () +
                                                       QDir::separator () + icon );
@@ -384,6 +382,10 @@ TopLevel::TopLevel()
     }
 
 }
+
+
+
+
 
 bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                      const QNetworkRequest & request,

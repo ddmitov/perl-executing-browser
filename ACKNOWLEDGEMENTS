@@ -36,7 +36,7 @@
  http://qt-project.org/forums/viewthread/10672
  http://qt-project.org/forums/viewthread/4433
  http://qt-project.org/forums/viewthread/9346
- http://qt-project.org/forums/viewthread/17635
+ http://qt-project.org/forums/viewthread/11729
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
  http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
@@ -72,6 +72,7 @@
  http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button
  http://stackoverflow.com/questions/11749262/qt-close-a-running-window-through-code
  http://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7
+ http://stackoverflow.com/questions/6421747/how-to-find-current-qtwebkit-version-used-in-qt-sdk
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
