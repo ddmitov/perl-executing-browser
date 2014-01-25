@@ -26,6 +26,75 @@
 #include <QSystemTrayIcon>
 #include <QDebug>
 
+class Settings : public QSettings
+{
+    Q_OBJECT
+
+public:
+
+    Settings ();
+
+    QString settingsFileName;
+    QString startPage;
+    QString icon;
+    QString iconPathName;
+    QString windowSize;
+    QString framelessWindow;
+    QString stayOnTop;
+    QString browserTitle;
+    QString contextMenu;
+
+};
+
+class Watchdog : public QSystemTrayIcon
+{
+
+    Q_OBJECT
+
+public slots:
+
+    void pingSlot ()
+    {
+        QTcpSocket localWebServerPing;
+        localWebServerPing.connectToHost ( "127.0.0.1", 8080 );
+        QTcpSocket webConnectivityPing;
+        webConnectivityPing.connectToHost ( "www.google.com", 80 );
+
+        if ( localWebServerPing.waitForConnected ( 1000 ) )
+        {
+            qDebug () << "Local web server is running.";
+        } else {
+            qDebug () << "Local web server is not running. Will try to restart it.";
+            QProcess server;
+            server.startDetached ( QString ( QApplication::applicationDirPath () +
+                                             QDir::separator () + "mongoose" ) );
+        }
+        if ( webConnectivityPing.waitForConnected ( 1000 ) )
+        {
+            qDebug () << "Web connection is available.";
+            qDebug () << "===============";
+        } else {
+            qDebug () << "Web connection is not available.";
+            qDebug () << "===============";
+        }
+    }
+
+public:
+
+    Watchdog ();
+
+    QAction * quitAction;
+    QAction * aboutAction;
+    QAction * aboutQtAction;
+
+private:
+
+    Settings settings;
+    QSystemTrayIcon * trayIcon;
+    QMenu * trayIconMenu;
+
+};
+
 class ModifiedNetworkAccessManager : public QNetworkAccessManager
 {
 
@@ -176,43 +245,11 @@ class Page : public QWebPage
 
 signals:
 
-    void checkFileExistenceSignal ();
-
-    void defineInterpreterSignal ();
-
     void quitFromURLSignal ();
-
-    void aboutFromSystemTraySignal ();
 
     void closeWindowSignal ();
 
 public slots:
-
-    void pingSlot ()
-    {
-        QTcpSocket localWebServerPing;
-        localWebServerPing.connectToHost ( "127.0.0.1", 8080 );
-        QTcpSocket webConnectivityPing;
-        webConnectivityPing.connectToHost ( "www.google.com", 80 );
-
-        if ( localWebServerPing.waitForConnected ( 1000 ) )
-        {
-            qDebug () << "Local web server is running.";
-        } else {
-            qDebug () << "Local web server is not running. Will try to restart it.";
-            QProcess server;
-            server.startDetached ( QString ( QApplication::applicationDirPath () +
-                                             QDir::separator () + "mongoose" ) );
-        }
-        if ( webConnectivityPing.waitForConnected ( 1000 ) )
-        {
-            qDebug () << "Web connection is available.";
-            qDebug () << "===============";
-        } else {
-            qDebug () << "Web connection is not available.";
-            qDebug () << "===============";
-        }
-    }
 
     void checkFileExistenceSlot ()
     {
@@ -317,20 +354,6 @@ public slots:
         qDebug () << "===============";
     }
 
-    void aboutFromSystemTraySlot ()
-    {
-        emit aboutFromSystemTraySignal ();
-    }
-
-    void quitApplicationSlot ()
-    {
-        QFile::remove (
-                    QDir::toNativeSeparators (
-                        QDir::tempPath () + QDir::separator () + "output.htm" ) );
-        Page::currentFrame() -> setUrl ( QUrl ( "http://localhost:8080/close" ) );
-        QApplication::exit();
-    }
-
 public:
 
     Page ();
@@ -349,18 +372,11 @@ private:
         return "PerlExecutingBrowser/0.1 AppleWebKit/535.2 (KHTML, like Gecko)";
     }
 
-    QString icon;
-    QString iconPathName;
+    Settings settings;
 
     QString filepath;
     QString extension;
     QString interpreter;
-
-    QSystemTrayIcon * trayIcon;
-    QMenu * trayIconMenu;
-    QAction * quitAction;
-    QAction * aboutAction;
-    QAction * aboutQtAction;
 
     QProcess longRunningScriptHandler;
     QNetworkRequest lastRequest;
@@ -382,12 +398,6 @@ class TopLevel : public QWebView
 {
     Q_OBJECT
 
-signals:
-
-    void loadStartPageSignal ();
-
-    void quitApplicationFromContextMenuSignal ();
-
 public slots:
 
     void loadStartPageSlot ()
@@ -395,7 +405,7 @@ public slots:
         QString startPageFilePath;
         startPageFilePath = QDir::toNativeSeparators (
                     QApplication::applicationDirPath () +
-                    QDir::separator () + startPage );
+                    QDir::separator () + settings.startPage );
         qDebug () << "Start page:" << startPageFilePath;
 
         QString extension = startPageFilePath.section ( ".", 1, 1 );
@@ -520,47 +530,47 @@ public slots:
     {
         QMenu * menu = mainPage -> createStandardContextMenu ();
         menu -> addSeparator ();
-        if ( windowSize == "maximized" or windowSize == "fullscreen" )
+        if ( settings.windowSize == "maximized" or settings.windowSize == "fullscreen" )
         {
-            if ( framelessWindow == "no" )
+            if ( settings.framelessWindow == "no" )
             {
-                QAction * maximizeAct = menu -> addAction ( "&Maximize" );
+                QAction * maximizeAct = menu -> addAction ( tr ( "&Maximize" ) );
                 QObject::connect ( maximizeAct, SIGNAL ( triggered () ),
                           this, SLOT ( maximizeSlot () ) );
             }
-            QAction * toggleFullScreenAct = menu -> addAction ( "Toggle &Fullscreen" );
+            QAction * toggleFullScreenAct = menu -> addAction ( tr ( "Toggle &Fullscreen" ) );
             QObject::connect ( toggleFullScreenAct, SIGNAL ( triggered () ),
                       this, SLOT ( toggleFullScreenSlot () ) );
         }
-        if ( framelessWindow == "no" )
+        if ( settings.framelessWindow == "no" )
         {
-            QAction * minimizeAct = menu -> addAction ( "Mi&nimize" );
+            QAction * minimizeAct = menu -> addAction ( tr ( "Mi&nimize" ) );
             QObject::connect ( minimizeAct, SIGNAL ( triggered () ),
                       this, SLOT ( minimizeSlot () ) );
         }
         if ( ! TopLevel::url () .toString () .contains ( "longrun" ) )
         {
-            QAction * homeAct = menu -> addAction ( "&Home" );
+            QAction * homeAct = menu -> addAction ( tr ( "&Home" ) );
             QObject::connect ( homeAct, SIGNAL ( triggered () ),
                       this, SLOT ( loadStartPageSlot () ) );
         }
-        QAction * printAct = menu -> addAction ( "&Print" );
+        QAction * printAct = menu -> addAction ( tr ( "&Print" ) );
         QObject::connect ( printAct, SIGNAL ( triggered () ),
                   this, SLOT ( printPageSlot() ) );
-        QAction * closeWindowAct = menu -> addAction ( "&Close window" );
+        QAction * closeWindowAct = menu -> addAction ( tr ( "&Close window" ) );
         QObject::connect ( closeWindowAct, SIGNAL ( triggered () ),
                   this, SLOT ( close () ) );
         if ( ! TopLevel::url () .toString () .contains ( "longrun" ) )
         {
-            QAction * quitAct = menu -> addAction ( "&Quit" );
+            QAction * quitAct = menu -> addAction ( tr ( "&Quit" ) );
             QObject::connect ( quitAct, SIGNAL ( triggered () ),
-                      this, SLOT ( quitApplicationFromContextMenuSlot () ) );
+                      this, SLOT ( quitApplicationSlot () ) );
         }
         menu -> addSeparator();
-        QAction * aboutAction = menu -> addAction ( "&About" );
+        QAction * aboutAction = menu -> addAction ( tr ( "&About" ) );
         QObject::connect ( aboutAction, SIGNAL ( triggered () ),
                   this, SLOT ( aboutSlot () ) );
-        QAction * aboutQtAction = menu -> addAction ( "About Q&t" );
+        QAction * aboutQtAction = menu -> addAction ( tr ( "About Q&t" ) );
         QObject::connect ( aboutQtAction, SIGNAL ( triggered () ),
                   qApp, SLOT ( aboutQt () ) );
         menu -> exec ( event -> globalPos () );
@@ -593,18 +603,23 @@ public slots:
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
         QMessageBox msgBox;
         msgBox.setWindowTitle ( "About" );
-        msgBox.setIconPixmap ( QPixmap ( iconPathName ) );
-        msgBox.setText ( "Perl Executing Browser v. 0.1,<br>"
-                         "code name Camel Calf<br>"
-                         "Qt version: " + qtVersion + "<br>"
-                         "Qt WebKit version: " + qtWebKitVersion );
+        msgBox.setIconPixmap ( QPixmap ( settings.iconPathName ) );
+        msgBox.setText ( "Perl Executing Browser, version 0.1, code name Camel Calf<br>"
+                         "<a href='https://github.com/ddmitov/perl-executing-browser'>"
+                         "https://github.com/ddmitov/perl-executing-browser</a><br>"
+                         "Qt WebKit version: " + qtWebKitVersion + ", "
+                         "Qt version: " + qtVersion );
         msgBox.setDefaultButton ( QMessageBox::Ok );
         msgBox.exec ();
     }
 
-    void quitApplicationFromContextMenuSlot ()
+    void quitApplicationSlot ()
     {
-        emit quitApplicationFromContextMenuSignal ();
+        QFile::remove (
+                    QDir::toNativeSeparators (
+                        QDir::tempPath () + QDir::separator () + "output.htm" ) );
+        setUrl ( QUrl ( "http://localhost:8080/close" ) );
+        QApplication::exit();
     }
 
 public:
@@ -617,24 +632,17 @@ public:
 //    {
 //        Q_UNUSED ( type );
 
-//        QWebView * webView = new TopLevel;
-//        webView -> setAttribute ( Qt::WA_DeleteOnClose, true );
-//        webView -> show ();
-//        return webView;
+//        QWebView * newWindow = new TopLevel;
+//        newWindow -> setAttribute ( Qt::WA_DeleteOnClose, true );
+//        newWindow -> show ();
+//        return newWindow;
 //    }
 
 private:
 
     Page * mainPage;
 
-    QString startPage;
-    QString icon;
-    QString iconPathName;
-    QString windowSize;
-    QString framelessWindow;
-    QString stayOnTop;
-    QString browserTitle;
-    QString contextMenu;
+    Settings settings;
 
 };
 
