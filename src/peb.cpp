@@ -31,7 +31,9 @@
 int main ( int argc, char ** argv )
 {
 
-    QApplication app ( argc, argv );
+    QApplication application ( argc, argv );
+
+    application.setApplicationName ( "Perl Executing Browser" );
 
     // Get current date and time:
     QDateTime dateTime = QDateTime::currentDateTime ();
@@ -48,11 +50,11 @@ int main ( int argc, char ** argv )
     QTextCodec::setCodecForCStrings ( QTextCodec::codecForName ( "UTF8" ) );
 #endif
 
-    Settings settings;
+    QPixmap emptyTransparentIcon ( 16, 16 );
+    emptyTransparentIcon.fill ( Qt::transparent );
+    QApplication::setWindowIcon ( QIcon ( emptyTransparentIcon ) );
 
-    QApplication::setWindowIcon ( QIcon ( settings.iconPathName ) );
-    qDebug () << "Application icon:" << settings.iconPathName;
-    qDebug () << "===============";
+    Settings settings;
 
     QFile settingsFile ( settings.settingsFileName );
     if ( ! settingsFile.exists () )
@@ -69,10 +71,10 @@ int main ( int argc, char ** argv )
         QApplication::exit ();
     }
 
-    QFile file ( QDir::toNativeSeparators (
+    QFile startPageFile ( QDir::toNativeSeparators (
                      QApplication::applicationDirPath () +
                      QDir::separator () + settings.startPage ) );
-    if ( ! file.exists () )
+    if ( ! startPageFile.exists () )
     {
         qDebug () << QDir::toNativeSeparators (
                          QApplication::applicationDirPath () +
@@ -92,6 +94,10 @@ int main ( int argc, char ** argv )
         return 1;
         QApplication::exit ();
     }
+
+    QApplication::setWindowIcon ( QIcon ( settings.iconPathName ) );
+    qDebug () << "Application icon:" << settings.iconPathName;
+    qDebug () << "===============";
 
     // Environment variables:
     QByteArray path;
@@ -145,7 +151,7 @@ int main ( int argc, char ** argv )
     QObject::connect ( watchdog.quitAction, SIGNAL ( triggered () ),
                        & toplevel, SLOT ( quitApplicationSlot () ) );
 
-    return app.exec ();
+    return application.exec ();
 
 }
 
@@ -211,23 +217,22 @@ Page::Page ()
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::JavascriptEnabled, true );
     QWebSettings::globalSettings() ->
-            setAttribute ( QWebSettings::JavascriptCanOpenWindows, false );
-    QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::SpatialNavigationEnabled, true );
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::LinksIncludedInFocusChain, true );
     QWebSettings::globalSettings() ->
-            setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
-    QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::AutoLoadImages, true );
-    QWebSettings::globalSettings() ->
-            setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
-    QWebSettings::globalSettings() ->
-            setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
     QWebSettings::globalSettings() ->
             setAttribute ( QWebSettings::DeveloperExtrasEnabled, true );
 //    QWebSettings::globalSettings() ->
 //            setAttribute ( QWebSettings::LocalStorageEnabled, true );
+
+    QWebSettings::globalSettings() ->
+            setAttribute ( QWebSettings::PrivateBrowsingEnabled, true );
+    QWebSettings::globalSettings() ->
+            setAttribute ( QWebSettings::LocalContentCanAccessFileUrls, true );
+    QWebSettings::globalSettings() ->
+            setAttribute ( QWebSettings::LocalContentCanAccessRemoteUrls, true );
     QWebSettings::setMaximumPagesInCache ( 0 );
     QWebSettings::setObjectCacheCapacities ( 0, 0, 0 );
     QWebSettings::clearMemoryCaches ();
@@ -245,6 +250,7 @@ TopLevel::TopLevel ()
     : QWebView ( 0 )
 {
 
+    // Configure keyboard shortcuts:
     QShortcut * maximizeShortcut = new QShortcut ( QKeySequence ( "Ctrl+M" ), this );
     QObject::connect ( maximizeShortcut, SIGNAL ( activated () ),
                        this, SLOT ( maximizeSlot () ) );
@@ -264,6 +270,7 @@ TopLevel::TopLevel ()
     QObject::connect ( closeAppShortcut, SIGNAL ( activated () ),
                        this, SLOT ( quitApplicationSlot () ) );
 
+    // Configure screen appearance:
     if ( settings.windowSize != "maximized" or settings.windowSize != "fullscreen" )
     {
         int fixedWidth = settings.windowSize.section ( "x", 0, 0 ) .toInt ();
@@ -322,42 +329,50 @@ TopLevel::TopLevel ()
 
     setPage ( mainPage );
 
+    // Use modified Network Access Manager with every window of the program:
     ModifiedNetworkAccessManager * nam = new ModifiedNetworkAccessManager ();
     mainPage -> setNetworkAccessManager ( nam );
 
     //main_page -> setLinkDelegationPolicy ( QWebPage::DelegateAllLinks );
 
-    // Scroll bars:
+    // Configure scroll bars:
     mainPage -> mainFrame () -> setScrollBarPolicy ( Qt::Horizontal, Qt::ScrollBarAsNeeded );
     mainPage -> mainFrame () -> setScrollBarPolicy ( Qt::Vertical, Qt::ScrollBarAsNeeded );
 
-    // Disabling history:
+    // Disable history:
     QWebHistory * history = mainPage -> history ();
     history -> setMaximumItemCount ( 0 );
 
     // Context menu settings:
-    mainPage -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( true );
-    mainPage -> action ( QWebPage::Back ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::Forward ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::Stop ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::OpenLink ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::OpenLinkInNewWindow ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::OpenFrameInNewWindow ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::DownloadLinkToDisk ) -> setVisible ( false );
     mainPage -> action ( QWebPage::SetTextDirectionLeftToRight ) -> setVisible ( false );
     mainPage -> action ( QWebPage::SetTextDirectionRightToLeft ) -> setVisible ( false );
+
+    mainPage -> action ( QWebPage::Back ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Forward ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Reload ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::Stop ) -> setVisible ( false );
+
+    mainPage -> action ( QWebPage::OpenLink ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::CopyLinkToClipboard ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenLinkInNewWindow ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::DownloadLinkToDisk ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::OpenFrameInNewWindow ) -> setVisible ( false );
+
+    mainPage -> action ( QWebPage::CopyImageUrlToClipboard ) -> setVisible ( false );
+    mainPage -> action ( QWebPage::CopyImageToClipboard ) -> setVisible ( false );
     mainPage -> action ( QWebPage::OpenImageInNewWindow ) -> setVisible ( false );
     mainPage -> action ( QWebPage::DownloadImageToDisk ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::CopyImageToClipboard ) -> setVisible ( false );
-    mainPage -> action ( QWebPage::Reload ) -> setVisible ( false );
 
 }
 
+// Manage clicking of links:
 bool Page::acceptNavigationRequest ( QWebFrame * frame,
                                      const QNetworkRequest & request,
                                      QWebPage::NavigationType navigationType )
 {
 
+    // Open local content in a new window
+    // (with the exception of results from long-running scripts in new windows):
     if ( frame != Page::currentFrame () and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url () ) )
@@ -368,10 +383,15 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             {
                 newWindow = new TopLevel;
                 newWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
-                newWindow -> setUrl ( QUrl::fromLocalFile (
-                                          QDir::toNativeSeparators (
-                                              QApplication::applicationDirPath () +
-                                              QDir::separator () + request.url () .path () ) ) );
+                if ( request.url () .path () .contains ( ".htm" ) )
+                {
+                    newWindow -> setUrl ( QUrl::fromLocalFile (
+                                              QDir::toNativeSeparators (
+                                                  QApplication::applicationDirPath () +
+                                                  QDir::separator () + request.url () .path () ) ) );
+                } else {
+                    newWindow -> setUrl ( request.url () );
+                }
                 newWindow -> show ();
 
 //                QMessageBox msgBox;
@@ -387,6 +407,20 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         }
     }
 
+    // Open allowed web site in a new window:
+    if ( frame != Page::currentFrame () and
+         request.url () .authority () .contains ( "www.perl.com" ) )
+    {
+        if ( ! Page::mainFrame() -> childFrames () .contains ( frame ) )
+        {
+            newWindow = new TopLevel;
+            newWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
+            newWindow -> setUrl ( request.url () );
+            newWindow -> show ();
+        }
+    }
+
+    // Open file from URL:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "openfile:" ) )
     {
@@ -408,6 +442,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         return true;
     }
 
+    // Open folder from URL:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "openfolder:" ) )
     {
@@ -429,6 +464,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         return true;
     }
 
+    // Print page from URL:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "print:" ) )
     {
@@ -455,6 +491,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         return true;
     }
 
+    // Quit application from URL:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "quit:" ) )
     {
@@ -463,6 +500,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         emit quitFromURLSignal ();
     }
 
+    // Close window from URL:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "closewindow:" ) )
     {
@@ -471,6 +509,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         emit closeWindowSignal ();
     }
 
+    // Execute external application:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "external:" ) )
     {
@@ -484,6 +523,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         return false;
     }
 
+    // Open allowed web site, localhost or not allowed web site using default browser:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .scheme () .contains ( "http" ) and
          ! ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
@@ -503,13 +543,14 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
         } else {
             externalWebLink = request.url () .toString ();
-            qDebug () << "External browser called for:" << externalWebLink;
+            qDebug () << "Default browser called for:" << externalWebLink;
             qDebug () << "===============";
             QDesktopServices::openUrl ( request.url () );
             return false;
         }
     }
 
+    // Open local file using default application:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .scheme () .contains ( "file" ) )
     {
@@ -525,24 +566,21 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         }
     }
 
+    // Execute local scripts or load local HTML pages invoked from hyperlinks
+    // (with the exception of long-running scripts):
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url () ) )
+         .isParentOf ( request.url () ) and
+         ( ! request.url () .path () .contains ( "longrun" ) ) )
     {
 
-        if ( request.url () .path () .contains ( "longrun" ) )
-        {
-            qDebug () << "Long-running script detected.";
-        }
         qDebug () << "Local link:" << request.url () .toString ();
         filepath = request.url ()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority |
                             QUrl::RemoveQuery | QUrl::RemoveFragment );
         qDebug () << "File path:" << QDir::toNativeSeparators (
                          QApplication::applicationDirPath() + filepath );
-
         checkFileExistenceSlot ();
-
         extension = filepath.section ( ".", 1, 1 );
         qDebug () << "Extension:" << extension;
         defineInterpreterSlot ();
@@ -551,7 +589,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         {
             qDebug () << "Interpreter:" << interpreter;
 
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
             env.insert ( "REQUEST_METHOD", "GET" );
             QString query = request.url ()
                     .toString ( QUrl::RemoveScheme |
@@ -561,65 +599,58 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             env.insert ( "QUERY_STRING", query );
 
             QProcess handler;
-
-            if ( request.url () .path () .contains ( "longrun" ) )
-            {
-                longRunningScriptHandler.setProcessEnvironment ( env );
-            } else {
-                handler.setProcessEnvironment ( env );
-            }
+            handler.setProcessEnvironment ( env );
 
             QFileInfo file ( filepath );
             QString fileDirectory = QDir::toNativeSeparators (
-                        QApplication::applicationDirPath() +
+                        QApplication::applicationDirPath () +
                         file.absoluteDir() .absolutePath () );
             qDebug () << "Working directory:" << fileDirectory;
             qDebug () << "TEMP folder:" << QDir::tempPath();
             qDebug () << "===============";
+            handler.setWorkingDirectory ( fileDirectory );
 
-            if ( request.url () .path () .contains ( "longrun" ) )
+            handler.setStandardErrorFile (
+                        QDir::toNativeSeparators (
+                            QDir::tempPath () + QDir::separator () + "error.txt" ) );
+            handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
+                                QApplication::applicationDirPath () +
+                                QDir::separator () + filepath ) );
+            QString output;
+            // wait until handler has finished:
+            if ( handler.waitForFinished () )
             {
-                longRunningScriptHandler.setWorkingDirectory ( fileDirectory );
-            } else {
-                handler.setWorkingDirectory ( fileDirectory );
-                handler.setStandardOutputFile (
-                            QDir::toNativeSeparators (
-                                QDir::tempPath () + QDir::separator () + "output.htm" ) );
-                handler.setStandardErrorFile (
-                            QDir::toNativeSeparators (
-                                QDir::tempPath () + QDir::separator () + "error.txt" ) );
-            }
-
-            if ( request.url () .path () .contains ( "longrun" ) )
-            {
-                longRunningScriptHandler.start ( interpreter, QStringList() <<
-                                                 QDir::toNativeSeparators (
-                                                     QApplication::applicationDirPath () +
-                                                     QDir::separator () + filepath ) );
-                if ( frame == Page::currentFrame () )
-                {
-                    longRunningScriptOutputInNewWindow = false;
-                }
-                if ( frame != Page::currentFrame () )
-                {
-                    longRunningScriptOutputInNewWindow = true;
-                    lastRequest = request;
-                    newLongRunWindow = new TopLevel;
-                    newLongRunWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
-                }
-            } else {
-                handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
-                                    QApplication::applicationDirPath () +
-                                    QDir::separator () + filepath ) );
-                // wait until handler has finished:
-                if ( ! handler.waitForFinished() )
-                    return 1;
-                frame -> load ( QUrl::fromLocalFile (
-                                    QDir::toNativeSeparators (
-                                        QDir::tempPath () + QDir::separator () +
-                                        "output.htm" ) ) );
+                output = handler.readAll ();
                 handler.close ();
             }
+
+            QString outputFilePath = QDir::toNativeSeparators (
+                        QDir::tempPath () +
+                        QDir::separator () +
+                        "output.htm" );
+            QFile outputFilePathFile ( outputFilePath );
+            if ( outputFilePathFile.exists () )
+            {
+                outputFilePathFile.remove ();
+            }
+
+            QRegExp regExpOne( "^Content-type: text/html; charset=\\w*-\\d*\n" );
+            regExpOne.setCaseSensitivity ( Qt::CaseInsensitive );
+            output.replace ( regExpOne, "" );
+            QRegExp regExpTwo ( "^Content-type: text/html" );
+            regExpTwo.setCaseSensitivity ( Qt::CaseInsensitive );
+            output.replace ( regExpTwo, "" );
+
+            if ( outputFilePathFile.open ( QIODevice::ReadWrite ) )
+            {
+                QTextStream stream ( & outputFilePathFile );
+                stream << output << endl;
+            }
+            frame -> load ( QUrl::fromLocalFile (
+                                QDir::toNativeSeparators (
+                                    QDir::tempPath () +
+                                    QDir::separator () +
+                                    "output.htm" ) ) );
         }
 
         if ( extension == "htm" or extension == "html" )
@@ -635,7 +666,99 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         return true;
     }
 
-    // GET method form data:
+    // Execute local long-running scripts invoked from hyperlinks:
+    if ( navigationType == QWebPage::NavigationTypeLinkClicked and
+         ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
+         .isParentOf ( request.url () ) and
+         ( request.url () .path () .contains ( "longrun" ) ) )
+    {
+
+        qDebug () << "Long-running script:" << request.url () .toString ();
+        filepath = request.url ()
+                .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority |
+                            QUrl::RemoveQuery | QUrl::RemoveFragment );
+        qDebug () << "File path:" << QDir::toNativeSeparators (
+                         QApplication::applicationDirPath () + filepath );
+        checkFileExistenceSlot ();
+        extension = filepath.section ( ".", 1, 1 );
+        qDebug () << "Extension:" << extension;
+        defineInterpreterSlot ();
+
+        if ( extension == "pl" or extension == "php" or extension == "py" )
+        {
+            qDebug () << "Interpreter:" << interpreter;
+
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
+            env.insert ( "REQUEST_METHOD", "GET" );
+            QString query = request.url ()
+                    .toString ( QUrl::RemoveScheme |
+                                QUrl::RemoveAuthority |
+                                QUrl::RemovePath )
+                    .replace ( "?", "" );
+            env.insert ( "QUERY_STRING", query );
+
+//            // Early experiments for implementing an idea proposed by Valcho Nedelchev.
+//            // Influenced by usefull code example from:
+//            // http://stackoverflow.com/questions/1725097
+//            env.insert ( "COLUMNS", "80" );
+//            env.insert ( "LINES", "24" );
+
+            longRunningScriptHandler.setProcessEnvironment ( env );
+
+            QFileInfo file ( filepath );
+            QString fileDirectory = QDir::toNativeSeparators (
+                        QApplication::applicationDirPath() +
+                        file.absoluteDir() .absolutePath () );
+            qDebug () << "Working directory:" << fileDirectory;
+            qDebug () << "TEMP folder:" << QDir::tempPath();
+            qDebug () << "===============";
+            longRunningScriptHandler.setWorkingDirectory ( fileDirectory );
+
+            longRunningScriptHandler.start ( interpreter, QStringList () <<
+                                             QDir::toNativeSeparators (
+                                                 QApplication::applicationDirPath () +
+                                                 QDir::separator () + filepath ) );
+
+//            // Early experiments for implementing an idea proposed by Valcho Nedelchev.
+//            // Influenced by usefull code examples from:
+//            // http://qt-project.org/forums/viewthread/1335
+//            // http://www.qtcentre.org/threads/31264
+//            // http://stackoverflow.com/questions/13856734/open-qfile-for-appending
+//            longRunningScriptHandler.setProcessChannelMode ( QProcess::MergedChannels );
+//            longRunningScriptHandler.start ( interpreter, QStringList() << "-d" <<
+//                                             QDir::toNativeSeparators (
+//                                                 QApplication::applicationDirPath () +
+//                                                 QDir::separator () + filepath ),
+//                                             QProcess::Unbuffered | QProcess::ReadWrite );
+//            if ( ! longRunningScriptHandler.waitForStarted (-1) )
+//                return 1;
+//            QByteArray noTTY;
+//            noTTY.append ( QString ( "noTTY\n" ).toLatin1 () );
+//            longRunningScriptHandler.write ( noTTY );
+//            QByteArray showModuleVersions;
+//            showModuleVersions.append ( QString ( "M\n" ).toLatin1 () );
+//            longRunningScriptHandler.write ( showModuleVersions );
+
+            if ( frame == Page::currentFrame () )
+            {
+                longRunningScriptOutputInNewWindow = false;
+            }
+            if ( frame != Page::currentFrame () )
+            {
+                longRunningScriptOutputInNewWindow = true;
+                lastRequest = request;
+                newLongRunWindow = new TopLevel;
+                newLongRunWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
+            }
+
+        }
+
+        QWebSettings::clearMemoryCaches ();
+        return true;
+    }
+
+    // Get data from any local form using CGI GET method and
+    // execute associated local script:
     if ( navigationType == QWebPage::NavigationTypeFormSubmitted and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url () ) and request.url ()
@@ -646,15 +769,11 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     {
 
         qDebug () << "Form submitted to:" << request.url () .toString ( QUrl::RemoveQuery );
-
         filepath = request.url ()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery );
-
         qDebug () << "Script path:" << QDir::toNativeSeparators (
                          QApplication::applicationDirPath () + filepath );
-
         checkFileExistenceSlot ();
-
         qDebug () << "Query string:" << request.url()
                      .toString ( QUrl::RemoveScheme |
                                  QUrl::RemoveAuthority |
@@ -686,23 +805,48 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             handler.setWorkingDirectory ( scriptDirectory );
             qDebug () << "Working directory:" << scriptDirectory;
 
-            handler.setStandardOutputFile (
-                        QDir::toNativeSeparators (
-                            QDir::tempPath () +
-                            QDir::separator () + "output.htm" ) );
             qDebug () << "TEMP folder:" << QDir::tempPath();
             qDebug () << "===============";
             handler.start ( interpreter, QStringList() << QDir::toNativeSeparators (
                                 QApplication::applicationDirPath () +
                                 QDir::separator () + filepath ) );
-            // wait until handler has finished
-            if ( ! handler.waitForFinished () )
-                return 1;
+
+            QString output;
+            // wait until handler has finished:
+            if ( handler.waitForFinished () )
+            {
+                output = handler.readAll ();
+                handler.close ();
+            }
+
+            QString outputFilePath = QDir::toNativeSeparators (
+                        QDir::tempPath () +
+                        QDir::separator () +
+                        "output.htm" );
+            QFile outputFilePathFile ( outputFilePath );
+            if ( outputFilePathFile.exists () )
+            {
+                outputFilePathFile.remove ();
+            }
+
+            QRegExp regExpOne( "^Content-type: text/html; charset=\\w*-\\d*\n" );
+            regExpOne.setCaseSensitivity ( Qt::CaseInsensitive );
+            output.replace ( regExpOne, "" );
+            QRegExp regExpTwo ( "^Content-type: text/html" );
+            regExpTwo.setCaseSensitivity ( Qt::CaseInsensitive );
+            output.replace ( regExpTwo, "" );
+
+            if ( outputFilePathFile.open ( QIODevice::ReadWrite ) )
+            {
+                QTextStream stream ( & outputFilePathFile );
+                stream << output << endl;
+            }
+
             frame -> load ( QUrl::fromLocalFile (
                                 QDir::toNativeSeparators (
                                     QDir::tempPath () +
-                                    QDir::separator () + "output.htm" ) ) );
-            handler.close ();
+                                    QDir::separator () +
+                                    "output.htm" ) ) );
             qputenv ( "FILE_TO_OPEN", "" );
             qputenv ( "FOLDER_TO_OPEN", "" );
         }

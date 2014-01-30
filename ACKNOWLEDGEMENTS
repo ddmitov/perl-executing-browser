@@ -1,10 +1,37 @@
 
- PERL EXECUTING BROWSER - REFERENCES, ACKNOWLEDGEMENTS AND THANKS:
- 
+ PERL EXECUTING BROWSER - THANKS, ACKNOWLEDGEMENTS AND REFERENCES:
+
+ Amata mea Argeia - gratiam magnam tibi ago!
+ Patientia tua in studiis meis computatoriis auxilium meum maximum!
+
  Being in debt to each and every one, who
  prepared the official Qt documentation or
  shared usefull knowledge on a variety of forums, blogs and other sites,
  I thank them all! Their expertise, effort and good will are highly appreciated!
+
+ Special thanks to the staff of the Library of the New Bulgarian University,
+ where much of the coding effort took place!
+
+ Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
+ "How to read POST data "sent" from my own QtWebKit application?":
+ http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
+
+ I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
+ for their code, which I adopted and modified:
+ http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
+ http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
+
+ Thanks to Mike Accardo <accardo@cpan.org> - the author of the CPAN module HTML-Perlinfo:
+ http://search.cpan.org/~accardo/HTML-Perlinfo-1.62/lib/HTML/Perlinfo/HTML.pod
+ HTML-Perlinfo is used as a testing tool for loading modules from a directory, without system-wide installation.
+
+ Thanks to Jennifer J. Maher-Bontrager, author of the Camel icon.
+ http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
+ http://www.totoro.org/jen/
+
+ Thanks to Sergey Lyubka, author of Mongoose web server.
+ http://cesanta.com/docs.html?Mongoose.md
+ https://github.com/cesanta/mongoose
 
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
  http://qt-project.org/doc/qt-4.8/qwebhistory.html
@@ -48,6 +75,7 @@
  http://www.qtcentre.org/archive/index.php/t-31264.html
  http://www.qtcentre.org/archive/index.php/t-14691.html
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
+ http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
  http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
  http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
@@ -73,6 +101,7 @@
  http://stackoverflow.com/questions/11749262/qt-close-a-running-window-through-code
  http://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7
  http://stackoverflow.com/questions/6421747/how-to-find-current-qtwebkit-version-used-in-qt-sdk
+ http://stackoverflow.com/questions/9101887/how-to-validate-email-address-using-qregexp
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -82,19 +111,3 @@
  http://msturm.p7.de/programming_qprocess.php
  http://en.wikipedia.org/wiki/Common_Gateway_Interface
  http://en.wikipedia.org/wiki/INI_file
-
- Special thanks to the staff of the Library of the New Bulgarian University,
- where much of the coding effort took place!
-
- Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
- "How to read POST data "sent" from my own QtWebKit application?":
- http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
-
- I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
- for their code, which I adopted and modified:
- http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
- http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
-
- Amata mea Argeia - gratiam magnam tibi ago!
- Patientia tua in studiis meis computatoriis auxilium meum maximum!
-  

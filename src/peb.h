@@ -106,7 +106,122 @@ protected:
                                             const QNetworkRequest & request,
                                             QIODevice * outgoingData = 0 )
     {
-        // POST method form data:
+
+        // Get output from local scripts in a new window:
+        if ( operation == GetOperation and
+             ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
+             .isParentOf ( request.url () ) and
+             ( ! request.url () .path () .contains ( "longrun" ) ) )
+        {
+
+            QString scriptpath = request.url ()
+                    .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority );
+
+            qDebug () << "New window - script path:" << QDir::toNativeSeparators (
+                            QApplication::applicationDirPath () + scriptpath );
+            QFile file ( QDir::toNativeSeparators (
+                             QApplication::applicationDirPath () + scriptpath ) );
+            if ( ! file.exists () )
+            {
+                qDebug () << QDir::toNativeSeparators (
+                                QApplication::applicationDirPath () + scriptpath ) <<
+                            " is missing.";
+                qDebug () << "Please restore the missing script.";
+                QMessageBox msgBox;
+                msgBox.setIcon ( QMessageBox::Critical );
+                msgBox.setWindowTitle ( "Missing script" );
+                msgBox.setText ( QDir::toNativeSeparators (
+                                     QApplication::applicationDirPath () + scriptpath ) +
+                                 " is missing.<br>Please restore the missing script." );
+                msgBox.setDefaultButton ( QMessageBox::Ok );
+                msgBox.exec ();
+                QNetworkRequest emptyRequest;
+                return QNetworkAccessManager::createRequest (
+                            QNetworkAccessManager::GetOperation,
+                            emptyRequest );
+            }
+
+            extension = scriptpath.section (".", 1, 1);
+            qDebug () << "Extension:" << extension;
+            defineInterpreterSlot ();
+            if ( extension == "pl" or extension == "php" or extension == "py" )
+            {
+                qDebug () << "Interpreter:" << interpreter;
+                QProcess handler;
+                QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
+
+                env.insert ( "REQUEST_METHOD", "GET" );
+                QString query = request.url ()
+                        .toString ( QUrl::RemoveScheme |
+                                    QUrl::RemoveAuthority |
+                                    QUrl::RemovePath )
+                        .replace ( "?", "" );
+                env.insert ( "QUERY_STRING", query );
+
+                handler.setProcessEnvironment ( env );
+
+                QFileInfo script ( scriptpath );
+                QString scriptDirectory = QDir::toNativeSeparators (
+                            QApplication::applicationDirPath () +
+                            script.absoluteDir () .absolutePath () );
+                handler.setWorkingDirectory ( scriptDirectory );
+                qDebug () << "Working directory:" << scriptDirectory;
+                qDebug () << "TEMP folder:" << QDir::tempPath ();
+                handler.start ( interpreter, QStringList () <<
+                                QDir::toNativeSeparators (
+                                    QApplication::applicationDirPath () +
+                                    QDir::separator () + scriptpath ) );
+
+                if ( handler.waitForFinished () )
+                {
+                    QString output = handler.readAll ();
+                    handler.close ();
+
+                    QString outputFilePath = QDir::toNativeSeparators (
+                                QDir::tempPath () +
+                                QDir::separator () +
+                                "output.htm" );
+                    QFile outputFilePathFile ( outputFilePath );
+                    if ( outputFilePathFile.exists () )
+                    {
+                        outputFilePathFile.remove ();
+                    }
+
+                    QRegExp regExpOne( "^Content-type: text/html; charset=\\w*-\\d*\n" );
+                    regExpOne.setCaseSensitivity ( Qt::CaseInsensitive );
+                    output.replace ( regExpOne, "" );
+                    QRegExp regExpTwo ( "^Content-type: text/html" );
+                    regExpTwo.setCaseSensitivity ( Qt::CaseInsensitive );
+                    output.replace ( regExpTwo, "" );
+
+                    if ( outputFilePathFile.open ( QIODevice::ReadWrite ) )
+                    {
+                        QTextStream stream ( & outputFilePathFile );
+                        stream << output << endl;
+                    }
+
+                    QNetworkRequest networkRequest;
+                    networkRequest.setHeader (
+                                QNetworkRequest::ContentTypeHeader, "text/html; charset=UTF-8");
+                    networkRequest.setUrl (
+                                QUrl::fromLocalFile (
+                                    QDir::toNativeSeparators (
+                                        QDir::tempPath () +
+                                        QDir::separator () +
+                                        "output.htm" ) ) );
+
+                    QWebSettings::clearMemoryCaches ();
+                    qDebug () << "===============";
+                    return QNetworkAccessManager::createRequest (
+                                QNetworkAccessManager::GetOperation,
+                                QNetworkRequest ( networkRequest ) );
+
+                }
+            }
+        }
+
+        // Get data from any local form using CGI POST method and
+        // execute associated local script:
         if ( operation == PostOperation and
              ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
              .isParentOf ( request.url () ) )
@@ -149,38 +264,9 @@ protected:
                             emptyRequest );
             }
 
-            QString extension = scriptpath.section (".", 1, 1);
+            extension = scriptpath.section (".", 1, 1);
             qDebug () << "Extension:" << extension;
-            QString interpreter;
-
-            if ( extension == "pl" )
-            {
-#ifdef Q_OS_WIN
-                interpreter = "perl.exe";
-#endif
-#ifdef Q_OS_LINUX
-                interpreter = "perl";
-#endif
-            }
-            if ( extension == "php" )
-            {
-#ifdef Q_OS_WIN
-                interpreter = "php-cgi.exe";
-#endif
-#ifdef Q_OS_LINUX
-                interpreter = "php";
-#endif
-            }
-            if ( extension == "py" )
-            {
-#ifdef Q_OS_WIN
-                interpreter = "python.exe";
-#endif
-#ifdef Q_OS_LINUX
-                interpreter = "python";
-#endif
-            }
-
+            defineInterpreterSlot ();
             if ( extension == "pl" or extension == "php" or extension == "py" )
             {
                 qDebug () << "Interpreter:" << interpreter;
@@ -201,10 +287,6 @@ protected:
                 handler.setWorkingDirectory ( scriptDirectory );
                 qDebug () << "Working directory:" << scriptDirectory;
 
-                handler.setStandardOutputFile (
-                            QDir::toNativeSeparators (
-                                QDir::tempPath () +
-                                QDir::separator () + "output.htm" ) );
                 qDebug () << "TEMP folder:" << QDir::tempPath ();
                 qDebug () << "===============";
                 handler.start ( interpreter, QStringList () <<
@@ -219,23 +301,93 @@ protected:
 
                 if ( handler.waitForFinished () )
                 {
+                    QString output = handler.readAll ();
                     handler.close ();
+
+                    QString outputFilePath = QDir::toNativeSeparators (
+                                QDir::tempPath () +
+                                QDir::separator () +
+                                "output.htm" );
+                    QFile outputFilePathFile ( outputFilePath );
+                    if ( outputFilePathFile.exists () )
+                    {
+                        outputFilePathFile.remove ();
+                    }
+
+                    QRegExp regExpOne( "^Content-type: text/html; charset=\\w*-\\d*\n" );
+                    regExpOne.setCaseSensitivity ( Qt::CaseInsensitive );
+                    output.replace ( regExpOne, "" );
+                    QRegExp regExpTwo ( "^Content-type: text/html" );
+                    regExpTwo.setCaseSensitivity ( Qt::CaseInsensitive );
+                    output.replace ( regExpTwo, "" );
+
+                    if ( outputFilePathFile.open ( QIODevice::ReadWrite ) )
+                    {
+                        QTextStream stream ( & outputFilePathFile );
+                        stream << output << endl;
+                    }
+
                     qputenv ( "FILE_TO_OPEN", "" );
                     qputenv ( "FOLDER_TO_OPEN", "" );
+
+                    QNetworkRequest networkRequest;
+                    networkRequest.setHeader (
+                                QNetworkRequest::ContentTypeHeader, "text/html; charset=UTF-8");
+                    networkRequest.setUrl (
+                                QUrl::fromLocalFile (
+                                    QDir::toNativeSeparators (
+                                        QDir::tempPath () +
+                                        QDir::separator () +
+                                        "output.htm" ) ) );
+
                     QWebSettings::clearMemoryCaches ();
                     return QNetworkAccessManager::createRequest (
                                 QNetworkAccessManager::GetOperation,
-                                QNetworkRequest ( QUrl::fromLocalFile (
-                                                      QDir::toNativeSeparators (
-                                                          QDir::tempPath () +
-                                                          QDir::separator () +
-                                                          "output.htm" ) ) ) );
+                                QNetworkRequest ( networkRequest ) );
                 }
             }
         }
 
         return QNetworkAccessManager::createRequest ( operation, request );
     }
+
+public slots:
+
+    void defineInterpreterSlot ()
+    {
+        if ( extension == "pl" )
+        {
+#ifdef Q_OS_WIN
+            interpreter = "perl.exe";
+#endif
+#ifdef Q_OS_LINUX
+            interpreter = "perl";
+#endif
+        }
+        if ( extension == "php" )
+        {
+#ifdef Q_OS_WIN
+            interpreter = "php-cgi.exe";
+#endif
+#ifdef Q_OS_LINUX
+            interpreter = "php";
+#endif
+        }
+        if ( extension == "py" )
+        {
+#ifdef Q_OS_WIN
+            interpreter = "python.exe";
+#endif
+#ifdef Q_OS_LINUX
+            interpreter = "python";
+#endif
+        }
+    }
+
+private:
+
+    QString extension;
+    QString interpreter;
 
 };
 
@@ -319,6 +471,9 @@ public slots:
         {
             longRunningScriptOutputFile.remove ();
         }
+
+//        // Early experiments for implementing an idea proposed by Valcho Nedelchev.
+//        if ( longRunningScriptOutputFile.open ( QIODevice::Append ) )
         if ( longRunningScriptOutputFile.open ( QIODevice::ReadWrite ) )
         {
             QTextStream stream ( & longRunningScriptOutputFile );
@@ -369,7 +524,8 @@ private:
     QString userAgentForUrl ( const QUrl & url ) const
     {
         Q_UNUSED ( url );
-        return "PerlExecutingBrowser/0.1 AppleWebKit/535.2 (KHTML, like Gecko)";
+        return "Mozilla/5.0 AppleWebKit/534.34 (KHTML, like Gecko) "
+               "PerlExecutingBrowser/0.1 Safari/534.34";
     }
 
     Settings settings;
@@ -402,81 +558,16 @@ public slots:
 
     void loadStartPageSlot ()
     {
-        QString startPageFilePath;
-        startPageFilePath = QDir::toNativeSeparators (
-                    QApplication::applicationDirPath () +
-                    QDir::separator () + settings.startPage );
-        qDebug () << "Start page:" << startPageFilePath;
-
-        QString extension = startPageFilePath.section ( ".", 1, 1 );
-        qDebug () << "Extension:" << extension;
-        QString interpreter;
-        if ( extension == "pl" )
+        if ( settings.startPage.contains ( ".htm" ) )
         {
-#ifdef Q_OS_WIN
-            interpreter = "perl.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "perl";
-#endif
+            setUrl ( QUrl::fromLocalFile (
+                         QDir::toNativeSeparators (
+                             QApplication::applicationDirPath () +
+                             QDir::separator () + settings.startPage ) ) );
+        } else {
+            setUrl ( QUrl ( QString ( "http://perl-executing-browser-pseudodomain/" +
+                                      settings.startPage ) ) );
         }
-        if ( extension == "php" )
-        {
-#ifdef Q_OS_WIN
-            interpreter = "php-cgi.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "php";
-#endif
-        }
-        if ( extension == "py" )
-        {
-#ifdef Q_OS_WIN
-            interpreter = "python.exe";
-#endif
-#ifdef Q_OS_LINUX
-            interpreter = "python";
-#endif
-        }
-
-        if ( extension == "pl" or extension == "php" or extension == "py" )
-        {
-            qDebug () << "Interpreter:" << interpreter;
-            QProcess handler;
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment ();
-            handler.setProcessEnvironment ( env );
-
-            QFileInfo initialViewFile ( startPageFilePath );
-            QString initialViewFileDirectory = QDir::toNativeSeparators (
-                        initialViewFile.absoluteDir () .absolutePath () );
-            handler.setWorkingDirectory ( initialViewFileDirectory );
-            qDebug () << "Working directory:" << initialViewFileDirectory;
-
-            handler.setStandardOutputFile (
-                        QDir::toNativeSeparators (
-                            QDir::tempPath () +
-                            QDir::separator () + "output.htm" ) );
-            qDebug () << "TEMP folder:" << QDir::tempPath();
-            qDebug () << "===============";
-            handler.start ( interpreter, QStringList () << startPageFilePath );
-            // wait until handler has finished
-            if ( handler.waitForFinished () )
-            {
-                setUrl ( QUrl::fromLocalFile (
-                             QDir::toNativeSeparators (
-                                 QDir::tempPath () +
-                                 QDir::separator () +
-                                 "output.htm" ) ) );
-            }
-            handler.close ();
-        }
-
-        if ( extension == "htm" or extension == "html" )
-        {
-            setUrl ( QUrl::fromLocalFile ( startPageFilePath ) );
-            qDebug () << "===============";
-        }
-        QWebSettings::clearMemoryCaches ();
     }
 
     void pageLoadedDynamicTitleSlot ( bool ok )
@@ -526,9 +617,59 @@ public slots:
         dialog -> deleteLater ();
     }
 
+    void editSlot ()
+    {
+        QString fileToEdit = QDir::toNativeSeparators (
+                    QApplication::applicationDirPath () +
+                    QDir::separator () + qWebHitTestURL
+                    .toString ( QUrl::RemoveScheme |
+                                QUrl::RemoveAuthority |
+                                QUrl::RemoveQuery )
+                    .replace ( "?", "" ) );
+        qDebug () << "File to edit:" << fileToEdit;
+        qDebug () << "===============";
+        QProcess externalProcess;
+        externalProcess.startDetached ( "padre", QStringList() << fileToEdit );
+    }
+
+    void openInNewWindowSlot ()
+    {
+        newWindow = new TopLevel;
+        newWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
+        qDebug () << "Link to open in a new window:" << qWebHitTestURL.path ();
+        qDebug () << "===============";
+        if ( qWebHitTestURL .path () .contains ( ".htm" ) )
+        {
+            QString fileToOpen = QDir::toNativeSeparators (
+                        QApplication::applicationDirPath () +
+                        QDir::separator () + qWebHitTestURL
+                        .toString ( QUrl::RemoveScheme |
+                                    QUrl::RemoveAuthority ) );
+                    newWindow -> setUrl ( QUrl::fromLocalFile ( fileToOpen ) );
+        } else {
+            newWindow -> setUrl ( qWebHitTestURL );
+        }
+        newWindow -> show ();
+    }
+
     void contextMenuEvent ( QContextMenuEvent * event )
     {
+        QWebHitTestResult qWebHitTestResult =
+                mainPage -> mainFrame () -> hitTestContent ( event -> pos () );
         QMenu * menu = mainPage -> createStandardContextMenu ();
+        if ( ! qWebHitTestResult.linkUrl () .isEmpty () ) {
+            qWebHitTestURL = qWebHitTestResult.linkUrl ();
+            if ( QUrl ( "http://perl-executing-browser-pseudodomain/" )
+                 .isParentOf ( qWebHitTestURL ) ) {
+                menu -> addSeparator ();
+                QAction * editAct = menu -> addAction ( tr ( "&Edit" ) );
+                QObject::connect ( editAct, SIGNAL ( triggered () ),
+                                   this, SLOT ( editSlot () ) );
+                QAction * openInNewWindowAct = menu -> addAction ( tr ( "&Open in new window" ) );
+                QObject::connect ( openInNewWindowAct, SIGNAL ( triggered () ),
+                                   this, SLOT ( openInNewWindowSlot () ) );
+            }
+        }
         menu -> addSeparator ();
         if ( settings.windowSize == "maximized" or settings.windowSize == "fullscreen" )
         {
@@ -573,7 +714,7 @@ public slots:
         QAction * aboutQtAction = menu -> addAction ( tr ( "About Q&t" ) );
         QObject::connect ( aboutQtAction, SIGNAL ( triggered () ),
                   qApp, SLOT ( aboutQt () ) );
-        menu -> exec ( event -> globalPos () );
+        menu -> exec ( mapToGlobal ( event -> pos () ) );
     }
 
     void maximizeSlot ()
@@ -604,11 +745,12 @@ public slots:
         QMessageBox msgBox;
         msgBox.setWindowTitle ( "About" );
         msgBox.setIconPixmap ( QPixmap ( settings.iconPathName ) );
-        msgBox.setText ( "Perl Executing Browser, version 0.1, code name Camel Calf<br>"
+        msgBox.setText ( "Perl Executing Browser, version 0.1<br>"
+                         "code name Camel Calf,<br>"
+                         "Qt WebKit version: " + qtWebKitVersion + "<br>"
+                         "Qt version: " + qtVersion + "<br>"
                          "<a href='https://github.com/ddmitov/perl-executing-browser'>"
-                         "https://github.com/ddmitov/perl-executing-browser</a><br>"
-                         "Qt WebKit version: " + qtWebKitVersion + ", "
-                         "Qt version: " + qtVersion );
+                         "https://github.com/ddmitov/perl-executing-browser</a><br>" );
         msgBox.setDefaultButton ( QMessageBox::Ok );
         msgBox.exec ();
     }
@@ -626,23 +768,14 @@ public:
 
     TopLevel ();
 
-//    // http://qt-project.org/forums/viewthread/17635
-//    // http://www.qtcentre.org/threads/52787
-//    QWebView * createWindow ( QWebPage::WebWindowType type )
-//    {
-//        Q_UNUSED ( type );
-
-//        QWebView * newWindow = new TopLevel;
-//        newWindow -> setAttribute ( Qt::WA_DeleteOnClose, true );
-//        newWindow -> show ();
-//        return newWindow;
-//    }
-
 private:
 
     Page * mainPage;
 
     Settings settings;
+
+    QUrl qWebHitTestURL;
+    QWebView * newWindow;
 
 };
 

@@ -16,27 +16,43 @@ Design Objectives
 * **4. Flexible network access:**  
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
     **b)** if network connection is essential, PEB can be configured as a client or both as a client and server for network services in a variety of combinations and topologies.  
-    Local webserver functionality, if needed, is provided by a minimally modified version of Mongoose web server.  
+    Local webserver functionality, if needed, is provided by a separate binary, which can be easily changed or independently modified.  
   
 Features
 ----------------------------------------------------------------------------------------
   
+SCRIPTING:  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
-* Can open a file or a folder on the local file system using special URLs. Selected file and folder are accessible for a locally executed script as environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
+* Can load Perl modules from a directory when they are not installed system-wide.  
+NETWORKING:  
+* Can start local webserver (minimally modified Mongoose) and load scripts and HTML pages from localhost.  
+* Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
+* Can load a predefined website in the same or in a new window and be used as a site-specific browser or client for a web service.  
+LOCAL FILESYSTEM:  
+* Can open single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
+* Can open local documents using default applications and start user-specified programs.  
+DEVELOPMENT GOODIES:  
+* WebKit Web Inspector can be invoked from context menu.  
+* Local scripts and pages can be edited in external editor using context menu entry.  
+USABILITY & CONFIGURATION:  
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  
-* Can open local documents and start user-specified programs.
-* Can load Perl modules from directory when they are not installed system-wide.  
-* Can start local webserver (Mongoose) and load scripts and pages from localhost.  
-* Can load a predefined website and be used as a site-specific browser or a client for a web service.  
-* Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Configurable from INI file.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
+APPEARANCE:  
 * Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
-* Can open HTML file in a new window.  
+* Output from local scripts, local and allowed web pages can be open in a new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
+..
 ... to be continued
+  
+Limitations
+----------------------------------------------------------------------------------------
+  
+* No history , no cache and no 'Previous Page' or 'Next Page' from JavaScript or from menus. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
+* No 'Reload' action from menu, but auto-reload using " <meta http-equiv='refresh' content='XX'> " is supported. Hyperlink to itself is also able to reload every page.  
+* No opening of new windows from JavaScript, although opening new windows from hyperlinks using " target = '_blank' " attribute is supported.  
   
 History
 ----------------------------------------------------------------------------------------

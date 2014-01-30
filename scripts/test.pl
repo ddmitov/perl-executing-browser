@@ -5,6 +5,8 @@ use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
+print "Content-type: text/html; charset=utf-8\n\n";
+
 print "<html>\n";
 
 print "<head>\n";
