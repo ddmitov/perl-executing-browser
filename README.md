@@ -26,22 +26,17 @@ No feature or implementation should be considered final at this early stage of d
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a directory when they are not installed system-wide.  
-
 * Can start local webserver (minimally modified Mongoose) and load scripts and HTML pages from localhost.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load a predefined website in the same or in a new window and be used as a site-specific browser or client for a web service.  
-
 * Can open single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
 * Can open local documents using default applications and start user-specified programs.  
-
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  
 * Configurable from INI file.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
-
 * Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
 * Output from local scripts, local and allowed web pages can be open in a new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
