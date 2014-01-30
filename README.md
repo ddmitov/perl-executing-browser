@@ -21,26 +21,27 @@ Design Objectives
 Features
 ----------------------------------------------------------------------------------------
   
-** SCRIPTING:  
+No feature or implementation should be considered final at this early stage of development!  
+**SCRIPTING:**  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a directory when they are not installed system-wide.  
-** NETWORKING:  
+**NETWORKING:**  
 * Can start local webserver (minimally modified Mongoose) and load scripts and HTML pages from localhost.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load a predefined website in the same or in a new window and be used as a site-specific browser or client for a web service.  
-** LOCAL FILESYSTEM:  
+**LOCAL FILESYSTEM:**  
 * Can open single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN and FOLDER_TO_OPEN.  
 * Can open local documents using default applications and start user-specified programs.  
-** DEVELOPMENT GOODIES:  
+**DEVELOPMENT GOODIES:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-** USABILITY & CONFIGURATION:  
+**USABILITY & CONFIGURATION:**  
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  
 * Configurable from INI file.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
-** APPEARANCE:  
+**APPEARANCE:**  
 * Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
 * Output from local scripts, local and allowed web pages can be open in a new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
@@ -49,13 +50,13 @@ Limitations
 ----------------------------------------------------------------------------------------
   
 * No history , no cache and no 'Previous Page' or 'Next Page' from JavaScript or from menus. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No 'Reload' action from menu, but auto-reload using " meta http-equiv='refresh' content='XX' " is supported. Hyperlink to itself is also able to reload every page.  
+* No 'Reload' action from menu, but auto-reload using " meta http-equiv='refresh' content='XX' " is supported.  
 * No opening of new windows from JavaScript, although opening new windows from hyperlinks using " target = '_blank' " attribute is supported.  
   
 History
 ----------------------------------------------------------------------------------------
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! No feature or implementation should be considered final at this point. Proper documentation and examples are still missing.  
+PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation and examples are still missing.  
   
 Compiling
 ----------------------------------------------------------------------------------------
@@ -70,6 +71,7 @@ Compiled and tested successfully using:
 Licensing
 ----------------------------------------------------------------------------------------
   
-This software is licensed under the terms of GNU GPL v.3 and is provided without warranties of any kind!  
+This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License, as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  
   
