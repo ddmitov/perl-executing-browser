@@ -21,7 +21,7 @@ Design Objectives
 Features
 ----------------------------------------------------------------------------------------
   
-No feature or implementation should be considered final at this early stage of development!  
+* No feature or implementation should be considered final at this early stage of development!  
 **Scripting:**  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
