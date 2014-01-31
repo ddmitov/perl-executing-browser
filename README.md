@@ -21,7 +21,7 @@ Design Objectives
 Features
 ----------------------------------------------------------------------------------------
   
-* No feature or implementation should be considered final at this early stage of development!  
+* **No feature or implementation should be considered final at this early stage of development!**  
 **Scripting:**  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
@@ -70,7 +70,8 @@ Compiled and tested successfully using:
 License
 ----------------------------------------------------------------------------------------
   
-This program is free software; you can redistribute it and/or modify it under the terms of the GNU General Public License,  
+This program is free software;  
+you can redistribute it and/or modify it under the terms of the GNU General Public License,  
 as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
