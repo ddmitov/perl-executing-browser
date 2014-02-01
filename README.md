@@ -27,7 +27,7 @@ Features
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a directory when they are not installed system-wide.  
 **Networking:**  
-* Can start local webserver (minimally modified Mongoose) and load scripts and HTML pages from localhost.  
+* Can start local webserver (minimally modified Mongoose) and load scripts and pages from localhost.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load a predefined website in the same or in a new window and be used as a site-specific browser or client for a web service.  
 **Local filesystem:**  
@@ -48,9 +48,9 @@ Features
 Limitations
 ----------------------------------------------------------------------------------------
   
-* No history , no cache and no 'Previous Page' or 'Next Page' from JavaScript or from menus. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No 'Reload' action from menu, but auto-reload using ``` <meta http-equiv='refresh' content='XX'> ``` is supported.  
-* No opening of new windows from JavaScript, although opening new windows from hyperlinks using ``` target = '_blank' ``` attribute is supported.  
+* No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
+* No 'Reload' action from context menu, but auto-reload using ```<meta http-equiv='refresh' content='XX'>``` is supported.  
+* No opening of new windows from JavaScript, although opening new windows from hyperlinks using ```target = '_blank'``` attribute is supported.  
   
 History
 ----------------------------------------------------------------------------------------
@@ -72,7 +72,8 @@ License
   
 This program is free software;  
 you can redistribute it and/or modify it under the terms of the GNU General Public License,  
-as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
+as published by the Free Software Foundation; either version 3 of the License,  
+or (at your option) any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   
