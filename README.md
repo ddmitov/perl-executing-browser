@@ -41,8 +41,8 @@ Features
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
-* Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area is dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
-* Output from local scripts, local and allowed web pages can be open in a new window; 'Open in new window' from context menu.  
+* Can be used in normal or frameless window in resizable, fixed size or fullscreen mode. 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces. Basic program functions are accessible from a right-click context menu.  
+* Output from local scripts, local and allowed web pages can be opened in new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
   
 Limitations

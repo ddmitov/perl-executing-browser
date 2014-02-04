@@ -1,10 +1,13 @@
 all versions:
 =============
+
 - more and better examples
+
 - documentation; commented code
 
 v. 0.2
 ======
+
 - check for STDERR from scripts, if any - display message
 
 - display 'Loading...' page before page is fully loaded
@@ -12,10 +15,9 @@ v. 0.2
 - check if long-running script is not already started
 - independent settings for main window and long-running scripts window
 
-
 - temporary folders in /tmp; to be removed immediately after page is loaded;
-- default values if INI file is missing or corrupt
 
+- default values if INI file is missing or corrupt
 - more config options
 - configuration interface using a script and restart URL
 - command line arguments
@@ -26,6 +28,7 @@ v. 0.2
 
 v. 0.3
 ======
+
 - mojolicious support
 
 - internal cron using script started by the browser
