@@ -25,7 +25,7 @@
  http://search.cpan.org/~accardo/HTML-Perlinfo-1.62/lib/HTML/Perlinfo/HTML.pod
  HTML-Perlinfo is used as a testing tool for loading modules from a directory, without system-wide installation.
 
- Thanks to Jennifer J. Maher-Bontrager, author of the Camel icon.
+ Thanks to Jennifer Maher-Bontrager, author of the Camel icon.
  http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
  http://www.totoro.org/jen/
 
@@ -64,6 +64,7 @@
  http://qt-project.org/forums/viewthread/4433
  http://qt-project.org/forums/viewthread/9346
  http://qt-project.org/forums/viewthread/11729
+ http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
  http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
