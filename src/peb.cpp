@@ -1,5 +1,5 @@
 
-// Perl Executing Browser, v.0.1
+// Perl Executing Browser, v. 0.1
 
 // This program is free software;
 // you can redistribute it and/or modify it under the terms of the
@@ -384,7 +384,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         QFile file ( QDir::toNativeSeparators ( filepath ) );
         if ( file.exists() )
         {
-            defaultApplicationFile = request.url() .toString();
+            QString defaultApplicationFile = request.url() .toString();
             qDebug () << "Opening file with default application:" << defaultApplicationFile;
             qDebug () << "===============";
             QDesktopServices::openUrl ( request.url() );
@@ -396,7 +396,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .toString () .contains ( "external:" ) )
     {
-        externalApplication = request.url ()
+        QString externalApplication = request.url ()
                 .toString ( QUrl::RemoveScheme )
                 .replace ( "/", "" );
         qDebug () << "External application: " << externalApplication;
@@ -417,7 +417,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( settings.iconPathName ) );
-        fileNameToOpenString = dialog.getOpenFileName ( 0, "Select File",
+        QString fileNameToOpenString = dialog.getOpenFileName ( 0, "Select File",
                                                           QDir::currentPath (), "All files (*)" );
         QByteArray fileName;
         fileName.append ( fileNameToOpenString );
@@ -439,7 +439,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         dialog.setOption ( QFileDialog::DontUseNativeDialog );
         dialog.setWindowFlags ( Qt::WindowStaysOnTopHint );
         dialog.setWindowIcon ( QIcon ( settings.iconPathName ) );
-        folderNameToOpenString = dialog.getExistingDirectory ( 0, "Select Folder",
+        QString folderNameToOpenString = dialog.getExistingDirectory ( 0, "Select Folder",
                                                                  QDir::currentPath () );
         QByteArray folderName;
         folderName.append ( folderNameToOpenString );
@@ -496,39 +496,35 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         emit quitFromURLSignal ();
     }
 
-    // 1.) Open allowed web site in the same window,
-    // 2.) open localhost or
-    // 3.) open not-allowed web site using default browser:
+    // Open not allowed web site using default browser:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url () .scheme () .contains ( "http" ) and
-         ! ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
-         .isParentOf ( request.url () ) )
+         ( ! ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
+           .isParentOf ( request.url () ) ) and
+         ( ! request.url () .authority () .contains ( "localhost" ) ) and
+         ( ! request.url () .authority () .contains ( "www.perl.org" ) ) )
     {
-        if ( request.url () .authority () .contains ( "localhost" ) )
-        {
-            qDebug () << "Local webserver link:" << request.url () .toString ();
-            qDebug () << "===============";
-            return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
-        }
-        if ( request.url () .authority () .contains ( "www.perl.com" ) )
-        {
-            allowedWebLink = request.url () .toString ();
-            qDebug () << "Allowed web link:" << allowedWebLink;
-            qDebug () << "===============";
-            return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
-        } else {
-            externalWebLink = request.url () .toString ();
-            qDebug () << "Default browser called for:" << externalWebLink;
-            qDebug () << "===============";
-            QDesktopServices::openUrl ( request.url () );
-            return false;
-        }
+        QString externalWebLink = request.url () .toString ();
+        qDebug () << "Default browser called for:" << externalWebLink;
+        qDebug () << "===============";
+        QDesktopServices::openUrl ( request.url () );
+        return false;
     }
 
-    // Open allowed web site in a new window:
-    if ( frame != Page::currentFrame () and
-         request.url () .authority () .contains ( "www.perl.com" ) )
+    // Open allowed web site in the same or in a new window:
+    if ( frame == Page::currentFrame () and
+         request.url () .authority () .contains ( "www.perl.org" ) )
     {
+        QString allowedWebLink = request.url () .toString ();
+        qDebug () << "Allowed web link:" << allowedWebLink;
+        qDebug () << "===============";
+        return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
+
+    }
+    if ( frame != Page::currentFrame () and
+               request.url () .authority () .contains ( "www.perl.org" ) ) {
+        qDebug () << "Allowed web link in a new window:" << request.url ();
+        qDebug () << "===============";
         if ( ! Page::mainFrame() -> childFrames () .contains ( frame ) )
         {
             newWindow = new TopLevel;
@@ -538,8 +534,18 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
         }
     }
 
+    // Open localhost:
+    if ( navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url () .scheme () .contains ( "http" ) and
+         request.url () .authority () .contains ( "localhost" ) )
+    {
+        qDebug () << "Local webserver link:" << request.url () .toString ();
+        qDebug () << "===============";
+        return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
+    }
+
     // Open local content in a new window
-    // (with the exception of result from long-running script in a new windows):
+    // (with the exception of result from long-running script):
     if ( frame != Page::currentFrame () and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url () ) )
@@ -559,9 +565,7 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                 {
                     missingFileMessageSlot ();
                     return true;
-                }
-                if ( file.exists () )
-                {
+                } else {
                     newWindow = new TopLevel;
                     newWindow -> setWindowIcon ( QIcon ( settings.iconPathName ) );
                     if ( request.url () .path () .contains ( ".htm" ) )
@@ -573,105 +577,32 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
                     } else {
                         newWindow -> setUrl ( request.url () );
                     }
-                    newWindow -> show ();
-                    return true;
                 }
+                newWindow -> show ();
+                return true;
             }
         }
     }
 
-    // 1.) Get output from local script invoked from hyperlink,
-    // which is not long-running script and has no query string or
-    // 2.) load local HTML page invoked from hyperlink:
+    // Load local HTML page invoked from hyperlink:
     if ( navigationType == QWebPage::NavigationTypeLinkClicked and
          ( QUrl ( "http://perl-executing-browser-pseudodomain/" ) )
          .isParentOf ( request.url () ) and
-         ( ! request.url () .path () .contains ( "longrun" ) ) and
-         request.url () .toString ( QUrl::RemoveScheme |
-                                    QUrl::RemoveAuthority |
-                                    QUrl::RemovePath )
-         .replace ( "?", "" ).length() == 0 )
+         ( request.url () .path () .contains ( ".htm" ) ) )
     {
-
         filepath = request.url ()
                 .toString ( QUrl::RemoveScheme |
                             QUrl::RemoveAuthority |
                             QUrl::RemoveQuery |
                             QUrl::RemoveFragment );
-
-        qDebug () << "File path:" << QDir::toNativeSeparators (
+        qDebug () << "HTML file path:" << QDir::toNativeSeparators (
                          QApplication::applicationDirPath () + filepath );
         checkFileExistenceSlot ();
-
-        extension = filepath.section (".", 1, 1);
-        qDebug () << "Extension:" << extension;
-        defineInterpreterSlot ();
-
-        if ( extension == "pl" or extension == "php" or extension == "py" )
-        {
-            qDebug () << "Interpreter:" << interpreter;
-
-            QProcess handler;
-
-            QFileInfo script ( filepath );
-            QString scriptDirectory = QDir::toNativeSeparators (
-                        QApplication::applicationDirPath () +
-                        script.absoluteDir () .absolutePath () );
-            handler.setWorkingDirectory ( scriptDirectory );
-            qDebug () << "Working directory:" << scriptDirectory;
-            qDebug () << "TEMP folder:" << QDir::tempPath ();
-            handler.start ( interpreter, QStringList () <<
+        frame -> load ( QUrl::fromLocalFile (
                             QDir::toNativeSeparators (
                                 QApplication::applicationDirPath () +
-                                QDir::separator () + filepath ) );
-
-            QString output;
-            if ( handler.waitForFinished () )
-            {
-                output = handler.readAll ();
-                handler.close ();
-            }
-
-            QString outputFilePath = QDir::toNativeSeparators (
-                        QDir::tempPath () +
-                        QDir::separator () +
-                        "output.htm" );
-            QFile outputFilePathFile ( outputFilePath );
-            if ( outputFilePathFile.exists () )
-            {
-                outputFilePathFile.remove ();
-            }
-
-            QRegExp regExpOne ( "^Content-type: text/html; charset=\\w*-\\d*\n" );
-            regExpOne.setCaseSensitivity ( Qt::CaseInsensitive );
-            output.replace ( regExpOne, "" );
-            QRegExp regExpTwo ( "^Content-type: text/html" );
-            regExpTwo.setCaseSensitivity ( Qt::CaseInsensitive );
-            output.replace ( regExpTwo, "" );
-
-            if ( outputFilePathFile.open ( QIODevice::ReadWrite ) )
-            {
-                QTextStream stream ( & outputFilePathFile );
-                stream << output << endl;
-            }
-
-            frame -> load ( QUrl::fromLocalFile (
-                                QDir::toNativeSeparators (
-                                    QDir::tempPath () +
-                                    QDir::separator () +
-                                    "output.htm" ) ) );
-            qDebug () << "===============";
-        }
-
-        if ( extension == "htm" or extension == "html" )
-        {
-            frame -> load ( QUrl::fromLocalFile (
-                                QDir::toNativeSeparators (
-                                    QApplication::applicationDirPath () +
-                                    QDir::separator () + filepath ) ) );
-            qDebug () << "===============";
-        }
-
+                                QDir::separator () + filepath ) ) );
+        qDebug () << "===============";
         QWebSettings::clearMemoryCaches ();
         return true;
     }
@@ -682,7 +613,6 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
          .isParentOf ( request.url () ) and
          ( request.url () .path () .contains ( "longrun" ) ) )
     {
-
         qDebug () << "Long-running script:" << request.url () .toString ();
         filepath = request.url ()
                 .toString ( QUrl::RemoveScheme | QUrl::RemoveAuthority |
@@ -762,6 +692,5 @@ bool Page::acceptNavigationRequest ( QWebFrame * frame,
             return true;
     }
 
-    QNetworkRequest emptyRequest;
-    return QWebPage::acceptNavigationRequest ( frame, emptyRequest, navigationType );
+    return QWebPage::acceptNavigationRequest ( frame, request, navigationType );
 }

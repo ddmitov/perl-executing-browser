@@ -62,11 +62,11 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.perl.com/'>Allowed External Link in This Browser</a>\n";
+print "<a href='http://www.perl.org/index.html'>Allowed External Link in This Browser</a>\n";
 print "</font></p>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.perl.com/' target='_blank'>Allowed External Link in a New Window of This Browser</a>\n";
+print "<a href='http://www.perl.org/index.html' target='_blank'>Allowed External Link in a New Window of This Browser</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";

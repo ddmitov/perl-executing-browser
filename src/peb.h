@@ -1,3 +1,14 @@
+
+// Perl Executing Browser, v. 0.1
+
+// This program is free software;
+// you can redistribute it and/or modify it under the terms of the
+// GNU General Public License, as published by the Free Software Foundation;
+// either version 3 of the License, or (at your option) any later version.
+// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+// Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
+
 #ifndef PEB_H
 #define PEB_H
 
@@ -473,12 +484,13 @@ public slots:
         QString output = longRunningScriptHandler.readAllStandardOutput ();
         QString filepathForConversion = lastRequest.url () .path ();
         QString extension = filepathForConversion.section ( ".", 1, 1 );
-        QString longRunningScriptOutputFilePath = QDir::toNativeSeparators (
+        longRunningScriptOutputFilePath = QDir::toNativeSeparators (
                     QDir::tempPath () + QDir::separator () + filepathForConversion
                     .replace ( QDir::separator (), "_" )
                     .replace ( QRegExp ( "(\\s+)" ), "_" )
                     .replace ( "." + extension, "" ) +
                     "_output.htm" );
+
         QFile longRunningScriptOutputFile ( longRunningScriptOutputFilePath );
         if ( longRunningScriptOutputFile.exists () )
         {
@@ -505,14 +517,15 @@ public slots:
             newLongRunWindow -> setUrl ( QUrl::fromLocalFile ( longRunningScriptOutputFilePath ) );
             newLongRunWindow -> show ();
         }
-        longRunningScriptOutputFile.remove ();
     }
 
     void longRunningScriptFinishedSlot ()
     {
+        longRunningScriptHandler.close ();
+        QFile longRunningScriptOutputFile ( longRunningScriptOutputFilePath );
+        longRunningScriptOutputFile.remove ();
         qDebug () << "Long-running script finished.";
         qDebug () << "===============";
-        longRunningScriptHandler.close ();
     }
 
     void displayLongRunningScriptErrorSlot ()
@@ -549,17 +562,11 @@ private:
 
     QProcess longRunningScriptHandler;
     QNetworkRequest lastRequest;
+    QString longRunningScriptOutputFilePath;
     bool longRunningScriptOutputInNewWindow;
     QWebView * newLongRunWindow;
 
     QWebView * newWindow;
-
-    QString fileNameToOpenString;
-    QString folderNameToOpenString;
-    QString externalApplication;
-    QString allowedWebLink;
-    QString externalWebLink;
-    QString defaultApplicationFile;
 
 };
 
