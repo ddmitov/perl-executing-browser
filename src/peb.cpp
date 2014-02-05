@@ -128,13 +128,13 @@ int main (int argc, char **argv)
     QByteArray documentRoot;
     documentRoot.append (QApplication::applicationDirPath());
     qputenv ("DOCUMENT_ROOT", documentRoot);
-    QByteArray perl5Lib;
-    perl5Lib.append (QApplication::applicationDirPath());
-    perl5Lib.append (QDir::separator());
-    perl5Lib.append ("perl");
-    perl5Lib.append (QDir::separator());
-    perl5Lib.append ("lib");
-    qputenv ("PERL5LIB", perl5Lib);
+    QByteArray perlLib;
+    perlLib.append (QApplication::applicationDirPath());
+    perlLib.append (QDir::separator());
+    perlLib.append ("perl");
+    perlLib.append (QDir::separator());
+    perlLib.append ("lib");
+    qputenv ("PERLLIB", perlLib);
     qputenv ("FILE_TO_OPEN", "");
     qputenv ("FOLDER_TO_OPEN", "");
 

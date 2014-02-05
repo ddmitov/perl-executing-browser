@@ -29,7 +29,10 @@
  http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
  http://www.totoro.org/jen/
 
- Thanks to Sergey Lyubka, author of Mongoose web server.
+ Thanks to Sergey Lyubka, author of Mongoose web server,
+ for creating Mongoose and providing quality support to Mongoose users through
+ https://groups.google.com/forum/#!forum/mongoose-users
+ More about Mongoose web server:
  http://cesanta.com/docs.html?Mongoose.md
  https://github.com/cesanta/mongoose
 
