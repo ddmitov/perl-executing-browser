@@ -1054,15 +1054,18 @@ int main(int argc, char *argv[]) {
 }
 #else
 
-
-####################
-// Close from URI function
-static int close_uri() {
-  mg_destroy_server(&server);
-  exit(0);
+// Quit from URI function // DDM // http://www.cplusplus.com/reference/cstring/strlen/
+static int quit_uri(struct mg_connection *conn) {
+  if ((unsigned)strlen(mg_get_option(server, "quit_token")) > 24) {
+    printf("Exiting after quit URI has been requested.\n");
+    fflush(stdout);
+    mg_destroy_server(&server);
+    exit(0);
+  } else {
+    mg_printf_data(conn, "Quit token is less than 16 characters long or is not enabled! Will continue to operate!");
+  }
+  return 0;
 }
-####################
-
 
 int main(int argc, char *argv[]) {
   init_server_name();
@@ -1070,18 +1073,15 @@ int main(int argc, char *argv[]) {
   printf("%s serving [%s] on port %s\n",
          server_name, mg_get_option(server, "document_root"),
          mg_get_option(server, "listening_port"));
-         
-         
-         ####################
-         mg_add_uri_handler(server, "/close", close_uri);
-         ####################
-         
-         
+         char quit_uri_password[1000]; // DDM
+         strcpy (quit_uri_password, "/quit__"); // DDM // http://www.cplusplus.com/reference/cstring/strcat/
+         strcat (quit_uri_password, mg_get_option(server, "quit_token")); // DDM
+         mg_add_uri_handler (server, quit_uri_password, quit_uri); // DDM
   fflush(stdout);  // Needed, Windows terminals might not be line-buffered
   while (exit_flag == 0) {
     mg_poll_server(server, 1000);
   }
-  printf("Exiting on signal %d ...", exit_flag);
+  printf("\nExiting on signal %d ...", exit_flag); // DDM
   fflush(stdout);
   mg_destroy_server(&server);
   printf("%s\n", " done.");

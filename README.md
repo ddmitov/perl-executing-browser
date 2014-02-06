@@ -27,7 +27,7 @@ Features
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a custom directory when they are not installed system-wide using PERLLIB environment variable. These modules are available for all scripts executed in serverless mode, as well as for all scripts executed by the local webserver (Mongoose).  
 **Networking:**  
-* Can start local webserver and load scripts and pages from localhost. Mongoose 5.1 webserver with an URI handler that can stop the server is used. **WARNING:** Additional securing of the URI handler and setting (at least) ACL is necessary before using the server in any production environment!  
+* Can start local webserver and load scripts and pages from localhost. Mongoose 5.1 webserver with an URI handler that can stop the server is used.  
 * Can ping local and remote web servers and notify when network connectivity is lost. Local webserver is automatically restarted if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load a predefined website in the same or in a new window and be used as a site-specific browser or client for a web service.  
 **Local filesystem:**  

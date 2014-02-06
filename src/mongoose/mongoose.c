@@ -225,8 +225,8 @@ enum {
 #ifdef USE_SSL
   SSL_CERTIFICATE,
 #endif
-  URL_REWRITES, NUM_OPTIONS
-};
+  URL_REWRITES, NUM_OPTIONS, QUIT_TOKEN
+}; // DDM - QUIT_TOKEN
 
 struct mg_server {
   sock_t listening_sock;
@@ -359,6 +359,7 @@ static const char *static_config_options[] = {
   "ssl_certificate", NULL,
 #endif
   "url_rewrites", NULL,
+  "quit_token", NULL, // DDM
   NULL
 };
 
