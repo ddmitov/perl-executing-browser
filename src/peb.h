@@ -742,7 +742,7 @@ public slots:
         QFile::remove
                 (QDir::toNativeSeparators
                  (QDir::tempPath()+QDir::separator()+"output.htm"));
-        setUrl (QUrl ("http://localhost:8080/close"));
+        setUrl (QUrl ("http://localhost:8080/quit__$1$AZYjaHDN$MJ4UVPyDMCl.CbJH0Klrf0"));
         QApplication::exit();
     }
 
