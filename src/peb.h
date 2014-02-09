@@ -46,6 +46,8 @@ public:
     Settings ();
 
     QString settingsFileName;
+    QString mongooseSettingsFileName;
+
     QString startPage;
     QString icon;
     QString iconPathName;
@@ -54,6 +56,9 @@ public:
     QString stayOnTop;
     QString browserTitle;
     QString contextMenu;
+
+    QString listeningPort;
+    QString quitToken;
 
 };
 
@@ -237,7 +242,7 @@ protected:
             QString postData;
             QByteArray outgoingByteArray;
             if (outgoingData) {
-                outgoingByteArray = outgoingData -> readAll();
+                outgoingByteArray = outgoingData->readAll();
                 QString postDataRaw (outgoingByteArray);
                 postData = postDataRaw;
                 qDebug() << "POST data:" << postData;
@@ -483,12 +488,12 @@ public slots:
         qDebug() << "Long-running script output file:" << longRunningScriptOutputFilePath;
         qDebug() << "===============";
         if (longRunningScriptOutputInNewWindow == false) {
-            Page::currentFrame() -> setUrl
+            Page::currentFrame()->setUrl
                     (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
         }
         if (longRunningScriptOutputInNewWindow == true) {
-            newLongRunWindow -> setUrl (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
-            newLongRunWindow -> show();
+            newLongRunWindow->setUrl (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
+            newLongRunWindow->show();
         }
     }
 
@@ -596,16 +601,16 @@ public slots:
         //        printer.setOutputFormat (QPrinter::PdfFormat);
         //        printer.setOutputFileName ("output.pdf");
         QPrintDialog *dialog = new QPrintDialog ( &printer);
-        dialog -> setWindowFlags (Qt::WindowStaysOnTopHint);
-        QSize dialogSize = dialog -> sizeHint();
-        QRect screenRect = QDesktopWidget().screen() -> rect();
-        dialog -> move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
+        dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
+        QSize dialogSize = dialog->sizeHint();
+        QRect screenRect = QDesktopWidget().screen()->rect();
+        dialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
                                 screenRect.height() / 2 - dialogSize.height() / 2));
-        if (dialog -> exec() == QDialog::Accepted) {
+        if (dialog->exec() == QDialog::Accepted) {
             TopLevel::print (&printer);
         }
-        dialog -> close();
-        dialog -> deleteLater();
+        dialog->close();
+        dialog->deleteLater();
     }
 
     void editSlot()
@@ -624,7 +629,7 @@ public slots:
     void openInNewWindowSlot()
     {
         newWindow = new TopLevel;
-        newWindow -> setWindowIcon (QIcon (settings.iconPathName));
+        newWindow->setWindowIcon (QIcon (settings.iconPathName));
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
         qDebug() << "===============";
         if (qWebHitTestURL.path().contains (".htm")) {
@@ -632,71 +637,71 @@ public slots:
                     (QApplication::applicationDirPath()+
                      QDir::separator()+qWebHitTestURL.toString
                      (QUrl::RemoveScheme | QUrl::RemoveAuthority));
-            newWindow -> setUrl (QUrl::fromLocalFile (fileToOpen));
+            newWindow->setUrl (QUrl::fromLocalFile (fileToOpen));
         } else {
-            newWindow -> setUrl (qWebHitTestURL);
+            newWindow->setUrl (qWebHitTestURL);
         }
-        newWindow -> show();
+        newWindow->show();
     }
 
     void contextMenuEvent (QContextMenuEvent *event)
     {
         QWebHitTestResult qWebHitTestResult =
-                mainPage -> mainFrame() -> hitTestContent (event -> pos());
-        QMenu *menu = mainPage -> createStandardContextMenu();
+                mainPage->mainFrame()->hitTestContent (event->pos());
+        QMenu *menu = mainPage->createStandardContextMenu();
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
             if (QUrl ("http://perl-executing-browser-pseudodomain/")
                     .isParentOf (qWebHitTestURL)) {
-                menu -> addSeparator ();
-                QAction *editAct = menu -> addAction (tr ("&Edit"));
+                menu->addSeparator ();
+                QAction *editAct = menu->addAction (tr ("&Edit"));
                 QObject::connect (editAct, SIGNAL (triggered()),
                                   this, SLOT (editSlot()));
-                QAction *openInNewWindowAct = menu -> addAction (tr ("&Open in new window"));
+                QAction *openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
                 QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
                                   this, SLOT (openInNewWindowSlot()));
             }
         }
-        menu -> addSeparator();
+        menu->addSeparator();
         if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
             if (settings.framelessWindow == "no") {
-                QAction *maximizeAct = menu -> addAction (tr ("&Maximize"));
+                QAction *maximizeAct = menu->addAction (tr ("&Maximize"));
                 QObject::connect (maximizeAct, SIGNAL (triggered()),
                                   this, SLOT (maximizeSlot()));
             }
-            QAction *toggleFullScreenAct = menu -> addAction (tr ("Toggle &Fullscreen"));
+            QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &Fullscreen"));
             QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
                               this, SLOT (toggleFullScreenSlot()));
         }
         if (settings.framelessWindow == "no") {
-            QAction *minimizeAct = menu -> addAction (tr ("Mi&nimize"));
+            QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
             QObject::connect (minimizeAct, SIGNAL (triggered()),
                               this, SLOT (minimizeSlot()));
         }
         if (!TopLevel::url().toString().contains ("longrun")) {
-            QAction *homeAct = menu -> addAction (tr ("&Home"));
+            QAction *homeAct = menu->addAction (tr ("&Home"));
             QObject::connect (homeAct, SIGNAL (triggered()),
                               this, SLOT (loadStartPageSlot()));
         }
-        QAction *printAct = menu -> addAction (tr ("&Print"));
+        QAction *printAct = menu->addAction (tr ("&Print"));
         QObject::connect (printAct, SIGNAL (triggered()),
                           this, SLOT (printPageSlot()));
-        QAction *closeWindowAct = menu -> addAction (tr ("&Close window"));
+        QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
         QObject::connect (closeWindowAct, SIGNAL (triggered()),
                           this, SLOT (close()));
         if (!TopLevel::url().toString().contains ("longrun")) {
-            QAction *quitAct = menu -> addAction (tr ("&Quit"));
+            QAction *quitAct = menu->addAction (tr ("&Quit"));
             QObject::connect ( quitAct, SIGNAL (triggered()),
                                this, SLOT (quitApplicationSlot()));
         }
-        menu -> addSeparator();
-        QAction *aboutAction = menu -> addAction (tr ("&About"));
+        menu->addSeparator();
+        QAction *aboutAction = menu->addAction (tr ("&About"));
         QObject::connect (aboutAction, SIGNAL (triggered()),
                           this, SLOT (aboutSlot()));
-        QAction *aboutQtAction = menu -> addAction (tr ("About Q&t"));
+        QAction *aboutQtAction = menu->addAction (tr ("About Q&t"));
         QObject::connect ( aboutQtAction, SIGNAL (triggered()),
                            qApp, SLOT (aboutQt()));
-        menu -> exec (mapToGlobal (event -> pos()));
+        menu->exec (mapToGlobal (event->pos()));
     }
 
     void maximizeSlot()
@@ -742,7 +747,8 @@ public slots:
         QFile::remove
                 (QDir::toNativeSeparators
                  (QDir::tempPath()+QDir::separator()+"output.htm"));
-        setUrl (QUrl ("http://localhost:8080/quit__$1$AZYjaHDN$MJ4UVPyDMCl.CbJH0Klrf0"));
+        setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
+                               "/quit__"+settings.quitToken)));
         QApplication::exit();
     }
 

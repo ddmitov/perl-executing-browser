@@ -174,11 +174,34 @@ Settings::Settings()
     iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
                                               QDir::separator()+icon);
 
+    mongooseSettingsFileName = QDir::toNativeSeparators
+            (QApplication::applicationDirPath()+QDir::separator()+"mongoose.conf");
+    QFile mongooseSettingsFile (mongooseSettingsFileName);
+    QRegExp space ("\\s");
+    QRegExp listeningPortRegExp ("^listening_port");
+    QRegExp quitTokenRegExp ("^quit_token");
+    if (!mongooseSettingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+        return;
+    QTextStream mongooseSettings (&mongooseSettingsFile);
+    while (!mongooseSettings.atEnd()) {
+        QString line = mongooseSettings.readLine();
+        if (line.contains (listeningPortRegExp)) {
+            listeningPort = line.section (space, 1, 1);
+            listeningPort.replace (QString ("\n"), "");
+        }
+        if (line.contains (quitTokenRegExp)) {
+            quitToken = line.section (space, 1, 1);
+            quitToken.replace (QString ("\n"), "");
+        }
+    }
+
 }
 
 Watchdog::Watchdog()
     : QObject (0)
 {
+
+    qDebug() << "Mongoose quit token:" << settings.quitToken;
 
     QProcess server;
     server.startDetached (QString (QApplication::applicationDirPath()+
@@ -186,11 +209,11 @@ Watchdog::Watchdog()
 
     QTimer *timer = new QTimer (this);
     connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
-    timer -> start (5000);
+    timer->start (5000);
 
     trayIcon = new QSystemTrayIcon();
-    trayIcon -> setIcon (QIcon (settings.iconPathName));
-    trayIcon -> setToolTip ("Camel Calf");
+    trayIcon->setIcon (QIcon (settings.iconPathName));
+    trayIcon->setToolTip ("Camel Calf");
 
     aboutAction = new QAction (tr ("&About"), this);
     aboutQtAction = new QAction (tr ("About Q&t"), this);
@@ -199,12 +222,12 @@ Watchdog::Watchdog()
     quitAction = new QAction (tr ("&Quit"), this);
 
     trayIconMenu = new QMenu();
-    trayIcon -> setContextMenu (trayIconMenu);
-    trayIconMenu -> addAction (aboutAction);
-    trayIconMenu -> addAction (aboutQtAction);
-    trayIconMenu -> addSeparator();
-    trayIconMenu -> addAction (quitAction);
-    trayIcon -> show();
+    trayIcon->setContextMenu (trayIconMenu);
+    trayIconMenu->addAction (aboutAction);
+    trayIconMenu->addAction (aboutQtAction);
+    trayIconMenu->addSeparator();
+    trayIconMenu->addAction (quitAction);
+    trayIcon->show();
 
 }
 
@@ -212,28 +235,28 @@ Page::Page()
     : QWebPage (0)
 {
 
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setDefaultTextEncoding (QString ("utf-8"));
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::JavascriptEnabled, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::SpatialNavigationEnabled, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::LinksIncludedInFocusChain, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::AutoLoadImages, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
-//    QWebSettings::globalSettings() ->
+//    QWebSettings::globalSettings()->
 //            setAttribute (QWebSettings::LocalStorageEnabled, true);
 
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::PrivateBrowsingEnabled, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::LocalContentCanAccessFileUrls, true);
-    QWebSettings::globalSettings() ->
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::LocalContentCanAccessRemoteUrls, true);
     QWebSettings::setMaximumPagesInCache (0);
     QWebSettings::setObjectCacheCapacities (0, 0, 0);
@@ -278,7 +301,7 @@ TopLevel::TopLevel()
         int fixedHeight = settings.windowSize.section ("x", 1, 1) .toInt();
         if (fixedWidth > 100 and fixedHeight > 100) {
             setFixedSize (fixedWidth, fixedHeight);
-            QRect screenRect = QDesktopWidget().screen() -> rect();
+            QRect screenRect = QDesktopWidget().screen()->rect();
             move (QPoint (screenRect.width() / 2 - width() / 2,
                             screenRect.height() / 2 - height() / 2));
         }
@@ -323,37 +346,37 @@ TopLevel::TopLevel()
 
     // Use modified Network Access Manager with every window of the program:
     ModifiedNetworkAccessManager *nam = new ModifiedNetworkAccessManager();
-    mainPage -> setNetworkAccessManager (nam);
+    mainPage->setNetworkAccessManager (nam);
 
-    //main_page -> setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
+    //main_page->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
 
     // Configure scroll bars:
-    mainPage -> mainFrame() -> setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
-    mainPage -> mainFrame() -> setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
+    mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
+    mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
 
     // Disable history:
-    QWebHistory *history = mainPage -> history();
-    history -> setMaximumItemCount (0);
+    QWebHistory *history = mainPage->history();
+    history->setMaximumItemCount (0);
 
     // Context menu settings:
-    mainPage -> action (QWebPage::SetTextDirectionLeftToRight) -> setVisible (false);
-    mainPage -> action (QWebPage::SetTextDirectionRightToLeft) -> setVisible (false);
+    mainPage->action (QWebPage::SetTextDirectionLeftToRight)->setVisible (false);
+    mainPage->action (QWebPage::SetTextDirectionRightToLeft)->setVisible (false);
 
-    mainPage -> action (QWebPage::Back) -> setVisible (false);
-    mainPage -> action (QWebPage::Forward) -> setVisible (false);
-    mainPage -> action (QWebPage::Reload) -> setVisible (false);
-    mainPage -> action (QWebPage::Stop) -> setVisible (false);
+    mainPage->action (QWebPage::Back)->setVisible (false);
+    mainPage->action (QWebPage::Forward)->setVisible (false);
+    mainPage->action (QWebPage::Reload)->setVisible (false);
+    mainPage->action (QWebPage::Stop)->setVisible (false);
 
-    mainPage -> action (QWebPage::OpenLink) -> setVisible (false);
-    mainPage -> action (QWebPage::CopyLinkToClipboard) -> setVisible (false);
-    mainPage -> action (QWebPage::OpenLinkInNewWindow) -> setVisible (false);
-    mainPage -> action (QWebPage::DownloadLinkToDisk) -> setVisible (false);
-    mainPage -> action (QWebPage::OpenFrameInNewWindow) -> setVisible (false);
+    mainPage->action (QWebPage::OpenLink)->setVisible (false);
+    mainPage->action (QWebPage::CopyLinkToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::OpenLinkInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::DownloadLinkToDisk)->setVisible (false);
+    mainPage->action (QWebPage::OpenFrameInNewWindow)->setVisible (false);
 
-    mainPage -> action (QWebPage::CopyImageUrlToClipboard) -> setVisible (false);
-    mainPage -> action (QWebPage::CopyImageToClipboard) -> setVisible (false);
-    mainPage -> action (QWebPage::OpenImageInNewWindow) -> setVisible (false);
-    mainPage -> action (QWebPage::DownloadImageToDisk) -> setVisible (false);
+    mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
 
 }
 
@@ -449,12 +472,12 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         //            printer.setOutputFormat (QPrinter::PdfFormat);
         //            printer.setOutputFileName ("output.pdf");
         QPrintDialog *dialog = new QPrintDialog (&printer);
-        dialog -> setWindowFlags (Qt::WindowStaysOnTopHint);
-        if (dialog -> exec() == QDialog::Accepted) {
-            frame -> print (&printer);
+        dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
+        if (dialog->exec() == QDialog::Accepted) {
+            frame->print (&printer);
         }
-        dialog -> close();
-        dialog -> deleteLater();
+        dialog->close();
+        dialog->deleteLater();
         return true;
     }
 
@@ -501,12 +524,12 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                request.url().authority().contains ("www.perl.org")) {
         qDebug() << "Allowed web link in a new window:" << request.url();
         qDebug() << "===============";
-        if (! Page::mainFrame() -> childFrames().contains (frame))
+        if (! Page::mainFrame()->childFrames().contains (frame))
         {
             newWindow = new TopLevel;
-            newWindow -> setWindowIcon (QIcon (settings.iconPathName));
-            newWindow -> setUrl (request.url());
-            newWindow -> show();
+            newWindow->setWindowIcon (QIcon (settings.iconPathName));
+            newWindow->setUrl (request.url());
+            newWindow->show();
         }
     }
 
@@ -524,7 +547,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     if (frame != Page::currentFrame() and
             (QUrl ("http://perl-executing-browser-pseudodomain/"))
             .isParentOf (request.url())) {
-        if (! Page::mainFrame() -> childFrames().contains (frame)) {
+        if (! Page::mainFrame()->childFrames().contains (frame)) {
             if (! request.url().path().contains ("longrun")) {
                 filepath = request.url()
                         .toString (QUrl::RemoveScheme
@@ -538,17 +561,17 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                     return true;
                 } else {
                     newWindow = new TopLevel;
-                    newWindow -> setWindowIcon (QIcon (settings.iconPathName));
+                    newWindow->setWindowIcon (QIcon (settings.iconPathName));
                     if (request.url().path().contains (".htm")) {
-                        newWindow -> setUrl (QUrl::fromLocalFile
+                        newWindow->setUrl (QUrl::fromLocalFile
                                              (QDir::toNativeSeparators
                                               (QApplication::applicationDirPath()+
                                                QDir::separator()+request.url().path())));
                     } else {
-                        newWindow -> setUrl (request.url());
+                        newWindow->setUrl (request.url());
                     }
                 }
-                newWindow -> show();
+                newWindow->show();
                 return true;
             }
         }
@@ -567,7 +590,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "HTML file path:" << QDir::toNativeSeparators
                     (QApplication::applicationDirPath()+filepath);
         checkFileExistenceSlot();
-        frame -> load (QUrl::fromLocalFile
+        frame->load (QUrl::fromLocalFile
                        (QDir::toNativeSeparators
                         (QApplication::applicationDirPath()+
                                 QDir::separator()+filepath)));
@@ -652,7 +675,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 longRunningScriptOutputInNewWindow = true;
                 lastRequest = request;
                 newLongRunWindow = new TopLevel;
-                newLongRunWindow -> setWindowIcon (QIcon (settings.iconPathName));
+                newLongRunWindow->setWindowIcon (QIcon (settings.iconPathName));
             }
 
             QWebSettings::clearMemoryCaches();
