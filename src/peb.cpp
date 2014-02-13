@@ -456,6 +456,68 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return true;
     }
 
+    // List all modules of a Perl script using the built-in Perl debugger.
+    // Early experiments for implementing an idea proposed by Valcho Nedelchev.
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().toString().contains ("perl_debugger_list_modules:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::ExistingFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (QIcon (settings.iconPathName));
+        filepath = "";
+        filepath = dialog.getOpenFileName
+                (0, "Select Perl File", QDir::currentPath(),
+                 "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi)");
+        if (filepath.length() > 1) {
+            debuggingStarted = true;
+            qDebug() << "File path:" << filepath;
+            extension = filepath.section (".", 1, 1);
+            qDebug() << "Extension:" << extension;
+            defineInterpreterSlot();
+            qDebug() << "Interpreter:" << interpreter;
+
+            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+            // http://stackoverflow.com/questions/1725097
+            env.insert ("COLUMNS", "80");
+            env.insert ("LINES", "24");
+
+            longRunningScriptHandler.setProcessEnvironment (env);
+
+            QFileInfo file (filepath);
+            QString fileDirectory = QDir::toNativeSeparators
+                    (file.absoluteDir().absolutePath());
+            qDebug() << "Working directory:" << fileDirectory;
+            qDebug() << "TEMP folder:" << QDir::tempPath();
+            qDebug() << "===============";
+            longRunningScriptHandler.setWorkingDirectory (fileDirectory);
+
+            // http://qt-project.org/forums/viewthread/1335
+            // http://www.qtcentre.org/threads/31264
+            // http://stackoverflow.com/questions/13856734/open-qfile-for-appending
+            longRunningScriptHandler.setProcessChannelMode (QProcess::MergedChannels);
+            longRunningScriptHandler.start (interpreter, QStringList() << "-d" <<
+                                            QDir::toNativeSeparators (filepath),
+                                            QProcess::Unbuffered | QProcess::ReadWrite);
+            if (! longRunningScriptHandler.waitForStarted (-1))
+                return 1;
+            QByteArray noTTY;
+            noTTY.append (QString ("noTTY\n").toLatin1());
+            longRunningScriptHandler.write (noTTY);
+            QByteArray showModuleVersions;
+            showModuleVersions.append (QString ("M\n").toLatin1());
+            longRunningScriptHandler.write (showModuleVersions);
+
+            longRunningScriptOutputInNewWindow = true;
+            newLongRunWindow = new TopLevel;
+            newLongRunWindow->setWindowIcon (QIcon (settings.iconPathName));
+        }
+
+        QWebSettings::clearMemoryCaches();
+        return true;
+    }
+
     // Print page from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("print:")) {
@@ -625,13 +687,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                            | QUrl::RemovePath)
                 .replace ("?", "");
         env.insert ("QUERY_STRING", query);
-
-//        // Early experiments for implementing an idea proposed by Valcho Nedelchev.
-//        // Influenced by usefull code example from:
-//        // http://stackoverflow.com/questions/1725097
-//        env.insert ("COLUMNS", "80");
-//        env.insert ("LINES", "24");
-
         longRunningScriptHandler.setProcessEnvironment (env);
 
         QFileInfo file (filepath);
@@ -647,26 +702,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                          QDir::toNativeSeparators
                                         (QApplication::applicationDirPath()+
                                              QDir::separator()+filepath));
-
-//            // Early experiments for implementing an idea proposed by Valcho Nedelchev.
-//            // Influenced by usefull code examples from:
-//            // http://qt-project.org/forums/viewthread/1335
-//            // http://www.qtcentre.org/threads/31264
-//            // http://stackoverflow.com/questions/13856734/open-qfile-for-appending
-//            longRunningScriptHandler.setProcessChannelMode (QProcess::MergedChannels);
-//            longRunningScriptHandler.start (interpreter, QStringList() << "-d" <<
-//                                             QDir::toNativeSeparators
-//                                            (QApplication::applicationDirPath()+
-//                                                 QDir::separator()+filepath),
-//                                             QProcess::Unbuffered | QProcess::ReadWrite);
-//            if (! longRunningScriptHandler.waitForStarted (-1))
-//                return 1;
-//            QByteArray noTTY;
-//            noTTY.append (QString ("noTTY\n").toLatin1());
-//            longRunningScriptHandler.write (noTTY);
-//            QByteArray showModuleVersions;
-//            showModuleVersions.append (QString ("M\n").toLatin1());
-//            longRunningScriptHandler.write (showModuleVersions);
 
             if (frame == Page::currentFrame()) {
                 longRunningScriptOutputInNewWindow = false;

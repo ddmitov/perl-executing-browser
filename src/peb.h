@@ -129,8 +129,8 @@ protected:
         if (operation == GetOperation and
                 (QUrl ("http://perl-executing-browser-pseudodomain/"))
                 .isParentOf(request.url()) and
-                (!request.url().path().contains("longrun")))
-        {
+                (!request.url().path().contains ("longrun")) and
+                (!request.url().toString().contains ("debugger"))) {
 
             QString query = request.url()
                     .toString (QUrl::RemoveScheme
@@ -464,7 +464,12 @@ public slots:
     void displayLongRunningScriptOutputSlot()
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
-        QString filepathForConversion = lastRequest.url().path();
+        QString filepathForConversion;
+        if (debuggingStarted == false) {
+            filepathForConversion = lastRequest.url().path();
+        } else {
+            filepathForConversion = filepath;
+        }
         QString extension = filepathForConversion.section (".", 1, 1);
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
                 (QDir::tempPath()+QDir::separator()+filepathForConversion
@@ -478,8 +483,6 @@ public slots:
             longRunningScriptOutputFile.remove();
         }
 
-        //        // Early experiments for implementing an idea proposed by Valcho Nedelchev.
-        //        if (longRunningScriptOutputFile.open (QIODevice::Append))
         if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
             QTextStream stream (&longRunningScriptOutputFile);
             stream << output << endl;
@@ -542,6 +545,7 @@ private:
     QNetworkRequest lastRequest;
     QString longRunningScriptOutputFilePath;
     bool longRunningScriptOutputInNewWindow;
+    bool debuggingStarted;
     QWebView *newLongRunWindow;
 
     QWebView *newWindow;
