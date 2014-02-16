@@ -465,11 +465,8 @@ public slots:
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
         QString filepathForConversion;
-        if (debuggingStarted == false) {
-            filepathForConversion = lastRequest.url().path();
-        } else {
-            filepathForConversion = filepath;
-        }
+        filepathForConversion = lastRequest.url().path();
+
         QString extension = filepathForConversion.section (".", 1, 1);
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
                 (QDir::tempPath()+QDir::separator()+filepathForConversion
@@ -516,6 +513,38 @@ public slots:
         qDebug() << "===============";
     }
 
+
+    void displayDebuggerOutputSlot()
+    {
+        QString debuggerOutput = debuggerHandler.readAllStandardOutput();
+
+        QRegExp regExpOne ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\\s{3,100}");
+        regExpOne.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExpOne, "");
+
+        QString filepathForConversion = filepath;
+        QString extension = filepathForConversion.section (".", 1, 1);
+        debuggerOutputFilePath = QDir::toNativeSeparators
+                (QDir::tempPath()+QDir::separator()+filepathForConversion
+                 .replace (QDir::separator(), "_")
+                 .replace (QRegExp ("(\\s+)"), "_")
+                 .replace ("."+extension, "")+
+                 "_debugger_output.txt" );
+
+        QFile debuggerOutputFile (debuggerOutputFilePath);
+        if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
+            QTextStream debuggerOutputStream (&debuggerOutputFile);
+            debuggerOutputStream << debuggerOutput << endl;
+        }
+        qDebug() << "Output from debugger received.";
+        qDebug() << "Debugger output file:" << debuggerOutputFilePath;
+        qDebug() << "===============";
+
+        newDebuggerWindow->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
+        newDebuggerWindow->show();
+    }
+
+
 public:
 
     Page();
@@ -545,8 +574,11 @@ private:
     QNetworkRequest lastRequest;
     QString longRunningScriptOutputFilePath;
     bool longRunningScriptOutputInNewWindow;
-    bool debuggingStarted;
     QWebView *newLongRunWindow;
+
+    QProcess debuggerHandler;
+    QString debuggerOutputFilePath;
+    QWebView *newDebuggerWindow;
 
     QWebView *newWindow;
 

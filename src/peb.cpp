@@ -269,6 +269,9 @@ Page::Page()
     QObject::connect (&longRunningScriptHandler, SIGNAL (readyReadStandardError()),
                        this, SLOT (displayLongRunningScriptErrorSlot()));
 
+    QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
+                       this, SLOT (displayDebuggerOutputSlot()));
+
 }
 
 TopLevel::TopLevel()
@@ -459,7 +462,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // List all modules of a Perl script using the built-in Perl debugger.
     // Early experiments for implementing an idea proposed by Valcho Nedelchev.
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().toString().contains ("perl_debugger_list_modules:")) {
+            request.url().toString().contains ("perl_debugger")) {
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::ExistingFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -471,19 +474,23 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, "Select Perl File", QDir::currentPath(),
                  "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi)");
         if (filepath.length() > 1) {
-            debuggingStarted = true;
             qDebug() << "File path:" << filepath;
             extension = filepath.section (".", 1, 1);
             qDebug() << "Extension:" << extension;
             defineInterpreterSlot();
             qDebug() << "Interpreter:" << interpreter;
 
+            debuggerHandler.close();
+            QFile debuggerOutputFile (debuggerOutputFilePath);
+            if (debuggerOutputFile.exists()) {
+                debuggerOutputFile.remove();
+            }
+
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             // http://stackoverflow.com/questions/1725097
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
-
-            longRunningScriptHandler.setProcessEnvironment (env);
+            debuggerHandler.setProcessEnvironment (env);
 
             QFileInfo file (filepath);
             QString fileDirectory = QDir::toNativeSeparators
@@ -491,27 +498,26 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             qDebug() << "Working directory:" << fileDirectory;
             qDebug() << "TEMP folder:" << QDir::tempPath();
             qDebug() << "===============";
-            longRunningScriptHandler.setWorkingDirectory (fileDirectory);
+            debuggerHandler.setWorkingDirectory (fileDirectory);
 
             // http://qt-project.org/forums/viewthread/1335
             // http://www.qtcentre.org/threads/31264
             // http://stackoverflow.com/questions/13856734/open-qfile-for-appending
-            longRunningScriptHandler.setProcessChannelMode (QProcess::MergedChannels);
-            longRunningScriptHandler.start (interpreter, QStringList() << "-d" <<
+            debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
+            debuggerHandler.start (interpreter, QStringList() << "-d" <<
                                             QDir::toNativeSeparators (filepath),
                                             QProcess::Unbuffered | QProcess::ReadWrite);
-            if (! longRunningScriptHandler.waitForStarted (-1))
+            if (! debuggerHandler.waitForStarted (-1))
                 return 1;
             QByteArray noTTY;
             noTTY.append (QString ("noTTY\n").toLatin1());
-            longRunningScriptHandler.write (noTTY);
+            debuggerHandler.write (noTTY);
             QByteArray showModuleVersions;
             showModuleVersions.append (QString ("M\n").toLatin1());
-            longRunningScriptHandler.write (showModuleVersions);
+            debuggerHandler.write (showModuleVersions);
 
-            longRunningScriptOutputInNewWindow = true;
-            newLongRunWindow = new TopLevel;
-            newLongRunWindow->setWindowIcon (QIcon (settings.iconPathName));
+            newDebuggerWindow = new TopLevel;
+            newDebuggerWindow->setWindowIcon (QIcon (settings.iconPathName));
         }
 
         QWebSettings::clearMemoryCaches();
