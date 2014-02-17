@@ -86,7 +86,7 @@ print "<a href='openfolder://now'>Open Existing Folder</a>\n";
 print "</font></p>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='perl_debugger_list_modules://now'>List All Modules of an Existing Perl Script using<br>Built-in Perl Debugger</a>\n";
+print "<a href='perl_debugger_list_modules://now'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>\n";
 print "</font></p>\n";
 
 #~ print "<p align='center'><font size='5' face='SansSerif'>\n";

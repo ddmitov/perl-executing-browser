@@ -518,9 +518,31 @@ public slots:
     {
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
-        QRegExp regExpOne ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\\s{3,100}");
+        QRegExp regExpOne ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
         regExpOne.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (regExpOne, "");
+
+        QRegExp regExpTwo ("Editor support available.");
+        regExpTwo.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExpTwo, "");
+
+        QRegExp regExpThree ("Enter h or `h h' for help, or `man perldebug' for more help.");
+        regExpThree.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExpThree, "");
+
+        accumulatedOutput.append (debuggerOutput);
+
+        QRegExp regExpFour ("\n\\s*\n");
+        regExpFour.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExpFour, "\n\n");
+
+        QRegExp regExpFive ("\n\\s{2,}");
+        regExpFive.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExpFive, "");
+
+        QRegExp regExpSix ("\n{3,100}");
+        regExpSix.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExpSix, "\n\n");
 
         QString filepathForConversion = filepath;
         QString extension = filepathForConversion.section (".", 1, 1);
@@ -534,7 +556,7 @@ public slots:
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
             QTextStream debuggerOutputStream (&debuggerOutputFile);
-            debuggerOutputStream << debuggerOutput << endl;
+            debuggerOutputStream << accumulatedOutput << endl;
         }
         qDebug() << "Output from debugger received.";
         qDebug() << "Debugger output file:" << debuggerOutputFilePath;
@@ -542,6 +564,7 @@ public slots:
 
         newDebuggerWindow->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
         newDebuggerWindow->show();
+        debuggerOutputFile.remove();
     }
 
 
@@ -577,6 +600,7 @@ private:
     QWebView *newLongRunWindow;
 
     QProcess debuggerHandler;
+    QString accumulatedOutput;
     QString debuggerOutputFilePath;
     QWebView *newDebuggerWindow;
 

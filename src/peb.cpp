@@ -472,19 +472,22 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         filepath = "";
         filepath = dialog.getOpenFileName
                 (0, "Select Perl File", QDir::currentPath(),
-                 "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi)");
+                 "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)");
         if (filepath.length() > 1) {
             qDebug() << "File path:" << filepath;
             extension = filepath.section (".", 1, 1);
+            if (extension.length() == 0)
+                extension = "pl";
             qDebug() << "Extension:" << extension;
             defineInterpreterSlot();
             qDebug() << "Interpreter:" << interpreter;
 
             debuggerHandler.close();
+            accumulatedOutput = "";
+            accumulatedOutput.append ("\nScript: "+filepath+"\n");
             QFile debuggerOutputFile (debuggerOutputFilePath);
-            if (debuggerOutputFile.exists()) {
+            if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
-            }
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             // http://stackoverflow.com/questions/1725097
