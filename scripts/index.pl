@@ -85,10 +85,6 @@ print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='openfolder://now'>Open Existing Folder</a>\n";
 print "</font></p>\n";
 
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='perl_debugger_list_modules://now'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>\n";
-print "</font></p>\n";
-
 #~ print "<p align='center'><font size='5' face='SansSerif'>\n";
 #~ print "<a href='newfile://now'>Create New File</a>\n";
 #~ print "</font></p>\n";
@@ -96,6 +92,20 @@ print "</font></p>\n";
 #~ print "<p align='center'><font size='5' face='SansSerif'>\n";
 #~ print "<a href='newfolder://now'>Create New Folder</a>\n";
 #~ print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='perl_debugger_list_modules://now'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='perl_debugger_list_subroutine_names://now'>List All Subroutine Names of a Perl Script using<br>Built-in Perl Debugger</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='perl_debugger_list_variables_in_package://now'>List All Variables of a Perl Script using<br>Built-in Perl Debugger</a>\n";
+print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 

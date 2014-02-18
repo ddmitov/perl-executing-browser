@@ -459,8 +459,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return true;
     }
 
-    // List all modules of a Perl script using the built-in Perl debugger.
-    // Early experiments for implementing an idea proposed by Valcho Nedelchev.
+    // Display information about user-selected Perl scripts using the built-in Perl debugger.
+    // Partial implementation of an idea proposed by Valcho Nedelchev.
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().toString().contains ("perl_debugger")) {
         QFileDialog dialog;
@@ -515,9 +515,23 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             QByteArray noTTY;
             noTTY.append (QString ("noTTY\n").toLatin1());
             debuggerHandler.write (noTTY);
-            QByteArray showModuleVersions;
-            showModuleVersions.append (QString ("M\n").toLatin1());
-            debuggerHandler.write (showModuleVersions);
+            QByteArray debuggerCommand;
+
+            if (request.url().toString().contains ("perl_debugger_list_modules:")) {
+                debuggerCommand.append (QString ("M\n").toLatin1());
+                debuggerCommandHumanReadable = "Show module versions (M)";
+            }
+            if (request.url().toString().contains ("perl_debugger_list_subroutine_names:")) {
+                debuggerCommand.append (QString ("S\n").toLatin1());
+                debuggerCommandHumanReadable = "List subroutine names (S)";
+            }
+            if (request.url().toString().contains ("perl_debugger_list_variables_in_package:")) {
+                debuggerCommand.append (QString ("V\n").toLatin1());
+                debuggerCommandHumanReadable = "List Variables in Package (V)";
+            }
+            accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"\n");
+
+            debuggerHandler.write (debuggerCommand);
 
             newDebuggerWindow = new TopLevel;
             newDebuggerWindow->setWindowIcon (QIcon (settings.iconPathName));

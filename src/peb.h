@@ -513,7 +513,8 @@ public slots:
         qDebug() << "===============";
     }
 
-
+    // Display information about user-selected Perl scripts using the built-in Perl debugger.
+    // Partial implementation of an idea proposed by Valcho Nedelchev.
     void displayDebuggerOutputSlot()
     {
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
@@ -567,7 +568,6 @@ public slots:
         debuggerOutputFile.remove();
     }
 
-
 public:
 
     Page();
@@ -600,6 +600,7 @@ private:
     QWebView *newLongRunWindow;
 
     QProcess debuggerHandler;
+    QString debuggerCommandHumanReadable;
     QString accumulatedOutput;
     QString debuggerOutputFilePath;
     QWebView *newDebuggerWindow;
