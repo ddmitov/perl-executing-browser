@@ -537,7 +537,7 @@ public slots:
         regExpFour.setCaseSensitivity (Qt::CaseSensitive);
         accumulatedOutput.replace (regExpFour, "\n\n");
 
-        QRegExp regExpFive ("\n\\s{2,}");
+        QRegExp regExpFive ("\n\\s{4,}");
         regExpFive.setCaseSensitivity (Qt::CaseSensitive);
         accumulatedOutput.replace (regExpFive, "");
 
