@@ -27,6 +27,7 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebElement>
+#include <QtWebKit>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QtNetwork/QNetworkRequest>
 #include <QtNetwork/QNetworkReply>
