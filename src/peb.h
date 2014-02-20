@@ -366,7 +366,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "perl.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "perl";
 #endif
         }
@@ -374,7 +374,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "php-cgi.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "php";
 #endif
         }
@@ -382,7 +382,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "python.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "python";
 #endif
         }
@@ -439,7 +439,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "perl.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "perl";
 #endif
         }
@@ -447,7 +447,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "php-cgi.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "php";
 #endif
         }
@@ -455,7 +455,7 @@ public slots:
 #ifdef Q_OS_WIN
             interpreter = "python.exe";
 #endif
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "python";
 #endif
         }

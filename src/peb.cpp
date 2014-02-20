@@ -103,14 +103,16 @@ int main (int argc, char **argv)
 
     // Environment variables:
     QByteArray path;
-#ifdef Q_OS_LINUX
+// http://qt-project.org/forums/viewthread/25533
+// http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
     QByteArray oldPath = qgetenv ("PATH"); //linux
 #endif
 #ifdef Q_OS_WIN
     QByteArray oldPath = qgetenv ("Path"); //win32
 #endif
     path.append (oldPath);
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
     path.append (":"); //linux
 #endif
 #ifdef Q_OS_WIN
@@ -119,7 +121,7 @@ int main (int argc, char **argv)
     path.append (QApplication::applicationDirPath());
     path.append (QDir::separator());
     path.append ("perl");
-#ifdef Q_OS_LINUX
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
     qputenv ("PATH", path); //linux
 #endif
 #ifdef Q_OS_WIN
@@ -203,13 +205,13 @@ Watchdog::Watchdog()
 
     qDebug() << "Mongoose quit token:" << settings.quitToken;
 
-    QProcess server;
-    server.startDetached (QString (QApplication::applicationDirPath()+
-                                     QDir::separator()+"mongoose"));
+//    QProcess server;
+//    server.startDetached (QString (QApplication::applicationDirPath()+
+//                                     QDir::separator()+"mongoose"));
 
-    QTimer *timer = new QTimer (this);
-    connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
-    timer->start (5000);
+//    QTimer *timer = new QTimer (this);
+//    connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
+//    timer->start (5000);
 
     trayIcon = new QSystemTrayIcon();
     trayIcon->setIcon (QIcon (settings.iconPathName));
