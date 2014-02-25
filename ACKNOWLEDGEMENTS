@@ -68,6 +68,7 @@
  http://qt-project.org/forums/viewthread/4433
  http://qt-project.org/forums/viewthread/9346
  http://qt-project.org/forums/viewthread/11729
+ http://qt-project.org/forums/viewthread/1335
  http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
@@ -78,6 +79,7 @@
  http://www.qtcentre.org/threads/30060-QtWebkit-problems-with-custom-QNetworkAccessManager-QNetworkReply
  http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character
  http://www.qtcentre.org/threads/14401-QString-how-to-delete-new-lines
+ http://www.qtcentre.org/threads/31264-How-to-use-QProcess-to-write-multiple-commands-to-external-console-based-program
  http://www.qtcentre.org/archive/index.php/t-31264.html
  http://www.qtcentre.org/archive/index.php/t-14691.html
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
@@ -108,6 +110,10 @@
  http://stackoverflow.com/questions/1551605/how-to-set-applications-taskbar-icon-in-windows-7
  http://stackoverflow.com/questions/6421747/how-to-find-current-qtwebkit-version-used-in-qt-sdk
  http://stackoverflow.com/questions/9101887/how-to-validate-email-address-using-qregexp
+ http://stackoverflow.com/questions/13856734/open-qfile-for-appending
+ http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
+ http://stackoverflow.com/questions/1312922/detect-if-stdin-is-a-terminal-or-pipe-in-c-c-qt
+ http://stackoverflow.com/questions/5156675/how-to-use-isatty-on-cout-or-can-i-assume-that-cout-file-descriptor-1
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

@@ -32,6 +32,7 @@
 #include <QIcon>
 #include <QDebug>
 #include "peb.h"
+#include <unistd.h> // for isatty()
 
 int main (int argc, char **argv)
 {
@@ -46,6 +47,48 @@ int main (int argc, char **argv)
     qDebug() << "Application file path:" << QApplication::applicationFilePath();
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
+
+    if (isatty (fileno (stdin))) {
+        qDebug() << "Started from terminal.";
+        qDebug() << "Will start another instance of the program and quit this one.";
+
+        //http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
+        int pid = fork();
+        if (pid < 0)
+        {
+            // Report error and exit:
+            qDebug() << "PID less than zero. Aborting.";
+            return 1;
+            QApplication::exit();
+        }
+        if (pid == 0)
+        {
+            // Detach all standard I/O descriptors:
+            close(0);
+            close(1);
+            close(2);
+            // Enter a new session:
+            setsid();
+            // New instance is now detached from terminal:
+            QProcess anotherInstance;
+            anotherInstance.startDetached (QApplication::applicationFilePath());
+            if (anotherInstance.waitForStarted (-1)) {
+                return 1;
+                QApplication::exit();
+            }
+        }
+        else
+        {
+            // The parent instance should be closed now:
+            //exit(0);
+            return 1;
+            QApplication::exit();
+        }
+
+    } else {
+        qDebug() << "Started without terminal.";
+    }
+
     qDebug() << "===============";
 
 #if QT_VERSION >= 0x050000
@@ -492,7 +535,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 debuggerOutputFile.remove();
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-            // http://stackoverflow.com/questions/1725097
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
             debuggerHandler.setProcessEnvironment (env);
@@ -505,20 +547,14 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             qDebug() << "===============";
             debuggerHandler.setWorkingDirectory (fileDirectory);
 
-            // http://qt-project.org/forums/viewthread/1335
-            // http://www.qtcentre.org/threads/31264
-            // http://stackoverflow.com/questions/13856734/open-qfile-for-appending
             debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
             debuggerHandler.start (interpreter, QStringList() << "-d" <<
-                                            QDir::toNativeSeparators (filepath),
-                                            QProcess::Unbuffered | QProcess::ReadWrite);
-            if (! debuggerHandler.waitForStarted (-1))
+                                   QDir::toNativeSeparators (filepath),
+                                   QProcess::Unbuffered | QProcess::ReadWrite);
+            if (!debuggerHandler.waitForStarted (-1))
                 return 1;
-            QByteArray noTTY;
-            noTTY.append (QString ("noTTY\n").toLatin1());
-            debuggerHandler.write (noTTY);
-            QByteArray debuggerCommand;
 
+            QByteArray debuggerCommand;
             if (request.url().toString().contains ("perl_debugger_list_modules:")) {
                 debuggerCommand.append (QString ("M\n").toLatin1());
                 debuggerCommandHumanReadable = "Show module versions (M)";
