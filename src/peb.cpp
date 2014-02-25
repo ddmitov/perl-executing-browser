@@ -623,7 +623,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Open not allowed web site using default browser:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("http") and
-         (! (QUrl ("http://perl-executing-browser-pseudodomain/"))
+         (! (QUrl (PEB_DOMAIN))
            .isParentOf (request.url())) and
          (! request.url().authority().contains ("localhost")) and
          (! request.url().authority().contains ("www.perl.org"))) {
@@ -668,7 +668,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Open local content in a new window
     // (with the exception of result from long-running script):
     if (frame != Page::currentFrame() and
-            (QUrl ("http://perl-executing-browser-pseudodomain/"))
+            (QUrl (PEB_DOMAIN))
             .isParentOf (request.url())) {
         if (! Page::mainFrame()->childFrames().contains (frame)) {
             if (! request.url().path().contains ("longrun")) {
@@ -702,7 +702,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Load local HTML page invoked from hyperlink:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         (QUrl ("http://perl-executing-browser-pseudodomain/"))
+         (QUrl (PEB_DOMAIN))
          .isParentOf (request.url()) and
          (request.url().path().contains (".htm"))) {
         filepath = request.url()
@@ -724,7 +724,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Execute local long-running script invoked from hyperlink:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         (QUrl ("http://perl-executing-browser-pseudodomain/"))
+         (QUrl (PEB_DOMAIN))
          .isParentOf (request.url()) and
          (request.url().path().contains ("longrun"))){
         qDebug() << "Long-running script:" << request.url().toString();

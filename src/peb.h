@@ -12,6 +12,11 @@
 #ifndef PEB_H
 #define PEB_H
 
+// The domain of Perl Executing Browser
+#ifndef PEB_DOMAIN
+#define PEB_DOMAIN "http://perl-executing-browser-pseudodomain/"
+#endif
+
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -128,7 +133,7 @@ protected:
         // 2.) script started in a new window,
         // 3.) script, which was fed with data from local form using CGI GET method
         if (operation == GetOperation and
-                (QUrl ("http://perl-executing-browser-pseudodomain/"))
+                (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
                 (!request.url().path().contains ("longrun")) and
                 (!request.url().toString().contains ("debugger"))) {
@@ -238,7 +243,7 @@ protected:
         // Get data from local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                (QUrl("http://perl-executing-browser-pseudodomain/"))
+                (QUrl(PEB_DOMAIN))
                 .isParentOf (request.url())) {
             QString postData;
             QByteArray outgoingByteArray;
@@ -624,7 +629,7 @@ public slots:
                      (QApplication::applicationDirPath()+
                       QDir::separator()+settings.startPage)));
         } else {
-            setUrl (QUrl (QString ("http://perl-executing-browser-pseudodomain/" +
+            setUrl (QUrl (QString (PEB_DOMAIN +
                                    settings.startPage)));
         }
     }
@@ -713,7 +718,7 @@ public slots:
         QMenu *menu = mainPage->createStandardContextMenu();
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
-            if (QUrl ("http://perl-executing-browser-pseudodomain/")
+            if (QUrl (PEB_DOMAIN)
                     .isParentOf (qWebHitTestURL)) {
                 menu->addSeparator ();
                 QAction *editAct = menu->addAction (tr ("&Edit"));
