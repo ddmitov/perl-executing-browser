@@ -1,13 +1,9 @@
 
-all versions:
-=============
-
 - more and better examples
 
 - documentation, commented code
 
-v. 0.2
-======
+=============
 
 - log file settings - enable or disable log; log file rotation or accumulation of data in a single file
 
@@ -32,9 +28,6 @@ v. 0.2
 - application icon & info on win32
 
 - display 'Loading...' page before page is fully loaded
-
-v. 0.3
-======
 
 - mojolicious support
 
