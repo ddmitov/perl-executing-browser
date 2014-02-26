@@ -9,6 +9,10 @@ all versions:
 v. 0.2
 ======
 
+- log file settings - enable or disable log; log file rotation or accumulation of data in a single file
+
+- dialog to select and execute scripts from any folder
+
 - check for STDERR from scripts, if any - display message
 
 - check if long-running script is not already started
