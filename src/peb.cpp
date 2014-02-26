@@ -34,15 +34,63 @@
 #include "peb.h"
 #include <unistd.h> // for isatty()
 
+#if QT_VERSION >= 0x050000
+// Qt5 code:
+void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &msg)
+   Q_UNUSED (context);
+#else
+// Qt4 code:
+void customMessageHandler (QtMsgType type, const char *msg)
+#endif
+{
+   QString dt = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
+   QString txt = QString ("[%1] ").arg (dt);
+
+   switch (type)
+   {
+      case QtDebugMsg:
+         txt += QString ("{Debug} %1").arg (msg);
+         break;
+      case QtWarningMsg:
+         txt += QString ("{Warning} %1").arg (msg);
+         break;
+      case QtCriticalMsg:
+         txt += QString ("{Critical} %1").arg (msg);
+         break;
+      case QtFatalMsg:
+         txt += QString ("{Fatal} %1").arg (msg);
+         abort();
+         break;
+   }
+
+   QFile logFile (QDir::toNativeSeparators
+                  (QApplication::applicationDirPath()+
+                   QDir::separator()+"peb.log"));
+   logFile.open (QIODevice::WriteOnly | QIODevice::Append);
+
+   QTextStream textStream (&logFile);
+   textStream << txt << endl;
+}
+
 int main (int argc, char **argv)
 {
 
     QApplication application (argc, argv);
 
     application.setApplicationName ("Perl Executing Browser");
+
+#if QT_VERSION >= 0x050000
+        // Qt5 code:
+        qInstallMessageHandler (customMessageHandler);
+#else
+        // Qt4 code:
+        qInstallMsgHandler (customMessageHandler);
+#endif
+
     // Get current date and time:
     QDateTime dateTime = QDateTime::currentDateTime();
     QString dateTimeString = dateTime.toString();
+    qDebug() << "===============";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
     qDebug() << "Application file path:" << QApplication::applicationFilePath();
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
@@ -51,8 +99,8 @@ int main (int argc, char **argv)
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
         qDebug() << "Will start another instance of the program and quit this one.";
+        qDebug() << "===============";
 
-        //http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
         int pid = fork();
         if (pid < 0)
         {
@@ -80,16 +128,14 @@ int main (int argc, char **argv)
         else
         {
             // The parent instance should be closed now:
-            //exit(0);
             return 1;
             QApplication::exit();
         }
 
     } else {
-        qDebug() << "Started without terminal.";
+        qDebug() << "Started without terminal or inside Qt Creator.";
+        qDebug() << "===============";
     }
-
-    qDebug() << "===============";
 
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
@@ -146,8 +192,6 @@ int main (int argc, char **argv)
 
     // Environment variables:
     QByteArray path;
-// http://qt-project.org/forums/viewthread/25533
-// http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
     QByteArray oldPath = qgetenv ("PATH"); //linux
 #endif
@@ -185,18 +229,19 @@ int main (int argc, char **argv)
 
     TopLevel toplevel;
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
-                       &toplevel, SLOT (quitApplicationSlot()));
+                      &toplevel, SLOT (quitApplicationSlot()));
     QObject::connect (qApp, SIGNAL (aboutToQuit()),
-                       &toplevel, SLOT (quitApplicationSlot()));
+                      &toplevel, SLOT (aboutToQuitSlot()));
+
     toplevel.setWindowIcon (QIcon (settings.iconPathName));
     toplevel.loadStartPageSlot();
     toplevel.show();
 
     Watchdog watchdog;
     QObject::connect (watchdog.aboutAction, SIGNAL (triggered()),
-                       &toplevel, SLOT (aboutSlot()));
+                      &toplevel, SLOT (aboutSlot()));
     QObject::connect (watchdog.quitAction, SIGNAL (triggered()),
-                       &toplevel, SLOT (quitApplicationSlot()));
+                      &toplevel, SLOT (quitApplicationSlot()));
 
     return application.exec();
 
@@ -247,6 +292,7 @@ Watchdog::Watchdog()
 {
 
     qDebug() << "Mongoose quit token:" << settings.quitToken;
+    qDebug() << "===============";
 
 //    QProcess server;
 //    server.startDetached (QString (QApplication::applicationDirPath()+

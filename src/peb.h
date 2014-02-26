@@ -819,6 +819,14 @@ public slots:
         QApplication::exit();
     }
 
+    void aboutToQuitSlot()
+    {
+        QDateTime dateTime = QDateTime::currentDateTime();
+        QString dateTimeString = dateTime.toString();
+        qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
+        qDebug() << "===============";
+    }
+
 public:
 
     TopLevel();
