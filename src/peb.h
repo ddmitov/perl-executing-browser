@@ -131,7 +131,8 @@ protected:
         // Get output from local script, including:
         // 1.) script used as a start page,
         // 2.) script started in a new window,
-        // 3.) script, which was fed with data from local form using CGI GET method
+        // 3.) script, which was fed with data from local form using CGI GET method,
+        // 4.) script, started by clicking a hyperlink.
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
@@ -213,9 +214,12 @@ protected:
                 QRegExp regExpOne ("^Content-type: text/html; charset=\\w*-\\d*\n");
                 regExpOne.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpOne, "");
-                QRegExp regExpTwo ("^Content-type: text/html");
+                QRegExp regExpTwo ("Content-type: text/html");
                 regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpTwo, "");
+                QRegExp regExpThree ("X-Powered-By: PHP.{1,20}\n");
+                regExpThree.setCaseSensitivity (Qt::CaseInsensitive);
+                output.replace (regExpThree, "");
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite)) {
                     QTextStream stream (&outputFilePathFile);
@@ -381,7 +385,7 @@ public slots:
             interpreter = "php-cgi.exe";
 #endif
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
-            interpreter = "php";
+            interpreter = "php-cgi";
 #endif
         }
         if (extension == "py") {
@@ -454,7 +458,7 @@ public slots:
             interpreter = "php-cgi.exe";
 #endif
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
-            interpreter = "php";
+            interpreter = "php-cgi";
 #endif
         }
         if (extension == "py") {

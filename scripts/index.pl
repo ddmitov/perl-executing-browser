@@ -27,6 +27,32 @@ print "<a href='http://search.cpan.org/dist/HTML-Perlinfo/lib/HTML/Perlinfo/HTML
 print "Copyright (c) 2009, Mike Accardo\n";
 print "</font></p>\n";
 
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>Perl SQLite Example</a>\n";
+print "</font></p>\n";
+
+#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
+#~ print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'>BG Volumina</a>\n";
+#~ print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Perl Environment Test</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/phpinfo.php'>phpinfo()</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.py'>Python Environment Test</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/cgi-test.py'>Python CGI Example</a>\n";
+print "</font></p>\n";
+
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
@@ -116,23 +142,7 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>SQLite Example</a>\n";
-print "</font></p>\n";
-
-#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
-#~ print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'>BG Volumina</a>\n";
-#~ print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://localhost:8080'>Localhost</a>\n";
-print "</font></p>\n";
-
-print "<hr width='95%'>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Environment Test</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";

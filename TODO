@@ -14,6 +14,8 @@
 - check if long-running script is not already started
 - independent settings for main window and long-running scripts window
 
+- detect file type by reading the shebang line
+
 - temporary folders in /tmp; to be removed immediately after page is loaded
 
 - default values if INI file is missing or corrupt
@@ -29,6 +31,6 @@
 
 - display 'Loading...' page before page is fully loaded
 
-- mojolicious support
+- Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
 
 - internal cron using script started by the browser
