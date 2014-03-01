@@ -78,6 +78,7 @@ int main (int argc, char **argv)
     QApplication application (argc, argv);
 
     application.setApplicationName ("Perl Executing Browser");
+    application.setApplicationVersion ("0.1");
 
 #if QT_VERSION >= 0x050000
         // Qt5 code:
@@ -226,6 +227,7 @@ int main (int argc, char **argv)
     qputenv ("PERLLIB", perlLib);
     qputenv ("FILE_TO_OPEN", "");
     qputenv ("FOLDER_TO_OPEN", "");
+    qputenv ("NEW_FILE", "");
 
     TopLevel toplevel;
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
@@ -523,6 +525,29 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         fileName.append (fileNameToOpenString);
         qputenv ("FILE_TO_OPEN", fileName);
         qDebug() << "File to open:" << fileName;
+        qDebug() << "===============";
+        dialog.close();
+        dialog.deleteLater();
+        return true;
+    }
+
+    // Invoke 'New file' dialog from URL:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().toString().contains ("newfile:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (QIcon (settings.iconPathName));
+        QString fileNameToOpenString = dialog.getSaveFileName
+                (0, "Create New File", QDir::currentPath(), "All files (*)");
+        if (fileNameToOpenString.isEmpty())
+            return false;
+        QByteArray fileName;
+        fileName.append (fileNameToOpenString);
+        qputenv ("NEW_FILE", fileName);
+        qDebug() << "New file:" << fileName;
         qDebug() << "===============";
         dialog.close();
         dialog.deleteLater();

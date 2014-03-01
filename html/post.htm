@@ -7,9 +7,13 @@
 
 <!-- http://www.w3schools.com/jsref/event_onclick.asp -->
 <script>
-function fileSelected()
+function existingFileSelected()
 {
-	document.getElementById("FileSelection").innerHTML="Select another file";
+	document.getElementById("ExistingFileSelection").innerHTML="Select another file";
+}
+function newFileSelected()
+{
+	document.getElementById("NewFileSelection").innerHTML="Select another file name";
 }
 function folderSelected()
 {
@@ -51,9 +55,11 @@ Value 2:<br>
 <input type="text" name="value2"><br>
 <br>
 
-<a href='openfile://now' onclick="fileSelected()" id="FileSelection">Select File</a>
+<a href='openfile://now' onclick="existingFileSelected()" id="ExistingFileSelection">Select file</a>
 <br>
-<a href='openfolder://now' onclick="folderSelected()" id="FolderSelection">Select Folder</a>
+<a href='newfile://now' onclick="newFileSelected()" id="NewFileSelection">Select new filename</a>
+<br>
+<a href='openfolder://now' onclick="folderSelected()" id="FolderSelection">Select folder</a>
 <br><br>
 
 <input type="submit" value="Submit with File & Folder"><br><br>

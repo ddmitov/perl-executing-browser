@@ -227,6 +227,7 @@ protected:
                 }
 
                 qputenv ("FILE_TO_OPEN", "");
+                qputenv ("NEW_FILE", "");
                 qputenv ("FOLDER_TO_OPEN", "");
 
                 QNetworkRequest networkRequest;
@@ -336,6 +337,7 @@ protected:
                 }
 
                 qputenv ("FILE_TO_OPEN", "");
+                qputenv ("NEW_FILE", "");
                 qputenv ("FOLDER_TO_OPEN", "");
 
                 QNetworkRequest networkRequest;

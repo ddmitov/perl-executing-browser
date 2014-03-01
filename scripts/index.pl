@@ -106,11 +106,15 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='newfile://now'>Create New File</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='openfile://now'>Open Existing File</a>\n";
 print "</font></p>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='openfolder://now'>Open Existing Folder</a>\n";
+print "<a href='openfolder://now'>Open Existing Folder or Create a New One</a>\n";
 print "</font></p>\n";
 
 #~ print "<p align='center'><font size='5' face='SansSerif'>\n";
@@ -155,6 +159,10 @@ print "</font></p>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl' target='_blank'>Long-Running Script in a New Window</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/html/resizer.htm'>Resizer Long Running Example</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
