@@ -45,6 +45,8 @@ print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/phpinfo.php'>phpinfo()</a>\n";
 print "</font></p>\n";
 
+print "<hr width='95%'>\n";
+
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.py'>Python Environment Test</a>\n";
 print "</font></p>\n";

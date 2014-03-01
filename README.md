@@ -46,12 +46,21 @@ Features
 * Output from local scripts, local and allowed web pages can be opened in new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
   
+Runtime Requirements
+----------------------------------------------------------------------------------------
+  
+* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes or Qt5 libraries, if you compiled the program using Qt5 classes.  
+* Perl 5 distribution - any standard Linux or Mac Perl distribution or Strawberry Perl for Windows.  
+* Only if you want to run PHP scripts - standard PHP distribution including ```php-cgi``` executable.  
+* Only if you want to run Python scripts - standard Python distribution for your operating system.  
+  
 Limitations
 ----------------------------------------------------------------------------------------
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
 * No 'Reload' action from context menu, but auto-reload using ```<meta http-equiv='refresh' content='XX'>``` is supported.  
 * No opening of new windows from JavaScript, although opening new windows from hyperlinks using ```target = '_blank'``` attribute is supported.  
+* No support for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
 History
 ----------------------------------------------------------------------------------------
@@ -67,6 +76,8 @@ Compiled and tested successfully using:
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
+* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5.  
+Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
   
 License
 ----------------------------------------------------------------------------------------
