@@ -14,6 +14,8 @@
 - check if long-running script is not already started
 - independent settings for main window and long-running scripts window
 
+- switching between different Perl distributions (system Perl vs. user selected Perl)
+
 - detect file type by reading the shebang line
 
 - temporary folders in /tmp; to be removed immediately after page is loaded
