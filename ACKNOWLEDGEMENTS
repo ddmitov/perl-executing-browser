@@ -117,6 +117,7 @@
  http://stackoverflow.com/questions/1312922/detect-if-stdin-is-a-terminal-or-pipe-in-c-c-qt
  http://stackoverflow.com/questions/5156675/how-to-use-isatty-on-cout-or-can-i-assume-that-cout-file-descriptor-1
  http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
+ http://stackoverflow.com/questions/12927273/how-to-get-local-ip-address-of-a-computer-using-qt
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

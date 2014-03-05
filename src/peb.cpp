@@ -293,16 +293,16 @@ Watchdog::Watchdog()
     : QObject (0)
 {
 
-    qDebug() << "Mongoose quit token:" << settings.quitToken;
-    qDebug() << "===============";
+//    qDebug() << "Mongoose quit token:" << settings.quitToken;
+//    qDebug() << "===============";
 
-    QProcess server;
-    server.startDetached (QString (QApplication::applicationDirPath()+
-                                     QDir::separator()+"mongoose"));
+//    QProcess server;
+//    server.startDetached (QString (QApplication::applicationDirPath()+
+//                                     QDir::separator()+"mongoose"));
 
-    QTimer *timer = new QTimer (this);
-    connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
-    timer->start (5000);
+//    QTimer *timer = new QTimer (this);
+//    connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
+//    timer->start (5000);
 
     trayIcon = new QSystemTrayIcon();
     trayIcon->setIcon (QIcon (settings.iconPathName));

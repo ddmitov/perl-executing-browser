@@ -90,14 +90,31 @@ public slots:
             server.startDetached (QString (QApplication::applicationDirPath()+
                                            QDir::separator()+"mongoose"));
         }
-        if (webConnectivityPing.waitForConnected (1000 ) )
+        qDebug() << "===============";
+
+        if (webConnectivityPing.waitForConnected (1000 ))
         {
-            qDebug() << "Web connection is available.";
-            qDebug() << "===============";
+            qDebug() << "Internet connectivity is available.";
+            qDebug()
+                << "Local IPv4 address for Internet connectivity is:"
+                << webConnectivityPing.localAddress().toString();
+            qDebug()
+                << "Local IPv4 port for Internet connectivity is:"
+                << webConnectivityPing.localPort();
+            qDebug()
+                << "Remote IPv4 address for Internet connectivity is:"
+                << webConnectivityPing.peerAddress().toString();
+            qDebug()
+                << "Remote IPv4 port for Internet connectivity is:"
+                << webConnectivityPing.peerPort();
+            qDebug()
+                << "Remote domain name for Internet connectivity is:"
+                << webConnectivityPing.peerName();
         } else {
-            qDebug() << "Web connection is not available.";
-            qDebug() << "===============";
+            qDebug() << "Internet connectivity is not available.";
         }
+        qDebug() << "===============";
+
     }
 
 public:
