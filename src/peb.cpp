@@ -34,6 +34,8 @@
 #include "peb.h"
 #include <unistd.h> // for isatty()
 
+QString applicationStartDateAndTime;
+
 #if QT_VERSION >= 0x050000
 // Qt5 code:
 void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &msg)
@@ -43,33 +45,34 @@ void customMessageHandler (QtMsgType type, const QMessageLogContext &context, co
 void customMessageHandler (QtMsgType type, const char *msg)
 #endif
 {
-   QString dt = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
-   QString txt = QString ("[%1] ").arg (dt);
+   QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
+   QString text = QString ("[%1] ").arg (dateAndTime);
 
    switch (type)
    {
       case QtDebugMsg:
-         txt += QString ("{Debug} %1").arg (msg);
+         text += QString ("{Debug} %1").arg (msg);
          break;
       case QtWarningMsg:
-         txt += QString ("{Warning} %1").arg (msg);
+         text += QString ("{Warning} %1").arg (msg);
          break;
       case QtCriticalMsg:
-         txt += QString ("{Critical} %1").arg (msg);
+         text += QString ("{Critical} %1").arg (msg);
          break;
       case QtFatalMsg:
-         txt += QString ("{Fatal} %1").arg (msg);
+         text += QString ("{Fatal} %1").arg (msg);
          abort();
          break;
    }
 
    QFile logFile (QDir::toNativeSeparators
                   (QApplication::applicationDirPath()+
-                   QDir::separator()+"peb.log"));
+                   QDir::separator()+
+                   "peb-started-at-"+applicationStartDateAndTime+".log"));
    logFile.open (QIODevice::WriteOnly | QIODevice::Append);
 
    QTextStream textStream (&logFile);
-   textStream << txt << endl;
+   textStream << text << endl;
 }
 
 int main (int argc, char **argv)
@@ -77,15 +80,18 @@ int main (int argc, char **argv)
 
     QApplication application (argc, argv);
 
+    applicationStartDateAndTime =
+            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");;
+
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
 #if QT_VERSION >= 0x050000
-        // Qt5 code:
-        qInstallMessageHandler (customMessageHandler);
+    // Qt5 code:
+    qInstallMessageHandler (customMessageHandler);
 #else
-        // Qt4 code:
-        qInstallMsgHandler (customMessageHandler);
+    // Qt4 code:
+    qInstallMsgHandler (customMessageHandler);
 #endif
 
     // Get current date and time:
