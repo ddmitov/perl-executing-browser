@@ -95,21 +95,28 @@ public slots:
         if (webConnectivityPing.waitForConnected (1000 ))
         {
             qDebug() << "Internet connectivity is available.";
-            qDebug()
-                << "Local IPv4 address for Internet connectivity is:"
-                << webConnectivityPing.localAddress().toString();
-            qDebug()
-                << "Local IPv4 port for Internet connectivity is:"
-                << webConnectivityPing.localPort();
-            qDebug()
-                << "Remote IPv4 address for Internet connectivity is:"
-                << webConnectivityPing.peerAddress().toString();
-            qDebug()
-                << "Remote IPv4 port for Internet connectivity is:"
-                << webConnectivityPing.peerPort();
-            qDebug()
-                << "Remote domain name for Internet connectivity is:"
-                << webConnectivityPing.peerName();
+            QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+            foreach (QNetworkInterface iface, list) {
+                QList<QNetworkAddressEntry> interfaceEntries = iface.addressEntries();
+                foreach (QNetworkAddressEntry entry, interfaceEntries) {
+                    if (entry.ip() == webConnectivityPing.localAddress()) {
+                        qDebug() << "Local interface:" << iface.name();
+                        qDebug() << "Local MAC:" << iface.hardwareAddress();
+                        qDebug() << "Local IP address:" << entry.ip().toString();
+                        qDebug() << "Local netmask:" << entry.netmask().toString();
+                        qDebug() << "Local broadcast address:" << entry.broadcast().toString();
+                        qDebug() << "Local prefix length:" << entry.prefixLength();
+                        qDebug() << "Local port:" << webConnectivityPing.localPort();
+                        qDebug() << "Remote IP address:"
+                            << webConnectivityPing.peerAddress().toString();
+                        qDebug() << "Remote port:"
+                            << webConnectivityPing.peerPort();
+                        qDebug() << "Remote domain name:"
+                            << webConnectivityPing.peerName();
+                    }
+                }
+            }
+
         } else {
             qDebug() << "Internet connectivity is not available.";
         }

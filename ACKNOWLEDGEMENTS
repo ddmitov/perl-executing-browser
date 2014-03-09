@@ -46,6 +46,7 @@
  http://qt-project.org/doc/qt-4.8/qtcpsocket-members.html
  http://qt-project.org/doc/qt-4.8/qregexp.html
  http://qt-project.org/doc/qt-4.8/qfile.html
+ http://qt-project.org/doc/qt-4.8/qnetworkinterface.html
  http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
@@ -81,6 +82,7 @@
  http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character
  http://www.qtcentre.org/threads/14401-QString-how-to-delete-new-lines
  http://www.qtcentre.org/threads/31264-How-to-use-QProcess-to-write-multiple-commands-to-external-console-based-program
+ http://www.qtcentre.org/threads/19583-How-To-Get-System-Network-Interface-List-in-using-qt4-5
  http://www.qtcentre.org/archive/index.php/t-31264.html
  http://www.qtcentre.org/archive/index.php/t-14691.html
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
