@@ -256,6 +256,8 @@ Settings::Settings()
     settingsFileName = QDir::toNativeSeparators
             (QApplication::applicationDirPath()+QDir::separator()+"peb.ini");
     QSettings settings (settingsFileName, QSettings::IniFormat);
+
+    // GUI settings:
     startPage = settings.value ("gui/start_page"). toString();
     icon = settings.value ("gui/icon") .toString();
     windowSize = settings.value ("gui/window_size") .toString();
@@ -263,6 +265,14 @@ Settings::Settings()
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
     browserTitle = settings.value ("gui/browser_title") .toString();
     contextMenu = settings.value ("gui/context_menu") .toString();
+
+    // Local webserver settings:
+    autostartLocalWebserver = settings.value ("local_webserver/autostart") .toString();
+
+    // Ping settings:
+    pingLocalWebserver = settings.value ("ping/ping_local_webserver") .toString();
+    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver") .toString();
+
     iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
                                               QDir::separator()+icon);
 
@@ -293,12 +303,14 @@ Watchdog::Watchdog()
     : QObject (0)
 {
 
-    qDebug() << "Mongoose quit token:" << settings.quitToken;
-    qDebug() << "===============";
+    if (settings.autostartLocalWebserver == "yes") {
+        qDebug() << "Mongoose quit token:" << settings.quitToken;
+        qDebug() << "===============";
 
-    QProcess server;
-    server.startDetached (QString (QApplication::applicationDirPath()+
-                                     QDir::separator()+"mongoose"));
+        QProcess server;
+        server.startDetached (QString (QApplication::applicationDirPath()+
+                                       QDir::separator()+"mongoose"));
+    }
 
     QTimer *timer = new QTimer (this);
     connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));

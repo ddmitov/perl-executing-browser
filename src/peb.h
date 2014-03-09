@@ -63,6 +63,11 @@ public:
     QString browserTitle;
     QString contextMenu;
 
+    QString autostartLocalWebserver;
+
+    QString pingLocalWebserver;
+    QString pingRemoteWebserver;
+
     QString listeningPort;
     QString quitToken;
 
@@ -78,49 +83,63 @@ public slots:
     void pingSlot()
     {
         QTcpSocket localWebServerPing;
-        localWebServerPing.connectToHost ("127.0.0.1", 8080);
         QTcpSocket webConnectivityPing;
-        webConnectivityPing.connectToHost ("www.google.com", 80);
 
-        if (localWebServerPing.waitForConnected (1000) ) {
-            qDebug() << "Local web server is running.";
-        } else {
-            qDebug() << "Local web server is not running. Will try to restart it.";
-            QProcess server;
-            server.startDetached (QString (QApplication::applicationDirPath()+
-                                           QDir::separator()+"mongoose"));
+        if (settings.pingLocalWebserver == "yes") {
+            localWebServerPing.connectToHost ("127.0.0.1", settings.listeningPort.toInt());
         }
-        qDebug() << "===============";
 
-        if (webConnectivityPing.waitForConnected (1000 ))
-        {
-            qDebug() << "Internet connectivity is available.";
-            QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-            foreach (QNetworkInterface iface, list) {
-                QList<QNetworkAddressEntry> interfaceEntries = iface.addressEntries();
-                foreach (QNetworkAddressEntry entry, interfaceEntries) {
-                    if (entry.ip() == webConnectivityPing.localAddress()) {
-                        qDebug() << "Local interface:" << iface.name();
-                        qDebug() << "Local MAC:" << iface.hardwareAddress();
-                        qDebug() << "Local IP address:" << entry.ip().toString();
-                        qDebug() << "Local netmask:" << entry.netmask().toString();
-                        qDebug() << "Local broadcast address:" << entry.broadcast().toString();
-                        qDebug() << "Local prefix length:" << entry.prefixLength();
-                        qDebug() << "Local port:" << webConnectivityPing.localPort();
-                        qDebug() << "Remote IP address:"
-                            << webConnectivityPing.peerAddress().toString();
-                        qDebug() << "Remote port:"
-                            << webConnectivityPing.peerPort();
-                        qDebug() << "Remote domain name:"
-                            << webConnectivityPing.peerName();
-                    }
+        if (settings.pingRemoteWebserver == "yes") {
+            webConnectivityPing.connectToHost ("www.google.com", 80);
+        }
+
+        if (settings.pingLocalWebserver == "yes") {
+            if (localWebServerPing.waitForConnected (1000) ) {
+                qDebug() << "Local web server is running.";
+            } else {
+                if (settings.autostartLocalWebserver == "yes") {
+                    qDebug() << "Local web server is not running. Will try to restart it.";
+                    QProcess server;
+                    server.startDetached (QString (QApplication::applicationDirPath()+
+                                                   QDir::separator()+"mongoose"));
+                } else {
+                    qDebug() << "Local web server is not running.";
                 }
             }
-
-        } else {
-            qDebug() << "Internet connectivity is not available.";
+            qDebug() << "===============";
         }
-        qDebug() << "===============";
+
+        if (settings.pingRemoteWebserver == "yes") {
+            if (webConnectivityPing.waitForConnected (1000 ))
+            {
+                qDebug() << "Internet connectivity is available.";
+                QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
+                foreach (QNetworkInterface iface, list) {
+                    QList<QNetworkAddressEntry> interfaceEntries = iface.addressEntries();
+                    foreach (QNetworkAddressEntry entry, interfaceEntries) {
+                        if (entry.ip() == webConnectivityPing.localAddress()) {
+                            qDebug() << "Local interface:" << iface.name();
+                            qDebug() << "Local MAC:" << iface.hardwareAddress();
+                            qDebug() << "Local IP address:" << entry.ip().toString();
+                            qDebug() << "Local netmask:" << entry.netmask().toString();
+                            qDebug() << "Local broadcast address:" << entry.broadcast().toString();
+                            qDebug() << "Local prefix length:" << entry.prefixLength();
+                            qDebug() << "Local port:" << webConnectivityPing.localPort();
+                            qDebug() << "Remote IP address:"
+                                     << webConnectivityPing.peerAddress().toString();
+                            qDebug() << "Remote port:"
+                                     << webConnectivityPing.peerPort();
+                            qDebug() << "Remote domain name:"
+                                     << webConnectivityPing.peerName();
+                        }
+                    }
+                }
+
+            } else {
+                qDebug() << "Internet connectivity is not available.";
+            }
+            qDebug() << "===============";
+        }
 
     }
 
