@@ -81,7 +81,7 @@ int main (int argc, char **argv)
     QApplication application (argc, argv);
 
     applicationStartDateAndTime =
-            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");;
+            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
@@ -278,6 +278,9 @@ Settings::Settings()
     // Ping settings:
     pingLocalWebserver = settings.value ("ping/ping_local_webserver") .toString();
     pingRemoteWebserver = settings.value ("ping/ping_remote_webserver") .toString();
+
+    // Perl Debugger Settings:
+    debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter") .toString();
 
     iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
                                               QDir::separator()+icon);
@@ -613,7 +616,15 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             if (extension.length() == 0)
                 extension = "pl";
             qDebug() << "Extension:" << extension;
-            defineInterpreterSlot();
+
+            if (settings.debuggerInterpreter == "default") {
+                defineInterpreterSlot();
+            }
+
+            if (settings.debuggerInterpreter == "select") {
+                selectInterpreterSlot();
+            }
+
             qDebug() << "Interpreter:" << interpreter;
 
             debuggerHandler.close();
@@ -622,6 +633,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             QFile debuggerOutputFile (debuggerOutputFilePath);
             if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
+
+            accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             env.insert ("COLUMNS", "80");

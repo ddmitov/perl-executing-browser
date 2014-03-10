@@ -68,6 +68,8 @@ public:
     QString pingLocalWebserver;
     QString pingRemoteWebserver;
 
+    QString debuggerInterpreter;
+
     QString listeningPort;
     QString quitToken;
 
@@ -516,6 +518,38 @@ public slots:
         }
     }
 
+    void selectInterpreterSlot()
+    {
+        QFileDialog selectInterpreterDialog;
+        selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
+        selectInterpreterDialog.setViewMode (QFileDialog::Detail);
+        selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
+        selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectInterpreterDialog.setWindowIcon (QIcon (settings.iconPathName));
+        interpreter = selectInterpreterDialog.getOpenFileName
+                (0, "Select Interpreter", QDir::currentPath(), "All files (*)");
+        qDebug() << "Selected interpreter:" << interpreter;
+        qDebug() << "===============";
+        selectInterpreterDialog.close();
+        selectInterpreterDialog.deleteLater();
+
+        QFileDialog selectPerlLibDialog;
+        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
+        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
+        selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
+        selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectPerlLibDialog.setWindowIcon (QIcon (settings.iconPathName));
+        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
+                (0, "Select PERLLIB", QDir::currentPath());
+        QByteArray perlLibFolderName;
+        perlLibFolderName.append (perlLibFolderNameString);
+        qputenv ("PERLLIB", perlLibFolderName);
+        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+        qDebug() << "===============";
+        selectPerlLibDialog.close();
+        selectPerlLibDialog.deleteLater();
+    }
+
     void displayLongRunningScriptOutputSlot()
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
@@ -582,7 +616,7 @@ public slots:
         regExpTwo.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (regExpTwo, "");
 
-        QRegExp regExpThree ("Enter h or `h h' for help, or `man perldebug' for more help.");
+        QRegExp regExpThree ("Enter h .{40,55}\n");
         regExpThree.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (regExpThree, "");
 
