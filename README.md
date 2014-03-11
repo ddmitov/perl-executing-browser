@@ -95,8 +95,9 @@ Name
 'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although Perl is my programming language of choice, the program is not limited by design to Perl scripting only. My wish is to make a usable, multi-purpose tool, which is flexible and adaptable as much as possible, serving different people with different scripting needs and qualifications.  
 Possible new name: **QtCamel**
   
-Author
+Authors
 ----------------------------------------------------------------------------------------
   
 Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  
+Valcho Nedelchev, 2014  
   
