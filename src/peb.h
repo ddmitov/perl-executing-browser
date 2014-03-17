@@ -8,6 +8,7 @@
 // This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
+// Valcho Nedelchev, 2014
 
 #ifndef PEB_H
 #define PEB_H
@@ -908,6 +909,15 @@ public slots:
         QString dateTimeString = dateTime.toString();
         qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
         qDebug() << "===============";
+    }
+
+    void sslErrors (QNetworkReply* reply, const QList<QSslError> &errors)
+    {
+        foreach (QSslError error, errors)
+        {
+            qDebug() << "SSL error: " << error;
+        }
+        reply->ignoreSslErrors();
     }
 
 public:

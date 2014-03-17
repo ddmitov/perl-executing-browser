@@ -8,6 +8,7 @@
 // This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 // Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
+// Valcho Nedelchev, 2014
 
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
@@ -465,6 +466,12 @@ TopLevel::TopLevel()
     ModifiedNetworkAccessManager *nam = new ModifiedNetworkAccessManager();
     mainPage->setNetworkAccessManager (nam);
 
+    // HTTPS support:
+    QNetworkCookieJar *jar = new QNetworkCookieJar;
+    nam->setCookieJar (jar);
+    QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
+                 this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
+
     //main_page->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
 
     // Configure scroll bars:
@@ -728,7 +735,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
          (! (QUrl (PEB_DOMAIN))
            .isParentOf (request.url())) and
          (! request.url().authority().contains ("localhost")) and
-         (! request.url().authority().contains ("www.perl.org"))) {
+         //(! request.url().authority().contains ("www.perl.org"))) {
+
+        (! request.url().authority().contains ("www.google.com"))) {
+
         QString externalWebLink = request.url().toString();
         qDebug() << "Default browser called for:" << externalWebLink;
         qDebug() << "===============";
@@ -738,7 +748,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Open allowed web site in the same or in a new window:
     if (frame == Page::currentFrame() and
-         request.url().authority().contains ("www.perl.org")) {
+         //request.url().authority().contains ("www.perl.org")) {
+
+        request.url().authority().contains ("www.google.com")) {
+
         QString allowedWebLink = request.url().toString();
         qDebug() << "Allowed web link:" << allowedWebLink;
         qDebug() << "===============";
@@ -746,7 +759,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     }
     if (frame != Page::currentFrame() and
-               request.url().authority().contains ("www.perl.org")) {
+               //request.url().authority().contains ("www.perl.org")) {
+
+        request.url().authority().contains ("www.google.com")) {
+
         qDebug() << "Allowed web link in a new window:" << request.url();
         qDebug() << "===============";
         if (! Page::mainFrame()->childFrames().contains (frame))

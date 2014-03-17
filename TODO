@@ -20,6 +20,8 @@
 
 - temporary folders in /tmp; to be removed immediately after page is loaded
 
+- https support
+
 - default values if INI file is missing or corrupt
 - more config options
 - configuration interface using a script and restart URL

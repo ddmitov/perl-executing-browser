@@ -90,11 +90,13 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.perl.org/index.html'>Allowed External Link in This Browser</a>\n";
+#print "<a href='http://www.perl.org/index.html'>Allowed External Link in This Browser</a>\n";
+print "<a href='https://www.google.com/doodles/finder/'>Allowed External Link in This Browser</a>\n";
 print "</font></p>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "<a href='http://www.perl.org/index.html' target='_blank'>Allowed External Link in a New Window of This Browser</a>\n";
+#print "<a href='http://www.perl.org/index.html' target='_blank'>Allowed External Link in a New Window of This Browser</a>\n";
+print "<a href='https://www.google.com/doodles/finder/' target='_new'>Allowed External Link in a New Window of This Browser</a>\n";
 print "</font></p>\n";
 
 print "<hr width='95%'>\n";
@@ -116,14 +118,6 @@ print "</font></p>\n";
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='openfolder://now'>Open Existing Folder or Create a New One</a>\n";
 print "</font></p>\n";
-
-#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
-#~ print "<a href='newfile://now'>Create New File</a>\n";
-#~ print "</font></p>\n";
-
-#~ print "<p align='center'><font size='5' face='SansSerif'>\n";
-#~ print "<a href='newfolder://now'>Create New Folder</a>\n";
-#~ print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 

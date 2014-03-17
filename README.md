@@ -62,10 +62,15 @@ Limitations
 * No opening of new windows from JavaScript, although opening new windows from hyperlinks using ```target = '_blank'``` attribute is supported.  
 * No support for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
+Security Considerations
+----------------------------------------------------------------------------------------
+  
+Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser.  However, downloading locally executed scripts from remote locations is not supported because of the huge security risks involved. If implemented at all, such a feature has to be subject to special restrictions, limiting the source of locally executed scripts to a trusted location with the use of a secure connection and other authentication measures.  
+  
 History
 ----------------------------------------------------------------------------------------
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation and examples are still missing.  
+PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation is still missing and current examples are basic.  
   
 Compiling
 ----------------------------------------------------------------------------------------
@@ -92,8 +97,9 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 Name
 ----------------------------------------------------------------------------------------
   
-'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although Perl is my programming language of choice, the program is not limited by design to Perl scripting only. My wish is to make a usable, multi-purpose tool, which is flexible and adaptable as much as possible, serving different people with different scripting needs and qualifications.  
-Possible new name: **QtCamel**
+'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although it was started as a tool for the Perl programming language, the program is not limited by design to Perl scripting only. It is developed as a flexible, adaptable and multi-purpose software, serving different people with different scripting needs and qualifications.  
+Possible new names: **QtCamel Browser, QtKangoroo Browser, Qangoroo Browser**  
+Kangoroo-based name was first proposed by the members of Hackafe, the hackerspace of Plovdiv (http://hackafe.org/).  
   
 Authors
 ----------------------------------------------------------------------------------------
