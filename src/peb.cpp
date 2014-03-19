@@ -248,7 +248,7 @@ int main (int argc, char **argv)
 
     // DOCUMENT_ROOT:
     QByteArray documentRoot;
-    documentRoot.append (QApplication::applicationDirPath());
+    documentRoot.append (QDir::toNativeSeparators (QApplication::applicationDirPath()));
     qputenv ("DOCUMENT_ROOT", documentRoot);
 
     // PERLLIB:
