@@ -215,7 +215,6 @@ int main (int argc, char **argv)
 #endif
     path.append (oldPath);
     path.append (pathSeparator);
-
     // Read the INI file for folders to insert into the PATH environment variable:
     QString equalSign = "=";
     QRegExp absolutePath ("^absolute_path");
@@ -409,10 +408,10 @@ Page::Page()
 
     QObject::connect (&longRunningScriptHandler, SIGNAL (readyReadStandardOutput()),
                        this, SLOT (displayLongRunningScriptOutputSlot()));
-    QObject::connect (&longRunningScriptHandler, SIGNAL (finished (int, QProcess::ExitStatus)),
-                       this, SLOT (longRunningScriptFinishedSlot()));
     QObject::connect (&longRunningScriptHandler, SIGNAL (readyReadStandardError()),
                        this, SLOT (displayLongRunningScriptErrorSlot()));
+    QObject::connect (&longRunningScriptHandler, SIGNAL (finished (int, QProcess::ExitStatus)),
+                       this, SLOT (longRunningScriptFinishedSlot()));
 
     QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
                        this, SLOT (displayDebuggerOutputSlot()));
@@ -648,7 +647,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, "Select Perl File", QDir::currentPath(),
                  "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)");
         if (filepath.length() > 1) {
-            qDebug() << "File path:" << QDir::toNativeSeparators (filepath);
+            qDebug() << "File passed to Perl debugger:" << QDir::toNativeSeparators (filepath);
             extension = filepath.section (".", 1, 1);
             if (extension.length() == 0)
                 extension = "pl";
@@ -679,10 +678,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             debuggerHandler.setProcessEnvironment (env);
             //qDebug() << "Process environment:" << debuggerHandler.processEnvironment().toStringList();
 
-//            QFileInfo scriptAbsoluteFilePath (filepath);
-//            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-//            debuggerHandler.setWorkingDirectory (scriptDirectory);
-//            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+            QFileInfo scriptAbsoluteFilePath (filepath);
+            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+            debuggerHandler.setWorkingDirectory (scriptDirectory);
+            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
 
             qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
             qDebug() << "===============";
@@ -762,14 +761,11 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Open not allowed web site using default browser:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("http") and
-         (! (QUrl (PEB_DOMAIN))
-           .isParentOf (request.url())) and
-         (! request.url().authority().contains ("localhost")) and
-         //(! request.url().authority().contains ("www.perl.org"))) {
-
-        (! request.url().authority().contains ("www.google.com"))) {
-
+            request.url().scheme().contains ("http") and
+            (! (QUrl (PEB_DOMAIN))
+             .isParentOf (request.url())) and
+            (! request.url().authority().contains ("localhost")) and
+            (! request.url().authority().contains ("www.google.com"))) {
         QString externalWebLink = request.url().toString();
         qDebug() << "Default browser called for:" << externalWebLink;
         qDebug() << "===============";
@@ -779,10 +775,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Open allowed web site in the same or in a new window:
     if (frame == Page::currentFrame() and
-         //request.url().authority().contains ("www.perl.org")) {
-
-        request.url().authority().contains ("www.google.com")) {
-
+            request.url().authority().contains ("www.google.com")) {
         QString allowedWebLink = request.url().toString();
         qDebug() << "Allowed web link:" << allowedWebLink;
         qDebug() << "===============";
@@ -790,10 +783,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     }
     if (frame != Page::currentFrame() and
-               //request.url().authority().contains ("www.perl.org")) {
-
-        request.url().authority().contains ("www.google.com")) {
-
+            request.url().authority().contains ("www.google.com")) {
         qDebug() << "Allowed web link in a new window:" << request.url();
         qDebug() << "===============";
         if (! Page::mainFrame()->childFrames().contains (frame))
@@ -900,18 +890,20 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         longRunningScriptHandler.setProcessEnvironment (env);
         //qDebug() << "Process environment:" << longRunningScriptHandler.processEnvironment().toStringList();
 
-//        QFileInfo scriptAbsoluteFilePath (filepath);
-//        QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-//        longRunningScriptHandler.setWorkingDirectory (scriptDirectory);
-//        qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+        QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
+                                          (QApplication::applicationDirPath()+
+                                           QDir::separator()+filepath));
+        QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+        longRunningScriptHandler.setWorkingDirectory (scriptDirectory);
+        qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
 
         qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
         qDebug() << "===============";
 
         longRunningScriptHandler.start (interpreter, QStringList() <<
-                                         QDir::toNativeSeparators
+                                        QDir::toNativeSeparators
                                         (QApplication::applicationDirPath()+
-                                             QDir::separator()+filepath));
+                                         QDir::separator()+filepath));
 
             if (frame == Page::currentFrame()) {
                 longRunningScriptOutputInNewWindow = false;

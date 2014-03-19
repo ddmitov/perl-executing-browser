@@ -533,16 +533,10 @@ public slots:
         QString filepathForConversion;
         filepathForConversion = lastRequest.url().path();
 
-//        QString extension = filepathForConversion.section (".", 1, 1);
-//        longRunningScriptOutputFilePath = QDir::toNativeSeparators
-//                //(QDir::tempPath()+QDir::separator()+filepathForConversion
-//                (QDir::tempPath()+filepathForConversion
-//                 .replace (QDir::separator(), "_")
-//                 .replace (QRegExp ("(\\s+)"), "_")
-//                 .replace ("."+extension, "")+
-//                 "_output.htm");
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+ "lroutput.htm");
+                        (QDir::tempPath()+
+                         QDir::separator()+
+                         "lroutput.htm");
 
         QFile longRunningScriptOutputFile (longRunningScriptOutputFilePath);
         if (longRunningScriptOutputFile.exists()) {
@@ -614,17 +608,10 @@ public slots:
         regExpSix.setCaseSensitivity (Qt::CaseSensitive);
         accumulatedOutput.replace (regExpSix, "\n\n");
 
-//        QString filepathForConversion = filepath;
-//        QString extension = filepathForConversion.section (".", 1, 1);
-//        debuggerOutputFilePath = QDir::toNativeSeparators
-//                (QDir::tempPath()+QDir::separator()+filepathForConversion
-//                 .replace (QDir::separator(), "_")
-//                 .replace (QRegExp ("(\\s+)"), "_")
-//                 .replace ("."+extension, "")+
-//                 "_debugger_output.txt" );
-
         debuggerOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+ "deboutput.htm");
+                        (QDir::tempPath()+
+                         QDir::separator()+
+                         "deboutput.txt");
 
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
