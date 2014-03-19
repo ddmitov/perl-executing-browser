@@ -40,14 +40,16 @@ QString applicationStartDateAndTime;
 #if QT_VERSION >= 0x050000
 // Qt5 code:
 void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &msg)
-   Q_UNUSED (context);
 #else
 // Qt4 code:
 void customMessageHandler (QtMsgType type, const char *msg)
 #endif
 {
-   QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
-   QString text = QString ("[%1] ").arg (dateAndTime);
+#if QT_VERSION >= 0x050000
+    Q_UNUSED (context);
+#endif
+    QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
+    QString text = QString ("[%1] ").arg (dateAndTime);
 
    switch (type)
    {
@@ -65,13 +67,11 @@ void customMessageHandler (QtMsgType type, const char *msg)
          abort();
          break;
    }
-
    QFile logFile (QDir::toNativeSeparators
                   (QApplication::applicationDirPath()+
                    QDir::separator()+
                    "peb-started-at-"+applicationStartDateAndTime+".log"));
-   logFile.open (QIODevice::WriteOnly | QIODevice::Append);
-
+   logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
    QTextStream textStream (&logFile);
    textStream << text << endl;
 }
@@ -96,11 +96,10 @@ int main (int argc, char **argv)
 #endif
 
     // Get current date and time:
-    QDateTime dateTime = QDateTime::currentDateTime();
-    QString dateTimeString = dateTime.toString();
+    QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
     qDebug() << "===============";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
-    qDebug() << "Application file path:" << QApplication::applicationFilePath();
+    qDebug() << "Application file path:" << QDir::toNativeSeparators (QApplication::applicationFilePath());
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
@@ -109,6 +108,7 @@ int main (int argc, char **argv)
         qDebug() << "Will start another instance of the program and quit this one.";
         qDebug() << "===============";
 
+#ifndef Q_OS_WIN
         int pid = fork();
         if (pid < 0)
         {
@@ -120,9 +120,9 @@ int main (int argc, char **argv)
         if (pid == 0)
         {
             // Detach all standard I/O descriptors:
-            close(0);
-            close(1);
-            close(2);
+            close (0);
+            close (1);
+            close (2);
             // Enter a new session:
             setsid();
             // New instance is now detached from terminal:
@@ -139,6 +139,7 @@ int main (int argc, char **argv)
             return 1;
             QApplication::exit();
         }
+#endif
 
     } else {
         qDebug() << "Started without terminal or inside Qt Creator.";
@@ -161,6 +162,7 @@ int main (int argc, char **argv)
     if (!settingsFile.exists()) {
         qDebug() << "'peb.ini' is missing. Please restore the missing file.";
         qDebug() << "Exiting.";
+        qDebug() << "===============";
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle ("Critical file missing");
@@ -198,40 +200,65 @@ int main (int argc, char **argv)
     qDebug() << "Application icon:" << settings.iconPathName;
     qDebug() << "===============";
 
-    // Environment variables:
+    // ENVIRONMENT VARIABLES:
+    // PATH:
+    // Get the existing PATH and set the separator sign:
     QByteArray path;
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
-    QByteArray oldPath = qgetenv ("PATH"); //linux
+    QString pathSeparator;
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+    QByteArray oldPath = qgetenv ("PATH");
+    pathSeparator = ":";
 #endif
-#ifdef Q_OS_WIN
-    QByteArray oldPath = qgetenv ("Path"); //win32
+#ifdef Q_OS_WIN // Windows
+    QByteArray oldPath = qgetenv ("Path");
+    pathSeparator = ";";
 #endif
     path.append (oldPath);
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
-    path.append (":"); //linux
+    path.append (pathSeparator);
+
+    // Read the INI file for folders to insert into the PATH environment variable:
+    QString equalSign = "=";
+    QRegExp absolutePath ("^absolute_path");
+    QRegExp relativePath ("^relative_path");
+    if (!settingsFile.open (QIODevice::ReadOnly | QIODevice::Text))
+        return 1;
+    QTextStream settingsStream (&settingsFile);
+    while (!settingsStream.atEnd()) {
+        QString line = settingsStream.readLine();
+        if (line.contains (absolutePath)) {
+            QString absolutePathToAdd = line.section (equalSign, 1, 1);
+            absolutePathToAdd.replace (QString ("\n"), "");
+            path.append (QDir::toNativeSeparators (absolutePathToAdd));
+            path.append (pathSeparator);
+        }
+        if (line.contains (relativePath)) {
+            QString relativePathToAdd = line.section (equalSign, 1, 1);
+            relativePathToAdd.replace (QString ("\n"), "");
+            path.append (QDir::toNativeSeparators (QApplication::applicationDirPath()+
+                                                   QDir::separator()+relativePathToAdd));
+            path.append (pathSeparator);
+        }
+    }
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+    qputenv ("PATH", path);
 #endif
-#ifdef Q_OS_WIN
-    path.append (";"); //win32
+#ifdef Q_OS_WIN // Windows
+    qputenv ("Path", path);
 #endif
-    path.append (QApplication::applicationDirPath());
-    path.append (QDir::separator());
-    path.append ("perl");
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
-    qputenv ("PATH", path); //linux
-#endif
-#ifdef Q_OS_WIN
-    qputenv ("Path", path); //win32
-#endif
+
+    // DOCUMENT_ROOT:
     QByteArray documentRoot;
     documentRoot.append (QApplication::applicationDirPath());
     qputenv ("DOCUMENT_ROOT", documentRoot);
+
+    // PERLLIB:
     QByteArray perlLib;
-    perlLib.append (QApplication::applicationDirPath());
-    perlLib.append (QDir::separator());
-    perlLib.append ("perl");
-    perlLib.append (QDir::separator());
-    perlLib.append ("lib");
+    QString perlLibFullPath = QDir::toNativeSeparators (QApplication::applicationDirPath()+
+                              QDir::separator()+settings.perlLib);
+    perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
+
+    // Browser-specific environment variables:
     qputenv ("FILE_TO_OPEN", "");
     qputenv ("FOLDER_TO_OPEN", "");
     qputenv ("NEW_FILE", "");
@@ -265,23 +292,26 @@ Settings::Settings()
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
     // GUI settings:
-    startPage = settings.value ("gui/start_page"). toString();
-    icon = settings.value ("gui/icon") .toString();
-    windowSize = settings.value ("gui/window_size") .toString();
-    framelessWindow = settings.value ("gui/frameless_window") .toString();
+    startPage = settings.value ("gui/start_page").toString();
+    icon = settings.value ("gui/icon").toString();
+    windowSize = settings.value ("gui/window_size").toString();
+    framelessWindow = settings.value ("gui/frameless_window").toString();
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
-    browserTitle = settings.value ("gui/browser_title") .toString();
-    contextMenu = settings.value ("gui/context_menu") .toString();
+    browserTitle = settings.value ("gui/browser_title").toString();
+    contextMenu = settings.value ("gui/context_menu").toString();
 
     // Local webserver settings:
-    autostartLocalWebserver = settings.value ("local_webserver/autostart") .toString();
+    autostartLocalWebserver = settings.value ("local_webserver/autostart").toString();
 
     // Ping settings:
-    pingLocalWebserver = settings.value ("ping/ping_local_webserver") .toString();
-    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver") .toString();
+    pingLocalWebserver = settings.value ("ping/ping_local_webserver").toString();
+    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver").toString();
 
-    // Perl Debugger Settings:
-    debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter") .toString();
+    // Perl debugger settings:
+    debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
+
+    // Environment settings:
+    perlLib = settings.value ("environment/perllib").toString();
 
     iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
                                               QDir::separator()+icon);
@@ -596,7 +626,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QByteArray folderName;
         folderName.append (folderNameToOpenString);
         qputenv ("FOLDER_TO_OPEN", folderName);
-        qDebug() << "Folder to open:" << folderName;
+        qDebug() << "Folder to open:" << QDir::toNativeSeparators (folderName);
         qDebug() << "===============";
         dialog.close();
         dialog.deleteLater();
@@ -618,7 +648,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, "Select Perl File", QDir::currentPath(),
                  "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)");
         if (filepath.length() > 1) {
-            qDebug() << "File path:" << filepath;
+            qDebug() << "File path:" << QDir::toNativeSeparators (filepath);
             extension = filepath.section (".", 1, 1);
             if (extension.length() == 0)
                 extension = "pl";
@@ -647,14 +677,15 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
             debuggerHandler.setProcessEnvironment (env);
+            //qDebug() << "Process environment:" << debuggerHandler.processEnvironment().toStringList();
 
-            QFileInfo file (filepath);
-            QString fileDirectory = QDir::toNativeSeparators
-                    (file.absoluteDir().absolutePath());
-            qDebug() << "Working directory:" << fileDirectory;
-            qDebug() << "TEMP folder:" << QDir::tempPath();
+//            QFileInfo scriptAbsoluteFilePath (filepath);
+//            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+//            debuggerHandler.setWorkingDirectory (scriptDirectory);
+//            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+
+            qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
             qDebug() << "===============";
-            debuggerHandler.setWorkingDirectory (fileDirectory);
 
             debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
             debuggerHandler.start (interpreter, QStringList() << "-d" <<
@@ -867,15 +898,15 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 .replace ("?", "");
         env.insert ("QUERY_STRING", query);
         longRunningScriptHandler.setProcessEnvironment (env);
+        //qDebug() << "Process environment:" << longRunningScriptHandler.processEnvironment().toStringList();
 
-        QFileInfo file (filepath);
-        QString fileDirectory = QDir::toNativeSeparators
-                (QApplication::applicationDirPath()+
-                    file.absoluteDir().absolutePath());
-        qDebug() << "Working directory:" << fileDirectory;
-        qDebug() << "TEMP folder:" << QDir::tempPath();
+//        QFileInfo scriptAbsoluteFilePath (filepath);
+//        QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+//        longRunningScriptHandler.setWorkingDirectory (scriptDirectory);
+//        qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+
+        qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
         qDebug() << "===============";
-        longRunningScriptHandler.setWorkingDirectory (fileDirectory);
 
         longRunningScriptHandler.start (interpreter, QStringList() <<
                                          QDir::toNativeSeparators

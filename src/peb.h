@@ -41,6 +41,7 @@
 #include <QProcess>
 #include <QPrintDialog>
 #include <QPrinter>
+#include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QDebug>
 
@@ -70,6 +71,8 @@ public:
     QString pingRemoteWebserver;
 
     QString debuggerInterpreter;
+
+    QString perlLib;
 
     QString listeningPort;
     QString quitToken;
@@ -178,7 +181,7 @@ protected:
         // 1.) script used as a start page,
         // 2.) script started in a new window,
         // 3.) script, which was fed with data from local form using CGI GET method,
-        // 4.) script, started by clicking a hyperlink.
+        // 4.) script started by clicking a hyperlink.
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
@@ -188,12 +191,12 @@ protected:
             QString query = request.url()
                     .toString (QUrl::RemoveScheme
                                | QUrl::RemoveAuthority
-                               | QUrl::RemovePath )
+                               | QUrl::RemovePath)
                     .replace ("?", "");
             filepath = request.url()
                     .toString (QUrl::RemoveScheme
                                | QUrl::RemoveAuthority
-                               | QUrl::RemoveQuery );
+                               | QUrl::RemoveQuery);
 
             qDebug() << "Script path:" << QDir::toNativeSeparators
                         (QApplication::applicationDirPath()+filepath);
@@ -227,15 +230,19 @@ protected:
                     env.insert ("REQUEST_METHOD", "GET");
                     env.insert ("QUERY_STRING", query);
                     handler.setProcessEnvironment (env);
+                    //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
                 }
 
-                QFileInfo script (filepath);
-                QString scriptDirectory = QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+
-                         script.absoluteDir().absolutePath());
+                QFileInfo scriptAbsoluteFilePath (QApplication::applicationDirPath()+
+                                                  QDir::separator()+
+                                                  filepath);
+                QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 handler.setWorkingDirectory (scriptDirectory);
-                qDebug() << "Working directory:" << scriptDirectory;
-                qDebug() << "TEMP folder:" << QDir::tempPath();
+                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+
+
+
+                qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
                 handler.start (interpreter, QStringList() <<
                                QDir::toNativeSeparators
@@ -257,15 +264,12 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExpOne ("^Content-type: text/html; charset=\\w*-\\d*\n");
+                QRegExp regExpOne ("Content-type: text/html.{1,25}\n");
                 regExpOne.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpOne, "");
-                QRegExp regExpTwo ("Content-type: text/html");
+                QRegExp regExpTwo ("X-Powered-By: PHP.{1,20}\n");
                 regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpTwo, "");
-                QRegExp regExpThree ("X-Powered-By: PHP.{1,20}\n");
-                regExpThree.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExpThree, "");
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite)) {
                     QTextStream stream (&outputFilePathFile);
@@ -294,7 +298,7 @@ protected:
         // Get data from local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                (QUrl(PEB_DOMAIN))
+                (QUrl (PEB_DOMAIN))
                 .isParentOf (request.url())) {
             QString postData;
             QByteArray outgoingByteArray;
@@ -335,15 +339,16 @@ protected:
                     env.insert ("CONTENT_LENGTH", postDataSize);
                 }
                 handler.setProcessEnvironment (env);
+                //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
 
-                QFileInfo script (filepath);
-                QString scriptDirectory = QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+
-                         script.absoluteDir().absolutePath());
+                QFileInfo scriptAbsoluteFilePath (QApplication::applicationDirPath()+
+                                                  QDir::separator()+
+                                                  filepath);
+                QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 handler.setWorkingDirectory (scriptDirectory);
-                qDebug() << "Working directory:" << scriptDirectory;
+                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
 
-                qDebug() << "TEMP folder:" << QDir::tempPath();
+                qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
                 handler.start (interpreter, QStringList() <<
                                QDir::toNativeSeparators
@@ -369,10 +374,10 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExpOne ("^Content-type: text/html; charset=\\w*-\\d*\n");
+                QRegExp regExpOne ("Content-type: text/html.{1,25}\n");
                 regExpOne.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpOne, "");
-                QRegExp regExpTwo ("^Content-type: text/html");
+                QRegExp regExpTwo ("X-Powered-By: PHP.{1,20}\n");
                 regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpTwo, "");
 
@@ -421,28 +426,13 @@ public slots:
     void defineInterpreterSlot()
     {
         if (extension == "pl") {
-#ifdef Q_OS_WIN
-            interpreter = "perl.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "perl";
-#endif
         }
         if (extension == "php") {
-#ifdef Q_OS_WIN
-            interpreter = "php-cgi.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "php-cgi";
-#endif
         }
         if (extension == "py") {
-#ifdef Q_OS_WIN
-            interpreter = "python.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "python";
-#endif
         }
     }
 
@@ -492,30 +482,16 @@ public slots:
         }
     }
 
-    void defineInterpreterSlot() {
+    void defineInterpreterSlot()
+    {
         if (extension == "pl") {
-#ifdef Q_OS_WIN
-            interpreter = "perl.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "perl";
-#endif
         }
         if (extension == "php") {
-#ifdef Q_OS_WIN
-            interpreter = "php-cgi.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "php-cgi";
-#endif
         }
         if (extension == "py") {
-#ifdef Q_OS_WIN
-            interpreter = "python.exe";
-#endif
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC)
             interpreter = "python";
-#endif
         }
     }
 
@@ -557,13 +533,16 @@ public slots:
         QString filepathForConversion;
         filepathForConversion = lastRequest.url().path();
 
-        QString extension = filepathForConversion.section (".", 1, 1);
+//        QString extension = filepathForConversion.section (".", 1, 1);
+//        longRunningScriptOutputFilePath = QDir::toNativeSeparators
+//                //(QDir::tempPath()+QDir::separator()+filepathForConversion
+//                (QDir::tempPath()+filepathForConversion
+//                 .replace (QDir::separator(), "_")
+//                 .replace (QRegExp ("(\\s+)"), "_")
+//                 .replace ("."+extension, "")+
+//                 "_output.htm");
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
-                (QDir::tempPath()+QDir::separator()+filepathForConversion
-                 .replace (QDir::separator(), "_")
-                 .replace (QRegExp ("(\\s+)"), "_")
-                 .replace ("."+extension, "")+
-                 "_output.htm" );
+                        (QDir::tempPath()+ "lroutput.htm");
 
         QFile longRunningScriptOutputFile (longRunningScriptOutputFilePath);
         if (longRunningScriptOutputFile.exists()) {
@@ -635,14 +614,17 @@ public slots:
         regExpSix.setCaseSensitivity (Qt::CaseSensitive);
         accumulatedOutput.replace (regExpSix, "\n\n");
 
-        QString filepathForConversion = filepath;
-        QString extension = filepathForConversion.section (".", 1, 1);
+//        QString filepathForConversion = filepath;
+//        QString extension = filepathForConversion.section (".", 1, 1);
+//        debuggerOutputFilePath = QDir::toNativeSeparators
+//                (QDir::tempPath()+QDir::separator()+filepathForConversion
+//                 .replace (QDir::separator(), "_")
+//                 .replace (QRegExp ("(\\s+)"), "_")
+//                 .replace ("."+extension, "")+
+//                 "_debugger_output.txt" );
+
         debuggerOutputFilePath = QDir::toNativeSeparators
-                (QDir::tempPath()+QDir::separator()+filepathForConversion
-                 .replace (QDir::separator(), "_")
-                 .replace (QRegExp ("(\\s+)"), "_")
-                 .replace ("."+extension, "")+
-                 "_debugger_output.txt" );
+                        (QDir::tempPath()+ "deboutput.htm");
 
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
@@ -905,8 +887,7 @@ public slots:
 
     void aboutToQuitSlot()
     {
-        QDateTime dateTime = QDateTime::currentDateTime();
-        QString dateTimeString = dateTime.toString();
+        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
         qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
         qDebug() << "===============";
     }
