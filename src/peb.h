@@ -502,7 +502,9 @@ public slots:
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
         selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        selectInterpreterDialog.setWindowIcon (QIcon (settings.iconPathName));
+        QPixmap icon (settings.iconPathName);
+        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
+        selectInterpreterDialog.setWindowIcon (icon);
         interpreter = selectInterpreterDialog.getOpenFileName
                 (0, "Select Interpreter", QDir::currentPath(), "All files (*)");
         qDebug() << "Selected interpreter:" << interpreter;
@@ -515,7 +517,7 @@ public slots:
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
         selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        selectPerlLibDialog.setWindowIcon (QIcon (settings.iconPathName));
+        selectPerlLibDialog.setWindowIcon (icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
                 (0, "Select PERLLIB", QDir::currentPath());
         QByteArray perlLibFolderName;
@@ -749,7 +751,9 @@ public slots:
     void openInNewWindowSlot()
     {
         newWindow = new TopLevel;
-        newWindow->setWindowIcon (QIcon (settings.iconPathName));
+        QPixmap icon (settings.iconPathName);
+        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
+        newWindow->setWindowIcon (icon);
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
         qDebug() << "===============";
         if (qWebHitTestURL.path().contains (".htm")) {
@@ -851,7 +855,9 @@ public slots:
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
         QMessageBox msgBox;
         msgBox.setWindowTitle ("About");
-        msgBox.setIconPixmap (QPixmap (settings.iconPathName));
+        QPixmap icon (settings.iconPathName);
+        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
+        msgBox.setIconPixmap (icon);
         msgBox.setText ("Perl Executing Browser, version 0.1<br>"
                         "code name Camel Calf,<br>"
                         "Qt WebKit version: "+qtWebKitVersion+"<br>"
