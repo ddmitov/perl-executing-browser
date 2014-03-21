@@ -34,6 +34,7 @@
 #include <QDebug>
 #include "peb.h"
 #include <unistd.h> // for isatty()
+#include <iostream> // for std::cout
 
 QString applicationStartDateAndTime;
 
@@ -105,20 +106,29 @@ int main (int argc, char **argv)
 
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
-        qDebug() << "Will start another instance of the program and quit this one.";
-        qDebug() << "===============";
 
 #ifndef Q_OS_WIN
+        std::cout << "Perl Executing Browser v.0.1 started on: "
+                  << dateTimeString.toLocal8Bit().constData() << "\n";
+        std::cout << "Application file path: "
+                  << (QDir::toNativeSeparators (
+                         QApplication::applicationFilePath()).toLocal8Bit().constData())
+                  << std::endl;
+        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << "\n";
+        std::cout << "Qt version: " << QT_VERSION_STR << "\n";
+        std::cout << "Started from terminal." << "\n";
+        std::cout << "Will start another instance of the program and quit this one." << "\n";
+
+        qDebug() << "Will start another instance of the program and quit this one.";
+
         int pid = fork();
-        if (pid < 0)
-        {
+        if (pid < 0) {
             // Report error and exit:
             qDebug() << "PID less than zero. Aborting.";
             return 1;
             QApplication::exit();
         }
-        if (pid == 0)
-        {
+        if (pid == 0) {
             // Detach all standard I/O descriptors:
             close (0);
             close (1);
@@ -132,14 +142,13 @@ int main (int argc, char **argv)
                 return 1;
                 QApplication::exit();
             }
-        }
-        else
-        {
+        } else {
             // The parent instance should be closed now:
             return 1;
             QApplication::exit();
         }
 #endif
+        qDebug() << "===============";
 
     } else {
         qDebug() << "Started without terminal or inside Qt Creator.";
@@ -688,8 +697,13 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+#ifndef Q_OS_WIN
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
+#endif
+
+            //env.insert ("PERLDB_OPTS", "LineInfo=/home/knoppix/github/peb/lineinfo.txt");
+
             debuggerHandler.setProcessEnvironment (env);
             //qDebug() << "Process environment:" << debuggerHandler.processEnvironment().toStringList();
 
