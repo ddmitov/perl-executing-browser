@@ -36,7 +36,7 @@ Features
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* Can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* Can interact with the built-in Perl debugger (Linux and Mac for now). An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 **Configuration & usability:**  
 * Configurable from INI file.  
 * Can print current page by clicking a special URL.  

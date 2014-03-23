@@ -100,7 +100,8 @@ int main (int argc, char **argv)
     QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
     qDebug() << "===============";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
-    qDebug() << "Application file path:" << QDir::toNativeSeparators (QApplication::applicationFilePath());
+    qDebug() << "Application file path:"
+             << QDir::toNativeSeparators (QApplication::applicationFilePath());
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
@@ -109,15 +110,15 @@ int main (int argc, char **argv)
 
 #ifndef Q_OS_WIN
         std::cout << "Perl Executing Browser v.0.1 started on: "
-                  << dateTimeString.toLocal8Bit().constData() << "\n";
+                  << dateTimeString.toLatin1().constData() << std::endl;
         std::cout << "Application file path: "
                   << (QDir::toNativeSeparators (
-                         QApplication::applicationFilePath()).toLocal8Bit().constData())
+                         QApplication::applicationFilePath()).toLatin1().constData())
                   << std::endl;
-        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << "\n";
-        std::cout << "Qt version: " << QT_VERSION_STR << "\n";
-        std::cout << "Started from terminal." << "\n";
-        std::cout << "Will start another instance of the program and quit this one." << "\n";
+        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
+        std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+        std::cout << "Started from terminal." << std::endl;
+        std::cout << "Will start another instance of the program and quit this one." << std::endl;
 
         qDebug() << "Will start another instance of the program and quit this one.";
 
@@ -720,7 +721,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                    QDir::toNativeSeparators (filepath),
                                    QProcess::Unbuffered | QProcess::ReadWrite);
             if (!debuggerHandler.waitForStarted (-1))
-                return 1;
+                return false;
 
             QByteArray debuggerCommand;
             if (request.url().toString().contains ("perl_debugger_list_modules:")) {
