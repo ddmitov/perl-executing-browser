@@ -102,6 +102,17 @@ int main (int argc, char **argv)
     qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
+
+
+//    // http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
+//    // http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
+//    QDir applicationDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+//    applicationDir.cdUp();
+//    applicationDir.cdUp();
+//    QString twoLevelsUp = applicationDir.absolutePath().toLatin1();
+//    qDebug() << "Two Levels Up:" << twoLevelsUp;
+
+
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
@@ -698,13 +709,9 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-#ifndef Q_OS_WIN
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
-#endif
-
             //env.insert ("PERLDB_OPTS", "LineInfo=/home/knoppix/github/peb/lineinfo.txt");
-
             debuggerHandler.setProcessEnvironment (env);
             //qDebug() << "Process environment:" << debuggerHandler.processEnvironment().toStringList();
 
