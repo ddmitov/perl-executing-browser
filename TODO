@@ -20,7 +20,7 @@
 
 - temporary folders in /tmp; to be removed immediately after page is loaded
 
-- https support
+- https support for win32
 
 - default values if INI file is missing or corrupt
 - more config options
