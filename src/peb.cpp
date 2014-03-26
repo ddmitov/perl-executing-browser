@@ -85,6 +85,8 @@ int main (int argc, char **argv)
     applicationStartDateAndTime =
             QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
+    application.setOrganizationName ("PEBDevTeam");
+    //application.setOrganizationDomain ("mysoft.com");
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
@@ -103,7 +105,6 @@ int main (int argc, char **argv)
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
 
-
 //    // http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
 //    // http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
 //    QDir applicationDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
@@ -111,7 +112,6 @@ int main (int argc, char **argv)
 //    applicationDir.cdUp();
 //    QString twoLevelsUp = applicationDir.absolutePath().toLatin1();
 //    qDebug() << "Two Levels Up:" << twoLevelsUp;
-
 
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
@@ -178,12 +178,10 @@ int main (int argc, char **argv)
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
 
     Settings settings;
-    qDebug() << "Settings file:" << settings.settingsFileName;
-    qDebug() << "===============";
 
     QFile settingsFile (settings.settingsFileName);
     if (!settingsFile.exists()) {
-        qDebug() << "'peb.ini' is missing. Please restore the missing file.";
+        qDebug() << settings.settingsFileName << "is missing. Please restore the missing file.";
         qDebug() << "Exiting.";
         qDebug() << "===============";
         QMessageBox msgBox;
@@ -194,11 +192,14 @@ int main (int argc, char **argv)
         msgBox.exec();
         return 1;
         QApplication::exit();
+    } else {
+        qDebug() << "Settings file found:" << settings.settingsFileName;
     }
 
-    QFile startPageFile (QDir::toNativeSeparators
+    QString startPageFileName (QDir::toNativeSeparators
                          (QApplication::applicationDirPath()+
                           QDir::separator()+settings.startPage));
+    QFile startPageFile (startPageFileName);
     if (!startPageFile.exists()) {
         qDebug() << QDir::toNativeSeparators
                     (QApplication::applicationDirPath()+
@@ -217,11 +218,12 @@ int main (int argc, char **argv)
         msgBox.exec();
         return 1;
         QApplication::exit();
+    } else {
+        qDebug() << "Start page found:" << startPageFileName;
+        qDebug() << "===============";
     }
 
-    QPixmap icon (settings.iconPathName);
-    icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-    QApplication::setWindowIcon (icon);
+    QApplication::setWindowIcon (settings.icon);
     qDebug() << "Application icon:" << settings.iconPathName;
     qDebug() << "===============";
 
@@ -290,10 +292,8 @@ int main (int argc, char **argv)
     TopLevel toplevel;
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
-    QObject::connect (qApp, SIGNAL (aboutToQuit()),
-                      &toplevel, SLOT (aboutToQuitSlot()));
 
-    toplevel.setWindowIcon (icon);
+    toplevel.setWindowIcon (settings.icon);
     toplevel.loadStartPageSlot();
     toplevel.show();
 
@@ -302,6 +302,8 @@ int main (int argc, char **argv)
                       &toplevel, SLOT (aboutSlot()));
     QObject::connect (watchdog.quitAction, SIGNAL (triggered()),
                       &toplevel, SLOT (quitApplicationSlot()));
+    QObject::connect (qApp, SIGNAL (aboutToQuit()),
+                      &watchdog, SLOT (aboutToQuitSlot()));
 
     return application.exec();
 
@@ -311,20 +313,26 @@ Settings::Settings()
     : QSettings (0)
 {
 
+    // Settings file:
     settingsFileName = QDir::toNativeSeparators
             (QApplication::applicationDirPath()+QDir::separator()+"peb.ini");
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
-    // GUI settings:
+    // Main window settings:
     startPage = settings.value ("gui/start_page").toString();
-    icon = settings.value ("gui/icon").toString();
     windowSize = settings.value ("gui/window_size").toString();
     framelessWindow = settings.value ("gui/frameless_window").toString();
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
     browserTitle = settings.value ("gui/browser_title").toString();
     contextMenu = settings.value ("gui/context_menu").toString();
 
-    // Local webserver settings:
+    // Icon:
+    QString iconRelativePathName = settings.value ("gui/icon").toString();
+    iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
+                                              QDir::separator()+iconRelativePathName);
+    icon.load (iconPathName);
+
+    // Local webserver general settings:
     autostartLocalWebserver = settings.value ("local_webserver/autostart").toString();
 
     // Ping settings:
@@ -337,9 +345,7 @@ Settings::Settings()
     // Environment settings:
     perlLib = settings.value ("environment/perllib").toString();
 
-    iconPathName = QDir::toNativeSeparators (QApplication::applicationDirPath() +
-                                              QDir::separator()+icon);
-
+    // Mongoose local web server settings:
     mongooseSettingsFileName = QDir::toNativeSeparators
             (QApplication::applicationDirPath()+QDir::separator()+"mongoose.conf");
     QFile mongooseSettingsFile (mongooseSettingsFileName);
@@ -382,9 +388,7 @@ Watchdog::Watchdog()
 
     trayIcon = new QSystemTrayIcon();
 
-    QPixmap icon (settings.iconPathName);
-    icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-    trayIcon->setIcon (icon);
+    trayIcon->setIcon (settings.icon);
     trayIcon->setToolTip ("Camel Calf");
 
     aboutAction = new QAction (tr ("&About"), this);
@@ -603,9 +607,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setViewMode (QFileDialog::Detail);
         dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        dialog.setWindowIcon (icon);
+        dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getOpenFileName
                 (0, "Select File", QDir::currentPath(), "All files (*)");
         QByteArray fileName;
@@ -626,9 +628,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setViewMode (QFileDialog::Detail);
         dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        dialog.setWindowIcon (icon);
+        dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getSaveFileName
                 (0, "Create New File", QDir::currentPath(), "All files (*)");
         if (fileNameToOpenString.isEmpty())
@@ -651,9 +651,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setViewMode (QFileDialog::Detail);
         dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        dialog.setWindowIcon (icon);
+        dialog.setWindowIcon (settings.icon);
         QString folderNameToOpenString = dialog.getExistingDirectory
                 (0, "Select Folder", QDir::currentPath());
         QByteArray folderName;
@@ -675,9 +673,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setViewMode (QFileDialog::Detail);
         dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        dialog.setWindowIcon (icon);
+        dialog.setWindowIcon (settings.icon);
         filepath = "";
         filepath = dialog.getOpenFileName
                 (0, "Select Perl File", QDir::currentPath(),
@@ -748,9 +744,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             debuggerHandler.write (debuggerCommand);
 
             newDebuggerWindow = new TopLevel;
-            QPixmap icon (settings.iconPathName);
-            icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-            newDebuggerWindow->setWindowIcon (icon);
+            newDebuggerWindow->setWindowIcon (settings.icon);
         }
 
         QWebSettings::clearMemoryCaches();
@@ -794,7 +788,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("quit:")) {
         qDebug() << "Application termination requested from URL.";
-        qDebug() << "Exiting.";
         emit quitFromURLSignal();
     }
 
@@ -828,9 +821,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         if (! Page::mainFrame()->childFrames().contains (frame))
         {
             newWindow = new TopLevel;
-            QPixmap icon (settings.iconPathName);
-            icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-            newWindow->setWindowIcon (icon);
+            newWindow->setWindowIcon (settings.icon);
             newWindow->setUrl (request.url());
             newWindow->show();
         }
@@ -864,9 +855,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                     return true;
                 } else {
                     newWindow = new TopLevel;
-                    QPixmap icon (settings.iconPathName);
-                    icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-                    newWindow->setWindowIcon (icon);
+                    newWindow->setWindowIcon (settings.icon);
                     if (request.url().path().contains (".htm")) {
                         newWindow->setUrl (QUrl::fromLocalFile
                                              (QDir::toNativeSeparators
@@ -955,9 +944,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 longRunningScriptOutputInNewWindow = true;
                 lastRequest = request;
                 newLongRunWindow = new TopLevel;
-                QPixmap icon (settings.iconPathName);
-                icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-                newLongRunWindow->setWindowIcon (icon);
+                newLongRunWindow->setWindowIcon (settings.icon);
             }
 
             QWebSettings::clearMemoryCaches();

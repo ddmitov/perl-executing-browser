@@ -13,7 +13,7 @@
 #ifndef PEB_H
 #define PEB_H
 
-// The domain of Perl Executing Browser
+// The domain of Perl Executing Browser:
 #ifndef PEB_DOMAIN
 #define PEB_DOMAIN "http://perl-executing-browser-pseudodomain/"
 #endif
@@ -45,6 +45,20 @@
 #include <QSystemTrayIcon>
 #include <QDebug>
 
+
+//class RootFolder : public QObject
+//{
+//    Q_OBJECT
+
+//public:
+
+//    RootFolder ();
+
+//    QString rootFolder;
+
+//};
+
+
 class Settings : public QSettings
 {
     Q_OBJECT
@@ -57,13 +71,14 @@ public:
     QString mongooseSettingsFileName;
 
     QString startPage;
-    QString icon;
-    QString iconPathName;
     QString windowSize;
     QString framelessWindow;
     QString stayOnTop;
     QString browserTitle;
     QString contextMenu;
+
+    QString iconPathName;
+    QPixmap icon;
 
     QString autostartLocalWebserver;
 
@@ -146,7 +161,14 @@ public slots:
             }
             qDebug() << "===============";
         }
+    }
 
+    void aboutToQuitSlot()
+    {
+        trayIcon->hide();
+        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+        qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
+        qDebug() << "===============";
     }
 
 public:
@@ -502,9 +524,7 @@ public slots:
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
         selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        selectInterpreterDialog.setWindowIcon (icon);
+        selectInterpreterDialog.setWindowIcon (settings.icon);
         interpreter = selectInterpreterDialog.getOpenFileName
                 (0, "Select Interpreter", QDir::currentPath(), "All files (*)");
         qDebug() << "Selected interpreter:" << interpreter;
@@ -517,7 +537,7 @@ public slots:
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
         selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        selectPerlLibDialog.setWindowIcon (icon);
+        selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
                 (0, "Select PERLLIB", QDir::currentPath());
         QByteArray perlLibFolderName;
@@ -751,9 +771,7 @@ public slots:
     void openInNewWindowSlot()
     {
         newWindow = new TopLevel;
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        newWindow->setWindowIcon (icon);
+        newWindow->setWindowIcon (settings.icon);
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
         qDebug() << "===============";
         if (qWebHitTestURL.path().contains (".htm")) {
@@ -855,9 +873,7 @@ public slots:
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
         QMessageBox msgBox;
         msgBox.setWindowTitle ("About");
-        QPixmap icon (settings.iconPathName);
-        icon.setMask (icon.createMaskFromColor (QColor (255, 255, 255)));
-        msgBox.setIconPixmap (icon);
+        msgBox.setIconPixmap (settings.icon);
         msgBox.setText ("Perl Executing Browser, version 0.1<br>"
                         "code name Camel Calf,<br>"
                         "Qt WebKit version: "+qtWebKitVersion+"<br>"
@@ -878,17 +894,9 @@ public slots:
         QApplication::exit();
     }
 
-    void aboutToQuitSlot()
-    {
-        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-        qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
-        qDebug() << "===============";
-    }
-
     void sslErrors (QNetworkReply* reply, const QList<QSslError> &errors)
     {
-        foreach (QSslError error, errors)
-        {
+        foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;
         }
         reply->ignoreSslErrors();
