@@ -46,17 +46,18 @@
 #include <QDebug>
 
 
-//class RootFolder : public QObject
-//{
-//    Q_OBJECT
+class RootDir : public QObject
+{
+    Q_OBJECT
 
-//public:
+public:
 
-//    RootFolder ();
+    RootDir ();
 
-//    QString rootFolder;
+    QString rootDirName;
+    QDir rootDir;
 
-//};
+};
 
 
 class Settings : public QSettings
@@ -120,8 +121,9 @@ public slots:
             } else {
                 if (settings.autostartLocalWebserver == "yes") {
                     qDebug() << "Local web server is not running. Will try to restart it.";
+                    RootDir rootDir;
                     QProcess server;
-                    server.startDetached (QString (QApplication::applicationDirPath()+
+                    server.startDetached (QString (rootDir.rootDirName+
                                                    QDir::separator()+"mongoose"));
                 } else {
                     qDebug() << "Local web server is not running.";
@@ -204,6 +206,7 @@ protected:
         // 2.) script started in a new window,
         // 3.) script, which was fed with data from local form using CGI GET method,
         // 4.) script started by clicking a hyperlink.
+        RootDir rootDir;
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
@@ -221,10 +224,10 @@ protected:
                                | QUrl::RemoveQuery);
 
             qDebug() << "Script path:" << QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath);
+                        (rootDir.rootDirName+filepath);
 
             QFile file (QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath));
+                        (rootDir.rootDirName+filepath));
             if (!file.exists()) {
                 missingFileMessageSlot();
                 QNetworkRequest emptyRequest;
@@ -255,7 +258,7 @@ protected:
                     //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
                 }
 
-                QFileInfo scriptAbsoluteFilePath (QApplication::applicationDirPath()+
+                QFileInfo scriptAbsoluteFilePath (rootDir.rootDirName+
                                                   QDir::separator()+
                                                   filepath);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
@@ -268,7 +271,7 @@ protected:
                 qDebug() << "===============";
                 handler.start (interpreter, QStringList() <<
                                QDir::toNativeSeparators
-                               (QApplication::applicationDirPath() +
+                               (rootDir.rootDirName+
                                 QDir::separator()+filepath));
 
                 QString output;
@@ -336,10 +339,10 @@ protected:
                     .toString (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery);
 
             qDebug() << "Script path:" << QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath);
+                        (rootDir.rootDirName+filepath);
 
             QFile file (QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath));
+                        (rootDir.rootDirName+filepath));
             if (!file.exists()) {
                 missingFileMessageSlot();
                 QNetworkRequest emptyRequest;
@@ -363,7 +366,7 @@ protected:
                 handler.setProcessEnvironment (env);
                 //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
 
-                QFileInfo scriptAbsoluteFilePath (QApplication::applicationDirPath()+
+                QFileInfo scriptAbsoluteFilePath (rootDir.rootDirName+
                                                   QDir::separator()+
                                                   filepath);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
@@ -374,7 +377,7 @@ protected:
                 qDebug() << "===============";
                 handler.start (interpreter, QStringList() <<
                                QDir::toNativeSeparators
-                               (QApplication::applicationDirPath()+
+                               (rootDir.rootDirName+
                                 QDir::separator()+filepath));
                 if (postData.size() > 0) {
                     handler.write (outgoingByteArray);
@@ -435,11 +438,12 @@ public slots:
 
     void missingFileMessageSlot()
     {
+        RootDir rootDir;
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle ("Missing file");
         msgBox.setText (QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath)+
+                        (rootDir.rootDirName+filepath)+
                         " is missing.<br>Please restore the missing file.");
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
@@ -480,16 +484,17 @@ public slots:
 
     void missingFileMessageSlot()
     {
+        RootDir rootDir;
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle ("Missing file");
         msgBox.setText (QDir::toNativeSeparators
-                        (QApplication::applicationDirPath()+filepath)+
+                        (rootDir.rootDirName+filepath)+
                         " is missing.<br>Please restore the missing file.");
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
         qDebug() << QDir::toNativeSeparators
-                    (QApplication::applicationDirPath()+filepath) <<
+                    (rootDir.rootDirName+filepath) <<
                     "is missing.";
         qDebug() << "Please restore the missing file.";
         qDebug() << "===============";
@@ -497,8 +502,9 @@ public slots:
 
     void checkFileExistenceSlot()
     {
+        RootDir rootDir;
         QFile file (QDir::toNativeSeparators
-                    (QApplication::applicationDirPath()+filepath));
+                    (rootDir.rootDirName+filepath));
         if (!file.exists()) {
             missingFileMessageSlot();
         }
@@ -698,10 +704,11 @@ public slots:
 
     void loadStartPageSlot()
     {
+        RootDir rootDir;
         if (settings.startPage.contains (".htm")) {
             setUrl (QUrl::fromLocalFile
                     (QDir::toNativeSeparators
-                     (QApplication::applicationDirPath()+
+                     (rootDir.rootDirName+
                       QDir::separator()+settings.startPage)));
         } else {
             setUrl (QUrl (QString (PEB_DOMAIN +
@@ -757,8 +764,9 @@ public slots:
 
     void editSlot()
     {
+        RootDir rootDir;
         QString fileToEdit = QDir::toNativeSeparators
-                (QApplication::applicationDirPath()+
+                (rootDir.rootDirName+
                  QDir::separator()+qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery)
                  .replace ("?", ""));
@@ -770,13 +778,14 @@ public slots:
 
     void openInNewWindowSlot()
     {
+        RootDir rootDir;
         newWindow = new TopLevel;
         newWindow->setWindowIcon (settings.icon);
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
         qDebug() << "===============";
         if (qWebHitTestURL.path().contains (".htm")) {
             QString fileToOpen = QDir::toNativeSeparators
-                    (QApplication::applicationDirPath()+
+                    (rootDir.rootDirName+
                      QDir::separator()+qWebHitTestURL.toString
                      (QUrl::RemoveScheme | QUrl::RemoveAuthority));
             newWindow->setUrl (QUrl::fromLocalFile (fileToOpen));

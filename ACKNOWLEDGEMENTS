@@ -90,6 +90,7 @@
  http://www.qtcentre.org/archive/index.php/t-14691.html
  http://www.qtcentre.org/threads/15425-Transparency-in-Icons
  http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout
+ http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
  http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
@@ -126,6 +127,7 @@
  http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
  http://stackoverflow.com/questions/12927273/how-to-get-local-ip-address-of-a-computer-using-qt
  http://stackoverflow.com/questions/8362506/qwebview-qt-webkit-wont-open-some-ssl-pages-redirects-not-allowed
+ http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
