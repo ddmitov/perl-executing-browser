@@ -40,7 +40,7 @@ QString applicationStartDateAndTime;
 
 #if QT_VERSION >= 0x050000
 // Qt5 code:
-void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &msg)
+void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &message)
 #else
 // Qt4 code:
 void customMessageHandler (QtMsgType type, const char *message)
