@@ -40,7 +40,8 @@ QString applicationStartDateAndTime;
 
 #if QT_VERSION >= 0x050000
 // Qt5 code:
-void customMessageHandler (QtMsgType type, const QMessageLogContext &context, const QString &message)
+void customMessageHandler (QtMsgType type, const QMessageLogContext &context,
+                           const QString &message)
 #else
 // Qt4 code:
 void customMessageHandler (QtMsgType type, const char *message)
@@ -68,9 +69,9 @@ void customMessageHandler (QtMsgType type, const char *message)
          abort();
          break;
    }
-   RootDir rootDir;
+   Settings settings;
    QFile logFile (QDir::toNativeSeparators
-                  (rootDir.rootDirName+
+                  (settings.rootDirName+
                    QDir::separator()+
                    "peb-started-at-"+applicationStartDateAndTime+".log"));
    logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
@@ -86,7 +87,7 @@ int main (int argc, char **argv)
     applicationStartDateAndTime =
             QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
-    application.setOrganizationName ("PEBDevTeam");
+    application.setOrganizationName ("PEB-Dev-Team");
     //application.setOrganizationDomain ("mysoft.com");
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
@@ -159,10 +160,6 @@ int main (int argc, char **argv)
         qDebug() << "===============";
     }
 
-    RootDir rootDir;
-    qDebug() << "Root folder:" << rootDir.rootDirName;
-    qDebug() << "===============";
-
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
 #else
@@ -174,6 +171,8 @@ int main (int argc, char **argv)
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
 
     Settings settings;
+    qDebug() << "Root folder:" << settings.rootDirName;
+    qDebug() << "===============";
 
     QFile settingsFile (settings.settingsFileName);
     if (!settingsFile.exists()) {
@@ -193,7 +192,7 @@ int main (int argc, char **argv)
     }
 
     QString startPageFileName (QDir::toNativeSeparators
-                         (rootDir.rootDirName+
+                         (settings.rootDirName+
                           QDir::separator()+settings.startPage));
     QFile startPageFile (startPageFileName);
     if (!startPageFile.exists()) {
@@ -252,7 +251,7 @@ int main (int argc, char **argv)
         if (line.contains (relativePath)) {
             QString relativePathToAdd = line.section (equalSign, 1, 1);
             relativePathToAdd.replace (QString ("\n"), "");
-            path.append (QDir::toNativeSeparators (rootDir.rootDirName+
+            path.append (QDir::toNativeSeparators (settings.rootDirName+
                                                    QDir::separator()+relativePathToAdd));
             path.append (pathSeparator);
         }
@@ -266,13 +265,13 @@ int main (int argc, char **argv)
 
     // DOCUMENT_ROOT:
     QByteArray documentRoot;
-    documentRoot.append (QDir::toNativeSeparators (rootDir.rootDirName));
+    documentRoot.append (QDir::toNativeSeparators (settings.rootDirName));
     qputenv ("DOCUMENT_ROOT", documentRoot);
 
     // PERLLIB:
     QByteArray perlLib;
     QString perlLibFullPath = QDir::toNativeSeparators (
-                rootDir.rootDirName+QDir::separator()+settings.perlLib);
+                settings.rootDirName+QDir::separator()+settings.perlLib);
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
 
@@ -301,10 +300,11 @@ int main (int argc, char **argv)
 
 }
 
-RootDir::RootDir()
-    : QObject (0)
+Settings::Settings()
+    : QSettings (0)
 {
 
+    // Root directory:
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
         rootDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
@@ -316,17 +316,9 @@ RootDir::RootDir()
     rootDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
     rootDirName = rootDir.absolutePath().toLatin1();
 
-}
-
-Settings::Settings()
-    : QSettings (0)
-{
-
-    RootDir rootDir;
-
     // Settings file:
     settingsFileName = QDir::toNativeSeparators
-            (rootDir.rootDirName+QDir::separator()+"peb.ini");
+            (rootDirName+QDir::separator()+"peb.ini");
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
     // Main window settings:
@@ -340,7 +332,7 @@ Settings::Settings()
     // Icon:
     QString iconRelativePathName = settings.value ("gui/icon").toString();
     iconPathName = QDir::toNativeSeparators (
-                rootDir.rootDirName+QDir::separator()+iconRelativePathName);
+                rootDirName+QDir::separator()+iconRelativePathName);
     icon.load (iconPathName);
 
     // Local webserver general settings:
@@ -358,7 +350,7 @@ Settings::Settings()
 
     // Mongoose local web server settings:
     mongooseSettingsFileName = QDir::toNativeSeparators
-            (rootDir.rootDirName+QDir::separator()+"mongoose.conf");
+            (rootDirName+QDir::separator()+"mongoose.conf");
     QFile mongooseSettingsFile (mongooseSettingsFileName);
     QRegExp space ("\\s");
     QRegExp listeningPortRegExp ("^listening_port");
@@ -388,10 +380,9 @@ Watchdog::Watchdog()
         qDebug() << "Mongoose quit token:" << settings.quitToken;
         qDebug() << "===============";
 
-        RootDir rootDir;
         QProcess server;
         server.startDetached (QString (
-                                  rootDir.rootDirName+QDir::separator()+"mongoose"));
+                                  settings.rootDirName+QDir::separator()+"mongoose"));
     }
 
     QTimer *timer = new QTimer (this);
@@ -582,8 +573,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                      const QNetworkRequest &request,
                                      QWebPage::NavigationType navigationType)
 {
-
-    RootDir rootDir;
 
     // Open local file using default application:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -863,7 +852,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                    | QUrl::RemoveQuery
                                    | QUrl::RemoveFragment);
                 QFile file (QDir::toNativeSeparators
-                            (rootDir.rootDirName+filepath));
+                            (settings.rootDirName+filepath));
                 if (!file.exists()) {
                     missingFileMessageSlot();
                     return true;
@@ -873,7 +862,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                     if (request.url().path().contains (".htm")) {
                         newWindow->setUrl (QUrl::fromLocalFile
                                              (QDir::toNativeSeparators
-                                              (rootDir.rootDirName+
+                                              (settings.rootDirName+
                                                QDir::separator()+request.url().path())));
                     } else {
                         newWindow->setUrl (request.url());
@@ -896,11 +885,11 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                            | QUrl::RemoveQuery
                            | QUrl::RemoveFragment);
         qDebug() << "HTML file path:" << QDir::toNativeSeparators
-                    (rootDir.rootDirName+filepath);
+                    (settings.rootDirName+filepath);
         checkFileExistenceSlot();
         frame->load (QUrl::fromLocalFile
                        (QDir::toNativeSeparators
-                        (rootDir.rootDirName+
+                        (settings.rootDirName+
                                 QDir::separator()+filepath)));
         qDebug() << "===============";
         QWebSettings::clearMemoryCaches();
@@ -918,7 +907,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                            | QUrl::RemoveAuthority
                            | QUrl::RemoveQuery);
         qDebug() << "File path:" << QDir::toNativeSeparators
-                    (rootDir.rootDirName+filepath);
+                    (settings.rootDirName+filepath);
         checkFileExistenceSlot();
         extension = filepath.section (".", 1, 1);
         qDebug() << "Extension:" << extension;
@@ -937,7 +926,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         //qDebug() << "Process environment:" << longRunningScriptHandler.processEnvironment().toStringList();
 
         QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
-                                          (rootDir.rootDirName+
+                                          (settings.rootDirName+
                                            QDir::separator()+filepath));
         QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
         longRunningScriptHandler.setWorkingDirectory (scriptDirectory);
@@ -948,7 +937,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
         longRunningScriptHandler.start (interpreter, QStringList() <<
                                         QDir::toNativeSeparators
-                                        (rootDir.rootDirName+
+                                        (settings.rootDirName+
                                          QDir::separator()+filepath));
 
             if (frame == Page::currentFrame()) {

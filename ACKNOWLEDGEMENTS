@@ -128,6 +128,7 @@
  http://stackoverflow.com/questions/12927273/how-to-get-local-ip-address-of-a-computer-using-qt
  http://stackoverflow.com/questions/8362506/qwebview-qt-webkit-wont-open-some-ssl-pages-redirects-not-allowed
  http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
+ http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -137,5 +138,9 @@
  http://msturm.p7.de/programming_qprocess.php
  http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
  http://mvclogic.com/qt/qt-code-example-new-file-open-file-save-file-save-as-file-file-print-print-preview-file-print-preview-print-preview/
+ http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
+ http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
+ http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
+ http://iconverticons.com/online/
  http://en.wikipedia.org/wiki/Common_Gateway_Interface
  http://en.wikipedia.org/wiki/INI_file
