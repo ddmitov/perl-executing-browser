@@ -109,10 +109,11 @@ int main (int argc, char **argv)
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
+#ifndef Q_OS_WIN
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
+        qDebug() << "Will start another instance of the program and quit this one.";
 
-#ifndef Q_OS_WIN
         std::cout << "Perl Executing Browser v.0.1 started on: "
                   << dateTimeString.toLatin1().constData() << std::endl;
         std::cout << "Application file path: "
@@ -123,8 +124,6 @@ int main (int argc, char **argv)
         std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
         std::cout << "Started from terminal." << std::endl;
         std::cout << "Will start another instance of the program and quit this one." << std::endl;
-
-        qDebug() << "Will start another instance of the program and quit this one.";
 
         int pid = fork();
         if (pid < 0) {
@@ -152,13 +151,14 @@ int main (int argc, char **argv)
             return 1;
             QApplication::exit();
         }
-#endif
+
         qDebug() << "===============";
 
     } else {
         qDebug() << "Started without terminal or inside Qt Creator.";
         qDebug() << "===============";
     }
+#endif
 
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
@@ -176,7 +176,10 @@ int main (int argc, char **argv)
 
     QFile settingsFile (settings.settingsFileName);
     if (!settingsFile.exists()) {
-        qDebug() << settings.settingsFileName << "is missing. Please restore the missing file.";
+        qDebug() << "===============";
+        qDebug() << QDir::toNativeSeparators (settings.settingsFileName)
+                 << "is missing.";
+        qDebug() << "Please restore the missing file.";
         qDebug() << "Exiting.";
         qDebug() << "===============";
         QMessageBox msgBox;
@@ -196,10 +199,12 @@ int main (int argc, char **argv)
                           QDir::separator()+settings.startPage));
     QFile startPageFile (startPageFileName);
     if (!startPageFile.exists()) {
-        qDebug() << QDir::toNativeSeparators (startPageFileName) <<
-                    "is missing.";
+        qDebug() << "===============";
+        qDebug() << QDir::toNativeSeparators (startPageFileName)
+                 << "is missing.";
         qDebug() << "Please restore the missing start page.";
         qDebug() << "Exiting.";
+        qDebug() << "===============";
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle ("Missing start page");
@@ -304,22 +309,30 @@ Settings::Settings()
     : QSettings (0)
 {
 
-    // Root directory:
+    // Settings folder:
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        rootDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
-        rootDir.cdUp();
-        rootDir.cdUp();
-        rootDirName = rootDir.absolutePath().toLatin1();
+        iniDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+        iniDir.cdUp();
+        iniDir.cdUp();
+        rootDirName = iniDir.absolutePath().toLatin1();
     }
 #endif
-    rootDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
-    rootDirName = rootDir.absolutePath().toLatin1();
+    iniDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+    iniDirName = iniDir.absolutePath().toLatin1();
 
     // Settings file:
     settingsFileName = QDir::toNativeSeparators
-            (rootDirName+QDir::separator()+"peb.ini");
+            (iniDirName+QDir::separator()+"peb.ini");
     QSettings settings (settingsFileName, QSettings::IniFormat);
+
+    // Browser root directory:
+    QString rootDirNameSetting = settings.value ("root_directory/path").toString();
+    if (rootDirNameSetting == "current") {
+        rootDirName = iniDirName;
+    } else {
+        rootDirName = rootDirNameSetting;
+    }
 
     // Main window settings:
     startPage = settings.value ("gui/start_page").toString();

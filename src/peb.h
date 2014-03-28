@@ -53,8 +53,10 @@ public:
 
     Settings ();
 
+    QString iniDirName;
+    QDir iniDir;
+
     QString rootDirName;
-    QDir rootDir;
 
     QString settingsFileName;
     QString mongooseSettingsFileName;
