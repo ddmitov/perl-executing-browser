@@ -1,7 +1,7 @@
 #! /bin/sh
 
 echo "Perl Executing Browser DMG Packer, v.0.1"
-echo "Usage: makedmg peb.app"
+echo "Usage: makedmg.sh peb.app"
 echo " "
 
 if [ -z "$QTDIR" ]; then
