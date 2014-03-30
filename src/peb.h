@@ -51,7 +51,7 @@ class Settings : public QSettings
 
 public:
 
-    Settings ();
+    Settings();
 
     QString iniDirName;
     QDir iniDir;
@@ -60,6 +60,9 @@ public:
 
     QString settingsFileName;
     QString mongooseSettingsFileName;
+
+    QString debuggerInterpreter;
+    QString perlLib;
 
     QString startPage;
     QString windowSize;
@@ -71,14 +74,10 @@ public:
     QString iconPathName;
     QPixmap icon;
 
-    QString autostartLocalWebserver;
-
     QString pingLocalWebserver;
     QString pingRemoteWebserver;
 
-    QString debuggerInterpreter;
-
-    QString perlLib;
+    QString autostartLocalWebserver;
 
     QString listeningPort;
     QString quitToken;
@@ -230,7 +229,7 @@ protected:
 
             extension = filepath.section (".", 1, 1);
             qDebug() << "Extension:" << extension;
-            defineInterpreterSlot ();
+            defineInterpreter ();
 
             if (extension == "pl" or extension == "php" or extension == "py")
             {
@@ -342,7 +341,7 @@ protected:
 
             extension = filepath.section (".", 1, 1);
             qDebug() << "Extension:" << extension;
-            defineInterpreterSlot();
+            defineInterpreter();
             if (extension == "pl" or extension == "php" or extension == "py") {
                 qDebug() << "Interpreter:" << interpreter;
                 QProcess handler;
@@ -438,16 +437,22 @@ public slots:
         msgBox.exec();
     }
 
-    void defineInterpreterSlot()
+    void defineInterpreter()
     {
         if (extension == "pl") {
-            interpreter = "perl";
-        }
-        if (extension == "php") {
-            interpreter = "php-cgi";
+            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+            QString perlInterpreter (perlInterpreterByteArray);
+            interpreter = perlInterpreter;
         }
         if (extension == "py") {
-            interpreter = "python";
+            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
+            QString pythonInterpreter (pythonInterpreterByteArray);
+            interpreter = pythonInterpreter;
+        }
+        if (extension == "php") {
+            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
+            QString phpInterpreter (phpInterpreterByteArray);
+            interpreter = phpInterpreter;
         }
     }
 
@@ -497,16 +502,22 @@ public slots:
         }
     }
 
-    void defineInterpreterSlot()
+    void defineInterpreter()
     {
         if (extension == "pl") {
-            interpreter = "perl";
-        }
-        if (extension == "php") {
-            interpreter = "php-cgi";
+            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+            QString perlInterpreter (perlInterpreterByteArray);
+            interpreter = perlInterpreter;
         }
         if (extension == "py") {
-            interpreter = "python";
+            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
+            QString pythonInterpreter (pythonInterpreterByteArray);
+            interpreter = pythonInterpreter;
+        }
+        if (extension == "php") {
+            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
+            QString phpInterpreter (phpInterpreterByteArray);
+            interpreter = phpInterpreter;
         }
     }
 

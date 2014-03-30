@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/bin/sh
 
 echo "Perl Executing Browser DMG Packer, v.0.1"
 echo "Usage: makedmg.sh peb.app"

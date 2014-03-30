@@ -108,6 +108,20 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='selectperl://now'>Select Perl Interpreter</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='selectpython://now'>Select Python Interpreter</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='selectphp://now'>Select PHP Interpreter</a>\n";
+print "</font></p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='newfile://now'>Create New File</a>\n";
 print "</font></p>\n";
 

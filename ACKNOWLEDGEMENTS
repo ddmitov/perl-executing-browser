@@ -36,6 +36,13 @@
  http://cesanta.com/docs.html?Mongoose.md
  https://github.com/cesanta/mongoose
 
+ Thanks to Leon Anavi, Valentin Alexiev, Stefan Chekanov, Rangel Ivanov, Philip Georgiev,
+ karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,
+ for beeing welcoming host of the first public presentation of Perl Executing Browser
+ on the 2nd of March 2014 and for their helpfull proposals.
+ http://hackafe.org/
+ http://www.youtube.com/watch?v=Z9mVQzHqcKo (in Bulgarian)
+
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
  http://qt-project.org/doc/qt-4.8/qwebhistory.html
  http://qt-project.org/doc/qt-4.8/qdir.html
@@ -91,6 +98,8 @@
  http://www.qtcentre.org/threads/15425-Transparency-in-Icons
  http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout
  http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
+ http://www.qtcentre.org/threads/19676-qgetenv-and-special-chars
+ http://www.qtcentre.org/threads/10661-QByteArray-to-QString
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
  http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView

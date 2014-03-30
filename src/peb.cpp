@@ -36,7 +36,8 @@
 #include <unistd.h> // for isatty()
 #include <iostream> // for std::cout
 
-QString applicationStartDateAndTime;
+static QString applicationStartDateAndTime =
+        QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -50,6 +51,7 @@ void customMessageHandler (QtMsgType type, const char *message)
 #if QT_VERSION >= 0x050000
     Q_UNUSED (context);
 #endif
+
     QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
     QString text = QString ("[%1] ").arg (dateAndTime);
 
@@ -70,10 +72,12 @@ void customMessageHandler (QtMsgType type, const char *message)
          break;
    }
    Settings settings;
+
    QFile logFile (QDir::toNativeSeparators
                   (settings.rootDirName+
                    QDir::separator()+
-                   "peb-started-at-"+applicationStartDateAndTime+".log"));
+                   "peb-started-at-"+
+                   applicationStartDateAndTime+".log"));
    logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
    QTextStream textStream (&logFile);
    textStream << text << endl;
@@ -84,11 +88,8 @@ int main (int argc, char **argv)
 
     QApplication application (argc, argv);
 
-    applicationStartDateAndTime =
-            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
-
     application.setOrganizationName ("PEB-Dev-Team");
-    //application.setOrganizationDomain ("mysoft.com");
+    //application.setOrganizationDomain ("peb.org");
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
@@ -281,6 +282,9 @@ int main (int argc, char **argv)
     qputenv ("PERLLIB", perlLib);
 
     // Browser-specific environment variables:
+    qputenv ("PERL_INTERPRETER", "");
+    qputenv ("PYTHON_INTERPRETER", "");
+    qputenv ("PHP_INTERPRETER", "");
     qputenv ("FILE_TO_OPEN", "");
     qputenv ("FOLDER_TO_OPEN", "");
     qputenv ("NEW_FILE", "");
@@ -334,32 +338,52 @@ Settings::Settings()
         rootDirName = rootDirNameSetting;
     }
 
-    // Main window settings:
-    startPage = settings.value ("gui/start_page").toString();
-    windowSize = settings.value ("gui/window_size").toString();
-    framelessWindow = settings.value ("gui/frameless_window").toString();
-    stayOnTop = settings.value ("gui/stay_on_top") .toString();
-    browserTitle = settings.value ("gui/browser_title").toString();
-    contextMenu = settings.value ("gui/context_menu").toString();
+    // Environment settings:
+    perlLib = settings.value ("environment/perllib").toString();
 
-    // Icon:
-    QString iconRelativePathName = settings.value ("gui/icon").toString();
-    iconPathName = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+iconRelativePathName);
-    icon.load (iconPathName);
-
-    // Local webserver general settings:
-    autostartLocalWebserver = settings.value ("local_webserver/autostart").toString();
-
-    // Ping settings:
-    pingLocalWebserver = settings.value ("ping/ping_local_webserver").toString();
-    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver").toString();
+    // Interpreters:
+    QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+    QString perlInterpreter (perlInterpreterByteArray);
+    if (perlInterpreter.length() == 0) {
+        QString defaultPerlInterpreter = settings.value ("interpreters/perl").toString();
+        if (defaultPerlInterpreter == "system") {
+            qputenv ("PERL_INTERPRETER", "perl");
+        } else {
+            QByteArray perlInterpreterByteArray;
+            perlInterpreterByteArray.append (defaultPerlInterpreter);
+            qputenv ("PERL_INTERPRETER", perlInterpreterByteArray);
+        }
+    }
+    QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
+    QString pythonInterpreter (pythonInterpreterByteArray);
+    if (pythonInterpreter.length() == 0) {
+        QString defaultPythonInterpreter = settings.value ("interpreters/python").toString();
+        if (defaultPythonInterpreter == "system") {
+            qputenv ("PYTHON_INTERPRETER", "python");
+        } else {
+            QByteArray pythonInterpreterByteArray;
+            pythonInterpreterByteArray.append (defaultPythonInterpreter);
+            qputenv ("PYTHON_INTERPRETER", pythonInterpreterByteArray);
+        }
+    }
+    QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
+    QString phpInterpreter (phpInterpreterByteArray);
+    if (phpInterpreter.length() == 0) {
+        QString defaultPhpInterpreter = settings.value ("interpreters/php").toString();
+        if (defaultPhpInterpreter == "system") {
+            qputenv ("PHP_INTERPRETER", "php");
+        } else {
+            QByteArray phpInterpreterByteArray;
+            phpInterpreterByteArray.append (defaultPhpInterpreter);
+            qputenv ("PHP_INTERPRETER", phpInterpreterByteArray);
+        }
+    }
 
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
 
-    // Environment settings:
-    perlLib = settings.value ("environment/perllib").toString();
+    // Local webserver general settings:
+    autostartLocalWebserver = settings.value ("local_webserver/autostart").toString();
 
     // Mongoose local web server settings:
     mongooseSettingsFileName = QDir::toNativeSeparators
@@ -383,6 +407,24 @@ Settings::Settings()
         }
     }
 
+    // Ping settings:
+    pingLocalWebserver = settings.value ("ping/ping_local_webserver").toString();
+    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver").toString();
+
+    // GUI settings:
+    startPage = settings.value ("gui/start_page").toString();
+    windowSize = settings.value ("gui/window_size").toString();
+    framelessWindow = settings.value ("gui/frameless_window").toString();
+    stayOnTop = settings.value ("gui/stay_on_top") .toString();
+    browserTitle = settings.value ("gui/browser_title").toString();
+    contextMenu = settings.value ("gui/context_menu").toString();
+
+    // Icon:
+    QString iconRelativePathName = settings.value ("gui/icon").toString();
+    iconPathName = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+iconRelativePathName);
+    icon.load (iconPathName);
+
 }
 
 Watchdog::Watchdog()
@@ -403,7 +445,6 @@ Watchdog::Watchdog()
     timer->start (5000);
 
     trayIcon = new QSystemTrayIcon();
-
     trayIcon->setIcon (settings.icon);
     trayIcon->setToolTip ("Camel Calf");
 
@@ -614,6 +655,68 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return false;
     }
 
+    // Select Perl interpreter:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().toString().contains ("selectperl:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (settings.icon);
+        QString perlInterpreter = dialog.getOpenFileName
+                (0, "Select Perl Interpreter", QDir::currentPath(), "All files (*)");
+        dialog.close();
+        dialog.deleteLater();
+        QByteArray perlInterpreterByteArray;
+        perlInterpreterByteArray.append (perlInterpreter);
+        qputenv ("PERL_INTERPRETER", perlInterpreterByteArray);
+        qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+        qDebug() << "===============";
+        return true;
+    }
+
+    // Select Python interpreter:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().toString().contains ("selectpython:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (settings.icon);
+        QString pythonInterpreter = dialog.getOpenFileName
+                (0, "Select Python Interpreter", QDir::currentPath(), "All files (*)");
+        dialog.close();
+        dialog.deleteLater();
+        QByteArray pythonInterpreterByteArray;
+        pythonInterpreterByteArray.append (pythonInterpreter);
+        qputenv ("PYTHON_INTERPRETER", pythonInterpreterByteArray);
+        qDebug() << "Selected Python interpreter:" << pythonInterpreter;
+        qDebug() << "===============";
+        return true;
+    }
+
+    // Select PHP interpreter:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().toString().contains ("selectphp:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (settings.icon);
+        QString phpInterpreter = dialog.getOpenFileName
+                (0, "Select PHP Interpreter", QDir::currentPath(), "All files (*)");
+        dialog.close();
+        dialog.deleteLater();
+        QByteArray phpInterpreterByteArray;
+        phpInterpreterByteArray.append (phpInterpreter);
+        qputenv ("PHP_INTERPRETER", phpInterpreterByteArray);
+        qDebug() << "Selected PHP interpreter:" << phpInterpreter;
+        qDebug() << "===============";
+        return true;
+    }
 
     // Invoke 'Open file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -626,13 +729,13 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getOpenFileName
                 (0, "Select File", QDir::currentPath(), "All files (*)");
+        dialog.close();
+        dialog.deleteLater();
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
         qputenv ("FILE_TO_OPEN", fileName);
         qDebug() << "File to open:" << fileName;
         qDebug() << "===============";
-        dialog.close();
-        dialog.deleteLater();
         return true;
     }
 
@@ -649,13 +752,13 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, "Create New File", QDir::currentPath(), "All files (*)");
         if (fileNameToOpenString.isEmpty())
             return false;
+        dialog.close();
+        dialog.deleteLater();
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
         qputenv ("NEW_FILE", fileName);
         qDebug() << "New file:" << fileName;
         qDebug() << "===============";
-        dialog.close();
-        dialog.deleteLater();
         return true;
     }
 
@@ -670,13 +773,13 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowIcon (settings.icon);
         QString folderNameToOpenString = dialog.getExistingDirectory
                 (0, "Select Folder", QDir::currentPath());
+        dialog.close();
+        dialog.deleteLater();
         QByteArray folderName;
         folderName.append (folderNameToOpenString);
         qputenv ("FOLDER_TO_OPEN", folderName);
         qDebug() << "Folder to open:" << QDir::toNativeSeparators (folderName);
         qDebug() << "===============";
-        dialog.close();
-        dialog.deleteLater();
         return true;
     }
 
@@ -694,6 +797,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         filepath = dialog.getOpenFileName
                 (0, "Select Perl File", QDir::currentPath(),
                  "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)");
+        dialog.close();
+        dialog.deleteLater();
         if (filepath.length() > 1) {
             qDebug() << "File passed to Perl debugger:" << QDir::toNativeSeparators (filepath);
             extension = filepath.section (".", 1, 1);
@@ -702,7 +807,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             qDebug() << "Extension:" << extension;
 
             if (settings.debuggerInterpreter == "default") {
-                defineInterpreterSlot();
+                defineInterpreter();
             }
 
             if (settings.debuggerInterpreter == "select") {
@@ -924,7 +1029,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         checkFileExistenceSlot();
         extension = filepath.section (".", 1, 1);
         qDebug() << "Extension:" << extension;
-        defineInterpreterSlot();
+        defineInterpreter();
         qDebug() << "Interpreter:" << interpreter;
 
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
