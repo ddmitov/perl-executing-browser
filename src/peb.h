@@ -64,6 +64,14 @@ public:
     QString debuggerInterpreter;
     QString perlLib;
 
+    QString pingLocalWebserver;
+    QString pingRemoteWebserver;
+
+    QString autostartLocalWebserver;
+
+    QString listeningPort;
+    QString quitToken;
+
     QString startPage;
     QString windowSize;
     QString framelessWindow;
@@ -74,13 +82,8 @@ public:
     QString iconPathName;
     QPixmap icon;
 
-    QString pingLocalWebserver;
-    QString pingRemoteWebserver;
-
-    QString autostartLocalWebserver;
-
-    QString listeningPort;
-    QString quitToken;
+    QString logging;
+    QString logFile;
 
 };
 

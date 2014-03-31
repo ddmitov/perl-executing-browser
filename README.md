@@ -99,7 +99,7 @@ Name
   
 'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although it was started as a tool for the Perl programming language, the program is not limited by design to Perl scripting only. It is developed as a flexible, adaptable and multi-purpose software, serving different people with different scripting needs and qualifications.  
 Possible new names: **QtCamel Browser, QtKangoroo Browser, Qangoroo Browser**  
-Kangoroo-based name was first proposed by the members of Hackafe, the hackerspace of Plovdiv (http://hackafe.org/).  
+Kangoroo-based name was first proposed by Stefan Chekanov and supported by other members of Hackafe, the hackerspace of Plovdiv. (http://hackafe.org/).  
   
 Authors
 ----------------------------------------------------------------------------------------

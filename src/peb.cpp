@@ -71,16 +71,28 @@ void customMessageHandler (QtMsgType type, const char *message)
          abort();
          break;
    }
-   Settings settings;
 
-   QFile logFile (QDir::toNativeSeparators
-                  (settings.rootDirName+
-                   QDir::separator()+
-                   "peb-started-at-"+
-                   applicationStartDateAndTime+".log"));
-   logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-   QTextStream textStream (&logFile);
-   textStream << text << endl;
+   Settings settings;
+   if (settings.logFile == "single") {
+       QFile logFile (QDir::toNativeSeparators
+                      (settings.rootDirName+
+                       QDir::separator()+
+                       "peb.log"));
+       logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+       QTextStream textStream (&logFile);
+       textStream << text << endl;
+   }
+   if (settings.logFile == "per_session") {
+       QFile logFile (QDir::toNativeSeparators
+                      (settings.rootDirName+
+                       QDir::separator()+
+                       "peb-started-at-"+
+                       applicationStartDateAndTime+".log"));
+       logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+       QTextStream textStream (&logFile);
+       textStream << text << endl;
+   }
+
 }
 
 int main (int argc, char **argv)
@@ -93,13 +105,17 @@ int main (int argc, char **argv)
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
+    Settings settings;
+
+    if (settings.logging == "yes") {
 #if QT_VERSION >= 0x050000
-    // Qt5 code:
-    qInstallMessageHandler (customMessageHandler);
+        // Qt5 code:
+        qInstallMessageHandler (customMessageHandler);
 #else
-    // Qt4 code:
-    qInstallMsgHandler (customMessageHandler);
+        // Qt4 code:
+        qInstallMsgHandler (customMessageHandler);
 #endif
+    }
 
     // Get current date and time:
     QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
@@ -171,7 +187,6 @@ int main (int argc, char **argv)
     emptyTransparentIcon.fill (Qt::transparent);
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
 
-    Settings settings;
     qDebug() << "Root folder:" << settings.rootDirName;
     qDebug() << "===============";
 
@@ -424,6 +439,10 @@ Settings::Settings()
     iconPathName = QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+iconRelativePathName);
     icon.load (iconPathName);
+
+    // Logging:
+    logging = settings.value ("logging/enable").toString();
+    logFile = settings.value ("logging/file").toString();
 
 }
 
@@ -806,7 +825,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 extension = "pl";
             qDebug() << "Extension:" << extension;
 
-            if (settings.debuggerInterpreter == "default") {
+            if (settings.debuggerInterpreter == "current") {
                 defineInterpreter();
             }
 

@@ -1,40 +1,43 @@
 
+Permanent TODO priorities:
 - more and better examples
-
 - documentation, commented code
-
 =============
 
-- log file settings - enable or disable log; log file rotation or accumulation of data in a single file
-
-- dialog to select and execute scripts from any folder
-
-- check for STDERR from scripts, if any - display message
-
-- check if long-running script is not already started
-- independent settings for main window and long-running scripts window
-
-- switching between different Perl distributions (system Perl vs. user selected Perl)
-
-- detect file type by reading the shebang line
-
-- temporary folders in /tmp; to be removed immediately after page is loaded
-
+Security:
 - https support for win32
 
+All locally executed scripts:
+- dialog to select and execute scripts from any folder
+- detect file type by reading the shebang line
+
+CGI-like locally executed scripts:
+- non-blocking execution using signals and slots
+- check for STDERR from scripts, if any - display message
+- display 'Working...' page before output is ready
+
+Long-running scripts:
+- check if long-running script is not already started
+- independent settings for main window and long-running scripts window
+- temporary folders in /tmp
+
+Perl debugger interaction:
+- option to display debugger output in HTML
+- 'Save Page As' dialog to save debugger output in a file
+
+Extensibility:
+- Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
+- internal cron using script started by the browser
+
+Configuration:
 - default values if INI file is missing or corrupt
 - more config options
 - configuration interface using a script and restart URL
 - command line arguments
 
+i18n:
 - frameless QWebView-based message boxes
+- i18n in all native dialogs
 
-- i18n
-
+GUI:
 - application icon & info on win32
-
-- display 'Loading...' page before page is fully loaded
-
-- Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
-
-- internal cron using script started by the browser
