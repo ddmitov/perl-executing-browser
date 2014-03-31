@@ -131,16 +131,19 @@ int main (int argc, char **argv)
         qDebug() << "Started from terminal.";
         qDebug() << "Will start another instance of the program and quit this one.";
 
-        std::cout << "Perl Executing Browser v.0.1 started on: "
-                  << dateTimeString.toLatin1().constData() << std::endl;
-        std::cout << "Application file path: "
-                  << (QDir::toNativeSeparators (
-                         QApplication::applicationFilePath()).toLatin1().constData())
-                  << std::endl;
-        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
-        std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-        std::cout << "Started from terminal." << std::endl;
-        std::cout << "Will start another instance of the program and quit this one." << std::endl;
+        if (settings.logging == "yes") {
+            std::cout << "Perl Executing Browser v.0.1 started on: "
+                      << dateTimeString.toLatin1().constData() << std::endl;
+            std::cout << "Application file path: "
+                      << (QDir::toNativeSeparators (
+                              QApplication::applicationFilePath()).toLatin1().constData())
+                      << std::endl;
+            std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
+            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+            std::cout << "Started from terminal." << std::endl;
+            std::cout << "Will start another instance of the program and quit this one."
+                      << std::endl;
+        }
 
         int pid = fork();
         if (pid < 0) {
