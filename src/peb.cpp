@@ -36,7 +36,7 @@
 #include <unistd.h> // for isatty()
 #include <iostream> // for std::cout
 
-static QString applicationStartDateAndTime =
+static QString applicationStartForLogFileName =
         QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
 #if QT_VERSION >= 0x050000
@@ -87,7 +87,7 @@ void customMessageHandler (QtMsgType type, const char *message)
                       (settings.rootDirName+
                        QDir::separator()+
                        "peb-started-at-"+
-                       applicationStartDateAndTime+".log"));
+                       applicationStartForLogFileName+".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
        textStream << text << endl;
@@ -117,10 +117,43 @@ int main (int argc, char **argv)
 #endif
     }
 
-    // Get current date and time:
-    QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+    // Get current date and time for the log file and the command line output:
+    QString applicationStartForLogging = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+
+    // Display command line help:
+    QStringList arguments = QCoreApplication::arguments();
+    foreach (QString argument, arguments){
+        if (argument.contains ("--help") or argument.contains ("-h")) {
+            std::cout << " " << std::endl;
+            std::cout << "Perl Executing Browser v.0.1 started on: "
+                      << applicationStartForLogging.toLatin1().constData() << std::endl;
+            std::cout << "Application file path: "
+                      << (QDir::toNativeSeparators (
+                              QApplication::applicationFilePath()).toLatin1().constData())
+                      << std::endl;
+            std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
+            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "Usage:" << std::endl;
+            std::cout << "  peb --option=value -o=value" << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "Command line options:" << std::endl;
+            std::cout << "  --root -r    absolute path of the browser root folder"
+                      << std::endl;
+            std::cout << "  --help -h    this help"
+                      << std::endl;
+            std::cout << " " << std::endl;
+            QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+            qDebug() << "Perl Executing Browser v.0.1 displayed help and terminated normally on:"
+                     << dateTimeString;
+            qDebug() << "===============";
+            return 1;
+            QApplication::exit();
+        }
+    }
+
     qDebug() << "===============";
-    qDebug() << "Perl Executing Browser v.0.1 started on:" << dateTimeString;
+    qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogging;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
@@ -132,17 +165,20 @@ int main (int argc, char **argv)
         qDebug() << "Will start another instance of the program and quit this one.";
 
         if (settings.logging == "yes") {
+            std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
-                      << dateTimeString.toLatin1().constData() << std::endl;
+                      << applicationStartForLogging.toLatin1().constData() << std::endl;
             std::cout << "Application file path: "
                       << (QDir::toNativeSeparators (
                               QApplication::applicationFilePath()).toLatin1().constData())
                       << std::endl;
             std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
             std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+            std::cout << " " << std::endl;
             std::cout << "Started from terminal." << std::endl;
             std::cout << "Will start another instance of the program and quit this one."
                       << std::endl;
+            std::cout << " " << std::endl;
         }
 
         int pid = fork();
@@ -161,7 +197,8 @@ int main (int argc, char **argv)
             setsid();
             // New instance is now detached from terminal:
             QProcess anotherInstance;
-            anotherInstance.startDetached (QApplication::applicationFilePath());
+            anotherInstance.startDetached (
+                        QApplication::applicationFilePath(), arguments);
             if (anotherInstance.waitForStarted (-1)) {
                 return 1;
                 QApplication::exit();
@@ -446,6 +483,14 @@ Settings::Settings()
     // Logging:
     logging = settings.value ("logging/enable").toString();
     logFile = settings.value ("logging/file").toString();
+
+    // Command line options
+    QStringList arguments = QCoreApplication::arguments();
+    foreach (QString argument, arguments){
+        if (argument.contains ("--root") or argument.contains ("-r")) {
+            rootDirName = argument.section ("=", 1, 1);
+        }
+    }
 
 }
 
