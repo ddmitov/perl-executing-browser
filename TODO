@@ -2,7 +2,7 @@
 Permanent TODO priorities:
 - more and better examples
 - documentation, commented code
-=============
+======================
 
 Security:
 - https support for win32
@@ -25,6 +25,10 @@ Perl debugger interaction:
 - option to display debugger output in HTML
 - 'Save Page As' dialog to save debugger output in a file
 
+Connectivity:
+- Configuration option for a custom User Agent
+- Message when network connectivity is lost or restored
+
 Extensibility:
 - Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
 - internal cron using script started by the browser
@@ -32,7 +36,7 @@ Extensibility:
 Configuration:
 - default values if INI file is missing or corrupt
 - more config options
-- configuration interface using a script and restart URL
+- configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 - command line arguments
 
 i18n:
@@ -40,4 +44,5 @@ i18n:
 - i18n in all native dialogs
 
 GUI:
+- configuration option to select a skin for all local pages in the browser
 - application icon & info on win32

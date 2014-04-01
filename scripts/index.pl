@@ -2,8 +2,8 @@
 
 # UTF-8 encoded file
 
-#use strict;
-#use warnings;
+use strict;
+use warnings;
 
 print "Content-type: text/html; charset=utf-8\n\n";
 
