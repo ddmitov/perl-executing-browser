@@ -10,6 +10,7 @@ Security:
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
 - detect file type by reading the shebang line
+- temporary folders
 
 CGI-like locally executed scripts:
 - non-blocking execution using signals and slots
@@ -18,8 +19,8 @@ CGI-like locally executed scripts:
 
 Long-running scripts:
 - check if long-running script is not already started
+- check for STDERR from scripts, if any - display message
 - independent settings for main window and long-running scripts window
-- temporary folders in /tmp
 
 Perl debugger interaction:
 - option to display debugger output in HTML
@@ -34,9 +35,9 @@ Extensibility:
 - internal cron using script started by the browser
 
 Configuration:
+- more INI file options
 - more command line arguments
 - default values if INI file is missing or corrupt
-- more config options
 - configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 
 GUI:

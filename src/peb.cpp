@@ -751,7 +751,23 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         perlInterpreterByteArray.append (perlInterpreter);
         qputenv ("PERL_INTERPRETER", perlInterpreterByteArray);
         qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+
+        QFileDialog selectPerlLibDialog;
+        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
+        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
+        selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
+        selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectPerlLibDialog.setWindowIcon (settings.icon);
+        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
+                (0, "Select PERLLIB", QDir::currentPath());
+        selectPerlLibDialog.close();
+        selectPerlLibDialog.deleteLater();
+        QByteArray perlLibFolderName;
+        perlLibFolderName.append (perlLibFolderNameString);
+        qputenv ("PERLLIB", perlLibFolderName);
+        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
         qDebug() << "===============";
+
         return true;
     }
 
