@@ -138,9 +138,11 @@ int main (int argc, char **argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --root -r    absolute path of the browser root folder"
+            std::cout << "  --root      -r    absolute path of the browser root folder"
                       << std::endl;
-            std::cout << "  --help -h    this help"
+            std::cout << "  --webserver -w    start a local webserver with the browser: 'yes' or 'no'"
+                      << std::endl;
+            std::cout << "  --help      -h    this help"
                       << std::endl;
             std::cout << " " << std::endl;
             QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
@@ -156,6 +158,13 @@ int main (int argc, char **argv)
     qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogging;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
+    QString allArguments;
+    foreach (QString argument, arguments){
+                     allArguments.append (argument);
+                     allArguments.append (" ");
+                 }
+    allArguments.replace (QRegExp ("\\s$"), "");
+    qDebug() << "Command line:" << allArguments;
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
@@ -489,6 +498,9 @@ Settings::Settings()
     foreach (QString argument, arguments){
         if (argument.contains ("--root") or argument.contains ("-r")) {
             rootDirName = argument.section ("=", 1, 1);
+        }
+        if (argument.contains ("--webserver") or argument.contains ("-w")) {
+            autostartLocalWebserver = argument.section ("=", 1, 1);
         }
     }
 
