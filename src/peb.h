@@ -64,10 +64,10 @@ public:
     QString debuggerInterpreter;
     QString perlLib;
 
+    QString autostartLocalWebserver;
     QString pingLocalWebserver;
     QString pingRemoteWebserver;
-
-    QString autostartLocalWebserver;
+    QString userAgent;
 
     QString listeningPort;
     QString quitToken;
@@ -671,8 +671,10 @@ private:
     QString userAgentForUrl (const QUrl &url) const
     {
         Q_UNUSED (url);
-        return "Mozilla/5.0 AppleWebKit/534.34 (KHTML, like Gecko) "
-                "PerlExecutingBrowser/0.1 Safari/534.34";
+        Settings settings;
+        return settings.userAgent;
+//        return "Mozilla/5.0 AppleWebKit/534.34 (KHTML, like Gecko) "
+//                "PerlExecutingBrowser/0.1 Safari/534.34";
     }
 
     Settings settings;

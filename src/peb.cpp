@@ -446,10 +446,13 @@ Settings::Settings()
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
 
-    // Local webserver general settings:
-    autostartLocalWebserver = settings.value ("local_webserver/autostart").toString();
+    // Networking:
+    autostartLocalWebserver = settings.value ("networking/autostart").toString();
+    pingLocalWebserver = settings.value ("networking/ping_local_webserver").toString();
+    pingRemoteWebserver = settings.value ("networking/ping_remote_webserver").toString();
+    userAgent = settings.value ("networking/user_agent").toString();
 
-    // Mongoose local web server settings:
+    // Read Mongoose local web server settings from its own configuration file:
     mongooseSettingsFileName = QDir::toNativeSeparators
             (rootDirName+QDir::separator()+"mongoose.conf");
     QFile mongooseSettingsFile (mongooseSettingsFileName);
@@ -471,9 +474,7 @@ Settings::Settings()
         }
     }
 
-    // Ping settings:
-    pingLocalWebserver = settings.value ("ping/ping_local_webserver").toString();
-    pingRemoteWebserver = settings.value ("ping/ping_remote_webserver").toString();
+
 
     // GUI settings:
     startPage = settings.value ("gui/start_page").toString();
