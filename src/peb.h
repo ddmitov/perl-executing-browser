@@ -18,16 +18,7 @@
 #define PEB_DOMAIN "http://perl-executing-browser-pseudodomain/"
 #endif
 
-#include <qglobal.h>
-#if QT_VERSION >= 0x050000
-// Qt5 code:
-#include <QtWidgets>
-#else
-// Qt4 code:
-#include <QtGui>
 #include <QApplication>
-#endif
-
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
@@ -39,11 +30,24 @@
 #include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QTcpSocket>
 #include <QProcess>
-#include <QPrintDialog>
-#include <QPrinter>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QMenu>
+#include <QDesktopWidget>
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QDebug>
+
+#include <qglobal.h>
+#if QT_VERSION >= 0x050000
+// Qt5 code:
+#include <QtPrintSupport/QPrinter>
+#include <QtPrintSupport/QPrintDialog>
+#else
+// Qt4 code:
+#include <QPrintDialog>
+#include <QPrinter>
+#endif
 
 class Settings : public QSettings
 {
@@ -53,16 +57,15 @@ public:
 
     Settings();
 
-    QString iniDirName;
-    QDir iniDir;
-
     QString rootDirName;
 
     QString settingsFileName;
+    QString settingsDirName;
+    QDir settingsDir;
     QString mongooseSettingsFileName;
 
-    QString debuggerInterpreter;
     QString perlLib;
+    QString debuggerInterpreter;
 
     QString autostartLocalWebserver;
     QString pingLocalWebserver;

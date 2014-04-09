@@ -3,6 +3,7 @@ TEMPLATE = app
 TARGET = peb
 DEPENDPATH += .
 CONFIG += openssl-linked
+VERSION = 0.1
 
 # Mac specific settings:
 macx {
@@ -17,6 +18,10 @@ macx {
   ICON = camel.icns
 }
 
+win32 {
+  RC_FILE = peb.rc
+}
+
 # Qt4 specific settings:
 lessThan (QT_MAJOR_VERSION, 5) {
   QT += webkit
@@ -24,9 +29,13 @@ lessThan (QT_MAJOR_VERSION, 5) {
 
 # Qt5 specific settings:
 greaterThan (QT_MAJOR_VERSION, 4) {
-  QT += widgets webkitwidgets
+  QT += widgets webkitwidgets printsupport
   DEFINES += HAVE_QT5
 }
 
 HEADERS += peb.h
 SOURCES += peb.cpp
+
+OTHER_FILES += \
+    peb.rc \
+    camel.ico

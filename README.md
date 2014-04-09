@@ -50,6 +50,18 @@ Features
 * Output from local scripts, local and allowed web pages can be opened in new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
   
+Compile-time Requirements
+----------------------------------------------------------------------------------------
+  
+Compiled and tested successfully using:  
+* Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux  
+(main development and testing platform),  
+* Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
+* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
+* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
+* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5.  
+Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
+  
 Runtime Requirements
 ----------------------------------------------------------------------------------------
   
@@ -75,18 +87,6 @@ History
 ----------------------------------------------------------------------------------------
   
 PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation is still missing and current examples are basic.  
-  
-Compiling
-----------------------------------------------------------------------------------------
-  
-Compiled and tested successfully using:  
-* Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux  
-(main development and testing platform),  
-* Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
-* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
-* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
-* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5.  
-Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
   
 License
 ----------------------------------------------------------------------------------------

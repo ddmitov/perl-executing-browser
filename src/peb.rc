@@ -1,0 +1,43 @@
+IDI_ICON1               ICON    DISCARDABLE     "camel.ico"
+
+/* http://qt-project.org/forums/viewthread/16520 */
+
+# include <winver.h>
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,1,0,0
+ PRODUCTVERSION 0,1,0,0
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS VS_FF_DEBUG
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS VOS__WINDOWS32
+ FILETYPE VFT_DLL
+ FILESUBTYPE 0x0L
+ BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+   BLOCK "040904B0"
+   BEGIN
+    VALUE "CompanyName", "PEB Dev Team\0"
+    VALUE "FileDescription", "Qt WebKit browser capable of executing Perl scripts locally without a webserver\0"
+    VALUE "FileVersion", "0.1.0.0\0"
+    VALUE "LegalCopyright", "GPL v.3\0"
+    VALUE "OriginalFilename", "peb.exe\0"
+    VALUE "ProductName", "Perl Executing Browser\0"
+   END
+  END
+  BLOCK "VarFileInfo"
+ BEGIN
+  /* The following line should only be modified for localized versions.     */
+  /* It consists of any number of WORD,WORD pairs, with each pair           */
+  /* describing a language,codepage combination supported by the file.      */
+  /*                                                                        */
+  /* For example, a file might have values "0x409,1252" indicating that it  */
+  /* supports English language (0x409) in the Windows ANSI codepage (1252). */
+  VALUE "Translation", 0x409, 1252
+ END
+ END
+/* End of Version info */

@@ -4,8 +4,12 @@ Permanent TODO priorities:
 - documentation, commented code
 ======================
 
-Security:
-- https support for win32
+Configuration:
+- search for INI file in all standard locations for a configuration file on different operating systems
+- more INI file options
+- more command line arguments for GUI configuration
+- default values if INI file is missing or corrupt
+- configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
@@ -25,20 +29,12 @@ Long-running scripts:
 Perl debugger interaction:
 - option to display debugger output in HTML
 - 'Save Page As' dialog to save debugger output in a file
-
-Connectivity:
-- Configuration option for a custom User Agent
-- Message when network connectivity is lost or restored
+- load modified debugger on Windows, which is capable of working without a console
+  (using PERL5DB environment variable? http://perldoc.perl.org/perldebguts.html)
 
 Extensibility:
 - Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
 - internal cron using script started by the browser
-
-Configuration:
-- more INI file options
-- more command line arguments
-- default values if INI file is missing or corrupt
-- configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 
 GUI:
 - configuration option to select a skin for all local pages in the browser
@@ -47,3 +43,10 @@ GUI:
 i18n:
 - frameless QWebView-based message boxes
 - i18n in all native dialogs
+
+Security:
+- mandatory access control lists for Mongoose
+- https support for win32
+
+Connectivity:
+- Message when network connectivity is lost or restored

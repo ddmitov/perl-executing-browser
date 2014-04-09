@@ -10,35 +10,42 @@
 // Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
 // Valcho Nedelchev, 2014
 
-#include <qglobal.h>
-#if QT_VERSION >= 0x050000
-// Qt5 code:
-#include <QtWidgets>
-#else
-// Qt4 code:
-#include <QtGui>
 #include <QApplication>
-#endif
-
 #include <QWebPage>
 #include <QWebView>
 #include <QWebFrame>
 #include <QWebHistory>
 #include <QtNetwork/QNetworkRequest>
 #include <QProcess>
-#include <QPrintDialog>
-#include <QPrinter>
+#include <QShortcut>
+#include <QDesktopServices>
 #include <QDateTime>
 #include <QSystemTrayIcon>
 #include <QIcon>
 #include <QDebug>
 #include "peb.h"
+#ifndef Q_OS_WIN
 #include <unistd.h> // for isatty()
+#endif
 #include <iostream> // for std::cout
 
+// http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
+#include <qglobal.h>
+#if QT_VERSION >= 0x050000
+// Qt5 code:
+#include <QtPrintSupport/QPrinter>
+#include <QtPrintSupport/QPrintDialog>
+#else
+// Qt4 code:
+#include <QPrintDialog>
+#include <QPrinter>
+#endif
+
+// Application start date and time for filenames of per-session log files:
 static QString applicationStartForLogFileName =
         QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
+// Custom message handler for redirecting all debug messages to a log file:
 #if QT_VERSION >= 0x050000
 // Qt5 code:
 void customMessageHandler (QtMsgType type, const QMessageLogContext &context,
@@ -100,13 +107,26 @@ int main (int argc, char **argv)
 
     QApplication application (argc, argv);
 
+    // Use UTF-8 encoding within the application:
+#if QT_VERSION >= 0x050000
+    QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
+#else
+    QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF8"));
+#endif
+
+    // Basic application variables:
     application.setOrganizationName ("PEB-Dev-Team");
     //application.setOrganizationDomain ("peb.org");
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
+    // Initialize settings:
     Settings settings;
 
+    // Settings file:
+    QFile settingsFile (settings.settingsFileName);
+
+    // Install custom message handler for redirecting all debug messages to a log file:
     if (settings.logging == "yes") {
 #if QT_VERSION >= 0x050000
         // Qt5 code:
@@ -118,15 +138,17 @@ int main (int argc, char **argv)
     }
 
     // Get current date and time for the log file and the command line output:
-    QString applicationStartForLogging = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+    QString applicationStartForLogContents = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
 
-    // Display command line help:
+    // Get command line arguments:
     QStringList arguments = QCoreApplication::arguments();
+
+    // Display command line help and exit:
     foreach (QString argument, arguments){
         if (argument.contains ("--help") or argument.contains ("-h")) {
             std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
-                      << applicationStartForLogging.toLatin1().constData() << std::endl;
+                      << applicationStartForLogContents.toLatin1().constData() << std::endl;
             std::cout << "Application file path: "
                       << (QDir::toNativeSeparators (
                               QApplication::applicationFilePath()).toLatin1().constData())
@@ -138,24 +160,44 @@ int main (int argc, char **argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --root      -r    absolute path of the browser root folder"
+            std::cout << "  --ini       -i    absolute path to a browser configuration file"
                       << std::endl;
             std::cout << "  --webserver -w    start a local webserver with the browser: 'yes' or 'no'"
                       << std::endl;
             std::cout << "  --help      -h    this help"
                       << std::endl;
             std::cout << " " << std::endl;
-            QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-            qDebug() << "Perl Executing Browser v.0.1 displayed help and terminated normally on:"
-                     << dateTimeString;
-            qDebug() << "===============";
+            if (settingsFile.exists()) {
+                QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+                qDebug() << "Perl Executing Browser v.0.1 displayed help and terminated normally on:"
+                         << dateTimeString;
+                qDebug() << "===============";
+            }
             return 1;
             QApplication::exit();
         }
     }
 
+    // Set an empty, transparent icon for message boxes in case no icon file is found:
+    QPixmap emptyTransparentIcon (16, 16);
+    emptyTransparentIcon.fill (Qt::transparent);
+    QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
+
+    // Check if settings file exists:
+    if (!settingsFile.exists()) {
+        QMessageBox msgBox;
+        msgBox.setIcon (QMessageBox::Critical);
+        msgBox.setWindowTitle ("Missing configuration file");
+        msgBox.setText ("Configuration file<br>"+settings.settingsFileName+"<br>is missing.<br>Please restore it.");
+        msgBox.setDefaultButton (QMessageBox::Ok);
+        msgBox.exec();
+        return 1;
+        QApplication::exit();
+    }
+
+    // Log basic program information:
     qDebug() << "===============";
-    qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogging;
+    qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogContents;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
     QString allArguments;
@@ -168,6 +210,9 @@ int main (int argc, char **argv)
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
 
+    // Detect if the program is started from terminal (Linux and Mac only).
+    // If the browser is started from terminal, it will start another copy of itself and
+    // close the first one. This is necessary for a working interaction with the Perl debugger.
 #ifndef Q_OS_WIN
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
@@ -176,7 +221,7 @@ int main (int argc, char **argv)
         if (settings.logging == "yes") {
             std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
-                      << applicationStartForLogging.toLatin1().constData() << std::endl;
+                      << applicationStartForLogContents.toLatin1().constData() << std::endl;
             std::cout << "Application file path: "
                       << (QDir::toNativeSeparators (
                               QApplication::applicationFilePath()).toLatin1().constData())
@@ -226,67 +271,58 @@ int main (int argc, char **argv)
     }
 #endif
 
-#if QT_VERSION >= 0x050000
-    QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
-#else
-    QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF8"));
-#endif
-
-    QPixmap emptyTransparentIcon (16, 16);
-    emptyTransparentIcon.fill (Qt::transparent);
-    QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
-
+    // Log all settings:
+    qDebug() << "GENERAL SETTINGS:";
     qDebug() << "Root folder:" << settings.rootDirName;
+    qDebug() << "Browser settings file name:" << settings.settingsFileName;
+    qDebug() << "Mongoose settings file name:" << settings.mongooseSettingsFileName;
+    qDebug() << "ENVIRONMENT SETTINGS:";
+    qDebug() << "PERLLIB folder:" << settings.perlLib;
+    qDebug() << "DEBUGGER SETTINGS:";
+    qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
+    qDebug() << "NETWORKING SETTINGS:";
+    qDebug() << "Autostart local webserver:" << settings.autostartLocalWebserver;
+    qDebug() << "Mongoose listening port:" << settings.listeningPort;
+    qDebug() << "Mongoose quit token:" << settings.quitToken;
+    qDebug() << "Ping local webserver:" << settings.pingLocalWebserver;
+    qDebug() << "Ping remote webserver:" << settings.pingRemoteWebserver;
+    qDebug() << "Browser User Agent:" << settings.userAgent;
+    qDebug() << "GUI SETTINGS:";
+    qDebug() << "Start page:" << settings.startPage;
+    qDebug() << "Window size:" << settings.windowSize;
+    qDebug() << "Frameless window:" << settings.framelessWindow;
+    qDebug() << "Stay on top:" << settings.stayOnTop;
+    qDebug() << "Browser title:" << settings.browserTitle;
+    qDebug() << "Context menu:" << settings.contextMenu;
+    qDebug() << "Application icon:" << settings.iconPathName;
+    qDebug() << "LOGGING SETTINGS:";
+    qDebug() << "Logging:" << settings.logging;
+    qDebug() << "Log file:" << settings.logFile;
     qDebug() << "===============";
 
-    QFile settingsFile (settings.settingsFileName);
-    if (!settingsFile.exists()) {
-        qDebug() << "===============";
-        qDebug() << QDir::toNativeSeparators (settings.settingsFileName)
-                 << "is missing.";
-        qDebug() << "Please restore the missing file.";
-        qDebug() << "Exiting.";
-        qDebug() << "===============";
-        QMessageBox msgBox;
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle ("Critical file missing");
-        msgBox.setText ("'peb.ini' is missing.<br>Please restore the missing file.");
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
-        return 1;
-        QApplication::exit();
-    } else {
-        qDebug() << "Settings file found:" << settings.settingsFileName;
-    }
-
+    // Convert start page relative path to an absolute one:
     QString startPageFileName (QDir::toNativeSeparators
                          (settings.rootDirName+
                           QDir::separator()+settings.startPage));
+    // Check if start page exists:
     QFile startPageFile (startPageFileName);
     if (!startPageFile.exists()) {
-        qDebug() << "===============";
-        qDebug() << QDir::toNativeSeparators (startPageFileName)
-                 << "is missing.";
-        qDebug() << "Please restore the missing start page.";
+        qDebug() << "Start page is missing.";
+        qDebug() << "Please select a start page.";
         qDebug() << "Exiting.";
         qDebug() << "===============";
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle ("Missing start page");
-        msgBox.setText (QDir::toNativeSeparators (startPageFileName)+
-                        " is missing.<br>Please restore the missing start page.");
+        msgBox.setText ("Start page is missing.<br>Please select a start page.");
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
         return 1;
         QApplication::exit();
-    } else {
-        qDebug() << "Start page found:" << startPageFileName;
-        qDebug() << "===============";
     }
 
+    // Set application window icon from an external file:
     QApplication::setWindowIcon (settings.icon);
-    qDebug() << "Application icon:" << settings.iconPathName;
-    qDebug() << "===============";
 
     // ENVIRONMENT VARIABLES:
     // PATH:
@@ -377,29 +413,43 @@ Settings::Settings()
     : QSettings (0)
 {
 
-    // Settings folder:
+    // Get command line arguments:
+    QStringList arguments = QCoreApplication::arguments();
+
+    // Command line options - part 1:
+    foreach (QString argument, arguments){
+        // Settings file:
+        if (argument.contains ("--ini") or argument.contains ("-i")) {
+            settingsFileName = QDir::toNativeSeparators (argument.section ("=", 1, 1));
+            settingsDir = QFileInfo(
+                        QDir::toNativeSeparators (settingsFileName)).absolutePath();
+            settingsDirName = settingsDir.absolutePath().toLatin1();
+        } else {
+#ifndef Q_OS_MAC
+            settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+#endif
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        iniDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
-        iniDir.cdUp();
-        iniDir.cdUp();
-        rootDirName = iniDir.absolutePath().toLatin1();
+        settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+        settingsDir.cdUp();
+        settingsDir.cdUp();
     }
 #endif
-    iniDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
-    iniDirName = iniDir.absolutePath().toLatin1();
+            settingsDirName = settingsDir.absolutePath().toLatin1();
+            settingsFileName = QDir::toNativeSeparators
+                    (settingsDirName+QDir::separator()+"peb.ini");
+        }
+    }
 
-    // Settings file:
-    settingsFileName = QDir::toNativeSeparators
-            (iniDirName+QDir::separator()+"peb.ini");
+    // Opening of the settings file:
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
     // Browser root directory:
     QString rootDirNameSetting = settings.value ("root_directory/path").toString();
     if (rootDirNameSetting == "current") {
-        rootDirName = iniDirName;
+        rootDirName = settingsDirName;
     } else {
-        rootDirName = rootDirNameSetting;
+        rootDirName = QDir::toNativeSeparators (rootDirNameSetting);
     }
 
     // Environment settings:
@@ -435,7 +485,7 @@ Settings::Settings()
     if (phpInterpreter.length() == 0) {
         QString defaultPhpInterpreter = settings.value ("interpreters/php").toString();
         if (defaultPhpInterpreter == "system") {
-            qputenv ("PHP_INTERPRETER", "php");
+            qputenv ("PHP_INTERPRETER", "php-cgi");
         } else {
             QByteArray phpInterpreterByteArray;
             phpInterpreterByteArray.append (defaultPhpInterpreter);
@@ -447,7 +497,7 @@ Settings::Settings()
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
 
     // Networking:
-    autostartLocalWebserver = settings.value ("networking/autostart").toString();
+    autostartLocalWebserver = settings.value ("networking/autostart_local_webserver").toString();
     pingLocalWebserver = settings.value ("networking/ping_local_webserver").toString();
     pingRemoteWebserver = settings.value ("networking/ping_remote_webserver").toString();
     userAgent = settings.value ("networking/user_agent").toString();
@@ -474,8 +524,6 @@ Settings::Settings()
         }
     }
 
-
-
     // GUI settings:
     startPage = settings.value ("gui/start_page").toString();
     windowSize = settings.value ("gui/window_size").toString();
@@ -494,12 +542,8 @@ Settings::Settings()
     logging = settings.value ("logging/enable").toString();
     logFile = settings.value ("logging/file").toString();
 
-    // Command line options
-    QStringList arguments = QCoreApplication::arguments();
+    // Command line options - part 2:
     foreach (QString argument, arguments){
-        if (argument.contains ("--root") or argument.contains ("-r")) {
-            rootDirName = argument.section ("=", 1, 1);
-        }
         if (argument.contains ("--webserver") or argument.contains ("-w")) {
             autostartLocalWebserver = argument.section ("=", 1, 1);
         }
