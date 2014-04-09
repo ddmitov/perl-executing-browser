@@ -38,7 +38,6 @@ Extensibility:
 
 GUI:
 - configuration option to select a skin for all local pages in the browser
-- application icon & info on win32
 
 i18n:
 - frameless QWebView-based message boxes

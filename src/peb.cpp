@@ -273,7 +273,7 @@ int main (int argc, char **argv)
 
     // Log all settings:
     qDebug() << "GENERAL SETTINGS:";
-    qDebug() << "Root folder:" << settings.rootDirName;
+    qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
     qDebug() << "Browser settings file name:" << settings.settingsFileName;
     qDebug() << "Mongoose settings file name:" << settings.mongooseSettingsFileName;
     qDebug() << "ENVIRONMENT SETTINGS:";
@@ -506,21 +506,23 @@ Settings::Settings()
     mongooseSettingsFileName = QDir::toNativeSeparators
             (rootDirName+QDir::separator()+"mongoose.conf");
     QFile mongooseSettingsFile (mongooseSettingsFileName);
-    QRegExp space ("\\s");
-    QRegExp listeningPortRegExp ("^listening_port");
-    QRegExp quitTokenRegExp ("^quit_token");
-    if (!mongooseSettingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-    QTextStream mongooseSettings (&mongooseSettingsFile);
-    while (!mongooseSettings.atEnd()) {
-        QString line = mongooseSettings.readLine();
-        if (line.contains (listeningPortRegExp)) {
-            listeningPort = line.section (space, 1, 1);
-            listeningPort.replace (QString ("\n"), "");
-        }
-        if (line.contains (quitTokenRegExp)) {
-            quitToken = line.section (space, 1, 1);
-            quitToken.replace (QString ("\n"), "");
+    if (mongooseSettingsFile.exists()) {
+        QRegExp space ("\\s");
+        QRegExp listeningPortRegExp ("^listening_port");
+        QRegExp quitTokenRegExp ("^quit_token");
+        if (!mongooseSettingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
+            return;
+        QTextStream mongooseSettings (&mongooseSettingsFile);
+        while (!mongooseSettings.atEnd()) {
+            QString line = mongooseSettings.readLine();
+            if (line.contains (listeningPortRegExp)) {
+                listeningPort = line.section (space, 1, 1);
+                listeningPort.replace (QString ("\n"), "");
+            }
+            if (line.contains (quitTokenRegExp)) {
+                quitToken = line.section (space, 1, 1);
+                quitToken.replace (QString ("\n"), "");
+            }
         }
     }
 
