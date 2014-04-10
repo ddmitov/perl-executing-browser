@@ -22,7 +22,7 @@ VS_VERSION_INFO VERSIONINFO
    BLOCK "040904B0"
    BEGIN
     VALUE "CompanyName", "PEB Dev Team\0"
-    VALUE "FileDescription", "Local serverless executor of Perl scripts\0"
+    VALUE "FileDescription", "Perl Executing Browser\0"
     VALUE "FileVersion", "0.1.0.0\0"
     VALUE "LegalCopyright", "GPL v.3\0"
     VALUE "OriginalFilename", "peb.exe\0"

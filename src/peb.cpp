@@ -24,10 +24,11 @@
 #include <QIcon>
 #include <QDebug>
 #include "peb.h"
+#include <iostream> // for std::cout
+
 #ifndef Q_OS_WIN
 #include <unistd.h> // for isatty()
 #endif
-#include <iostream> // for std::cout
 
 // http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
 #include <qglobal.h>
@@ -37,8 +38,8 @@
 #include <QtPrintSupport/QPrintDialog>
 #else
 // Qt4 code:
-#include <QPrintDialog>
 #include <QPrinter>
+#include <QPrintDialog>
 #endif
 
 // Application start date and time for filenames of per-session log files:
@@ -55,6 +56,7 @@ void customMessageHandler (QtMsgType type, const QMessageLogContext &context,
 void customMessageHandler (QtMsgType type, const char *message)
 #endif
 {
+
 #if QT_VERSION >= 0x050000
     Q_UNUSED (context);
 #endif
@@ -62,38 +64,38 @@ void customMessageHandler (QtMsgType type, const char *message)
     QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
     QString text = QString ("[%1] ").arg (dateAndTime);
 
-   switch (type)
-   {
-      case QtDebugMsg:
-         text += QString ("{Debug} %1").arg (message);
-         break;
-      case QtWarningMsg:
-         text += QString ("{Warning} %1").arg (message);
-         break;
-      case QtCriticalMsg:
-         text += QString ("{Critical} %1").arg (message);
-         break;
-      case QtFatalMsg:
-         text += QString ("{Fatal} %1").arg (message);
-         abort();
-         break;
-   }
+    switch (type)
+    {
+    case QtDebugMsg:
+        text += QString ("{Log} %1").arg (message);
+        break;
+    case QtWarningMsg:
+        text += QString ("{Warning} %1").arg (message);
+        break;
+    case QtCriticalMsg:
+        text += QString ("{Critical} %1").arg (message);
+        break;
+    case QtFatalMsg:
+        text += QString ("{Fatal} %1").arg (message);
+        abort();
+        break;
+    }
 
    Settings settings;
-   if (settings.logFile == "single") {
+
+   if (settings.logMode == "single_file") {
        QFile logFile (QDir::toNativeSeparators
-                      (settings.rootDirName+
-                       QDir::separator()+
-                       "peb.log"));
+                      (settings.logDirFullPath+QDir::separator()+
+                       settings.logPrefix+".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
        textStream << text << endl;
    }
-   if (settings.logFile == "per_session") {
+
+   if (settings.logMode == "per_session_file") {
        QFile logFile (QDir::toNativeSeparators
-                      (settings.rootDirName+
-                       QDir::separator()+
-                       "peb-started-at-"+
+                      (settings.logDirFullPath+QDir::separator()+
+                       settings.logPrefix+"-started-at-"+
                        applicationStartForLogFileName+".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
@@ -297,7 +299,9 @@ int main (int argc, char **argv)
     qDebug() << "Application icon:" << settings.iconPathName;
     qDebug() << "LOGGING SETTINGS:";
     qDebug() << "Logging:" << settings.logging;
-    qDebug() << "Log file:" << settings.logFile;
+    qDebug() << "Logging mode:" << settings.logMode;
+    qDebug() << "Logfiles directory:" << settings.logDirFullPath;
+    qDebug() << "Logfiles prefix:" << settings.logPrefix;
     qDebug() << "===============";
 
     // Convert start page relative path to an absolute one:
@@ -524,6 +528,9 @@ Settings::Settings()
                 quitToken.replace (QString ("\n"), "");
             }
         }
+    } else {
+        listeningPort = "unavailable";
+        quitToken = "unavailable";
     }
 
     // GUI settings:
@@ -533,6 +540,10 @@ Settings::Settings()
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
     browserTitle = settings.value ("gui/browser_title").toString();
     contextMenu = settings.value ("gui/context_menu").toString();
+    if (windowSize != "maximized" or windowSize != "fullscreen") {
+        fixedWidth = windowSize.section ("x", 0, 0) .toInt();
+        fixedHeight = windowSize.section ("x", 1, 1) .toInt();
+    }
 
     // Icon:
     QString iconRelativePathName = settings.value ("gui/icon").toString();
@@ -542,7 +553,21 @@ Settings::Settings()
 
     // Logging:
     logging = settings.value ("logging/enable").toString();
-    logFile = settings.value ("logging/file").toString();
+    logMode = settings.value ("logging/mode").toString();
+    logDirName = settings.value ("logging/directory").toString();
+    QDir logDir (logDirName);
+    if (!logDir.exists ()) {
+        logDir.mkpath(".");
+    }
+    if (logDir.isRelative()) {
+        logDirFullPath = QDir::toNativeSeparators
+                       (rootDirName+QDir::separator()+logDirName);
+    }
+    if (logDir.isAbsolute()) {
+        logDirFullPath = QDir::toNativeSeparators
+                       (logDirName);
+    }
+    logPrefix = settings.value ("logging/prefix").toString();
 
     // Command line options - part 2:
     foreach (QString argument, arguments){
@@ -658,15 +683,11 @@ TopLevel::TopLevel()
                        this, SLOT (quitApplicationSlot()));
 
     // Configure screen appearance:
-    if (settings.windowSize != "maximized" or settings.windowSize != "fullscreen") {
-        int fixedWidth = settings.windowSize.section ("x", 0, 0) .toInt();
-        int fixedHeight = settings.windowSize.section ("x", 1, 1) .toInt();
-        if (fixedWidth > 100 and fixedHeight > 100) {
-            setFixedSize (fixedWidth, fixedHeight);
-            QRect screenRect = QDesktopWidget().screen()->rect();
-            move (QPoint (screenRect.width() / 2 - width() / 2,
-                            screenRect.height() / 2 - height() / 2));
-        }
+    if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
+        setFixedSize (settings.fixedWidth, settings.fixedHeight);
+        QRect screenRect = QDesktopWidget().screen()->rect();
+        move (QPoint (screenRect.width() / 2 - width() / 2,
+                      screenRect.height() / 2 - height() / 2));
     }
     if (settings.windowSize == "maximized") {
         showMaximized();

@@ -77,6 +77,10 @@ public:
 
     QString startPage;
     QString windowSize;
+
+    int fixedWidth;
+    int fixedHeight;
+
     QString framelessWindow;
     QString stayOnTop;
     QString browserTitle;
@@ -86,7 +90,10 @@ public:
     QPixmap icon;
 
     QString logging;
-    QString logFile;
+    QString logMode;
+    QString logDirName;
+    QString logDirFullPath;
+    QString logPrefix;
 
 };
 
