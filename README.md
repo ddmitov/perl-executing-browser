@@ -75,7 +75,7 @@ Limitations
 ----------------------------------------------------------------------------------------
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No opening of new windows from JavaScript, although opening new windows from hyperlinks using ```target = '_blank'``` attribute is supported.  
+* No opening of new windows from JavaScript, although opening new windows from context menu or from hyperlinks using ```target = '_blank'``` attribute is supported.  
 * No support for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
 Security Considerations

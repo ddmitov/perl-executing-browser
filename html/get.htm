@@ -1,77 +1,59 @@
 ﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
 
 <head>
-<title>Perl Executing Browser - Test Form - GET method</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Perl Executing Browser - Test Form - GET method</title>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 <link href="current.css" media="all" rel="stylesheet" />
-
-<!-- http://www.w3schools.com/jsref/event_onclick.asp -->
-<script>
-function existingFileSelected()
-{
-	document.getElementById("ExistingFileSelection").innerHTML="Select another file";
-}
-function newFileSelected()
-{
-	document.getElementById("NewFileSelection").innerHTML="Select another file name";
-}
-function folderSelected()
-{
-	document.getElementById("FolderSelection").innerHTML="Select another folder";
-}
-</script>
-
-<!-- http://www.w3schools.com/js/tryit.asp?filename=tryjs_focus -->
-<script>
-function setFocus()
-{
-	document.getElementById("value1").focus();
-}
-</script>
-
-<!-- http://www.w3schools.com/jsref/met_his_back.asp -->
-<script>
-function goBack()
-{
-	window.history.back()
-}
-</script>
-
+  
+  <script>
+  function existingFileSelected() {
+  	document.getElementById("ExistingFileSelection").innerHTML="Select another file";
+  }
+  function newFileSelected() {
+  	document.getElementById("NewFileSelection").innerHTML="Select another file name";
+  }
+  function folderSelected() {
+  	document.getElementById("FolderSelection").innerHTML="Select another folder";
+  }
+  function goBack() {
+  	window.history.back();
+  }
+  </script>
 </head>
 
-<body onload="setFocus()">
+<body>
 
-<p align='center'><font size='5' face='SansSerif'>Test Form - GET method</font></p>
+<form action="http://perl-executing-browser-pseudodomain/scripts/test.pl" method="get" class="">
+<div class="col-lg-4 col-lg-offset-4">
+  <fieldset>
+    <legend>Send GET request</legend>
+    <div class="form-group">
+      <div class="input-prepend">
+        <input type="text" id="value1" name="value1" class="form-control" placeholder="Value 1" title="Value 1"/>
+      </div>
+      <div class="input-append">
+	    <input type="text" name="value2" class="form-control" placeholder="Value 2" title="Value 2"/>
+	  </div>
+	</div>
 
-<center>
+    <div class="form-group">
+		<a href='openfile://now' onclick="existingFileSelected()" id="ExistingFileSelection" class="btn btn-info btn-sm">Select file</a>
+		<a href='newfile://now' onclick="newFileSelected()" id="NewFileSelection" class="btn btn-info btn-sm">Select new filename</a>
+		<a href='openfolder://now' onclick="folderSelected()" id="FolderSelection" class="btn btn-info btn-sm">Select folder</a>
+	</div>
 
-<font size='3' face='SansSerif'>
+			<div class="form-group">
+				<input type="reset" value="Reset" class="btn btn-default" />
+				<input type="submit" value="Submit with File & Folder" class="btn btn-primary" />
+			</div>
+		</fieldset>
+	</form>
 
-<form action="http://perl-executing-browser-pseudodomain/scripts/test.pl" method="get">
-
-Value 1:<br>
-<input type="text" id="value1" name="value1"><br>
-Value 2:<br>
-<input type="text" name="value2"><br>
-<br>
-
-<a href='openfile://now' onclick="existingFileSelected()" id="ExistingFileSelection">Select file</a>
-<br>
-<a href='newfile://now' onclick="newFileSelected()" id="NewFileSelection">Select new filename</a>
-<br>
-<a href='openfolder://now' onclick="folderSelected()" id="FolderSelection">Select folder</a>
-<br><br>
-
-<input type="submit" value="Submit with File & Folder"><br><br>
-<input type="reset" value="Reset">
-</form>
-</font>
-
-<br>
-<button onclick="goBack()">Go Back from JavaScript<br>
-Intentionally Disabled - Doesn't Work</button>
-
-</center>
+	<button onclick="goBack()" class="btn btn-danger btn-sm">
+	  Go Back from JavaScript <br/>
+	  Intentionally Disabled - Doesn't Work
+	</button>
+</div>
 
 </body>
 </html>
