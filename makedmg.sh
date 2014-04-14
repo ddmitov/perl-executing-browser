@@ -27,7 +27,7 @@ if [ -z "$macdeployqt_bin" ]
 	    set QTDIR = $qtdirname
 	    if [ -z "$QTDIR" ]
 	    	then
-	    	echo "No QTDIR was set. I have to quit now."
+	    	echo "No QTDIR was set. I have quit now."
 	    	exit
 	    fi
 	    echo ""
