@@ -13,10 +13,10 @@ print "<head>\n";
 
 print "<title>Perl Executing Browser - Dynamic Startpage</title>\n";
 print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
-
+print "<link href='../html/current.css' media='all' rel='stylesheet' />\n";
 print "</head>\n";
 
-print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
+print "<body>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/perlinfo.pl'>Perl Info</a>\n";
@@ -122,6 +122,12 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5' face='SansSerif'>\n";
+print "<a href='selectskin://now'>Select Browser Skin</a>\n";
+print "</p>\n";
+
+print "<hr width='95%'>\n";
+
+print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "<a href='newfile://now'>Create New File</a>\n";
 print "</font></p>\n";
 
@@ -186,4 +192,3 @@ print "</font></p>\n";
 print "</body>\n";
 
 print "</html>\n";
- 

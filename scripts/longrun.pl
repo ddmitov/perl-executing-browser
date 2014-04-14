@@ -19,14 +19,14 @@ print <<WAITING
 
 </head>
 
-<body text='#000000' bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>
+<body>
 
 <p align='center'><font size='5' face='SansSerif'>
 
 <center>
 <br>
 <!--http://www.javascriptkit.com/script/cut19.shtml-->
-<form name='d'>Waiting for output <input type='text' name='d2' size='2'> seconds...</form>
+<form name='d'>Waiting for output <input type='text' name='d2' size='3'> seconds...</form>
 </center>
 
 <script>
@@ -81,7 +81,7 @@ print <<HTML;
 Waited for output $waiting seconds!
 
 
-<br><a href='http://www.perl.org/index.html'>Allowed External Link</a><br>
+<br><a href='https://www.google.com/doodles'>Allowed External Link</a><br>
 <a href='closewindow://now'>Close window</a>
 
 

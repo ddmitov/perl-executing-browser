@@ -37,7 +37,7 @@ sub header() {
 	print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
 	print "</head>\n";
 
-	print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
+	print "<body>\n";
 
 	print "<p align='center'><font size='5' face='SansSerif'>\n";
 }

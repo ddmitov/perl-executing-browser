@@ -16,7 +16,7 @@ print """
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 </head>
 
-<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>
+<body>
 
 <font face='SansSerif'>
 

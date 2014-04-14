@@ -28,10 +28,11 @@ print  <<HEADER;
 
 <title>Perl Executing Browser - SQLite Example</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<link href="../html/current.css" media="all" rel="stylesheet" />
 
 </head>
 
-<body text='#000000' bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>
+<body>
 
 <p align='left'><font size='3' face='SansSerif'>
 

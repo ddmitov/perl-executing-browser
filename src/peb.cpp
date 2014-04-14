@@ -109,6 +109,18 @@ int main (int argc, char **argv)
 
     QApplication application (argc, argv);
 
+//    // http://stackoverflow.com/questions/19406634/qt-how-to-get-application-to-get-md5-checksum-of-itself
+//    QFile applicationFile(QCoreApplication::applicationFilePath());
+//    QByteArray applicationFileArray;
+//    if (applicationFile.open(QIODevice::ReadOnly)) {
+//        applicationFileArray = applicationFile.readAll();
+//    } else {
+//        qDebug() << "Can't open file.";
+//    }
+//    QString applicationMd5 = QString(QCryptographicHash::hash(
+//                        (applicationFileArray), QCryptographicHash::Md5).toHex());
+//    qDebug() << "MD5:" << applicationMd5;
+
     // Use UTF-8 encoding within the application:
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
@@ -117,16 +129,13 @@ int main (int argc, char **argv)
 #endif
 
     // Basic application variables:
-    application.setOrganizationName ("PEB-Dev-Team");
+    application.setOrganizationName ("PEBDevTeam");
     //application.setOrganizationDomain ("peb.org");
-    application.setApplicationName ("Perl Executing Browser");
+    application.setApplicationName ("PerlExecutingBrowser");
     application.setApplicationVersion ("0.1");
 
     // Initialize settings:
     Settings settings;
-
-    // Settings file:
-    QFile settingsFile (settings.settingsFileName);
 
     // Install custom message handler for redirecting all debug messages to a log file:
     if (settings.logging == "yes") {
@@ -169,7 +178,7 @@ int main (int argc, char **argv)
             std::cout << "  --help      -h    this help"
                       << std::endl;
             std::cout << " " << std::endl;
-            if (settingsFile.exists()) {
+            if (settings.logging == "yes") {
                 QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
                 qDebug() << "Perl Executing Browser v.0.1 displayed help and terminated normally on:"
                          << dateTimeString;
@@ -184,6 +193,9 @@ int main (int argc, char **argv)
     QPixmap emptyTransparentIcon (16, 16);
     emptyTransparentIcon.fill (Qt::transparent);
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
+
+    // Settings file:
+    QFile settingsFile (settings.settingsFileName);
 
     // Check if settings file exists:
     if (!settingsFile.exists()) {
@@ -394,6 +406,7 @@ int main (int argc, char **argv)
     qputenv ("NEW_FILE", "");
 
     TopLevel toplevel;
+
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
 
@@ -635,7 +648,6 @@ Page::Page()
             setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
 //    QWebSettings::globalSettings()->
 //            setAttribute (QWebSettings::LocalStorageEnabled, true);
-
     QWebSettings::globalSettings()->
             setAttribute (QWebSettings::PrivateBrowsingEnabled, true);
     QWebSettings::globalSettings()->
@@ -666,18 +678,27 @@ TopLevel::TopLevel()
     QShortcut *maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
     QObject::connect (maximizeShortcut, SIGNAL (activated()),
                        this, SLOT (maximizeSlot()));
+
     QShortcut *minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
     QObject::connect (minimizeShortcut, SIGNAL (activated()),
                        this, SLOT (minimizeSlot()));
+
     QShortcut *toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
     QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
                        this, SLOT (toggleFullScreenSlot()));
+
     QShortcut *homeShortcut = new QShortcut (Qt::Key_F12, this);
     QObject::connect (homeShortcut, SIGNAL (activated()),
                        this, SLOT (loadStartPageSlot()));
+
+    QShortcut *reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
+    QObject::connect (reloadShortcut, SIGNAL (activated()),
+                       this, SLOT (reloadSlot()));
+
     QShortcut *printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
     QObject::connect (printShortcut, SIGNAL (activated()),
                        this, SLOT (printPageSlot()));
+
     QShortcut *closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
     QObject::connect (closeAppShortcut, SIGNAL (activated()),
                        this, SLOT (quitApplicationSlot()));
@@ -713,6 +734,8 @@ TopLevel::TopLevel()
 
     mainPage = new Page();
 
+    QObject::connect (mainPage, SIGNAL (reloadSignal()),
+                       this, SLOT (reloadSlot()));
     QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
                        this, SLOT (close()));
     QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
@@ -731,7 +754,7 @@ TopLevel::TopLevel()
     ModifiedNetworkAccessManager *nam = new ModifiedNetworkAccessManager();
     mainPage->setNetworkAccessManager (nam);
 
-    // HTTPS support:
+    // Cookies and HTTPS support:
     QNetworkCookieJar *jar = new QNetworkCookieJar;
     nam->setCookieJar (jar);
     QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
@@ -881,6 +904,31 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return true;
     }
 
+    // Select another skin:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().toString().contains ("selectskin:")) {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (settings.icon);
+        QString newSkin = dialog.getOpenFileName
+                (0, "Select Browser Skin",
+                 settings.rootDirName+QDir::separator()+"html/themes",
+                 "Cascading Style Sheets (*.css)");
+        dialog.close();
+        dialog.deleteLater();
+        if (QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
+            QFile::remove (settings.rootDirName+QDir::separator()+"html/current.css");
+        }
+        QFile::copy (newSkin, settings.rootDirName+QDir::separator()+"html/current.css");
+        emit reloadSignal();
+        qDebug() << "Selected skin:" << newSkin;
+        qDebug() << "===============";
+        return true;
+    }
+
     // Invoke 'Open file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("openfile:")) {
@@ -974,7 +1022,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             }
 
             if (settings.debuggerInterpreter == "select") {
-                selectInterpreterSlot();
+                selectDebuggingPerlInterpreterSlot();
             }
 
             qDebug() << "Interpreter:" << interpreter;

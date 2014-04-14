@@ -77,10 +77,8 @@ public:
 
     QString startPage;
     QString windowSize;
-
     int fixedWidth;
     int fixedHeight;
-
     QString framelessWindow;
     QString stayOnTop;
     QString browserTitle;
@@ -202,12 +200,13 @@ protected:
                                           QIODevice *outgoingData = 0)
     {
 
+        Settings settings;
+
         // Get output from local script, including:
         // 1.) script used as a start page,
         // 2.) script started in a new window,
         // 3.) script, which was fed with data from local form using CGI GET method,
         // 4.) script started by clicking a hyperlink.
-        Settings settings;
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
@@ -296,6 +295,16 @@ protected:
                 QRegExp regExpTwo ("X-Powered-By: PHP.{1,20}\n");
                 regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpTwo, "");
+
+                QString css;
+                css.append ("<style media=\"screen\" type=\"text/css\">");
+                QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+                cssFile.open(QFile::ReadOnly);
+                QString cssFileContents = QLatin1String (cssFile.readAll());
+                css.append (cssFileContents);
+                css.append ("</style>");
+                css.append ("</head>");
+                output.replace ("</head>", css);
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite)) {
                     QTextStream stream (&outputFilePathFile);
@@ -407,6 +416,16 @@ protected:
                 regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExpTwo, "");
 
+                QString css;
+                css.append ("<style media=\"screen\" type=\"text/css\">");
+                QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+                cssFile.open(QFile::ReadOnly);
+                QString cssFileContents = QLatin1String (cssFile.readAll());
+                css.append (cssFileContents);
+                css.append ("</style>");
+                css.append ("</head>");
+                output.replace ("</head>", css);
+
                 if (outputFilePathFile.open (QIODevice::ReadWrite))
                 {
                     QTextStream stream (&outputFilePathFile);
@@ -483,9 +502,11 @@ class Page : public QWebPage
 
 signals:
 
-    void quitFromURLSignal();
+    void reloadSignal();
 
     void closeWindowSignal();
+
+    void quitFromURLSignal();
 
 public slots:
 
@@ -534,7 +555,7 @@ public slots:
         }
     }
 
-    void selectInterpreterSlot()
+    void selectDebuggingPerlInterpreterSlot()
     {
         QFileDialog selectInterpreterDialog;
         selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
@@ -569,8 +590,16 @@ public slots:
     void displayLongRunningScriptOutputSlot()
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
-        QString filepathForConversion;
-        filepathForConversion = lastRequest.url().path();
+
+        QString css;
+        css.append ("<style media=\"screen\" type=\"text/css\">");
+        QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+        cssFile.open(QFile::ReadOnly);
+        QString cssFileContents = QLatin1String (cssFile.readAll());
+        css.append (cssFileContents);
+        css.append ("</style>");
+        css.append ("</head>");
+        output.replace ("</head>", css);
 
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
                         (QDir::tempPath()+
@@ -683,8 +712,6 @@ private:
         Q_UNUSED (url);
         Settings settings;
         return settings.userAgent;
-//        return "Mozilla/5.0 AppleWebKit/534.34 (KHTML, like Gecko) "
-//                "PerlExecutingBrowser/0.1 Safari/534.34";
     }
 
     Settings settings;
@@ -723,15 +750,14 @@ public slots:
                      (settings.rootDirName+
                       QDir::separator()+settings.startPage)));
         } else {
-            setUrl (QUrl (QString (PEB_DOMAIN +
+            setUrl (QUrl (QString (PEB_DOMAIN+
                                    settings.startPage)));
         }
     }
 
     void pageLoadedDynamicTitleSlot(bool ok)
     {
-        if (ok)
-        {
+        if (ok) {
             setWindowTitle (TopLevel::title());
             QFile::remove
                     (QDir::toNativeSeparators
@@ -741,8 +767,7 @@ public slots:
 
     void pageLoadedStaticTitleSlot(bool ok)
     {
-        if (ok)
-        {
+        if (ok) {
             QFile::remove
                     (QDir::toNativeSeparators
                      (QDir::tempPath()+QDir::separator()+"output.htm"));
@@ -772,6 +797,13 @@ public slots:
         }
         dialog->close();
         dialog->deleteLater();
+    }
+
+    void reloadSlot()
+    {
+        QUrl currentUrl = mainPage->mainFrame()->url();
+        setUrl (currentUrl);
+        raise();
     }
 
     void editSlot()
@@ -810,6 +842,7 @@ public slots:
         QWebHitTestResult qWebHitTestResult =
                 mainPage->mainFrame()->hitTestContent (event->pos());
         QMenu *menu = mainPage->createStandardContextMenu();
+
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
             if (QUrl (PEB_DOMAIN)
@@ -823,45 +856,62 @@ public slots:
                                   this, SLOT (openInNewWindowSlot()));
             }
         }
+
         menu->addSeparator();
+
         if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
             if (settings.framelessWindow == "no") {
                 QAction *maximizeAct = menu->addAction (tr ("&Maximize"));
                 QObject::connect (maximizeAct, SIGNAL (triggered()),
                                   this, SLOT (maximizeSlot()));
             }
-            QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &Fullscreen"));
+            QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &fullscreen"));
             QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
                               this, SLOT (toggleFullScreenSlot()));
         }
+
         if (settings.framelessWindow == "no") {
             QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
             QObject::connect (minimizeAct, SIGNAL (triggered()),
                               this, SLOT (minimizeSlot()));
         }
+
         if (!TopLevel::url().toString().contains ("longrun")) {
             QAction *homeAct = menu->addAction (tr ("&Home"));
             QObject::connect (homeAct, SIGNAL (triggered()),
                               this, SLOT (loadStartPageSlot()));
         }
+
+        if (!TopLevel::url().toString().contains ("longrun")) {
+            QAction *reloadAct = menu->addAction (tr ("&Reload"));
+            QObject::connect (reloadAct, SIGNAL (triggered()),
+                              this, SLOT (reloadSlot()));
+        }
+
         QAction *printAct = menu->addAction (tr ("&Print"));
         QObject::connect (printAct, SIGNAL (triggered()),
                           this, SLOT (printPageSlot()));
+
         QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
         QObject::connect (closeWindowAct, SIGNAL (triggered()),
                           this, SLOT (close()));
+
         if (!TopLevel::url().toString().contains ("longrun")) {
             QAction *quitAct = menu->addAction (tr ("&Quit"));
             QObject::connect ( quitAct, SIGNAL (triggered()),
                                this, SLOT (quitApplicationSlot()));
         }
+
         menu->addSeparator();
+
         QAction *aboutAction = menu->addAction (tr ("&About"));
         QObject::connect (aboutAction, SIGNAL (triggered()),
                           this, SLOT (aboutSlot()));
+
         QAction *aboutQtAction = menu->addAction (tr ("About Q&t"));
         QObject::connect ( aboutQtAction, SIGNAL (triggered()),
                            qApp, SLOT (aboutQt()));
+
         menu->exec (mapToGlobal (event->pos()));
     }
 
@@ -913,7 +963,7 @@ public slots:
         QApplication::exit();
     }
 
-    void sslErrors (QNetworkReply* reply, const QList<QSslError> &errors)
+    void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors)
     {
         foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;

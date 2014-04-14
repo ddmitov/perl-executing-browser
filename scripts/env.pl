@@ -14,10 +14,11 @@ print "<head>\n";
 
 print "<title>Environment Test</title>\n";
 print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
+print "<link href='../html/current.css' media='all' rel='stylesheet' />\n";
 
 print "</head>\n";
 
-print "<body bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>\n";
+print "<body>\n";
 
 
 print "<pre>\n";

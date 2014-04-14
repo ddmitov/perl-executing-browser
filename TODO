@@ -11,6 +11,14 @@ Configuration:
 - default values if INI file is missing or corrupt
 - configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 
+Security:
+- mandatory access control lists for Mongoose
+- https support for win32
+
+GUI:
+- skins for all native dialogs corresponding to the css skins of the HTML pages;
+  simultaneous loading of both types of skins using already implemented 'selectskin' URL.
+
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
 - detect file type by reading the shebang line
@@ -34,19 +42,11 @@ Perl debugger interaction:
 
 Extensibility:
 - Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
-- internal cron using script started by the browser
-
-GUI:
-- configuration option to select a skin for all local pages in the browser
 
 i18n:
 - frameless QWebView-based message boxes
 - i18n in all native dialogs
 
-Security:
-- mandatory access control lists for Mongoose
-- https support for win32
-
 Connectivity:
 - Message when network connectivity is lost or restored
-
+- Whitelist of allowed web sites

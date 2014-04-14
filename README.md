@@ -42,6 +42,7 @@ Features
 * Extensive logging in a file or files of all debugging messages, giving information for every aspect of the browser and the execution of local scripts.  
 **Configuration & usability:**  
 * Configurable from INI file.  
+* Skinnable - a common CSS skin for both static and dynamic pages can be slected using a special URL.  
 * Browser root folder can be any folder and this is configurable from INI file.  
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  
@@ -74,14 +75,13 @@ Limitations
 ----------------------------------------------------------------------------------------
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No 'Reload' action from context menu, but auto-reload using ```<meta http-equiv='refresh' content='XX'>``` is supported.  
 * No opening of new windows from JavaScript, although opening new windows from hyperlinks using ```target = '_blank'``` attribute is supported.  
 * No support for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
 Security Considerations
 ----------------------------------------------------------------------------------------
   
-Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser.  However, downloading locally executed scripts from remote locations is not supported because of the huge security risks involved. If implemented at all, such a feature has to be subject to special restrictions, limiting the source of locally executed scripts to a trusted location with the use of a secure connection and other authentication measures.  
+Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations is not supported because of the huge security risks involved. If implemented at all, such a feature has to limit the source of locally executed scripts to a trusted location with the use of a secure connection and other authentication measures.  
   
 History
 ----------------------------------------------------------------------------------------
