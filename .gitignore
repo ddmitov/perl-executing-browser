@@ -3,6 +3,7 @@ src/peb.pro.user
 src/peb.pro.user.qt4
 src/peb.pro.user.qt5
 src/peb.pro.user.qt5.win32
+html/current.css
 peb
 peb.exe
 peb-qt-5-2-0
