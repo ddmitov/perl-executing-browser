@@ -8,7 +8,7 @@ Design Objectives
 ----------------------------------------------------------------------------------------
   
 * **1. Easy GUI for scripts:**  
-    use HTML, CSS and JavaScript to craft and deploy rapidly beautifull interfaces for your Perl, PHP, Python or other scripts;  
+    use HTML, CSS and JavaScript to craft and deploy rapidly beautifull interfaces for your Perl, Python, PHP or other scripts;  
 * **2. Zero installation when needed:**  
     pack your Perl modules and even your version of Perl with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
 * **3. Cross-platform availability:**  
@@ -42,7 +42,7 @@ Features
 * Extensive logging in a file or files of all debugging messages, giving information for every aspect of the browser and the execution of local scripts.  
 **Configuration & usability:**  
 * Configurable from INI file.  
-* Skinnable - a common CSS skin for both static and dynamic pages can be slected using a special URL.  
+* Themable - a common CSS theme for both static and dynamic pages can be slected using a special URL.  
 * Browser root folder can be any folder and this is configurable from INI file.  
 * Can print current page by clicking a special URL.  
 * Browser can also be closed by clicking a special URL.  

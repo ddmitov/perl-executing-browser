@@ -123,7 +123,7 @@ print "</font></p>\n";
 print "<hr width='95%'>\n";
 
 print "<p align='center'><font size='5'>\n";
-print "<a href='selectskin://now'>Select Browser Skin</a>\n";
+print "<a href='selecttheme://now'>Select Browser Theme</a>\n";
 print "</p>\n";
 
 print "<hr width='95%'>\n";
