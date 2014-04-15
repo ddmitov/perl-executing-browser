@@ -13,7 +13,7 @@ macx {
   # To make a bundle (peb.app):
   # DEFINES += "BUNDLE=1"
   # CONFIG += app_bundle
-  DEFINES += "BUNDLE=1"
+  DEFINES += "BUNDLE=0"
   CONFIG += app_bundle
   ICON = camel.icns
 }
