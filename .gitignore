@@ -12,4 +12,3 @@ peb*.log
 moc_peb.cpp
 moc_peb.o
 peb.o
-Makefile

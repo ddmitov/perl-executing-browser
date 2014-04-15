@@ -209,6 +209,12 @@ int main (int argc, char **argv)
         QApplication::exit();
     }
 
+    // Check if default theme file exists, if not - copy it from themes folder:
+    if (!QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
+        QFile::copy (settings.rootDirName+QDir::separator()+"html/themes/bright.theme",
+                     settings.rootDirName+QDir::separator()+"html/current.css");
+    }
+
     // Log basic program information:
     qDebug() << "===============";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogContents;

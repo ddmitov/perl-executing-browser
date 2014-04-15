@@ -16,6 +16,7 @@ Security:
 
 GUI:
 - select browser theme from context menu
+- browser theme INI settings
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
