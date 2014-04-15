@@ -209,6 +209,12 @@ int main (int argc, char **argv)
         QApplication::exit();
     }
 
+    // Check if default theme file exists, if not - copy it from themes folder:
+    if (!QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
+        QFile::copy (settings.rootDirName+QDir::separator()+"html/themes/bright.theme",
+                     settings.rootDirName+QDir::separator()+"html/current.css");
+    }
+
     // Log basic program information:
     qDebug() << "===============";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogContents;
@@ -904,28 +910,35 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return true;
     }
 
-    // Select another skin:
+    // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("selectskin:")) {
+         request.url().toString().contains ("selecttheme:")) {
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
         dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
-        QString newSkin = dialog.getOpenFileName
-                (0, "Select Browser Skin",
+        QString newTheme = dialog.getOpenFileName
+                (0, "Select Browser Theme",
                  settings.rootDirName+QDir::separator()+"html/themes",
-                 "Cascading Style Sheets (*.css)");
+                 "Browser theme (*.theme)");
         dialog.close();
         dialog.deleteLater();
-        if (QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
-            QFile::remove (settings.rootDirName+QDir::separator()+"html/current.css");
+        if (newTheme.length() > 0) {
+            if (QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
+                QFile::remove (settings.rootDirName+QDir::separator()+"html/current.css");
+            }
+            QFile::copy (newTheme, settings.rootDirName+QDir::separator()+"html/current.css");
+            emit reloadSignal();
+            qDebug() << "===============";
+            qDebug() << "Selected new theme:" << newTheme;
+            qDebug() << "===============";
+        } else {
+            qDebug() << "===============";
+            qDebug() << "No new theme selected.";
+            qDebug() << "===============";
         }
-        QFile::copy (newSkin, settings.rootDirName+QDir::separator()+"html/current.css");
-        emit reloadSignal();
-        qDebug() << "Selected skin:" << newSkin;
-        qDebug() << "===============";
         return true;
     }
 

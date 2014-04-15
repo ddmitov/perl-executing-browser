@@ -13,11 +13,10 @@ Configuration:
 
 Security:
 - mandatory access control lists for Mongoose
-- https support for win32
 
 GUI:
-- skins for all native dialogs corresponding to the css skins of the HTML pages;
-  simultaneous loading of both types of skins using already implemented 'selectskin' URL.
+- select browser theme from context menu
+- browser theme INI settings
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
@@ -33,6 +32,7 @@ Long-running scripts:
 - check if long-running script is not already started
 - check for STDERR from scripts, if any - display message
 - independent settings for main window and long-running scripts window
+- 'Cancel' button to abort a long-running script at any time
 
 Perl debugger interaction:
 - option to display debugger output in HTML
