@@ -75,7 +75,9 @@ public:
     QString listeningPort;
     QString quitToken;
 
+    QString startPageSetting;
     QString startPage;
+
     QString windowSize;
     int fixedWidth;
     int fixedHeight;
@@ -86,6 +88,10 @@ public:
 
     QString iconPathName;
     QPixmap icon;
+
+    QString defaultTheme;
+    QString defaultThemeDirectory;
+    QString allThemesDirectory;
 
     QString logging;
     QString logMode;
@@ -255,7 +261,6 @@ protected:
                     env.insert ("REQUEST_METHOD", "GET");
                     env.insert ("QUERY_STRING", query);
                     handler.setProcessEnvironment (env);
-                    //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
                 }
 
                 QFileInfo scriptAbsoluteFilePath (settings.rootDirName+
@@ -289,12 +294,12 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExpOne ("Content-type: text/html.{1,25}\n");
-                regExpOne.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExpOne, "");
-                QRegExp regExpTwo ("X-Powered-By: PHP.{1,20}\n");
-                regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExpTwo, "");
+                QRegExp regExp01 ("Content-type: text/html.{1,25}\n");
+                regExp01.setCaseSensitivity (Qt::CaseInsensitive);
+                output.replace (regExp01, "");
+                QRegExp regExp02 ("X-Powered-By: PHP.{1,20}\n");
+                regExp02.setCaseSensitivity (Qt::CaseInsensitive);
+                output.replace (regExp02, "");
 
                 QString css;
                 css.append ("<style media=\"screen\" type=\"text/css\">");
@@ -374,7 +379,6 @@ protected:
                     env.insert ("CONTENT_LENGTH", postDataSize);
                 }
                 handler.setProcessEnvironment (env);
-                //qDebug() << "Process environment:" << handler.processEnvironment().toStringList();
 
                 QFileInfo scriptAbsoluteFilePath (settings.rootDirName+
                                                   QDir::separator()+
@@ -409,12 +413,12 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExpOne ("Content-type: text/html.{1,25}\n");
-                regExpOne.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExpOne, "");
-                QRegExp regExpTwo ("X-Powered-By: PHP.{1,20}\n");
-                regExpTwo.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExpTwo, "");
+                QRegExp regExp01 ("Content-type: text/html.{1,25}\n");
+                regExp01.setCaseSensitivity (Qt::CaseInsensitive);
+                output.replace (regExp01, "");
+                QRegExp regExp02 ("X-Powered-By: PHP.{1,20}\n");
+                regExp02.setCaseSensitivity (Qt::CaseInsensitive);
+                output.replace (regExp02, "");
 
                 QString css;
                 css.append ("<style media=\"screen\" type=\"text/css\">");
@@ -650,31 +654,48 @@ public slots:
     {
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
-        QRegExp regExpOne ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
-        regExpOne.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExpOne, "");
+        QRegExp regExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
+        regExp01.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExp01, "");
 
-        QRegExp regExpTwo ("Editor support available.");
-        regExpTwo.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExpTwo, "");
+        QRegExp regExp02 ("Editor support \\w{1,20}.");
+        regExp02.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExp02, "");
 
-        QRegExp regExpThree ("Enter h .{40,55}\n");
-        regExpThree.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExpThree, "");
+        QRegExp regExp03 ("Enter h .{40,80}\n");
+        regExp03.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (regExp03, "");
 
         accumulatedOutput.append (debuggerOutput);
 
-        QRegExp regExpFour ("\n\\s*\n");
-        regExpFour.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExpFour, "\n\n");
+        QRegExp regExp04 ("\n\\s*\n");
+        regExp04.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExp04, "\n\n");
 
-        QRegExp regExpFive ("\n\\s{4,}");
-        regExpFive.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExpFive, "");
+        QRegExp regExp05 ("\n\\s{4,}");
+        regExp05.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExp05, "\n");
 
-        QRegExp regExpSix ("\n{3,100}");
-        regExpSix.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExpSix, "\n\n");
+        if (accumulatedOutput.contains ("Show module versions")) {
+            QRegExp regExp06 ("\n\\s{3,}");
+            regExp06.setCaseSensitivity (Qt::CaseSensitive);
+            accumulatedOutput.replace (regExp06, "\n");
+        }
+
+        QRegExp regExp07 ("routines from .{10,30}\n");
+        regExp07.setCaseSensitivity (Qt::CaseSensitive);
+        int pos = regExp07.indexIn (accumulatedOutput);
+        Q_UNUSED (pos);
+        QString debuggerVersion = regExp07.capturedTexts().first();
+        accumulatedOutput.replace (regExp07, debuggerVersion+"\n");
+
+        QRegExp regExp08 ("\n{3,100}");
+        regExp08.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExp08, "\n\n");
+
+        QRegExp regExp09 ("  ");
+        regExp09.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (regExp09, " ");
 
         debuggerOutputFilePath = QDir::toNativeSeparators
                         (QDir::tempPath()+
@@ -744,14 +765,13 @@ public slots:
 
     void loadStartPageSlot()
     {
-        if (settings.startPage.contains (".htm")) {
+        if (settings.startPageSetting.contains (".htm")) {
             setUrl (QUrl::fromLocalFile
                     (QDir::toNativeSeparators
-                     (settings.rootDirName+
-                      QDir::separator()+settings.startPage)));
+                     (settings.startPage)));
         } else {
             setUrl (QUrl (QString (PEB_DOMAIN+
-                                   settings.startPage)));
+                                   settings.startPageSetting)));
         }
     }
 

@@ -109,18 +109,6 @@ int main (int argc, char **argv)
 
     QApplication application (argc, argv);
 
-//    // http://stackoverflow.com/questions/19406634/qt-how-to-get-application-to-get-md5-checksum-of-itself
-//    QFile applicationFile(QCoreApplication::applicationFilePath());
-//    QByteArray applicationFileArray;
-//    if (applicationFile.open(QIODevice::ReadOnly)) {
-//        applicationFileArray = applicationFile.readAll();
-//    } else {
-//        qDebug() << "Can't open file.";
-//    }
-//    QString applicationMd5 = QString(QCryptographicHash::hash(
-//                        (applicationFileArray), QCryptographicHash::Md5).toHex());
-//    qDebug() << "MD5:" << applicationMd5;
-
     // Use UTF-8 encoding within the application:
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
@@ -237,7 +225,6 @@ int main (int argc, char **argv)
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
         qDebug() << "Will start another instance of the program and quit this one.";
-
         if (settings.logging == "yes") {
             std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
@@ -254,7 +241,6 @@ int main (int argc, char **argv)
                       << std::endl;
             std::cout << " " << std::endl;
         }
-
         int pid = fork();
         if (pid < 0) {
             // Report error and exit:
@@ -282,9 +268,7 @@ int main (int argc, char **argv)
             return 1;
             QApplication::exit();
         }
-
         qDebug() << "===============";
-
     } else {
         qDebug() << "Started without terminal or inside Qt Creator.";
         qDebug() << "===============";
@@ -322,12 +306,15 @@ int main (int argc, char **argv)
     qDebug() << "Logfiles prefix:" << settings.logPrefix;
     qDebug() << "===============";
 
-    // Convert start page relative path to an absolute one:
-    QString startPageFileName (QDir::toNativeSeparators
-                         (settings.rootDirName+
-                          QDir::separator()+settings.startPage));
+    // Check if default theme exists,
+    // if not - copy it in the default theme directory
+    if (!QFile::exists (settings.defaultThemeDirectory+QDir::separator()+"current.css")) {
+        QFile::copy (settings.defaultTheme,
+                     settings.defaultThemeDirectory+QDir::separator()+"current.css");
+    }
+
     // Check if start page exists:
-    QFile startPageFile (startPageFileName);
+    QFile startPageFile (settings.startPage);
     if (!startPageFile.exists()) {
         qDebug() << "Start page is missing.";
         qDebug() << "Please select a start page.";
@@ -552,8 +539,12 @@ Settings::Settings()
         quitToken = "unavailable";
     }
 
-    // GUI settings:
-    startPage = settings.value ("gui/start_page").toString();
+    // Start page:
+    startPageSetting = settings.value ("gui/start_page").toString();
+    startPage = QDir::toNativeSeparators
+            (rootDirName+QDir::separator()+startPageSetting);
+
+    // Basic GUI settings:
     windowSize = settings.value ("gui/window_size").toString();
     framelessWindow = settings.value ("gui/frameless_window").toString();
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
@@ -565,10 +556,24 @@ Settings::Settings()
     }
 
     // Icon:
-    QString iconRelativePathName = settings.value ("gui/icon").toString();
-    iconPathName = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+iconRelativePathName);
+    QString iconPathNameSetting = settings.value ("gui/icon").toString();
+    iconPathName =
+            QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+iconPathNameSetting);
     icon.load (iconPathName);
+
+    // GUI theme:
+    defaultTheme = settings.value ("gui/default_theme").toString();
+    QString defaultThemeDirectorySetting =
+            settings.value ("gui/default_theme_directory").toString();
+    QString allThemesDirectorySetting =
+            settings.value ("gui/all_themes_directory").toString();
+    defaultThemeDirectory =
+            QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+defaultThemeDirectorySetting);
+    allThemesDirectory =
+            QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+allThemesDirectorySetting);
 
     // Logging:
     logging = settings.value ("logging/enable").toString();
@@ -921,15 +926,15 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
                 (0, "Select Browser Theme",
-                 settings.rootDirName+QDir::separator()+"html/themes",
+                 settings.allThemesDirectory,
                  "Browser theme (*.theme)");
         dialog.close();
         dialog.deleteLater();
         if (newTheme.length() > 0) {
-            if (QFile::exists (settings.rootDirName+QDir::separator()+"html/current.css")) {
-                QFile::remove (settings.rootDirName+QDir::separator()+"html/current.css");
+            if (QFile::exists (settings.defaultThemeDirectory+QDir::separator()+"current.css")) {
+                QFile::remove (settings.defaultThemeDirectory+QDir::separator()+"current.css");
             }
-            QFile::copy (newTheme, settings.rootDirName+QDir::separator()+"html/current.css");
+            QFile::copy (newTheme, settings.defaultThemeDirectory+QDir::separator()+"current.css");
             emit reloadSignal();
             qDebug() << "===============";
             qDebug() << "Selected new theme:" << newTheme;
@@ -1054,7 +1059,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             env.insert ("LINES", "24");
             //env.insert ("PERLDB_OPTS", "LineInfo=/home/knoppix/github/peb/lineinfo.txt");
             debuggerHandler.setProcessEnvironment (env);
-            //qDebug() << "Process environment:" << debuggerHandler.processEnvironment().toStringList();
 
             QFileInfo scriptAbsoluteFilePath (filepath);
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
@@ -1066,7 +1070,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
             debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
             debuggerHandler.start (interpreter, QStringList() << "-d" <<
-                                   QDir::toNativeSeparators (filepath),
+                                   QDir::toNativeSeparators (filepath) << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
             if (!debuggerHandler.waitForStarted (-1))
                 return false;
@@ -1265,7 +1269,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 .replace ("?", "");
         env.insert ("QUERY_STRING", query);
         longRunningScriptHandler.setProcessEnvironment (env);
-        //qDebug() << "Process environment:" << longRunningScriptHandler.processEnvironment().toStringList();
 
         QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
                                           (settings.rootDirName+

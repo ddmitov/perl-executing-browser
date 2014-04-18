@@ -2,21 +2,26 @@
 Permanent TODO priorities:
 - more and better examples
 - documentation, commented code
-======================
+====================================
 
 Configuration:
-- search for INI file in all standard locations for a configuration file on different operating systems
+- search for INI file in all configuration files standard locations
+  on different operating systems
+- check file paths to determine if they are absolute or relative paths
 - more INI file options
-- more command line arguments for GUI configuration
 - default values if INI file is missing or corrupt
 - configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
+- more command line arguments for GUI configuration
 
 Security:
 - mandatory access control lists for Mongoose
+- md5 control of all locally executed scripts
 
 GUI:
 - select browser theme from context menu
-- browser theme INI settings
+- frameless QWebView-based message boxes
+- i18n in all native dialogs
+
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
@@ -37,15 +42,9 @@ Long-running scripts:
 Perl debugger interaction:
 - option to display debugger output in HTML
 - 'Save Page As' dialog to save debugger output in a file
-- load modified debugger on Windows, which is capable of working without a console
-  (using PERL5DB environment variable? http://perldoc.perl.org/perldebguts.html)
 
 Extensibility:
 - Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
-
-i18n:
-- frameless QWebView-based message boxes
-- i18n in all native dialogs
 
 Connectivity:
 - Message when network connectivity is lost or restored
