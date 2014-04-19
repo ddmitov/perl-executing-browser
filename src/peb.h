@@ -38,6 +38,8 @@
 #include <QSystemTrayIcon>
 #include <QDebug>
 
+#include <QShortcut>
+
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -958,19 +960,36 @@ public slots:
 
     void aboutSlot()
     {
-        QString qtVersion = QT_VERSION_STR;
-        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
-        QMessageBox msgBox;
-        msgBox.setWindowTitle ("About");
-        msgBox.setIconPixmap (settings.icon);
-        msgBox.setText ("Perl Executing Browser, version 0.1<br>"
-                        "code name Camel Calf,<br>"
-                        "Qt WebKit version: "+qtWebKitVersion+"<br>"
-                        "Qt version: "+qtVersion+"<br>"
-                        "<a href='https://github.com/ddmitov/perl-executing-browser'>"
-                        "https://github.com/ddmitov/perl-executing-browser</a><br>");
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
+//        QString qtVersion = QT_VERSION_STR;
+//        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
+
+//        QMessageBox msgBox;
+//        msgBox.setWindowTitle ("About");
+//        msgBox.setIconPixmap (settings.icon);
+//        msgBox.setText ("Perl Executing Browser, version 0.1<br>"
+//                        "code name Camel Calf,<br>"
+//                        "Qt WebKit version: "+qtWebKitVersion+"<br>"
+//                        "Qt version: "+qtVersion+"<br>"
+//                        "<a href='https://github.com/ddmitov/perl-executing-browser'>"
+//                        "https://github.com/ddmitov/perl-executing-browser</a><br>");
+//        msgBox.setDefaultButton (QMessageBox::Ok);
+//        msgBox.exec();
+
+        aboutDialog = new TopLevel;
+        aboutDialog->setWindowIcon (settings.icon);
+        aboutDialog->setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        aboutDialog->setContextMenuPolicy (Qt::NoContextMenu);
+        aboutDialog->setFixedSize (400, 200);
+        QRect screenRect = QDesktopWidget().screen()->rect();
+        aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
+                              screenRect.height()/2 - aboutDialog->height()/2));
+        QUrl startUrl = "file://" +
+                QApplication::applicationDirPath()+
+                QDir::separator()+"help/about.htm";
+        aboutDialog->setUrl (startUrl);
+        aboutDialog->setFocus();
+        aboutDialog->show();
+
     }
 
     void quitApplicationSlot()
@@ -1004,6 +1023,8 @@ private:
     QUrl qWebHitTestURL;
     QString filepath;
     QWebView *newWindow;
+
+    QWebView *aboutDialog;
 
 };
 

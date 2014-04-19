@@ -190,7 +190,6 @@ print "<p align='center'><font size='5'>\n";
 print "<a href='quit://now'>Quit Application</a>\n";
 print "</font></p>\n";
 
-
 print "</div>\n";
 print "</body>\n";
 

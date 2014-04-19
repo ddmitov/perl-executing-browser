@@ -688,31 +688,31 @@ TopLevel::TopLevel()
     // Configure keyboard shortcuts:
     QShortcut *maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
     QObject::connect (maximizeShortcut, SIGNAL (activated()),
-                       this, SLOT (maximizeSlot()));
+                      this, SLOT (maximizeSlot()));
 
     QShortcut *minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
     QObject::connect (minimizeShortcut, SIGNAL (activated()),
-                       this, SLOT (minimizeSlot()));
+                      this, SLOT (minimizeSlot()));
 
     QShortcut *toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
     QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
-                       this, SLOT (toggleFullScreenSlot()));
+                      this, SLOT (toggleFullScreenSlot()));
 
     QShortcut *homeShortcut = new QShortcut (Qt::Key_F12, this);
     QObject::connect (homeShortcut, SIGNAL (activated()),
-                       this, SLOT (loadStartPageSlot()));
+                      this, SLOT (loadStartPageSlot()));
 
     QShortcut *reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
     QObject::connect (reloadShortcut, SIGNAL (activated()),
-                       this, SLOT (reloadSlot()));
+                      this, SLOT (reloadSlot()));
 
     QShortcut *printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
     QObject::connect (printShortcut, SIGNAL (activated()),
-                       this, SLOT (printPageSlot()));
+                      this, SLOT (printPageSlot()));
 
     QShortcut *closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
     QObject::connect (closeAppShortcut, SIGNAL (activated()),
-                       this, SLOT (quitApplicationSlot()));
+                      this, SLOT (quitApplicationSlot()));
 
     // Configure screen appearance:
     if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
@@ -746,17 +746,17 @@ TopLevel::TopLevel()
     mainPage = new Page();
 
     QObject::connect (mainPage, SIGNAL (reloadSignal()),
-                       this, SLOT (reloadSlot()));
+                      this, SLOT (reloadSlot()));
     QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
-                       this, SLOT (close()));
+                      this, SLOT (close()));
     QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
-                       this, SLOT (quitApplicationSlot()));
+                      this, SLOT (quitApplicationSlot()));
     if (settings.browserTitle == "dynamic") {
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                           this, SLOT (pageLoadedDynamicTitleSlot (bool)));
+                          this, SLOT (pageLoadedDynamicTitleSlot (bool)));
     } else {
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                           this, SLOT (pageLoadedStaticTitleSlot (bool)));
+                          this, SLOT (pageLoadedStaticTitleSlot (bool)));
     }
 
     setPage (mainPage);
@@ -769,7 +769,7 @@ TopLevel::TopLevel()
     QNetworkCookieJar *jar = new QNetworkCookieJar;
     nam->setCookieJar (jar);
     QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
-                 this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
+                      this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
 
     //main_page->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
 

@@ -13,6 +13,9 @@ Configuration:
 - configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
 - more command line arguments for GUI configuration
 
+Building:
+- build script for command line compilation of the browser
+
 Security:
 - mandatory access control lists for Mongoose
 - md5 control of all locally executed scripts
@@ -21,7 +24,6 @@ GUI:
 - select browser theme from context menu
 - frameless QWebView-based message boxes
 - i18n in all native dialogs
-
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
