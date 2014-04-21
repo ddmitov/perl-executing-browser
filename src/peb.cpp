@@ -30,7 +30,6 @@
 #include <unistd.h> // for isatty()
 #endif
 
-// http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -398,7 +397,7 @@ int main (int argc, char **argv)
     qputenv ("FOLDER_TO_OPEN", "");
     qputenv ("NEW_FILE", "");
 
-    TopLevel toplevel;
+    TopLevel toplevel (QString ("mainWindow"));
 
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
@@ -681,82 +680,103 @@ Page::Page()
 
 }
 
-TopLevel::TopLevel()
+TopLevel::TopLevel (QString type)
     : QWebView (0)
 {
 
-    // Configure keyboard shortcuts:
-    QShortcut *maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
-    QObject::connect (maximizeShortcut, SIGNAL (activated()),
-                      this, SLOT (maximizeSlot()));
+    if (type == "mainWindow") {
+        // Configure keyboard shortcuts - main window:
+        QShortcut *minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
+        QObject::connect (minimizeShortcut, SIGNAL (activated()),
+                          this, SLOT (minimizeSlot()));
 
-    QShortcut *minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
-    QObject::connect (minimizeShortcut, SIGNAL (activated()),
-                      this, SLOT (minimizeSlot()));
+        QShortcut *maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
+        QObject::connect (maximizeShortcut, SIGNAL (activated()),
+                          this, SLOT (maximizeSlot()));
 
-    QShortcut *toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
-    QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
-                      this, SLOT (toggleFullScreenSlot()));
+        QShortcut *toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
+        QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
+                          this, SLOT (toggleFullScreenSlot()));
 
-    QShortcut *homeShortcut = new QShortcut (Qt::Key_F12, this);
-    QObject::connect (homeShortcut, SIGNAL (activated()),
-                      this, SLOT (loadStartPageSlot()));
+        QShortcut *homeShortcut = new QShortcut (Qt::Key_F12, this);
+        QObject::connect (homeShortcut, SIGNAL (activated()),
+                          this, SLOT (loadStartPageSlot()));
 
-    QShortcut *reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
-    QObject::connect (reloadShortcut, SIGNAL (activated()),
-                      this, SLOT (reloadSlot()));
+        QShortcut *reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
+        QObject::connect (reloadShortcut, SIGNAL (activated()),
+                          this, SLOT (reloadSlot()));
 
-    QShortcut *printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
-    QObject::connect (printShortcut, SIGNAL (activated()),
-                      this, SLOT (printPageSlot()));
+        QShortcut *printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
+        QObject::connect (printShortcut, SIGNAL (activated()),
+                          this, SLOT (printPageSlot()));
 
-    QShortcut *closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
-    QObject::connect (closeAppShortcut, SIGNAL (activated()),
-                      this, SLOT (quitApplicationSlot()));
+        QShortcut *closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
+        QObject::connect (closeAppShortcut, SIGNAL (activated()),
+                          this, SLOT (quitApplicationSlot()));
 
-    // Configure screen appearance:
-    if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
-        setFixedSize (settings.fixedWidth, settings.fixedHeight);
-        QRect screenRect = QDesktopWidget().screen()->rect();
-        move (QPoint (screenRect.width() / 2 - width() / 2,
-                      screenRect.height() / 2 - height() / 2));
+        // Configure screen appearance - main window:
+        if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
+            setFixedSize (settings.fixedWidth, settings.fixedHeight);
+            QRect screenRect = QDesktopWidget().screen()->rect();
+            move (QPoint (screenRect.width() / 2 - width() / 2,
+                          screenRect.height() / 2 - height() / 2));
+        }
+        if (settings.windowSize == "maximized") {
+            showMaximized();
+        }
+        if (settings.windowSize == "fullscreen") {
+            showFullScreen();
+        }
+        if (settings.stayOnTop == "yes") {
+            setWindowFlags (Qt::WindowStaysOnTopHint);
+        }
+        if (settings.stayOnTop == "yes" and settings.framelessWindow == "yes") {
+            setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        }
+        if (settings.stayOnTop == "no" and settings.framelessWindow == "yes") {
+            setWindowFlags (Qt::FramelessWindowHint);
+        }
+        if (settings.browserTitle != "dynamic") {
+            setWindowTitle (settings.browserTitle);
+        }
+        if (settings.contextMenu == "no") {
+            setContextMenuPolicy (Qt::NoContextMenu);
+        }
     }
-    if (settings.windowSize == "maximized") {
-        showMaximized();
-    }
-    if (settings.windowSize == "fullscreen") {
-        showFullScreen();
-    }
-    if (settings.stayOnTop == "yes") {
-        setWindowFlags (Qt::WindowStaysOnTopHint);
-    }
-    if (settings.stayOnTop == "yes" and settings.framelessWindow == "yes") {
-        setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
-    }
-    if (settings.stayOnTop == "no" and settings.framelessWindow == "yes") {
-        setWindowFlags (Qt::FramelessWindowHint);
-    }
-    if (settings.browserTitle != "dynamic") {
-        setWindowTitle (settings.browserTitle);
-    }
-    if (settings.contextMenu == "no") {
-        setContextMenuPolicy (Qt::NoContextMenu);
+
+    if (type == "messageBox") {
+        // Configure keyboard shortcuts - message box:
+        QShortcut *escapeShortcut = new QShortcut (Qt::Key_Escape, this);
+        QObject::connect (escapeShortcut, SIGNAL (activated()), this, SLOT (close()));
+
+        QShortcut *enterShortcut = new QShortcut (Qt::Key_Return, this);
+        QObject::connect (enterShortcut, SIGNAL (activated()), this, SLOT (close()));
     }
 
     mainPage = new Page();
 
-    QObject::connect (mainPage, SIGNAL (reloadSignal()),
-                      this, SLOT (reloadSlot()));
     QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
                       this, SLOT (close()));
-    QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
-                      this, SLOT (quitApplicationSlot()));
-    if (settings.browserTitle == "dynamic") {
+
+    if (type == "mainWindow") {
+        // Connect signals and slots - main window:
+        QObject::connect (mainPage, SIGNAL (reloadSignal()),
+                          this, SLOT (reloadSlot()));
+        QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
+                          this, SLOT (quitApplicationSlot()));
+        if (settings.browserTitle == "dynamic") {
+            QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
+                              this, SLOT (pageLoadedDynamicTitleSlot (bool)));
+        } else {
+            QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
+                              this, SLOT (pageLoadedStaticTitleSlot (bool)));
+        }
+    }
+
+    if (type == "messageBox") {
+        // Connect signals and slots - message box:
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
                           this, SLOT (pageLoadedDynamicTitleSlot (bool)));
-    } else {
-        QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                          this, SLOT (pageLoadedStaticTitleSlot (bool)));
     }
 
     setPage (mainPage);
@@ -765,41 +785,51 @@ TopLevel::TopLevel()
     ModifiedNetworkAccessManager *nam = new ModifiedNetworkAccessManager();
     mainPage->setNetworkAccessManager (nam);
 
-    // Cookies and HTTPS support:
-    QNetworkCookieJar *jar = new QNetworkCookieJar;
-    nam->setCookieJar (jar);
-    QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
-                      this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
-
-    //main_page->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
-
-    // Configure scroll bars:
-    mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
-    mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
-
     // Disable history:
     QWebHistory *history = mainPage->history();
     history->setMaximumItemCount (0);
 
-    // Context menu settings:
-    mainPage->action (QWebPage::SetTextDirectionLeftToRight)->setVisible (false);
-    mainPage->action (QWebPage::SetTextDirectionRightToLeft)->setVisible (false);
+    if (type == "mainWindow") {
+        // Cookies and HTTPS support:
+        QNetworkCookieJar *jar = new QNetworkCookieJar;
+        nam->setCookieJar (jar);
+        QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
+                          this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
 
-    mainPage->action (QWebPage::Back)->setVisible (false);
-    mainPage->action (QWebPage::Forward)->setVisible (false);
-    mainPage->action (QWebPage::Reload)->setVisible (false);
-    mainPage->action (QWebPage::Stop)->setVisible (false);
+        // Configure scroll bars:
+        mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
+        mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
 
-    mainPage->action (QWebPage::OpenLink)->setVisible (false);
-    mainPage->action (QWebPage::CopyLinkToClipboard)->setVisible (false);
-    mainPage->action (QWebPage::OpenLinkInNewWindow)->setVisible (false);
-    mainPage->action (QWebPage::DownloadLinkToDisk)->setVisible (false);
-    mainPage->action (QWebPage::OpenFrameInNewWindow)->setVisible (false);
+        // Context menu settings:
+        mainPage->action (QWebPage::SetTextDirectionLeftToRight)->setVisible (false);
+        mainPage->action (QWebPage::SetTextDirectionRightToLeft)->setVisible (false);
 
-    mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
-    mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
-    mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
-    mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
+        mainPage->action (QWebPage::Back)->setVisible (false);
+        mainPage->action (QWebPage::Forward)->setVisible (false);
+        mainPage->action (QWebPage::Reload)->setVisible (false);
+        mainPage->action (QWebPage::Stop)->setVisible (false);
+
+        mainPage->action (QWebPage::OpenLink)->setVisible (false);
+        mainPage->action (QWebPage::CopyLinkToClipboard)->setVisible (false);
+        mainPage->action (QWebPage::OpenLinkInNewWindow)->setVisible (false);
+        mainPage->action (QWebPage::DownloadLinkToDisk)->setVisible (false);
+        mainPage->action (QWebPage::OpenFrameInNewWindow)->setVisible (false);
+
+        mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
+        mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
+        mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
+        mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
+    }
+
+    if (type == "messageBox") {
+        mainPage->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
+        mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAlwaysOff);
+        mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAlwaysOff);
+
+        setWindowIcon (settings.icon);
+        setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        setContextMenuPolicy (Qt::NoContextMenu);
+    }
 
 }
 
@@ -931,10 +961,16 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.close();
         dialog.deleteLater();
         if (newTheme.length() > 0) {
-            if (QFile::exists (settings.defaultThemeDirectory+QDir::separator()+"current.css")) {
-                QFile::remove (settings.defaultThemeDirectory+QDir::separator()+"current.css");
+            if (QFile::exists (
+                        QDir::toNativeSeparators (
+                            settings.defaultThemeDirectory+QDir::separator()+"current.css"))) {
+                QFile::remove (
+                            QDir::toNativeSeparators (
+                                settings.defaultThemeDirectory+QDir::separator()+"current.css"));
             }
-            QFile::copy (newTheme, settings.defaultThemeDirectory+QDir::separator()+"current.css");
+            QFile::copy (newTheme,
+                         QDir::toNativeSeparators (
+                             settings.defaultThemeDirectory+QDir::separator()+"current.css"));
             emit reloadSignal();
             qDebug() << "===============";
             qDebug() << "Selected new theme:" << newTheme;
@@ -1092,7 +1128,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
             debuggerHandler.write (debuggerCommand);
 
-            newDebuggerWindow = new TopLevel;
+            newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);
         }
 
@@ -1169,7 +1205,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "===============";
         if (! Page::mainFrame()->childFrames().contains (frame))
         {
-            newWindow = new TopLevel;
+            newWindow = new TopLevel (QString ("mainWindow"));
             newWindow->setWindowIcon (settings.icon);
             newWindow->setUrl (request.url());
             newWindow->show();
@@ -1203,7 +1239,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                     missingFileMessageSlot();
                     return true;
                 } else {
-                    newWindow = new TopLevel;
+                    newWindow = new TopLevel (QString ("mainWindow"));
                     newWindow->setWindowIcon (settings.icon);
                     if (request.url().path().contains (".htm")) {
                         newWindow->setUrl (QUrl::fromLocalFile
@@ -1291,7 +1327,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             if (frame != Page::currentFrame()) {
                 longRunningScriptOutputInNewWindow = true;
                 lastRequest = request;
-                newLongRunWindow = new TopLevel;
+                newLongRunWindow = new TopLevel (QString ("mainWindow"));
                 newLongRunWindow->setWindowIcon (settings.icon);
             }
 

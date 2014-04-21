@@ -305,7 +305,9 @@ protected:
 
                 QString css;
                 css.append ("<style media=\"screen\" type=\"text/css\">");
-                QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+                QFile cssFile (
+                            QDir::toNativeSeparators (
+                                settings.defaultThemeDirectory+QDir::separator()+"current.css"));
                 cssFile.open(QFile::ReadOnly);
                 QString cssFileContents = QLatin1String (cssFile.readAll());
                 css.append (cssFileContents);
@@ -843,7 +845,7 @@ public slots:
 
     void openInNewWindowSlot()
     {
-        newWindow = new TopLevel;
+        newWindow = new TopLevel (QString ("mainWindow"));
         newWindow->setWindowIcon (settings.icon);
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
         qDebug() << "===============";
@@ -861,6 +863,7 @@ public slots:
 
     void contextMenuEvent (QContextMenuEvent *event)
     {
+
         QWebHitTestResult qWebHitTestResult =
                 mainPage->mainFrame()->hitTestContent (event->pos());
         QMenu *menu = mainPage->createStandardContextMenu();
@@ -904,7 +907,8 @@ public slots:
                               this, SLOT (loadStartPageSlot()));
         }
 
-        if (!TopLevel::url().toString().contains ("longrun")) {
+        if ((!TopLevel::url().toString().contains ("longrun")) and
+                (!TopLevel::url().toString().contains ("deboutput"))) {
             QAction *reloadAct = menu->addAction (tr ("&Reload"));
             QObject::connect (reloadAct, SIGNAL (triggered()),
                               this, SLOT (reloadSlot()));
@@ -935,6 +939,7 @@ public slots:
                            qApp, SLOT (aboutQt()));
 
         menu->exec (mapToGlobal (event->pos()));
+
     }
 
     void maximizeSlot()
@@ -960,8 +965,8 @@ public slots:
 
     void aboutSlot()
     {
-//        QString qtVersion = QT_VERSION_STR;
-//        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
+        QString qtVersion = QT_VERSION_STR;
+        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
 
 //        QMessageBox msgBox;
 //        msgBox.setWindowTitle ("About");
@@ -975,18 +980,68 @@ public slots:
 //        msgBox.setDefaultButton (QMessageBox::Ok);
 //        msgBox.exec();
 
-        aboutDialog = new TopLevel;
-        aboutDialog->setWindowIcon (settings.icon);
-        aboutDialog->setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
-        aboutDialog->setContextMenuPolicy (Qt::NoContextMenu);
-        aboutDialog->setFixedSize (400, 200);
+        // Initialize a new message box
+        aboutDialog = new TopLevel (QString ("messageBox"));
+
+        // Calculate message box dimensions,
+        // center message box on screen:
         QRect screenRect = QDesktopWidget().screen()->rect();
+        float onePercentOfScreenWidth = screenRect.width()/100;
+        float onePercentOfScreenHeigth = screenRect.height()/100;
+        float messageBoxWidth = onePercentOfScreenWidth * 42;
+        float messageBoxHeigth = onePercentOfScreenHeigth * 32;
+        aboutDialog->setFixedSize (messageBoxWidth, messageBoxHeigth);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
                               screenRect.height()/2 - aboutDialog->height()/2));
-        QUrl startUrl = "file://" +
-                QApplication::applicationDirPath()+
-                QDir::separator()+"help/about.htm";
-        aboutDialog->setUrl (startUrl);
+
+        // Output file name:
+        QString outputFilePath = QDir::toNativeSeparators
+                (QDir::tempPath()+
+                 QDir::separator()+
+                 "output.htm");
+        QFile outputFile ( outputFilePath );
+        if (outputFile.exists()) {
+            outputFile.remove();
+        }
+
+        // Initialize output variable:
+        QString output;
+
+        // Read template file, add browser vaiables and
+        // append all of this to the output variable:
+        QFile aboutFileTemplateFile (
+                    QDir::toNativeSeparators (
+                        QApplication::applicationDirPath()+
+                        QDir::separator()+"help/about.htm"));
+        aboutFileTemplateFile.open(QFile::ReadOnly);
+        QString aboutTemplateContents = QLatin1String (aboutFileTemplateFile.readAll());
+        aboutTemplateContents.replace ("[% browser root %]", settings.rootDirName);
+        aboutTemplateContents.replace ("[% Qt Webkit version %]", qtVersion);
+        aboutTemplateContents.replace ("[% Qt version %]", qtWebKitVersion);
+        output.append (aboutTemplateContents);
+
+        // Read CSS theme file and inject its content into the output variable:
+        QString css;
+        css.append ("<style media=\"screen\" type=\"text/css\">");
+        QFile cssFile (
+                    QDir::toNativeSeparators (
+                        settings.defaultThemeDirectory+QDir::separator()+"current.css"));
+        cssFile.open(QFile::ReadOnly);
+        QString cssFileContents = QLatin1String (cssFile.readAll());
+        css.append (cssFileContents);
+        css.append ("</style>");
+        css.append ("</head>");
+        output.replace ("</head>", css);
+
+        // Save the output variable as an output file:
+        if (outputFile.open (QIODevice::ReadWrite)) {
+            QTextStream stream (&outputFile);
+            stream << output << endl;
+        }
+
+        // Load the output file and show it:
+        QUrl aboutUrl = "file://"+outputFilePath;
+        aboutDialog->setUrl (aboutUrl);
         aboutDialog->setFocus();
         aboutDialog->show();
 
@@ -1012,7 +1067,7 @@ public slots:
 
 public:
 
-    TopLevel();
+    TopLevel (QString type);
 
 private:
 
