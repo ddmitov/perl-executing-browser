@@ -827,7 +827,7 @@ TopLevel::TopLevel (QString type)
         mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAlwaysOff);
 
         setWindowIcon (settings.icon);
-        setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
+        setWindowFlags (Qt::WindowStaysOnTopHint);
         setContextMenuPolicy (Qt::NoContextMenu);
     }
 
