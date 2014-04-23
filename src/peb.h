@@ -470,10 +470,10 @@ public slots:
         Settings settings;
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle ("Missing file");
+        msgBox.setWindowTitle (tr ("Missing file"));
         msgBox.setText (QDir::toNativeSeparators
                         (settings.rootDirName+filepath)+
-                        " is missing.<br>Please restore the missing file.");
+                        tr (" is missing.<br>Please restore the missing file."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
     }
@@ -528,9 +528,9 @@ public slots:
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
-                (0, "Select Browser Theme",
+                (0, tr ("Select Browser Theme"),
                  settings.allThemesDirectory,
-                 "Browser theme (*.theme)");
+                 tr ("Browser theme (*.theme)"));
         dialog.close();
         dialog.deleteLater();
         if (newTheme.length() > 0) {
@@ -562,10 +562,10 @@ public slots:
     {
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle ("Missing file");
+        msgBox.setWindowTitle (tr ("Missing file"));
         msgBox.setText (QDir::toNativeSeparators
                         (settings.rootDirName+filepath)+
-                        " is missing.<br>Please restore the missing file.");
+                        tr (" is missing.<br>Please restore the missing file."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
         qDebug() << QDir::toNativeSeparators
@@ -612,7 +612,8 @@ public slots:
         selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectInterpreterDialog.setWindowIcon (settings.icon);
         interpreter = selectInterpreterDialog.getOpenFileName
-                (0, "Select Interpreter", QDir::currentPath(), "All files (*)");
+                (0, tr ("Select Interpreter"),
+                 QDir::currentPath(), tr ("All files (*)"));
         qDebug() << "Selected interpreter:" << interpreter;
         qDebug() << "===============";
         selectInterpreterDialog.close();
@@ -625,7 +626,7 @@ public slots:
         selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
-                (0, "Select PERLLIB", QDir::currentPath());
+                (0, tr ("Select PERLLIB"), QDir::currentPath());
         QByteArray perlLibFolderName;
         perlLibFolderName.append (perlLibFolderNameString);
         qputenv ("PERLLIB", perlLibFolderName);

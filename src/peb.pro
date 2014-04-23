@@ -1,6 +1,8 @@
 
 TEMPLATE = app
 TARGET = peb
+TRANSLATIONS = $${TARGET}_en_US.ts $${TARGET}_bg_BG.ts
+
 DEPENDPATH += .
 CONFIG += openssl-linked
 VERSION = 0.1
@@ -13,7 +15,7 @@ macx {
   # To make a bundle (peb.app):
   # DEFINES += "BUNDLE=1"
   # CONFIG += app_bundle
-  DEFINES += "BUNDLE=0"
+  DEFINES += "BUNDLE=1"
   CONFIG += app_bundle
   ICON = camel.icns
 }

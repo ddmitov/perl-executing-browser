@@ -21,9 +21,11 @@
 #include <QShortcut>
 #include <QDesktopServices>
 #include <QDateTime>
+#include <QTranslator>
 #include <QSystemTrayIcon>
 #include <QIcon>
 #include <QDebug>
+
 #include "peb.h"
 #include <iostream> // for std::cout
 
@@ -117,13 +119,18 @@ int main (int argc, char **argv)
 #endif
 
     // Basic application variables:
-    application.setOrganizationName ("PEBDevTeam");
+    application.setOrganizationName ("PEB-Dev-Team");
     //application.setOrganizationDomain ("peb.org");
     application.setApplicationName ("PerlExecutingBrowser");
     application.setApplicationVersion ("0.1");
 
     // Initialize settings:
     Settings settings;
+
+    // Load translation:
+//    QTranslator translator;
+//    translator.load ("pebtr_bg");
+//    app.installTranslator (&translator);
 
     // Install custom message handler for redirecting all debug messages to a log file:
     if (settings.logging == "yes") {
@@ -189,8 +196,10 @@ int main (int argc, char **argv)
     if (!settingsFile.exists()) {
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle ("Missing configuration file");
-        msgBox.setText ("Configuration file<br>"+settings.settingsFileName+"<br>is missing.<br>Please restore it.");
+        msgBox.setWindowTitle (QMessageBox::tr ("Missing configuration file"));
+        msgBox.setText (QMessageBox::tr ("Configuration file<br>")+
+                        settings.settingsFileName+
+                        QMessageBox::tr ("<br>is missing.<br>Please restore it."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
         return 1;
@@ -322,8 +331,9 @@ int main (int argc, char **argv)
         qDebug() << "===============";
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle ("Missing start page");
-        msgBox.setText ("Start page is missing.<br>Please select a start page.");
+        msgBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
+        msgBox.setText (QMessageBox::tr (
+                            "Start page is missing.<br>Please select a start page."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
         return 1;
@@ -879,7 +889,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString perlInterpreter = dialog.getOpenFileName
-                (0, "Select Perl Interpreter", QDir::currentPath(), "All files (*)");
+                (0, tr ("Select Perl Interpreter"),
+                 QDir::currentPath(), tr ("All files (*)"));
         dialog.close();
         dialog.deleteLater();
         QByteArray perlInterpreterByteArray;
@@ -894,7 +905,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
-                (0, "Select PERLLIB", QDir::currentPath());
+                (0, tr ("Select PERLLIB"), QDir::currentPath());
         selectPerlLibDialog.close();
         selectPerlLibDialog.deleteLater();
         QByteArray perlLibFolderName;
@@ -916,7 +927,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString pythonInterpreter = dialog.getOpenFileName
-                (0, "Select Python Interpreter", QDir::currentPath(), "All files (*)");
+                (0, tr ("Select Python Interpreter"),
+                 QDir::currentPath(), tr ("All files (*)"));
         dialog.close();
         dialog.deleteLater();
         QByteArray pythonInterpreterByteArray;
@@ -937,7 +949,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString phpInterpreter = dialog.getOpenFileName
-                (0, "Select PHP Interpreter", QDir::currentPath(), "All files (*)");
+                (0, tr ("Select PHP Interpreter"),
+                 QDir::currentPath(), tr ("All files (*)"));
         dialog.close();
         dialog.deleteLater();
         QByteArray phpInterpreterByteArray;
@@ -965,7 +978,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getOpenFileName
-                (0, "Select File", QDir::currentPath(), "All files (*)");
+                (0, tr ("Select File"),
+                 QDir::currentPath(), tr ("All files (*)"));
         dialog.close();
         dialog.deleteLater();
         QByteArray fileName;
@@ -986,7 +1000,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getSaveFileName
-                (0, "Create New File", QDir::currentPath(), "All files (*)");
+                (0, tr ("Create New File"),
+                 QDir::currentPath(), tr ("All files (*)"));
         if (fileNameToOpenString.isEmpty())
             return false;
         dialog.close();
@@ -1009,7 +1024,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString folderNameToOpenString = dialog.getExistingDirectory
-                (0, "Select Folder", QDir::currentPath());
+                (0, tr ("Select Folder"), QDir::currentPath());
         dialog.close();
         dialog.deleteLater();
         QByteArray folderName;
@@ -1032,8 +1047,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.setWindowIcon (settings.icon);
         filepath = "";
         filepath = dialog.getOpenFileName
-                (0, "Select Perl File", QDir::currentPath(),
-                 "Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)");
+                (0, tr ("Select Perl File"), QDir::currentPath(),
+                 tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
         dialog.close();
         dialog.deleteLater();
         if (filepath.length() > 1) {
