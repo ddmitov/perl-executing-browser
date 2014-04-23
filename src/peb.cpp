@@ -1,14 +1,15 @@
+/*
+ Perl Executing Browser, v. 0.1
 
-// Perl Executing Browser, v. 0.1
-
-// This program is free software;
-// you can redistribute it and/or modify it under the terms of the
-// GNU General Public License, as published by the Free Software Foundation;
-// either version 3 of the License, or (at your option) any later version.
-// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
-// Valcho Nedelchev, 2014
+ This program is free software;
+ you can redistribute it and/or modify it under the terms of the
+ GNU General Public License, as published by the Free Software Foundation;
+ either version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014
+*/
 
 #include <QApplication>
 #include <QWebPage>
@@ -760,6 +761,8 @@ TopLevel::TopLevel (QString type)
 
     if (type == "mainWindow") {
         // Connect signals and slots - main window:
+        QObject::connect (this, SIGNAL (selectThemeSignal()),
+                          mainPage, SLOT (selectThemeSlot()));
         QObject::connect (mainPage, SIGNAL (reloadSignal()),
                           this, SLOT (reloadSlot()));
         QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
@@ -948,38 +951,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("selecttheme:")) {
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setOption (QFileDialog::DontUseNativeDialog);
-        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
-        dialog.setWindowIcon (settings.icon);
-        QString newTheme = dialog.getOpenFileName
-                (0, "Select Browser Theme",
-                 settings.allThemesDirectory,
-                 "Browser theme (*.theme)");
-        dialog.close();
-        dialog.deleteLater();
-        if (newTheme.length() > 0) {
-            if (QFile::exists (
-                        QDir::toNativeSeparators (
-                            settings.defaultThemeDirectory+QDir::separator()+"current.css"))) {
-                QFile::remove (
-                            QDir::toNativeSeparators (
-                                settings.defaultThemeDirectory+QDir::separator()+"current.css"));
-            }
-            QFile::copy (newTheme,
-                         QDir::toNativeSeparators (
-                             settings.defaultThemeDirectory+QDir::separator()+"current.css"));
-            emit reloadSignal();
-            qDebug() << "===============";
-            qDebug() << "Selected new theme:" << newTheme;
-            qDebug() << "===============";
-        } else {
-            qDebug() << "===============";
-            qDebug() << "No new theme selected.";
-            qDebug() << "===============";
-        }
+        selectThemeSlot();
         return true;
     }
 

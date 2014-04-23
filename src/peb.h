@@ -1,14 +1,15 @@
+/*
+ Perl Executing Browser, v. 0.1
 
-// Perl Executing Browser, v. 0.1
-
-// This program is free software;
-// you can redistribute it and/or modify it under the terms of the
-// GNU General Public License, as published by the Free Software Foundation;
-// either version 3 of the License, or (at your option) any later version.
-// This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
-// without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-// Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
-// Valcho Nedelchev, 2014
+ This program is free software;
+ you can redistribute it and/or modify it under the terms of the
+ GNU General Public License, as published by the Free Software Foundation;
+ either version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
+ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014
+*/
 
 #ifndef PEB_H
 #define PEB_H
@@ -518,6 +519,45 @@ signals:
 
 public slots:
 
+    void selectThemeSlot()
+    {
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowIcon (settings.icon);
+        QString newTheme = dialog.getOpenFileName
+                (0, "Select Browser Theme",
+                 settings.allThemesDirectory,
+                 "Browser theme (*.theme)");
+        dialog.close();
+        dialog.deleteLater();
+        if (newTheme.length() > 0) {
+            if (QFile::exists (
+                        QDir::toNativeSeparators (
+                            settings.defaultThemeDirectory+
+                            QDir::separator()+"current.css"))) {
+                QFile::remove (
+                            QDir::toNativeSeparators (
+                                settings.defaultThemeDirectory+
+                                QDir::separator()+"current.css"));
+            }
+            QFile::copy (newTheme,
+                         QDir::toNativeSeparators (
+                             settings.defaultThemeDirectory+
+                             QDir::separator()+"current.css"));
+            emit reloadSignal();
+            qDebug() << "===============";
+            qDebug() << "Selected new theme:" << newTheme;
+            qDebug() << "===============";
+        } else {
+            qDebug() << "===============";
+            qDebug() << "No new theme selected.";
+            qDebug() << "===============";
+        }
+    }
+
     void missingFileMessageSlot()
     {
         QMessageBox msgBox;
@@ -765,6 +805,10 @@ class TopLevel : public QWebView
 {
     Q_OBJECT
 
+signals:
+
+    void selectThemeSignal();
+
 public slots:
 
     void loadStartPageSlot()
@@ -866,6 +910,7 @@ public slots:
 
         QWebHitTestResult qWebHitTestResult =
                 mainPage->mainFrame()->hitTestContent (event->pos());
+
         QMenu *menu = mainPage->createStandardContextMenu();
 
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
@@ -882,61 +927,70 @@ public slots:
             }
         }
 
-        menu->addSeparator();
+        if (!qWebHitTestResult.isContentEditable()) {
 
-        if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
-            if (settings.framelessWindow == "no") {
-                QAction *maximizeAct = menu->addAction (tr ("&Maximize"));
-                QObject::connect (maximizeAct, SIGNAL (triggered()),
-                                  this, SLOT (maximizeSlot()));
+            menu->addSeparator();
+
+            if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
+                if (settings.framelessWindow == "no" and
+                        (!TopLevel::isMaximized())) {
+                    QAction *maximizeAct = menu->addAction (tr ("&Maximize"));
+                    QObject::connect (maximizeAct, SIGNAL (triggered()),
+                                      this, SLOT (maximizeSlot()));
+                }
+                QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &fullscreen"));
+                QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
+                                  this, SLOT (toggleFullScreenSlot()));
             }
-            QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &fullscreen"));
-            QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
-                              this, SLOT (toggleFullScreenSlot()));
+
+            if (settings.framelessWindow == "no") {
+                QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
+                QObject::connect (minimizeAct, SIGNAL (triggered()),
+                                  this, SLOT (minimizeSlot()));
+            }
+
+            if (!TopLevel::url().toString().contains ("longrun")) {
+                QAction *homeAct = menu->addAction (tr ("&Home"));
+                QObject::connect (homeAct, SIGNAL (triggered()),
+                                  this, SLOT (loadStartPageSlot()));
+            }
+
+            if ((!TopLevel::url().toString().contains ("longrun")) and
+                    (!TopLevel::url().toString().contains ("deboutput"))) {
+                QAction *reloadAct = menu->addAction (tr ("&Reload"));
+                QObject::connect (reloadAct, SIGNAL (triggered()),
+                                  this, SLOT (reloadSlot()));
+            }
+
+            QAction *printAct = menu->addAction (tr ("&Print"));
+            QObject::connect (printAct, SIGNAL (triggered()),
+                              this, SLOT (printPageSlot()));
+
+            QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));
+            QObject::connect (selectThemeAct, SIGNAL (triggered()),
+                              this, SLOT (selectThemeFromContextMenuSlot()));
+
+            QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
+            QObject::connect (closeWindowAct, SIGNAL (triggered()),
+                              this, SLOT (close()));
+
+            if (!TopLevel::url().toString().contains ("longrun")) {
+                QAction *quitAct = menu->addAction (tr ("&Quit"));
+                QObject::connect ( quitAct, SIGNAL (triggered()),
+                                   this, SLOT (quitApplicationSlot()));
+            }
+
+            menu->addSeparator();
+
+            QAction *aboutAction = menu->addAction (tr ("&About"));
+            QObject::connect (aboutAction, SIGNAL (triggered()),
+                              this, SLOT (aboutSlot()));
+
+            QAction *aboutQtAction = menu->addAction (tr ("About Q&t"));
+            QObject::connect ( aboutQtAction, SIGNAL (triggered()),
+                               qApp, SLOT (aboutQt()));
+
         }
-
-        if (settings.framelessWindow == "no") {
-            QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
-            QObject::connect (minimizeAct, SIGNAL (triggered()),
-                              this, SLOT (minimizeSlot()));
-        }
-
-        if (!TopLevel::url().toString().contains ("longrun")) {
-            QAction *homeAct = menu->addAction (tr ("&Home"));
-            QObject::connect (homeAct, SIGNAL (triggered()),
-                              this, SLOT (loadStartPageSlot()));
-        }
-
-        if ((!TopLevel::url().toString().contains ("longrun")) and
-                (!TopLevel::url().toString().contains ("deboutput"))) {
-            QAction *reloadAct = menu->addAction (tr ("&Reload"));
-            QObject::connect (reloadAct, SIGNAL (triggered()),
-                              this, SLOT (reloadSlot()));
-        }
-
-        QAction *printAct = menu->addAction (tr ("&Print"));
-        QObject::connect (printAct, SIGNAL (triggered()),
-                          this, SLOT (printPageSlot()));
-
-        QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
-        QObject::connect (closeWindowAct, SIGNAL (triggered()),
-                          this, SLOT (close()));
-
-        if (!TopLevel::url().toString().contains ("longrun")) {
-            QAction *quitAct = menu->addAction (tr ("&Quit"));
-            QObject::connect ( quitAct, SIGNAL (triggered()),
-                               this, SLOT (quitApplicationSlot()));
-        }
-
-        menu->addSeparator();
-
-        QAction *aboutAction = menu->addAction (tr ("&About"));
-        QObject::connect (aboutAction, SIGNAL (triggered()),
-                          this, SLOT (aboutSlot()));
-
-        QAction *aboutQtAction = menu->addAction (tr ("About Q&t"));
-        QObject::connect ( aboutQtAction, SIGNAL (triggered()),
-                           qApp, SLOT (aboutQt()));
 
         menu->exec (mapToGlobal (event->pos()));
 
@@ -961,6 +1015,11 @@ public slots:
         } else {
             showFullScreen();
         }
+    }
+
+    void selectThemeFromContextMenuSlot()
+    {
+        emit selectThemeSignal();
     }
 
     void aboutSlot()

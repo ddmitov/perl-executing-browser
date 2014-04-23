@@ -5,8 +5,7 @@ Permanent TODO priorities:
 ====================================
 
 Configuration:
-- search for INI file in all configuration files standard locations
-  on different operating systems
+- search for INI file in all standard locations on the supported operating systems
 - check file paths to determine if they are absolute or relative paths
 - more INI file options
 - default values if INI file is missing or corrupt
@@ -21,8 +20,6 @@ Security:
 - md5 control of all locally executed scripts
 
 GUI:
-- select browser theme from context menu
-- frameless QWebView-based message boxes
 - i18n in all native dialogs
 
 All locally executed scripts:
