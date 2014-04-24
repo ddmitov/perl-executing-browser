@@ -1048,8 +1048,8 @@ public slots:
         QRect screenRect = QDesktopWidget().screen()->rect();
         float onePercentOfScreenWidth = screenRect.width()/100;
         float onePercentOfScreenHeigth = screenRect.height()/100;
-        float messageBoxWidth = onePercentOfScreenWidth * 42;
-        float messageBoxHeigth = onePercentOfScreenHeigth * 32;
+        float messageBoxWidth = onePercentOfScreenWidth * 54;
+        float messageBoxHeigth = onePercentOfScreenHeigth * 58;
         aboutDialog->setFixedSize (messageBoxWidth, messageBoxHeigth);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
                               screenRect.height()/2 - aboutDialog->height()/2));
