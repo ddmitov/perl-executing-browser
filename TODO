@@ -9,7 +9,7 @@ Configuration:
 - check file paths to determine if they are absolute or relative paths
 - more INI file options
 - default values if INI file is missing or corrupt
-- configuration interface using 'config' URL, HTML page and, when needed, 'restart' URL
+- configuration interface using 'config' URL, HTML interface and, when needed, 'restart' URL
 - more command line arguments for GUI configuration
 
 Building:
@@ -18,9 +18,6 @@ Building:
 Security:
 - mandatory access control lists for Mongoose
 - md5 control of all locally executed scripts
-
-GUI:
-- i18n in all native dialogs
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder

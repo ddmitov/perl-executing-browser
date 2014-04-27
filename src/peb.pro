@@ -1,7 +1,7 @@
 
 TEMPLATE = app
 TARGET = peb
-TRANSLATIONS = $${TARGET}_en_US.ts $${TARGET}_bg_BG.ts
+TRANSLATIONS = $${TARGET}_bg_BG.ts
 
 DEPENDPATH += .
 CONFIG += openssl-linked

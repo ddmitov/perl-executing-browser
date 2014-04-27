@@ -128,9 +128,11 @@ int main (int argc, char **argv)
     Settings settings;
 
     // Load translation:
-//    QTranslator translator;
-//    translator.load ("pebtr_bg");
-//    app.installTranslator (&translator);
+    QTranslator translator;
+    if (settings.defaultTranslation != "none") {
+        translator.load (settings.defaultTranslation, settings.allTranslationsDirectory);
+    }
+    application.installTranslator (&translator);
 
     // Install custom message handler for redirecting all debug messages to a log file:
     if (settings.logging == "yes") {
@@ -289,8 +291,10 @@ int main (int argc, char **argv)
     qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
     qDebug() << "Browser settings file name:" << settings.settingsFileName;
     qDebug() << "Mongoose settings file name:" << settings.mongooseSettingsFileName;
+
     qDebug() << "ENVIRONMENT SETTINGS:";
     qDebug() << "PERLLIB folder:" << settings.perlLib;
+
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
     qDebug() << "NETWORKING SETTINGS:";
@@ -300,6 +304,7 @@ int main (int argc, char **argv)
     qDebug() << "Ping local webserver:" << settings.pingLocalWebserver;
     qDebug() << "Ping remote webserver:" << settings.pingRemoteWebserver;
     qDebug() << "Browser User Agent:" << settings.userAgent;
+
     qDebug() << "GUI SETTINGS:";
     qDebug() << "Start page:" << settings.startPage;
     qDebug() << "Window size:" << settings.windowSize;
@@ -308,6 +313,12 @@ int main (int argc, char **argv)
     qDebug() << "Browser title:" << settings.browserTitle;
     qDebug() << "Context menu:" << settings.contextMenu;
     qDebug() << "Application icon:" << settings.iconPathName;
+    qDebug() << "Browser default theme:" << settings.defaultTheme;
+    qDebug() << "Browser default theme directory:" << settings.defaultThemeDirectory;
+    qDebug() << "Browser all themes directory:" << settings.allThemesDirectory;
+    qDebug() << "Browser default translation:" << settings.defaultTranslation;
+    qDebug() << "Browser translations directory:" << settings.allTranslationsDirectory;
+
     qDebug() << "LOGGING SETTINGS:";
     qDebug() << "Logging:" << settings.logging;
     qDebug() << "Logging mode:" << settings.logMode;
@@ -584,6 +595,13 @@ Settings::Settings()
     allThemesDirectory =
             QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+allThemesDirectorySetting);
+
+    // Translation:
+    defaultTranslation = settings.value ("gui/default_translation").toString();
+    QString allTranslationsDirectorySetting =
+            settings.value ("gui/all_translations_directory").toString();
+    allTranslationsDirectory = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+allTranslationsDirectorySetting);
 
     // Logging:
     logging = settings.value ("logging/enable").toString();

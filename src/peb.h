@@ -96,6 +96,9 @@ public:
     QString defaultThemeDirectory;
     QString allThemesDirectory;
 
+    QString defaultTranslation;
+    QString allTranslationsDirectory;
+
     QString logging;
     QString logMode;
     QString logDirName;
@@ -935,13 +938,15 @@ public slots:
             if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
                 if (settings.framelessWindow == "no" and
                         (!TopLevel::isMaximized())) {
-                    QAction *maximizeAct = menu->addAction (tr ("&Maximize"));
+                    QAction *maximizeAct = menu->addAction (tr ("&Maximized window"));
                     QObject::connect (maximizeAct, SIGNAL (triggered()),
                                       this, SLOT (maximizeSlot()));
                 }
-                QAction *toggleFullScreenAct = menu->addAction (tr ("Toggle &fullscreen"));
+                if (!TopLevel::isFullScreen()) {
+                QAction *toggleFullScreenAct = menu->addAction (tr ("&Fullscreen"));
                 QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
                                   this, SLOT (toggleFullScreenSlot()));
+                }
             }
 
             if (settings.framelessWindow == "no") {
