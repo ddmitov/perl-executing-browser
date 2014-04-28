@@ -9,14 +9,18 @@ VERSION = 0.1
 
 # Mac specific settings:
 macx {
+  #############################
   # To make a bundle-less application:
+  # (recommended)
   # DEFINES += "BUNDLE=0"
   # CONFIG -= app_bundle
+  #############################
   # To make a bundle (peb.app):
   # DEFINES += "BUNDLE=1"
   # CONFIG += app_bundle
-  DEFINES += "BUNDLE=1"
-  CONFIG += app_bundle
+  #############################
+  DEFINES += "BUNDLE=0"
+  CONFIG -= app_bundle
   ICON = camel.icns
 }
 
