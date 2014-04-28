@@ -420,10 +420,8 @@ int main (int argc, char **argv)
     qputenv ("NEW_FILE", "");
 
     TopLevel toplevel (QString ("mainWindow"));
-
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
-
     toplevel.setWindowIcon (settings.icon);
     toplevel.loadStartPageSlot();
     toplevel.show();
@@ -650,6 +648,9 @@ Watchdog::Watchdog()
     trayIcon = new QSystemTrayIcon();
     trayIcon->setIcon (settings.icon);
     trayIcon->setToolTip ("Camel Calf");
+
+    QObject::connect (trayIcon, SIGNAL (activated (QSystemTrayIcon::ActivationReason)),
+                     this, SLOT (trayIconActivatedSlot (QSystemTrayIcon::ActivationReason)));
 
     aboutAction = new QAction (tr ("&About"), this);
     aboutQtAction = new QAction (tr ("About Q&t"), this);

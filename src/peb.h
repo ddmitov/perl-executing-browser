@@ -114,6 +114,22 @@ class Watchdog : public QObject
 
 public slots:
 
+    void trayIconActivatedSlot (QSystemTrayIcon::ActivationReason reason)
+    {
+        if (reason == QSystemTrayIcon::DoubleClick) {
+            QMessageBox msgBox;
+            msgBox.setWindowTitle ("Quit");
+            msgBox.setIconPixmap (settings.icon);
+            msgBox.setText ("You are going to quit the program.<br>"
+                            "Are you sure?");
+            msgBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
+            msgBox.setDefaultButton (QMessageBox::No);
+            if (msgBox.exec() == QMessageBox::Yes) {
+                QApplication::quit();
+            }
+        }
+    }
+
     void pingSlot()
     {
         QTcpSocket localWebServerPing;
