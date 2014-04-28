@@ -99,6 +99,8 @@ public:
     QString defaultTranslation;
     QString allTranslationsDirectory;
 
+    QString helpDirectory;
+
     QString logging;
     QString logMode;
     QString logDirName;
@@ -1093,11 +1095,11 @@ public slots:
         // append all of this to the output variable:
         QFile aboutFileTemplateFile (
                     QDir::toNativeSeparators (
-                        QApplication::applicationDirPath()+
-                        QDir::separator()+"help/about.htm"));
+                        settings.helpDirectory+
+                        QDir::separator()+"about.htm"));
         aboutFileTemplateFile.open(QFile::ReadOnly);
         QString aboutTemplateContents = QLatin1String (aboutFileTemplateFile.readAll());
-        aboutTemplateContents.replace ("[% browser root %]", settings.rootDirName);
+        aboutTemplateContents.replace ("[% icon %]", settings.iconPathName);
         aboutTemplateContents.replace ("[% Qt Webkit version %]", qtVersion);
         aboutTemplateContents.replace ("[% Qt version %]", qtWebKitVersion);
         output.append (aboutTemplateContents);

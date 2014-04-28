@@ -601,6 +601,12 @@ Settings::Settings()
     allTranslationsDirectory = QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+allTranslationsDirectorySetting);
 
+    // Help:
+    QString helpDirectorySetting =
+            settings.value ("gui/help_directory").toString();
+    helpDirectory = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+helpDirectorySetting);
+
     // Logging:
     logging = settings.value ("logging/enable").toString();
     logMode = settings.value ("logging/mode").toString();
