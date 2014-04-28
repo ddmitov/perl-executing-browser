@@ -117,14 +117,15 @@ public slots:
     void trayIconActivatedSlot (QSystemTrayIcon::ActivationReason reason)
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
-            QMessageBox msgBox;
-            msgBox.setWindowTitle ("Quit");
-            msgBox.setIconPixmap (settings.icon);
-            msgBox.setText ("You are going to quit the program.<br>"
-                            "Are you sure?");
-            msgBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-            msgBox.setDefaultButton (QMessageBox::No);
-            if (msgBox.exec() == QMessageBox::Yes) {
+            QMessageBox confirmExitMessageBox;
+            confirmExitMessageBox.setWindowTitle (tr ("Quit"));
+            confirmExitMessageBox.setIconPixmap (settings.icon);
+            confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
+            confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
+            confirmExitMessageBox.setButtonText (QMessageBox::Yes,tr ("Yes"));
+            confirmExitMessageBox.setButtonText (QMessageBox::No,tr ("No"));
+            confirmExitMessageBox.setDefaultButton (QMessageBox::No);
+            if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 QApplication::quit();
             }
         }

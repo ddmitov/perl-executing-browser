@@ -4,98 +4,98 @@
 <context>
     <name>ModifiedNetworkAccessManager</name>
     <message>
-        <location filename="peb.h" line="476"/>
+        <location filename="peb.h" line="493"/>
         <source>Missing file</source>
-        <translation type="unfinished">Липсващ файл</translation>
+        <translation>Липсващ файл</translation>
     </message>
     <message>
-        <location filename="peb.h" line="479"/>
+        <location filename="peb.h" line="496"/>
         <source> is missing.&lt;br&gt;Please restore the missing file.</source>
-        <translation type="unfinished">не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
+        <translation>не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
     </message>
 </context>
 <context>
     <name>Page</name>
     <message>
-        <location filename="peb.cpp" line="910"/>
-        <source>Select Perl Interpreter</source>
-        <translation type="unfinished">Избор на Perl интерпретатор</translation>
-    </message>
-    <message>
         <location filename="peb.cpp" line="911"/>
-        <location filename="peb.cpp" line="949"/>
-        <location filename="peb.cpp" line="971"/>
-        <location filename="peb.cpp" line="1000"/>
-        <location filename="peb.cpp" line="1022"/>
-        <location filename="peb.h" line="619"/>
+        <source>Select Perl Interpreter</source>
+        <translation>Избор на Perl интерпретатор</translation>
+    </message>
+    <message>
+        <location filename="peb.cpp" line="912"/>
+        <location filename="peb.cpp" line="950"/>
+        <location filename="peb.cpp" line="972"/>
+        <location filename="peb.cpp" line="1001"/>
+        <location filename="peb.cpp" line="1023"/>
+        <location filename="peb.h" line="636"/>
         <source>All files (*)</source>
-        <translation type="unfinished">Всички файлове (*)</translation>
+        <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="926"/>
-        <location filename="peb.h" line="632"/>
+        <location filename="peb.cpp" line="927"/>
+        <location filename="peb.h" line="649"/>
         <source>Select PERLLIB</source>
-        <translation type="unfinished">Избор на PERLLIB</translation>
+        <translation>Избор на PERLLIB</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="948"/>
+        <location filename="peb.cpp" line="949"/>
         <source>Select Python Interpreter</source>
-        <translation type="unfinished">Избор на Python интерпретатор</translation>
+        <translation>Избор на Python интерпретатор</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="970"/>
+        <location filename="peb.cpp" line="971"/>
         <source>Select PHP Interpreter</source>
-        <translation type="unfinished">Избор на PHP интерпретатор</translation>
+        <translation>Избор на PHP интерпретатор</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="999"/>
+        <location filename="peb.cpp" line="1000"/>
         <source>Select File</source>
-        <translation type="unfinished">Избор на файл</translation>
+        <translation>Избор на файл</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="1021"/>
+        <location filename="peb.cpp" line="1022"/>
         <source>Create New File</source>
-        <translation type="unfinished">Създай нов файл</translation>
+        <translation>Създай нов файл</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="1045"/>
+        <location filename="peb.cpp" line="1046"/>
         <source>Select Folder</source>
-        <translation type="unfinished">Избери директория</translation>
-    </message>
-    <message>
-        <location filename="peb.cpp" line="1068"/>
-        <source>Select Perl File</source>
-        <translation type="unfinished">Избери Perl файл</translation>
+        <translation>Избери директория</translation>
     </message>
     <message>
         <location filename="peb.cpp" line="1069"/>
+        <source>Select Perl File</source>
+        <translation>Избери Perl файл</translation>
+    </message>
+    <message>
+        <location filename="peb.cpp" line="1070"/>
         <source>Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)</source>
-        <translation type="unfinished">Perl скриптове (*.pl);;Perl модули (*.pm);;CGI скриптове (*.cgi);;Всички файлове (*)</translation>
+        <translation>Perl скриптове (*.pl);;Perl модули (*.pm);;CGI скриптове (*.cgi);;Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="peb.h" line="534"/>
+        <location filename="peb.h" line="551"/>
         <source>Select Browser Theme</source>
-        <translation type="unfinished">Избор на тема на браузъра</translation>
+        <translation>Избор на тема на браузъра</translation>
     </message>
     <message>
-        <location filename="peb.h" line="536"/>
+        <location filename="peb.h" line="553"/>
         <source>Browser theme (*.theme)</source>
-        <translation type="unfinished">Тема на браузъра (*.theme)</translation>
+        <translation>Тема на браузъра (*.theme)</translation>
     </message>
     <message>
-        <location filename="peb.h" line="568"/>
+        <location filename="peb.h" line="585"/>
         <source>Missing file</source>
-        <translation type="unfinished">Липсващ файл</translation>
+        <translation>Липсващ файл</translation>
     </message>
     <message>
-        <location filename="peb.h" line="571"/>
+        <location filename="peb.h" line="588"/>
         <source> is missing.&lt;br&gt;Please restore the missing file.</source>
-        <translation type="unfinished">не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
+        <translation>не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
     </message>
     <message>
-        <location filename="peb.h" line="618"/>
+        <location filename="peb.h" line="635"/>
         <source>Select Interpreter</source>
-        <translation type="unfinished">Избор на интерпретатор</translation>
+        <translation>Избор на интерпретатор</translation>
     </message>
 </context>
 <context>
@@ -103,113 +103,133 @@
     <message>
         <location filename="peb.cpp" line="201"/>
         <source>Missing configuration file</source>
-        <translation type="unfinished">Липсващ конфигурационен файл</translation>
+        <translation>Липсващ конфигурационен файл</translation>
     </message>
     <message>
         <location filename="peb.cpp" line="202"/>
         <source>Configuration file&lt;br&gt;</source>
-        <translation type="unfinished">Конфигурационният файл</translation>
+        <translation>Конфигурационният файл</translation>
     </message>
     <message>
         <location filename="peb.cpp" line="204"/>
         <source>&lt;br&gt;is missing.&lt;br&gt;Please restore it.</source>
-        <translation type="unfinished">не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
+        <translation>не бе намерен. &lt;br&gt;Моля, възстановете липсващия файл.</translation>
     </message>
     <message>
         <location filename="peb.cpp" line="345"/>
         <source>Missing start page</source>
-        <translation type="unfinished">Липсваща главна страница</translation>
+        <translation>Липсваща главна страница</translation>
     </message>
     <message>
         <location filename="peb.cpp" line="346"/>
         <source>Start page is missing.&lt;br&gt;Please select a start page.</source>
-        <translation type="unfinished">Главната страница липсва.&lt;br&gt;Моля, изберете главна страница.</translation>
+        <translation>Главната страница липсва.&lt;br&gt;Моля, изберете главна страница.</translation>
     </message>
 </context>
 <context>
     <name>TopLevel</name>
     <message>
-        <location filename="peb.h" line="925"/>
+        <location filename="peb.h" line="942"/>
         <source>&amp;Edit</source>
-        <translation type="unfinished">&amp;Редактирай</translation>
+        <translation>&amp;Редактирай</translation>
     </message>
     <message>
-        <location filename="peb.h" line="928"/>
+        <location filename="peb.h" line="945"/>
         <source>&amp;Open in new window</source>
-        <translation type="unfinished">Отвори в &amp;нов прозорец</translation>
+        <translation>Отвори в &amp;нов прозорец</translation>
     </message>
     <message>
-        <location filename="peb.h" line="941"/>
+        <location filename="peb.h" line="958"/>
         <source>&amp;Maximized window</source>
-        <translation type="unfinished">&amp;Максимизиран прозорец</translation>
+        <translation>&amp;Максимизиран прозорец</translation>
     </message>
     <message>
-        <location filename="peb.h" line="946"/>
+        <location filename="peb.h" line="963"/>
         <source>&amp;Fullscreen</source>
-        <translation type="unfinished">&amp;Цял екран</translation>
+        <translation>&amp;Цял екран</translation>
     </message>
     <message>
-        <location filename="peb.h" line="953"/>
+        <location filename="peb.h" line="970"/>
         <source>Mi&amp;nimize</source>
-        <translation type="unfinished">&amp;Свали прозореца</translation>
+        <translation>&amp;Свали прозореца</translation>
     </message>
     <message>
-        <location filename="peb.h" line="959"/>
+        <location filename="peb.h" line="976"/>
         <source>&amp;Home</source>
-        <translation type="unfinished">&amp;Главна страница</translation>
+        <translation>&amp;Главна страница</translation>
     </message>
     <message>
-        <location filename="peb.h" line="966"/>
+        <location filename="peb.h" line="983"/>
         <source>&amp;Reload</source>
-        <translation type="unfinished">Презаре&amp;ди</translation>
+        <translation>Презаре&amp;ди</translation>
     </message>
     <message>
-        <location filename="peb.h" line="971"/>
+        <location filename="peb.h" line="988"/>
         <source>&amp;Print</source>
-        <translation type="unfinished">&amp;Печат</translation>
+        <translation>&amp;Печат</translation>
     </message>
     <message>
-        <location filename="peb.h" line="975"/>
+        <location filename="peb.h" line="992"/>
         <source>&amp;Select theme</source>
-        <translation type="unfinished">Избери &amp;тема</translation>
+        <translation>Избери &amp;тема</translation>
     </message>
     <message>
-        <location filename="peb.h" line="979"/>
+        <location filename="peb.h" line="996"/>
         <source>&amp;Close window</source>
-        <translation type="unfinished">&amp;Затвори прозореца</translation>
+        <translation>&amp;Затвори прозореца</translation>
     </message>
     <message>
-        <location filename="peb.h" line="984"/>
+        <location filename="peb.h" line="1001"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Изход</translation>
+        <translation>&amp;Изход</translation>
     </message>
     <message>
-        <location filename="peb.h" line="991"/>
+        <location filename="peb.h" line="1008"/>
         <source>&amp;About</source>
-        <translation type="unfinished">З&amp;а програмата</translation>
+        <translation>З&amp;а програмата</translation>
     </message>
     <message>
-        <location filename="peb.h" line="995"/>
+        <location filename="peb.h" line="1012"/>
         <source>About Q&amp;t</source>
-        <translation type="unfinished">За &amp;Qt</translation>
+        <translation>За &amp;Qt</translation>
     </message>
 </context>
 <context>
     <name>Watchdog</name>
     <message>
-        <location filename="peb.cpp" line="654"/>
-        <source>&amp;About</source>
-        <translation type="unfinished">За &amp;програмата</translation>
-    </message>
-    <message>
         <location filename="peb.cpp" line="655"/>
-        <source>About Q&amp;t</source>
-        <translation type="unfinished">За &amp;Qt</translation>
+        <source>&amp;About</source>
+        <translation>За &amp;програмата</translation>
     </message>
     <message>
-        <location filename="peb.cpp" line="658"/>
+        <location filename="peb.cpp" line="656"/>
+        <source>About Q&amp;t</source>
+        <translation>За &amp;Qt</translation>
+    </message>
+    <message>
+        <location filename="peb.cpp" line="659"/>
         <source>&amp;Quit</source>
-        <translation type="unfinished">&amp;Изход</translation>
+        <translation>&amp;Изключване</translation>
+    </message>
+    <message>
+        <location filename="peb.h" line="121"/>
+        <source>Quit</source>
+        <translation>Изключване</translation>
+    </message>
+    <message>
+        <location filename="peb.h" line="123"/>
+        <source>You are going to quit the program.&lt;br&gt;Are you sure?</source>
+        <translation>На път сте да изключите програмата.&lt;br&gt;Съгласни ли сте?</translation>
+    </message>
+    <message>
+        <location filename="peb.h" line="125"/>
+        <source>Yes</source>
+        <translation>Да</translation>
+    </message>
+    <message>
+        <location filename="peb.h" line="126"/>
+        <source>No</source>
+        <translation>Не</translation>
     </message>
 </context>
 </TS>
