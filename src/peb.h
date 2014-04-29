@@ -1052,28 +1052,14 @@ public slots:
         QString qtVersion = QT_VERSION_STR;
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
 
-//        QMessageBox msgBox;
-//        msgBox.setWindowTitle ("About");
-//        msgBox.setIconPixmap (settings.icon);
-//        msgBox.setText ("Perl Executing Browser, version 0.1<br>"
-//                        "code name Camel Calf,<br>"
-//                        "Qt WebKit version: "+qtWebKitVersion+"<br>"
-//                        "Qt version: "+qtVersion+"<br>"
-//                        "<a href='https://github.com/ddmitov/perl-executing-browser'>"
-//                        "https://github.com/ddmitov/perl-executing-browser</a><br>");
-//        msgBox.setDefaultButton (QMessageBox::Ok);
-//        msgBox.exec();
-
         // Initialize a new message box
         aboutDialog = new TopLevel (QString ("messageBox"));
 
         // Calculate message box dimensions,
         // center message box on screen:
         QRect screenRect = QDesktopWidget().screen()->rect();
-        float onePercentOfScreenWidth = screenRect.width()/100;
-        float onePercentOfScreenHeigth = screenRect.height()/100;
-        float messageBoxWidth = onePercentOfScreenWidth * 54;
-        float messageBoxHeigth = onePercentOfScreenHeigth * 58;
+        float messageBoxHeigth = screenRect.height() * 0.60;
+        float messageBoxWidth = messageBoxHeigth * 1.20;
         aboutDialog->setFixedSize (messageBoxWidth, messageBoxHeigth);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
                               screenRect.height()/2 - aboutDialog->height()/2));
