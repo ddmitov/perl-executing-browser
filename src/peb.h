@@ -1058,7 +1058,7 @@ public slots:
         // Calculate message box dimensions,
         // center message box on screen:
         QRect screenRect = QDesktopWidget().screen()->rect();
-        float messageBoxHeigth = screenRect.height() * 0.60;
+        float messageBoxHeigth = screenRect.height() * 0.57;
         float messageBoxWidth = messageBoxHeigth * 1.20;
         aboutDialog->setFixedSize (messageBoxWidth, messageBoxHeigth);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
