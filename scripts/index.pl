@@ -20,7 +20,7 @@ print "<body>\n";
 
 print '<div class="container">'.$/;
 print "<h3 align=\"center\">\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/perlinfo.pl'>Perl Info</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/perlinfo.pl?theme=false'>Perl Info</a>\n";
 print "</h3>\n";
 print "<p align='center'><font size='3'>\n";
 print "Non-core module loaded from directory, without system-wide installation.<br>\n";

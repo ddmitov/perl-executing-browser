@@ -297,6 +297,9 @@ int main (int argc, char **argv)
 
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
+    qDebug() << "Source viewer:" << settings.sourceViewer;
+    qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
+
     qDebug() << "NETWORKING SETTINGS:";
     qDebug() << "Autostart local webserver:" << settings.autostartLocalWebserver;
     qDebug() << "Mongoose listening port:" << settings.listeningPort;
@@ -438,6 +441,7 @@ int main (int argc, char **argv)
 
 }
 
+
 Settings::Settings()
     : QSettings (0)
 {
@@ -492,9 +496,9 @@ Settings::Settings()
         if (defaultPerlInterpreter == "system") {
             qputenv ("PERL_INTERPRETER", "perl");
         } else {
-            QByteArray perlInterpreterByteArray;
-            perlInterpreterByteArray.append (defaultPerlInterpreter);
-            qputenv ("PERL_INTERPRETER", perlInterpreterByteArray);
+            QByteArray perlInterpreterNewByteArray;
+            perlInterpreterNewByteArray.append (defaultPerlInterpreter);
+            qputenv ("PERL_INTERPRETER", perlInterpreterNewByteArray);
         }
     }
     QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
@@ -504,9 +508,9 @@ Settings::Settings()
         if (defaultPythonInterpreter == "system") {
             qputenv ("PYTHON_INTERPRETER", "python");
         } else {
-            QByteArray pythonInterpreterByteArray;
-            pythonInterpreterByteArray.append (defaultPythonInterpreter);
-            qputenv ("PYTHON_INTERPRETER", pythonInterpreterByteArray);
+            QByteArray pythonInterpreterNewByteArray;
+            pythonInterpreterNewByteArray.append (defaultPythonInterpreter);
+            qputenv ("PYTHON_INTERPRETER", pythonInterpreterNewByteArray);
         }
     }
     QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
@@ -516,14 +520,17 @@ Settings::Settings()
         if (defaultPhpInterpreter == "system") {
             qputenv ("PHP_INTERPRETER", "php-cgi");
         } else {
-            QByteArray phpInterpreterByteArray;
-            phpInterpreterByteArray.append (defaultPhpInterpreter);
-            qputenv ("PHP_INTERPRETER", phpInterpreterByteArray);
+            QByteArray phpInterpreterNewByteArray;
+            phpInterpreterNewByteArray.append (defaultPhpInterpreter);
+            qputenv ("PHP_INTERPRETER", phpInterpreterNewByteArray);
         }
     }
 
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
+    QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
+    sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
+    sourceViewerArguments = settings.value ("perl_debugger/source_viewer_arguments").toString();
 
     // Networking:
     autostartLocalWebserver = settings.value ("networking/autostart_local_webserver").toString();
@@ -634,6 +641,7 @@ Settings::Settings()
 
 }
 
+
 Watchdog::Watchdog()
     : QObject (0)
 {
@@ -673,6 +681,7 @@ Watchdog::Watchdog()
     trayIcon->show();
 
 }
+
 
 Page::Page()
     : QWebPage (0)
@@ -715,6 +724,7 @@ Page::Page()
                        this, SLOT (displayDebuggerOutputSlot()));
 
 }
+
 
 TopLevel::TopLevel (QString type)
     : QWebView (0)
@@ -1238,8 +1248,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     if (frame != Page::currentFrame() and
             (QUrl (PEB_DOMAIN))
             .isParentOf (request.url())) {
-        if (! Page::mainFrame()->childFrames().contains (frame)) {
-            if (! request.url().path().contains ("longrun")) {
+        if (!Page::mainFrame()->childFrames().contains (frame)) {
+            if (!request.url().path().contains ("longrun")) {
                 filepath = request.url()
                         .toString (QUrl::RemoveScheme
                                    | QUrl::RemoveAuthority

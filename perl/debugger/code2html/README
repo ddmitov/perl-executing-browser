@@ -1,0 +1,46 @@
+*** README for code2html(1) ***
+*** $Revision: 1.2 $
+*** $Date: 2002/01/12 21:17:02 $
+
+[For details on installing code2html see the INSTALL file]
+
+This is the README for code2html, a tool wich allows you to convert
+your source code files to syntax highlighted HTML. In the future other 
+output-formats may be added, the hooks to support this are already
+there.
+
+
+For options and details please query the man-page which is distributed 
+together with code2thml. In short, there are 3 ways to use code2html:
+
+o Convert a simple source-code file to HTML. For example to convert
+  the code2html perl script itself to an HTML file, use
+
+	code2html code2html out.html
+
+  The first part ('code2html') calls the program itself, the second
+  block is the source file, where code2html should take the
+  source-code to syntax highlight from, and the third and last part is 
+  the desitination file.
+
+  The source and destination files are optional, if not given STDIN
+  and STDOUT will be used.
+
+o Use code2html in patch mode. Code2html allows you to have inline
+  source code in an HTML file. It can then take this file and replace
+  the source code in the HTML file with its syntax highlighted
+  counterpart. 
+
+  For details see the man-page.
+
+o At last code2html can also be used as a CGI script.
+
+  See the man-page and the example at
+
+  http://www.palfrader.org/code2html/
+
+  for details.
+
+
+Have fun.
+Peter Palfrader <code2html@palfrader.org>

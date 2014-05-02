@@ -1,0 +1,69 @@
+        This is at least a partial credits-file of people that have
+        contributed to code2html. The format is the same as in
+        /usr/src/linux/CREDITS. It is sorted by name and formatted to
+        allow easy grepping and beautification by scripts.  The fields
+        are: name (N), email (E), web-address (W), PGP key ID and
+        fingerprint (P), description (D), and snail-mail address (S).
+        Thanks,
+			Peter (stolen from Linus)
+
+------
+
+N: Joel Andersson (JA)
+E: joel@post.netlink.se
+D: awk, groff, m4 patterns
+
+N: Matt Giwer (MG)
+E: jull43@ij.net
+D: keywords for povray
+
+N: John Interrante 
+E: interran@crd.ge.com
+D: patched a typo
+
+N: Joor Loohuis (DL)
+E: joor@casema.net
+D: converted doc to POD
+D: also showed a way for lang autodetect
+
+N: Don Mahurin (DM)
+E: dmahurin@dmapub.dma.org
+D: bugfixes
+
+N: Peter Palfrader
+E: peter@palfrader.org
+P: 1024R/D1A3A329 BB A2 DC FE D7 D2 09 BF  93 46 36 6F C1 A4 41 1A
+P: 1024D/94C09C7F 5B00 C96D 5D54 AEE1 206B  AF84 DE7A AF6E 94C0 9C7F
+W: http://www.palfrader.org/
+S: Hoettinger Auffahrt 1
+S: A-6020 Innsbruck
+S: Austria
+
+B: Pepin, Joseph D (Joe), GOVMK (JP)
+E: joepepin@att.com
+D: perl subroutine header with prototypes recognition
+
+N: John Douglas Rowell (JD)
+E: me@jdrowell.com
+D: perl tweaks
+
+N: Barrie Slaymaker (BS)
+E: rbs@telerama.com
+D: many hints & suggestions
+D: patches to improve speed
+
+N: Michael Still (MS)
+E: mikal@stillhq.com
+D: awk typo fixes and C/C++ doc comments
+
+N: Joshua Swink
+E: jswink@pacbell.net
+D: ruby support
+
+N: Jukka A. Ukkonen
+E: jau@cs74137.pp.htv.fi
+D: came up with the first version of the man-page
+D: and helped to improve later versions
+
+------
+if you feel your name should be here too, mail me a patch!

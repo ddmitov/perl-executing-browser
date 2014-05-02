@@ -39,18 +39,18 @@
 #include <QSystemTrayIcon>
 #include <QDebug>
 
-#include <QShortcut>
-
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
 #include <QtPrintSupport/QPrinter>
 #include <QtPrintSupport/QPrintDialog>
+#include <QUrlQuery>
 #else
 // Qt4 code:
 #include <QPrintDialog>
 #include <QPrinter>
 #endif
+
 
 class Settings : public QSettings
 {
@@ -68,7 +68,10 @@ public:
     QString mongooseSettingsFileName;
 
     QString perlLib;
+
     QString debuggerInterpreter;
+    QString sourceViewer;
+    QString sourceViewerArguments;
 
     QString autostartLocalWebserver;
     QString pingLocalWebserver;
@@ -109,6 +112,7 @@ public:
 
 };
 
+
 class Watchdog : public QObject
 {
 
@@ -119,6 +123,7 @@ public slots:
     void trayIconActivatedSlot (QSystemTrayIcon::ActivationReason reason)
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
+
             QMessageBox confirmExitMessageBox;
             confirmExitMessageBox.setWindowTitle (tr ("Quit"));
             confirmExitMessageBox.setIconPixmap (settings.icon);
@@ -130,6 +135,7 @@ public slots:
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 QApplication::quit();
             }
+
         }
     }
 
@@ -219,6 +225,7 @@ private:
 
 };
 
+
 class ModifiedNetworkAccessManager : public QNetworkAccessManager
 {
 
@@ -295,25 +302,54 @@ protected:
                 handler.setWorkingDirectory (scriptDirectory);
                 qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
 
-
-
                 qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
-                handler.start (interpreter, QStringList() <<
-                               QDir::toNativeSeparators
-                               (settings.rootDirName+
-                                QDir::separator()+filepath));
 
                 QString output;
-                if (handler.waitForFinished()) {
-                    output = handler.readAll();
-                    handler.close();
+
+                if (query.contains("source=true")) {
+                    QProcess sourceViewer;
+                    QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+                    QString perlInterpreter (perlInterpreterByteArray);
+                    sourceViewer.start (perlInterpreter, QStringList() <<
+                                     settings.sourceViewer
+                                     << settings.sourceViewerArguments <<
+                                     QDir::toNativeSeparators
+                                     (settings.rootDirName+
+                                      QDir::separator()+filepath));
+
+                    if (sourceViewer.waitForFinished()) {
+                        output = sourceViewer.readAll();
+                        sourceViewer.close();
+                    }
+
+                } else {
+
+                    handler.start (interpreter, QStringList() <<
+                                   QDir::toNativeSeparators
+                                   (settings.rootDirName+
+                                    QDir::separator()+filepath));
+
+                    if (handler.waitForFinished()) {
+                        output = handler.readAll();
+                        handler.close();
+                    }
+
                 }
 
-                QString outputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+
-                         QDir::separator()+
-                         "output.htm");
+                QString outputFilePath;
+                if (query.contains("source=true")) {
+                    outputFilePath = QDir::toNativeSeparators
+                            (QDir::tempPath()+
+                             QDir::separator()+
+                             "source.htm");
+                } else {
+                    outputFilePath = QDir::toNativeSeparators
+                            (QDir::tempPath()+
+                             QDir::separator()+
+                             "output.htm");
+                }
+
                 QFile outputFilePathFile (outputFilePath);
                 if (outputFilePathFile.exists()) {
                     outputFilePathFile.remove();
@@ -326,17 +362,22 @@ protected:
                 regExp02.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExp02, "");
 
-                QString css;
-                css.append ("<style media=\"screen\" type=\"text/css\">");
-                QFile cssFile (
-                            QDir::toNativeSeparators (
-                                settings.defaultThemeDirectory+QDir::separator()+"current.css"));
-                cssFile.open(QFile::ReadOnly);
-                QString cssFileContents = QLatin1String (cssFile.readAll());
-                css.append (cssFileContents);
-                css.append ("</style>");
-                css.append ("</head>");
-                output.replace ("</head>", css);
+                if ((!request.url().toString().contains ("phpinfo")) and
+                    (!query.contains ("theme=false"))) {
+                    QString css;
+                    css.append ("<style media=\"screen\" type=\"text/css\">");
+                    QFile cssFile (
+                                QDir::toNativeSeparators (
+                                    settings.defaultThemeDirectory+
+                                    QDir::separator()+
+                                    "current.css"));
+                    cssFile.open(QFile::ReadOnly);
+                    QString cssFileContents = QLatin1String (cssFile.readAll());
+                    css.append (cssFileContents);
+                    css.append ("</style>");
+                    css.append ("</head>");
+                    output.replace ("</head>", css);
+                }
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite)) {
                     QTextStream stream (&outputFilePathFile);
@@ -350,10 +391,7 @@ protected:
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
-                         (QDir::toNativeSeparators
-                          (QDir::tempPath()+
-                           QDir::separator()+
-                           "output.htm" )));
+                         (outputFilePath));
 
                 QWebSettings::clearMemoryCaches();
                 return QNetworkAccessManager::createRequest
@@ -526,6 +564,7 @@ private:
     QString interpreter;
 
 };
+
 
 class Page : public QWebPage
 {
@@ -824,6 +863,7 @@ private:
 
 };
 
+
 class TopLevel : public QWebView
 {
     Q_OBJECT
@@ -836,7 +876,10 @@ public slots:
 
     void loadStartPageSlot()
     {
-        if (settings.startPageSetting.contains (".htm")) {
+        if (settings.startPage.contains (".htm") or
+                settings.startPage.contains (".html") or
+                settings.startPage.contains (".HTM") or
+                settings.startPage.contains (".HTML")) {
             setUrl (QUrl::fromLocalFile
                     (QDir::toNativeSeparators
                      (settings.startPage)));
@@ -910,6 +953,30 @@ public slots:
         externalProcess.startDetached ("padre", QStringList() << fileToEdit);
     }
 
+
+    void viewSourceFromContextMenuSlot()
+    {
+        qDebug() << "Local URL to view as source code:" << qWebHitTestURL;
+        qDebug() << "===============";
+        newWindow = new TopLevel (QString ("mainWindow"));
+        newWindow->setWindowIcon (settings.icon);
+// http://stackoverflow.com/questions/14465263/how-do-you-port-qurl-addqueryitem-to-qt5s-qurlquery
+#if QT_VERSION >= 0x050000
+        QUrlQuery viewSourceUrlQuery;
+        viewSourceUrlQuery.addQueryItem (QString ("source"), QString ("true"));
+        viewSourceUrlQuery.addQueryItem (QString ("theme"), QString ("false"));
+        QUrl viewSourceUrl = qWebHitTestURL;
+        viewSourceUrl.setQuery (viewSourceUrlQuery);
+#else
+        QUrl viewSourceUrl = qWebHitTestURL;
+        viewSourceUrl.addQueryItem (QString ("source"), QString ("true"));
+        viewSourceUrl.addQueryItem (QString ("theme"), QString ("false"));
+#endif
+        newWindow->setUrl (viewSourceUrl);
+        newWindow->show();
+    }
+
+
     void openInNewWindowSlot()
     {
         newWindow = new TopLevel (QString ("mainWindow"));
@@ -938,19 +1005,28 @@ public slots:
 
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
-            if (QUrl (PEB_DOMAIN)
-                    .isParentOf (qWebHitTestURL)) {
+            if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL)) {
+
                 menu->addSeparator ();
+
                 QAction *editAct = menu->addAction (tr ("&Edit"));
                 QObject::connect (editAct, SIGNAL (triggered()),
                                   this, SLOT (editSlot()));
+
+                if (qWebHitTestURL.toString().contains(".pl")) {
+                    QAction *viewSourceAct = menu->addAction (tr ("&View Source"));
+                    QObject::connect (viewSourceAct, SIGNAL (triggered()),
+                                      this, SLOT (viewSourceFromContextMenuSlot()));
+                }
+
                 QAction *openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
                 QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
                                   this, SLOT (openInNewWindowSlot()));
             }
         }
 
-        if (!qWebHitTestResult.isContentEditable()) {
+        if (!qWebHitTestResult.isContentEditable() and
+                qWebHitTestResult.linkUrl().isEmpty()) {
 
             menu->addSeparator();
 
@@ -961,6 +1037,7 @@ public slots:
                     QObject::connect (maximizeAct, SIGNAL (triggered()),
                                       this, SLOT (maximizeSlot()));
                 }
+
                 if (!TopLevel::isFullScreen()) {
                 QAction *toggleFullScreenAct = menu->addAction (tr ("&Fullscreen"));
                 QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),

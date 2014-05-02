@@ -1,0 +1,479 @@
+$Date: 2002/01/12 21:17:02 $
+$Revision: 1.12 $
+$Id: ChangeLog,v 1.12 2002/01/12 21:17:02 weaselp Exp $
+
+0.9.1 - 2002-01-12
+
+	Added python support by Tom Good <tgood@tripwire.com>
+	Added diff file support by Martin Dorey <mdorey@bluearc.com>
+	Applied linebreak patch by Andreas Marschallek <e9627177@student.tuwien.ac.at>
+	Added shellscript support by Andreas Marschallek
+	Added html-simple and html-nocolor stylesheets by Andreas Marschallek
+	Added lisp support by Andreas Krennmair <a.krennmair@aon.at>
+	Added html-fntlck stylesheet by Vincent Sanders <vince@trinity.fluff.org>
+	Added gpasm support by Vincent Sanders
+
+	Replaced cosy.sbg.ac.at URIs.
+
+	Thanks to everyone who submitted a patch or comments. I apologize for
+	 the long delay.
+
+0.9 - 2001-03-25
+	
+	Add --prefix switch.
+	Changed a typo in awk (function header). (MS)
+	Added doc comments to C and C++. (MS)
+	Added povray support. (MG)
+	Changed author address and page URI.
+	Changed text/code to text/x-sourcecode in Documentation.
+	Added ruby support.
+	Made gimsox at regexen gimesox in styles.
+	Fixed function header style.
+	Fixed HTML style to not create a <font> tag for each char
+	 seperatly.
+
+0.8.12 - 2000-10-02
+	
+	Fixed typo in the manpage and mention that the Action
+	module must get loaded for the auto execution with apache
+	to work (closes: Debian Bug #72935).
+
+0.8.11 - 2000-04-24
+	
+	"\\" was not recognized as a string. added "\\\\\\\\" to regexps.
+	same for single quote strings.
+	
+0.8.10 - 2000-04-11
+
+	Fixed problem with parameter parsing. The fix in 0.8.8.d, while
+	fixing the problem with - beeing used for stdin and stdout,
+	broke using of 'binary' options like "-t 4". Should be fixed now.
+	
+	
+0.8.9a - 2000-03-21
+
+	The style 'continuation' (used for Makefiles) was not defined.
+	FIXED.
+
+0.8.9 - 2000-03-18
+
+	--version no longer prints an empty line after the actual
+	version message.
+
+	Added INSTALL and README.
+
+0.8.8f - 2000-03-16
+
+	HTML templates now have a closing </body> tag. (Closes #102669)
+
+	File extensions are treated case insensitive in some cases now. 
+	(Closes #102670)
+	
+	Jukka A. Ukkonen helped me to improve the manpage.
+	The wording should be more clearly now.
+	Formatting is more consistent.
+
+0.8.8e - MARCH 2000
+
+	moved CREDITS, LICENSE, and ChangeLog to their own files.
+	$FILES_DISALLOWED_IN_CGI is now set by default.
+
+0.8.8d - MARCH 2000
+
+	changed all command parameters' names from abc_def to abd-def
+	the old names should still work
+
+	using the minus (-) on the commandline to choose STDIN/STDOUT
+	did not work. FIXED.
+
+	no pod documentation any longer. Use the man-page.
+
+0.8.8c - FEBRUARY 2000
+
+	fixed a bug in put_output. $params{'outfile'} should be
+	$params->{'outfile'}. It did work the old way too, but relied
+	on the global %params. not nice. (DM)
+
+	file extensions .hpp and .hxx now result in the file treated
+	as C++
+
+	added new output definition for 'html-dark' and 'html-nobc'
+	Tnx to DM.
+
+	Now really check wheter the outputformat is defined.
+
+0.8.8b - JANUARY 2000
+
+	fixed some typos
+
+	fixed problem with string recognition if last character was a
+	backslash
+
+	fixed endtag of 'predefined type' style
+
+0.8.8a - JANUARY 2000
+
+	fixed documentation for REDIRECT_URL call.
+
+	'cpp' extensions are now identified as C++ files.
+
+0.8.8 - JANUARY 2000
+
+	added support for different outputformats. the texinfo output
+	format will be added soon (perhaps even in this release)
+	added --outputformat=s; -o=s switch
+
+	added template support
+	added --template switch
+
+	removed -? switch
+
+	tried to move the CGI stuff to CGI.pm but CGI.pm has problems
+	handling some file uploaded via filefields, so we'll have to live
+	with my selfmade parsing routine.
+
+	fixed some perl patterns bugs. TNX to
+	"Pepin, Joseph D (Joe), GOVMK" <joepepin@att.com> for reporting.
+
+	external language files should work now
+
+	Perl sub's with prototypes are recognized (JP).
+
+	some line number changes (there was a +-1 error)
+
+	introduced STYLESHEET.
+	this means that %LANGUAGE was changed:
+	o no starttag and endtag anymore for each rule
+	o instead there's a style field which refers to an appropriate
+	entry in the STYLESHEET
+
+	changed license to MIT.
+	This is the old license:
+	Not derived from licensed software.
+
+	Permission is granted to anyone to use this  software  for
+	any purpose on any computer system, and to redistribute it
+	in any way, subject to the following restrictions:
+
+	1. The author is not responsible for the  consequences  of
+	use of this software, no matter how awful, even if they
+	arise from defects in it.
+	2. The origin of this software must not be misrepresented,
+	either by explicit claim or by omission.
+	3. Altered  versions  must  be plainly marked as such, and
+	must  not  be  misrepresented  (by  explicit  claim  or
+	omission) as being the original software.
+	3a. It would be nice if I got  a  copy  of  your  improved
+	version  sent to ppalfrad@cosy.sbg.ac.at. However this
+	is not obligatory.
+	4. This notice must not be removed or altered.
+
+
+0.8.7d - NOVEMBER 1999
+
+	langmode is not case sensitive any longer
+
+0.8.7c - OCTOBER 1999
+
+	line numbers AGAIN :/ (this time everything schould work :)
+
+0.8.7b - OCTOBER 1999
+
+	line numbers AGAIN :/
+
+0.8.7a - OCTOBER 1999
+
+	declared result in putout, so code2html runs with use strict
+
+	patching works with stdin to stdout too.
+
+0.8.7 - OCTOBER 1999
+
+	the newslines where missing with lin[ke]numbers. Fixed (PP)
+
+	fixed patchmode. TNX to "Brad M. Garcia" <bgarcia@fore.com>
+	for the bug report (PP)
+
+0.8.6 - OCTOBER 1999
+
+	changed some perl patterns, faster & smaller html (PP)
+
+	replaced (abc|Abc|ABC) style patterns with (?i)abc (PP)
+
+	changed config file layout; using a data structure now (PP)
+
+	speed
+	o create_snippets tweaking (BS)
+	o Pod::Text not used but required (BS)
+	o _new_ _improved_ (great words, eh?) perl patterns (BS)
+
+	checkTab in again (PP)
+
+0.8.5 - AUGUST 1999
+
+	fixed linenumbers.
+
+	html patching now also has an outputfile.
+	(Daniel Winkelmann <winkelma@chemie.fu-berlin.de>)
+
+	html patching failed when refering to external files. this is
+	fixed now. TNX to Daniel Winkelmann for the bug report
+
+	code2html in CGI mode now encodes the output as bz2/gz/Z if
+	the program is on the server and the format is accepted by
+	the client (HTTP_ACCEPT_ENCODING).
+	TNX to Matty <mattpratt@yahoo.com> for the idea.
+
+0.8.4 - AUGUST 1999
+
+	Barrie Slaymaker <barries@slaysys.com> sent a different
+	approach for finding & inserting tags. the hidechar way is no
+	longer needed. It is quite fast and needs not that much
+	memory.
+
+0.8.3 - AUGUST 1999
+
+	removed 'use HTML::Entities' line. it HTML::Entities was not
+	used anyway.
+
+0.8.2 - AUGUST 1999
+
+	John Douglas Rowell <me@jdrowell.com> submitted some perl
+	tweaks to correctly parse <<"-x-"; and =begin/=end blocks.
+
+	anchors are not used any more when no line numbers are wanted.
+
+	John Interrante <interran@crd.ge.com> patched a typo that
+	made the html footer even printed if noheader was spezified.
+
+	new option -T=s, --title=s; suggested by Harald Fielker
+	<fielker@informatik.fh-augsburg.de> as well as Barrie Slaymaker
+	<barries@slaysys.com>.
+
+	significantly reduced memory usage
+
+	Barrie Slaymaker <barries@slaysys.com> sent a patch to speed up
+	insert_tags. I already had a not that bad version some time ago
+	but somehow it got lost. Anyway Barrie's way is _a_lot_ faster
+	than mine.
+
+0.8.1 - AUGUST 1999
+
+	Joor Loohuis <joor@casema.net> updated the documentation.
+
+0.8.0 - AUGUST 1999
+
+	Joor Loohuis <joor@casema.net> converted the long help text to
+	pod (plain old documentation, see perlpod(1)). The major
+	advantage is that the documentation can now simply be
+	converted to html, man, LaTeX or plain text, by using one of
+	the filters from the standard Perl POD module.
+
+	Joor Loohuis also contributed an example of automatic
+	language recognition. I adapted it and it is now part of
+	code2html. As a result the syntax has changed. langmode is no
+	longer obligatory but optional with -l <langmode>
+
+	Joel Andersson <joel@post.netlink.se> sent me the patterns for
+	awl, m4, groff.
+
+	perl tweaks; again :/
+
+	regular expressions in config files are now checked for
+	correctness. code2html fails gracefully if a regex is wrong.
+
+0.7.1 - August 1999
+
+	corrected (hopefully) a gotcha in the perl patterns (again...)
+
+	added one item to the changelog of 0.7.0
+
+	--replace_tabs no longer replaces every tab with the given
+	amount of spaces but instead it now replaces it with the right
+	number to go to the next tabstop. the parameter given to
+	replace_tabs gives the width of tabstops.
+	TNX to T. Jahn <tjahn@crosswinds.net> for providing an example
+	of how to do this in one of his programs. If I had known it
+	was that easy I'ld have done it earlier :)
+
+0.7.0 - August 1999
+
+	No longer need for that stupid fatal_error sub. I now use perl's
+	handlers for __DIE__ and __WARN__
+
+	complete rewrite of the option and parameter fetching sub. I
+	now use Getopt::Long. TNX to Barrie for the pointer. As a
+	the number for --replace_tabs / -t is no longer optional.
+
+	Added HTML patching: code2html now also allows you to have
+	inline source code in an html file. It can then take this html
+	file and insert the syntax highlighted code.
+	Look in the help. It's very usefull ( at least for me )
+
+	the CGI mode got a forth way to pass the input file. If the
+	input_selector parameter is set to REDIRECT_URL the file is
+	taken from ENV{'DOCUMENT_ROOT'}.$ENV{'REDIRECT_URL'}.
+	Kevin Burton <burton@relativity.yi.org> suggested this so that
+	it is possible to configure Apache with an action directive
+	to automatically print java files syntax highlighted.
+
+0.6.6 - July 1999
+
+	added sql - it is still very poor since I don't know all the
+	keywords etc. If you know, tell me.
+
+	Martynov Andrew <root@tn.energo.ru> pointed me to the qq, qx,
+	etc operators in perl. They should now no longer cause problems
+
+	Wayne Roberts <wroberts1@cx983858-b.orng1.occa.home.com>
+	reported a problem with C strings like "\\". It should be fixed
+	too.
+
+	I changed the operator with which the default language base
+	is assigned to a variable, so there's no need for \\\\\\\\\\
+	quotes anymore :)
+
+0.6.5 - June 1999
+
+	tweaking Perl regular expressions (TNX to Barrie Slaymaker
+	<rbs@telerama.com>)
+
+	if a language mode cannot be found the error message now tells
+	you which lang you requested.
+
+	new --fallback <lang> option. This language mode is used if the
+	given mode by parameter1 is not available. This feature was
+	requested by Barrie Slaymaker <rbs@telerama.com>
+
+	changed 'is called as CGI' heuristics.
+
+0.6.4 - May 1999
+
+	the name attribute in the line numbers was wrong. there should
+	be no in it. TNX to <stifle33@hotmail.com>
+
+	linking to line numbers now works from the command line too
+
+0.6.3 - May 1999
+
+	fixed C character constant regex. TNX to Jesse
+	<jesse@lmscadsi.com>
+
+	line numbers now can link to themselves
+
+	line numbers now have a constant width
+
+0.6.2 - May 1999
+
+	fixed something in HTML lang
+
+0.6.1 - May 1999
+
+	added 'plain' language mode
+
+	cgi support improoved. should now also handle
+	enctype="multipart/form-data" forms
+
+0.6.0 - May 1999
+
+	fixed Substitution loop at ./code2html.pl (5.2) line 627
+
+	changed string regular expressions: \" is no longer a problem
+
+	default locations for the language files have changed:
+	first all the files listed in the enviroment variable
+	CODE2HTML_CONFIG (seperated by colons (:)) will be checked,
+	then, if HOME set, $HOME/.code2html.config and finally
+	/etc/code2html.config
+	TNX to Eric Brandwine <ebrandwi@UU.NET> for the hint.
+
+	new: --no_header does not print the <html><head>... stuff
+
+	new: --content_type prints Content-Type: text/html;
+
+	C/C++: in preprocessor lines: strings are highlighted now
+
+	-n now also names the lines with <a name="line<nr>">..</a>
+
+	script may now be run as a CGI script. see the CGI section
+	in the help
+
+	get_config_file was rewritten because it was _ugly_
+
+0.5.2 - May 1999
+
+	fixed Makefile dependency line bug. (a * in regexp instead a +)
+
+0.5.1 - May 1999
+
+	clarified copyright questions on regular expressions
+
+	changed -dumb_default_lang to -dump_default_lang :)
+
+0.5.0 - Apr 1999
+
+	changed find_all_matches__create_taglist__insert_placeholders
+	so that it works around a bug in earlier perl versions, in which
+	pos() is not set if the return value of m//g is not used.
+
+	changed a regex in get_config_file
+
+0.4.1 - Mar 1999
+
+	changed JavaScript regexps slightly
+
+	changed find_all_matches_.. slightly
+
+0.4.0 - Mar 1999
+
+	script no longer needs $' and $` thus beeing faster. $& is still
+	needed
+
+	regexps for perl changed slightly
+
+	find_all_matches has been completly rewritten. verify is no
+	longer needed. taglist is built while searching.
+	May take a bit longer now, but otherwhise a bug could not have
+	been fixed.
+
+	changed (fixed?) start of language_def_block pos evaluation
+
+0.3.3 - Feb 1999
+
+	fixed STDIN/STDOUT parameters when passed a - the scrpit though
+	options would follow and didn't tread this as a handle for STDIN
+
+	added -V as shortcut to --version
+
+0.3.2 - Feb 1999
+
+	removed -T from 1st line so activePerl will run the script
+	without any modifications
+
+	changed perl string regexps. run now faster and better
+	(and run at all under win)
+
+	added --replace_tabs
+
+0.3.1 - Feb 1999
+
+	fixed language files bug (<space>lang_mode<space> no longer
+	starts langmode)
+
+	fixed empty html tag bug when reading lang specs
+
+	added languages: Makefile, Java, JavaScript, Perl
+
+	added --modes
+
+0.3.0 - Feb 1999
+
+	added linenumbers
+
+	added <head> and <title> tag in html output
+
+	fixed crlf switch works now
+
+0.2.0 - Feb 1999
+
+	first official release
