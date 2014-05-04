@@ -75,11 +75,14 @@ public:
 
     QString autostartLocalWebserver;
     QString pingLocalWebserver;
-    QString pingRemoteWebserver;
-    QString userAgent;
-
     QString listeningPort;
     QString quitToken;
+
+    QString pingRemoteWebserver;
+    QString remoteWebserver;
+    QString remoteWebserverPort;
+
+    QString userAgent;
 
     QString startPageSetting;
     QString startPage;
@@ -149,11 +152,11 @@ public slots:
         }
 
         if (settings.pingRemoteWebserver == "yes") {
-            webConnectivityPing.connectToHost ("www.google.com", 80);
+            webConnectivityPing.connectToHost (settings.remoteWebserver, 80);
         }
 
         if (settings.pingLocalWebserver == "yes") {
-            if (localWebServerPing.waitForConnected (1000) ) {
+            if (localWebServerPing.waitForConnected (1000)) {
                 qDebug() << "Local web server is running.";
             } else {
                 if (settings.autostartLocalWebserver == "yes") {
@@ -169,9 +172,27 @@ public slots:
         }
 
         if (settings.pingRemoteWebserver == "yes") {
-            if (webConnectivityPing.waitForConnected (1000 ))
+            if (webConnectivityPing.waitForConnected (1000))
             {
+
+                if (lastStateOfRemoteWebserver.length() > 0) {
+                    if (lastStateOfRemoteWebserver == "unavailable") {
+                        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (0);
+                        trayIcon->showMessage (tr ("Connected to remote server"),
+                                               tr ("Connectivity to remote server is restored!"),
+                                               icon, 10 * 1000);
+                    }
+                } else {
+                    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (0);
+                    trayIcon->showMessage (tr ("Connected to remote server"),
+                                           tr ("Remote server is available."),
+                                           icon, 10 * 1000);
+                }
+
+                lastStateOfRemoteWebserver = "available";
+                qputenv ("REMOTE_SERVER", "available");
                 qDebug() << "Internet connectivity is available.";
+
                 QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
                 foreach (QNetworkInterface iface, list) {
                     QList<QNetworkAddressEntry> interfaceEntries = iface.addressEntries();
@@ -195,7 +216,25 @@ public slots:
                 }
 
             } else {
+
+                if (lastStateOfRemoteWebserver.length() > 0) {
+                    if (lastStateOfRemoteWebserver == "available") {
+                        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
+                        trayIcon -> showMessage (tr ("Disconnected"),
+                                                 tr ("Connectivity to remote server is lost!"),
+                                                 icon, 10 * 1000);
+                    }
+                } else {
+                    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
+                    trayIcon->showMessage (tr ("No connection"),
+                                           tr ("Remote server is not available."),
+                                           icon, 10 * 1000);
+                }
+
+                lastStateOfRemoteWebserver = "unavailable";
+                qputenv ("REMOTE_SERVER", "unavailable");
                 qDebug() << "Internet connectivity is not available.";
+
             }
             qDebug() << "===============";
         }
@@ -222,6 +261,8 @@ private:
     Settings settings;
     QSystemTrayIcon *trayIcon;
     QMenu *trayIconMenu;
+
+    QString lastStateOfRemoteWebserver;
 
 };
 

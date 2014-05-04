@@ -14,7 +14,7 @@ Configuration:
 
 Security:
 - mandatory access control lists for Mongoose
-- md5 control of all locally executed scripts
+- optional md5 control of all locally executed scripts
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
@@ -45,10 +45,11 @@ Help:
 - 'help' URL
 
 Connectivity:
-- Message when network connectivity is lost or restored
 - Whitelist of allowed web sites
+- Easier configuration or custom local web server started with the browser
 
 Building:
 - build script for command line compilation of the browser
 - Debian package producing script
+- windeployqt script for win32 deployment
 - Qt Installer Framework configuration script

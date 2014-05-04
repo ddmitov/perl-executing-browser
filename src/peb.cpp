@@ -306,6 +306,8 @@ int main (int argc, char **argv)
     qDebug() << "Mongoose quit token:" << settings.quitToken;
     qDebug() << "Ping local webserver:" << settings.pingLocalWebserver;
     qDebug() << "Ping remote webserver:" << settings.pingRemoteWebserver;
+    qDebug() << "Remote webserver:" << settings.remoteWebserver;
+    qDebug() << "Remote webserver port:" << settings.remoteWebserverPort;
     qDebug() << "Browser User Agent:" << settings.userAgent;
 
     qDebug() << "GUI SETTINGS:";
@@ -415,6 +417,7 @@ int main (int argc, char **argv)
     qputenv ("PERLLIB", perlLib);
 
     // Browser-specific environment variables:
+    qputenv ("REMOTE_SERVER", "");
     qputenv ("PERL_INTERPRETER", "");
     qputenv ("PYTHON_INTERPRETER", "");
     qputenv ("PHP_INTERPRETER", "");
@@ -536,6 +539,8 @@ Settings::Settings()
     autostartLocalWebserver = settings.value ("networking/autostart_local_webserver").toString();
     pingLocalWebserver = settings.value ("networking/ping_local_webserver").toString();
     pingRemoteWebserver = settings.value ("networking/ping_remote_webserver").toString();
+    remoteWebserver = settings.value ("networking/remote_webserver").toString();
+    remoteWebserverPort = settings.value ("networking/remote_webserver_port").toInt();
     userAgent = settings.value ("networking/user_agent").toString();
 
     // Read Mongoose local web server settings from its own configuration file:
