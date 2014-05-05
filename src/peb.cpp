@@ -297,6 +297,10 @@ int main (int argc, char **argv)
 
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
+    qDebug() << "Debugger output:" << settings.debuggerOutput;
+    qDebug() << "Debugger HTML header:" << settings.debuggerHtmlHeader;
+    qDebug() << "Debugger HTML footer:" << settings.debuggerHtmlFooter;
+    qDebug() << "Debugger HTML theme:" << settings.debuggerHtmlTheme;
     qDebug() << "Source viewer:" << settings.sourceViewer;
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
@@ -531,7 +535,20 @@ Settings::Settings()
 
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
+    debuggerOutput = settings.value ("perl_debugger/debugger_output").toString();
+    QString debuggerHtmlHeaderSetting = settings.value (
+                "perl_debugger/debugger_html_header").toString();
+    debuggerHtmlHeader = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+debuggerHtmlHeaderSetting);
+    QString debuggerHtmlFooterSetting = settings.value (
+                "perl_debugger/debugger_html_footer").toString();
+    debuggerHtmlFooter = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+debuggerHtmlFooterSetting);
     QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
+    QString debuggerHtmlThemeSetting = settings.value (
+                "perl_debugger/debugger_html_theme").toString();
+    debuggerHtmlTheme = QDir::toNativeSeparators (
+                rootDirName+QDir::separator()+debuggerHtmlThemeSetting);
     sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
     sourceViewerArguments = settings.value ("perl_debugger/source_viewer_arguments").toString();
 
@@ -1110,12 +1127,42 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
             debuggerHandler.close();
             accumulatedOutput = "";
-            accumulatedOutput.append ("\nScript: "+filepath+"\n");
+
+            if (settings.debuggerOutput == "html") {
+                QFile htmlHeaderFile (
+                            QDir::toNativeSeparators (settings.debuggerHtmlHeader));
+                htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
+                QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
+                accumulatedOutput.append (htmlHeaderFileContents);
+            }
+
+            QString css;
+            css.append ("<style media=\"screen\" type=\"text/css\">");
+            QFile cssFile (QDir::toNativeSeparators (settings.debuggerHtmlTheme));
+            cssFile.open (QFile::ReadOnly);
+            QString cssFileContents = QString (cssFile.readAll());
+            css.append (cssFileContents);
+            css.append ("</style>");
+            css.append ("</head>");
+            accumulatedOutput.replace ("</head>", css);
+
+            if (settings.debuggerOutput == "txt") {
+                accumulatedOutput.append ("\nScript: "+filepath+"\n");
+            }
+            if (settings.debuggerOutput == "html") {
+                accumulatedOutput.append ("\nScript: "+filepath+"<br>\n");
+            }
+
             QFile debuggerOutputFile (debuggerOutputFilePath);
             if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
 
-            accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
+            if (settings.debuggerOutput == "txt") {
+                accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
+            }
+            if (settings.debuggerOutput == "html") {
+                accumulatedOutput.append ("Interpreter: "+interpreter+"<br>\n");
+            }
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             env.insert ("COLUMNS", "80");
@@ -1151,12 +1198,19 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 debuggerCommand.append (QString ("V\n").toLatin1());
                 debuggerCommandHumanReadable = "List Variables in Package (V)";
             }
-            accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"\n");
+
+            if (settings.debuggerOutput == "txt") {
+                accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"\n");
+            }
+            if (settings.debuggerOutput == "html") {
+                accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"<br>\n");
+            }
 
             debuggerHandler.write (debuggerCommand);
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);
+
         }
 
         QWebSettings::clearMemoryCaches();

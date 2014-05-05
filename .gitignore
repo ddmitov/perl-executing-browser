@@ -12,3 +12,6 @@ peb*.log
 moc_peb.cpp
 moc_peb.o
 peb.o
+copy-win32
+upcopy
+upgit

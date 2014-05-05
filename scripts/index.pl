@@ -29,16 +29,23 @@ print "Copyright (c) 2009, Mike Accardo\n";
 print "</font></p>\n";
 
 print "<p align='center'><font size='5'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Perl Environment Test</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5'>\n";
 print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>Perl SQLite Example</a>\n";
+print "</font></p>\n";
+
+print "<p align='center'><font size='5'>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl?source=true&theme=false' target='_blank'>Perl SQLite Example as source code</a>\n";
+print "</font></p>\n";
+print "<p align='center'><font size='3'>\n";
+print "(will open in a new window)\n";
 print "</font></p>\n";
 
 #~ print "<p align='center'><font size='5'>\n";
 #~ print "<a href='http://perl-executing-browser-pseudodomain/html/bgvol/index.htm'>BG Volumina</a>\n";
 #~ print "</font></p>\n";
-
-print "<p align='center'><font size='5'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Perl Environment Test</a>\n";
-print "</font></p>\n";
 
 print "<hr width='95%'>\n";
 

@@ -70,6 +70,10 @@ public:
     QString perlLib;
 
     QString debuggerInterpreter;
+    QString debuggerOutput;
+    QString debuggerHtmlHeader;
+    QString debuggerHtmlFooter;
+    QString debuggerHtmlTheme;
     QString sourceViewer;
     QString sourceViewerArguments;
 
@@ -413,7 +417,7 @@ protected:
                                     QDir::separator()+
                                     "current.css"));
                     cssFile.open(QFile::ReadOnly);
-                    QString cssFileContents = QLatin1String (cssFile.readAll());
+                    QString cssFileContents = QString (cssFile.readAll());
                     css.append (cssFileContents);
                     css.append ("</style>");
                     css.append ("</head>");
@@ -530,7 +534,7 @@ protected:
                 css.append ("<style media=\"screen\" type=\"text/css\">");
                 QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
                 cssFile.open(QFile::ReadOnly);
-                QString cssFileContents = QLatin1String (cssFile.readAll());
+                QString cssFileContents = QString (cssFile.readAll());
                 css.append (cssFileContents);
                 css.append ("</style>");
                 css.append ("</head>");
@@ -746,7 +750,7 @@ public slots:
         css.append ("<style media=\"screen\" type=\"text/css\">");
         QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
         cssFile.open(QFile::ReadOnly);
-        QString cssFileContents = QLatin1String (cssFile.readAll());
+        QString cssFileContents = QString (cssFile.readAll());
         css.append (cssFileContents);
         css.append ("</style>");
         css.append ("</head>");
@@ -801,53 +805,84 @@ public slots:
     {
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
-        QRegExp regExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
-        regExp01.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExp01, "");
+        QRegExp outputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
+        outputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (outputRegExp01, "");
 
-        QRegExp regExp02 ("Editor support \\w{1,20}.");
-        regExp02.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExp02, "");
+        QRegExp OutputRegExp02 ("Editor support \\w{1,20}.");
+        OutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (OutputRegExp02, "");
 
-        QRegExp regExp03 ("Enter h .{40,80}\n");
-        regExp03.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (regExp03, "");
+        QRegExp outputRegExp03 ("Enter h .{40,80}\n");
+        outputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (outputRegExp03, "");
+
+        // Remove SUB characters:
+        debuggerOutput.replace ("\u001a", "");
+
+        if (settings.debuggerOutput == "html") {
+            debuggerOutput.replace ("\n", "<br>\n");
+        }
 
         accumulatedOutput.append (debuggerOutput);
 
-        QRegExp regExp04 ("\n\\s*\n");
-        regExp04.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExp04, "\n\n");
+        QRegExp accumulatedOutputRegExp01 ("\n\\s*\n");
+        accumulatedOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (accumulatedOutputRegExp01, "\n\n");
 
-        QRegExp regExp05 ("\n\\s{4,}");
-        regExp05.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExp05, "\n");
+        QRegExp accumulatedOutputRegExp02 ("\n\\s{4,}");
+        accumulatedOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (accumulatedOutputRegExp02, "\n");
 
         if (accumulatedOutput.contains ("Show module versions")) {
-            QRegExp regExp06 ("\n\\s{3,}");
-            regExp06.setCaseSensitivity (Qt::CaseSensitive);
-            accumulatedOutput.replace (regExp06, "\n");
+            QRegExp accumulatedOutputRegExp03 ("\n\\s{3,}");
+            accumulatedOutputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
+            accumulatedOutput.replace (accumulatedOutputRegExp03, "\n");
         }
 
-        QRegExp regExp07 ("routines from .{10,30}\n");
-        regExp07.setCaseSensitivity (Qt::CaseSensitive);
-        int pos = regExp07.indexIn (accumulatedOutput);
+        QRegExp accumulatedOutputRegExp04 ("routines from .{10,30}\n");
+        accumulatedOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
+        int pos = accumulatedOutputRegExp04.indexIn (accumulatedOutput);
         Q_UNUSED (pos);
-        QString debuggerVersion = regExp07.capturedTexts().first();
-        accumulatedOutput.replace (regExp07, debuggerVersion+"\n");
+        QString debuggerVersion = accumulatedOutputRegExp04.capturedTexts().first();
+        accumulatedOutput.replace (accumulatedOutputRegExp04, debuggerVersion+"\n");
 
-        QRegExp regExp08 ("\n{3,100}");
-        regExp08.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExp08, "\n\n");
+        QRegExp accumulatedOutputRegExp05 ("\n{3,100}");
+        accumulatedOutputRegExp05.setCaseSensitivity (Qt::CaseSensitive);
+        accumulatedOutput.replace (accumulatedOutputRegExp05, "\n\n");
 
-        QRegExp regExp09 ("  ");
-        regExp09.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (regExp09, " ");
+        if (!accumulatedOutput.contains ("List Variables in Package")) {
+            accumulatedOutput.replace ("  ", " ");
+        }
+        if (accumulatedOutput.contains ("List Variables in Package") and
+                settings.debuggerOutput == "html") {
+            accumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
+        }
 
+        if (settings.debuggerOutput == "html") {
+            accumulatedOutput.replace ("\n<br>\n<br>", "<br>");
+
+            QFile htmlFooterFile (
+                        QDir::toNativeSeparators (settings.debuggerHtmlFooter));
+            htmlFooterFile.open (QFile::ReadOnly | QFile::Text);
+            QString htmlFooterFileContents = QString (htmlFooterFile.readAll());
+            //QString htmlFooterFileContents = "</body>\n</html>";
+            accumulatedOutput.replace (htmlFooterFileContents, "");
+            accumulatedOutput.append (htmlFooterFileContents);
+        }
+
+        if (settings.debuggerOutput == "txt") {
         debuggerOutputFilePath = QDir::toNativeSeparators
                         (QDir::tempPath()+
                          QDir::separator()+
                          "deboutput.txt");
+        }
+        if (settings.debuggerOutput == "html") {
+        debuggerOutputFilePath = QDir::toNativeSeparators
+                        (QDir::tempPath()+
+                         QDir::separator()+
+                         "deboutput.htm");
+        }
 
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
@@ -930,7 +965,7 @@ public slots:
         }
     }
 
-    void pageLoadedDynamicTitleSlot(bool ok)
+    void pageLoadedDynamicTitleSlot (bool ok)
     {
         if (ok) {
             setWindowTitle (TopLevel::title());
@@ -940,7 +975,7 @@ public slots:
         }
     }
 
-    void pageLoadedStaticTitleSlot(bool ok)
+    void pageLoadedStaticTitleSlot (bool ok)
     {
         if (ok) {
             QFile::remove
@@ -1202,8 +1237,9 @@ public slots:
                         settings.helpDirectory+
                         QDir::separator()+"about.htm"));
         aboutFileTemplateFile.open(QFile::ReadOnly);
-        QString aboutTemplateContents = QLatin1String (aboutFileTemplateFile.readAll());
+        QString aboutTemplateContents = QString (aboutFileTemplateFile.readAll());
         aboutTemplateContents.replace ("[% icon %]", settings.iconPathName);
+        aboutTemplateContents.replace ("[% version %]", QApplication::applicationVersion());
         aboutTemplateContents.replace ("[% Qt Webkit version %]", qtVersion);
         aboutTemplateContents.replace ("[% Qt version %]", qtWebKitVersion);
         output.append (aboutTemplateContents);
@@ -1214,8 +1250,8 @@ public slots:
         QFile cssFile (
                     QDir::toNativeSeparators (
                         settings.defaultThemeDirectory+QDir::separator()+"current.css"));
-        cssFile.open(QFile::ReadOnly);
-        QString cssFileContents = QLatin1String (cssFile.readAll());
+        cssFile.open (QFile::ReadOnly);
+        QString cssFileContents = QString (cssFile.readAll());
         css.append (cssFileContents);
         css.append ("</style>");
         css.append ("</head>");
