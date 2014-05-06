@@ -75,7 +75,7 @@ public:
     QString debuggerHtmlFooter;
     QString debuggerHtmlTheme;
     QString sourceViewer;
-    QString sourceViewerArguments;
+    QStringList sourceViewerArguments;
 
     QString autostartLocalWebserver;
     QString pingLocalWebserver;
@@ -356,12 +356,17 @@ protected:
                     QProcess sourceViewer;
                     QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
                     QString perlInterpreter (perlInterpreterByteArray);
-                    sourceViewer.start (perlInterpreter, QStringList() <<
-                                     settings.sourceViewer
-                                     << settings.sourceViewerArguments <<
-                                     QDir::toNativeSeparators
-                                     (settings.rootDirName+
-                                      QDir::separator()+filepath));
+
+                    QStringList sourceViewerCommandLine;
+                    sourceViewerCommandLine.append (settings.sourceViewer);
+                    foreach (QString argument, settings.sourceViewerArguments){
+                        sourceViewerCommandLine.append (argument);
+                    }
+                    sourceViewerCommandLine.append (QDir::toNativeSeparators
+                                                    (settings.rootDirName+
+                                                     QDir::separator()+filepath));
+
+                    sourceViewer.start (perlInterpreter, sourceViewerCommandLine);
 
                     if (sourceViewer.waitForFinished()) {
                         output = sourceViewer.readAll();
@@ -805,6 +810,9 @@ public slots:
     {
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
+        // Remove SUB characters:
+        debuggerOutput.replace ("\\u001a", "");
+
         QRegExp outputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
         outputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (outputRegExp01, "");
@@ -817,8 +825,13 @@ public slots:
         outputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (outputRegExp03, "");
 
-        // Remove SUB characters:
-        debuggerOutput.replace ("\u001a", "");
+        QRegExp outputRegExp04 (filepath+":\\d{1,5}:\\d{1,5}\n");
+        outputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
+        int outputRegExp04pos = outputRegExp04.indexIn (debuggerOutput);
+        Q_UNUSED (outputRegExp04pos);
+        QString lineInfo = outputRegExp04.capturedTexts().first();
+        lineInfoLastLine = lineInfo.section (":", 1, 1);
+        debuggerOutput.replace (outputRegExp04, "");
 
         if (settings.debuggerOutput == "html") {
             debuggerOutput.replace ("\n", "<br>\n");
@@ -842,8 +855,8 @@ public slots:
 
         QRegExp accumulatedOutputRegExp04 ("routines from .{10,30}\n");
         accumulatedOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
-        int pos = accumulatedOutputRegExp04.indexIn (accumulatedOutput);
-        Q_UNUSED (pos);
+        int accumulatedOutputRegExp04pos = accumulatedOutputRegExp04.indexIn (accumulatedOutput);
+        Q_UNUSED (accumulatedOutputRegExp04pos);
         QString debuggerVersion = accumulatedOutputRegExp04.capturedTexts().first();
         accumulatedOutput.replace (accumulatedOutputRegExp04, debuggerVersion+"\n");
 
@@ -851,10 +864,10 @@ public slots:
         accumulatedOutputRegExp05.setCaseSensitivity (Qt::CaseSensitive);
         accumulatedOutput.replace (accumulatedOutputRegExp05, "\n\n");
 
-        if (!accumulatedOutput.contains ("List Variables in Package")) {
+        if (debuggerCommandHumanReadable != "List Variables in Package (V)") {
             accumulatedOutput.replace ("  ", " ");
         }
-        if (accumulatedOutput.contains ("List Variables in Package") and
+        if (debuggerCommandHumanReadable == "List Variables in Package (V)" and
                 settings.debuggerOutput == "html") {
             accumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
         }
@@ -890,6 +903,7 @@ public slots:
             debuggerOutputStream << accumulatedOutput << endl;
         }
         qDebug() << "Output from debugger received.";
+        qDebug() << "LineInfo last line:" << lineInfoLastLine;
         qDebug() << "Debugger output file:" << debuggerOutputFilePath;
         qDebug() << "===============";
 
@@ -931,6 +945,7 @@ private:
 
     QProcess debuggerHandler;
     QString debuggerCommandHumanReadable;
+    QString lineInfoLastLine;
     QString accumulatedOutput;
     QString debuggerOutputFilePath;
     QWebView *newDebuggerWindow;

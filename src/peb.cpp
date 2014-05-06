@@ -550,7 +550,9 @@ Settings::Settings()
     debuggerHtmlTheme = QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+debuggerHtmlThemeSetting);
     sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
-    sourceViewerArguments = settings.value ("perl_debugger/source_viewer_arguments").toString();
+    QString sourceViewerArgumentsSetting =
+            settings.value ("perl_debugger/source_viewer_arguments").toString();
+    sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
     // Networking:
     autostartLocalWebserver = settings.value ("networking/autostart_local_webserver").toString();
@@ -1125,7 +1127,9 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
             qDebug() << "Interpreter:" << interpreter;
 
-            debuggerHandler.close();
+            if (debuggerHandler.isOpen()) {
+                debuggerHandler.close();
+            }
             accumulatedOutput = "";
 
             if (settings.debuggerOutput == "html") {
