@@ -1132,40 +1132,16 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             }
             accumulatedOutput = "";
 
-            if (settings.debuggerOutput == "html") {
-                QFile htmlHeaderFile (
-                            QDir::toNativeSeparators (settings.debuggerHtmlHeader));
-                htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
-                QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
-                accumulatedOutput.append (htmlHeaderFileContents);
-            }
-
-            QString css;
-            css.append ("<style media=\"screen\" type=\"text/css\">");
-            QFile cssFile (QDir::toNativeSeparators (settings.debuggerHtmlTheme));
-            cssFile.open (QFile::ReadOnly);
-            QString cssFileContents = QString (cssFile.readAll());
-            css.append (cssFileContents);
-            css.append ("</style>");
-            css.append ("</head>");
-            accumulatedOutput.replace ("</head>", css);
-
-            if (settings.debuggerOutput == "txt") {
-                accumulatedOutput.append ("\nScript: "+filepath+"\n");
-            }
-            if (settings.debuggerOutput == "html") {
-                accumulatedOutput.append ("\nScript: "+filepath+"<br>\n");
-            }
-
             QFile debuggerOutputFile (debuggerOutputFilePath);
             if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
 
             if (settings.debuggerOutput == "txt") {
-                accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
+                accumulatedOutput.append ("\nScript: "+filepath+"\n");
             }
-            if (settings.debuggerOutput == "html") {
-                accumulatedOutput.append ("Interpreter: "+interpreter+"<br>\n");
+
+            if (settings.debuggerOutput == "txt") {
+                accumulatedOutput.append ("Interpreter: "+interpreter+"\n");
             }
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -1206,11 +1182,30 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             if (settings.debuggerOutput == "txt") {
                 accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"\n");
             }
-            if (settings.debuggerOutput == "html") {
-                accumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"<br>\n");
-            }
 
             debuggerHandler.write (debuggerCommand);
+
+            if (settings.debuggerOutput == "html") {
+                QFile htmlHeaderFile (
+                            QDir::toNativeSeparators (settings.debuggerHtmlHeader));
+                htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
+                QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
+                htmlHeaderFileContents.replace ("[% Script %]", filepath);
+                htmlHeaderFileContents.replace ("[% Interpreter %]", interpreter);
+                htmlHeaderFileContents.replace (
+                            "[% Debugger Command %]", debuggerCommandHumanReadable);
+                accumulatedOutput.append (htmlHeaderFileContents);
+            }
+
+            QString css;
+            css.append ("<style media=\"screen\" type=\"text/css\">");
+            QFile cssFile (QDir::toNativeSeparators (settings.debuggerHtmlTheme));
+            cssFile.open (QFile::ReadOnly);
+            QString cssFileContents = QString (cssFile.readAll());
+            css.append (cssFileContents);
+            css.append ("</style>");
+            css.append ("</head>");
+            accumulatedOutput.replace ("</head>", css);
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);

@@ -5,4 +5,8 @@
 	<title>Perl Debugger Output</title>
 </head>
 
-<body> 
+<body>
+
+Script: [% Script %]<br>
+Interpreter: [% Interpreter %]<br>
+Debugger Command: [% Debugger Command %]<br>
