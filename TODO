@@ -4,6 +4,9 @@ Permanent TODO priorities:
 - documentation, commented code
 ====================================
 
+GUI:
+- working windows size settings on Mac
+
 Configuration:
 - search for INI file in all standard locations on the supported operating systems
 - check file paths to determine if they are absolute or relative paths
@@ -46,7 +49,7 @@ Help:
 
 Connectivity:
 - Whitelist of allowed web sites
-- Easier configuration or custom local web server started with the browser
+- Easier configuration of custom local web server started with the browser
 
 Building:
 - build script for command line compilation of the browser
