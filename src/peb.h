@@ -359,8 +359,10 @@ protected:
 
                     QStringList sourceViewerCommandLine;
                     sourceViewerCommandLine.append (settings.sourceViewer);
-                    foreach (QString argument, settings.sourceViewerArguments){
-                        sourceViewerCommandLine.append (argument);
+                    if (settings.sourceViewerArguments.length() > 1) {
+                        foreach (QString argument, settings.sourceViewerArguments) {
+                            sourceViewerCommandLine.append (argument);
+                        }
                     }
                     sourceViewerCommandLine.append (QDir::toNativeSeparators
                                                     (settings.rootDirName+
@@ -1104,7 +1106,11 @@ public slots:
                 QObject::connect (editAct, SIGNAL (triggered()),
                                   this, SLOT (editSlot()));
 
-                if (qWebHitTestURL.toString().contains(".pl")) {
+                QString extension = qWebHitTestURL
+                        .toString (QUrl::RemoveQuery)
+                        .replace ("?", "")
+                        .section (".", 1, 1);
+                if (extension == "pl" or extension == "php" or extension == "py") {
                     QAction *viewSourceAct = menu->addAction (tr ("&View Source"));
                     QObject::connect (viewSourceAct, SIGNAL (triggered()),
                                       this, SLOT (viewSourceFromContextMenuSlot()));

@@ -8,17 +8,45 @@ use strict;
 use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
+# Define variables:
+my $input_filename = $ARGV[0]; # input file is the first and only needed command line argument
+my $input_filehandle;
+my $first_line;
 my $language;
-my $input_file = $ARGV[1];
+my $line_number;
 
-# Command line arguments:
-foreach my $command_line_argument (@ARGV){
-	(my $command_line_flag, my $command_line_value)=split(/\=/,$command_line_argument);
-	if ($command_line_flag =~ "--language" or $command_line_flag =~ "-L"){
-		$language = $command_line_value;
-	}
+# Remove double slash '//' from script filenames:
+$input_filename =~ s/\/\//\//g;
+
+# Detect script language by file extension:
+if ($input_filename =~ ".pl" or $input_filename =~ ".PL"){
+	$language = "Perl";
+}
+if ($input_filename =~ ".py" or $input_filename =~ ".PY"){
+	$language = "Python";
+}
+if ($input_filename =~ ".php" or $input_filename =~ ".PHP"){
+	$language = "PHP (HTML)";
 }
 
+# Detect script language by shebang line:
+# Open the input file read-only to detect the shebang line:
+#~ open ($input_filehandle, "<", "$input_filename");
+
+# Detect Perl and Python using the shebang line.
+# Perl and Python scripts may not have a file extension.
+#~ $first_line = <$input_filehandle>;
+#~ if ($first_line =~ m/\#\!.*perl/){
+	#~ $language = "Perl";
+#~ }
+#~ if ($first_line =~ m/\#\!.*python/){
+	#~ $language = "Python";
+#~ }
+
+# Close the input file:
+#~ close ($input_filehandle);
+
+# Syntax::Highlight::Engine::Kate settings:
  my $hl = new Syntax::Highlight::Engine::Kate(
     language => $language,
     substitutions => {
@@ -53,19 +81,22 @@ foreach my $command_line_argument (@ARGV){
     },
  );
 
-my $line_number;
+# Open the input file read-only to highlight the syntax:
+open ($input_filehandle, "<", "$input_filename");
 
-# Open file for reading:
-my $input_filehandle;
-open ($input_filehandle, "<", "$input_file");
-
-print "<html>\n<head>\n</head>\n<body>\n";
+# Highlight the syntax of the input file:
+print "<html>\n";
+print "<head>\n";
+#print "<title>Syntax::Highlight::Engine::Kate Source Viewer</title>\n";
+print "<title>$input_filename</title>\n";
+print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
+print "</head>\n";
 while (my $in = <$input_filehandle>) {
 	$line_number++;
 	print "<a name='line$line_number' href='#line$line_number'>$line_number</a> &nbsp;";
 	print $hl->highlightText($in);
 }
-
 print "</body>\n</html>\n";
 
+# Close the input file:
 close ($input_filehandle);

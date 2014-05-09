@@ -552,6 +552,7 @@ Settings::Settings()
     sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
     QString sourceViewerArgumentsSetting =
             settings.value ("perl_debugger/source_viewer_arguments").toString();
+    sourceViewerArgumentsSetting.replace ("\n", "");
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
     // Networking:
