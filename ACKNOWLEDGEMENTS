@@ -59,6 +59,7 @@
  http://qt-project.org/doc/qt-4.8/qiodevice.html
  http://qt-project.org/doc/qt-4.8/qwebframe.html
  http://qt-project.org/doc/qt-4.8/linguist-hellotr-main-cpp.html
+ http://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets
  http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
@@ -152,6 +153,7 @@
  http://stackoverflow.com/questions/21795919/qsystemtrayicon-mouse-hover
  http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
  http://stackoverflow.com/questions/12013201/how-to-detect-sub-character-and-remove-it-from-a-text-file-in-c
+ http://stackoverflow.com/questions/14465263/how-do-you-port-qurl-addqueryitem-to-qt5s-qurlquery
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

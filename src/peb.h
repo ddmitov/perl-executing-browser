@@ -68,6 +68,9 @@ public:
     QString mongooseSettingsFileName;
 
     QString perlLib;
+    QString defaultPerlInterpreter;
+    QString defaultPythonInterpreter;
+    QString defaultPhpInterpreter;
 
     QString debuggerInterpreter;
     QString debuggerOutput;
@@ -98,6 +101,7 @@ public:
     QString stayOnTop;
     QString browserTitle;
     QString contextMenu;
+    QString webInspector;
 
     QString iconPathName;
     QPixmap icon;
@@ -110,6 +114,9 @@ public:
     QString allTranslationsDirectory;
 
     QString helpDirectory;
+
+    QString systrayIcon;
+    QString systrayIconDoubleClickAction;
 
     QString logging;
     QString logMode;
@@ -131,16 +138,26 @@ public slots:
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
 
-            QMessageBox confirmExitMessageBox;
-            confirmExitMessageBox.setWindowTitle (tr ("Quit"));
-            confirmExitMessageBox.setIconPixmap (settings.icon);
-            confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
-            confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-            confirmExitMessageBox.setButtonText (QMessageBox::Yes,tr ("Yes"));
-            confirmExitMessageBox.setButtonText (QMessageBox::No,tr ("No"));
-            confirmExitMessageBox.setDefaultButton (QMessageBox::No);
-            if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                QApplication::quit();
+            if (settings.systrayIconDoubleClickAction == "quit") {
+                QMessageBox confirmExitMessageBox;
+                confirmExitMessageBox.setWindowTitle (tr ("Quit"));
+                confirmExitMessageBox.setIconPixmap (settings.icon);
+                confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
+                confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
+                confirmExitMessageBox.setButtonText (QMessageBox::Yes,tr ("Yes"));
+                confirmExitMessageBox.setButtonText (QMessageBox::No,tr ("No"));
+                confirmExitMessageBox.setDefaultButton (QMessageBox::No);
+                if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
+                    QApplication::quit();
+                }
+            }
+
+            if (settings.systrayIconDoubleClickAction == "minimize_all_windows") {
+                foreach (QWidget *window, QApplication::topLevelWidgets()) {
+                    if (window->isVisible()) {
+                        window->showMinimized();
+                    }
+                }
             }
 
         }
@@ -151,19 +168,19 @@ public slots:
         QTcpSocket localWebServerPing;
         QTcpSocket webConnectivityPing;
 
-        if (settings.pingLocalWebserver == "yes") {
+        if (settings.pingLocalWebserver == "enable") {
             localWebServerPing.connectToHost ("127.0.0.1", settings.listeningPort.toInt());
         }
 
-        if (settings.pingRemoteWebserver == "yes") {
+        if (settings.pingRemoteWebserver == "enable") {
             webConnectivityPing.connectToHost (settings.remoteWebserver, 80);
         }
 
-        if (settings.pingLocalWebserver == "yes") {
+        if (settings.pingLocalWebserver == "enable") {
             if (localWebServerPing.waitForConnected (1000)) {
                 qDebug() << "Local web server is running.";
             } else {
-                if (settings.autostartLocalWebserver == "yes") {
+                if (settings.autostartLocalWebserver == "enable") {
                     qDebug() << "Local web server is not running. Will try to restart it.";
                     QProcess server;
                     server.startDetached (QString (settings.rootDirName+
@@ -175,25 +192,28 @@ public slots:
             qDebug() << "===============";
         }
 
-        if (settings.pingRemoteWebserver == "yes") {
+        if (settings.pingRemoteWebserver == "enable") {
             if (webConnectivityPing.waitForConnected (1000))
             {
 
-                if (lastStateOfRemoteWebserver.length() > 0) {
-                    if (lastStateOfRemoteWebserver == "unavailable") {
+                if (settings.systrayIcon == "enable") {
+                    if (lastStateOfRemoteWebserver.length() > 0) {
+                        if (lastStateOfRemoteWebserver == "unavailable") {
+                            QSystemTrayIcon::MessageIcon icon =
+                                    QSystemTrayIcon::MessageIcon (0);
+                            trayIcon->showMessage (tr ("Connected to remote server"),
+                                                   tr ("Connectivity to remote server is restored!"),
+                                                   icon, 10 * 1000);
+                        }
+                    } else {
                         QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (0);
                         trayIcon->showMessage (tr ("Connected to remote server"),
-                                               tr ("Connectivity to remote server is restored!"),
+                                               tr ("Remote server is available."),
                                                icon, 10 * 1000);
                     }
-                } else {
-                    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (0);
-                    trayIcon->showMessage (tr ("Connected to remote server"),
-                                           tr ("Remote server is available."),
-                                           icon, 10 * 1000);
+                    lastStateOfRemoteWebserver = "available";
                 }
 
-                lastStateOfRemoteWebserver = "available";
                 qputenv ("REMOTE_SERVER", "available");
                 qDebug() << "Internet connectivity is available.";
 
@@ -221,21 +241,23 @@ public slots:
 
             } else {
 
-                if (lastStateOfRemoteWebserver.length() > 0) {
-                    if (lastStateOfRemoteWebserver == "available") {
+                if (settings.systrayIcon == "enable") {
+                    if (lastStateOfRemoteWebserver.length() > 0) {
+                        if (lastStateOfRemoteWebserver == "available") {
+                            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
+                            trayIcon -> showMessage (tr ("Disconnected"),
+                                                     tr ("Connectivity to remote server is lost!"),
+                                                     icon, 10 * 1000);
+                        }
+                    } else {
                         QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
-                        trayIcon -> showMessage (tr ("Disconnected"),
-                                                 tr ("Connectivity to remote server is lost!"),
-                                                 icon, 10 * 1000);
+                        trayIcon->showMessage (tr ("No connection"),
+                                               tr ("Remote server is not available."),
+                                               icon, 10 * 1000);
                     }
-                } else {
-                    QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
-                    trayIcon->showMessage (tr ("No connection"),
-                                           tr ("Remote server is not available."),
-                                           icon, 10 * 1000);
+                    lastStateOfRemoteWebserver = "unavailable";
                 }
 
-                lastStateOfRemoteWebserver = "unavailable";
                 qputenv ("REMOTE_SERVER", "unavailable");
                 qDebug() << "Internet connectivity is not available.";
 
@@ -246,7 +268,9 @@ public slots:
 
     void aboutToQuitSlot()
     {
-        trayIcon->hide();
+        if (settings.systrayIcon == "enable") {
+            trayIcon->hide();
+        }
         QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
         qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
         qDebug() << "===============";
@@ -275,6 +299,10 @@ class ModifiedNetworkAccessManager : public QNetworkAccessManager
 {
 
     Q_OBJECT
+
+signals:
+
+    void startLongRunningScriptFromNAM (QUrl url);
 
 protected:
 
@@ -326,14 +354,12 @@ protected:
             qDebug() << "Extension:" << extension;
             defineInterpreter ();
 
-            if (extension == "pl" or extension == "php" or extension == "py")
-            {
+            if (extension == "pl" or extension == "php" or extension == "py") {
                 qDebug() << "Interpreter:" << interpreter;
 
                 QProcess handler;
 
-                if (query.length() > 0)
-                {
+                if (query.length() > 0) {
                     QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                     env.insert ("REQUEST_METHOD", "GET");
                     env.insert ("QUERY_STRING", query);
@@ -352,55 +378,30 @@ protected:
 
                 QString output;
 
-                if (query.contains("source=true")) {
-                    QProcess sourceViewer;
-                    QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
-                    QString perlInterpreter (perlInterpreterByteArray);
-
-                    QStringList sourceViewerCommandLine;
-                    sourceViewerCommandLine.append (settings.sourceViewer);
-                    if (settings.sourceViewerArguments.length() > 1) {
-                        foreach (QString argument, settings.sourceViewerArguments) {
-                            sourceViewerCommandLine.append (argument);
-                        }
-                    }
-                    sourceViewerCommandLine.append (QDir::toNativeSeparators
-                                                    (settings.rootDirName+
-                                                     QDir::separator()+filepath));
-
-                    sourceViewer.start (perlInterpreter, sourceViewerCommandLine);
-
-                    if (sourceViewer.waitForFinished()) {
-                        output = sourceViewer.readAll();
-                        sourceViewer.close();
-                    }
-
+                if (query.contains("source=enabled")) {
+                // Qt 4:
+                //if (query.contains("source"+QUrl::queryValueDelimiter+"enabled")) {
+                // Qt 5:
+                //if (query.contains("source"+QUrlQuery::queryValueDelimiter()+"enabled)) {
+                    QUrl url = request.url();
+                    emit startLongRunningScriptFromNAM (url);
                 } else {
-
                     handler.start (interpreter, QStringList() <<
                                    QDir::toNativeSeparators
                                    (settings.rootDirName+
                                     QDir::separator()+filepath));
-
                     if (handler.waitForFinished()) {
                         output = handler.readAll();
                         handler.close();
                     }
-
                 }
 
                 QString outputFilePath;
-                if (query.contains("source=true")) {
-                    outputFilePath = QDir::toNativeSeparators
-                            (QDir::tempPath()+
-                             QDir::separator()+
-                             "source.htm");
-                } else {
-                    outputFilePath = QDir::toNativeSeparators
-                            (QDir::tempPath()+
-                             QDir::separator()+
-                             "output.htm");
-                }
+
+                outputFilePath = QDir::toNativeSeparators
+                        (QDir::tempPath()+
+                         QDir::separator()+
+                         "output.htm");
 
                 QFile outputFilePathFile (outputFilePath);
                 if (outputFilePathFile.exists()) {
@@ -415,7 +416,7 @@ protected:
                 output.replace (regExp02, "");
 
                 if ((!request.url().toString().contains ("phpinfo")) and
-                    (!query.contains ("theme=false"))) {
+                    (!query.contains ("theme=disabled"))) {
                     QString css;
                     css.append ("<style media=\"screen\" type=\"text/css\">");
                     QFile cssFile (
@@ -583,9 +584,8 @@ public slots:
         QMessageBox msgBox;
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle (tr ("Missing file"));
-        msgBox.setText (QDir::toNativeSeparators
-                        (settings.rootDirName+filepath)+
-                        tr (" is missing.<br>Please restore the missing file."));
+        msgBox.setText (tr ("Please restore the missing file:<br>")+
+                        QDir::toNativeSeparators (settings.rootDirName+filepath));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
     }
@@ -637,7 +637,7 @@ public slots:
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        dialog.setOption (QFileDialog::DontUseNativeDialog);
+        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
@@ -721,7 +721,7 @@ public slots:
         QFileDialog selectInterpreterDialog;
         selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
-        selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
+        //selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectInterpreterDialog.setWindowIcon (settings.icon);
         interpreter = selectInterpreterDialog.getOpenFileName
@@ -735,7 +735,7 @@ public slots:
         QFileDialog selectPerlLibDialog;
         selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
+        //selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
         selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
@@ -749,19 +749,91 @@ public slots:
         selectPerlLibDialog.deleteLater();
     }
 
+    void startLongRunningScript (QUrl url)
+    {
+        qDebug() << "Long-running script:" << url.toString();
+
+        filepath = url.toString (QUrl::RemoveScheme
+                                 | QUrl::RemoveAuthority
+                                 | QUrl::RemoveQuery
+                                 | QUrl::RemoveFragment);
+
+        qDebug() << "File path:" << QDir::toNativeSeparators
+                    (settings.rootDirName+filepath);
+        checkFileExistenceSlot();
+        extension = filepath.section (".", 1, 1);
+        qDebug() << "Extension:" << extension;
+        defineInterpreter();
+        qDebug() << "Interpreter:" << interpreter;
+
+        QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+        env.insert ("REQUEST_METHOD", "GET");
+        longRunningScriptQuery = url.toString (QUrl::RemoveScheme
+                                      | QUrl::RemoveAuthority
+                                      | QUrl::RemovePath
+                                      | QUrl::RemoveFragment)
+                .replace ("?", "");
+        env.insert ("QUERY_STRING", longRunningScriptQuery);
+        longRunningScriptHandler.setProcessEnvironment (env);
+        qDebug() << "Long-running script query string:" << longRunningScriptQuery;
+
+        QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
+                                          (settings.rootDirName+
+                                           QDir::separator()+filepath));
+        QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+        longRunningScriptHandler.setWorkingDirectory (scriptDirectory);
+        qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+
+        qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
+        qDebug() << "===============";
+
+        if (longRunningScriptQuery.contains("source=enabled")) {
+            longRunningScriptOutputInNewWindow = false;
+
+            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+            QString perlInterpreter (perlInterpreterByteArray);
+
+            QStringList sourceViewerCommandLine;
+            sourceViewerCommandLine.append (settings.sourceViewer);
+            if (settings.sourceViewerArguments.length() > 1) {
+                foreach (QString argument, settings.sourceViewerArguments) {
+                    sourceViewerCommandLine.append (argument);
+                }
+            }
+            sourceViewerCommandLine.append (QDir::toNativeSeparators
+                                            (settings.rootDirName+
+                                             QDir::separator()+filepath));
+
+            longRunningScriptHandler.start (perlInterpreter, sourceViewerCommandLine);
+        } else {
+            longRunningScriptHandler.start (interpreter, QStringList() <<
+                                            QDir::toNativeSeparators
+                                            (settings.rootDirName+
+                                             QDir::separator()+filepath));
+        }
+
+        QWebSettings::clearMemoryCaches();
+    }
+
     void displayLongRunningScriptOutputSlot()
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
 
-        QString css;
-        css.append ("<style media=\"screen\" type=\"text/css\">");
-        QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
-        cssFile.open(QFile::ReadOnly);
-        QString cssFileContents = QString (cssFile.readAll());
-        css.append (cssFileContents);
-        css.append ("</style>");
-        css.append ("</head>");
-        output.replace ("</head>", css);
+        if (longRunningScriptQuery.contains("output=gradual_accumulation")) {
+            longRunningScriptAccumulatedOutput.append (output);
+        }
+
+        if (!longRunningScriptQuery.contains ("theme=disabled")) {
+            QString css;
+            css.append ("<style media=\"screen\" type=\"text/css\">");
+            QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+            cssFile.open(QFile::ReadOnly);
+            QString cssFileContents = QString (cssFile.readAll());
+            css.append (cssFileContents);
+            css.append ("</style>");
+            css.append ("</head>");
+            output.replace ("</head>", css);
+        }
 
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
                         (QDir::tempPath()+
@@ -769,24 +841,57 @@ public slots:
                          "lroutput.htm");
 
         QFile longRunningScriptOutputFile (longRunningScriptOutputFilePath);
-        if (longRunningScriptOutputFile.exists()) {
-            longRunningScriptOutputFile.remove();
+
+        // Delete previous output file:
+        if (longRunningScriptQuery.contains ("output=latest_output_only") and
+                longRunningScriptQuery.contains ("write_to_file=enabled")) {
+            if (longRunningScriptOutputFile.exists()) {
+                longRunningScriptOutputFile.remove();
+            }
         }
 
-        if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
-            QTextStream stream (&longRunningScriptOutputFile);
-            stream << output << endl;
+        // Latest output only and write to file:
+        if (longRunningScriptQuery.contains ("output=latest_output_only") and
+                longRunningScriptQuery.contains ("write_to_file=enabled")) {
+            if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
+                QTextStream stream (&longRunningScriptOutputFile);
+                stream << output << endl;
+            }
         }
+
+        // Accumulated output and write to file:
+        if (longRunningScriptQuery.contains ("output=gradual_accumulation") and
+                longRunningScriptQuery.contains ("write_to_file=enabled")) {
+            if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
+                QTextStream stream (&longRunningScriptOutputFile);
+                stream << longRunningScriptAccumulatedOutput << endl;
+            }
+        }
+
         qDebug() << "Output from long-running script received.";
         qDebug() << "Long-running script output file:" << longRunningScriptOutputFilePath;
         qDebug() << "===============";
+
         if (longRunningScriptOutputInNewWindow == false) {
-            Page::currentFrame()->setUrl
-                    (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
+            if (longRunningScriptQuery.contains ("write_to_file=enabled")) {
+                Page::currentFrame()->setUrl
+                        (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
+            }
+            if (longRunningScriptQuery.contains ("write_to_file=disabled")) {
+                Page::currentFrame()->setHtml (longRunningScriptAccumulatedOutput);
+            }
         }
+
         if (longRunningScriptOutputInNewWindow == true) {
-            newLongRunWindow->setUrl (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
+            if (longRunningScriptQuery.contains ("write_to_file=enabled")) {
+                newLongRunWindow->setUrl (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
+            }
+            if (longRunningScriptQuery.contains ("write_to_file=disabled")) {
+                newLongRunWindow->setHtml (longRunningScriptAccumulatedOutput);
+            }
+
             newLongRunWindow->show();
+            qApp->processEvents();
         }
     }
 
@@ -815,75 +920,75 @@ public slots:
         // Remove SUB characters:
         debuggerOutput.replace ("\\u001a", "");
 
-        QRegExp outputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
-        outputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (outputRegExp01, "");
+        QRegExp debuggerOutputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
+        debuggerOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (debuggerOutputRegExp01, "");
 
-        QRegExp OutputRegExp02 ("Editor support \\w{1,20}.");
-        OutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (OutputRegExp02, "");
+        QRegExp debuggerOutputRegExp02 ("Editor support \\w{1,20}.");
+        debuggerOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (debuggerOutputRegExp02, "");
 
-        QRegExp outputRegExp03 ("Enter h .{40,80}\n");
-        outputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
-        debuggerOutput.replace (outputRegExp03, "");
+        QRegExp debuggerOutputRegExp03 ("Enter h .{40,80}\n");
+        debuggerOutputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerOutput.replace (debuggerOutputRegExp03, "");
 
-        QRegExp outputRegExp04 (filepath+":\\d{1,5}:\\d{1,5}\n");
-        outputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
-        int outputRegExp04pos = outputRegExp04.indexIn (debuggerOutput);
+        QRegExp debuggerOutputRegExp04 (filepath+":\\d{1,5}:\\d{1,5}\n");
+        debuggerOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
+        int outputRegExp04pos = debuggerOutputRegExp04.indexIn (debuggerOutput);
         Q_UNUSED (outputRegExp04pos);
-        QString lineInfo = outputRegExp04.capturedTexts().first();
+        QString lineInfo = debuggerOutputRegExp04.capturedTexts().first();
         lineInfoLastLine = lineInfo.section (":", 1, 1);
-        debuggerOutput.replace (outputRegExp04, "");
+        debuggerOutput.replace (debuggerOutputRegExp04, "");
 
         if (settings.debuggerOutput == "html") {
             debuggerOutput.replace ("\n", "<br>\n");
         }
 
-        accumulatedOutput.append (debuggerOutput);
+        debuggerAccumulatedOutput.append (debuggerOutput);
 
-        QRegExp accumulatedOutputRegExp01 ("\n\\s*\n");
-        accumulatedOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (accumulatedOutputRegExp01, "\n\n");
+        QRegExp debuggerAccumulatedOutputRegExp01 ("\n\\s*\n");
+        debuggerAccumulatedOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp01, "\n\n");
 
-        QRegExp accumulatedOutputRegExp02 ("\n\\s{4,}");
-        accumulatedOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (accumulatedOutputRegExp02, "\n");
+        QRegExp debuggerAccumulatedOutputRegExp02 ("\n\\s{4,}");
+        debuggerAccumulatedOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp02, "\n");
 
-        if (accumulatedOutput.contains ("Show module versions")) {
-            QRegExp accumulatedOutputRegExp03 ("\n\\s{3,}");
-            accumulatedOutputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
-            accumulatedOutput.replace (accumulatedOutputRegExp03, "\n");
+        if (debuggerAccumulatedOutput.contains ("Show module versions")) {
+            QRegExp debuggerAccumulatedOutputRegExp03 ("\n\\s{3,}");
+            debuggerAccumulatedOutputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
+            debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp03, "\n");
         }
 
-        QRegExp accumulatedOutputRegExp04 ("routines from .{10,30}\n");
-        accumulatedOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
-        int accumulatedOutputRegExp04pos = accumulatedOutputRegExp04.indexIn (accumulatedOutput);
-        Q_UNUSED (accumulatedOutputRegExp04pos);
-        QString debuggerVersion = accumulatedOutputRegExp04.capturedTexts().first();
-        accumulatedOutput.replace (accumulatedOutputRegExp04, debuggerVersion+"\n");
+        QRegExp debuggerAccumulatedOutputRegExp04 ("routines from .{10,30}\n");
+        debuggerAccumulatedOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
+        int debuggerAccumulatedOutputRegExp04pos = debuggerAccumulatedOutputRegExp04.indexIn (debuggerAccumulatedOutput);
+        Q_UNUSED (debuggerAccumulatedOutputRegExp04pos);
+        QString debuggerVersion = debuggerAccumulatedOutputRegExp04.capturedTexts().first();
+        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp04, debuggerVersion+"\n");
 
-        QRegExp accumulatedOutputRegExp05 ("\n{3,100}");
-        accumulatedOutputRegExp05.setCaseSensitivity (Qt::CaseSensitive);
-        accumulatedOutput.replace (accumulatedOutputRegExp05, "\n\n");
+        QRegExp debuggerAccumulatedOutputRegExp05 ("\n{3,100}");
+        debuggerAccumulatedOutputRegExp05.setCaseSensitivity (Qt::CaseSensitive);
+        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp05, "\n\n");
 
         if (debuggerCommandHumanReadable != "List Variables in Package (V)") {
-            accumulatedOutput.replace ("  ", " ");
+            debuggerAccumulatedOutput.replace ("  ", " ");
         }
         if (debuggerCommandHumanReadable == "List Variables in Package (V)" and
                 settings.debuggerOutput == "html") {
-            accumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
+            debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
         }
 
         if (settings.debuggerOutput == "html") {
-            accumulatedOutput.replace ("\n<br>\n<br>", "<br>");
+            debuggerAccumulatedOutput.replace ("\n<br>\n<br>", "<br>");
 
             QFile htmlFooterFile (
                         QDir::toNativeSeparators (settings.debuggerHtmlFooter));
             htmlFooterFile.open (QFile::ReadOnly | QFile::Text);
             QString htmlFooterFileContents = QString (htmlFooterFile.readAll());
             //QString htmlFooterFileContents = "</body>\n</html>";
-            accumulatedOutput.replace (htmlFooterFileContents, "");
-            accumulatedOutput.append (htmlFooterFileContents);
+            debuggerAccumulatedOutput.replace (htmlFooterFileContents, "");
+            debuggerAccumulatedOutput.append (htmlFooterFileContents);
         }
 
         if (settings.debuggerOutput == "txt") {
@@ -902,7 +1007,7 @@ public slots:
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
             QTextStream debuggerOutputStream (&debuggerOutputFile);
-            debuggerOutputStream << accumulatedOutput << endl;
+            debuggerOutputStream << debuggerAccumulatedOutput << endl;
         }
         qDebug() << "Output from debugger received.";
         qDebug() << "LineInfo last line:" << lineInfoLastLine;
@@ -940,7 +1045,9 @@ private:
     QString interpreter;
 
     QProcess longRunningScriptHandler;
-    QNetworkRequest lastRequest;
+    QString longRunningScriptQuery;
+    int longRunningScriptOutputs;
+    QString longRunningScriptAccumulatedOutput;
     QString longRunningScriptOutputFilePath;
     bool longRunningScriptOutputInNewWindow;
     QWebView *newLongRunWindow;
@@ -948,7 +1055,7 @@ private:
     QProcess debuggerHandler;
     QString debuggerCommandHumanReadable;
     QString lineInfoLastLine;
-    QString accumulatedOutput;
+    QString debuggerAccumulatedOutput;
     QString debuggerOutputFilePath;
     QWebView *newDebuggerWindow;
 
@@ -1011,8 +1118,6 @@ public slots:
         printer.setColorMode (QPrinter::Color);
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
-        //        printer.setOutputFormat (QPrinter::PdfFormat);
-        //        printer.setOutputFileName ("output.pdf");
         QPrintDialog *dialog = new QPrintDialog ( &printer);
         dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
         QSize dialogSize = dialog->sizeHint();
@@ -1053,17 +1158,21 @@ public slots:
         qDebug() << "===============";
         newWindow = new TopLevel (QString ("mainWindow"));
         newWindow->setWindowIcon (settings.icon);
-// http://stackoverflow.com/questions/14465263/how-do-you-port-qurl-addqueryitem-to-qt5s-qurlquery
 #if QT_VERSION >= 0x050000
         QUrlQuery viewSourceUrlQuery;
-        viewSourceUrlQuery.addQueryItem (QString ("source"), QString ("true"));
-        viewSourceUrlQuery.addQueryItem (QString ("theme"), QString ("false"));
+        viewSourceUrlQuery.addQueryItem (QString ("source"), QString ("enabled"));
+        viewSourceUrlQuery.addQueryItem (QString ("theme"), QString ("disabled"));
+        viewSourceUrlQuery.addQueryItem (QString ("output"), QString ("gradual_accumulation"));
+        viewSourceUrlQuery.addQueryItem (QString ("write_to_file"), QString ("enabled"));
         QUrl viewSourceUrl = qWebHitTestURL;
         viewSourceUrl.setQuery (viewSourceUrlQuery);
 #else
         QUrl viewSourceUrl = qWebHitTestURL;
-        viewSourceUrl.addQueryItem (QString ("source"), QString ("true"));
-        viewSourceUrl.addQueryItem (QString ("theme"), QString ("false"));
+        viewSourceUrl.addQueryItem (QString ("source"), QString ("enabled"));
+        viewSourceUrl.addQueryItem (QString ("theme"), QString ("disabled"));
+        viewSourceUrl.addQueryItem (QString ("output"), QString ("gradual_accumulation"));
+        viewSourceUrl.addQueryItem (QString ("write_to_file"), QString ("enabled"));
+
 #endif
         newWindow->setUrl (viewSourceUrl);
         newWindow->show();
@@ -1123,12 +1232,15 @@ public slots:
         }
 
         if (!qWebHitTestResult.isContentEditable() and
-                qWebHitTestResult.linkUrl().isEmpty()) {
+                qWebHitTestResult.linkUrl().isEmpty() and
+                qWebHitTestResult.imageUrl().isEmpty() and
+                (!qWebHitTestResult.isContentSelected()) and
+                (!qWebHitTestResult.isContentEditable ())) {
 
             menu->addSeparator();
 
             if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
-                if (settings.framelessWindow == "no" and
+                if (settings.framelessWindow == "disable" and
                         (!TopLevel::isMaximized())) {
                     QAction *maximizeAct = menu->addAction (tr ("&Maximized window"));
                     QObject::connect (maximizeAct, SIGNAL (triggered()),
@@ -1142,19 +1254,19 @@ public slots:
                 }
             }
 
-            if (settings.framelessWindow == "no") {
+            if (settings.framelessWindow == "disable") {
                 QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
                 QObject::connect (minimizeAct, SIGNAL (triggered()),
                                   this, SLOT (minimizeSlot()));
             }
 
-            if (!TopLevel::url().toString().contains ("longrun")) {
+            if (!TopLevel::url().toString().contains ("lroutput")) {
                 QAction *homeAct = menu->addAction (tr ("&Home"));
                 QObject::connect (homeAct, SIGNAL (triggered()),
                                   this, SLOT (loadStartPageSlot()));
             }
 
-            if ((!TopLevel::url().toString().contains ("longrun")) and
+            if ((!TopLevel::url().toString().contains ("lroutput")) and
                     (!TopLevel::url().toString().contains ("deboutput"))) {
                 QAction *reloadAct = menu->addAction (tr ("&Reload"));
                 QObject::connect (reloadAct, SIGNAL (triggered()),
@@ -1165,9 +1277,12 @@ public slots:
             QObject::connect (printAct, SIGNAL (triggered()),
                               this, SLOT (printPageSlot()));
 
-            QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));
-            QObject::connect (selectThemeAct, SIGNAL (triggered()),
-                              this, SLOT (selectThemeFromContextMenuSlot()));
+            if ((!TopLevel::url().toString().contains ("lroutput")) and
+                    (!TopLevel::url().toString().contains ("deboutput"))) {
+                QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));
+                QObject::connect (selectThemeAct, SIGNAL (triggered()),
+                                  this, SLOT (selectThemeFromContextMenuSlot()));
+            }
 
             QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
             QObject::connect (closeWindowAct, SIGNAL (triggered()),

@@ -4,8 +4,11 @@ Permanent TODO priorities:
 - documentation, commented code
 ====================================
 
-GUI:
-- working windows size settings on Mac
+Perl debugger interaction:
+- source viewer as a long-running script
+- step-by-step debugging capability
+- capability to load for debugging Perl script from any location
+- 'Save Page As' dialog to save debugger output in a file
 
 Configuration:
 - search for INI file in all standard locations on the supported operating systems
@@ -35,9 +38,9 @@ Long-running scripts:
 - independent settings for main window and long-running scripts window
 - 'Cancel' button to abort a long-running script at any time
 
-Perl debugger interaction:
-- option to display debugger output in HTML
-- 'Save Page As' dialog to save debugger output in a file
+GUI:
+- working windows size settings on Mac
+- Print Preview from context menu
 
 Extensibility:
 - Mojolicious support - run Mojolicious scripts using morbo or hypnotoad Perl web servers
@@ -49,7 +52,7 @@ Help:
 
 Connectivity:
 - Whitelist of allowed web sites
-- Easier configuration of custom local web server started with the browser
+- Easier configuration of a custom local web server started with the browser
 
 Building:
 - build script for command line compilation of the browser

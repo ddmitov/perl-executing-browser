@@ -81,7 +81,7 @@ Limitations
 Security Considerations
 ----------------------------------------------------------------------------------------
   
-Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations is not supported because of the huge security risks involved. If implemented at all, such a feature has to limit the source of locally executed scripts to a trusted location with the use of a secure connection and other authentication measures.  
+Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations is not going to be implemented because of the huge security risks involved.  
   
 History
 ----------------------------------------------------------------------------------------
