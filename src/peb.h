@@ -569,7 +569,10 @@ protected:
 
                 QString css;
                 css.append ("<style media=\"screen\" type=\"text/css\">");
-                QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+                QFile cssFile (QDir::toNativeSeparators (
+                                settings.defaultThemeDirectory+
+                                QDir::separator()+
+                                "current.css"));
                 cssFile.open(QFile::ReadOnly);
                 QString cssFileContents = QString (cssFile.readAll());
                 css.append (cssFileContents);
@@ -815,7 +818,10 @@ public slots:
         if (!longRunningScriptQuery.contains ("theme=disabled")) {
             QString css;
             css.append ("<style media=\"screen\" type=\"text/css\">");
-            QFile cssFile (settings.rootDirName+QDir::separator()+"html/current.css");
+            QFile cssFile (QDir::toNativeSeparators (
+                            settings.defaultThemeDirectory+
+                            QDir::separator()+
+                            "current.css"));
             cssFile.open(QFile::ReadOnly);
             QString cssFileContents = QString (cssFile.readAll());
             css.append (cssFileContents);
