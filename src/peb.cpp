@@ -329,7 +329,7 @@ int main (int argc, char **argv)
     qDebug() << "Ping local webserver:" << settings.pingLocalWebserver;
     qDebug() << "Ping remote webserver:" << settings.pingRemoteWebserver;
     qDebug() << "Remote webserver:" << settings.remoteWebserver;
-    qDebug() << "Remote webserver port:" << settings.remoteWebserverPort.toLatin1();
+    qDebug() << "Remote webserver port:" << settings.remoteWebserverPort;
     qDebug() << "Browser User Agent:" << settings.userAgent;
 
     qDebug() << "===============";

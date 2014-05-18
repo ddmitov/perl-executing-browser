@@ -112,7 +112,7 @@ public:
 
     QString pingRemoteWebserver;
     QString remoteWebserver;
-    QString remoteWebserverPort;
+    int remoteWebserverPort;
 
     QString userAgent;
 
@@ -201,7 +201,7 @@ public slots:
         }
 
         if (settings.pingRemoteWebserver == "enable") {
-            webConnectivityPing.connectToHost (settings.remoteWebserver, 80);
+            webConnectivityPing.connectToHost (settings.remoteWebserver, settings.remoteWebserverPort);
         }
 
         if (settings.pingLocalWebserver == "enable") {
