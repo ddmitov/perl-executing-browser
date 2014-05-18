@@ -56,10 +56,35 @@ class Settings : public QSettings
 {
     Q_OBJECT
 
+public slots:
+
+    void defineInterpreter (QString filepath)
+    {
+        QString extension = filepath.section (".", 1, 1);
+        qDebug() << "Extension:" << extension;
+
+        if (extension == "pl") {
+            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
+            QString perlInterpreter (perlInterpreterByteArray);
+            interpreter = perlInterpreter;
+        }
+        if (extension == "py") {
+            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
+            QString pythonInterpreter (pythonInterpreterByteArray);
+            interpreter = pythonInterpreter;
+        }
+        if (extension == "php") {
+            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
+            QString phpInterpreter (phpInterpreterByteArray);
+            interpreter = phpInterpreter;
+        }
+    }
+
 public:
 
     Settings();
 
+    // Variables from settings file:
     QString rootDirName;
 
     QString settingsFileName;
@@ -123,6 +148,9 @@ public:
     QString logDirName;
     QString logDirFullPath;
     QString logPrefix;
+
+    // Variables returned from functions:
+    QString interpreter;
 
 };
 
@@ -350,12 +378,11 @@ protected:
             if (query.length() > 0)
                 qDebug() << "Query string:" << query;
 
-            extension = filepath.section (".", 1, 1);
-            qDebug() << "Extension:" << extension;
-            defineInterpreter ();
+            QString extension = filepath.section (".", 1, 1);
+            settings.defineInterpreter (filepath);
 
             if (extension == "pl" or extension == "php" or extension == "py") {
-                qDebug() << "Interpreter:" << interpreter;
+                qDebug() << "Interpreter:" << settings.interpreter;
 
                 QProcess handler;
 
@@ -371,8 +398,8 @@ protected:
                                                   filepath);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 handler.setWorkingDirectory (scriptDirectory);
-                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
 
+                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
                 qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
 
@@ -386,10 +413,12 @@ protected:
                     QUrl url = request.url();
                     emit startLongRunningScriptFromNAM (url);
                 } else {
-                    handler.start (interpreter, QStringList() <<
+
+                    handler.start (settings.interpreter, QStringList() <<
                                    QDir::toNativeSeparators
                                    (settings.rootDirName+
                                     QDir::separator()+filepath));
+
                     if (handler.waitForFinished()) {
                         output = handler.readAll();
                         handler.close();
@@ -484,11 +513,11 @@ protected:
                          emptyRequest);
             }
 
-            extension = filepath.section (".", 1, 1);
-            qDebug() << "Extension:" << extension;
-            defineInterpreter();
+            QString extension = filepath.section (".", 1, 1);
+            settings.defineInterpreter (filepath);
+
             if (extension == "pl" or extension == "php" or extension == "py") {
-                qDebug() << "Interpreter:" << interpreter;
+                qDebug() << "Interpreter:" << settings.interpreter;
                 QProcess handler;
                 QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                 if (postData.size() > 0) {
@@ -507,7 +536,7 @@ protected:
 
                 qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
-                handler.start (interpreter, QStringList() <<
+                handler.start (settings.interpreter, QStringList() <<
                                QDir::toNativeSeparators
                                (settings.rootDirName+
                                 QDir::separator()+filepath));
@@ -590,30 +619,9 @@ public slots:
         msgBox.exec();
     }
 
-    void defineInterpreter()
-    {
-        if (extension == "pl") {
-            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
-            QString perlInterpreter (perlInterpreterByteArray);
-            interpreter = perlInterpreter;
-        }
-        if (extension == "py") {
-            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
-            QString pythonInterpreter (pythonInterpreterByteArray);
-            interpreter = pythonInterpreter;
-        }
-        if (extension == "php") {
-            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
-            QString phpInterpreter (phpInterpreterByteArray);
-            interpreter = phpInterpreter;
-        }
-    }
-
 private:
 
     QString filepath;
-    QString extension;
-    QString interpreter;
 
 };
 
@@ -697,25 +705,6 @@ public slots:
         }
     }
 
-    void defineInterpreter()
-    {
-        if (extension == "pl") {
-            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
-            QString perlInterpreter (perlInterpreterByteArray);
-            interpreter = perlInterpreter;
-        }
-        if (extension == "py") {
-            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
-            QString pythonInterpreter (pythonInterpreterByteArray);
-            interpreter = pythonInterpreter;
-        }
-        if (extension == "php") {
-            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
-            QString phpInterpreter (phpInterpreterByteArray);
-            interpreter = phpInterpreter;
-        }
-    }
-
     void selectDebuggingPerlInterpreterSlot()
     {
         QFileDialog selectInterpreterDialog;
@@ -761,10 +750,10 @@ public slots:
         qDebug() << "File path:" << QDir::toNativeSeparators
                     (settings.rootDirName+filepath);
         checkFileExistenceSlot();
+
         extension = filepath.section (".", 1, 1);
-        qDebug() << "Extension:" << extension;
-        defineInterpreter();
-        qDebug() << "Interpreter:" << interpreter;
+        settings.defineInterpreter (filepath);
+        qDebug() << "Interpreter:" << settings.interpreter;
 
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
         env.insert ("REQUEST_METHOD", "GET");
@@ -806,7 +795,7 @@ public slots:
 
             longRunningScriptHandler.start (perlInterpreter, sourceViewerCommandLine);
         } else {
-            longRunningScriptHandler.start (interpreter, QStringList() <<
+            longRunningScriptHandler.start (settings.interpreter, QStringList() <<
                                             QDir::toNativeSeparators
                                             (settings.rootDirName+
                                              QDir::separator()+filepath));
@@ -1046,7 +1035,6 @@ private:
 
     QProcess longRunningScriptHandler;
     QString longRunningScriptQuery;
-    int longRunningScriptOutputs;
     QString longRunningScriptAccumulatedOutput;
     QString longRunningScriptOutputFilePath;
     bool longRunningScriptOutputInNewWindow;

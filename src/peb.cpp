@@ -1164,7 +1164,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             qDebug() << "Extension:" << extension;
 
             if (settings.debuggerInterpreter == "current") {
-                defineInterpreter();
+                settings.defineInterpreter (filepath);
+                interpreter = settings.interpreter;
             }
 
             if (settings.debuggerInterpreter == "select") {
