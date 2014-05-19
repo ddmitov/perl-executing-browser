@@ -80,6 +80,23 @@ public slots:
         }
     }
 
+    void cssInjector (QString htmlInput)
+    {
+        QString css;
+        css.append ("<style media=\"screen\" type=\"text/css\">");
+        QFile cssFile (QDir::toNativeSeparators (
+                        defaultThemeDirectory+
+                        QDir::separator()+
+                        "current.css"));
+        cssFile.open(QFile::ReadOnly);
+        QString cssFileContents = QString (cssFile.readAll());
+        css.append (cssFileContents);
+        css.append ("</style>");
+        css.append ("</head>");
+        htmlInput.replace ("</head>", css);
+        cssInjectedHtml = htmlInput;
+    }
+
 public:
 
     Settings();
@@ -101,7 +118,6 @@ public:
     QString debuggerOutput;
     QString debuggerHtmlHeader;
     QString debuggerHtmlFooter;
-    QString debuggerHtmlTheme;
     QString sourceViewer;
     QStringList sourceViewerArguments;
 
@@ -151,6 +167,7 @@ public:
 
     // Variables returned from functions:
     QString interpreter;
+    QString cssInjectedHtml;
 
 };
 
@@ -446,19 +463,8 @@ protected:
 
                 if ((!request.url().toString().contains ("phpinfo")) and
                     (!query.contains ("theme=disabled"))) {
-                    QString css;
-                    css.append ("<style media=\"screen\" type=\"text/css\">");
-                    QFile cssFile (
-                                QDir::toNativeSeparators (
-                                    settings.defaultThemeDirectory+
-                                    QDir::separator()+
-                                    "current.css"));
-                    cssFile.open(QFile::ReadOnly);
-                    QString cssFileContents = QString (cssFile.readAll());
-                    css.append (cssFileContents);
-                    css.append ("</style>");
-                    css.append ("</head>");
-                    output.replace ("</head>", css);
+                    settings.cssInjector (output);
+                    output = settings.cssInjectedHtml;
                 }
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite)) {
@@ -567,18 +573,8 @@ protected:
                 regExp02.setCaseSensitivity (Qt::CaseInsensitive);
                 output.replace (regExp02, "");
 
-                QString css;
-                css.append ("<style media=\"screen\" type=\"text/css\">");
-                QFile cssFile (QDir::toNativeSeparators (
-                                settings.defaultThemeDirectory+
-                                QDir::separator()+
-                                "current.css"));
-                cssFile.open(QFile::ReadOnly);
-                QString cssFileContents = QString (cssFile.readAll());
-                css.append (cssFileContents);
-                css.append ("</style>");
-                css.append ("</head>");
-                output.replace ("</head>", css);
+                settings.cssInjector (output);
+                output = settings.cssInjectedHtml;
 
                 if (outputFilePathFile.open (QIODevice::ReadWrite))
                 {
@@ -816,18 +812,8 @@ public slots:
         }
 
         if (!longRunningScriptQuery.contains ("theme=disabled")) {
-            QString css;
-            css.append ("<style media=\"screen\" type=\"text/css\">");
-            QFile cssFile (QDir::toNativeSeparators (
-                            settings.defaultThemeDirectory+
-                            QDir::separator()+
-                            "current.css"));
-            cssFile.open(QFile::ReadOnly);
-            QString cssFileContents = QString (cssFile.readAll());
-            css.append (cssFileContents);
-            css.append ("</style>");
-            css.append ("</head>");
-            output.replace ("</head>", css);
+            settings.cssInjector (output);
+            output = settings.cssInjectedHtml;
         }
 
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
@@ -1375,17 +1361,8 @@ public slots:
         output.append (aboutTemplateContents);
 
         // Read CSS theme file and inject its content into the output variable:
-        QString css;
-        css.append ("<style media=\"screen\" type=\"text/css\">");
-        QFile cssFile (
-                    QDir::toNativeSeparators (
-                        settings.defaultThemeDirectory+QDir::separator()+"current.css"));
-        cssFile.open (QFile::ReadOnly);
-        QString cssFileContents = QString (cssFile.readAll());
-        css.append (cssFileContents);
-        css.append ("</style>");
-        css.append ("</head>");
-        output.replace ("</head>", css);
+        settings.cssInjector (output);
+        output = settings.cssInjectedHtml;
 
         // Save the output variable as an output file:
         if (outputFile.open (QIODevice::ReadWrite)) {

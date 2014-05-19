@@ -211,13 +211,10 @@ int main (int argc, char **argv)
     }
 
     // Check if default theme file exists, if not - copy it from themes folder:
-    if (!QFile::exists (settings.rootDirName+QDir::separator()+
-                        settings.defaultThemeDirectory+QDir::separator()+
+    if (!QFile::exists (settings.defaultThemeDirectory+QDir::separator()+
                         "current.css")) {
-        QFile::copy (settings.rootDirName+QDir::separator()+
-                     settings.allThemesDirectory+QDir::separator()+
+        QFile::copy (settings.allThemesDirectory+QDir::separator()+
                      settings.defaultTheme,
-                     settings.rootDirName+QDir::separator()+
                      settings.defaultThemeDirectory+QDir::separator()+
                      "current.css");
     }
@@ -316,7 +313,6 @@ int main (int argc, char **argv)
     qDebug() << "Debugger output:" << settings.debuggerOutput;
     qDebug() << "Debugger HTML header:" << settings.debuggerHtmlHeader;
     qDebug() << "Debugger HTML footer:" << settings.debuggerHtmlFooter;
-    qDebug() << "Debugger HTML theme:" << settings.debuggerHtmlTheme;
     qDebug() << "Source viewer:" << settings.sourceViewer;
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
@@ -360,13 +356,6 @@ int main (int argc, char **argv)
     qDebug() << "Logfiles directory:" << settings.logDirFullPath;
     qDebug() << "Logfiles prefix:" << settings.logPrefix;
     qDebug() << "===============";
-
-    // Check if default theme exists,
-    // if not - copy it in the default theme directory
-    if (!QFile::exists (settings.defaultThemeDirectory+QDir::separator()+"current.css")) {
-        QFile::copy (settings.defaultTheme,
-                     settings.defaultThemeDirectory+QDir::separator()+"current.css");
-    }
 
     // Check if start page exists:
     QFile startPageFile (settings.startPage);
@@ -577,10 +566,6 @@ Settings::Settings()
     debuggerHtmlFooter = QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+debuggerHtmlFooterSetting);
     QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
-    QString debuggerHtmlThemeSetting = settings.value (
-                "perl_debugger/debugger_html_theme").toString();
-    debuggerHtmlTheme = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+debuggerHtmlThemeSetting);
     sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
     QString sourceViewerArgumentsSetting =
             settings.value ("perl_debugger/source_viewer_arguments").toString();
@@ -650,11 +635,11 @@ Settings::Settings()
     defaultTheme = settings.value ("gui/default_theme").toString();
     QString defaultThemeDirectorySetting =
             settings.value ("gui/default_theme_directory").toString();
-    QString allThemesDirectorySetting =
-            settings.value ("gui/all_themes_directory").toString();
     defaultThemeDirectory =
             QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+defaultThemeDirectorySetting);
+    QString allThemesDirectorySetting =
+            settings.value ("gui/all_themes_directory").toString();
     allThemesDirectory =
             QDir::toNativeSeparators (
                 rootDirName+QDir::separator()+allThemesDirectorySetting);
@@ -1244,15 +1229,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 debuggerAccumulatedOutput.append (htmlHeaderFileContents);
             }
 
-            QString css;
-            css.append ("<style media=\"screen\" type=\"text/css\">");
-            QFile cssFile (QDir::toNativeSeparators (settings.debuggerHtmlTheme));
-            cssFile.open (QFile::ReadOnly);
-            QString cssFileContents = QString (cssFile.readAll());
-            css.append (cssFileContents);
-            css.append ("</style>");
-            css.append ("</head>");
-            debuggerAccumulatedOutput.replace ("</head>", css);
+            settings.cssInjector (debuggerAccumulatedOutput);
+            debuggerAccumulatedOutput = settings.cssInjectedHtml;
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);
