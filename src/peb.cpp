@@ -975,7 +975,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString perlInterpreter = dialog.getOpenFileName
@@ -1013,7 +1012,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString pythonInterpreter = dialog.getOpenFileName
@@ -1035,7 +1033,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString phpInterpreter = dialog.getOpenFileName
@@ -1064,7 +1061,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getOpenFileName
@@ -1086,7 +1082,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getSaveFileName
@@ -1110,7 +1105,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString folderNameToOpenString = dialog.getExistingDirectory
@@ -1132,7 +1126,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::ExistingFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         filepath = "";
@@ -1273,14 +1266,13 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString fileName = dialog.getSaveFileName
                 (0, tr ("Save as PDF"),
                  QDir::currentPath(), tr ("PDF files (*.pdf)"));
         if (!fileName.isEmpty()) {
-            if (QFileInfo(fileName).suffix().isEmpty()) {
+            if (QFileInfo (fileName).suffix().isEmpty()) {
                 fileName.append(".pdf");
             }
             qDebug() << "Save as PDF requested.";

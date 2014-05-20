@@ -20,6 +20,7 @@
 #endif
 
 #include <QApplication>
+#include <QObject>
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
@@ -77,7 +78,9 @@ public slots:
             QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
             QString phpInterpreter (phpInterpreterByteArray);
             interpreter = phpInterpreter;
+
         }
+        qDebug() << "Interpreter:" << interpreter;
     }
 
     void cssInjector (QString htmlInput)
@@ -95,6 +98,17 @@ public slots:
         css.append ("</head>");
         htmlInput.replace ("</head>", css);
         cssInjectedHtml = htmlInput;
+    }
+
+    void httpHeaderCleaner (QString input)
+    {
+        QRegExp regExp01 ("Content-type: text/html.{1,25}\n");
+        regExp01.setCaseSensitivity (Qt::CaseInsensitive);
+        input.replace (regExp01, "");
+        QRegExp regExp02 ("X-Powered-By: PHP.{1,20}\n");
+        regExp02.setCaseSensitivity (Qt::CaseInsensitive);
+        input.replace (regExp02, "");
+        httpHeadersCleanedHtml = input;
     }
 
 public:
@@ -168,6 +182,7 @@ public:
     // Variables returned from functions:
     QString interpreter;
     QString cssInjectedHtml;
+    QString httpHeadersCleanedHtml;
 
 };
 
@@ -399,7 +414,6 @@ protected:
             settings.defineInterpreter (filepath);
 
             if (extension == "pl" or extension == "php" or extension == "py") {
-                qDebug() << "Interpreter:" << settings.interpreter;
 
                 QProcess handler;
 
@@ -454,12 +468,8 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExp01 ("Content-type: text/html.{1,25}\n");
-                regExp01.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExp01, "");
-                QRegExp regExp02 ("X-Powered-By: PHP.{1,20}\n");
-                regExp02.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExp02, "");
+                settings.httpHeaderCleaner (output);
+                output = settings.httpHeadersCleanedHtml;
 
                 if ((!request.url().toString().contains ("phpinfo")) and
                     (!query.contains ("theme=disabled"))) {
@@ -523,8 +533,9 @@ protected:
             settings.defineInterpreter (filepath);
 
             if (extension == "pl" or extension == "php" or extension == "py") {
-                qDebug() << "Interpreter:" << settings.interpreter;
+
                 QProcess handler;
+
                 QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
                 if (postData.size() > 0) {
                     env.insert ("REQUEST_METHOD", "POST");
@@ -566,12 +577,8 @@ protected:
                     outputFilePathFile.remove();
                 }
 
-                QRegExp regExp01 ("Content-type: text/html.{1,25}\n");
-                regExp01.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExp01, "");
-                QRegExp regExp02 ("X-Powered-By: PHP.{1,20}\n");
-                regExp02.setCaseSensitivity (Qt::CaseInsensitive);
-                output.replace (regExp02, "");
+                settings.httpHeaderCleaner (output);
+                output = settings.httpHeadersCleanedHtml;
 
                 settings.cssInjector (output);
                 output = settings.cssInjectedHtml;
@@ -644,7 +651,6 @@ public slots:
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setOption (QFileDialog::DontUseNativeDialog);
         dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
@@ -752,7 +758,6 @@ public slots:
 
         extension = filepath.section (".", 1, 1);
         settings.defineInterpreter (filepath);
-        qDebug() << "Interpreter:" << settings.interpreter;
 
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
         env.insert ("REQUEST_METHOD", "GET");
@@ -807,13 +812,16 @@ public slots:
     {
         QString output = longRunningScriptHandler.readAllStandardOutput();
 
-        if (longRunningScriptQuery.contains("output=gradual_accumulation")) {
-            longRunningScriptAccumulatedOutput.append (output);
-        }
+        settings.httpHeaderCleaner (output);
+        output = settings.httpHeadersCleanedHtml;
 
         if (!longRunningScriptQuery.contains ("theme=disabled")) {
             settings.cssInjector (output);
             output = settings.cssInjectedHtml;
+        }
+
+        if (longRunningScriptQuery.contains("output=gradual_accumulation")) {
+            longRunningScriptAccumulatedOutput.append (output);
         }
 
         longRunningScriptOutputFilePath = QDir::toNativeSeparators
