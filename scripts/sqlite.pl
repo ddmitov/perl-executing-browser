@@ -1,10 +1,13 @@
 #!/usr/bin/perl -w
 
 # http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
-# UTF-8 encoded file
 
 use strict;
 use warnings;
+
+use utf8;
+use open ':std', ':encoding(UTF-8)';
+
 use DBI;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD);
 

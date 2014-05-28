@@ -5,15 +5,13 @@ Permanent TODO priorities:
 ====================================
 
 Perl debugger interaction:
-- source viewer as a long-running script
+- source viewer output as a sequence of pages when lines > 100
 - step-by-step debugging capability
 - capability to load for debugging Perl script from any location
-- 'Save Page As' dialog to save debugger output in a file
 
 Configuration:
 - search for INI file in all standard locations on the supported operating systems
 - check file paths to determine if they are absolute or relative paths
-- more INI file options
 - default values if INI file is missing or corrupt
 - configuration interface using 'config' URL, HTML interface and, when needed, 'restart' URL
 - more command line arguments for GUI configuration
@@ -25,17 +23,9 @@ Security:
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
 - detect file type by reading the shebang line
-- temporary folders
-
-CGI-like locally executed scripts:
-- non-blocking execution using signals and slots
-- check for STDERR from scripts, if any - display message
-- display 'Working...' page before output is ready
 
 Long-running scripts:
 - check if long-running script is not already started
-- check for STDERR from scripts, if any - display message
-- independent settings for main window and long-running scripts window
 - 'Cancel' button to abort a long-running script at any time
 
 GUI:

@@ -19,7 +19,7 @@ print "<body>\n\n";
 
 print '<div class="container">'.$/;
 print "<p align='center'><font size='5'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/perlinfo.pl?theme=disabled'>Perl Info</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_perlinfo.pl?theme=disabled'>Perl Info</a>\n";
 print "</font><br>\n";
 print "<font size='3'>\n";
 print "Non-core module loaded from directory, without system-wide installation.<br>\n";
@@ -36,7 +36,7 @@ print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>Pe
 print "</font></p>\n\n";
 
 print "<p align='center'><font size='5'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl?source=enabled&theme=disabled&output=gradual_accumulation&write_to_file=enabled' target='_blank'>Perl SQLite Example as source code</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl?source=enabled' target='_blank'>Perl SQLite Example as source code</a>\n";
 print "</font><br>\n";
 print "<font size='3'>\n";
 print "(will open in a new window)\n";
@@ -175,11 +175,11 @@ print "</font></p>\n\n";
 print "<hr width='95%'>\n\n";
 
 print "<p align='center'><font size='5'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest_output_only&write_to_file=enabled'>Long-Running Script in This Window</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest'>Long-Running Script in This Window</a>\n";
 print "</font></p>\n\n";
 
 print "<p align='center'><font size='5'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest_output_only&write_to_file=enabled' target='_blank'>Long-Running Script in a New Window</a>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest' target='_blank'>Long-Running Script in a New Window</a>\n";
 print "</font></p>\n\n";
 
 print "<p align='center'><font size='5'>\n";

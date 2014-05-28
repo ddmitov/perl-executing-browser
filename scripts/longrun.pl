@@ -21,7 +21,7 @@ print <<WAITING
 
 <body>
 
-<p align='center'><font size='5' face='SansSerif'>
+<p align='center'><font size='5'>
 
 <center>
 <br>
@@ -64,7 +64,7 @@ WAITING
 
 sleep ($waiting);
 
-print <<HTML;
+print <<RESULT;
 <html>
 
 <head>
@@ -74,9 +74,7 @@ print <<HTML;
 
 </head>
 
-<body text='#000000' bgcolor='#ffffb8' link='#a03830' vlink='#a03830' alink='#ff3830'>
-
-<p align='center'><font size='5' face='SansSerif'>
+<p align='center'><font size='5'>
 <br>
 Waited for output $waiting seconds!
 
@@ -90,5 +88,5 @@ Waited for output $waiting seconds!
 </body>
 
 </html>
-HTML
+RESULT
 ;

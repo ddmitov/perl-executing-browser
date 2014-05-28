@@ -119,6 +119,7 @@
  http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
  http://developer.nokia.com/Community/Wiki/Get_current_Date_and_Time_in_Qt
  http://developer.nokia.com/community/wiki/How_to_redirect_qDebug_output_to_a_file
+ http://developer.nokia.com/community/wiki/How_to_write_data_to_a_file_in_Qt
  http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html
  http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html
  http://harmattan-dev.nokia.com/docs/library/html/qt4/qtglobal.html
@@ -160,6 +161,7 @@
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
+ http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=338&key=QStringtoByteArray
  http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm
  http://www.stringreplace.com/c-plus-plus/qt-string-replace-method/
  http://fr.openclassrooms.com/forum/sujet/qt-icone-et-titre-non-charge-d-un-qwebview-54256

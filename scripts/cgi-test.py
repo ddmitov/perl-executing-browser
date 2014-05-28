@@ -20,19 +20,19 @@ print """
 
 <font face='SansSerif'>
 
-  <h3>Sample CGI Script from wiki.python.org</h3>
+	<h3>Sample CGI Script from wiki.python.org</h3>
 """
 
 form = cgi.FieldStorage()
-message = form.getvalue("message", "(no message)")
+message = form.getvalue ("message", "(no message)")
 
 print """
 
-  <p>Previous message: %s</p>
+	<p>Previous message: %s</p>
 
-  <form method="post" action="cgi-test.py">
-    <p>New message: <input type="text" name="message"/></p>
-  </form>
+	<form method="post" action="http://perl-executing-browser-pseudodomain/scripts/cgi-test.py">
+	<p>New message: <input type="text" name="message"/></p>
+	</form>
 
 </body>
 

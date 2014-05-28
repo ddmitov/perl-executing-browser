@@ -7,23 +7,33 @@
 
 <!-- http://www.w3schools.com/jsref/event_onclick.asp -->
 <script>
-function folderSelected()
+function folderSelected01()
 {
-	document.getElementById("FolderSelection").innerHTML="Select another folder";
+	document.getElementById("FolderSelection01").innerHTML="Select another folder";
+}
+function folderSelected02()
+{
+	document.getElementById("FolderSelection02").innerHTML="Select another folder";
 }
 </script>
 
 </head>
 
-<body onload="setFocus()">
+<body>
 
 <p align='center'><font size='5' face='SansSerif'>Resizer Test</font></p>
 
 <center>
 <font size='3' face='SansSerif'>
-<a href='openfolder://now' onclick="folderSelected()" id="FolderSelection">Select folder</a>
+<a href='openfolder://now' onclick="folderSelected01()" id="FolderSelection01">Select folder</a>
+<br>
+<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_latest.pl?output=latest'>Start Resizer with only latest output displayed</a>
+
 <br><br>
-<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer.pl?output=latest_output_only&write_to_file=enabled'>Start Resizer</a>
+
+<a href='openfolder://now' onclick="folderSelected02()" id="FolderSelection02">Select folder</a>
+<br>
+<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_accumulation.pl?output=accumulation'>Start Resizer with accumulated output displayed</a>
 </font>
 </center>
 

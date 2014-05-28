@@ -20,7 +20,6 @@
 #endif
 
 #include <QApplication>
-#include <QObject>
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
@@ -59,26 +58,48 @@ class Settings : public QSettings
 
 public slots:
 
+    void saveSetting (QString key, QString value)
+    {
+        QRegExp keyFinderRegExp ("^"+key+"=");
+        QString temp;
+
+        QFile settingsFile (settingsFileName);
+
+        if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
+            QTextStream input (&settingsFile);
+            while (!input.atEnd()) {
+                QString line = input.readLine();
+                if (line.contains (keyFinderRegExp)) {
+                    line = key+"="+value;
+                }
+                temp.append (line);
+                temp.append ("\n");
+            }
+        }
+        settingsFile.close();
+
+        if (settingsFile.open (QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream output (&settingsFile);
+            output << temp;
+            settingsFile.close();
+        }
+
+        sync();
+    }
+
     void defineInterpreter (QString filepath)
     {
         QString extension = filepath.section (".", 1, 1);
         qDebug() << "Extension:" << extension;
 
         if (extension == "pl") {
-            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
-            QString perlInterpreter (perlInterpreterByteArray);
             interpreter = perlInterpreter;
         }
         if (extension == "py") {
-            QByteArray pythonInterpreterByteArray = qgetenv ("PYTHON_INTERPRETER");
-            QString pythonInterpreter (pythonInterpreterByteArray);
             interpreter = pythonInterpreter;
         }
         if (extension == "php") {
-            QByteArray phpInterpreterByteArray = qgetenv ("PHP_INTERPRETER");
-            QString phpInterpreter (phpInterpreterByteArray);
             interpreter = phpInterpreter;
-
         }
         qDebug() << "Interpreter:" << interpreter;
     }
@@ -124,9 +145,9 @@ public:
     QString mongooseSettingsFileName;
 
     QString perlLib;
-    QString defaultPerlInterpreter;
-    QString defaultPythonInterpreter;
-    QString defaultPhpInterpreter;
+    QString perlInterpreter;
+    QString pythonInterpreter;
+    QString phpInterpreter;
 
     QString debuggerInterpreter;
     QString debuggerOutput;
@@ -204,8 +225,8 @@ public slots:
                 confirmExitMessageBox.setIconPixmap (settings.icon);
                 confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
                 confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-                confirmExitMessageBox.setButtonText (QMessageBox::Yes,tr ("Yes"));
-                confirmExitMessageBox.setButtonText (QMessageBox::No,tr ("No"));
+                confirmExitMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
+                confirmExitMessageBox.setButtonText (QMessageBox::No, tr ("No"));
                 confirmExitMessageBox.setDefaultButton (QMessageBox::No);
                 if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                     QApplication::quit();
@@ -362,7 +383,10 @@ class ModifiedNetworkAccessManager : public QNetworkAccessManager
 
 signals:
 
-    void startLongRunningScriptFromNAM (QUrl url);
+    void viewSourceCodeFromNAM (QUrl url,
+                                bool sourceEnabled,
+                                bool themeEnabled,
+                                QString outputType);
 
 protected:
 
@@ -381,7 +405,6 @@ protected:
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN))
                 .isParentOf(request.url()) and
-                (!request.url().path().contains ("longrun")) and
                 (!request.url().toString().contains ("debugger"))) {
 
             QString query = request.url()
@@ -389,6 +412,24 @@ protected:
                                | QUrl::RemoveAuthority
                                | QUrl::RemovePath)
                     .replace ("?", "");
+
+            if (query.contains ("source=enabled")) {
+                QUrl url = request.url();
+                bool sourceEnabled = true;
+                bool themeEnabled = false;
+                QString outputType = "accumulation";
+
+                emit viewSourceCodeFromNAM (url,
+                                            sourceEnabled,
+                                            themeEnabled,
+                                            outputType);
+
+                QNetworkRequest emptyRequest;
+                return QNetworkAccessManager::createRequest
+                        (QNetworkAccessManager::GetOperation,
+                         emptyRequest);
+            }
+
             filepath = request.url()
                     .toString (QUrl::RemoveScheme
                                | QUrl::RemoveAuthority
@@ -396,7 +437,6 @@ protected:
 
             qDebug() << "Script path:" << QDir::toNativeSeparators
                         (settings.rootDirName+filepath);
-
             QFile file (QDir::toNativeSeparators
                         (settings.rootDirName+filepath));
             if (!file.exists()) {
@@ -407,8 +447,9 @@ protected:
                          emptyRequest);
             }
 
-            if (query.length() > 0)
+            if (query.length() > 0) {
                 qDebug() << "Query string:" << query;
+            }
 
             QString extension = filepath.section (".", 1, 1);
             settings.defineInterpreter (filepath);
@@ -435,23 +476,17 @@ protected:
                 qDebug() << "===============";
 
                 QString output;
+                QString error;
 
-                if (query.contains("source=enabled")) {
-                // Qt 4:
-                //if (query.contains("source"+QUrl::queryValueDelimiter+"enabled")) {
-                // Qt 5:
-                //if (query.contains("source"+QUrlQuery::queryValueDelimiter()+"enabled)) {
-                    QUrl url = request.url();
-                    emit startLongRunningScriptFromNAM (url);
-                } else {
-
+                if (!filepath.contains ("longrun")) {
                     handler.start (settings.interpreter, QStringList() <<
                                    QDir::toNativeSeparators
                                    (settings.rootDirName+
                                     QDir::separator()+filepath));
 
-                    if (handler.waitForFinished()) {
-                        output = handler.readAll();
+                    if (handler.waitForFinished (1000)) {
+                        output = handler.readAllStandardOutput();
+                        error = handler.readAllStandardError();
                         handler.close();
                     }
                 }
@@ -563,8 +598,11 @@ protected:
                 }
 
                 QString output;
-                if (handler.waitForFinished()) {
-                    output = handler.readAll();
+                QString error;
+
+                if (handler.waitForFinished (1000)) {
+                    output = handler.readAllStandardOutput();
+                    error = handler.readAllStandardError();
                     handler.close();
                 }
 
@@ -651,7 +689,7 @@ public slots:
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
                 (0, tr ("Select Browser Theme"),
@@ -715,8 +753,7 @@ public slots:
         QFileDialog selectInterpreterDialog;
         selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
-        //selectInterpreterDialog.setOption (QFileDialog::DontUseNativeDialog);
-        selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        //selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectInterpreterDialog.setWindowIcon (settings.icon);
         interpreter = selectInterpreterDialog.getOpenFileName
                 (0, tr ("Select Interpreter"),
@@ -729,8 +766,7 @@ public slots:
         QFileDialog selectPerlLibDialog;
         selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        //selectPerlLibDialog.setOption (QFileDialog::DontUseNativeDialog);
-        selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        //selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
                 (0, tr ("Select PERLLIB"), QDir::currentPath());
@@ -743,14 +779,24 @@ public slots:
         selectPerlLibDialog.deleteLater();
     }
 
-    void startLongRunningScript (QUrl url)
+    void startLongRunningScript (QUrl url,
+                                 bool sourceEnabled,
+                                 bool themeEnabled,
+                                 QString outputType)
     {
         qDebug() << "Long-running script:" << url.toString();
 
+        longRunningScriptThemeEnabled = themeEnabled;
+        longRunningScriptOutputType = outputType;
+
         filepath = url.toString (QUrl::RemoveScheme
                                  | QUrl::RemoveAuthority
-                                 | QUrl::RemoveQuery
-                                 | QUrl::RemoveFragment);
+                                 | QUrl::RemoveQuery);
+
+        QString queryString = url.toString (QUrl::RemoveScheme
+                                            | QUrl::RemoveAuthority
+                                            | QUrl::RemovePath)
+                .replace ("?", "");
 
         qDebug() << "File path:" << QDir::toNativeSeparators
                     (settings.rootDirName+filepath);
@@ -760,15 +806,13 @@ public slots:
         settings.defineInterpreter (filepath);
 
         QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
-        env.insert ("REQUEST_METHOD", "GET");
-        longRunningScriptQuery = url.toString (QUrl::RemoveScheme
-                                      | QUrl::RemoveAuthority
-                                      | QUrl::RemovePath
-                                      | QUrl::RemoveFragment)
-                .replace ("?", "");
-        env.insert ("QUERY_STRING", longRunningScriptQuery);
-        longRunningScriptHandler.setProcessEnvironment (env);
-        qDebug() << "Long-running script query string:" << longRunningScriptQuery;
+
+        if (queryString.length() > 0) {
+            env.insert ("REQUEST_METHOD", "GET");
+            env.insert ("QUERY_STRING", queryString);
+            longRunningScriptHandler.setProcessEnvironment (env);
+            qDebug() << "Long-running script query string:" << queryString;
+        }
 
         QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
                                           (settings.rootDirName+
@@ -780,11 +824,8 @@ public slots:
         qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
         qDebug() << "===============";
 
-        if (longRunningScriptQuery.contains("source=enabled")) {
+        if (sourceEnabled == true) {
             longRunningScriptOutputInNewWindow = false;
-
-            QByteArray perlInterpreterByteArray = qgetenv ("PERL_INTERPRETER");
-            QString perlInterpreter (perlInterpreterByteArray);
 
             QStringList sourceViewerCommandLine;
             sourceViewerCommandLine.append (settings.sourceViewer);
@@ -797,7 +838,7 @@ public slots:
                                             (settings.rootDirName+
                                              QDir::separator()+filepath));
 
-            longRunningScriptHandler.start (perlInterpreter, sourceViewerCommandLine);
+            longRunningScriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine);
         } else {
             longRunningScriptHandler.start (settings.interpreter, QStringList() <<
                                             QDir::toNativeSeparators
@@ -815,12 +856,7 @@ public slots:
         settings.httpHeaderCleaner (output);
         output = settings.httpHeadersCleanedHtml;
 
-        if (!longRunningScriptQuery.contains ("theme=disabled")) {
-            settings.cssInjector (output);
-            output = settings.cssInjectedHtml;
-        }
-
-        if (longRunningScriptQuery.contains("output=gradual_accumulation")) {
+        if (longRunningScriptOutputType == "accumulation") {
             longRunningScriptAccumulatedOutput.append (output);
         }
 
@@ -832,25 +868,28 @@ public slots:
         QFile longRunningScriptOutputFile (longRunningScriptOutputFilePath);
 
         // Delete previous output file:
-        if (longRunningScriptQuery.contains ("output=latest_output_only") and
-                longRunningScriptQuery.contains ("write_to_file=enabled")) {
-            if (longRunningScriptOutputFile.exists()) {
-                longRunningScriptOutputFile.remove();
-            }
+        if (longRunningScriptOutputFile.exists()) {
+            longRunningScriptOutputFile.remove();
         }
 
-        // Latest output only and write to file:
-        if (longRunningScriptQuery.contains ("output=latest_output_only") and
-                longRunningScriptQuery.contains ("write_to_file=enabled")) {
+        // Latest output:
+        if (longRunningScriptOutputType == "latest") {
+            if (longRunningScriptThemeEnabled == true) {
+                settings.cssInjector (output);
+                output = settings.cssInjectedHtml;
+            }
             if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
                 QTextStream stream (&longRunningScriptOutputFile);
                 stream << output << endl;
             }
         }
 
-        // Accumulated output and write to file:
-        if (longRunningScriptQuery.contains ("output=gradual_accumulation") and
-                longRunningScriptQuery.contains ("write_to_file=enabled")) {
+        // Accumulated output:
+        if (longRunningScriptOutputType == "accumulation") {
+            if (longRunningScriptThemeEnabled == true) {
+                settings.cssInjector (longRunningScriptAccumulatedOutput);
+                longRunningScriptAccumulatedOutput = settings.cssInjectedHtml;
+            }
             if (longRunningScriptOutputFile.open (QIODevice::ReadWrite)) {
                 QTextStream stream (&longRunningScriptOutputFile);
                 stream << longRunningScriptAccumulatedOutput << endl;
@@ -862,33 +901,25 @@ public slots:
         qDebug() << "===============";
 
         if (longRunningScriptOutputInNewWindow == false) {
-            if (longRunningScriptQuery.contains ("write_to_file=enabled")) {
-                Page::currentFrame()->setUrl
-                        (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
-            }
-            if (longRunningScriptQuery.contains ("write_to_file=disabled")) {
-                Page::currentFrame()->setHtml (longRunningScriptAccumulatedOutput);
-            }
+            Page::currentFrame()->setUrl
+                    (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
         }
 
         if (longRunningScriptOutputInNewWindow == true) {
-            if (longRunningScriptQuery.contains ("write_to_file=enabled")) {
-                newLongRunWindow->setUrl (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
-            }
-            if (longRunningScriptQuery.contains ("write_to_file=disabled")) {
-                newLongRunWindow->setHtml (longRunningScriptAccumulatedOutput);
-            }
-
+            newLongRunWindow->setUrl
+                    (QUrl::fromLocalFile (longRunningScriptOutputFilePath));
             newLongRunWindow->show();
-            qApp->processEvents();
         }
+
     }
 
     void longRunningScriptFinishedSlot()
     {
         longRunningScriptHandler.close();
+        longRunningScriptAccumulatedOutput = "";
         QFile longRunningScriptOutputFile (longRunningScriptOutputFilePath);
         longRunningScriptOutputFile.remove();
+
         qDebug() << "Long-running script finished.";
         qDebug() << "===============";
     }
@@ -1034,9 +1065,10 @@ private:
     QString interpreter;
 
     QProcess longRunningScriptHandler;
-    QString longRunningScriptQuery;
     QString longRunningScriptAccumulatedOutput;
     QString longRunningScriptOutputFilePath;
+    bool longRunningScriptThemeEnabled;
+    QString longRunningScriptOutputType;
     bool longRunningScriptOutputInNewWindow;
     QWebView *newLongRunWindow;
 
@@ -1106,8 +1138,8 @@ public slots:
         printer.setColorMode (QPrinter::Color);
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
-        QPrintDialog *dialog = new QPrintDialog ( &printer);
-        dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
+        QPrintDialog *dialog = new QPrintDialog (&printer);
+        //dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
         QSize dialogSize = dialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
         dialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
@@ -1142,36 +1174,31 @@ public slots:
 
     void viewSourceFromContextMenuSlot()
     {
-        qDebug() << "Local URL to view as source code:" << qWebHitTestURL;
-        qDebug() << "===============";
         newWindow = new TopLevel (QString ("mainWindow"));
         newWindow->setWindowIcon (settings.icon);
+
 #if QT_VERSION >= 0x050000
         QUrlQuery viewSourceUrlQuery;
         viewSourceUrlQuery.addQueryItem (QString ("source"), QString ("enabled"));
-        viewSourceUrlQuery.addQueryItem (QString ("theme"), QString ("disabled"));
-        viewSourceUrlQuery.addQueryItem (QString ("output"), QString ("gradual_accumulation"));
-        viewSourceUrlQuery.addQueryItem (QString ("write_to_file"), QString ("enabled"));
         QUrl viewSourceUrl = qWebHitTestURL;
         viewSourceUrl.setQuery (viewSourceUrlQuery);
 #else
         QUrl viewSourceUrl = qWebHitTestURL;
         viewSourceUrl.addQueryItem (QString ("source"), QString ("enabled"));
-        viewSourceUrl.addQueryItem (QString ("theme"), QString ("disabled"));
-        viewSourceUrl.addQueryItem (QString ("output"), QString ("gradual_accumulation"));
-        viewSourceUrl.addQueryItem (QString ("write_to_file"), QString ("enabled"));
-
 #endif
+
+        qDebug() << "Local script to view as source code:" << qWebHitTestURL.toString();
+        qDebug() << "===============";
+
         newWindow->setUrl (viewSourceUrl);
         newWindow->show();
     }
-
 
     void openInNewWindowSlot()
     {
         newWindow = new TopLevel (QString ("mainWindow"));
         newWindow->setWindowIcon (settings.icon);
-        qDebug() << "Link to open in a new window:" << qWebHitTestURL.path();
+        qDebug() << "Link to open in a new window:" << qWebHitTestURL;
         qDebug() << "===============";
         if (qWebHitTestURL.path().contains (".htm")) {
             QString fileToOpen = QDir::toNativeSeparators
@@ -1187,7 +1214,6 @@ public slots:
 
     void contextMenuEvent (QContextMenuEvent *event)
     {
-
         QWebHitTestResult qWebHitTestResult =
                 mainPage->mainFrame()->hitTestContent (event->pos());
 
@@ -1207,15 +1233,19 @@ public slots:
                         .toString (QUrl::RemoveQuery)
                         .replace ("?", "")
                         .section (".", 1, 1);
+
                 if (extension == "pl" or extension == "php" or extension == "py") {
                     QAction *viewSourceAct = menu->addAction (tr ("&View Source"));
                     QObject::connect (viewSourceAct, SIGNAL (triggered()),
                                       this, SLOT (viewSourceFromContextMenuSlot()));
                 }
 
-                QAction *openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
-                QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
-                                  this, SLOT (openInNewWindowSlot()));
+                if (!qWebHitTestURL.toString().contains ("longrun")) {
+                    QAction *openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
+                    QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
+                                      this, SLOT (openInNewWindowSlot()));
+                }
+
             }
         }
 
@@ -1295,7 +1325,6 @@ public slots:
         }
 
         menu->exec (mapToGlobal (event->pos()));
-
     }
 
     void maximizeSlot()

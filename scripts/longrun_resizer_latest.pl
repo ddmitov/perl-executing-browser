@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN NEW_FILE FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
+use Env qw (PATH PERL5LIB DOCUMENT_ROOT FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
 # http://perlmeme.org/faqs/file_io/directory_listing.html
@@ -18,18 +18,19 @@ while (my $file = readdir (DIR)) {
 	my $filepath = $FOLDER_TO_OPEN.$slash.$file;
 	my $converted = "_converted.jpg";
 	my $file_converted = $filepath.$converted;
-	header();
+	html_header();
 	print "Converting $file ...\n";
 	my $result = `convert $filepath -resize 20% $file_converted`;
-	footer();
+	html_footer();
 }
 
-closedir(DIR);
-header();
-print "Conversion successfully completed!\n";
-footer();
+closedir (DIR);
 
-sub header() {
+html_header();
+print "Conversion successfully completed!\n";
+html_footer();
+
+sub html_header() {
 	print "<html>\n";
 
 	print "<head>\n";
@@ -39,11 +40,13 @@ sub header() {
 
 	print "<body>\n";
 
-	print "<p align='center'><font size='5' face='SansSerif'>\n";
+	print "<p align='center'><font size='5'>\n";
 }
 
-sub footer() {
+sub html_footer() {
 	print "</font></p>\n";
+	
 	print "</body>\n";
+	
 	print "</html>\n";
 }
