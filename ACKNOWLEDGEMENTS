@@ -62,6 +62,7 @@
  http://qt-project.org/doc/qt-4.8/qwebframe.html
  http://qt-project.org/doc/qt-4.8/linguist-hellotr-main-cpp.html
  http://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets
+ http://qt-project.org/doc/qt-4.8/qlist.html#removeOne
  http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
  http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
@@ -88,6 +89,7 @@
  http://qt-project.org/forums/viewthread/1335
  http://qt-project.org/forums/viewthread/25533
  http://qt-project.org/forums/viewthread/15487
+ http://qt-project.org/forums/viewthread/8876
  http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://doc.qt.digia.com/4.6/internationalization.html
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
@@ -110,10 +112,12 @@
  http://www.qtcentre.org/threads/10661-QByteArray-to-QString
  http://www.qtcentre.org/threads/28302-Passing-Command-line-arguments-to-a-Qt-application-in-linux
  http://www.qtcentre.org/threads/10210-how-to-use-tr()-for-QMessageBox
+ http://www.qtcentre.org/threads/52787-QWebPage-createWindow
  http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
  http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
  http://www.qtforum.org/article/18224/get-directory-path.html
  http://www.qtforum.org/article/15030/passing-parameters-to-the-constructor.html
+ http://www.qtforum.org/article/27658/how-to-prevent-closing-of-a-window-by-alt-f4-solved.html
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
  http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
  http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
@@ -161,7 +165,6 @@
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
- http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=338&key=QStringtoByteArray
  http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm
  http://www.stringreplace.com/c-plus-plus/qt-string-replace-method/
  http://fr.openclassrooms.com/forum/sujet/qt-icone-et-titre-non-charge-d-un-qwebview-54256

@@ -48,6 +48,9 @@
 static QString applicationStartForLogFileName =
         QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
+// Dynamic global list of all scripts, that are started and still running in any given moment:
+QStringList startedScripts;
+
 // Custom message handler for redirecting all debug messages to a log file:
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -58,11 +61,9 @@ void customMessageHandler (QtMsgType type, const QMessageLogContext &context,
 void customMessageHandler (QtMsgType type, const char *message)
 #endif
 {
-
 #if QT_VERSION >= 0x050000
     Q_UNUSED (context);
 #endif
-
     QString dateAndTime = QDateTime::currentDateTime().toString ("dd/MM/yyyy hh:mm:ss");
     QString text = QString ("[%1] ").arg (dateAndTime);
 
@@ -103,7 +104,6 @@ void customMessageHandler (QtMsgType type, const char *message)
        QTextStream textStream (&logFile);
        textStream << text << endl;
    }
-
 }
 
 int main (int argc, char **argv)
@@ -379,6 +379,12 @@ int main (int argc, char **argv)
     QApplication::setWindowIcon (settings.icon);
 
     // ENVIRONMENT VARIABLES:
+    // Browser-specific environment variables:
+    qputenv ("REMOTE_SERVER", "");
+    qputenv ("FILE_TO_OPEN", "");
+    qputenv ("FOLDER_TO_OPEN", "");
+    qputenv ("NEW_FILE", "");
+
     // PATH:
     // Get the existing PATH and set the separator sign:
     QByteArray path;
@@ -435,28 +441,39 @@ int main (int argc, char **argv)
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
 
-    // Browser-specific environment variables:
-    qputenv ("REMOTE_SERVER", "");
-    qputenv ("FILE_TO_OPEN", "");
-    qputenv ("FOLDER_TO_OPEN", "");
-    qputenv ("NEW_FILE", "");
+    // REMOTE_SERVER:
+    QTcpSocket webConnectivityPing;
+    if (settings.pingRemoteWebserver == "enable") {
+        webConnectivityPing.connectToHost (settings.remoteWebserver,
+                                           settings.remoteWebserverPort);
 
-    TopLevel toplevel (QString ("mainWindow"));
-    QObject::connect (qApp, SIGNAL (lastWindowClosed()),
-                      &toplevel, SLOT (quitApplicationSlot()));
-    toplevel.setWindowIcon (settings.icon);
-    toplevel.loadStartPageSlot();
-    toplevel.show();
+        if (webConnectivityPing.waitForConnected (500))
+        {
+            qputenv ("REMOTE_SERVER", "available");
+        } else {
+            qputenv ("REMOTE_SERVER", "unavailable");
+        }
+    }
 
     Watchdog watchdog;
+
+    TopLevel toplevel (QString ("mainWindow"));
+
     if (settings.systrayIcon == "enable") {
         QObject::connect (watchdog.aboutAction, SIGNAL (triggered()),
                           &toplevel, SLOT (aboutSlot()));
         QObject::connect (watchdog.quitAction, SIGNAL (triggered()),
                           &toplevel, SLOT (quitApplicationSlot()));
     }
+
     QObject::connect (qApp, SIGNAL (aboutToQuit()),
                       &watchdog, SLOT (aboutToQuitSlot()));
+    QObject::connect (qApp, SIGNAL (lastWindowClosed()),
+                      &toplevel, SLOT (quitApplicationSlot()));
+
+    toplevel.setWindowIcon (settings.icon);
+    toplevel.loadStartPageSlot();
+    toplevel.show();
 
     return application.exec();
 
@@ -570,6 +587,26 @@ Settings::Settings()
         listeningPort = "unavailable";
         quitToken = "unavailable";
     }
+
+
+
+    // Read the INI file for a list of allowed web sites:
+    QFile settingsFile (settingsFileName);
+    QString equalSign = "=";
+    QRegExp allowedWebsite ("^allowed_website");
+    if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream settingsStream (&settingsFile);
+        while (!settingsStream.atEnd()) {
+            QString line = settingsStream.readLine();
+            if (line.contains (allowedWebsite)) {
+                QString allowedWebsiteToAdd = line.section (equalSign, 1, 1);
+                allowedWebsiteToAdd.replace (QString ("\n"), "");
+                allowedWebSites.append (allowedWebsiteToAdd);
+            }
+        }
+    }
+
+
 
     // Start page:
     startPageSetting = settings.value ("gui/start_page").toString();
@@ -708,6 +745,8 @@ Page::Page()
     QWebSettings::globalSettings()->
             setAttribute (QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->
+            setAttribute (QWebSettings::JavascriptCanOpenWindows, true);
+    QWebSettings::globalSettings()->
             setAttribute (QWebSettings::SpatialNavigationEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute (QWebSettings::LinksIncludedInFocusChain, true);
@@ -727,12 +766,12 @@ Page::Page()
     QWebSettings::setObjectCacheCapacities (0, 0, 0);
     QWebSettings::clearMemoryCaches();
 
-    QObject::connect (&longRunningScriptHandler, SIGNAL (readyReadStandardOutput()),
-                       this, SLOT (displayLongRunningScriptOutputSlot()));
-    QObject::connect (&longRunningScriptHandler, SIGNAL (readyReadStandardError()),
-                       this, SLOT (displayLongRunningScriptErrorSlot()));
-    QObject::connect (&longRunningScriptHandler, SIGNAL (finished (int, QProcess::ExitStatus)),
-                       this, SLOT (longRunningScriptFinishedSlot()));
+    QObject::connect (&scriptHandler, SIGNAL (readyReadStandardOutput()),
+                       this, SLOT (scriptOutputSlot()));
+    QObject::connect (&scriptHandler, SIGNAL (readyReadStandardError()),
+                       this, SLOT (scriptErrorSlot()));
+    QObject::connect (&scriptHandler, SIGNAL (finished (int, QProcess::ExitStatus)),
+                       this, SLOT (scriptFinishedSlot()));
 
     QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
                        this, SLOT (displayDebuggerOutputSlot()));
@@ -820,6 +859,9 @@ TopLevel::TopLevel (QString type)
 
     if (type == "mainWindow") {
         // Connect signals and slots - main window:
+        QObject::connect (mainPage, SIGNAL (displayErrorsSignalFromPage (QString)),
+                          this, SLOT (displayErrorsSlot (QString)));
+
         QObject::connect (this, SIGNAL (selectThemeSignal()),
                           mainPage, SLOT (selectThemeSlot()));
 
@@ -850,14 +892,8 @@ TopLevel::TopLevel (QString type)
     ModifiedNetworkAccessManager *nam = new ModifiedNetworkAccessManager();
     mainPage->setNetworkAccessManager (nam);
 
-    QObject::connect (nam, SIGNAL (viewSourceCodeFromNAM (QUrl,
-                                                          bool,
-                                                          bool,
-                                                          QString)),
-                      mainPage, SLOT (startLongRunningScript (QUrl,
-                                                              bool,
-                                                              bool,
-                                                              QString)));
+    QObject::connect (nam, SIGNAL (startScriptSignal (QUrl, QByteArray)),
+                      mainPage, SLOT (startScriptSlot (QUrl, QByteArray)));
 
     // Disable history:
     QWebHistory *history = mainPage->history();
@@ -916,13 +952,16 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Open local file using default application:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("file")) {
+
         QString filepath = request.url().toString (QUrl::RemoveScheme);
         QFile file (QDir::toNativeSeparators (filepath));
         if (file.exists()) {
-            QString defaultApplicationFile = request.url().toString();
-            qDebug() << "Opening file with default application:" << defaultApplicationFile;
+
+            qDebug() << "Opening file with default application:" << filepath;
             qDebug() << "===============";
+
             QDesktopServices::openUrl (request.url());
+
             return false;
         }
     }
@@ -930,19 +969,24 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Execute external application:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("external:")) {
+
         QString externalApplication = request.url()
                 .toString (QUrl::RemoveScheme)
                 .replace ("/", "");
+
         qDebug() << "External application: " << externalApplication;
         qDebug() << "===============";
+
         QProcess externalProcess;
         externalProcess.startDetached (externalApplication);
+
         return false;
     }
 
     // Select Perl interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("selectperl:")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -966,9 +1010,11 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, tr ("Select PERLLIB"), QDir::currentPath());
         selectPerlLibDialog.close();
         selectPerlLibDialog.deleteLater();
+
         QByteArray perlLibFolderName;
         perlLibFolderName.append (perlLibFolderNameString);
         qputenv ("PERLLIB", perlLibFolderName);
+
         qDebug() << "Selected PERLLIB:" << perlLibFolderName;
         qDebug() << "===============";
 
@@ -978,6 +1024,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Select Python interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("selectpython:")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -993,12 +1040,14 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
         qDebug() << "Selected Python interpreter:" << pythonInterpreter;
         qDebug() << "===============";
+
         return true;
     }
 
     // Select PHP interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("selectphp:")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1014,6 +1063,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
         qDebug() << "Selected PHP interpreter:" << phpInterpreter;
         qDebug() << "===============";
+
         return true;
     }
 
@@ -1037,17 +1087,21 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                  QDir::currentPath(), tr ("All files (*)"));
         dialog.close();
         dialog.deleteLater();
+
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
         qputenv ("FILE_TO_OPEN", fileName);
-        qDebug() << "File to open:" << fileName;
+
+        qDebug() << "File to open:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
+
         return true;
     }
 
     // Invoke 'New file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("newfile:")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1060,17 +1114,21 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             return false;
         dialog.close();
         dialog.deleteLater();
+
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
         qputenv ("NEW_FILE", fileName);
-        qDebug() << "New file:" << fileName;
+
+        qDebug() << "New file:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
+
         return true;
     }
 
     // Invoke 'Open folder' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("openfolder:")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1080,11 +1138,14 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 (0, tr ("Select Folder"), QDir::currentPath());
         dialog.close();
         dialog.deleteLater();
+
         QByteArray folderName;
         folderName.append (folderNameToOpenString);
         qputenv ("FOLDER_TO_OPEN", folderName);
+
         qDebug() << "Folder to open:" << QDir::toNativeSeparators (folderName);
         qDebug() << "===============";
+
         return true;
     }
 
@@ -1264,103 +1325,33 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Close window from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("closewindow:")) {
+
         qDebug() << "Close window requested from URL.";
         qDebug() << "===============";
+
         emit closeWindowSignal();
     }
 
     // Quit application from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("quit:")) {
+
         qDebug() << "Application termination requested from URL.";
+
         emit quitFromURLSignal();
     }
 
-    // Open not allowed web site using default browser:
+    // Load local HTML page in the same window:
+    QRegExp htmExtension ("\\.htm");
+    htmExtension.setCaseSensitivity (Qt::CaseInsensitive);
+    QRegExp htmlExtension ("\\.html");
+    htmlExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains ("http") and
-            (! (QUrl (PEB_DOMAIN))
-             .isParentOf (request.url())) and
-            (! request.url().authority().contains ("localhost")) and
-            (! request.url().authority().contains ("www.google.com"))) {
-        QString externalWebLink = request.url().toString();
-        qDebug() << "Default browser called for:" << externalWebLink;
-        qDebug() << "===============";
-        QDesktopServices::openUrl (request.url());
-        return false;
-    }
-
-    // Open allowed web site in the same or in a new window:
-    if (frame == Page::currentFrame() and
-            request.url().authority().contains ("www.google.com")) {
-        QString allowedWebLink = request.url().toString();
-        qDebug() << "Allowed web link:" << allowedWebLink;
-        qDebug() << "===============";
-        return QWebPage::acceptNavigationRequest (frame, request, navigationType);
-
-    }
-    if (frame != Page::currentFrame() and
-            request.url().authority().contains ("www.google.com")) {
-        qDebug() << "Allowed web link in a new window:" << request.url();
-        qDebug() << "===============";
-        if (!Page::mainFrame()->childFrames().contains (frame))
-        {
-            newWindow = new TopLevel (QString ("mainWindow"));
-            newWindow->setWindowIcon (settings.icon);
-            newWindow->setUrl (request.url());
-            newWindow->show();
-        }
-    }
-
-    // Open localhost:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("http") and
-         request.url().authority().contains ("localhost")) {
-        qDebug() << "Local webserver link:" << request.url().toString();
-        qDebug() << "===============";
-        return QWebPage::acceptNavigationRequest (frame, request, navigationType);
-    }
-
-    // Open local content in a new window
-    // (with the exception of result from long-running script):
-    if (frame != Page::currentFrame() and
-            (QUrl (PEB_DOMAIN))
-            .isParentOf (request.url())) {
-        if (!Page::mainFrame()->childFrames().contains (frame)) {
-            if (!request.url().path().contains ("longrun")) {
-                filepath = request.url()
-                        .toString (QUrl::RemoveScheme
-                                   | QUrl::RemoveAuthority
-                                   | QUrl::RemoveQuery
-                                   | QUrl::RemoveFragment);
-                QFile file (QDir::toNativeSeparators
-                            (settings.rootDirName+filepath));
-                if (!file.exists()) {
-                    missingFileMessageSlot();
-                    return true;
-                } else {
-                    newWindow = new TopLevel (QString ("mainWindow"));
-                    newWindow->setWindowIcon (settings.icon);
-                    if (request.url().path().contains (".htm")) {
-                        newWindow->setUrl (QUrl::fromLocalFile
-                                             (QDir::toNativeSeparators
-                                              (settings.rootDirName+
-                                               QDir::separator()+request.url().path())));
-                    } else {
-                        newWindow->setUrl (request.url());
-                    }
-                }
-                newWindow->show();
-                return true;
-            }
-        }
-    }
-
-    // Load local HTML page invoked from hyperlink:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         (QUrl (PEB_DOMAIN))
-         .isParentOf (request.url()) and
-         (request.url().path().contains (".htm"))) {
+            (QUrl (PEB_DOMAIN)).isParentOf (request.url()) and
+            (request.url().path().contains (htmExtension) or
+             request.url().path().contains (htmExtension)) and
+            (Page::mainFrame()->childFrames().contains (frame))) {
 
         filepath = request.url()
                 .toString (QUrl::RemoveScheme
@@ -1382,54 +1373,37 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return true;
     }
 
-    // Execute local long-running script invoked from hyperlink:
+    // Open allowed web content in a new window:
+    if ((!Page::mainFrame()->childFrames().contains (frame)) and
+            navigationType == QWebPage::NavigationTypeLinkClicked and
+            (settings.allowedWebSites.contains (request.url().authority()))) {
+
+        qDebug() << "Allowed web link in a new window:" << request.url().toString();
+        qDebug() << "===============";
+
+        newWindow = new TopLevel (QString ("mainWindow"));
+        newWindow->setWindowIcon (settings.icon);
+        newWindow->setAttribute (Qt::WA_DeleteOnClose, true);
+        newWindow->setUrl (request.url());
+        newWindow->show();
+
+        QWebSettings::clearMemoryCaches();
+        return false;
+    }
+
+    // Open clicked links to NOT allowed web content using default browser:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         (QUrl (PEB_DOMAIN))
-         .isParentOf (request.url()) and
-         (request.url().path().contains ("longrun"))){
+            request.url().scheme().contains ("http") and
+            (!request.url().toString().contains (PEB_DOMAIN)) and
+            (!request.url().authority().contains ("localhost")) and
+            (!settings.allowedWebSites.contains (request.url().authority()))) {
 
-        // Default values:
-        QUrl url = request.url();
-        bool sourceEnabled = false;
-        bool themeEnabled = true;
-        QString outputType = "accumulation";
+        qDebug() << "Default browser called for not allowed web link:" << request.url().toString();
+        qDebug() << "===============";
 
-        QString longRunningScriptQuery = url.toString (QUrl::RemoveScheme
-                                                       | QUrl::RemoveAuthority
-                                                       | QUrl::RemovePath)
-                .replace ("?", "");
+        QDesktopServices::openUrl (request.url());
 
-        if (longRunningScriptQuery.contains ("source=enabled")) {
-            sourceEnabled = true;
-        }
-
-        if (longRunningScriptQuery.contains ("theme=disabled")) {
-            themeEnabled = false;
-        }
-
-        if (longRunningScriptQuery.contains ("output=latest")) {
-            outputType = "latest";
-        }
-        if (longRunningScriptQuery.contains ("output=accumulation")) {
-            outputType = "accumulation";
-        }
-
-        startLongRunningScript (url,
-                                sourceEnabled,
-                                themeEnabled,
-                                outputType);
-
-        if (frame == Page::currentFrame()) {
-            longRunningScriptOutputInNewWindow = false;
-        }
-
-        if (frame != Page::currentFrame()) {
-            longRunningScriptOutputInNewWindow = true;
-            newLongRunWindow = new TopLevel (QString ("mainWindow"));
-            newLongRunWindow->setWindowIcon (settings.icon);
-        }
-
-        return true;
+        return false;
     }
 
     return QWebPage::acceptNavigationRequest (frame, request, navigationType);

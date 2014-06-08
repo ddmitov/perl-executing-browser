@@ -74,14 +74,15 @@ print <<RESULT;
 
 </head>
 
+<body>
+
 <p align='center'><font size='5'>
+
 <br>
 Waited for output $waiting seconds!
 
-
 <br><a href='https://www.google.com/doodles'>Allowed External Link</a><br>
 <a href='closewindow://now'>Close window</a>
-
 
 </font></p>
 
