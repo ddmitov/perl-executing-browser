@@ -26,28 +26,17 @@ All locally executed scripts:
 - dialog to select and execute scripts from any folder
 - detect file type by reading the shebang line
 
-Long-running scripts:
-- check if long-running script is not already started
-- 'Cancel' button to abort a long-running script at any time
-
-Networking:
-- ping local and remote servers in a non-blocking fashion using signal and slots
-
 GUI:
-- working windows size settings on Mac
+- working maximized windows setting on Mac
 - Print Preview from context menu
 
-Extensibility:
+Extensibility & connectivity:
+- Easier configuration of a custom local web server started with the browser
 - Mojolicious support - option to start Mojolicious together with the browser
 
 Help:
-- Configuration options explained
 - Keyboard shortcuts listed
 - 'help' URL
-
-Connectivity:
-- Whitelist of allowed web sites
-- Easier configuration of a custom local web server started with the browser
 
 Building:
 - build script for command line compilation of the browser

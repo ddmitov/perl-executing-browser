@@ -5,6 +5,32 @@ use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
+# http://www.perlmonks.org/index.pl?node_id=162876
+sub html_header() {
+	print "<html>\n";
+
+	print "<head>\n";
+	print "<title>Perl Executing Browser - Image Resizer Test</title>\n";
+	print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
+	print "</head>\n";
+
+	print "<body>\n";
+
+	print "<p align='center'><font size='5'>\n";
+
+	print "<br>\n";
+	print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_latest.pl?action=kill'><button type='button' autofocus>Kill Script</button></a>\n";
+	print "<br><br>\n";
+}
+
+sub html_footer() {
+	print "</font></p>\n";
+	
+	print "</body>\n";
+	
+	print "</html>\n";
+}
+
 # http://perlmeme.org/faqs/file_io/directory_listing.html
 opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
@@ -29,24 +55,3 @@ closedir (DIR);
 html_header();
 print "Conversion successfully completed!\n";
 html_footer();
-
-sub html_header() {
-	print "<html>\n";
-
-	print "<head>\n";
-	print "<title>Perl Executing Browser - Image Resizer Test</title>\n";
-	print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
-	print "</head>\n";
-
-	print "<body>\n";
-
-	print "<p align='center'><font size='5'>\n";
-}
-
-sub html_footer() {
-	print "</font></p>\n";
-	
-	print "</body>\n";
-	
-	print "</html>\n";
-}

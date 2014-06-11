@@ -19,6 +19,10 @@ print "<body>\n";
 
 print "<p align='center'><font size='5'>\n";
 
+print "<br>\n";
+print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_accumulation.pl?action=kill'><button type='button' autofocus>Kill Script</button></a>\n";
+print "<br><br>\n";
+
 print "Conversion started.<br>\n";
 
 while (my $file = readdir (DIR)) {

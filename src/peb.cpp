@@ -588,8 +588,6 @@ Settings::Settings()
         quitToken = "unavailable";
     }
 
-
-
     // Read the INI file for a list of allowed web sites:
     QFile settingsFile (settingsFileName);
     QString equalSign = "=";
@@ -605,8 +603,6 @@ Settings::Settings()
             }
         }
     }
-
-
 
     // Start page:
     startPageSetting = settings.value ("gui/start_page").toString();
@@ -1018,7 +1014,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "Selected PERLLIB:" << perlLibFolderName;
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Select Python interpreter:
@@ -1041,7 +1037,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "Selected Python interpreter:" << pythonInterpreter;
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Select PHP interpreter:
@@ -1064,7 +1060,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "Selected PHP interpreter:" << phpInterpreter;
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Select another theme:
@@ -1095,7 +1091,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "File to open:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Invoke 'New file' dialog from URL:
@@ -1122,7 +1118,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "New file:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Invoke 'Open folder' dialog from URL:
@@ -1146,7 +1142,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "Folder to open:" << QDir::toNativeSeparators (folderName);
         qDebug() << "===============";
 
-        return true;
+        return false;
     }
 
     // Display information about user-selected Perl scripts using the built-in Perl debugger.
@@ -1252,8 +1248,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 debuggerAccumulatedOutput.append (htmlHeaderFileContents);
             }
 
-            settings.cssInjector (debuggerAccumulatedOutput);
-            debuggerAccumulatedOutput = settings.cssInjectedHtml;
+            settings.cssLinker (debuggerAccumulatedOutput);
+            debuggerAccumulatedOutput = settings.cssLinkedHtml;
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);
@@ -1261,7 +1257,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         }
 
         QWebSettings::clearMemoryCaches();
-        return true;
+        return false;
     }
 
 #ifndef QT_NO_PRINTER
@@ -1285,7 +1281,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         }
         dialog->close();
         dialog->deleteLater();
-        return true;
+        return false;
     }
 
     // Save as PDF from URL:
@@ -1318,7 +1314,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             printer.setOutputFileName (fileName);
             frame->print (&printer);
         }
-        return true;
+        return false;
     }
 #endif
 
@@ -1330,6 +1326,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "===============";
 
         emit closeWindowSignal();
+
+        return false;
     }
 
     // Quit application from URL:
@@ -1339,6 +1337,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "Application termination requested from URL.";
 
         emit quitFromURLSignal();
+
+        return false;
     }
 
     // Load local HTML page in the same window:
@@ -1357,20 +1357,18 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 .toString (QUrl::RemoveScheme
                            | QUrl::RemoveAuthority
                            | QUrl::RemoveFragment);
-        qDebug() << "HTML file path:" << QDir::toNativeSeparators
-                    (settings.rootDirName+filepath);
-        qDebug() << "===============";
+
         checkFileExistenceSlot();
 
-        QString htmlWithFragment = request.url()
-                .toString (QUrl::RemoveScheme | QUrl::RemoveAuthority);
         frame->load (QUrl::fromLocalFile
-                       (QDir::toNativeSeparators
-                        (settings.rootDirName+
-                                QDir::separator()+htmlWithFragment)));
+                     (QDir::toNativeSeparators
+                      (settings.rootDirName+
+                       QDir::separator()+
+                       request.url().toString (
+                           QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
         QWebSettings::clearMemoryCaches();
-        return true;
+        return false;
     }
 
     // Open allowed web content in a new window:
