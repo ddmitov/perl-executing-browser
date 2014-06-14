@@ -13,7 +13,6 @@ print <<HTML
 <head>
 <title>Perl Executing Browser - Dynamic Startpage</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<link href='current.css' media='all' rel='stylesheet' />
 </head>
 
 <body>

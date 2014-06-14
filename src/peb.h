@@ -24,11 +24,8 @@
 #include <QWebPage>
 #include <QWebView>
 #include <QWebFrame>
-#include <QWebElement>
 #include <QtWebKit>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QNetworkRequest>
-#include <QtNetwork/QNetworkReply>
 #include <QtNetwork/QTcpSocket>
 #include <QProcess>
 #include <QMessageBox>
@@ -92,19 +89,56 @@ public slots:
 
     void defineInterpreter (QString filepath)
     {
-        QString extension = filepath.section (".", 1, 1);
-        qDebug() << "Extension:" << extension;
+        interpreter = "undefined";
 
-        if (extension == "pl") {
-            interpreter = perlInterpreter;
+        extension = filepath.section (".", 1, 1);
+
+        if (extension.length() == 0) {
+            QString firstLine;
+
+            QFile file (filepath);
+            if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
+                firstLine = file.readLine();
+            }
+
+            if (firstLine.contains (perlShebang)) {
+                interpreter = perlInterpreter;
+            }
+
+            if (firstLine.contains (pythonShebang)) {
+                interpreter = pythonInterpreter;
+            }
+
+            if (firstLine.contains (phpShebang)) {
+                interpreter = phpInterpreter;
+            }
+        } else {
+            if (extension.contains (htmlExtensions)) {
+                interpreter = "browser-html";
+            }
+            if (extension.contains (cssExtension)) {
+                interpreter = "browser-css";
+            }
+            if (extension.contains (pngExtension)) {
+                interpreter = "browser-image";
+            }
+            if (extension.contains (jpgExtensions)) {
+                interpreter = "browser-image";
+            }
+            if (extension.contains (gifExtension)) {
+                interpreter = "browser-image";
+            }
+
+            if (extension == "pl") {
+                interpreter = perlInterpreter;
+            }
+            if (extension == "py") {
+                interpreter = pythonInterpreter;
+            }
+            if (extension == "php") {
+                interpreter = phpInterpreter;
+            }
         }
-        if (extension == "py") {
-            interpreter = pythonInterpreter;
-        }
-        if (extension == "php") {
-            interpreter = phpInterpreter;
-        }
-        qDebug() << "Interpreter:" << interpreter;
     }
 
     void cssLinker (QString htmlInput)
@@ -213,9 +247,29 @@ public:
     QString logPrefix;
 
     // Variables returned from functions:
+    QString extension;
     QString interpreter;
     QString cssLinkedHtml;
     QString httpHeadersCleanedHtml;
+
+private:
+
+    // Regular expressions for file type detection by shebang line:
+    QRegExp perlShebang;
+    QRegExp pythonShebang;
+    QRegExp phpShebang;
+
+    // Regular expressions for file type detection by extension:
+    QRegExp htmlExtensions;
+    QRegExp cssExtension;
+    QRegExp jsExtension;
+    QRegExp pngExtension;
+    QRegExp jpgExtensions;
+    QRegExp gifExtension;
+
+    QRegExp plExtension;
+    QRegExp pyExtension;
+    QRegExp phpExtension;
 
 };
 
@@ -404,11 +458,7 @@ protected:
                                           const QNetworkRequest &request,
                                           QIODevice *outgoingData = 0)
     {
-        // Get output from local scripts, including:
-        // 1.) script used as a start page,
-        // 2.) script started in a new window,
-        // 3.) script, which was fed with data from local form using CGI GET method,
-        // 4.) script started by clicking a hyperlink.
+        // GET requests to local content:
         if (operation == GetOperation and
                 (QUrl (PEB_DOMAIN)).isParentOf (request.url()) and
                 (!request.url().toString().contains ("debugger"))) {
@@ -419,29 +469,15 @@ protected:
                                | QUrl::RemoveQuery
                                | QUrl::RemoveFragment);
 
-            QRegExp htmExtension ("\\.htm");
-            htmExtension.setCaseSensitivity (Qt::CaseInsensitive);
-            QRegExp htmlExtension ("\\.html");
-            htmlExtension.setCaseSensitivity (Qt::CaseInsensitive);
+            QString fullFilePath = QDir::toNativeSeparators
+                    (settings.rootDirName+filepath);
 
-            QRegExp cssExtension ("\\.css");
-            cssExtension.setCaseSensitivity (Qt::CaseInsensitive);
-            QRegExp jsExtension ("\\.js");
-            jsExtension.setCaseSensitivity (Qt::CaseInsensitive);
+            settings.defineInterpreter (fullFilePath);
 
-            QRegExp plExtension ("\\.pl");
-            plExtension.setCaseSensitivity (Qt::CaseInsensitive);
-            QRegExp pyExtension ("\\.py");
-            pyExtension.setCaseSensitivity (Qt::CaseInsensitive);
-            QRegExp phpExtension ("\\.php");
-            phpExtension.setCaseSensitivity (Qt::CaseInsensitive);
-
-            // Local HTML files:
-            if (filepath.contains (htmExtension) or
-                    filepath.contains (htmlExtension)) {
+            // Local HTML, CSS, JS or supported image files:
+            if (settings.interpreter.contains ("browser")) {
 
                 QNetworkRequest networkRequest;
-                networkRequest.setHeader (QNetworkRequest::ContentTypeHeader, "text/html");
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
                          (settings.rootDirName+
@@ -454,29 +490,32 @@ protected:
                          QNetworkRequest (networkRequest));
             }
 
-            // Local CSS or JS files:
-            if (filepath.contains (cssExtension) or
-                    filepath.contains (jsExtension)) {
+            // Local Perl, Python or PHP scripts:
+            if ((!settings.interpreter.contains ("undefined")) and
+                    (!settings.interpreter.contains ("browser"))) {
+
+                QByteArray emptyPostDataArray;
+                emit startScriptSignal (request.url(), emptyPostDataArray);
+            }
+
+            // Local files without recognized file type:
+            if (settings.interpreter.contains ("undefined")) {
+
+                qDebug() << "File type not recognized!";
+                qDebug() << "===============";
+
 
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
                          (settings.rootDirName+
                           QDir::separator()+
-                          filepath));
+                          "help/notrecognized.htm"));
+
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
                          QNetworkRequest (networkRequest));
-            }
-
-            // Local Perl, Python or PHP scripts:
-            if (filepath.contains (plExtension) or
-                    filepath.contains (pyExtension) or
-                    filepath.contains (phpExtension)) {
-
-                QByteArray emptyPostDataArray;
-                emit startScriptSignal (request.url(), emptyPostDataArray);
             }
         }
 
@@ -517,7 +556,7 @@ protected:
                  (request.url().toString().contains (PEB_DOMAIN)) or
                  (settings.allowedWebSites.contains (request.url().authority())))) {
 
-            qDebug() << "Link allowed:" << request.url().toString();
+            qDebug() << "Allowed link:" << request.url().toString();
             qDebug() << "===============";
 
             QNetworkRequest networkRequest;
@@ -527,9 +566,8 @@ protected:
                     (QNetworkAccessManager::GetOperation,
                      QNetworkRequest (networkRequest));
         } else {
-            qDebug() << "Link not allowed:" << request.url().toString();
+            qDebug() << "Not allowed link:" << request.url().toString();
             qDebug() << "===============";
-
 
 
             QNetworkRequest networkRequest;
@@ -538,7 +576,6 @@ protected:
                      (settings.rootDirName+
                       QDir::separator()+
                       "help/forbidden.htm"));
-
 
 
             return QNetworkAccessManager::createRequest
@@ -599,12 +636,12 @@ public slots:
                          QDir::toNativeSeparators (
                              settings.defaultThemeDirectory+
                              QDir::separator()+"current.css"));
+
             emit reloadSignal();
-            qDebug() << "===============";
+
             qDebug() << "Selected new theme:" << newTheme;
             qDebug() << "===============";
         } else {
-            qDebug() << "===============";
             qDebug() << "No new theme selected.";
             qDebug() << "===============";
         }
@@ -643,10 +680,10 @@ public slots:
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
         //selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
         selectInterpreterDialog.setWindowIcon (settings.icon);
-        interpreter = selectInterpreterDialog.getOpenFileName
+        debuggingInterpreter = selectInterpreterDialog.getOpenFileName
                 (0, tr ("Select Interpreter"),
                  QDir::currentPath(), tr ("All files (*)"));
-        qDebug() << "Selected interpreter:" << interpreter;
+        qDebug() << "Selected interpreter:" << debuggingInterpreter;
         qDebug() << "===============";
         selectInterpreterDialog.close();
         selectInterpreterDialog.deleteLater();
@@ -675,6 +712,9 @@ public slots:
                                  | QUrl::RemoveAuthority
                                  | QUrl::RemoveQuery);
 
+        QString fullFilePath = QDir::toNativeSeparators
+                (settings.rootDirName+filepath);
+
         QString queryString = url.toString (QUrl::RemoveScheme
                                             | QUrl::RemoveAuthority
                                             | QUrl::RemovePath)
@@ -696,7 +736,7 @@ public slots:
                 msgBox.setWindowTitle (tr ("Script Killed"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script is terminated as requested:<br>")+
-                                settings.rootDirName+QDir::separator()+filepath);
+                                fullFilePath);
                 msgBox.setDefaultButton (QMessageBox::Ok);
                 msgBox.exec();
             } else {
@@ -706,7 +746,7 @@ public slots:
                 msgBox.setWindowTitle (tr ("Script Finished"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script finished before script termination was requested:<br>")+
-                                settings.rootDirName+QDir::separator()+filepath);
+                                fullFilePath);
                 msgBox.setDefaultButton (QMessageBox::Ok);
                 msgBox.exec();
             }
@@ -765,12 +805,12 @@ public slots:
             QRegExp finalQuestionMark ("\\?$");
             queryString.replace (finalQuestionMark, "");
 
-            qDebug() << "File path:" << QDir::toNativeSeparators
-                        (settings.rootDirName+filepath);
             checkFileExistenceSlot();
+            settings.defineInterpreter (fullFilePath);
 
-            extension = filepath.section (".", 1, 1);
-            settings.defineInterpreter (filepath);
+            qDebug() << "File path:" << fullFilePath;
+            qDebug() << "Extension:" << settings.extension;
+            qDebug() << "Interpreter:" << settings.interpreter;
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
 
@@ -851,7 +891,7 @@ public slots:
             QWebSettings::clearMemoryCaches();
 
             qputenv ("FILE_TO_OPEN", "");
-            qputenv ("NEW_FILE", "");
+            qputenv ("FILE_TO_CREATE", "");
             qputenv ("FOLDER_TO_OPEN", "");
         }
     }
@@ -1159,18 +1199,7 @@ protected:
 public:
 
     QString filepath;
-    QString extension;
-    QString interpreter;
-
     QProcess scriptHandler;
-    bool scriptTimedOut;
-    bool scriptKilled;
-    QString scriptAccumulatedOutput;
-    QString scriptOutputFilePath;
-    QString scriptAccumulatedErrors;
-    bool scriptThemeEnabled;
-    QString scriptOutputType;
-    bool scrollDown;
 
 private:
 
@@ -1183,14 +1212,25 @@ private:
 
     Settings settings;
 
+    QWebView *newWindow;
+
+    bool scriptTimedOut;
+    bool scriptKilled;
+    QString scriptAccumulatedOutput;
+    QString scriptOutputFilePath;
+    QString scriptAccumulatedErrors;
+    bool scriptThemeEnabled;
+    QString scriptOutputType;
+    bool scrollDown;
+
+    QString debuggedFileExtension;
+    QString debuggingInterpreter;
     QProcess debuggerHandler;
     QString debuggerCommandHumanReadable;
     QString lineInfoLastLine;
     QString debuggerAccumulatedOutput;
     QString debuggerOutputFilePath;
     QWebView *newDebuggerWindow;
-
-    QWebView *newWindow;
 
 };
 
@@ -1207,13 +1247,9 @@ public slots:
 
     void loadStartPageSlot()
     {
-        QRegExp htmExtension ("\\.htm");
-        htmExtension.setCaseSensitivity (Qt::CaseInsensitive);
-        QRegExp htmlExtension ("\\.html");
-        htmlExtension.setCaseSensitivity (Qt::CaseInsensitive);
+        settings.defineInterpreter (settings.startPage);
 
-        if (settings.startPage.contains (htmExtension) or
-                settings.startPage.contains (htmlExtension)) {
+        if (settings.interpreter.contains ("browser-html")) {
             setUrl (QUrl::fromLocalFile
                     (QDir::toNativeSeparators
                      (settings.startPage)));
@@ -1317,17 +1353,14 @@ public slots:
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.toString();
         qDebug() << "===============";
 
-        QRegExp htmExtension ("\\.htm");
-        htmExtension.setCaseSensitivity (Qt::CaseInsensitive);
-        QRegExp htmlExtension ("\\.html");
-        htmlExtension.setCaseSensitivity (Qt::CaseInsensitive);
+        QString fileToOpen = QDir::toNativeSeparators
+                (settings.rootDirName+
+                 QDir::separator()+qWebHitTestURL.toString
+                 (QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
-        if (qWebHitTestURL.path().contains (htmExtension) or
-                qWebHitTestURL.path().contains (htmlExtension)) {
-            QString fileToOpen = QDir::toNativeSeparators
-                    (settings.rootDirName+
-                     QDir::separator()+qWebHitTestURL.toString
-                     (QUrl::RemoveScheme | QUrl::RemoveAuthority));
+        settings.defineInterpreter (fileToOpen);
+
+        if (settings.interpreter.contains ("browser-html")) {
             newWindow->setUrl (QUrl::fromLocalFile (fileToOpen));
         } else {
             newWindow->setUrl (qWebHitTestURL);
@@ -1363,21 +1396,16 @@ public slots:
                 QObject::connect (editAct, SIGNAL (triggered()),
                                   this, SLOT (editSlot()));
 
-                QString extension = qWebHitTestURL
-                        .toString (QUrl::RemoveQuery)
-                        .replace ("?", "")
-                        .section (".", 1, 1);
+                QString fileToOpen = QDir::toNativeSeparators
+                        (settings.rootDirName+
+                         QDir::separator()+qWebHitTestURL.toString
+                         (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery)
+                         .replace ("?", ""));
 
-                QRegExp plExtension ("pl");
-                plExtension.setCaseSensitivity (Qt::CaseInsensitive);
-                QRegExp pyExtension ("py");
-                pyExtension.setCaseSensitivity (Qt::CaseInsensitive);
-                QRegExp phpExtension ("php");
-                phpExtension.setCaseSensitivity (Qt::CaseInsensitive);
+                settings.defineInterpreter (fileToOpen);
 
-                if (extension.contains (plExtension) or
-                        extension.contains (pyExtension) or
-                        extension.contains (phpExtension)) {
+                if ((!settings.interpreter.contains ("browser")) and
+                        (!settings.interpreter.contains ("undefined"))) {
                     QAction *viewSourceAct = menu->addAction (tr ("&View Source"));
                     QObject::connect (viewSourceAct, SIGNAL (triggered()),
                                       this, SLOT (viewSourceFromContextMenuSlot()));
@@ -1537,7 +1565,7 @@ public slots:
         aboutTemplateContents.replace ("[% Qt version %]", qtWebKitVersion);
         output.append (aboutTemplateContents);
 
-        // Read CSS theme file and inject its content into the output variable:
+        // Read CSS theme file and link its content to the output variable:
         settings.cssLinker (output);
         output = settings.cssLinkedHtml;
 

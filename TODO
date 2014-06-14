@@ -24,7 +24,6 @@ Security:
 
 All locally executed scripts:
 - dialog to select and execute scripts from any folder
-- detect file type by reading the shebang line
 
 GUI:
 - working maximized windows setting on Mac
@@ -38,7 +37,7 @@ Help:
 - Keyboard shortcuts listed
 - 'help' URL
 
-Building:
+Compilation, packaging & installation:
 - build script for command line compilation of the browser
 - Debian package producing script
 - windeployqt script for win32 deployment

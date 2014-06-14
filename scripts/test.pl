@@ -2,7 +2,7 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN NEW_FILE FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
+use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN FILE_TO_CREATE FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
 print "Content-type: text/html; charset=utf-8\n\n";
@@ -59,8 +59,8 @@ if (defined $DOCUMENT_ROOT){
 if (defined $FILE_TO_OPEN){
 	print "FILE_TO_OPEN = $FILE_TO_OPEN<br>\n";
 }
-if (defined $NEW_FILE){
-	print "NEW_FILE = $NEW_FILE<br>\n";
+if (defined $FILE_TO_CREATE){
+	print "FILE_TO_CREATE = $FILE_TO_CREATE<br>\n";
 }
 if (defined $FOLDER_TO_OPEN){
 	print "FOLDER_TO_OPEN = $FOLDER_TO_OPEN<br>\n";

@@ -13,16 +13,12 @@
 
 #include <QApplication>
 #include <QWebPage>
-#include <QWebView>
 #include <QWebFrame>
 #include <QWebHistory>
-#include <QtNetwork/QNetworkRequest>
-#include <QProcess>
 #include <QShortcut>
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QTranslator>
-#include <QSystemTrayIcon>
 #include <QIcon>
 #include <QDebug>
 
@@ -382,8 +378,8 @@ int main (int argc, char **argv)
     // Browser-specific environment variables:
     qputenv ("REMOTE_SERVER", "");
     qputenv ("FILE_TO_OPEN", "");
+    qputenv ("FILE_TO_CREATE", "");
     qputenv ("FOLDER_TO_OPEN", "");
-    qputenv ("NEW_FILE", "");
 
     // PATH:
     // Get the existing PATH and set the separator sign:
@@ -683,6 +679,39 @@ Settings::Settings()
             autostartLocalWebserver = argument.section ("=", 1, 1);
         }
     }
+
+    // Regular expressions for file type detection by shebang line:
+    perlShebang.setPattern ("#!/.{1,}perl");
+    pythonShebang.setPattern ("#!/.{1,}python");
+    phpShebang.setPattern ("#!/.{1,}php");
+
+    // Regular expressions for file type detection by extension:
+    htmlExtensions.setPattern ("htm");
+    htmlExtensions.setCaseSensitivity (Qt::CaseInsensitive);
+
+    cssExtension.setPattern ("css");
+    cssExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    jsExtension.setPattern ("js");
+    jsExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    pngExtension.setPattern ("png");
+    pngExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    jpgExtensions.setPattern ("jpe{0,1}g");
+    jpgExtensions.setCaseSensitivity (Qt::CaseInsensitive);
+
+    gifExtension.setPattern ("gif");
+    gifExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    plExtension.setPattern ("pl");
+    plExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    pyExtension.setPattern ("py");
+    pyExtension.setCaseSensitivity (Qt::CaseInsensitive);
+
+    phpExtension.setPattern ("php");
+    phpExtension.setCaseSensitivity (Qt::CaseInsensitive);
 
 }
 
@@ -1066,8 +1095,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().toString().contains ("selecttheme:")) {
+
         selectThemeSlot();
-        return true;
+
+        return false;
     }
 
     // Invoke 'Open file' dialog from URL:
@@ -1113,7 +1144,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
-        qputenv ("NEW_FILE", fileName);
+        qputenv ("FILE_TO_CREATE", fileName);
 
         qDebug() << "New file:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
@@ -1160,23 +1191,24 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                  tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
         dialog.close();
         dialog.deleteLater();
+
         if (filepath.length() > 1) {
             qDebug() << "File passed to Perl debugger:" << QDir::toNativeSeparators (filepath);
-            extension = filepath.section (".", 1, 1);
-            if (extension.length() == 0)
-                extension = "pl";
-            qDebug() << "Extension:" << extension;
+            debuggedFileExtension = filepath.section (".", 1, 1);
+            if (debuggedFileExtension.length() == 0)
+                debuggedFileExtension = "pl";
+            qDebug() << "Extension:" << debuggedFileExtension;
 
             if (settings.debuggerInterpreter == "current") {
                 settings.defineInterpreter (filepath);
-                interpreter = settings.interpreter;
+                debuggingInterpreter = settings.interpreter;
             }
 
             if (settings.debuggerInterpreter == "select") {
                 selectDebuggingPerlInterpreterSlot();
             }
 
-            qDebug() << "Interpreter:" << interpreter;
+            qDebug() << "Interpreter:" << debuggingInterpreter;
 
             if (debuggerHandler.isOpen()) {
                 debuggerHandler.close();
@@ -1192,7 +1224,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             }
 
             if (settings.debuggerOutput == "txt") {
-                debuggerAccumulatedOutput.append ("Interpreter: "+interpreter+"\n");
+                debuggerAccumulatedOutput.append ("Interpreter: "+debuggingInterpreter+"\n");
             }
 
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
@@ -1210,7 +1242,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             qDebug() << "===============";
 
             debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
-            debuggerHandler.start (interpreter, QStringList() << "-d" <<
+            debuggerHandler.start (debuggingInterpreter, QStringList() << "-d" <<
                                    QDir::toNativeSeparators (filepath) << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
             if (!debuggerHandler.waitForStarted (-1))
@@ -1242,7 +1274,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
                 QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
                 htmlHeaderFileContents.replace ("[% Script %]", filepath);
-                htmlHeaderFileContents.replace ("[% Interpreter %]", interpreter);
+                htmlHeaderFileContents.replace ("[% Interpreter %]", debuggingInterpreter);
                 htmlHeaderFileContents.replace (
                             "[% Debugger Command %]", debuggerCommandHumanReadable);
                 debuggerAccumulatedOutput.append (htmlHeaderFileContents);
@@ -1257,6 +1289,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         }
 
         QWebSettings::clearMemoryCaches();
+
         return false;
     }
 
@@ -1281,6 +1314,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         }
         dialog->close();
         dialog->deleteLater();
+
         return false;
     }
 
@@ -1314,6 +1348,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             printer.setOutputFileName (fileName);
             frame->print (&printer);
         }
+
         return false;
     }
 #endif
@@ -1342,15 +1377,12 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     }
 
     // Load local HTML page in the same window:
-    QRegExp htmExtension ("\\.htm");
-    htmExtension.setCaseSensitivity (Qt::CaseInsensitive);
-    QRegExp htmlExtension ("\\.html");
-    htmlExtension.setCaseSensitivity (Qt::CaseInsensitive);
+    QRegExp htmlExtensions ("\\.htm");
+    htmlExtensions.setCaseSensitivity (Qt::CaseInsensitive);
 
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (QUrl (PEB_DOMAIN)).isParentOf (request.url()) and
-            (request.url().path().contains (htmExtension) or
-             request.url().path().contains (htmExtension)) and
+            request.url().path().contains (htmlExtensions) and
             (Page::mainFrame()->childFrames().contains (frame))) {
 
         filepath = request.url()
@@ -1368,6 +1400,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                            QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
         QWebSettings::clearMemoryCaches();
+
         return false;
     }
 
@@ -1386,6 +1419,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         newWindow->show();
 
         QWebSettings::clearMemoryCaches();
+
         return false;
     }
 
