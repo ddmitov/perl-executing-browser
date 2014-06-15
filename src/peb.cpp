@@ -237,6 +237,7 @@ int main (int argc, char **argv)
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
         qDebug() << "Will start another instance of the program and quit this one.";
+        qDebug() << "===============";
         if (settings.logging == "enable") {
             std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
@@ -432,8 +433,7 @@ int main (int argc, char **argv)
 
     // PERLLIB:
     QByteArray perlLib;
-    QString perlLibFullPath = QDir::toNativeSeparators (
-                settings.rootDirName+QDir::separator()+settings.perlLib);
+    QString perlLibFullPath = QDir::toNativeSeparators (settings.rootDirName+settings.perlLib);
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
 
@@ -522,6 +522,9 @@ Settings::Settings()
             }
         }
     }
+    if (!rootDirName.endsWith (QDir::separator())) {
+        rootDirName.append (QDir::separator());
+    }
 
     // Environment settings:
     perlLib = settings.value ("environment/perllib").toString();
@@ -537,13 +540,13 @@ Settings::Settings()
     QString debuggerHtmlHeaderSetting = settings.value (
                 "perl_debugger/debugger_html_header").toString();
     debuggerHtmlHeader = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+debuggerHtmlHeaderSetting);
+                rootDirName+debuggerHtmlHeaderSetting);
     QString debuggerHtmlFooterSetting = settings.value (
                 "perl_debugger/debugger_html_footer").toString();
     debuggerHtmlFooter = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+debuggerHtmlFooterSetting);
+                rootDirName+debuggerHtmlFooterSetting);
     QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
-    sourceViewer = QDir::toNativeSeparators (rootDirName+QDir::separator()+sourceViewerSetting);
+    sourceViewer = QDir::toNativeSeparators (rootDirName+sourceViewerSetting);
     QString sourceViewerArgumentsSetting =
             settings.value ("perl_debugger/source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
@@ -559,7 +562,7 @@ Settings::Settings()
 
     // Read Mongoose local web server settings from its own configuration file:
     mongooseSettingsFileName = QDir::toNativeSeparators
-            (rootDirName+QDir::separator()+"mongoose.conf");
+            (rootDirName+"mongoose.conf");
     QFile mongooseSettingsFile (mongooseSettingsFileName);
     if (mongooseSettingsFile.exists()) {
         QRegExp space ("\\s");
@@ -602,8 +605,7 @@ Settings::Settings()
 
     // Start page:
     startPageSetting = settings.value ("gui/start_page").toString();
-    startPage = QDir::toNativeSeparators
-            (rootDirName+QDir::separator()+startPageSetting);
+    startPage = QDir::toNativeSeparators (rootDirName+startPageSetting);
 
     // Basic GUI settings:
     windowSize = settings.value ("gui/window_size").toString();
@@ -620,8 +622,7 @@ Settings::Settings()
     // Icon:
     QString iconPathNameSetting = settings.value ("gui/icon").toString();
     iconPathName =
-            QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+iconPathNameSetting);
+            QDir::toNativeSeparators (rootDirName+iconPathNameSetting);
     icon.load (iconPathName);
 
     // GUI theme:
@@ -629,26 +630,24 @@ Settings::Settings()
     QString defaultThemeDirectorySetting =
             settings.value ("gui/default_theme_directory").toString();
     defaultThemeDirectory =
-            QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+defaultThemeDirectorySetting);
+            QDir::toNativeSeparators (rootDirName+defaultThemeDirectorySetting);
     QString allThemesDirectorySetting =
             settings.value ("gui/all_themes_directory").toString();
     allThemesDirectory =
-            QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+allThemesDirectorySetting);
+            QDir::toNativeSeparators (rootDirName+allThemesDirectorySetting);
 
     // Translation:
     defaultTranslation = settings.value ("gui/default_translation").toString();
     QString allTranslationsDirectorySetting =
             settings.value ("gui/all_translations_directory").toString();
     allTranslationsDirectory = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+allTranslationsDirectorySetting);
+                rootDirName+allTranslationsDirectorySetting);
 
     // Help:
     QString helpDirectorySetting =
             settings.value ("gui/help_directory").toString();
     helpDirectory = QDir::toNativeSeparators (
-                rootDirName+QDir::separator()+helpDirectorySetting);
+                rootDirName+helpDirectorySetting);
 
     // System tray icon:
     systrayIcon = settings.value ("gui/systray_icon").toString();
@@ -664,12 +663,10 @@ Settings::Settings()
         logDir.mkpath(".");
     }
     if (logDir.isRelative()) {
-        logDirFullPath = QDir::toNativeSeparators
-                       (rootDirName+QDir::separator()+logDirName);
+        logDirFullPath = QDir::toNativeSeparators (rootDirName+logDirName);
     }
     if (logDir.isAbsolute()) {
-        logDirFullPath = QDir::toNativeSeparators
-                       (logDirName);
+        logDirFullPath = QDir::toNativeSeparators (logDirName);
     }
     logPrefix = settings.value ("logging/logging_prefix").toString();
 
@@ -725,8 +722,7 @@ Watchdog::Watchdog()
         qDebug() << "===============";
 
         QProcess server;
-        server.startDetached (QString (
-                                  settings.rootDirName+QDir::separator()+"mongoose"));
+        server.startDetached (QString (settings.rootDirName+"mongoose"));
     }
 
     QTimer *timer = new QTimer (this);

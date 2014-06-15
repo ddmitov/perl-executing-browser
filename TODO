@@ -14,7 +14,6 @@ Configuration:
 - custom algorithm for reading and writing configuration file instead of QSettings
 - search for configuration file in all standard locations on the supported operating systems
 - check file paths to determine if they are absolute or relative paths
-- 'rootDirName' variable should always end with a QDir::separator()
 - default values if configuration file is missing or corrupt
 - configuration interface using 'config' URL, HTML interface and, when needed, 'restart' URL
 

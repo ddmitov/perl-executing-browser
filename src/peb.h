@@ -331,8 +331,7 @@ public slots:
                 if (settings.autostartLocalWebserver == "enable") {
                     qDebug() << "Local web server is not running. Will try to restart it.";
                     QProcess server;
-                    server.startDetached (QString (settings.rootDirName+
-                                                   QDir::separator()+"mongoose"));
+                    server.startDetached (QString (settings.rootDirName+"mongoose"));
                 } else {
                     qDebug() << "Local web server is not running.";
                 }
@@ -481,7 +480,6 @@ protected:
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
                          (settings.rootDirName+
-                          QDir::separator()+
                           request.url().toString (
                               QUrl::RemoveScheme | QUrl::RemoveAuthority)));
 
@@ -509,7 +507,6 @@ protected:
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
                          (settings.rootDirName+
-                          QDir::separator()+
                           "help/notrecognized.htm"));
 
 
@@ -574,7 +571,6 @@ protected:
             networkRequest.setUrl
                     (QUrl::fromLocalFile
                      (settings.rootDirName+
-                      QDir::separator()+
                       "help/forbidden.htm"));
 
 
@@ -830,8 +826,7 @@ public slots:
             scriptHandler.setProcessEnvironment (env);
 
             QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators
-                                              (settings.rootDirName+
-                                               QDir::separator()+filepath));
+                                              (settings.rootDirName+filepath));
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             scriptHandler.setWorkingDirectory (scriptDirectory);
             qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
@@ -849,20 +844,16 @@ public slots:
                         }
                     }
                     sourceViewerCommandLine.append (QDir::toNativeSeparators
-                                                    (settings.rootDirName+
-                                                     QDir::separator()+filepath));
+                                                    (settings.rootDirName+filepath));
                     scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine);
 
-                    startedScripts.append (settings.rootDirName+
-                                           QDir::separator()+filepath);
+                    startedScripts.append (settings.rootDirName+filepath);
                 } else {
                     scriptHandler.start (settings.interpreter, QStringList() <<
                                          QDir::toNativeSeparators
-                                         (settings.rootDirName+
-                                          QDir::separator()+filepath));
+                                         (settings.rootDirName+filepath));
 
-                    startedScripts.append (settings.rootDirName+
-                                           QDir::separator()+filepath);
+                    startedScripts.append (settings.rootDirName+filepath);
 
                     if (postData.length() > 0) {
                         scriptHandler.write (postDataArray);
@@ -877,7 +868,7 @@ public slots:
                 msgBox.setWindowTitle (tr ("Script Already Started"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script is already started and still running:<br>")+
-                                settings.rootDirName+QDir::separator()+filepath);
+                                settings.rootDirName+filepath);
                 msgBox.setDefaultButton (QMessageBox::Ok);
                 msgBox.exec();
             }
@@ -920,14 +911,10 @@ public slots:
             scriptAccumulatedOutput.append (output);
 
             scriptOutputFilePath = QDir::toNativeSeparators
-                    (QDir::tempPath()+
-                     QDir::separator()+
-                     "output.htm");
+                    (QDir::tempPath()+QDir::separator()+"output.htm");
         } else {
             scriptOutputFilePath = QDir::toNativeSeparators
-                    (QDir::tempPath()+
-                     QDir::separator()+
-                     "lroutput.htm");
+                    (QDir::tempPath()+QDir::separator()+"lroutput.htm");
         }
 
         QFile scriptOutputFile (scriptOutputFilePath);
@@ -1026,9 +1013,7 @@ public slots:
 
                 if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
                     QString scriptErrorFilePath = QDir::toNativeSeparators
-                            (QDir::tempPath()+
-                             QDir::separator()+
-                             "lrerror.txt");
+                            (QDir::tempPath()+QDir::separator()+"lrerror.txt");
 
                     QFile scriptErrorFile (scriptErrorFilePath);
 
@@ -1049,7 +1034,7 @@ public slots:
 
         }
 
-        startedScripts.removeOne (settings.rootDirName+QDir::separator()+filepath);
+        startedScripts.removeOne (settings.rootDirName+filepath);
 
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
@@ -1160,15 +1145,11 @@ public slots:
 
         if (settings.debuggerOutput == "txt") {
         debuggerOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+
-                         QDir::separator()+
-                         "deboutput.txt");
+                        (QDir::tempPath()+QDir::separator()+"deboutput.txt");
         }
         if (settings.debuggerOutput == "html") {
         debuggerOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+
-                         QDir::separator()+
-                         "deboutput.htm");
+                        (QDir::tempPath()+QDir::separator()+"deboutput.htm");
         }
 
         QFile debuggerOutputFile (debuggerOutputFilePath);
@@ -1311,8 +1292,7 @@ public slots:
     void editSlot()
     {
         QString fileToEdit = QDir::toNativeSeparators
-                (settings.rootDirName+
-                 QDir::separator()+qWebHitTestURL.toString
+                (settings.rootDirName+qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery)
                  .replace ("?", ""));
 
@@ -1354,8 +1334,7 @@ public slots:
         qDebug() << "===============";
 
         QString fileToOpen = QDir::toNativeSeparators
-                (settings.rootDirName+
-                 QDir::separator()+qWebHitTestURL.toString
+                (settings.rootDirName+qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
         settings.defineInterpreter (fileToOpen);
@@ -1397,8 +1376,7 @@ public slots:
                                   this, SLOT (editSlot()));
 
                 QString fileToOpen = QDir::toNativeSeparators
-                        (settings.rootDirName+
-                         QDir::separator()+qWebHitTestURL.toString
+                        (settings.rootDirName+qWebHitTestURL.toString
                          (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery)
                          .replace ("?", ""));
 
@@ -1540,9 +1518,7 @@ public slots:
 
         // Output file name:
         QString outputFilePath = QDir::toNativeSeparators
-                (QDir::tempPath()+
-                 QDir::separator()+
-                 "output.htm");
+                (QDir::tempPath()+QDir::separator()+"output.htm");
         QFile outputFile (outputFilePath);
         if (outputFile.exists()) {
             outputFile.remove();
@@ -1555,8 +1531,7 @@ public slots:
         // append all of this to the output variable:
         QFile aboutFileTemplateFile (
                     QDir::toNativeSeparators (
-                        settings.helpDirectory+
-                        QDir::separator()+"about.htm"));
+                        settings.helpDirectory+QDir::separator()+"about.htm"));
         aboutFileTemplateFile.open(QFile::ReadOnly);
         QString aboutTemplateContents = QString (aboutFileTemplateFile.readAll());
         aboutTemplateContents.replace ("[% icon %]", settings.iconPathName);
