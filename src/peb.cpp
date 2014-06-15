@@ -12,16 +12,13 @@
 */
 
 #include <QApplication>
-#include <QWebPage>
-#include <QWebFrame>
-#include <QWebHistory>
 #include <QShortcut>
 #include <QDesktopServices>
 #include <QDateTime>
 #include <QTranslator>
-#include <QIcon>
 #include <QDebug>
 
+#include <qglobal.h>
 #include "peb.h"
 #include <iostream> // for std::cout
 
@@ -29,7 +26,6 @@
 #include <unistd.h> // for isatty()
 #endif
 
-#include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
 #include <QtPrintSupport/QPrinter>
@@ -195,6 +191,7 @@ int main (int argc, char **argv)
     // Check if settings file exists:
     if (!settingsFile.exists()) {
         QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle (QMessageBox::tr ("Missing configuration file"));
         msgBox.setText (QMessageBox::tr ("Configuration file<br>")+
@@ -216,7 +213,7 @@ int main (int argc, char **argv)
     }
 
     // Log basic program information:
-    qDebug() << "===============";
+    qDebug() << "";
     qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogContents;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
@@ -229,6 +226,7 @@ int main (int argc, char **argv)
     qDebug() << "Command line:" << allArguments;
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
+    qDebug() << "";
 
     // Detect if the program is started from terminal (Linux and Mac only).
     // If the browser is started from terminal, it will start another copy of itself and
@@ -237,7 +235,7 @@ int main (int argc, char **argv)
     if (isatty (fileno (stdin))) {
         qDebug() << "Started from terminal.";
         qDebug() << "Will start another instance of the program and quit this one.";
-        qDebug() << "===============";
+
         if (settings.logging == "enable") {
             std::cout << " " << std::endl;
             std::cout << "Perl Executing Browser v.0.1 started on: "
@@ -254,6 +252,7 @@ int main (int argc, char **argv)
                       << std::endl;
             std::cout << " " << std::endl;
         }
+
         int pid = fork();
         if (pid < 0) {
             // Report error and exit:
@@ -281,14 +280,13 @@ int main (int argc, char **argv)
             return 1;
             QApplication::exit();
         }
-        qDebug() << "===============";
     } else {
         qDebug() << "Started without terminal or inside Qt Creator.";
-        qDebug() << "===============";
     }
 #endif
 
     // Log all settings:
+    qDebug() << "===============";
     qDebug() << "GENERAL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
@@ -361,13 +359,16 @@ int main (int argc, char **argv)
         qDebug() << "Please select a start page.";
         qDebug() << "Exiting.";
         qDebug() << "===============";
+
         QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
         msgBox.setText (QMessageBox::tr (
                             "Start page is missing.<br>Please select a start page."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
+
         return 1;
         QApplication::exit();
     }
@@ -414,8 +415,8 @@ int main (int argc, char **argv)
         if (line.contains (relativePath)) {
             QString relativePathToAdd = line.section (equalSign, 1, 1);
             relativePathToAdd.replace (QString ("\n"), "");
-            path.append (QDir::toNativeSeparators (settings.rootDirName+
-                                                   QDir::separator()+relativePathToAdd));
+            path.append (QDir::toNativeSeparators (
+                             settings.rootDirName+relativePathToAdd));
             path.append (pathSeparator);
         }
     }
@@ -1011,7 +1012,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString perlInterpreter = dialog.getOpenFileName
                 (0, tr ("Select Perl Interpreter"),
@@ -1025,7 +1026,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog selectPerlLibDialog;
         selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        //selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
                 (0, tr ("Select PERLLIB"), QDir::currentPath());
@@ -1049,7 +1050,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString pythonInterpreter = dialog.getOpenFileName
                 (0, tr ("Select Python Interpreter"),
@@ -1072,7 +1073,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString phpInterpreter = dialog.getOpenFileName
                 (0, tr ("Select PHP Interpreter"),
@@ -1103,7 +1104,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getOpenFileName
                 (0, tr ("Select File"),
@@ -1128,7 +1129,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString fileNameToOpenString = dialog.getSaveFileName
                 (0, tr ("Create New File"),
@@ -1155,7 +1156,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString folderNameToOpenString = dialog.getExistingDirectory
                 (0, tr ("Select Folder"), QDir::currentPath());
@@ -1179,7 +1180,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::ExistingFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         filepath = "";
         filepath = dialog.getOpenFileName
@@ -1320,7 +1321,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString fileName = dialog.getSaveFileName
                 (0, tr ("Save as PDF"),
@@ -1391,7 +1392,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         frame->load (QUrl::fromLocalFile
                      (QDir::toNativeSeparators
                       (settings.rootDirName+
-                       QDir::separator()+
                        request.url().toString (
                            QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
@@ -1400,9 +1400,24 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return false;
     }
 
+    // Open allowed web content in the same window:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            (Page::currentFrame() == frame) and
+            (settings.allowedWebSites.contains (request.url().authority()))) {
+
+        qDebug() << "Allowed web link in the same window:" << request.url().toString();
+        qDebug() << "===============";
+
+        frame->load (request.url());
+
+        QWebSettings::clearMemoryCaches();
+
+        return false;
+    }
+
     // Open allowed web content in a new window:
-    if ((!Page::mainFrame()->childFrames().contains (frame)) and
-            navigationType == QWebPage::NavigationTypeLinkClicked and
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            (!Page::mainFrame()->childFrames().contains (frame)) and
             (settings.allowedWebSites.contains (request.url().authority()))) {
 
         qDebug() << "Allowed web link in a new window:" << request.url().toString();

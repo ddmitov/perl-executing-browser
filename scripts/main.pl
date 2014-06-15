@@ -24,7 +24,7 @@ print <<HTML
 <font size='3'>
 Non-core module loaded from directory, without system-wide installation.<br>
 <a href='http://search.cpan.org/dist/HTML-Perlinfo/lib/HTML/Perlinfo/HTML.pod'>http://search.cpan.org/dist/HTML-Perlinfo/lib/HTML/Perlinfo/HTML.pod</a><br>
-Copyright (c) 2009, Mike Accardo
+Copyright (c) 2009, Michael Accardo
 </font></p>
 
 <p align='center'><font size='5'>

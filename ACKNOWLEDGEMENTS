@@ -21,9 +21,9 @@
  http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
  http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
 
- Thanks to Mike Accardo <accardo@cpan.org> - the author of the CPAN module HTML-Perlinfo:
- http://search.cpan.org/~accardo/HTML-Perlinfo-1.62/lib/HTML/Perlinfo/HTML.pod
- HTML-Perlinfo is used as a testing tool for loading modules from a directory, without system-wide installation.
+ Thanks to Michael Accardo, the author of the CPAN module HTML::Perlinfo.
+ HTML-Perlinfo was used as a testing tool for loading modules from a directory, without system-wide installation.
+ https://metacpan.org/pod/HTML::Perlinfo
 
  Thanks to Jennifer Maher-Bontrager, author of the Camel icon.
  http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
@@ -44,6 +44,15 @@
  on the 2nd of March 2014 and for their helpfull proposals.
  http://hackafe.org/
  http://www.youtube.com/watch?v=Z9mVQzHqcKo (in Bulgarian)
+
+ Thanks to Peter Palfrader, author of Code2HTML script, the first syntax highlighter used by the browser.
+ Although it is now not enabled by default, it was quite helpfull to develop and test syntax highlight capability.
+ http://www.palfrader.org/code/code2html/
+ http://sourceforge.net/projects/code2html/
+
+ Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.
+ This is currently the default syntax highlighter of Perl Executing Browser.
+ https://metacpan.org/release/Syntax-Highlight-Engine-Kate
 
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
  http://qt-project.org/doc/qt-4.8/qwebhistory.html
@@ -161,6 +170,7 @@
  http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
  http://stackoverflow.com/questions/12013201/how-to-detect-sub-character-and-remove-it-from-a-text-file-in-c
  http://stackoverflow.com/questions/14465263/how-do-you-port-qurl-addqueryitem-to-qt5s-qurlquery
+ http://stackoverflow.com/questions/17998811/window-modal-qfiledialog-pushing-parent-to-background-after-exec
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

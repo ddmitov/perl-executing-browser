@@ -21,16 +21,9 @@ Security:
 - mandatory access control lists for Mongoose
 - optional md5 control of all locally executed scripts
 
-All locally executed scripts:
-- dialog to select and execute scripts from any folder
-
 GUI:
 - working maximized windows setting on Mac
 - Print Preview from context menu
-
-Extensibility & connectivity:
-- Easier configuration of a custom local web server started with the browser
-- Mojolicious support - option to start Mojolicious together with the browser
 
 Help:
 - Keyboard shortcuts listed

@@ -104,11 +104,9 @@ public slots:
             if (firstLine.contains (perlShebang)) {
                 interpreter = perlInterpreter;
             }
-
             if (firstLine.contains (pythonShebang)) {
                 interpreter = pythonInterpreter;
             }
-
             if (firstLine.contains (phpShebang)) {
                 interpreter = phpInterpreter;
             }
@@ -287,6 +285,7 @@ public slots:
 
             if (settings.systrayIconDoubleClickAction == "quit") {
                 QMessageBox confirmExitMessageBox;
+                confirmExitMessageBox.setWindowModality (Qt::WindowModal);
                 confirmExitMessageBox.setWindowTitle (tr ("Quit"));
                 confirmExitMessageBox.setIconPixmap (settings.icon);
                 confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
@@ -610,7 +609,7 @@ public slots:
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
-        //dialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog.setWindowModality (Qt::WindowModal);
         dialog.setWindowIcon (settings.icon);
         QString newTheme = dialog.getOpenFileName
                 (0, tr ("Select Browser Theme"),
@@ -646,6 +645,7 @@ public slots:
     void missingFileMessageSlot()
     {
         QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
         msgBox.setIcon (QMessageBox::Critical);
         msgBox.setWindowTitle (tr ("Missing file"));
         msgBox.setText (QDir::toNativeSeparators
@@ -674,7 +674,7 @@ public slots:
         QFileDialog selectInterpreterDialog;
         selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
         selectInterpreterDialog.setViewMode (QFileDialog::Detail);
-        //selectInterpreterDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectInterpreterDialog.setWindowModality (Qt::WindowModal);
         selectInterpreterDialog.setWindowIcon (settings.icon);
         debuggingInterpreter = selectInterpreterDialog.getOpenFileName
                 (0, tr ("Select Interpreter"),
@@ -687,7 +687,7 @@ public slots:
         QFileDialog selectPerlLibDialog;
         selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
         selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        //selectPerlLibDialog.setWindowFlags (Qt::WindowStaysOnTopHint);
+        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
         selectPerlLibDialog.setWindowIcon (settings.icon);
         QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
                 (0, tr ("Select PERLLIB"), QDir::currentPath());
@@ -729,6 +729,7 @@ public slots:
                 scriptKilled = true;
 
                 QMessageBox msgBox;
+                msgBox.setWindowModality (Qt::WindowModal);
                 msgBox.setWindowTitle (tr ("Script Killed"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script is terminated as requested:<br>")+
@@ -739,6 +740,7 @@ public slots:
                 scriptKilled = true;
 
                 QMessageBox msgBox;
+                msgBox.setWindowModality (Qt::WindowModal);
                 msgBox.setWindowTitle (tr ("Script Finished"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script finished before script termination was requested:<br>")+
@@ -865,6 +867,7 @@ public slots:
                 qDebug() << "===============";
 
                 QMessageBox msgBox;
+                msgBox.setWindowModality (Qt::WindowModal);
                 msgBox.setWindowTitle (tr ("Script Already Started"));
                 msgBox.setIconPixmap (settings.icon);
                 msgBox.setText (tr ("This script is already started and still running:<br>")+
@@ -1002,6 +1005,7 @@ public slots:
             if (scriptAccumulatedErrors.length() > 0 and
                     scriptKilled == false) {
                 QMessageBox showErrorsMessageBox;
+                showErrorsMessageBox.setWindowModality (Qt::WindowModal);
                 showErrorsMessageBox.setWindowTitle (tr ("Errors"));
                 showErrorsMessageBox.setIconPixmap (settings.icon);
                 showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
@@ -1054,6 +1058,7 @@ public slots:
             qDebug() << "===============";
 
             QMessageBox msgBox;
+            msgBox.setWindowModality (Qt::WindowModal);
             msgBox.setWindowTitle (tr ("Script Timeout"));
             msgBox.setIconPixmap (settings.icon);
             msgBox.setText (tr ("Your script timed out!<br>")+
@@ -1561,6 +1566,7 @@ public slots:
     {
         if (mainPage->scriptHandler.isOpen()) {
             QMessageBox confirmExitMessageBox;
+            confirmExitMessageBox.setWindowModality (Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle (tr ("Close"));
             confirmExitMessageBox.setIconPixmap (settings.icon);
             confirmExitMessageBox.setText (tr ("You are going to close the window,<br>")+
@@ -1587,6 +1593,7 @@ public slots:
     {
         if (startedScripts.length () > 0) {
             QMessageBox confirmExitMessageBox;
+            confirmExitMessageBox.setWindowModality (Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle (tr ("Quit"));
             confirmExitMessageBox.setIconPixmap (settings.icon);
             confirmExitMessageBox.setText (tr ("You are going to quit the program,<br>")+
