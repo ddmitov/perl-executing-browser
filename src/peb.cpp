@@ -1305,7 +1305,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
         QPrintDialog *dialog = new QPrintDialog (&printer);
-        //dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog->setWindowModality (Qt::WindowModal);
         if (dialog->exec() == QDialog::Accepted) {
             frame->print (&printer);
         }

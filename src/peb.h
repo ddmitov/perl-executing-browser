@@ -30,6 +30,7 @@
 #include <QProcess>
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QPrintPreviewDialog>
 #include <QMenu>
 #include <QDesktopWidget>
 #include <QDateTime>
@@ -1264,6 +1265,27 @@ public slots:
         }
     }
 
+    void startPrintPreviewSlot()
+    {
+#ifndef QT_NO_PRINTER
+        QPrinter printer (QPrinter::HighResolution);
+        QPrintPreviewDialog preview (&printer, this);
+        preview.setWindowModality (Qt::WindowModal);
+        connect (&preview, SIGNAL (paintRequested (QPrinter *)),
+                 SLOT (printPreviewSlot (QPrinter *)));
+        preview.exec();
+#endif
+    }
+
+    void printPreviewSlot (QPrinter *printer)
+    {
+    #ifdef QT_NO_PRINTER
+        Q_UNUSED (printer);
+    #else
+        TopLevel::print (printer);
+    #endif
+    }
+
     void printPageSlot()
     {
         QPrinter printer;
@@ -1275,7 +1297,7 @@ public slots:
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
         QPrintDialog *dialog = new QPrintDialog (&printer);
-        //dialog->setWindowFlags (Qt::WindowStaysOnTopHint);
+        dialog->setWindowModality (Qt::WindowModal);
         QSize dialogSize = dialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
         dialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
@@ -1448,6 +1470,10 @@ public slots:
             QAction *printAct = menu->addAction (tr ("&Print"));
             QObject::connect (printAct, SIGNAL (triggered()),
                               this, SLOT (printPageSlot()));
+
+            QAction *printPreviewAct = menu->addAction (tr ("Print Pre&view"));
+            QObject::connect (printPreviewAct, SIGNAL (triggered()),
+                              this, SLOT (startPrintPreviewSlot()));
 
             if ((!TopLevel::url().toString().contains ("output"))) {
                 QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));

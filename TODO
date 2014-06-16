@@ -10,27 +10,23 @@ Perl debugger interaction:
 - capability to load for debugging Perl script from any location
 - better CSS styling for the debugger output
 
-Configuration:
+GUI:
+- working maximized window setting on Mac
+
+Configuration & help:
 - custom algorithm for reading and writing configuration file instead of QSettings
-- search for configuration file in all standard locations on the supported operating systems
+- search for a configuration file in all standard locations using QDesktopServices::DataLocation
 - check file paths to determine if they are absolute or relative paths
 - default values if configuration file is missing or corrupt
 - configuration interface using 'config' URL, HTML interface and, when needed, 'restart' URL
+- 'help' URL
+- Keyboard shortcuts listed
 
 Security:
-- mandatory access control lists for Mongoose
 - optional md5 control of all locally executed scripts
-
-GUI:
-- working maximized windows setting on Mac
-- Print Preview from context menu
-
-Help:
-- Keyboard shortcuts listed
-- 'help' URL
+- mandatory access control lists for Mongoose
 
 Compilation, packaging & installation:
 - build script for command line compilation of the browser
 - Debian package producing script
 - windeployqt script for win32 deployment
-- Qt Installer Framework configuration script
