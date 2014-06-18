@@ -5,9 +5,11 @@
 	<title>Perl Debugger Output</title>
 </head>
 
-<body>
+<style type="text/css">
+	body {text-align: left}
+ </style>
 
-<article>
+<body>
 
 Script: [% Script %]<br>
 Interpreter: [% Interpreter %]<br>

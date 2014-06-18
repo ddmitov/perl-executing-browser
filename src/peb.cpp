@@ -378,7 +378,6 @@ int main (int argc, char **argv)
 
     // ENVIRONMENT VARIABLES:
     // Browser-specific environment variables:
-    qputenv ("REMOTE_SERVER", "");
     qputenv ("FILE_TO_OPEN", "");
     qputenv ("FILE_TO_CREATE", "");
     qputenv ("FOLDER_TO_OPEN", "");
@@ -437,20 +436,6 @@ int main (int argc, char **argv)
     QString perlLibFullPath = QDir::toNativeSeparators (settings.rootDirName+settings.perlLib);
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
-
-    // REMOTE_SERVER:
-    QTcpSocket webConnectivityPing;
-    if (settings.pingRemoteWebserver == "enable") {
-        webConnectivityPing.connectToHost (settings.remoteWebserver,
-                                           settings.remoteWebserverPort);
-
-        if (webConnectivityPing.waitForConnected (500))
-        {
-            qputenv ("REMOTE_SERVER", "available");
-        } else {
-            qputenv ("REMOTE_SERVER", "unavailable");
-        }
-    }
 
     Watchdog watchdog;
 
@@ -829,7 +814,7 @@ TopLevel::TopLevel (QString type)
 
         QShortcut *printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
         QObject::connect (printShortcut, SIGNAL (activated()),
-                          this, SLOT (printPageSlot()));
+                          this, SLOT (printSlot()));
 
         QShortcut *closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
         QObject::connect (closeAppShortcut, SIGNAL (activated()),
@@ -881,11 +866,18 @@ TopLevel::TopLevel (QString type)
 
     if (type == "mainWindow") {
         // Connect signals and slots - main window:
-        QObject::connect (mainPage, SIGNAL (displayErrorsSignalFromPage (QString)),
+        QObject::connect (mainPage, SIGNAL (displayErrorsSignal (QString)),
                           this, SLOT (displayErrorsSlot (QString)));
 
         QObject::connect (this, SIGNAL (selectThemeSignal()),
                           mainPage, SLOT (selectThemeSlot()));
+
+        QObject::connect (mainPage, SIGNAL (printPreviewSignal()),
+                          this, SLOT (startPrintPreviewSlot()));
+        QObject::connect (mainPage, SIGNAL (printSignal()),
+                          this, SLOT (printSlot()));
+        QObject::connect (mainPage, SIGNAL (saveAsPdfSignal()),
+                          this, SLOT (saveAsPdfSlot()));
 
         QObject::connect (mainPage, SIGNAL (reloadSignal()),
                           this, SLOT (reloadSlot()));
@@ -971,43 +963,9 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                      QWebPage::NavigationType navigationType)
 {
 
-    // Open local file using default application:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("file")) {
-
-        QString filepath = request.url().toString (QUrl::RemoveScheme);
-        QFile file (QDir::toNativeSeparators (filepath));
-        if (file.exists()) {
-
-            qDebug() << "Opening file with default application:" << filepath;
-            qDebug() << "===============";
-
-            QDesktopServices::openUrl (request.url());
-
-            return false;
-        }
-    }
-
-    // Execute external application:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("external:")) {
-
-        QString externalApplication = request.url()
-                .toString (QUrl::RemoveScheme)
-                .replace ("/", "");
-
-        qDebug() << "External application: " << externalApplication;
-        qDebug() << "===============";
-
-        QProcess externalProcess;
-        externalProcess.startDetached (externalApplication);
-
-        return false;
-    }
-
     // Select Perl interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("selectperl:")) {
+         request.url().scheme().contains ("selectperl")) {
 
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
@@ -1020,32 +978,35 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.close();
         dialog.deleteLater();
 
-        settings.saveSetting (QString ("perl"), perlInterpreter);
-        qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+        if (perlInterpreter.length() > 0) {
+            settings.saveSetting (QString ("perl"), perlInterpreter);
 
-        QFileDialog selectPerlLibDialog;
-        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
-        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
-        selectPerlLibDialog.setWindowIcon (settings.icon);
-        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
-                (0, tr ("Select PERLLIB"), QDir::currentPath());
-        selectPerlLibDialog.close();
-        selectPerlLibDialog.deleteLater();
+            qDebug() << "Selected Perl interpreter:" << perlInterpreter;
 
-        QByteArray perlLibFolderName;
-        perlLibFolderName.append (perlLibFolderNameString);
-        qputenv ("PERLLIB", perlLibFolderName);
+            QFileDialog selectPerlLibDialog;
+            selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
+            selectPerlLibDialog.setViewMode (QFileDialog::Detail);
+            selectPerlLibDialog.setWindowModality (Qt::WindowModal);
+            selectPerlLibDialog.setWindowIcon (settings.icon);
+            QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
+                    (0, tr ("Select PERLLIB"), QDir::currentPath());
+            selectPerlLibDialog.close();
+            selectPerlLibDialog.deleteLater();
 
-        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-        qDebug() << "===============";
+            QByteArray perlLibFolderName;
+            perlLibFolderName.append (perlLibFolderNameString);
+            qputenv ("PERLLIB", perlLibFolderName);
+
+            qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+            qDebug() << "===============";
+        }
 
         return false;
     }
 
     // Select Python interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("selectpython:")) {
+         request.url().scheme().contains ("selectpython")) {
 
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
@@ -1058,17 +1019,19 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.close();
         dialog.deleteLater();
 
-        settings.saveSetting (QString ("python"), pythonInterpreter);
+        if (pythonInterpreter.length() > 0) {
+            settings.saveSetting (QString ("python"), pythonInterpreter);
 
-        qDebug() << "Selected Python interpreter:" << pythonInterpreter;
-        qDebug() << "===============";
+            qDebug() << "Selected Python interpreter:" << pythonInterpreter;
+            qDebug() << "===============";
+        }
 
         return false;
     }
 
     // Select PHP interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("selectphp:")) {
+         request.url().scheme().contains ("selectphp")) {
 
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
@@ -1081,17 +1044,19 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         dialog.close();
         dialog.deleteLater();
 
-        settings.saveSetting (QString ("php"), phpInterpreter);
+        if (phpInterpreter.length() > 0) {
+            settings.saveSetting (QString ("php"), phpInterpreter);
 
-        qDebug() << "Selected PHP interpreter:" << phpInterpreter;
-        qDebug() << "===============";
+            qDebug() << "Selected PHP interpreter:" << phpInterpreter;
+            qDebug() << "===============";
+        }
 
         return false;
     }
 
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("selecttheme:")) {
+         request.url().scheme().contains ("selecttheme")) {
 
         selectThemeSlot();
 
@@ -1100,7 +1065,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Invoke 'Open file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("openfile:")) {
+         request.url().scheme().contains ("openfile")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1124,7 +1090,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Invoke 'New file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("newfile:")) {
+         request.url().scheme().contains ("newfile")) {
 
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
@@ -1151,7 +1117,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Invoke 'Open folder' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("openfolder:")) {
+         request.url().scheme().contains ("openfolder")) {
 
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::AnyFile);
@@ -1176,7 +1142,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Display information about user-selected Perl scripts using the built-in Perl debugger.
     // Partial implementation of an idea proposed by Valcho Nedelchev.
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().toString().contains ("perl_debugger")) {
+            request.url().scheme().contains ("perldebugger")) {
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::ExistingFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1246,15 +1213,15 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 return false;
 
             QByteArray debuggerCommand;
-            if (request.url().toString().contains ("perl_debugger_list_modules:")) {
+            if (request.url().authority().contains ("modules")) {
                 debuggerCommand.append (QString ("M\n").toLatin1());
                 debuggerCommandHumanReadable = "Show module versions (M)";
             }
-            if (request.url().toString().contains ("perl_debugger_list_subroutine_names:")) {
+            if (request.url().authority().contains ("subroutines")) {
                 debuggerCommand.append (QString ("S\n").toLatin1());
                 debuggerCommandHumanReadable = "List subroutine names (S)";
             }
-            if (request.url().toString().contains ("perl_debugger_list_variables_in_package:")) {
+            if (request.url().authority().contains ("variables")) {
                 debuggerCommand.append (QString ("V\n").toLatin1());
                 debuggerCommandHumanReadable = "List Variables in Package (V)";
             }
@@ -1291,60 +1258,29 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     }
 
 #ifndef QT_NO_PRINTER
+    // Print preview from URL:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ("printpreview")) {
+
+        emit printPreviewSignal();
+
+        return false;
+    }
+
     // Print page from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("print:")) {
-        qDebug() << "Printing requested.";
-        qDebug() << "===============";
-        QPrinter printer;
-        printer.setOrientation (QPrinter::Portrait);
-        printer.setPageSize (QPrinter::A4);
-        printer.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
-        printer.setResolution (QPrinter::HighResolution);
-        printer.setColorMode (QPrinter::Color);
-        printer.setPrintRange (QPrinter::AllPages);
-        printer.setNumCopies (1);
-        QPrintDialog *dialog = new QPrintDialog (&printer);
-        dialog->setWindowModality (Qt::WindowModal);
-        if (dialog->exec() == QDialog::Accepted) {
-            frame->print (&printer);
-        }
-        dialog->close();
-        dialog->deleteLater();
+         request.url().scheme().contains ("printing")) {
+
+        emit printSignal();
 
         return false;
     }
 
     // Save as PDF from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().toString().contains ("printpdf:")) {
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (settings.icon);
-        QString fileName = dialog.getSaveFileName
-                (0, tr ("Save as PDF"),
-                 QDir::currentPath(), tr ("PDF files (*.pdf)"));
-        if (!fileName.isEmpty()) {
-            if (QFileInfo (fileName).suffix().isEmpty()) {
-                fileName.append(".pdf");
-            }
-            qDebug() << "Save as PDF requested.";
-            qDebug() << "PDF file:" << fileName;
-            qDebug() << "===============";
-            QPrinter printer;
-            printer.setOrientation (QPrinter::Portrait);
-            printer.setPageSize (QPrinter::A4);
-            printer.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
-            printer.setResolution (QPrinter::HighResolution);
-            printer.setColorMode (QPrinter::Color);
-            printer.setPrintRange (QPrinter::AllPages);
-            printer.setNumCopies (1);
-            printer.setOutputFormat (QPrinter::PdfFormat);
-            printer.setOutputFileName (fileName);
-            frame->print (&printer);
-        }
+            request.url().scheme().contains ("pdf")) {
+
+        emit saveAsPdfSignal();
 
         return false;
     }
@@ -1352,7 +1288,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Close window from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("closewindow:")) {
+         request.url().scheme().contains ("closewindow")) {
 
         qDebug() << "Close window requested from URL.";
         qDebug() << "===============";
@@ -1364,7 +1300,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
     // Quit application from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().toString().contains ("quit:")) {
+         request.url().scheme().contains ("quit")) {
 
         qDebug() << "Application termination requested from URL.";
 
@@ -1445,6 +1381,57 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         qDebug() << "===============";
 
         QDesktopServices::openUrl (request.url());
+
+        return false;
+    }
+
+    // Open local file using default application:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+             request.url().scheme().contains ("file")) {
+
+        QString filepath = request.url()
+                .toString (QUrl::RemoveScheme)
+                .replace ("///", "/");
+
+        QFile file (QDir::toNativeSeparators (filepath));
+        if (file.exists()) {
+
+            qDebug() << "Opening file with default application:" << filepath;
+            qDebug() << "===============";
+
+            QDesktopServices::openUrl (request.url());
+
+            return false;
+
+        } else {
+
+            QMessageBox msgBox;
+            msgBox.setWindowModality (Qt::WindowModal);
+            msgBox.setIcon (QMessageBox::Critical);
+            msgBox.setWindowTitle (tr ("Missing file"));
+            msgBox.setText (filepath+
+                            tr (" is missing.<br>Please restore the missing file."));
+            msgBox.setDefaultButton (QMessageBox::Ok);
+            msgBox.exec();
+
+            qDebug() << "Missing file:" << filepath;
+            qDebug() << "===============";
+
+            return false;
+        }
+    }
+
+    // Execute external command or application:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().scheme().contains ("external")) {
+
+        QString externalCommand = request.url().toString().replace ("external:", "");
+
+        qDebug() << "External command:" << externalCommand;
+        qDebug() << "===============";
+
+        QProcess externalProcess;
+        externalProcess.startDetached (externalCommand);
 
         return false;
     }

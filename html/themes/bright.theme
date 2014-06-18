@@ -14,10 +14,6 @@ body {
   margin: 0;
   text-align: center;
 }
-article {
-  margin: 0;
-  text-align: left;
-}
 aside,
 details,
 figcaption,

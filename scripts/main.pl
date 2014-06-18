@@ -13,6 +13,7 @@ print <<HTML
 <head>
 <title>Perl Executing Browser - Dynamic Startpage</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<link href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' rel='stylesheet' />
 </head>
 
 <body>
@@ -44,6 +45,20 @@ Copyright (c) 2009, Michael Accardo
 
 <p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
+</font></p>
+
+<hr width='95%'>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/noextpl'>Perl Extensionless Script</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/noextpy'>Python Extensionless Script</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/dummy'>Unrecognizable File Type Test</a>
 </font></p>
 
 <hr width='95%'>
@@ -85,18 +100,6 @@ Copyright (c) 2009, Michael Accardo
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='file:///home/knoppix/github/peb/peb.ini'>External Document</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
-<a href='external:/gedit peb.ini'>External Program with an Argument</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
 <a href='https://www.google.com/doodles/finder/'>Allowed External Link Nr.1 in This Browser</a>
 </font></p>
 
@@ -105,11 +108,11 @@ Copyright (c) 2009, Michael Accardo
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://www.perl.org/cpan.html'>Allowed External Link Nr.2 in This Browser</a>
+<a href='http://www.perl.org/.html'>Allowed External Link Nr.2 in This Browser</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://www.perl.org/cpan.html' target='_new'>Allowed External Link Nr.2 in a New Window of This Browser</a>
+<a href='http://www.perl.org/' target='_new'>Allowed External Link Nr.2 in a New Window of This Browser</a>
 </font></p>
 
 <p align='center'><font size='5'>
@@ -135,65 +138,69 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='https://www.microsoft.com/'>Not Allowed External Link in Default Browser</a>
+<a href='https://www.yahoo.com/'>Not Allowed External Link in Default Browser</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='selectperl://now'>Select Perl Interpreter</a>
+<a href='selectperl://'>Select Perl Interpreter</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='selectpython://now'>Select Python Interpreter</a>
+<a href='selectpython://'>Select Python Interpreter</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='selectphp://now'>Select PHP Interpreter</a>
+<a href='selectphp://'>Select PHP Interpreter</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='selecttheme://now'>Select Browser Theme</a>
+<a href='selecttheme://'>Select Browser Theme</a>
 </p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='newfile://now'>Create New File</a>
+<a href='newfile://'>Create New File</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='openfile://now'>Open Existing File</a>
+<a href='openfile://'>Open Existing File</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='openfolder://now'>Open Existing Folder or Create a New One</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
-<a href='perl_debugger_list_modules://now'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='perl_debugger_list_subroutine_names://now'>List All Subroutine Names of a Perl Script using<br>Built-in Perl Debugger</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='perl_debugger_list_variables_in_package://now'>List All Variables of a Perl Script using<br>Built-in Perl Debugger</a>
+<a href='openfolder://'>Open Existing Folder or Create a New One</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='print://now'>Print</a>
+<a href='perldebugger://modules/'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='printpdf://now'>Save as PDF</a>
+<a href='perldebugger://subroutines/'>List All Subroutine Names of a Perl Script using<br>Built-in Perl Debugger</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='perldebugger://variables/'>List All Variables of a Perl Script using<br>Built-in Perl Debugger</a>
+</font></p>
+
+<hr width='95%'>
+
+<p align='center'><font size='5'>
+<a href='printpreview://'>Print Preview</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='printing://'>Print</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='pdf://'>Save as PDF</a>
 </font></p>
 
 <hr width='95%'>
@@ -219,11 +226,11 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='closewindow://now'>Close Window</a>
+<a href='closewindow://'>Close Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='quit://now'>Quit Application</a>
+<a href='quit://'>Quit Application</a>
 </font></p>
 
 </div>

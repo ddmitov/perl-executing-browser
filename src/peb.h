@@ -361,7 +361,6 @@ public slots:
                     lastStateOfRemoteWebserver = "available";
                 }
 
-                qputenv ("REMOTE_SERVER", "available");
                 qDebug() << "Internet connectivity is available.";
 
                 QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
@@ -405,7 +404,6 @@ public slots:
                     lastStateOfRemoteWebserver = "unavailable";
                 }
 
-                qputenv ("REMOTE_SERVER", "unavailable");
                 qDebug() << "Internet connectivity is not available.";
 
             }
@@ -459,8 +457,7 @@ protected:
     {
         // GET requests to local content:
         if (operation == GetOperation and
-                (QUrl (PEB_DOMAIN)).isParentOf (request.url()) and
-                (!request.url().toString().contains ("debugger"))) {
+                (QUrl (PEB_DOMAIN)).isParentOf (request.url())) {
 
             QString filepath = request.url()
                     .toString (QUrl::RemoveScheme
@@ -516,7 +513,7 @@ protected:
             }
         }
 
-        // Take data from local form using CGI POST method and
+        // Take data from a local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
                 (QUrl (PEB_DOMAIN)).isParentOf (request.url())) {
@@ -595,7 +592,13 @@ class Page : public QWebPage
 
 signals:
 
-    void displayErrorsSignalFromPage (QString errorsFilePath);
+    void displayErrorsSignal (QString errorsFilePath);
+
+    void printPreviewSignal();
+
+    void printSignal();
+
+    void saveAsPdfSignal();
 
     void reloadSignal();
 
@@ -668,37 +671,6 @@ public slots:
         if (!file.exists()) {
             missingFileMessageSlot();
         }
-    }
-
-    void selectDebuggingPerlInterpreterSlot()
-    {
-        QFileDialog selectInterpreterDialog;
-        selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
-        selectInterpreterDialog.setViewMode (QFileDialog::Detail);
-        selectInterpreterDialog.setWindowModality (Qt::WindowModal);
-        selectInterpreterDialog.setWindowIcon (settings.icon);
-        debuggingInterpreter = selectInterpreterDialog.getOpenFileName
-                (0, tr ("Select Interpreter"),
-                 QDir::currentPath(), tr ("All files (*)"));
-        qDebug() << "Selected interpreter:" << debuggingInterpreter;
-        qDebug() << "===============";
-        selectInterpreterDialog.close();
-        selectInterpreterDialog.deleteLater();
-
-        QFileDialog selectPerlLibDialog;
-        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
-        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
-        selectPerlLibDialog.setWindowIcon (settings.icon);
-        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
-                (0, tr ("Select PERLLIB"), QDir::currentPath());
-        QByteArray perlLibFolderName;
-        perlLibFolderName.append (perlLibFolderNameString);
-        qputenv ("PERLLIB", perlLibFolderName);
-        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-        qDebug() << "===============";
-        selectPerlLibDialog.close();
-        selectPerlLibDialog.deleteLater();
     }
 
     void startScriptSlot (QUrl url, QByteArray postDataArray)
@@ -860,7 +832,6 @@ public slots:
 
                     if (postData.length() > 0) {
                         scriptHandler.write (postDataArray);
-                        //scriptHandler.closeWriteChannel();
                     }
                 }
             } else {
@@ -880,7 +851,7 @@ public slots:
             scriptTimedOut = false;
 
             if (!filepath.contains ("longrun")) {
-                QTimer::singleShot (2000, this, SLOT (scriptTimeoutSlot()));
+                QTimer::singleShot (3000, this, SLOT (scriptTimeoutSlot()));
             }
 
             QWebSettings::clearMemoryCaches();
@@ -1027,7 +998,7 @@ public slots:
                         stream << scriptAccumulatedErrors << endl;
                     }
 
-                    emit displayErrorsSignalFromPage (scriptErrorFilePath);
+                    emit displayErrorsSignal (scriptErrorFilePath);
 
                 }
             }
@@ -1055,6 +1026,8 @@ public slots:
             scriptTimedOut = true;
             scriptHandler.close();
 
+            startedScripts.removeOne (settings.rootDirName+filepath);
+
             qDebug() << "Script timed out:" << settings.rootDirName+filepath;
             qDebug() << "===============";
 
@@ -1067,6 +1040,37 @@ public slots:
             msgBox.setDefaultButton (QMessageBox::Ok);
             msgBox.exec();
         }
+    }
+
+    void selectDebuggingPerlInterpreterSlot()
+    {
+        QFileDialog selectInterpreterDialog;
+        selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
+        selectInterpreterDialog.setViewMode (QFileDialog::Detail);
+        selectInterpreterDialog.setWindowModality (Qt::WindowModal);
+        selectInterpreterDialog.setWindowIcon (settings.icon);
+        debuggingInterpreter = selectInterpreterDialog.getOpenFileName
+                (0, tr ("Select Interpreter"),
+                 QDir::currentPath(), tr ("All files (*)"));
+        qDebug() << "Selected interpreter:" << debuggingInterpreter;
+        qDebug() << "===============";
+        selectInterpreterDialog.close();
+        selectInterpreterDialog.deleteLater();
+
+        QFileDialog selectPerlLibDialog;
+        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
+        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
+        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
+        selectPerlLibDialog.setWindowIcon (settings.icon);
+        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
+                (0, tr ("Select PERLLIB"), QDir::currentPath());
+        QByteArray perlLibFolderName;
+        perlLibFolderName.append (perlLibFolderNameString);
+        qputenv ("PERLLIB", perlLibFolderName);
+        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+        qDebug() << "===============";
+        selectPerlLibDialog.close();
+        selectPerlLibDialog.deleteLater();
     }
 
     // Display information about user-selected Perl scripts using the built-in Perl debugger.
@@ -1120,7 +1124,8 @@ public slots:
 
         QRegExp debuggerAccumulatedOutputRegExp04 ("routines from .{10,30}\n");
         debuggerAccumulatedOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
-        int debuggerAccumulatedOutputRegExp04pos = debuggerAccumulatedOutputRegExp04.indexIn (debuggerAccumulatedOutput);
+        int debuggerAccumulatedOutputRegExp04pos =
+                debuggerAccumulatedOutputRegExp04.indexIn (debuggerAccumulatedOutput);
         Q_UNUSED (debuggerAccumulatedOutputRegExp04pos);
         QString debuggerVersion = debuggerAccumulatedOutputRegExp04.capturedTexts().first();
         debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp04, debuggerVersion+"\n");
@@ -1132,6 +1137,7 @@ public slots:
         if (debuggerCommandHumanReadable != "List Variables in Package (V)") {
             debuggerAccumulatedOutput.replace ("  ", " ");
         }
+
         if (debuggerCommandHumanReadable == "List Variables in Package (V)" and
                 settings.debuggerOutput == "html") {
             debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
@@ -1271,6 +1277,8 @@ public slots:
         QPrinter printer (QPrinter::HighResolution);
         QPrintPreviewDialog preview (&printer, this);
         preview.setWindowModality (Qt::WindowModal);
+        preview.setMinimumSize (QDesktopWidget().screen()->rect().width() * 0.8,
+                                QDesktopWidget().screen()->rect().height() * 0.8);
         connect (&preview, SIGNAL (paintRequested (QPrinter *)),
                  SLOT (printPreviewSlot (QPrinter *)));
         preview.exec();
@@ -1279,15 +1287,20 @@ public slots:
 
     void printPreviewSlot (QPrinter *printer)
     {
-    #ifdef QT_NO_PRINTER
+#ifdef QT_NO_PRINTER
         Q_UNUSED (printer);
-    #else
+#else
         TopLevel::print (printer);
-    #endif
+#endif
     }
 
-    void printPageSlot()
+    void printSlot()
     {
+#ifndef QT_NO_PRINTER
+
+        qDebug() << "Printing requested.";
+        qDebug() << "===============";
+
         QPrinter printer;
         printer.setOrientation (QPrinter::Portrait);
         printer.setPageSize (QPrinter::A4);
@@ -1296,17 +1309,61 @@ public slots:
         printer.setColorMode (QPrinter::Color);
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
+
         QPrintDialog *dialog = new QPrintDialog (&printer);
         dialog->setWindowModality (Qt::WindowModal);
         QSize dialogSize = dialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
         dialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
-                                screenRect.height() / 2 - dialogSize.height() / 2));
+                              screenRect.height() / 2 - dialogSize.height() / 2));
         if (dialog->exec() == QDialog::Accepted) {
             TopLevel::print (&printer);
         }
         dialog->close();
         dialog->deleteLater();
+#endif
+    }
+
+    void saveAsPdfSlot()
+    {
+#ifndef QT_NO_PRINTER
+
+        qDebug() << "Save as PDF requested.";
+
+        QFileDialog dialog;
+        dialog.setFileMode (QFileDialog::AnyFile);
+        dialog.setViewMode (QFileDialog::Detail);
+        dialog.setWindowModality (Qt::WindowModal);
+        dialog.setWindowIcon (settings.icon);
+
+        QString fileName = dialog.getSaveFileName
+                (0, tr ("Save as PDF"),
+                 QDir::currentPath(), tr ("PDF files (*.pdf)"));
+        if (!fileName.isEmpty()) {
+            if (QFileInfo (fileName).suffix().isEmpty()) {
+                fileName.append(".pdf");
+            }
+
+            qDebug() << "PDF file:" << fileName;
+
+            QPrinter printer;
+            printer.setOrientation (QPrinter::Portrait);
+            printer.setPageSize (QPrinter::A4);
+            printer.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
+            printer.setResolution (QPrinter::HighResolution);
+            printer.setColorMode (QPrinter::Color);
+            printer.setPrintRange (QPrinter::AllPages);
+            printer.setNumCopies (1);
+            printer.setOutputFormat (QPrinter::PdfFormat);
+            printer.setOutputFileName (fileName);
+            TopLevel::print (&printer);
+        }
+
+        dialog.close();
+        dialog.deleteLater();
+
+        qDebug() << "===============";
+#endif
     }
 
     void reloadSlot()
@@ -1467,13 +1524,17 @@ public slots:
                                   this, SLOT (reloadSlot()));
             }
 
-            QAction *printAct = menu->addAction (tr ("&Print"));
-            QObject::connect (printAct, SIGNAL (triggered()),
-                              this, SLOT (printPageSlot()));
-
-            QAction *printPreviewAct = menu->addAction (tr ("Print Pre&view"));
+            QAction *printPreviewAct = menu->addAction (tr ("Print pre&view"));
             QObject::connect (printPreviewAct, SIGNAL (triggered()),
                               this, SLOT (startPrintPreviewSlot()));
+
+            QAction *printAct = menu->addAction (tr ("&Print"));
+            QObject::connect (printAct, SIGNAL (triggered()),
+                              this, SLOT (printSlot()));
+
+            QAction *saveAsPdfAct = menu->addAction (tr ("Save as P&DF"));
+            QObject::connect (saveAsPdfAct, SIGNAL (triggered()),
+                              this, SLOT (saveAsPdfSlot()));
 
             if ((!TopLevel::url().toString().contains ("output"))) {
                 QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));
@@ -1541,9 +1602,8 @@ public slots:
         // Calculate message box dimensions,
         // center message box on screen:
         QRect screenRect = QDesktopWidget().screen()->rect();
-        float messageBoxHeigth = screenRect.height() * 0.6;
-        float messageBoxWidth = screenRect.width() * 0.6;
-        aboutDialog->setFixedSize (messageBoxWidth, messageBoxHeigth);
+        aboutDialog->setFixedSize (screenRect.width() * 0.6,
+                                   screenRect.height() * 0.6);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
                               screenRect.height()/2 - aboutDialog->height()/2));
 

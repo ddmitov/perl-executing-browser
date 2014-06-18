@@ -13,10 +13,9 @@ Design Objectives
     pack your Perl modules and even your version of Perl with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
 * **3. Cross-platform availability:**  
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
-* **4. Flexibility in every major aspect of the program, including in the network access:**  
+* **4. Flexibility in every major aspect of the program, including network access:**  
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
-    **b)** if network connection is essential, PEB can be configured as a client or both as a client and server for network services in a variety of combinations and topologies.  
-    Local webserver functionality, if needed, is provided by a separate binary, which can be easily changed or independently modified.  
+    **b)** if network connection is essential, PEB can be configured as a client only or can also start a local CGI-capable webserver.  
   
 Features
 ----------------------------------------------------------------------------------------
@@ -26,10 +25,10 @@ Features
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a custom directory without system-wide installation using PERLLIB environment variable. These modules are available for all scripts executed in serverless mode, as well as for all scripts executed by the local webserver (Mongoose).  
-* Any version of Perl/Python/PHP can be selected for local execution of scripts in the INI file. User can select any Perl/Python/PHP version by clicking a special URL.  
+* Any version of Perl/Python/PHP can be selected for local execution of scripts in the INI file. Users can select any Perl/Python/PHP version by clicking a special URL.  
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
 **Networking:**  
-* Can start local webserver and load scripts and pages from localhost. Mongoose 5.1 webserver with an URI handler that can stop the server is used.  
+* Can start local webserver and load scripts and pages from localhost. A separate binary of Mongoose 5.1 webserver with an URI handler that can stop the server is used.  
 * Can ping local and remote web servers. Local webserver is automatically restarted, if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load predefined websites in the same or in a new window. Can be used as a site-specific browser or a specialised web client.  
 **Local filesystem:**  
