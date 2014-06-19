@@ -5,46 +5,48 @@ Perl Executing Browser
 Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl scripts locally with or even without a webserver. Serverless execution of local scripts can go side by side with a traditional access to local or remote webservers. CGI protocol GET and POST methods are used for communication with scripts executed without a webserver.  
   
 ## Design Objectives
-----------------------------------------------------------------------------------------
   
 * **1. Easy GUI for scripts:**  
     use HTML, CSS and JavaScript to craft and deploy rapidly beautifull interfaces for your Perl, Python, PHP or other scripts;  
+
 * **2. Zero installation when needed:**  
     pack your Perl modules and even your version of Perl with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
+
 * **3. Cross-platform availability:**  
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
+
 * **4. Flexibility in every major aspect of the program, including network access:**  
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
     **b)** if network connection is essential, PEB can be configured as a client only or can also start a local CGI-capable webserver.  
   
 ## Features
-----------------------------------------------------------------------------------------
   
-* **No feature or implementation should be considered final at this early stage of development!**  
-
+**No feature or implementation should be considered final at this early stage of development!**
+  
 **Scripting:**  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a custom directory without system-wide installation using PERLLIB environment variable. These modules are available for all scripts executed in serverless mode, as well as for all scripts executed by the local webserver (Mongoose).  
 * Any version of Perl/Python/PHP can be selected for local execution of scripts in the INI file. Users can select any Perl/Python/PHP version by clicking a special URL.  
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
-
+  
 **Networking:**  
 * Can start local webserver and load scripts and pages from localhost. A separate binary of Mongoose 5.1 webserver with an URI handler that can stop the server is used.  
 * Can ping local and remote web servers. Local webserver is automatically restarted, if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
 * Can load predefined websites in the same or in a new window. Can be used as a site-specific browser or a specialised web client.  
+  
 **Local filesystem:**  
 * Can open or create a single file or open any folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
 * Can open local documents using default applications and start user-specified programs.  
-
+  
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
 * Can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Can display every Perl/Python/PHP script as a source code.  
 * Extensive logging in a file or files of all debugging messages, giving information for every browser activity and the execution of local scripts.  
-
-**Configuration & usability:**  
+  
+**Configuration:**  
 * Configurable from INI file and command line.  
 * Themable - a common CSS theme for both static and dynamic pages can be slected using a special URL.  
 * Browser root folder can be any folder and this is configurable from INI file or command line.  
@@ -56,7 +58,6 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * System tray icon & menu.  
   
 ## Compile-time Requirements
-----------------------------------------------------------------------------------------
   
 Compiled and tested successfully using:  
 * Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux  
@@ -68,7 +69,6 @@ Compiled and tested successfully using:
 Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
   
 ## Runtime Requirements
-----------------------------------------------------------------------------------------
   
 * Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes or Qt5 libraries, if you compiled the program using Qt5 classes.  
 * Perl 5 distribution - any standard Linux or Mac Perl distribution or Strawberry Perl for Windows.  
@@ -76,23 +76,19 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
 * Only if you want to run Python scripts - standard Python distribution for your operating system.  
   
 ## Limitations
-----------------------------------------------------------------------------------------
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
 * No effort is made for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
 ## Security Considerations
-----------------------------------------------------------------------------------------
   
 Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations is not going to be implemented because of the huge security risks involved.  
   
 ## History
-----------------------------------------------------------------------------------------
   
 PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation is still missing and current examples are basic.  
   
 ## License
-----------------------------------------------------------------------------------------
   
 This program is free software;  
 you can redistribute it and/or modify it under the terms of the GNU General Public License,  
@@ -102,14 +98,12 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   
 ## Name
-----------------------------------------------------------------------------------------
   
-'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although it was started as a tool for the Perl programming language, the program is not limited by design to Perl scripting only. It is developed as a flexible, adaptable and multi-purpose software, serving different people with different scripting needs and qualifications.  
+'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Started as a Perl scripting tool, the program is not limited by design to the Perl programming language only, but is developed as a flexible and multi-purpose software.  
 Possible new names: **QtCamel Browser, Qangoroo Browser**  
 Kangoroo-based name was first proposed by Stefan Chekanov and supported by other members of Hackafe, the hackerspace of Plovdiv. (http://hackafe.org/).  
   
 ## Authors
-----------------------------------------------------------------------------------------
   
 Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  
 Valcho Nedelchev, 2014  
