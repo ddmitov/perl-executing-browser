@@ -3,11 +3,10 @@
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<title>Perl Debugger Output</title>
+	<style type="text/css">
+		body {text-align: left}
+	</style>
 </head>
-
-<style type="text/css">
-	body {text-align: left}
- </style>
 
 <body>
 

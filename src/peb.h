@@ -144,14 +144,14 @@ public slots:
     {
         cssLinkedHtml = "";
 
-        if ((htmlInput.contains ("</head>")) and
+        if ((htmlInput.contains ("</title>")) and
                 (!htmlInput.contains (defaultThemeDirectory))) {
             QString cssLink;
+            cssLink.append ("</title>\n");
             cssLink.append ("<link href='file://");
             cssLink.append (defaultThemeDirectory);
-            cssLink.append ("/current.css' media='all' rel='stylesheet' />");
-            cssLink.append ("</head>");
-            htmlInput.replace ("</head>", cssLink);
+            cssLink.append ("/current.css' media='all' rel='stylesheet'/>");
+            htmlInput.replace ("</title>", cssLink);
 
             cssLinkedHtml = htmlInput;
         } else {
@@ -1693,16 +1693,24 @@ public slots:
                 QFile::remove
                         (QDir::toNativeSeparators
                          (QDir::tempPath()+QDir::separator()+"output.htm"));
-                setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
-                                       "/quit__"+settings.quitToken)));
+
+                if (settings.autostartLocalWebserver == "enable") {
+                    setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
+                                           "/quit__"+settings.quitToken)));
+                }
+
                 QApplication::exit();
             }
         } else {
             QFile::remove
                     (QDir::toNativeSeparators
                      (QDir::tempPath()+QDir::separator()+"output.htm"));
-            setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
-                                   "/quit__"+settings.quitToken)));
+
+            if (settings.autostartLocalWebserver == "enable") {
+                setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
+                                       "/quit__"+settings.quitToken)));
+            }
+
             QApplication::exit();
         }
     }
@@ -1712,6 +1720,7 @@ public slots:
         foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;
         }
+
         reply->ignoreSslErrors();
     }
 

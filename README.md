@@ -4,7 +4,7 @@ Perl Executing Browser
   
 Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl scripts locally with or even without a webserver. Serverless execution of local scripts can go side by side with a traditional access to local or remote webservers. CGI protocol GET and POST methods are used for communication with scripts executed without a webserver.  
   
-Design Objectives
+## Design Objectives
 ----------------------------------------------------------------------------------------
   
 * **1. Easy GUI for scripts:**  
@@ -17,16 +17,18 @@ Design Objectives
     **a)** if no network connectivity is wanted or needed, no services are started, no ports are opened, no firewall notifications are triggered, no need for administrative privileges and everything remains in the userspace, but  
     **b)** if network connection is essential, PEB can be configured as a client only or can also start a local CGI-capable webserver.  
   
-Features
+## Features
 ----------------------------------------------------------------------------------------
   
 * **No feature or implementation should be considered final at this early stage of development!**  
+
 **Scripting:**  
 * Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
 * Can load Perl modules from a custom directory without system-wide installation using PERLLIB environment variable. These modules are available for all scripts executed in serverless mode, as well as for all scripts executed by the local webserver (Mongoose).  
 * Any version of Perl/Python/PHP can be selected for local execution of scripts in the INI file. Users can select any Perl/Python/PHP version by clicking a special URL.  
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
+
 **Networking:**  
 * Can start local webserver and load scripts and pages from localhost. A separate binary of Mongoose 5.1 webserver with an URI handler that can stop the server is used.  
 * Can ping local and remote web servers. Local webserver is automatically restarted, if accidentally terminated. Local webserver is shut down simultaneously with the browser.  
@@ -34,16 +36,18 @@ Features
 **Local filesystem:**  
 * Can open or create a single file or open any folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
 * Can open local documents using default applications and start user-specified programs.  
+
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
 * Can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Can display every Perl/Python/PHP script as a source code.  
 * Extensive logging in a file or files of all debugging messages, giving information for every browser activity and the execution of local scripts.  
+
 **Configuration & usability:**  
-* Configurable from INI file.  
+* Configurable from INI file and command line.  
 * Themable - a common CSS theme for both static and dynamic pages can be slected using a special URL.  
-* Browser root folder can be any folder and this is configurable from INI file.  
+* Browser root folder can be any folder and this is configurable from INI file or command line.  
 * Can print any page or save it as a PDF file by clicking a special URL.  
 * Any browser window or the whole program can be closed by clicking a special URL, context menu item or system tray icon menu entry.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
@@ -51,7 +55,7 @@ Features
 * Output from local scripts, local and allowed web pages can be opened in new window; 'Open in new window' from context menu.  
 * System tray icon & menu.  
   
-Compile-time Requirements
+## Compile-time Requirements
 ----------------------------------------------------------------------------------------
   
 Compiled and tested successfully using:  
@@ -63,7 +67,7 @@ Compiled and tested successfully using:
 * Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5.  
 Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
   
-Runtime Requirements
+## Runtime Requirements
 ----------------------------------------------------------------------------------------
   
 * Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes or Qt5 libraries, if you compiled the program using Qt5 classes.  
@@ -71,23 +75,23 @@ Runtime Requirements
 * Only if you want to run PHP scripts - standard PHP distribution including ```php-cgi``` executable.  
 * Only if you want to run Python scripts - standard Python distribution for your operating system.  
   
-Limitations
+## Limitations
 ----------------------------------------------------------------------------------------
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
 * No effort is made for serverless execution of scripts based on PSGI, WSGI, SCGI or FastCGI protocols.  
   
-Security Considerations
+## Security Considerations
 ----------------------------------------------------------------------------------------
   
 Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations is not going to be implemented because of the huge security risks involved.  
   
-History
+## History
 ----------------------------------------------------------------------------------------
   
 PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation is still missing and current examples are basic.  
   
-License
+## License
 ----------------------------------------------------------------------------------------
   
 This program is free software;  
@@ -97,14 +101,14 @@ or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   
-Name
+## Name
 ----------------------------------------------------------------------------------------
   
 'Perl Executing Browser' is a descriptive, technical name, but not quite exact, because the program is capable of executing Python and PHP scripts too. Although it was started as a tool for the Perl programming language, the program is not limited by design to Perl scripting only. It is developed as a flexible, adaptable and multi-purpose software, serving different people with different scripting needs and qualifications.  
 Possible new names: **QtCamel Browser, Qangoroo Browser**  
 Kangoroo-based name was first proposed by Stefan Chekanov and supported by other members of Hackafe, the hackerspace of Plovdiv. (http://hackafe.org/).  
   
-Authors
+## Authors
 ----------------------------------------------------------------------------------------
   
 Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  

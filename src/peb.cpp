@@ -190,6 +190,7 @@ int main (int argc, char **argv)
 
     // Check if settings file exists:
     if (!settingsFile.exists()) {
+
         QMessageBox msgBox;
         msgBox.setWindowModality (Qt::WindowModal);
         msgBox.setIcon (QMessageBox::Critical);
@@ -199,6 +200,7 @@ int main (int argc, char **argv)
                         QMessageBox::tr ("<br>is missing.<br>Please restore it."));
         msgBox.setDefaultButton (QMessageBox::Ok);
         msgBox.exec();
+
         return 1;
         QApplication::exit();
     }
@@ -254,12 +256,14 @@ int main (int argc, char **argv)
         }
 
         int pid = fork();
+
         if (pid < 0) {
             // Report error and exit:
             qDebug() << "PID less than zero. Aborting.";
             return 1;
             QApplication::exit();
         }
+
         if (pid == 0) {
             // Detach all standard I/O descriptors:
             close (0);
@@ -1158,6 +1162,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
 
         if (filepath.length() > 1) {
             qDebug() << "File passed to Perl debugger:" << QDir::toNativeSeparators (filepath);
+
             debuggedFileExtension = filepath.section (".", 1, 1);
             if (debuggedFileExtension.length() == 0)
                 debuggedFileExtension = "pl";
@@ -1194,7 +1199,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
-            //env.insert ("PERLDB_OPTS", "LineInfo=/home/knoppix/github/peb/lineinfo.txt");
             debuggerHandler.setProcessEnvironment (env);
 
             QFileInfo scriptAbsoluteFilePath (filepath);
@@ -1209,6 +1213,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             debuggerHandler.start (debuggingInterpreter, QStringList() << "-d" <<
                                    QDir::toNativeSeparators (filepath) << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
+
             if (!debuggerHandler.waitForStarted (-1))
                 return false;
 
@@ -1227,12 +1232,14 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             }
 
             if (settings.debuggerOutput == "txt") {
-                debuggerAccumulatedOutput.append ("Debugger Command: "+debuggerCommandHumanReadable+"\n");
+                debuggerAccumulatedOutput.append ("Debugger Command: "+
+                                                  debuggerCommandHumanReadable+"\n");
             }
 
             debuggerHandler.write (debuggerCommand);
 
             if (settings.debuggerOutput == "html") {
+
                 QFile htmlHeaderFile (
                             QDir::toNativeSeparators (settings.debuggerHtmlHeader));
                 htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
