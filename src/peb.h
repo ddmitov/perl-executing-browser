@@ -26,7 +26,6 @@
 #include <QWebFrame>
 #include <QtWebKit>
 #include <QtNetwork/QNetworkAccessManager>
-#include <QtNetwork/QTcpSocket>
 #include <QProcess>
 #include <QMessageBox>
 #include <QFileDialog>
@@ -200,15 +199,6 @@ public:
     QString sourceViewer;
     QStringList sourceViewerArguments;
 
-    QString autostartLocalWebserver;
-    QString pingLocalWebserver;
-    QString listeningPort;
-    QString quitToken;
-
-    QString pingRemoteWebserver;
-    QString remoteWebserver;
-    int remoteWebserverPort;
-
     QString userAgent;
     QStringList allowedWebSites;
 
@@ -310,106 +300,6 @@ public slots:
         }
     }
 
-    void pingSlot()
-    {
-        QTcpSocket localWebServerPing;
-        QTcpSocket webConnectivityPing;
-
-        if (settings.pingLocalWebserver == "enable") {
-            localWebServerPing.connectToHost ("127.0.0.1", settings.listeningPort.toInt());
-        }
-
-        if (settings.pingRemoteWebserver == "enable") {
-            webConnectivityPing.connectToHost (settings.remoteWebserver,
-                                               settings.remoteWebserverPort);
-        }
-
-        if (settings.pingLocalWebserver == "enable") {
-            if (localWebServerPing.waitForConnected (500)) {
-                qDebug() << "Local web server is running.";
-            } else {
-                if (settings.autostartLocalWebserver == "enable") {
-                    qDebug() << "Local web server is not running. Will try to restart it.";
-                    QProcess server;
-                    server.startDetached (QString (settings.rootDirName+"mongoose"));
-                } else {
-                    qDebug() << "Local web server is not running.";
-                }
-            }
-            qDebug() << "===============";
-        }
-
-        if (settings.pingRemoteWebserver == "enable") {
-            if (webConnectivityPing.waitForConnected (500))
-            {
-
-                if (settings.systrayIcon == "enable") {
-                    if (lastStateOfRemoteWebserver.length() > 0) {
-                        if (lastStateOfRemoteWebserver == "unavailable") {
-                            QSystemTrayIcon::MessageIcon icon =
-                                    QSystemTrayIcon::MessageIcon (0);
-                            trayIcon->showMessage (tr ("Connected to remote server"),
-                                                   tr ("Connectivity to remote server is restored!"),
-                                                   icon, 10 * 1000);
-                        }
-                    } else {
-                        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (0);
-                        trayIcon->showMessage (tr ("Connected to remote server"),
-                                               tr ("Remote server is available."),
-                                               icon, 10 * 1000);
-                    }
-                    lastStateOfRemoteWebserver = "available";
-                }
-
-                qDebug() << "Internet connectivity is available.";
-
-                QList<QNetworkInterface> list = QNetworkInterface::allInterfaces();
-                foreach (QNetworkInterface iface, list) {
-                    QList<QNetworkAddressEntry> interfaceEntries = iface.addressEntries();
-                    foreach (QNetworkAddressEntry entry, interfaceEntries) {
-                        if (entry.ip() == webConnectivityPing.localAddress()) {
-                            qDebug() << "Local interface:" << iface.name();
-                            qDebug() << "Local MAC:" << iface.hardwareAddress();
-                            qDebug() << "Local IP address:" << entry.ip().toString();
-                            qDebug() << "Local netmask:" << entry.netmask().toString();
-                            qDebug() << "Local broadcast address:" << entry.broadcast().toString();
-                            qDebug() << "Local prefix length:" << entry.prefixLength();
-                            qDebug() << "Local port:" << webConnectivityPing.localPort();
-                            qDebug() << "Remote IP address:"
-                                     << webConnectivityPing.peerAddress().toString();
-                            qDebug() << "Remote port:"
-                                     << webConnectivityPing.peerPort();
-                            qDebug() << "Remote domain name:"
-                                     << webConnectivityPing.peerName();
-                        }
-                    }
-                }
-
-            } else {
-
-                if (settings.systrayIcon == "enable") {
-                    if (lastStateOfRemoteWebserver.length() > 0) {
-                        if (lastStateOfRemoteWebserver == "available") {
-                            QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
-                            trayIcon -> showMessage (tr ("Disconnected"),
-                                                     tr ("Connectivity to remote server is lost!"),
-                                                     icon, 10 * 1000);
-                        }
-                    } else {
-                        QSystemTrayIcon::MessageIcon icon = QSystemTrayIcon::MessageIcon (2);
-                        trayIcon->showMessage (tr ("No connection"),
-                                               tr ("Remote server is not available."),
-                                               icon, 10 * 1000);
-                    }
-                    lastStateOfRemoteWebserver = "unavailable";
-                }
-
-                qDebug() << "Internet connectivity is not available.";
-
-            }
-            qDebug() << "===============";
-        }
-    }
 
     void aboutToQuitSlot()
     {
@@ -417,7 +307,9 @@ public slots:
             trayIcon->hide();
         }
         QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-        qDebug() << "Perl Executing Browser v.0.1 terminated normally on:" << dateTimeString;
+        qDebug() << qApp->applicationName().toLatin1().constData()
+                 << qApp->applicationVersion().toLatin1().constData()
+                 << "terminated normally on:" << dateTimeString;
         qDebug() << "===============";
     }
 
@@ -1693,24 +1585,12 @@ public slots:
                 QFile::remove
                         (QDir::toNativeSeparators
                          (QDir::tempPath()+QDir::separator()+"output.htm"));
-
-                if (settings.autostartLocalWebserver == "enable") {
-                    setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
-                                           "/quit__"+settings.quitToken)));
-                }
-
                 QApplication::exit();
             }
         } else {
             QFile::remove
                     (QDir::toNativeSeparators
                      (QDir::tempPath()+QDir::separator()+"output.htm"));
-
-            if (settings.autostartLocalWebserver == "enable") {
-                setUrl (QUrl (QString ("http://localhost:"+settings.listeningPort+
-                                       "/quit__"+settings.quitToken)));
-            }
-
             QApplication::exit();
         }
     }

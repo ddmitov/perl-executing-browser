@@ -36,12 +36,14 @@
 #include <QPrintDialog>
 #endif
 
+
 // Application start date and time for filenames of per-session log files:
 static QString applicationStartForLogFileName =
         QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
 
 // Dynamic global list of all scripts, that are started and still running in any given moment:
 QStringList startedScripts;
+
 
 // Custom message handler for redirecting all debug messages to a log file:
 #if QT_VERSION >= 0x050000
@@ -111,9 +113,7 @@ int main (int argc, char **argv)
 #endif
 
     // Basic application variables:
-    application.setOrganizationName ("PEB-Dev-Team");
-    //application.setOrganizationDomain ("peb.org");
-    application.setApplicationName ("PerlExecutingBrowser");
+    application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
 
     // Initialize settings:
@@ -147,7 +147,9 @@ int main (int argc, char **argv)
     foreach (QString argument, arguments){
         if (argument.contains ("--help") or argument.contains ("-H")) {
             std::cout << " " << std::endl;
-            std::cout << "Perl Executing Browser v.0.1 started on: "
+            std::cout << application.applicationName().toLatin1().constData()
+                      << " v." << application.applicationVersion().toLatin1().constData()
+                      << " started on: "
                       << applicationStartForLogContents.toLatin1().constData() << std::endl;
             std::cout << "Application file path: "
                       << (QDir::toNativeSeparators (
@@ -164,14 +166,15 @@ int main (int argc, char **argv)
                       << std::endl;
             std::cout << "  --root      -R    absolute path of browser root folder"
                       << std::endl;
-            std::cout << "  --webserver -W    start local webserver with the browser: 'enable' or 'disable'"
-                      << std::endl;
             std::cout << "  --help      -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
             if (settings.logging == "enable") {
-                QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-                qDebug() << "Perl Executing Browser v.0.1 displayed help and terminated normally on:"
+                QString dateTimeString =
+                        QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+                qDebug() << application.applicationName().toLatin1().constData()
+                         << application.applicationVersion().toLatin1().constData()
+                         << "displayed help and terminated normally on:"
                          << dateTimeString;
                 qDebug() << "===============";
             }
@@ -216,7 +219,9 @@ int main (int argc, char **argv)
 
     // Log basic program information:
     qDebug() << "";
-    qDebug() << "Perl Executing Browser v.0.1 started on:" << applicationStartForLogContents;
+    qDebug() << application.applicationName().toLatin1().constData()
+             << application.applicationVersion().toLatin1().constData()
+             << "started on:" << applicationStartForLogContents;
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath());
     QString allArguments;
@@ -240,7 +245,9 @@ int main (int argc, char **argv)
 
         if (settings.logging == "enable") {
             std::cout << " " << std::endl;
-            std::cout << "Perl Executing Browser v.0.1 started on: "
+            std::cout << application.applicationName().toLatin1().constData()
+                      << " v." << application.applicationVersion().toLatin1().constData()
+                      << " started on:"
                       << applicationStartForLogContents.toLatin1().constData() << std::endl;
             std::cout << "Application file path: "
                       << (QDir::toNativeSeparators (
@@ -318,13 +325,6 @@ int main (int argc, char **argv)
     qDebug() << "===============";
     qDebug() << "NETWORKING SETTINGS:";
     qDebug() << "===============";
-    qDebug() << "Autostart local webserver:" << settings.autostartLocalWebserver;
-    qDebug() << "Mongoose listening port:" << settings.listeningPort;
-    qDebug() << "Mongoose quit token:" << settings.quitToken;
-    qDebug() << "Ping local webserver:" << settings.pingLocalWebserver;
-    qDebug() << "Ping remote webserver:" << settings.pingRemoteWebserver;
-    qDebug() << "Remote webserver:" << settings.remoteWebserver;
-    qDebug() << "Remote webserver port:" << settings.remoteWebserverPort;
     qDebug() << "Browser User Agent:" << settings.userAgent;
 
     qDebug() << "===============";
@@ -542,40 +542,7 @@ Settings::Settings()
     sourceViewerArgumentsSetting.replace ("\n", "");
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
-    // Networking:
-    autostartLocalWebserver = settings.value ("networking/autostart_local_webserver").toString();
-    pingLocalWebserver = settings.value ("networking/ping_local_webserver").toString();
-    pingRemoteWebserver = settings.value ("networking/ping_remote_webserver").toString();
-    remoteWebserver = settings.value ("networking/remote_webserver").toString();
-    remoteWebserverPort = settings.value ("networking/remote_webserver_port").toInt();
     userAgent = settings.value ("networking/user_agent").toString();
-
-    // Read Mongoose local web server settings from its own configuration file:
-    mongooseSettingsFileName = QDir::toNativeSeparators
-            (rootDirName+"mongoose.conf");
-    QFile mongooseSettingsFile (mongooseSettingsFileName);
-    if (mongooseSettingsFile.exists()) {
-        QRegExp space ("\\s");
-        QRegExp listeningPortRegExp ("^listening_port");
-        QRegExp quitTokenRegExp ("^quit_token");
-        if (!mongooseSettingsFile.open(QIODevice::ReadOnly | QIODevice::Text))
-            return;
-        QTextStream mongooseSettings (&mongooseSettingsFile);
-        while (!mongooseSettings.atEnd()) {
-            QString line = mongooseSettings.readLine();
-            if (line.contains (listeningPortRegExp)) {
-                listeningPort = line.section (space, 1, 1);
-                listeningPort.replace (QString ("\n"), "");
-            }
-            if (line.contains (quitTokenRegExp)) {
-                quitToken = line.section (space, 1, 1);
-                quitToken.replace (QString ("\n"), "");
-            }
-        }
-    } else {
-        listeningPort = "unavailable";
-        quitToken = "unavailable";
-    }
 
     // Read the INI file for a list of allowed web sites:
     QFile settingsFile (settingsFileName);
@@ -660,13 +627,6 @@ Settings::Settings()
     }
     logPrefix = settings.value ("logging/logging_prefix").toString();
 
-    // Start local webserver from command line:
-    foreach (QString argument, arguments){
-        if (argument.contains ("--webserver") or argument.contains ("-W")) {
-            autostartLocalWebserver = argument.section ("=", 1, 1);
-        }
-    }
-
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
     pythonShebang.setPattern ("#!/.{1,}python");
@@ -707,18 +667,6 @@ Watchdog::Watchdog()
     : QObject(0)
 {
 
-    if (settings.autostartLocalWebserver == "enable") {
-        qDebug() << "Mongoose quit token:" << settings.quitToken;
-        qDebug() << "===============";
-
-        QProcess server;
-        server.startDetached (QString (settings.rootDirName+"mongoose"));
-    }
-
-    QTimer *timer = new QTimer (this);
-    connect (timer, SIGNAL (timeout()), this, SLOT (pingSlot()));
-    timer->start (5000);
-
     if (settings.systrayIcon == "enable") {
         trayIcon = new QSystemTrayIcon();
         trayIcon->setIcon (settings.icon);
@@ -728,9 +676,11 @@ Watchdog::Watchdog()
                           this, SLOT (trayIconActivatedSlot (QSystemTrayIcon::ActivationReason)));
 
         aboutAction = new QAction (tr ("&About"), this);
+
         aboutQtAction = new QAction (tr ("About Q&t"), this);
         QObject::connect (aboutQtAction, SIGNAL (triggered()),
                           qApp, SLOT (aboutQt()));
+
         quitAction = new QAction (tr ("&Quit"), this);
 
         trayIconMenu = new QMenu();
@@ -1384,7 +1334,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             (!request.url().authority().contains ("localhost")) and
             (!settings.allowedWebSites.contains (request.url().authority()))) {
 
-        qDebug() << "Default browser called for not allowed web link:" << request.url().toString();
+        qDebug() << "Default browser called for not allowed web link:"
+                 << request.url().toString();
         qDebug() << "===============";
 
         QDesktopServices::openUrl (request.url());

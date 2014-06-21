@@ -206,12 +206,6 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://localhost:8080'>Localhost</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest'>Long-Running Script in This Window</a>
 </font></p>
 
