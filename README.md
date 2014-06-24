@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl scripts locally without a webserver. Serverless execution of local scripts can go side by side with a traditional access to local or remote webservers. CGI protocol GET and POST methods are used for communication with scripts executed without a webserver.  
+Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl/Python/PHP scripts locally without a webserver. Serverless execution of local scripts is separated from the traditional access to local or remote servers. CGI protocol GET and POST methods are used for communication with scripts executed locally without a server.  
   
 ## Design Objectives
   
@@ -13,7 +13,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
     use locally executed Perl, Python or PHP scripts to convert or verify large amounts of user data before upload;  
 
 * **3. Zero installation when needed:**  
-    pack your Perl modules and even your version of Perl with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
+    pack your Perl modules and even your version of Perl, Python or PHP with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
 
 * **4. Cross-platform availability:**  
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
@@ -26,32 +26,32 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 **No feature or implementation should be considered final at this early stage of development!**
   
 **Scripting:**  
-* Can execute CGI scripts locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
-* Can execute long-running scripts - i.e. scripts running for arbitrary long time. Output can be displayed in the same or in a new window.  
-* Can load Perl modules from a custom directory without system-wide installation using PERLLIB environment variable.  
+* CGI scripts can be executed locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
+* Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
+* Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
 * Any version of Perl/Python/PHP can be selected from INI file or by clicking a special URL.  
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
   
 **Networking:**  
-* Can load scripts and pages from localhost or from a predefined list of allowed websites.  
-* Can be used as a site-specific browser or a specialised web client.  
+* PEB can load scripts and pages from localhost or from a predefined list of allowed websites.  
+* PEB can be used as a site-specific browser or a specialised web client.  
   
 **Local filesystem:**  
-* Can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
-* Can open local documents using default applications and start user-specified programs.  
+* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
+* PEB can open local documents using default applications and start user-specified programs.  
   
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* Can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* Can display every Perl/Python/PHP script as a source code.  
+* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* Every Perl/Python/PHP script can be displayed as source code.  
 * Extensive logging of any browser activity and the execution of local scripts.  
   
 **Configuration:**  
 * Configurable from INI file and command line.  
-* Themable - a common CSS theme for both static and dynamic pages can be configured from INI file or selected using a special URL.  
 * Browser root folder can be any folder and this is configurable from INI file or command line.  
 * Basic program functions are accessible from special URLs or from right-click context menu.  
+* Themable - a common CSS theme for both static and dynamic pages can be configured from INI file or selected using a special URL.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
 * Multi-window application with normal or frameless windows in resizable, fixed size or fullscreen mode.  
@@ -80,7 +80,7 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
   
 ## Security Considerations
   
-Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folder containing locally executed scripts available to network-oriented services like webservers or file sharing applications due to risk of executing locally malicious or unsecure code uploaded from outside.  
+Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to webservers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
   
 ## History
   
@@ -90,7 +90,8 @@ PEB was started as a simple GUI for personal databases. This small project is st
   
 This program is free software;  
 you can redistribute it and/or modify it under the terms of the GNU General Public License,  
-as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
+as published by the Free Software Foundation; either version 3 of the License,
+or (at your option) any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   
