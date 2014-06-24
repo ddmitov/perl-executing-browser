@@ -29,15 +29,6 @@
  http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
  http://www.totoro.org/jen/
 
- Thanks to Sergey Lyubka, author of Mongoose web server,
- for creating Mongoose and providing quality support to Mongoose users through
- https://groups.google.com/forum/#!forum/mongoose-users
- More about Mongoose web server:
- http://cesanta.com/docs.html?Mongoose.md
- https://github.com/cesanta/mongoose
- https://github.com/cesanta/mongoose/blob/master/docs/API.md
- https://github.com/ctrix/free-mongoose/blob/master/UserManual.md
-
  Thanks to Leon Anavi, Valentin Alexiev, Stefan Chekanov, Rangel Ivanov, Philip Georgiev,
  karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,
  for beeing welcoming host of the first public presentation of Perl Executing Browser
@@ -61,11 +52,8 @@
  http://qt-project.org/doc/qt-4.8/qdir.html
  http://qt-project.org/doc/qt-4.8/desktop-systray.html
  http://qt-project.org/doc/qt-4.8/qtimer.html
- http://qt-project.org/doc/qt-4.8/qtcpsocket-members.html
  http://qt-project.org/doc/qt-4.8/qregexp.html
  http://qt-project.org/doc/qt-4.8/qfile.html
- http://qt-project.org/doc/qt-4.8/qnetworkinterface.html
- http://qt-project.org/doc/qt-4.8/network-http.html
  http://qt-project.org/doc/qt-4.8/qtextstream.html
  http://qt-project.org/doc/qt-4.8/qiodevice.html
  http://qt-project.org/doc/qt-4.8/qwebframe.html
@@ -85,20 +73,18 @@
  http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
  http://qt-project.org/wiki/Open_Web_Page_in_QWebView_Bulgarian
  http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
- http://qt-project.org/forums/viewthread/23835
- http://qt-project.org/forums/viewthread/5318
- http://qt-project.org/forums/viewthread/8270
- http://qt-project.org/forums/viewthread/18292
- http://qt-project.org/forums/viewthread/6102
- http://qt-project.org/forums/viewthread/17635
- http://qt-project.org/forums/viewthread/10672
- http://qt-project.org/forums/viewthread/4433
- http://qt-project.org/forums/viewthread/9346
- http://qt-project.org/forums/viewthread/11729
- http://qt-project.org/forums/viewthread/1335
- http://qt-project.org/forums/viewthread/25533
- http://qt-project.org/forums/viewthread/15487
- http://qt-project.org/forums/viewthread/8876
+ http://qt-project.org/forums/viewthread/23835 (Qt 5 - How to create a frameless window?)
+ http://qt-project.org/forums/viewthread/5318 (Set fixed size of QMainWindow created in Designer)
+ http://qt-project.org/forums/viewthread/8270 (Find length of QString text)
+ http://qt-project.org/forums/viewthread/18292 (how to show/hide application with shortcut?)
+ http://qt-project.org/forums/viewthread/6102 (WebView Clear history)
+ http://qt-project.org/forums/viewthread/17635 (how to actually use QWebView::createWindow())
+ http://qt-project.org/forums/viewthread/10672 (How to set windows system path using Qt api)
+ http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)
+ http://qt-project.org/forums/viewthread/11729 (How set user-agent in QWebView?)
+ http://qt-project.org/forums/viewthread/25533 (#ifdef condition)
+ http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)
+ http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())
  http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://doc.qt.digia.com/4.6/internationalization.html
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
@@ -111,9 +97,7 @@
  http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character
  http://www.qtcentre.org/threads/14401-QString-how-to-delete-new-lines
  http://www.qtcentre.org/threads/31264-How-to-use-QProcess-to-write-multiple-commands-to-external-console-based-program
- http://www.qtcentre.org/threads/19583-How-To-Get-System-Network-Interface-List-in-using-qt4-5
- http://www.qtcentre.org/archive/index.php/t-31264.html
- http://www.qtcentre.org/archive/index.php/t-14691.html
+ http://www.qtcentre.org/threads/14691-QProcess-finished()
  http://www.qtcentre.org/threads/15425-Transparency-in-Icons
  http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout
  http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
@@ -160,7 +144,6 @@
  http://stackoverflow.com/questions/1312922/detect-if-stdin-is-a-terminal-or-pipe-in-c-c-qt
  http://stackoverflow.com/questions/5156675/how-to-use-isatty-on-cout-or-can-i-assume-that-cout-file-descriptor-1
  http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
- http://stackoverflow.com/questions/12927273/how-to-get-local-ip-address-of-a-computer-using-qt
  http://stackoverflow.com/questions/8362506/qwebview-qt-webkit-wont-open-some-ssl-pages-redirects-not-allowed
  http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
  http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
@@ -169,7 +152,6 @@
  http://stackoverflow.com/questions/21795919/qsystemtrayicon-mouse-hover
  http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
  http://stackoverflow.com/questions/12013201/how-to-detect-sub-character-and-remove-it-from-a-text-file-in-c
- http://stackoverflow.com/questions/14465263/how-do-you-port-qurl-addqueryitem-to-qt5s-qurlquery
  http://stackoverflow.com/questions/17998811/window-modal-qfiledialog-pushing-parent-to-background-after-exec
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp

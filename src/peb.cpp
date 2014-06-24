@@ -301,8 +301,7 @@ int main (int argc, char **argv)
     qDebug() << "GENERAL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
-    qDebug() << "Browser settings file name:" << settings.settingsFileName;
-    qDebug() << "Mongoose settings file name:" << settings.mongooseSettingsFileName;
+    qDebug() << "Settings file name:" << settings.settingsFileName;
 
     qDebug() << "===============";
     qDebug() << "ENVIRONMENT SETTINGS:";
@@ -323,9 +322,7 @@ int main (int argc, char **argv)
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
     qDebug() << "===============";
-    qDebug() << "NETWORKING SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Browser User Agent:" << settings.userAgent;
+    qDebug() << "User Agent:" << settings.userAgent;
 
     qDebug() << "===============";
     qDebug() << "GUI SETTINGS:";
@@ -338,11 +335,11 @@ int main (int argc, char **argv)
     qDebug() << "Context menu:" << settings.contextMenu;
     qDebug() << "Web Inspector from context menu:" << settings.webInspector;
     qDebug() << "Application icon:" << settings.iconPathName;
-    qDebug() << "Browser default theme:" << settings.defaultTheme;
-    qDebug() << "Browser default theme directory:" << settings.defaultThemeDirectory;
-    qDebug() << "Browser all themes directory:" << settings.allThemesDirectory;
-    qDebug() << "Browser default translation:" << settings.defaultTranslation;
-    qDebug() << "Browser translations directory:" << settings.allTranslationsDirectory;
+    qDebug() << "Default theme:" << settings.defaultTheme;
+    qDebug() << "Default theme directory:" << settings.defaultThemeDirectory;
+    qDebug() << "All themes directory:" << settings.allThemesDirectory;
+    qDebug() << "Default translation:" << settings.defaultTranslation;
+    qDebug() << "Translations directory:" << settings.allTranslationsDirectory;
     qDebug() << "System tray icon:" << settings.systrayIcon;
     qDebug() << "System tray icon double-click action:"
              << settings.systrayIconDoubleClickAction;
@@ -441,25 +438,27 @@ int main (int argc, char **argv)
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
 
-    Watchdog watchdog;
-
     TopLevel toplevel (QString ("mainWindow"));
 
-    if (settings.systrayIcon == "enable") {
-        QObject::connect (watchdog.aboutAction, SIGNAL (triggered()),
-                          &toplevel, SLOT (aboutSlot()));
-        QObject::connect (watchdog.quitAction, SIGNAL (triggered()),
-                          &toplevel, SLOT (quitApplicationSlot()));
-    }
-
-    QObject::connect (qApp, SIGNAL (aboutToQuit()),
-                      &watchdog, SLOT (aboutToQuitSlot()));
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
 
     toplevel.setWindowIcon (settings.icon);
     toplevel.loadStartPageSlot();
     toplevel.show();
+
+    TrayIcon trayicon;
+
+    if (settings.systrayIcon == "enable") {
+        QObject::connect (trayicon.aboutAction, SIGNAL (triggered()),
+                          &toplevel, SLOT (aboutSlot()));
+
+        QObject::connect (trayicon.quitAction, SIGNAL (triggered()),
+                          &toplevel, SLOT (quitApplicationSlot()));
+
+        QObject::connect (&toplevel, SIGNAL (trayIconHideSignal()),
+                          &trayicon, SLOT (trayIconHideSlot()));
+    }
 
     return application.exec();
 
@@ -663,8 +662,8 @@ Settings::Settings()
 }
 
 
-Watchdog::Watchdog()
-    : QObject(0)
+TrayIcon::TrayIcon()
+    : QSystemTrayIcon(0)
 {
 
     if (settings.systrayIcon == "enable") {

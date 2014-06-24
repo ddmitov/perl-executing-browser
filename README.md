@@ -80,7 +80,7 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
   
 ## Security Considerations
   
-Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP as helper applications for online content are not going to be implemented because of the huge security risks involved!  
+Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folder containing locally executed scripts available to network-oriented services like webservers or file sharing applications due to risk of executing locally malicious or unsecure code uploaded from outside.  
   
 ## History
   
@@ -90,8 +90,7 @@ PEB was started as a simple GUI for personal databases. This small project is st
   
 This program is free software;  
 you can redistribute it and/or modify it under the terms of the GNU General Public License,  
-as published by the Free Software Foundation; either version 3 of the License,  
-or (at your option) any later version.  
+as published by the Free Software Foundation; either version 3 of the License, or (at your option) any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
   

@@ -31,20 +31,20 @@ if ($input_filename =~ ".php" or $input_filename =~ ".PHP"){
 
 # Detect script language by shebang line:
 # Open the input file read-only to detect the shebang line:
-#~ open ($input_filehandle, "<", "$input_filename");
+open ($input_filehandle, "<", "$input_filename");
 
 # Detect Perl and Python using the shebang line.
 # Perl and Python scripts may not have a file extension.
-#~ $first_line = <$input_filehandle>;
-#~ if ($first_line =~ m/\#\!.*perl/){
-	#~ $language = "Perl";
-#~ }
-#~ if ($first_line =~ m/\#\!.*python/){
-	#~ $language = "Python";
-#~ }
+$first_line = <$input_filehandle>;
+if ($first_line =~ m/\#\!.*perl/){
+	$language = "Perl";
+}
+if ($first_line =~ m/\#\!.*python/){
+	$language = "Python";
+}
 
 # Close the input file:
-#~ close ($input_filehandle);
+close ($input_filehandle);
 
 # Syntax::Highlight::Engine::Kate settings:
  my $hl = new Syntax::Highlight::Engine::Kate(

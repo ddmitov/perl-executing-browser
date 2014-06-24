@@ -185,7 +185,6 @@ public:
     QString settingsFileName;
     QString settingsDirName;
     QDir settingsDir;
-    QString mongooseSettingsFileName;
 
     QString perlLib;
     QString perlInterpreter;
@@ -263,7 +262,7 @@ private:
 };
 
 
-class Watchdog : public QObject
+class TrayIcon : public QSystemTrayIcon
 {
 
     Q_OBJECT
@@ -300,22 +299,14 @@ public slots:
         }
     }
 
-
-    void aboutToQuitSlot()
+    void trayIconHideSlot()
     {
-        if (settings.systrayIcon == "enable") {
-            trayIcon->hide();
-        }
-        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-        qDebug() << qApp->applicationName().toLatin1().constData()
-                 << qApp->applicationVersion().toLatin1().constData()
-                 << "terminated normally on:" << dateTimeString;
-        qDebug() << "===============";
+        trayIcon->hide();
     }
 
 public:
 
-    Watchdog();
+    TrayIcon();
 
     QAction *quitAction;
     QAction *aboutAction;
@@ -1128,6 +1119,8 @@ signals:
 
     void selectThemeSignal();
 
+    void trayIconHideSignal();
+
 public slots:
 
     void loadStartPageSlot()
@@ -1593,6 +1586,16 @@ public slots:
                      (QDir::tempPath()+QDir::separator()+"output.htm"));
             QApplication::exit();
         }
+
+        if (settings.systrayIcon == "enable") {
+            emit trayIconHideSignal();
+        }
+
+        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
+        qDebug() << qApp->applicationName().toLatin1().constData()
+                 << qApp->applicationVersion().toLatin1().constData()
+                 << "terminated normally on:" << dateTimeString;
+        qDebug() << "===============";
     }
 
     void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors)
