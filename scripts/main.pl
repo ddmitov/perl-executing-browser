@@ -23,10 +23,8 @@ print <<HTML
 <a href='http://perl-executing-browser-pseudodomain/scripts/longrun_perlinfo.pl?theme=disabled'>Perl Info</a>
 </font><br>
 <font size='3'>
-Non-core module loaded from directory, without system-wide installation.<br>
-<a href='http://search.cpan.org/dist/HTML-Perlinfo/lib/HTML/Perlinfo/HTML.pod'>http://search.cpan.org/dist/HTML-Perlinfo/lib/HTML/Perlinfo/HTML.pod</a><br>
-Copyright (c) 2009, Michael Accardo
-</font></p>
+Based on <a href='https://metacpan.org/pod/HTML::Perlinfo'>HTML::Perlinfo</a> by Michael Accardo,<br>
+a non-core module loaded from directory, without system-wide installation.</font></p>
 
 <p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Perl Environment Test</a>
@@ -40,8 +38,10 @@ Copyright (c) 2009, Michael Accardo
 <a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl?source=enabled' target='_blank'>Perl SQLite Example as source code</a>
 </font><br>
 <font size='3'>
-(will open in a new window)
-</font></p>
+(will open in a new window)<br>
+Based on <a href='https://metacpan.org/pod/Syntax::Highlight::Engine::Kate'>
+Syntax::Highlight::Engine::Kate</a> by Hans Jeuken and Gábor Szabó,<br>
+also a non-core module loaded from directory, without system-wide installation.</font></p>
 
 <p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
@@ -189,6 +189,11 @@ function notAllowedContent() {
 <a href='perldebugger://variables/'>List All Variables of a Perl Script using<br>Built-in Perl Debugger</a>
 </font></p>
 
+<!-- <p align='center'><font size='5'>
+<a href='perldebugger://stepbystep/'>Start Step-by-Step Debugging using<br>Built-in Perl Debugger</a>
+</font></p>
+ -->
+
 <hr width='95%'>
 
 <p align='center'><font size='5'>
@@ -228,6 +233,7 @@ function notAllowedContent() {
 </font></p>
 
 </div>
+
 </body>
 
 </html>

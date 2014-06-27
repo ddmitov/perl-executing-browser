@@ -963,7 +963,10 @@ public slots:
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
         // Remove SUB characters:
-        debuggerOutput.replace ("\\u001a", "");
+        static const QChar subChar[] = {0x001A};
+        int size = sizeof (subChar) / sizeof (QChar);
+        QString subStr = QString::fromRawData (subChar, size);
+        debuggerOutput.replace (subStr, "");
 
         QRegExp debuggerOutputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
         debuggerOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);

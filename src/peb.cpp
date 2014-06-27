@@ -1163,9 +1163,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                    QDir::toNativeSeparators (filepath) << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
 
-            if (!debuggerHandler.waitForStarted (-1))
-                return false;
-
             QByteArray debuggerCommand;
             if (request.url().authority().contains ("modules")) {
                 debuggerCommand.append (QString ("M\n").toLatin1());
@@ -1185,7 +1182,9 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                                   debuggerCommandHumanReadable+"\n");
             }
 
-            debuggerHandler.write (debuggerCommand);
+            if (!request.url().authority().contains ("stepbystep")) {
+                debuggerHandler.write (debuggerCommand);
+            }
 
             if (settings.debuggerOutput == "html") {
 
@@ -1198,10 +1197,10 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                 htmlHeaderFileContents.replace (
                             "[% Debugger Command %]", debuggerCommandHumanReadable);
                 debuggerAccumulatedOutput.append (htmlHeaderFileContents);
-            }
 
-            settings.cssLinker (debuggerAccumulatedOutput);
-            debuggerAccumulatedOutput = settings.cssLinkedHtml;
+                settings.cssLinker (debuggerAccumulatedOutput);
+                debuggerAccumulatedOutput = settings.cssLinkedHtml;
+            }
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
             newDebuggerWindow->setWindowIcon (settings.icon);
