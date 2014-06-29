@@ -80,7 +80,7 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
   
 ## Security Considerations
   
-Locally executed scripts are not executed in an isolated environment, but have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to webservers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
+Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to other system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to webservers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
   
 ## History
   

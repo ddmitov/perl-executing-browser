@@ -51,6 +51,8 @@
 
 extern QStringList startedScripts;
 
+extern QStringList allowedEnvironmentVariables;
+
 
 class Settings : public QSettings
 {
@@ -666,7 +668,20 @@ public slots:
             qDebug() << "Extension:" << settings.extension;
             qDebug() << "Interpreter:" << settings.interpreter;
 
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+            QStringList systemEnvironment =
+                    QProcessEnvironment::systemEnvironment().toStringList();
+
+            QProcessEnvironment env;
+
+            foreach (QString environmentVariable, systemEnvironment) {
+                QStringList environmentVariableList = environmentVariable.split ("=");
+                QString environmentVariableName = environmentVariableList.first();
+                if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
+                    env.remove (environmentVariable);
+                } else {
+                    env.insert (environmentVariableList.first(), environmentVariableList[1]);
+                }
+            }
 
             if (queryString.length() > 0) {
                 env.insert ("REQUEST_METHOD", "GET");
@@ -703,13 +718,15 @@ public slots:
                     }
                     sourceViewerCommandLine.append (QDir::toNativeSeparators
                                                     (settings.rootDirName+filepath));
-                    scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine);
+                    scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine,
+                                         QProcess::Unbuffered | QProcess::ReadWrite);
 
                     startedScripts.append (settings.rootDirName+filepath);
                 } else {
                     scriptHandler.start (settings.interpreter, QStringList() <<
                                          QDir::toNativeSeparators
-                                         (settings.rootDirName+filepath));
+                                         (settings.rootDirName+filepath),
+                                         QProcess::Unbuffered | QProcess::ReadWrite);
 
                     startedScripts.append (settings.rootDirName+filepath);
 
@@ -1043,12 +1060,18 @@ public slots:
 
         if (settings.debuggerOutput == "txt") {
         debuggerOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+QDir::separator()+"deboutput.txt");
+                        (QDir::tempPath()+QDir::separator()+"dbgoutput.txt");
         }
         if (settings.debuggerOutput == "html") {
         debuggerOutputFilePath = QDir::toNativeSeparators
-                        (QDir::tempPath()+QDir::separator()+"deboutput.htm");
+                        (QDir::tempPath()+QDir::separator()+"dbgoutput.htm");
         }
+
+
+//        if (debuggerRequestUrl.authority().contains ("stepbystep")) {
+
+//        }
+
 
         QFile debuggerOutputFile (debuggerOutputFilePath);
         if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
@@ -1060,7 +1083,15 @@ public slots:
         qDebug() << "Debugger output file:" << debuggerOutputFilePath;
         qDebug() << "===============";
 
-        newDebuggerWindow->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
+        if (!debuggerRequestUrl.authority().contains ("stepbystep")) {
+            newDebuggerWindow->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
+        } else {
+            newDebuggerWindow->setUrl (QUrl::fromLocalFile (QDir::toNativeSeparators
+                                                            (QDir::tempPath()+
+                                                             QDir::separator()+
+                                                             "dbgframe.htm")));
+        }
+
         newDebuggerWindow->show();
         debuggerOutputFile.remove();
     }
@@ -1102,6 +1133,7 @@ private:
     QString scriptOutputType;
     bool scrollDown;
 
+    QUrl debuggerRequestUrl;
     QString debuggedFileExtension;
     QString debuggingInterpreter;
     QProcess debuggerHandler;

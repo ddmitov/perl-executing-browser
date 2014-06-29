@@ -44,6 +44,8 @@ static QString applicationStartForLogFileName =
 // Dynamic global list of all scripts, that are started and still running in any given moment:
 QStringList startedScripts;
 
+QStringList allowedEnvironmentVariables;
+
 
 // Custom message handler for redirecting all debug messages to a log file:
 #if QT_VERSION >= 0x050000
@@ -233,6 +235,8 @@ int main (int argc, char **argv)
     qDebug() << "Command line:" << allArguments;
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
+    qDebug() << "Libraries Path:" << QLibraryInfo::location (QLibraryInfo::LibrariesPath);
+
     qDebug() << "";
 
     // Detect if the program is started from terminal (Linux and Mac only).
@@ -380,8 +384,11 @@ int main (int argc, char **argv)
     // ENVIRONMENT VARIABLES:
     // Browser-specific environment variables:
     qputenv ("FILE_TO_OPEN", "");
+    allowedEnvironmentVariables.append ("FILE_TO_OPEN");
     qputenv ("FILE_TO_CREATE", "");
+    allowedEnvironmentVariables.append ("FILE_TO_CREATE");
     qputenv ("FOLDER_TO_OPEN", "");
+    allowedEnvironmentVariables.append ("FOLDER_TO_OPEN");
 
     // PATH:
     // Get the existing PATH and set the separator sign:
@@ -422,21 +429,25 @@ int main (int argc, char **argv)
     }
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
     qputenv ("PATH", path);
+    allowedEnvironmentVariables.append ("PATH");
 #endif
 #ifdef Q_OS_WIN // Windows
     qputenv ("Path", path);
+    allowedEnvironmentVariables.append ("Path");
 #endif
 
     // DOCUMENT_ROOT:
     QByteArray documentRoot;
     documentRoot.append (QDir::toNativeSeparators (settings.rootDirName));
     qputenv ("DOCUMENT_ROOT", documentRoot);
+    allowedEnvironmentVariables.append ("DOCUMENT_ROOT");
 
     // PERLLIB:
     QByteArray perlLib;
     QString perlLibFullPath = QDir::toNativeSeparators (settings.rootDirName+settings.perlLib);
     perlLib.append (perlLibFullPath);
     qputenv ("PERLLIB", perlLib);
+    allowedEnvironmentVariables.append ("PERLLIB");
 
     TopLevel toplevel (QString ("mainWindow"));
 
@@ -1097,6 +1108,8 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains ("perldebugger")) {
 
+        debuggerRequestUrl = request.url();
+
         QFileDialog dialog;
         dialog.setFileMode (QFileDialog::ExistingFile);
         dialog.setViewMode (QFileDialog::Detail);
@@ -1137,15 +1150,21 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
 
-            if (settings.debuggerOutput == "txt") {
-                debuggerAccumulatedOutput.append ("\nScript: "+filepath+"\n");
+            QStringList systemEnvironment =
+                    QProcessEnvironment::systemEnvironment().toStringList();
+
+            QProcessEnvironment env;
+
+            foreach (QString environmentVariable, systemEnvironment) {
+                QStringList environmentVariableList = environmentVariable.split ("=");
+                QString environmentVariableName = environmentVariableList.first();
+                if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
+                    env.remove (environmentVariable);
+                } else {
+                    env.insert (environmentVariableList.first(), environmentVariableList[1]);
+                }
             }
 
-            if (settings.debuggerOutput == "txt") {
-                debuggerAccumulatedOutput.append ("Interpreter: "+debuggingInterpreter+"\n");
-            }
-
-            QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
             env.insert ("COLUMNS", "80");
             env.insert ("LINES", "24");
             debuggerHandler.setProcessEnvironment (env);
@@ -1163,43 +1182,44 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
                                    QDir::toNativeSeparators (filepath) << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
 
-            QByteArray debuggerCommand;
-            if (request.url().authority().contains ("modules")) {
-                debuggerCommand.append (QString ("M\n").toLatin1());
-                debuggerCommandHumanReadable = "Show module versions (M)";
-            }
-            if (request.url().authority().contains ("subroutines")) {
-                debuggerCommand.append (QString ("S\n").toLatin1());
-                debuggerCommandHumanReadable = "List subroutine names (S)";
-            }
-            if (request.url().authority().contains ("variables")) {
-                debuggerCommand.append (QString ("V\n").toLatin1());
-                debuggerCommandHumanReadable = "List Variables in Package (V)";
-            }
+            if (!debuggerRequestUrl.authority().contains ("stepbystep")) {
+                QByteArray debuggerCommand;
+                if (debuggerRequestUrl.authority().contains ("modules")) {
+                    debuggerCommand.append (QString ("M\n").toLatin1());
+                    debuggerCommandHumanReadable = "Show module versions (M)";
+                }
+                if (debuggerRequestUrl.authority().contains ("subroutines")) {
+                    debuggerCommand.append (QString ("S\n").toLatin1());
+                    debuggerCommandHumanReadable = "List subroutine names (S)";
+                }
+                if (debuggerRequestUrl.authority().contains ("variables")) {
+                    debuggerCommand.append (QString ("V\n").toLatin1());
+                    debuggerCommandHumanReadable = "List Variables in Package (V)";
+                }
 
-            if (settings.debuggerOutput == "txt") {
-                debuggerAccumulatedOutput.append ("Debugger Command: "+
-                                                  debuggerCommandHumanReadable+"\n");
-            }
+                if (settings.debuggerOutput == "txt") {
+                    debuggerAccumulatedOutput.append ("\nScript: "+filepath+"\n");
+                    debuggerAccumulatedOutput.append ("Interpreter: "+debuggingInterpreter+"\n");
+                    debuggerAccumulatedOutput.append ("Debugger Command: "+
+                                                      debuggerCommandHumanReadable+"\n");
+                }
 
-            if (!request.url().authority().contains ("stepbystep")) {
+                if (settings.debuggerOutput == "html") {
+                    QFile htmlHeaderFile (
+                                QDir::toNativeSeparators (settings.debuggerHtmlHeader));
+                    htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
+                    QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
+                    htmlHeaderFileContents.replace ("[% Script %]", filepath);
+                    htmlHeaderFileContents.replace ("[% Interpreter %]", debuggingInterpreter);
+                    htmlHeaderFileContents.replace (
+                                "[% Debugger Command %]", debuggerCommandHumanReadable);
+                    debuggerAccumulatedOutput.append (htmlHeaderFileContents);
+
+                    settings.cssLinker (debuggerAccumulatedOutput);
+                    debuggerAccumulatedOutput = settings.cssLinkedHtml;
+                }
+
                 debuggerHandler.write (debuggerCommand);
-            }
-
-            if (settings.debuggerOutput == "html") {
-
-                QFile htmlHeaderFile (
-                            QDir::toNativeSeparators (settings.debuggerHtmlHeader));
-                htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
-                QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
-                htmlHeaderFileContents.replace ("[% Script %]", filepath);
-                htmlHeaderFileContents.replace ("[% Interpreter %]", debuggingInterpreter);
-                htmlHeaderFileContents.replace (
-                            "[% Debugger Command %]", debuggerCommandHumanReadable);
-                debuggerAccumulatedOutput.append (htmlHeaderFileContents);
-
-                settings.cssLinker (debuggerAccumulatedOutput);
-                debuggerAccumulatedOutput = settings.cssLinkedHtml;
             }
 
             newDebuggerWindow = new TopLevel (QString ("mainWindow"));
