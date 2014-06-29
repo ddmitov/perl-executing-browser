@@ -2,18 +2,18 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl/Python/PHP scripts locally without a webserver. Serverless execution of local scripts is separated from the traditional access to local or remote servers. CGI protocol GET and POST methods are used for communication with scripts executed locally without a server.  
+Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl, Python or PHP scripts locally without a web server. CGI-like and long-running scripts can be executed locally in serverless mode and they can be fed from HTML forms using CGI protocol GET and POST methods. Serverless execution of local scripts is separated from the traditional browser access to local or remote servers. Limited interaction with the built-in Perl debugger is also supported.  
   
 ## Design Objectives
   
-* **1. Easy GUI for scripts:**  
-    use HTML, CSS and JavaScript to craft and deploy rapidly beautifull interfaces for custom Perl, Python or PHP scripts;  
+* **1. Easy GUI for local scripts:**  
+    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl, Python or PHP scripts  
 
-* **2. Specialised client for web services:**  
+* **2. Specialized web client:**  
     use locally executed Perl, Python or PHP scripts to convert or verify large amounts of user data before upload;  
 
 * **3. Zero installation when needed:**  
-    pack your Perl modules and even your version of Perl, Python or PHP with a copy of PEB and its Qt libraries and run your application from every folder, even from USB sticks;  
+    put together your Perl modules and even your version of Perl, Python or PHP with a copy of PEB and its Qt libraries and run your scripts from every folder, even from USB sticks;  
 
 * **4. Cross-platform availability:**  
     use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
@@ -29,7 +29,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * CGI scripts can be executed locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
 * Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
 * Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
-* Any version of Perl/Python/PHP can be selected from INI file or by clicking a special URL.  
+* Any version of Perl, Python or PHP can be selected from configuration file or by clicking a special URL.  
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
   
 **Networking:**  
@@ -37,24 +37,30 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * PEB can be used as a site-specific browser or a specialised web client.  
   
 **Local filesystem:**  
-* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
+* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
 * PEB can open local documents using default applications and start user-specified programs.  
   
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and separate output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* Every Perl/Python/PHP script can be displayed as source code.  
-* Extensive logging of any browser activity and the execution of local scripts.  
+* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* Every Perl, Python or PHP script can be displayed as source code.  
+* Extensive logging of every browser activity and the execution of local scripts.  
   
 **Configuration:**  
-* Configurable from INI file and command line.  
-* Browser root folder can be any folder and this is configurable from INI file or command line.  
-* Basic program functions are accessible from special URLs or from right-click context menu.  
-* Themable - a common CSS theme for both static and dynamic pages can be configured from INI file or selected using a special URL.  
+* Configurable from configuration file and command line.  
+* Browser root folder can be any folder and this is configurable from configuration file or command line.  
+* Basic program functions are accessible from special URLs or from a right-click context menu.  
+* Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
 * Multi-window application with normal or frameless windows in resizable, fixed size or fullscreen mode.  
+  
+## Possible Applications
+  
+* Perl, Python or PHP desktop applications with HTML4/5 & CSS2/3 GUI;  
+* Web clients with enhanced scripting capabilities based on Perl, Python, PHP & JavaScript;  
+* (Limited) GUI for the Perl debugger.  
   
 ## Compile-time Requirements
   
@@ -80,11 +86,11 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
   
 ## Security Considerations
   
-Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to other system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl/Python/PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to webservers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
+Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl, Python or PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
   
 ## History
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Proper documentation is still missing and current examples are basic.  
+PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Exhaustive documentation is still missing and current examples are basic.  
   
 ## License
   
