@@ -14,6 +14,7 @@ my $input_filehandle;
 my $first_line;
 my $language;
 my $line_number;
+my $formatted_line_number;
 
 # Remove double slash '//' from script filenames:
 $input_filename =~ s/\/\//\//g;
@@ -87,16 +88,30 @@ open ($input_filehandle, "<", "$input_filename");
 # Highlight the syntax of the input file:
 print "<html>\n";
 print "<head>\n";
-#print "<title>Syntax::Highlight::Engine::Kate Source Viewer</title>\n";
 print "<title>$input_filename</title>\n";
+
+print "<style type='text/css'>
+			body {
+				text-align: left;
+				font-family: Helvetica, Arial, sans-serif;
+				background-color: #FFFFFF;
+				color: #000000;
+				}
+	</style>\n";
+
 print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
 print "</head>\n";
+
+print "<body>\n";
 while (my $in = <$input_filehandle>) {
 	$line_number++;
-	print "<a name='line$line_number' href='#line$line_number'>$line_number</a> &nbsp;";
-	print $hl->highlightText($in);
+	$formatted_line_number = sprintf("%04d", $line_number);
+	print "<a id='$line_number'>$formatted_line_number</a> &nbsp;";
+	print $hl->highlightText ($in);
 }
-print "</body>\n</html>\n";
+print "</body>\n";
+
+print "</html>\n";
 
 # Close the input file:
 close ($input_filehandle);

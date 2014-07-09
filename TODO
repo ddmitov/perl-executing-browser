@@ -6,8 +6,6 @@ Permanent TODO priorities:
 
 Perl debugger interaction:
 - source viewer output as a sequence of pages when lines > 100
-- step-by-step debugging capability
-- capability to load for debugging Perl script from any location
 - better CSS styling for the debugger output
 
 Locally executed scripts:

@@ -28,16 +28,13 @@ print  <<HEADER;
 <html>
 
 <head>
-
-<title>Perl Executing Browser - SQLite Example</title>
-<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<link href="../html/current.css" media="all" rel="stylesheet" />
-
+	<title>Perl Executing Browser - SQLite Example</title>
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 </head>
 
 <body>
 
-<p align='left'><font size='3' face='SansSerif'>
+	<p align='left'><font size='3' face='SansSerif'>
 
 HEADER
 
@@ -48,7 +45,7 @@ foreach my $row (@$all) {
 
 print  <<FOOTER;
 
-</font></p>
+	</font></p>
 
 </body>
 

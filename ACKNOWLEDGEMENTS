@@ -154,6 +154,7 @@
  http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
  http://stackoverflow.com/questions/12013201/how-to-detect-sub-character-and-remove-it-from-a-text-file-in-c
  http://stackoverflow.com/questions/17998811/window-modal-qfiledialog-pushing-parent-to-background-after-exec
+ http://stackoverflow.com/questions/3214297/how-can-my-c-c-application-determine-if-the-root-user-is-executing-the-command
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -164,6 +165,7 @@
  http://msturm.p7.de/programming_qprocess.php
  http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
  http://mvclogic.com/qt/qt-code-example-new-file-open-file-save-file-save-as-file-file-print-print-preview-file-print-preview-print-preview/
+ http://ubuntuforums.org/showthread.php?t=174362
  http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
  http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
  http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html

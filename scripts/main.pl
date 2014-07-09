@@ -13,12 +13,17 @@ print <<HTML
 <head>
 <title>Perl Executing Browser - Dynamic Startpage</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<link href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' rel='stylesheet' />
+<link href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' rel='stylesheet'/>
 </head>
 
 <body>
 
 <div class="container">
+
+<p align='center'><font size='5'>
+Local Scripting Examples
+</font></p>
+
 <p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/longrun_perlinfo.pl?theme=disabled'>Perl Info</a>
 </font><br>
@@ -44,10 +49,30 @@ Syntax::Highlight::Engine::Kate</a> by Hans Jeuken and Gábor Szabó,<br>
 also a non-core module loaded from directory, without system-wide installation.</font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
+<a href='http://perl-executing-browser-pseudodomain/scripts/env.py'>Python Environment Test</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/cgi-test.py'>Python CGI Example</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/phpinfo.php?theme=disabled'>phpinfo()</a>
 </font></p>
 
 <hr width='95%'>
+
+<p align='center'><font size='5'>
+Local Scripting Tests
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/html/post.htm'>Form of a Locally Executed Perl Script - POST method</a>
+</font></p>
 
 <p align='center'><font size='5'>
 <a href='http://perl-executing-browser-pseudodomain/scripts/noextpl'>Perl Extensionless Script</a>
@@ -61,50 +86,62 @@ also a non-core module loaded from directory, without system-wide installation.<
 <a href='http://perl-executing-browser-pseudodomain/scripts/dummy'>Unrecognizable File Type Test</a>
 </font></p>
 
-<hr width='95%'>
-
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/phpinfo.php?theme=disabled'>phpinfo()</a>
+<a href='http://perl-executing-browser-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/env.py'>Python Environment Test</a>
+Long-Running Scripts
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/cgi-test.py'>Python CGI Example</a>
+<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest'>Long-Running Script in This Window</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest' target='_blank'>Long-Running Script in a New Window</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/html/resizer.htm'>Resizer Long Running Example</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/main.pl' target='_blank'>Dynamic Start Page in a New Window</a>
+Perl Debugger Interaction
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/index.htm' target='_blank'>Static Start Page in a New Window</a>
+<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=M'>List All Modules</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=S'>List All Subroutine Names</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=V'>List All Variables</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-debugger-pseudodomain/stepbystep/selectfile'>Start Step-by-Step Debugging</a>
 </font></p>
 
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>
+Web Interaction
 </font></p>
-
-<p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/post.htm'>Form of a Locally Executed Perl Script - POST method</a>
-</font></p>
-
-<hr width='95%'>
 
 <p align='center'><font size='5'>
 <a href='https://www.google.com/doodles/finder/'>Allowed External Link Nr.1 in This Browser</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='https://www.google.com/doodles/finder/' target='_new'>Allowed External Link Nr.1 in a New Window of This Browser</a>
+<a href='https://www.google.com/doodles/finder/' target='_blank'>Allowed External Link Nr.1 in a New Window of This Browser</a>
 </font></p>
 
 <p align='center'><font size='5'>
@@ -135,8 +172,6 @@ function notAllowedContent() {
 }
 </script>
 
-<hr width='95%'>
-
 <p align='center'><font size='5'>
 <a href='https://www.yahoo.com/'>Not Allowed External Link in Default Browser</a>
 </font></p>
@@ -144,24 +179,8 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='selectperl://'>Select Perl Interpreter</a>
+Filesystem Interaction
 </font></p>
-
-<p align='center'><font size='5'>
-<a href='selectpython://'>Select Python Interpreter</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='selectphp://'>Select PHP Interpreter</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
-<a href='selecttheme://'>Select Browser Theme</a>
-</p>
-
-<hr width='95%'>
 
 <p align='center'><font size='5'>
 <a href='newfile://'>Create New File</a>
@@ -178,23 +197,8 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='perldebugger://modules/'>List All Modules of a Perl Script using<br>Built-in Perl Debugger</a>
+Printing & PDF Creation
 </font></p>
-
-<p align='center'><font size='5'>
-<a href='perldebugger://subroutines/'>List All Subroutine Names of a Perl Script using<br>Built-in Perl Debugger</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='perldebugger://variables/'>List All Variables of a Perl Script using<br>Built-in Perl Debugger</a>
-</font></p>
-
-<!-- <p align='center'><font size='5'>
-<a href='perldebugger://stepbystep/'>Start Step-by-Step Debugging using<br>Built-in Perl Debugger</a>
-</font></p>
- -->
-
-<hr width='95%'>
 
 <p align='center'><font size='5'>
 <a href='printpreview://'>Print Preview</a>
@@ -211,18 +215,44 @@ function notAllowedContent() {
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest'>Long-Running Script in This Window</a>
+Settings
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/longrun.pl?output=latest' target='_blank'>Long-Running Script in a New Window</a>
+<a href='selectperl://'>Select Perl Interpreter</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/resizer.htm'>Resizer Long Running Example</a>
+<a href='selectpython://'>Select Python Interpreter</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='selectphp://'>Select PHP Interpreter</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='selecttheme://'>Select Browser Theme</a>
+</p>
+
+<hr width='95%'>
+
+<p align='center'><font size='5'>
+New Windows
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/scripts/main.pl' target='_blank'>Dynamic Start Page in a New Window</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='http://perl-executing-browser-pseudodomain/html/index.htm' target='_blank'>Static Start Page in a New Window</a>
 </font></p>
 
 <hr width='95%'>
+
+<p align='center'><font size='5'>
+Close & Quit
+</font></p>
 
 <p align='center'><font size='5'>
 <a href='closewindow://'>Close Window</a>

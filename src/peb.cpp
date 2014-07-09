@@ -223,29 +223,47 @@ int main (int argc, char **argv)
     qDebug() << "";
     qDebug() << application.applicationName().toLatin1().constData()
              << application.applicationVersion().toLatin1().constData()
-             << "started on:" << applicationStartForLogContents;
+             << "started on:"
+             << applicationStartForLogContents.toLatin1().constData();
     qDebug() << "Application file path:"
-             << QDir::toNativeSeparators (QApplication::applicationFilePath());
+             << QDir::toNativeSeparators (QApplication::applicationFilePath())
+                .toLatin1().constData();
     QString allArguments;
     foreach (QString argument, arguments){
-                     allArguments.append (argument);
-                     allArguments.append (" ");
-                 }
+        allArguments.append (argument);
+        allArguments.append (" ");
+    }
     allArguments.replace (QRegExp ("\\s$"), "");
-    qDebug() << "Command line:" << allArguments;
+    qDebug() << "Command line:" << allArguments.toLatin1().constData();
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
-    qDebug() << "Libraries Path:" << QLibraryInfo::location (QLibraryInfo::LibrariesPath);
+    qDebug() << "License:"
+             << QLibraryInfo::licensedProducts().toLatin1().constData();
+    qDebug() << "Libraries Path:"
+             << QLibraryInfo::location (QLibraryInfo::LibrariesPath).toLatin1().constData();
+
+    // Prevent starting the program as root - part 1 (Linux and Mac only):
+#ifndef Q_OS_WIN
+    int user;
+    user = geteuid();
+
+    if (user == 0) {
+        qDebug() << "Program started with root privileges. Aborting!";
+    }
+#endif
 
     qDebug() << "";
 
+#ifndef Q_OS_WIN
     // Detect if the program is started from terminal (Linux and Mac only).
     // If the browser is started from terminal, it will start another copy of itself and
     // close the first one. This is necessary for a working interaction with the Perl debugger.
-#ifndef Q_OS_WIN
     if (isatty (fileno (stdin))) {
-        qDebug() << "Started from terminal.";
-        qDebug() << "Will start another instance of the program and quit this one.";
+
+        if (user > 0) {
+            qDebug() << "Started from terminal.";
+            qDebug() << "Will start another instance of the program and quit this one.";
+        }
 
         if (settings.logging == "enable") {
             std::cout << " " << std::endl;
@@ -257,15 +275,36 @@ int main (int argc, char **argv)
                       << (QDir::toNativeSeparators (
                               QApplication::applicationFilePath()).toLatin1().constData())
                       << std::endl;
+            std::cout << "Command line: "
+                      << allArguments.toLatin1().constData() << std::endl;
             std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
             std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-            std::cout << " " << std::endl;
-            std::cout << "Started from terminal." << std::endl;
-            std::cout << "Will start another instance of the program and quit this one."
-                      << std::endl;
-            std::cout << " " << std::endl;
+            std::cout << "License: " << QLibraryInfo::licensedProducts()
+                         .toLatin1().constData() << std::endl;
+            std::cout << "Libraries Path: "
+                      << QLibraryInfo::location (QLibraryInfo::LibrariesPath)
+                         .toLatin1().constData() << std::endl;
+
+            if (user == 0) {
+                std::cout << "Program started with root privileges. Aborting!" << std::endl;
+                std::cout << " " << std::endl;
+                return 1;
+                QApplication::exit();
+            } else {
+                std::cout << "Started from terminal with normal user privileges." << std::endl;
+                std::cout << "Will start another instance of the program and quit this one."
+                          << std::endl;
+                std::cout << " " << std::endl;
+            }
         }
 
+        // Prevent starting the program as root - part 2:
+        if (user == 0) {
+            return 1;
+            QApplication::exit();
+        }
+
+        // Fork another instance of the browser:
         int pid = fork();
 
         if (pid < 0) {
@@ -296,7 +335,25 @@ int main (int argc, char **argv)
             QApplication::exit();
         }
     } else {
-        qDebug() << "Started without terminal or inside Qt Creator.";
+        if (user > 0) {
+            qDebug() << "Started without terminal or inside Qt Creator with user privileges.";
+        }
+    }
+
+    // Prevent starting the program as root - part 3:
+    if (user == 0) {
+        QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
+        msgBox.setIcon (QMessageBox::Critical);
+        msgBox.setWindowTitle (QMessageBox::tr ("Started as root"));
+        msgBox.setText (QMessageBox::tr ("Browser was started as root.<br>")+
+                        QMessageBox::tr ("This is definitely not a good idea!<br>")+
+                        QMessageBox::tr ("Going to quit now."));
+        msgBox.setDefaultButton (QMessageBox::Ok);
+        msgBox.exec();
+
+        return 1;
+        QApplication::exit();
     }
 #endif
 
@@ -319,9 +376,7 @@ int main (int argc, char **argv)
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
-    qDebug() << "Debugger output:" << settings.debuggerOutput;
-    qDebug() << "Debugger HTML header:" << settings.debuggerHtmlHeader;
-    qDebug() << "Debugger HTML footer:" << settings.debuggerHtmlFooter;
+    qDebug() << "Debugger HTML template:" << settings.debuggerHtmlTemplate;
     qDebug() << "Source viewer:" << settings.sourceViewer;
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
@@ -536,17 +591,15 @@ Settings::Settings()
 
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
-    debuggerOutput = settings.value ("perl_debugger/debugger_output").toString();
-    QString debuggerHtmlHeaderSetting = settings.value (
-                "perl_debugger/debugger_html_header").toString();
-    debuggerHtmlHeader = QDir::toNativeSeparators (
-                rootDirName+debuggerHtmlHeaderSetting);
-    QString debuggerHtmlFooterSetting = settings.value (
-                "perl_debugger/debugger_html_footer").toString();
-    debuggerHtmlFooter = QDir::toNativeSeparators (
-                rootDirName+debuggerHtmlFooterSetting);
+
+    QString debuggerHtmlTemplateSetting = settings.value (
+                "perl_debugger/debugger_html_template").toString();
+    debuggerHtmlTemplate = QDir::toNativeSeparators (
+                rootDirName+debuggerHtmlTemplateSetting);
+
     QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
     sourceViewer = QDir::toNativeSeparators (rootDirName+sourceViewerSetting);
+
     QString sourceViewerArgumentsSetting =
             settings.value ("perl_debugger/source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
@@ -745,7 +798,11 @@ Page::Page()
                        this, SLOT (scriptFinishedSlot()));
 
     QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
-                       this, SLOT (displayDebuggerOutputSlot()));
+                       this, SLOT (debuggerOutputSlot()));
+    QObject::connect (this, SIGNAL (sourceCodeForDebuggerReadySignal()),
+                       this, SLOT (displaySourceCodeAndDebuggerOutputSlot()));
+
+    sourceViewerForPerlDebuggerStarted = false;
 
 }
 
@@ -1106,128 +1163,44 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     // Display information about user-selected Perl scripts using the built-in Perl debugger.
     // Partial implementation of an idea proposed by Valcho Nedelchev.
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains ("perldebugger")) {
+            request.url().toString().contains (PERL_DBG_DOMAIN)) {
 
-        debuggerRequestUrl = request.url();
-
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::ExistingFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (settings.icon);
-        filepath = "";
-        filepath = dialog.getOpenFileName
-                (0, tr ("Select Perl File"), QDir::currentPath(),
-                 tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
-        dialog.close();
-        dialog.deleteLater();
-
-        if (filepath.length() > 1) {
-            qDebug() << "File passed to Perl debugger:" << QDir::toNativeSeparators (filepath);
-
-            debuggedFileExtension = filepath.section (".", 1, 1);
-            if (debuggedFileExtension.length() == 0)
-                debuggedFileExtension = "pl";
-            qDebug() << "Extension:" << debuggedFileExtension;
-
-            if (settings.debuggerInterpreter == "current") {
-                settings.defineInterpreter (filepath);
-                debuggingInterpreter = settings.interpreter;
-            }
-
-            if (settings.debuggerInterpreter == "select") {
-                selectDebuggingPerlInterpreterSlot();
-            }
-
-            qDebug() << "Interpreter:" << debuggingInterpreter;
-
-            if (debuggerHandler.isOpen()) {
-                debuggerHandler.close();
-            }
-            debuggerAccumulatedOutput = "";
-
-            QFile debuggerOutputFile (debuggerOutputFilePath);
-            if (debuggerOutputFile.exists())
-                debuggerOutputFile.remove();
-
-            QStringList systemEnvironment =
-                    QProcessEnvironment::systemEnvironment().toStringList();
-
-            QProcessEnvironment env;
-
-            foreach (QString environmentVariable, systemEnvironment) {
-                QStringList environmentVariableList = environmentVariable.split ("=");
-                QString environmentVariableName = environmentVariableList.first();
-                if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
-                    env.remove (environmentVariable);
-                } else {
-                    env.insert (environmentVariableList.first(), environmentVariableList[1]);
-                }
-            }
-
-            env.insert ("COLUMNS", "80");
-            env.insert ("LINES", "24");
-            debuggerHandler.setProcessEnvironment (env);
-
-            QFileInfo scriptAbsoluteFilePath (filepath);
-            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-            debuggerHandler.setWorkingDirectory (scriptDirectory);
-            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
-
-            qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
-            qDebug() << "===============";
-
-            debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
-            debuggerHandler.start (debuggingInterpreter, QStringList() << "-d" <<
-                                   QDir::toNativeSeparators (filepath) << "-emacs",
-                                   QProcess::Unbuffered | QProcess::ReadWrite);
-
-            if (!debuggerRequestUrl.authority().contains ("stepbystep")) {
-                QByteArray debuggerCommand;
-                if (debuggerRequestUrl.authority().contains ("modules")) {
-                    debuggerCommand.append (QString ("M\n").toLatin1());
-                    debuggerCommandHumanReadable = "Show module versions (M)";
-                }
-                if (debuggerRequestUrl.authority().contains ("subroutines")) {
-                    debuggerCommand.append (QString ("S\n").toLatin1());
-                    debuggerCommandHumanReadable = "List subroutine names (S)";
-                }
-                if (debuggerRequestUrl.authority().contains ("variables")) {
-                    debuggerCommand.append (QString ("V\n").toLatin1());
-                    debuggerCommandHumanReadable = "List Variables in Package (V)";
-                }
-
-                if (settings.debuggerOutput == "txt") {
-                    debuggerAccumulatedOutput.append ("\nScript: "+filepath+"\n");
-                    debuggerAccumulatedOutput.append ("Interpreter: "+debuggingInterpreter+"\n");
-                    debuggerAccumulatedOutput.append ("Debugger Command: "+
-                                                      debuggerCommandHumanReadable+"\n");
-                }
-
-                if (settings.debuggerOutput == "html") {
-                    QFile htmlHeaderFile (
-                                QDir::toNativeSeparators (settings.debuggerHtmlHeader));
-                    htmlHeaderFile.open (QFile::ReadOnly | QFile::Text);
-                    QString htmlHeaderFileContents = QString (htmlHeaderFile.readAll());
-                    htmlHeaderFileContents.replace ("[% Script %]", filepath);
-                    htmlHeaderFileContents.replace ("[% Interpreter %]", debuggingInterpreter);
-                    htmlHeaderFileContents.replace (
-                                "[% Debugger Command %]", debuggerCommandHumanReadable);
-                    debuggerAccumulatedOutput.append (htmlHeaderFileContents);
-
-                    settings.cssLinker (debuggerAccumulatedOutput);
-                    debuggerAccumulatedOutput = settings.cssLinkedHtml;
-                }
-
-                debuggerHandler.write (debuggerCommand);
-            }
-
-            newDebuggerWindow = new TopLevel (QString ("mainWindow"));
-            newDebuggerWindow->setWindowIcon (settings.icon);
-
+        if (request.url().path().contains ("selectfile")) {
+            QFileDialog dialog;
+            dialog.setFileMode (QFileDialog::ExistingFile);
+            dialog.setViewMode (QFileDialog::Detail);
+            dialog.setWindowModality (Qt::WindowModal);
+            dialog.setWindowIcon (settings.icon);
+            debuggedScriptFilePath = "";
+            debuggedScriptFilePath = dialog.getOpenFileName
+                    (0, tr ("Select Perl File"), QDir::currentPath(),
+                     tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
+            dialog.close();
+            dialog.deleteLater();
         }
 
-        QWebSettings::clearMemoryCaches();
+        if (debuggedScriptFilePath.length() > 1) {
+
+//            newWindow = new TopLevel (QString ("mainWindow"));
+//            newWindow->setWindowIcon (settings.icon);
+//            newWindow->setAttribute (Qt::WA_DeleteOnClose, true);
+
+            QUrl debuggerRequestUrl = request.url();
+            qDebug() << "Perl Debugger URL:" << debuggerRequestUrl.toString();
+
+            startPerlDebugger (debuggerRequestUrl);
+        }
+
+        return false;
+    }
+
+    // Send command to the Perl debugger via web form:
+    if (navigationType == QWebPage::NavigationTypeFormSubmitted and
+            request.url().toString().contains (PERL_DBG_DOMAIN)) {
+
+        qDebug() << "Perl Debugger URL:" << request.url().toString();
+
+        startPerlDebugger (request.url());
 
         return false;
     }
@@ -1293,12 +1266,12 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
             request.url().path().contains (htmlExtensions) and
             (Page::mainFrame()->childFrames().contains (frame))) {
 
-        filepath = request.url()
+        QString relativeFilePath = request.url()
                 .toString (QUrl::RemoveScheme
                            | QUrl::RemoveAuthority
                            | QUrl::RemoveFragment);
-
-        checkFileExistenceSlot();
+        QString fullFilePath = settings.rootDirName+relativeFilePath;
+        checkFileExistenceSlot (fullFilePath);
 
         frame->load (QUrl::fromLocalFile
                      (QDir::toNativeSeparators
@@ -1349,6 +1322,7 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains ("http") and
             (!request.url().toString().contains (PEB_DOMAIN)) and
+            (!request.url().toString().contains (PERL_DBG_DOMAIN)) and
             (!request.url().authority().contains ("localhost")) and
             (!settings.allowedWebSites.contains (request.url().authority()))) {
 
