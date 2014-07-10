@@ -388,7 +388,6 @@ int main (int argc, char **argv)
     qDebug() << "===============";
     qDebug() << "Start page:" << settings.startPage;
     qDebug() << "Window size:" << settings.windowSize;
-    qDebug() << "Frameless window:" << settings.framelessWindow;
     qDebug() << "Stay on top:" << settings.stayOnTop;
     qDebug() << "Browser title:" << settings.browserTitle;
     qDebug() << "Context menu:" << settings.contextMenu;
@@ -597,14 +596,16 @@ Settings::Settings()
     debuggerHtmlTemplate = QDir::toNativeSeparators (
                 rootDirName+debuggerHtmlTemplateSetting);
 
-    QString sourceViewerSetting = settings.value ("perl_debugger/source_viewer").toString();
+    // Source viewer settings:
+    QString sourceViewerSetting = settings.value ("source_viewer/source_viewer").toString();
     sourceViewer = QDir::toNativeSeparators (rootDirName+sourceViewerSetting);
 
     QString sourceViewerArgumentsSetting =
-            settings.value ("perl_debugger/source_viewer_arguments").toString();
+            settings.value ("source_viewer/source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
+    // Networking settings:
     userAgent = settings.value ("networking/user_agent").toString();
 
     // Read the INI file for a list of allowed web sites:
@@ -629,7 +630,6 @@ Settings::Settings()
 
     // Basic GUI settings:
     windowSize = settings.value ("gui/window_size").toString();
-    framelessWindow = settings.value ("gui/frameless_window").toString();
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
     browserTitle = settings.value ("gui/browser_title").toString();
     contextMenu = settings.value ("gui/context_menu").toString();
@@ -802,6 +802,21 @@ Page::Page()
     QObject::connect (this, SIGNAL (sourceCodeForDebuggerReadySignal()),
                        this, SLOT (displaySourceCodeAndDebuggerOutputSlot()));
 
+    // Safe environment for all scripts:
+    QStringList systemEnvironment =
+            QProcessEnvironment::systemEnvironment().toStringList();
+
+    foreach (QString environmentVariable, systemEnvironment) {
+        QStringList environmentVariableList = environmentVariable.split ("=");
+        QString environmentVariableName = environmentVariableList.first();
+        if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
+            scriptEnvironment.remove (environmentVariable);
+        } else {
+            scriptEnvironment.insert (
+                        environmentVariableList.first(), environmentVariableList[1]);
+        }
+    }
+
     sourceViewerForPerlDebuggerStarted = false;
 
 }
@@ -857,12 +872,6 @@ TopLevel::TopLevel (QString type)
         if (settings.stayOnTop == "enable") {
             setWindowFlags (Qt::WindowStaysOnTopHint);
         }
-        if (settings.stayOnTop == "enable" and settings.framelessWindow == "enable") {
-            setWindowFlags (Qt::WindowStaysOnTopHint | Qt::FramelessWindowHint);
-        }
-        if (settings.stayOnTop == "disable" and settings.framelessWindow == "enable") {
-            setWindowFlags (Qt::FramelessWindowHint);
-        }
         if (settings.browserTitle != "dynamic") {
             setWindowTitle (settings.browserTitle);
         }
@@ -881,9 +890,6 @@ TopLevel::TopLevel (QString type)
     }
 
     mainPage = new Page();
-
-    QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
-                      this, SLOT (close()));
 
     if (type == "mainWindow") {
         // Connect signals and slots - main window:
@@ -1233,18 +1239,6 @@ bool Page::acceptNavigationRequest (QWebFrame *frame,
         return false;
     }
 #endif
-
-    // Close window from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("closewindow")) {
-
-        qDebug() << "Close window requested from URL.";
-        qDebug() << "===============";
-
-        emit closeWindowSignal();
-
-        return false;
-    }
 
     // Quit application from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and

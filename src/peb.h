@@ -213,7 +213,6 @@ public:
     QString windowSize;
     int fixedWidth;
     int fixedHeight;
-    QString framelessWindow;
     QString stayOnTop;
     QString browserTitle;
     QString contextMenu;
@@ -492,8 +491,6 @@ signals:
 
     void reloadSignal();
 
-    void closeWindowSignal();
-
     void quitFromURLSignal();
 
 public slots:
@@ -565,24 +562,25 @@ public slots:
         scriptLastUrl = url;
         qDebug() << "Script URL:" << url.toString();
 
-        QString scheme = url.toString (QUrl::RemoveAuthority
-                                       | QUrl::RemovePath
-                                       | QUrl::RemoveQuery);
-        if (scheme == "http:") {
+        if (url.toString().contains ("http://")) {
             QString relativeFilePath = url.toString (QUrl::RemoveScheme
                                                      | QUrl::RemoveAuthority
                                                      | QUrl::RemoveQuery);
             scriptFullFilePath = QDir::toNativeSeparators
                     (settings.rootDirName+relativeFilePath);
         }
-        if (scheme == "file:") {
-            scriptFullFilePath = url.toString (QUrl::RemoveScheme).replace ("//", "");
+        if (url.toString().contains ("file://")) {
+            scriptFullFilePath = QDir::toNativeSeparators
+                    (url.toLocalFile());
+//            scriptFullFilePath = QDir::toNativeSeparators
+//                    (url.toString().replace ("file://", ""));
         }
 
         QString queryString = url.toString (QUrl::RemoveScheme
                                             | QUrl::RemoveAuthority
                                             | QUrl::RemovePath)
-                .replace ("?", "");
+                .replace ("?", "")
+                .replace ("//", "");
 
         scriptKilled = false;
 
@@ -639,7 +637,7 @@ public slots:
                 scriptOutputType = "final";
             }
 
-            if (scheme == "file:") {
+            if (url.toString().contains ("file://")) {
                 // Default values for displaying source code within the Perl debugger GUI:
                 sourceEnabled = true;
                 scriptOutputThemeEnabled = false;
@@ -685,35 +683,20 @@ public slots:
             qDebug() << "Extension:" << settings.extension;
             qDebug() << "Interpreter:" << settings.interpreter;
 
-            QStringList systemEnvironment =
-                    QProcessEnvironment::systemEnvironment().toStringList();
-
-            QProcessEnvironment env;
-
-            foreach (QString environmentVariable, systemEnvironment) {
-                QStringList environmentVariableList = environmentVariable.split ("=");
-                QString environmentVariableName = environmentVariableList.first();
-                if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
-                    env.remove (environmentVariable);
-                } else {
-                    env.insert (environmentVariableList.first(), environmentVariableList[1]);
-                }
-            }
-
             if (queryString.length() > 0) {
-                env.insert ("REQUEST_METHOD", "GET");
-                env.insert ("QUERY_STRING", queryString);
+                scriptEnvironment.insert ("REQUEST_METHOD", "GET");
+                scriptEnvironment.insert ("QUERY_STRING", queryString);
                 qDebug() << "Query string:" << queryString;
             }
 
             if (postData.length() > 0) {
-                env.insert ("REQUEST_METHOD", "POST");
+                scriptEnvironment.insert ("REQUEST_METHOD", "POST");
                 QString postDataSize = QString::number (postData.size());
-                env.insert ("CONTENT_LENGTH", postDataSize);
+                scriptEnvironment.insert ("CONTENT_LENGTH", postDataSize);
                 qDebug() << "POST data:" << postData;
             }
 
-            scriptHandler.setProcessEnvironment (env);
+            scriptHandler.setProcessEnvironment (scriptEnvironment);
 
             QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators (scriptFullFilePath));
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
@@ -855,11 +838,7 @@ public slots:
         qDebug() << "Script output file:" << scriptOutputFilePath;
         qDebug() << "===============";
 
-        QString scheme = scriptLastUrl.toString (QUrl::RemoveAuthority
-                                       | QUrl::RemovePath
-                                       | QUrl::RemoveQuery);
-
-        if (scheme != "file:") {
+        if (!scriptLastUrl.toString().contains ("file://")) {
             if (scriptOutputType == "latest") {
                 Page::currentFrame()->setUrl
                         (QUrl::fromLocalFile (scriptOutputFilePath));
@@ -889,13 +868,10 @@ public slots:
 
     void scriptFinishedSlot()
     {
-        QString scheme = scriptLastUrl.toString (QUrl::RemoveAuthority
-                                       | QUrl::RemovePath
-                                       | QUrl::RemoveQuery);
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
-                if (scheme != "file:") {
+                if (!scriptLastUrl.toString().contains ("file://")) {
                     Page::currentFrame()->setUrl
                             (QUrl::fromLocalFile (scriptOutputFilePath));
                 }
@@ -940,12 +916,12 @@ public slots:
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
 
-        if (scheme != "file:") {
+        if (!scriptLastUrl.toString().contains ("file://")) {
             QFile scriptOutputFile (scriptOutputFilePath);
             scriptOutputFile.remove();
         }
 
-        if (scheme == "file:") {
+        if (scriptLastUrl.toString().contains ("file://")) {
             emit sourceCodeForDebuggerReadySignal();
         }
     }
@@ -1282,6 +1258,7 @@ private:
 
     QWebView *newWindow;
 
+    QProcessEnvironment scriptEnvironment;
     bool scriptTimedOut;
     bool scriptKilled;
     QUrl scriptLastUrl;
@@ -1572,8 +1549,7 @@ public slots:
             menu->addSeparator();
 
             if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
-                if (settings.framelessWindow == "disable" and
-                        (!TopLevel::isMaximized())) {
+                if (!TopLevel::isMaximized()) {
                     QAction *maximizeAct = menu->addAction (tr ("&Maximized window"));
                     QObject::connect (maximizeAct, SIGNAL (triggered()),
                                       this, SLOT (maximizeSlot()));
@@ -1586,11 +1562,9 @@ public slots:
                 }
             }
 
-            if (settings.framelessWindow == "disable") {
-                QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
-                QObject::connect (minimizeAct, SIGNAL (triggered()),
-                                  this, SLOT (minimizeSlot()));
-            }
+            QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
+            QObject::connect (minimizeAct, SIGNAL (triggered()),
+                              this, SLOT (minimizeSlot()));
 
             if (!TopLevel::url().toString().contains ("lroutput")) {
                 QAction *homeAct = menu->addAction (tr ("&Home"));

@@ -43,9 +43,9 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected by clicking special URLs and output from three debugger commands can be displayed in the browser. These commands are: "Show module versions", "List subroutine names" and "List Variables in Package". Different version of Perl can be selected for every debugger session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* Every Perl, Python or PHP script can be displayed as source code.  
-* Extensive logging of every browser activity and the execution of local scripts.  
+* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected and loaded in debug mode. Graphical step-by-step debugging capability is under development and output from debugger commands is displayed together with the syntax highlighted source code of the debugged script. Different versions of Perl can be selected for every debugging session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* Every Perl, Python or PHP script can be displayed as syntax highlighted source code.  
+* Extensive logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
 * Configurable from configuration file and command line.  
@@ -54,7 +54,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
-* Multi-window application with normal or frameless windows in resizable, fixed size or fullscreen mode.  
+* Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
 ## Possible Applications
   
