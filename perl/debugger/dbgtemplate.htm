@@ -6,42 +6,33 @@
 		<style type="text/css">
 			body {
 				text-align: left
-				}
-			div.debugger
-				{
+			}
+			div.debugger {
 				background-color: #000000;
 				color: #00FF00;
 				padding: 16px;
 				width: 100%;
 				height: 32%;
 				overflow: auto;
-				}
+				font-family: monospace;
+			}
 		</style>
 		<script type="text/javascript">
-			function listAllModules() {
-				document.getElementById("command").value = "M";
+		// TODO: it looks like prompt is not working as expected.
+		function sendCommand(cmd, ask=false) {
+			if (ask !== false) {
+				var answer = prompt(ask);
+				document.getElementById("command").value = cmd+' '+answer;
+			} else {
+				document.getElementById("command").value = cmd;
 			}
-			function listAllSubroutineNames() {
-				document.getElementById("command").value = "S";
-			}
-			function listAllVariables() {
-				document.getElementById("command").value = "V";
-			}
-			function listVariablesInCurrentPackage() {
-				document.getElementById("command").value = "X";
-			}
-			function stepIn() {
-				document.getElementById("command").value = "s";
-			}
+		}
 		</script>
 	</head>
 
 	<body>
-		<div class="col-lg-4 col-lg-offset-4">
-
-			<p align="center">
-				<b>[% Script %]</b>
-			</p>
+		<div class="wrapper">
+			<p align="center"><b>[% Script %]</b></p>
 
 			<iframe src="[% Source %]" frameborder="0" width="100%" height="40%" name="source"></iframe>
 
@@ -54,21 +45,22 @@
 							placeholder="Type Perl debugger command and press Enter" title="Debugger Command"/>
 					</div>
 				</div>
+
 				<div class="form-group">
-					<a href="perl-debugger://select-file/restart" class="btn btn-info">Select Perl script</a>
 					<input type="submit" style="visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;" />
-					<button onClick="listAllModules()" class='btn btn-info' title="List All Modules">M</button>
-					<button onClick="listAllSubroutineNames()" class='btn btn-info' title="List All Subroutine Names">S</button>
-					<button onClick="listAllVariables()" class='btn btn-info' title="List All Variables">V</button>
-					<button onClick="listVariablesInCurrentPackage()" class='btn btn-info' title="List Variables in Current Package">X</button>
-					<button onClick="stepIn()" class='btn btn-info' title="Single Step">Step in</button>
+					Commands: 
+					<button onClick="sendCommand('n')" class='btn btn-info btn-xs' title="Next line">n</button>
+					<button onClick="sendCommand('c')" class='btn btn-info btn-xs' title="Continue">c</button>
+					<button onClick="sendCommand('M')" class='btn btn-info btn-xs' title="List All Modules">M</button>
+					<button onClick="sendCommand('S')" class='btn btn-info btn-xs' title="List All Subroutine Names">S</button>
+					<button onClick="sendCommand('V')" class='btn btn-info btn-xs' title="List All Variables">V</button>
+					<button onClick="sendCommand('X')" class='btn btn-info btn-xs' title="List Variables in Current Package">X</button>
+					<button onClick="sendCommand('s')" class='btn btn-info btn-xs' title="Step Into...">s</button>
+					<button onClick="sendCommand('R')" class='btn btn-info btn-xs' title="Restart debugger for [% Script %]">R</button>
 				</div>
 			</form>
 
-			<div class="debugger">
-[% Debugger Output %]
-			</div>
-
+			<div class="debugger">[% Debugger Output %]</div>
 		</div>
 	</body>
 </html>
