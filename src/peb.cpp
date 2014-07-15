@@ -356,6 +356,12 @@ int main (int argc, char** argv)
     }
 #endif
 
+    int screenWidth = QDesktopWidget().screen()->rect().width();
+    int screenHeight = QDesktopWidget().screen()->rect().height();
+
+    // Screen resolution:
+    qDebug() << "Screen resolution:" << screenWidth << "x" << screenHeight;
+
     // Log all settings:
     qDebug() << "===============";
     qDebug() << "GENERAL SETTINGS:";
