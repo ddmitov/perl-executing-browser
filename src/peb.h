@@ -1002,7 +1002,8 @@ public slots:
                                                     | QUrl::RemovePath)
                 .replace ("?", "")
                 .replace ("command=", "")
-                .replace ("+", " ");
+                .replace ("+", " ")
+                .replace ("/", "");
 
         qDebug() << "File passed to Perl debugger:"
                  << QDir::toNativeSeparators (debuggedScriptFilePath);
