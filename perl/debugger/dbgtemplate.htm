@@ -2,7 +2,7 @@
 
 	<head>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-		<title>[% Script %]</title>
+		<title>Perl Debugger</title>
 		<style type="text/css">
 			body {
 				text-align: left
@@ -17,27 +17,53 @@
 				overflow: auto;
 				}
 		</style>
+		<script type="text/javascript">
+			function listAllModules() {
+				document.getElementById("command").value = "M";
+			}
+			function listAllSubroutineNames() {
+				document.getElementById("command").value = "S";
+			}
+			function listAllVariables() {
+				document.getElementById("command").value = "V";
+			}
+			function listVariablesInCurrentPackage() {
+				document.getElementById("command").value = "X";
+			}
+			function stepIn() {
+				document.getElementById("command").value = "s";
+			}
+		</script>
 	</head>
 
 	<body>
 		<div class="col-lg-4 col-lg-offset-4">
-			<br>
-			<iframe src='[% Source %]' frameborder='0' width='100%' height='40%' name='source'></iframe>
-			<br>
-			<br>
 
-		<form action="http://perl-debugger-pseudodomain/execute" method="get">
-			<div class="form-group">
-				<div class="input-prepend">
-					<input type="text" id="command" name="command" class="form-control" placeholder="Type Perl debugger command and press Enter" title="Debugger Command"/>
+			<p align="center">
+				<b>[% Script %]</b>
+			</p>
+
+			<iframe src="[% Source %]" frameborder="0" width="100%" height="40%" name="source"></iframe>
+
+			<form action="file://[% Script %]" method="get">
+				<div class="form-group">
+					<b>[% Debugger Command %]</b> &nbsp;
+					<div class="input-prepend">
+						<input type="text" id="command"
+							name="command" class="form-control"
+							placeholder="Type Perl debugger command and press Enter" title="Debugger Command"/>
+					</div>
 				</div>
-			</div>
-			<div class="form-group">
-				<input type="reset" value="Reset" class="btn btn-default" />
-				<input type="submit" value="Execute" class="btn btn-primary" />
-				&nbsp; <b>[% Debugger Command %]</b><br>
-			</div>
-		</form>
+				<div class="form-group">
+					<a href="perl-debugger://select-file/restart" class="btn btn-info">Select Perl script</a>
+					<input type="submit" style="visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;" />
+					<button onClick="listAllModules()" class='btn btn-info' title="List All Modules">M</button>
+					<button onClick="listAllSubroutineNames()" class='btn btn-info' title="List All Subroutine Names">S</button>
+					<button onClick="listAllVariables()" class='btn btn-info' title="List All Variables">V</button>
+					<button onClick="listVariablesInCurrentPackage()" class='btn btn-info' title="List Variables in Current Package">X</button>
+					<button onClick="stepIn()" class='btn btn-info' title="Single Step">Step in</button>
+				</div>
+			</form>
 
 			<div class="debugger">
 [% Debugger Output %]

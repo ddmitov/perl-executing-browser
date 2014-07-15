@@ -19,11 +19,6 @@
 #define PEB_DOMAIN "http://perl-executing-browser-pseudodomain/"
 #endif
 
-// The domain of the Perl Debugger:
-#ifndef PERL_DBG_DOMAIN
-#define PERL_DBG_DOMAIN "http://perl-debugger-pseudodomain/"
-#endif
-
 #include <QApplication>
 #include <QUrl>
 #include <QWebPage>
@@ -54,9 +49,8 @@
 #endif
 
 
+// Global variable:
 extern QStringList startedScripts;
-
-extern QStringList allowedEnvironmentVariables;
 
 
 class Settings : public QSettings
@@ -294,7 +288,7 @@ public slots:
             }
 
             if (settings.systrayIconDoubleClickAction == "minimize_all_windows") {
-                foreach (QWidget *window, QApplication::topLevelWidgets()) {
+                foreach (QWidget* window, QApplication::topLevelWidgets()) {
                     if (window->isVisible()) {
                         window->showMinimized();
                     }
@@ -313,15 +307,15 @@ public:
 
     TrayIcon();
 
-    QAction *quitAction;
-    QAction *aboutAction;
-    QAction *aboutQtAction;
+    QAction* quitAction;
+    QAction* aboutAction;
+    QAction* aboutQtAction;
 
 private:
 
     Settings settings;
-    QSystemTrayIcon *trayIcon;
-    QMenu *trayIconMenu;
+    QSystemTrayIcon* trayIcon;
+    QMenu* trayIconMenu;
 
 };
 
@@ -335,11 +329,13 @@ signals:
 
     void startScriptSignal (QUrl url, QByteArray postDataArray);
 
+    void startPerlDebuggerSignal (QUrl debuggerUrl);
+
 protected:
 
-    virtual QNetworkReply *createRequest (Operation operation,
+    virtual QNetworkReply* createRequest (Operation operation,
                                           const QNetworkRequest &request,
-                                          QIODevice *outgoingData = 0)
+                                          QIODevice* outgoingData = 0)
     {
         // GET requests to local content:
         if (operation == GetOperation and
@@ -410,6 +406,17 @@ protected:
             }
         }
 
+        // Perl debugger interaction.
+        // Implementation of an idea proposed by Valcho Nedelchev.
+        // Transmit requests to Perl debugger in case debugger is started in a new window:
+        if (operation == GetOperation and
+                request.url().scheme().contains ("file") and
+                request.url().hasQuery()) {
+
+            emit startPerlDebuggerSignal (request.url());
+
+        }
+
         // GET, POST and PUT requests to localhost:
         if ((operation == GetOperation or
              operation == PostOperation or
@@ -434,7 +441,6 @@ protected:
              operation == PutOperation) and
                 ((request.url().scheme().contains ("file")) or
                  (request.url().toString().contains (PEB_DOMAIN)) or
-                 (request.url().toString().contains (PERL_DBG_DOMAIN)) or
                  (settings.allowedWebSites.contains (request.url().authority())))) {
 
             qDebug() << "Allowed link:" << request.url().toString();
@@ -570,8 +576,7 @@ public slots:
                     (settings.rootDirName+relativeFilePath);
         }
         if (url.toString().contains ("file://")) {
-            scriptFullFilePath = QDir::toNativeSeparators
-                    (url.toLocalFile());
+            scriptFullFilePath = QDir::toNativeSeparators (url.toLocalFile());
 //            scriptFullFilePath = QDir::toNativeSeparators
 //                    (url.toString().replace ("file://", ""));
         }
@@ -711,12 +716,7 @@ public slots:
                     QString sourceFilepath = QDir::toNativeSeparators (scriptFullFilePath);
 
                     QStringList sourceViewerCommandLine;
-                    sourceViewerCommandLine.append (settings.sourceViewer);
-                    if (settings.sourceViewerArguments.length() > 1) {
-                        foreach (QString argument, settings.sourceViewerArguments) {
-                            sourceViewerCommandLine.append (argument);
-                        }
-                    }
+                    sourceViewerCommandLine = sourceViewerMandatoryArguments;
                     sourceViewerCommandLine.append (sourceFilepath);
                     scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine,
                                          QProcess::Unbuffered | QProcess::ReadWrite);
@@ -838,18 +838,20 @@ public slots:
         qDebug() << "Script output file:" << scriptOutputFilePath;
         qDebug() << "===============";
 
+        if (!Page::mainFrame()->childFrames().contains (targetFrame)) {
+            targetFrame = Page::currentFrame();
+        }
+
         if (!scriptLastUrl.toString().contains ("file://")) {
             if (scriptOutputType == "latest") {
-                Page::currentFrame()->setUrl
-                        (QUrl::fromLocalFile (scriptOutputFilePath));
+                targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
             }
             if (scriptOutputType == "accumulation") {
                 if (scriptOutputScrollDown == false) {
-                    Page::currentFrame()->setUrl
-                            (QUrl::fromLocalFile (scriptOutputFilePath));
+                    targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
                 }
                 if (scriptOutputScrollDown == true) {
-                    Page::currentFrame()->setUrl (scriptOutputFilePath+"#latest");
+                    targetFrame->setUrl (scriptOutputFilePath+"#latest");
                 }
             }
         }
@@ -868,11 +870,14 @@ public slots:
 
     void scriptFinishedSlot()
     {
+        if (!Page::mainFrame()->childFrames().contains (targetFrame)) {
+            targetFrame = Page::currentFrame();
+        }
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
                 if (!scriptLastUrl.toString().contains ("file://")) {
-                    Page::currentFrame()->setUrl
+                    targetFrame->setUrl
                             (QUrl::fromLocalFile (scriptOutputFilePath));
                 }
             }
@@ -949,8 +954,8 @@ public slots:
         }
     }
 
-    // Display information about user-selected Perl scripts using the built-in Perl debugger.
-    // Partial implementation of an idea proposed by Valcho Nedelchev.
+    // Perl debugger interaction.
+    // Implementation of an idea proposed by Valcho Nedelchev.
     void selectDebuggingPerlInterpreterSlot()
     {
         QFileDialog selectInterpreterDialog;
@@ -982,131 +987,131 @@ public slots:
         selectPerlLibDialog.deleteLater();
     }
 
-    void startPerlDebugger (QUrl url)
+    void startPerlDebuggerSlot (QUrl debuggerUrl)
     {
-        debuggerLastUrl = url;
+        QString filePath = debuggerUrl.toString (QUrl::RemoveQuery)
+                .replace ("file://", "")
+                .replace ("?", "");
 
-        if (debuggedScriptFilePath.length() > 1) {
-            qDebug() << "File passed to Perl debugger:"
-                     << QDir::toNativeSeparators (debuggedScriptFilePath);
-
-            // Define Perl interpreter to be used for debugging:
-            QString debuggedScriptExtension = debuggedScriptFilePath.section (".", 1, 1);
-            if (debuggedScriptExtension.length() == 0)
-                debuggedScriptExtension = "pl";
-            qDebug() << "Extension:" << debuggedScriptExtension;
-
-            if (settings.debuggerInterpreter == "current") {
-                settings.defineInterpreter (debuggedScriptFilePath);
-                debuggingInterpreter = settings.interpreter;
-            }
-
-            if (settings.debuggerInterpreter == "select") {
-                selectDebuggingPerlInterpreterSlot();
-            }
-
-            qDebug() << "Interpreter:" << debuggingInterpreter;
-
-            debuggerQueryString = url.toString (QUrl::RemoveScheme
-                                                | QUrl::RemoveAuthority
-                                                | QUrl::RemovePath)
-                    .replace ("?", "")
-                    .replace ("command=", "")
-                    .replace ("+", " ");
-
-            // Clean accumulated debugger output from previous debugger session:
-            debuggerAccumulatedOutput = "";
-
-            // Clean debugger output file from previous debugger session:
-            QFile debuggerOutputFile (debuggerOutputFilePath);
-            if (debuggerOutputFile.exists())
-                debuggerOutputFile.remove();
-
-            // Clean last debugger command in human-readable form:
-            debuggerCommandHumanReadable = "";
-
-            // Start a new debugger session with a new file:
-            if (url.path().contains ("selectfile")) {
-                debuggerHandler.close();
-            }
-
-            if (debuggerHandler.isOpen()) {
-
-                QByteArray debuggerCommand;
-                debuggerCommand.append (debuggerQueryString.toLatin1());
-                debuggerCommand.append (QString ("\n").toLatin1());
-                debuggerHandler.write (debuggerCommand);
-
-                if (debuggerQueryString == "M") {
-                    debuggerCommandHumanReadable = "Show module versions (M)";
-                }
-                if (debuggerQueryString == "S") {
-                    debuggerCommandHumanReadable = "List subroutine names (S)";
-                }
-                if (debuggerQueryString == "V") {
-                    debuggerCommandHumanReadable = "List variables in package (V)";
-                }
-                if (debuggerQueryString == "X") {
-                    debuggerCommandHumanReadable = "List variables in current package (X)";
-                }
-
-            } else {
-
-                QStringList systemEnvironment =
-                        QProcessEnvironment::systemEnvironment().toStringList();
-
-                QProcessEnvironment env;
-
-                foreach (QString environmentVariable, systemEnvironment) {
-                    QStringList environmentVariableList = environmentVariable.split ("=");
-                    QString environmentVariableName = environmentVariableList.first();
-                    if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
-                        env.remove (environmentVariable);
-                    } else {
-                        env.insert (environmentVariableList.first(), environmentVariableList[1]);
-                    }
-                }
-
-                env.insert ("COLUMNS", "80");
-                env.insert ("LINES", "24");
-                debuggerHandler.setProcessEnvironment (env);
-
-                QFileInfo scriptAbsoluteFilePath (debuggedScriptFilePath);
-                QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-                debuggerHandler.setWorkingDirectory (scriptDirectory);
-                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
-
-                qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
-                qDebug() << "===============";
-
-                debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
-                debuggerHandler.start (debuggingInterpreter, QStringList()
-                                       << "-d" <<
-                                       QDir::toNativeSeparators (debuggedScriptFilePath)
-                                       << "-emacs",
-                                       QProcess::Unbuffered | QProcess::ReadWrite);
-
-                QByteArray debuggerCommand;
-                debuggerCommand.append (debuggerQueryString.toLatin1());
-                debuggerCommand.append (QString ("\n").toLatin1());
-                debuggerHandler.write (debuggerCommand);
-
-                if (debuggerQueryString == "M") {
-                    debuggerCommandHumanReadable = "Show module versions (M)";
-                }
-                if (debuggerQueryString == "S") {
-                    debuggerCommandHumanReadable = "List subroutine names (S)";
-                }
-                if (debuggerQueryString == "V") {
-                    debuggerCommandHumanReadable = "List variables in package (V)";
-                }
-                if (debuggerQueryString == "X") {
-                    debuggerCommandHumanReadable = "List variables in current package (X)";
-                }
-
-            }
+        if ((!filePath.contains ("select-file")) and (!filePath.contains ("execute"))) {
+            debuggedScriptFilePath = filePath;
         }
 
+        debuggerQueryString = debuggerUrl.toString (QUrl::RemoveScheme
+                                                    | QUrl::RemoveAuthority
+                                                    | QUrl::RemovePath)
+                .replace ("?", "")
+                .replace ("command=", "")
+                .replace ("+", " ");
+
+        qDebug() << "File passed to Perl debugger:"
+                 << QDir::toNativeSeparators (debuggedScriptFilePath);
+
+        // Define Perl interpreter to be used for debugging:
+        QString debuggedScriptExtension = debuggedScriptFilePath.section (".", 1, 1);
+        if (debuggedScriptExtension.length() == 0)
+            debuggedScriptExtension = "pl";
+        qDebug() << "Extension:" << debuggedScriptExtension;
+
+        if (settings.debuggerInterpreter == "current") {
+            settings.defineInterpreter (debuggedScriptFilePath);
+            debuggingInterpreter = settings.interpreter;
+        }
+
+        if (settings.debuggerInterpreter == "select") {
+            selectDebuggingPerlInterpreterSlot();
+        }
+
+        qDebug() << "Interpreter:" << debuggingInterpreter;
+
+        // Clean accumulated debugger output from previous debugger session:
+        debuggerAccumulatedOutput = "";
+
+        // Clean debugger output file from previous debugger session:
+        QFile debuggerOutputFile (debuggerOutputFilePath);
+        if (debuggerOutputFile.exists())
+            debuggerOutputFile.remove();
+
+        // Clean last debugger command in human-readable form:
+        debuggerCommandHumanReadable = "";
+
+        // Start a new debugger session with a new file:
+        if (debuggerUrl.path().contains ("select-file")) {
+            debuggerHandler.close();
+        }
+
+        if (debuggerHandler.isOpen()) {
+            QByteArray debuggerCommand;
+            debuggerCommand.append (debuggerQueryString.toLatin1());
+            debuggerCommand.append (QString ("\n").toLatin1());
+            debuggerHandler.write (debuggerCommand);
+
+            if (debuggerQueryString == "M") {
+                debuggerCommandHumanReadable = "Show module versions (M)";
+            }
+            if (debuggerQueryString == "S") {
+                debuggerCommandHumanReadable = "List subroutine names (S)";
+            }
+            if (debuggerQueryString == "V") {
+                debuggerCommandHumanReadable = "List variables in package (V)";
+            }
+            if (debuggerQueryString == "X") {
+                debuggerCommandHumanReadable = "List variables in current package (X)";
+            }
+        } else {
+            QStringList systemEnvironment =
+                    QProcessEnvironment::systemEnvironment().toStringList();
+
+            QProcessEnvironment env;
+
+            foreach (QString environmentVariable, systemEnvironment) {
+                QStringList environmentVariableList = environmentVariable.split ("=");
+                QString environmentVariableName = environmentVariableList.first();
+                if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
+                    env.remove (environmentVariable);
+                } else {
+                    env.insert (environmentVariableList.first(), environmentVariableList[1]);
+                }
+            }
+
+            env.insert ("COLUMNS", "80");
+            env.insert ("LINES", "24");
+
+            debuggerHandler.setProcessEnvironment (env);
+
+            QFileInfo scriptAbsoluteFilePath (debuggedScriptFilePath);
+            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+            debuggerHandler.setWorkingDirectory (scriptDirectory);
+            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+
+            qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
+            qDebug() << "===============";
+
+            debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
+            debuggerHandler.start (debuggingInterpreter, QStringList()
+                                   << "-d" <<
+                                   QDir::toNativeSeparators (debuggedScriptFilePath)
+                                   << "-emacs",
+                                   QProcess::Unbuffered | QProcess::ReadWrite);
+
+            QByteArray debuggerCommand;
+            debuggerCommand.append (debuggerQueryString.toLatin1());
+            debuggerCommand.append (QString ("\n").toLatin1());
+            debuggerHandler.write (debuggerCommand);
+
+            if (debuggerQueryString == "M") {
+                debuggerCommandHumanReadable = "Show module versions (M)";
+            }
+            if (debuggerQueryString == "S") {
+                debuggerCommandHumanReadable = "List subroutine names (S)";
+            }
+            if (debuggerQueryString == "V") {
+                debuggerCommandHumanReadable = "List variables in package (V)";
+            }
+            if (debuggerQueryString == "X") {
+                debuggerCommandHumanReadable = "List variables in current package (X)";
+            }
+        }
     }
 
     void debuggerOutputSlot()
@@ -1176,21 +1181,21 @@ public slots:
             debuggerCommandHumanReadable = debuggerQueryString;
         }
 
-        if (sourceViewerForPerlDebuggerStarted == false) {
+        if (!scriptHandler.isOpen()) {
             QByteArray emptyPostDataArray;
             QUrl fileToDisplayAsSourceCode (QUrl::fromLocalFile (debuggedScriptFilePath));
             startScriptSlot (fileToDisplayAsSourceCode, emptyPostDataArray);
-            sourceViewerForPerlDebuggerStarted = true;
         }
 
     }
 
     void displaySourceCodeAndDebuggerOutputSlot()
     {
-        QFile htmlFile (
+        QFile debuggerHtmlTemplateFile (
                     QDir::toNativeSeparators (settings.debuggerHtmlTemplate));
-        htmlFile.open (QFile::ReadOnly | QFile::Text);
-        QString debuggerHtmlOutput = QString (htmlFile.readAll());
+        debuggerHtmlTemplateFile.open (QFile::ReadOnly | QFile::Text);
+        QString debuggerHtmlOutput = QString (debuggerHtmlTemplateFile.readAll());
+        debuggerHtmlTemplateFile.close();
 
         debuggerHtmlOutput.replace ("[% Script %]", debuggedScriptFilePath);
         debuggerHtmlOutput.replace ("[% Source %]",
@@ -1221,12 +1226,8 @@ public slots:
         qDebug() << "Perl debugger output file:" << debuggerOutputFilePath;
         qDebug() << "===============";
 
-        Page::currentFrame()->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
+        targetFrame->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
 
-//        newWindow->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
-//        newWindow->show();
-
-        sourceViewerForPerlDebuggerStarted = false;
         debuggerOutputFile.remove();
     }
 
@@ -1236,7 +1237,7 @@ public:
 
 protected:
 
-    bool acceptNavigationRequest (QWebFrame *frame,
+    bool acceptNavigationRequest (QWebFrame* frame,
                                   const QNetworkRequest &request,
                                   QWebPage::NavigationType type);
 
@@ -1256,7 +1257,11 @@ private:
 
     Settings settings;
 
-    QWebView *newWindow;
+    QWebView* newWindow;
+    QWebFrame* targetFrame;
+
+    QStringList allowedEnvironmentVariables;
+    QStringList sourceViewerMandatoryArguments;
 
     QProcessEnvironment scriptEnvironment;
     bool scriptTimedOut;
@@ -1269,13 +1274,13 @@ private:
     QString scriptOutputType;
     bool scriptOutputScrollDown;
 
-    QUrl debuggerLastUrl;
+    QWebView* debuggerNewWindow;
     QString debuggerQueryString;
+    QString debuggedScriptUrl;
     QString debuggedScriptFilePath;
     QString debuggingInterpreter;
     QProcess debuggerHandler;
     QString debuggerCommandHumanReadable;
-    bool sourceViewerForPerlDebuggerStarted;
     QString debuggerLineInfoLastLine;
     QString debuggerAccumulatedOutput;
     QString debuggerOutputFilePath;
@@ -1334,15 +1339,15 @@ public slots:
         QPrinter printer (QPrinter::HighResolution);
         QPrintPreviewDialog preview (&printer, this);
         preview.setWindowModality (Qt::WindowModal);
-        preview.setMinimumSize (QDesktopWidget().screen()->rect().width() * 0.8,
-                                QDesktopWidget().screen()->rect().height() * 0.8);
-        connect (&preview, SIGNAL (paintRequested (QPrinter *)),
-                 SLOT (printPreviewSlot (QPrinter *)));
+        preview.setMinimumSize (QDesktopWidget().screen()->rect().width()*  0.8,
+                                QDesktopWidget().screen()->rect().height()*  0.8);
+        connect (&preview, SIGNAL (paintRequested (QPrinter* )),
+                 SLOT (printPreviewSlot (QPrinter* )));
         preview.exec();
 #endif
     }
 
-    void printPreviewSlot (QPrinter *printer)
+    void printPreviewSlot (QPrinter* printer)
     {
 #ifdef QT_NO_PRINTER
         Q_UNUSED (printer);
@@ -1367,7 +1372,7 @@ public slots:
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
 
-        QPrintDialog *dialog = new QPrintDialog (&printer);
+        QPrintDialog* dialog = new QPrintDialog (&printer);
         dialog->setWindowModality (Qt::WindowModal);
         QSize dialogSize = dialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
@@ -1498,12 +1503,12 @@ public slots:
         errorsWindow->show();
     }
 
-    void contextMenuEvent (QContextMenuEvent *event)
+    void contextMenuEvent (QContextMenuEvent* event)
     {
         QWebHitTestResult qWebHitTestResult =
                 mainPage->mainFrame()->hitTestContent (event->pos());
 
-        QMenu *menu = mainPage->createStandardContextMenu();
+        QMenu* menu = mainPage->createStandardContextMenu();
 
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
@@ -1512,7 +1517,7 @@ public slots:
 
                 menu->addSeparator ();
 
-                QAction *editAct = menu->addAction (tr ("&Edit"));
+                QAction* editAct = menu->addAction (tr ("&Edit"));
                 QObject::connect (editAct, SIGNAL (triggered()),
                                   this, SLOT (editSlot()));
 
@@ -1525,7 +1530,7 @@ public slots:
 
                 if ((!settings.interpreter.contains ("browser")) and
                         (!settings.interpreter.contains ("undefined"))) {
-                    QAction *viewSourceAct = menu->addAction (tr ("&View Source"));
+                    QAction* viewSourceAct = menu->addAction (tr ("&View Source"));
                     QObject::connect (viewSourceAct, SIGNAL (triggered()),
                                       this, SLOT (viewSourceFromContextMenuSlot()));
                 }
@@ -1534,7 +1539,7 @@ public slots:
             if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL) or
                     qWebHitTestURL.toString().contains ("localhost")) {
 
-                QAction *openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
+                QAction* openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
                 QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
                                   this, SLOT (openInNewWindowSlot()));
             }
@@ -1550,67 +1555,67 @@ public slots:
 
             if (settings.windowSize == "maximized" or settings.windowSize == "fullscreen") {
                 if (!TopLevel::isMaximized()) {
-                    QAction *maximizeAct = menu->addAction (tr ("&Maximized window"));
+                    QAction* maximizeAct = menu->addAction (tr ("&Maximized window"));
                     QObject::connect (maximizeAct, SIGNAL (triggered()),
                                       this, SLOT (maximizeSlot()));
                 }
 
                 if (!TopLevel::isFullScreen()) {
-                QAction *toggleFullScreenAct = menu->addAction (tr ("&Fullscreen"));
+                QAction* toggleFullScreenAct = menu->addAction (tr ("&Fullscreen"));
                 QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
                                   this, SLOT (toggleFullScreenSlot()));
                 }
             }
 
-            QAction *minimizeAct = menu->addAction (tr ("Mi&nimize"));
+            QAction* minimizeAct = menu->addAction (tr ("Mi&nimize"));
             QObject::connect (minimizeAct, SIGNAL (triggered()),
                               this, SLOT (minimizeSlot()));
 
             if (!TopLevel::url().toString().contains ("lroutput")) {
-                QAction *homeAct = menu->addAction (tr ("&Home"));
+                QAction* homeAct = menu->addAction (tr ("&Home"));
                 QObject::connect (homeAct, SIGNAL (triggered()),
                                   this, SLOT (loadStartPageSlot()));
             }
 
             if ((!TopLevel::url().toString().contains ("output"))) {
-                QAction *reloadAct = menu->addAction (tr ("&Reload"));
+                QAction* reloadAct = menu->addAction (tr ("&Reload"));
                 QObject::connect (reloadAct, SIGNAL (triggered()),
                                   this, SLOT (reloadSlot()));
             }
 
-            QAction *printPreviewAct = menu->addAction (tr ("Print pre&view"));
+            QAction* printPreviewAct = menu->addAction (tr ("Print pre&view"));
             QObject::connect (printPreviewAct, SIGNAL (triggered()),
                               this, SLOT (startPrintPreviewSlot()));
 
-            QAction *printAct = menu->addAction (tr ("&Print"));
+            QAction* printAct = menu->addAction (tr ("&Print"));
             QObject::connect (printAct, SIGNAL (triggered()),
                               this, SLOT (printSlot()));
 
-            QAction *saveAsPdfAct = menu->addAction (tr ("Save as P&DF"));
+            QAction* saveAsPdfAct = menu->addAction (tr ("Save as P&DF"));
             QObject::connect (saveAsPdfAct, SIGNAL (triggered()),
                               this, SLOT (saveAsPdfSlot()));
 
             if ((!TopLevel::url().toString().contains ("output"))) {
-                QAction *selectThemeAct = menu->addAction (tr ("&Select theme"));
+                QAction* selectThemeAct = menu->addAction (tr ("&Select theme"));
                 QObject::connect (selectThemeAct, SIGNAL (triggered()),
                                   this, SLOT (selectThemeFromContextMenuSlot()));
             }
 
-            QAction *closeWindowAct = menu->addAction (tr ("&Close window"));
+            QAction* closeWindowAct = menu->addAction (tr ("&Close window"));
             QObject::connect (closeWindowAct, SIGNAL (triggered()),
                               this, SLOT (close()));
 
-            QAction *quitAct = menu->addAction (tr ("&Quit"));
+            QAction* quitAct = menu->addAction (tr ("&Quit"));
             QObject::connect ( quitAct, SIGNAL (triggered()),
                                this, SLOT (quitApplicationSlot()));
 
             menu->addSeparator();
 
-            QAction *aboutAction = menu->addAction (tr ("&About"));
+            QAction* aboutAction = menu->addAction (tr ("&About"));
             QObject::connect (aboutAction, SIGNAL (triggered()),
                               this, SLOT (aboutSlot()));
 
-            QAction *aboutQtAction = menu->addAction (tr ("About Q&t"));
+            QAction* aboutQtAction = menu->addAction (tr ("About Q&t"));
             QObject::connect ( aboutQtAction, SIGNAL (triggered()),
                                qApp, SLOT (aboutQt()));
 
@@ -1656,8 +1661,8 @@ public slots:
         // Calculate message box dimensions,
         // center message box on screen:
         QRect screenRect = QDesktopWidget().screen()->rect();
-        aboutDialog->setFixedSize (screenRect.width() * 0.6,
-                                   screenRect.height() * 0.6);
+        aboutDialog->setFixedSize (screenRect.width()*  0.6,
+                                   screenRect.height()*  0.6);
         aboutDialog->move (QPoint(screenRect.width()/2 - aboutDialog->width()/2,
                               screenRect.height()/2 - aboutDialog->height()/2));
 
@@ -1702,7 +1707,7 @@ public slots:
         aboutDialog->show();
     }
 
-    void closeEvent (QCloseEvent *event)
+    void closeEvent (QCloseEvent* event)
     {
         if (mainPage->scriptHandler.isOpen()) {
             QMessageBox confirmExitMessageBox;
@@ -1767,7 +1772,7 @@ public slots:
         qDebug() << "===============";
     }
 
-    void sslErrors (QNetworkReply *reply, const QList<QSslError> &errors)
+    void sslErrors (QNetworkReply* reply, const QList<QSslError> &errors)
     {
         foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;
@@ -1780,28 +1785,32 @@ public:
 
     TopLevel (QString type);
 
-    QWebView *createWindow (QWebPage::WebWindowType type)
+    QWebView* createWindow (QWebPage::WebWindowType type)
     {
+        qDebug() << "New window requested.";
+
         Q_UNUSED (type);
-        QWebView *window = new TopLevel (QString ("mainWindow"));
+        QWebView* window = new TopLevel (QString ("mainWindow"));
         window->setWindowIcon (settings.icon);
         window->setAttribute (Qt::WA_DeleteOnClose, true);
         window->show();
+        window->show();
+
         return window;
     }
 
 private:
 
-    Page *mainPage;
+    Page* mainPage;
 
     Settings settings;
 
     QUrl qWebHitTestURL;
     QString filepath;
-    QWebView *newWindow;
+    QWebView* newWindow;
 
-    QWebView *aboutDialog;
-    QWebView *errorsWindow;
+    QWebView* aboutDialog;
+    QWebView* errorsWindow;
 
 };
 

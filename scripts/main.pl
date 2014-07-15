@@ -115,19 +115,23 @@ Perl Debugger Interaction
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=M'>List All Modules</a>
+<a href='perl-debugger://select-file?command=M'>List All Modules</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=S'>List All Subroutine Names</a>
+<a href='perl-debugger://select-file?command=S'>List All Subroutine Names</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-debugger-pseudodomain/selectfile/execute?command=V'>List All Variables</a>
+<a href='perl-debugger://select-file?command=V'>List All Variables</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-debugger-pseudodomain/stepbystep/selectfile'>Start Step-by-Step Debugging</a>
+<a href='perl-debugger://select-file'>Step-by-Step Debugging in This Window</a>
+</font></p>
+
+<p align='center'><font size='5'>
+<a href='perl-debugger://select-file' target='_blank'>Step-by-Step Debugging in a New Window</a>
 </font></p>
 
 <hr width='95%'>
@@ -137,23 +141,19 @@ Web Interaction
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='https://www.google.com/doodles/finder/'>Allowed External Link Nr.1 in This Browser</a>
+<a href='https://www.google.com/doodles/finder/'>Allowed External Link Nr.1</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='https://www.google.com/doodles/finder/' target='_blank'>Allowed External Link Nr.1 in a New Window of This Browser</a>
+<a href='https://www.google.com/doodles/finder/' target='_blank'>Allowed External Link Nr.1 in a New Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://www.perl.org/.html'>Allowed External Link Nr.2 in This Browser</a>
+<a href='http://www.perl.org/'>Allowed External Link Nr.2</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://www.perl.org/' target='_new'>Allowed External Link Nr.2 in a New Window of This Browser</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<button onclick='allowedContent()' class='btn btn-primary'>Open Allowed Content in a New Window from JavaScript</button>
+<a href='http://www.perl.org/' target='_blank'>Allowed External Link Nr.2 in a New Window</a>
 </font></p>
 
 <script>
@@ -163,7 +163,7 @@ function allowedContent() {
 </script>
 
 <p align='center'><font size='5'>
-<button onclick='notAllowedContent()' class='btn btn-primary'>Not Allowed Content in a New Window from JavaScript - Blocked</button>
+<button onclick='allowedContent()' class='btn btn-primary'>Open Allowed Content in a New Window from JavaScript</button>
 </font></p>
 
 <script>
@@ -171,6 +171,10 @@ function notAllowedContent() {
 	window.open ('http://www.yahoo.com');
 }
 </script>
+
+<p align='center'><font size='5'>
+<button onclick='notAllowedContent()' class='btn btn-primary'>Not Allowed Content in a New Window from JavaScript - Blocked</button>
+</font></p>
 
 <p align='center'><font size='5'>
 <a href='https://www.yahoo.com/'>Not Allowed External Link in Default Browser</a>
