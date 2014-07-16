@@ -142,12 +142,13 @@ foreach $line (@lines){
 	$formatted_line_number = sprintf ($line_number_format, $line_number);
 
 	if ($line_number eq $line_to_underline) {
-		print "<b><a id='$line_number' class='line_number'>$formatted_line_number</a></b> &nbsp;";
+		print "<div style=\"background-color:#cccccc\"><a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
 	} else {
-		print "<a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
+		print "<div><a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
 	}
 
 	print $highlighter->highlightText ($line);
+	print '</div>';
 }
 
 print "</body>\n";
