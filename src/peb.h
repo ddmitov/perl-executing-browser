@@ -718,6 +718,10 @@ public slots:
                     QStringList sourceViewerCommandLine;
                     sourceViewerCommandLine = sourceViewerMandatoryArguments;
                     sourceViewerCommandLine.append (sourceFilepath);
+                    if (scriptLastUrl.toString().contains ("file://")) {
+                        sourceViewerCommandLine.append (debuggerLineInfoLastLine);
+                    }
+
                     scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine,
                                          QProcess::Unbuffered | QProcess::ReadWrite);
 

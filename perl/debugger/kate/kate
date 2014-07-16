@@ -9,7 +9,14 @@ use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
 # Input filename:
-my $input_filename = $ARGV[0]; # input file is the first and only needed command line argument
+my $input_filename = $ARGV[0]; # input file is the first command line argument
+
+my $line_to_underline;
+if (defined $ARGV[1]) {
+	$line_to_underline = $ARGV[1]; # line to underline is the second command line argument
+} else {
+	$line_to_underline = 0;
+}
 
 # Remove double slash '//' from script filenames (if any):
 $input_filename =~ s/\/\//\//g;
@@ -129,10 +136,17 @@ print "<body>\n";
 my $line;
 my $line_number;
 my $formatted_line_number;
+
 foreach $line (@lines){
 	$line_number++;
 	$formatted_line_number = sprintf ($line_number_format, $line_number);
-	print "<a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
+
+	if ($line_number eq $line_to_underline) {
+		print "<b><a id='$line_number' class='line_number'>$formatted_line_number</a></b> &nbsp;";
+	} else {
+		print "<a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
+	}
+
 	print $highlighter->highlightText ($line);
 }
 
