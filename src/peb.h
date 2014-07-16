@@ -1148,6 +1148,8 @@ public slots:
         QRegExp debuggerOutputRegExp05 ("^\\s{0,}\n");
         debuggerOutput.replace (debuggerOutputRegExp05, "");
 
+        debuggerOutput.replace ("`", "'");
+
         debuggerOutput.replace ("\n", "<br>\n");
 
         debuggerAccumulatedOutput.append (debuggerOutput);

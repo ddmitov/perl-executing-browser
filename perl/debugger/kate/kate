@@ -8,18 +8,14 @@ use strict;
 use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
-# Define variables:
+# Input filename:
 my $input_filename = $ARGV[0]; # input file is the first and only needed command line argument
-my $input_filehandle;
-my $first_line;
-my $language;
-my $line_number;
-my $formatted_line_number;
 
-# Remove double slash '//' from script filenames:
+# Remove double slash '//' from script filenames (if any):
 $input_filename =~ s/\/\//\//g;
 
 # Detect script language by file extension:
+my $language;
 if ($input_filename =~ ".pl" or $input_filename =~ ".PL"){
 	$language = "Perl";
 }
@@ -30,13 +26,17 @@ if ($input_filename =~ ".php" or $input_filename =~ ".PHP"){
 	$language = "PHP (HTML)";
 }
 
-# Detect script language by shebang line:
-# Open the input file read-only to detect the shebang line:
+# Open the input file read-only:
+my $input_filehandle;
 open ($input_filehandle, "<", "$input_filename");
+
+# Read the file and push it into an array:
+my @lines = <$input_filehandle>;
+my $total_lines = scalar @lines;
 
 # Detect Perl and Python using the shebang line.
 # Perl and Python scripts may not have a file extension.
-$first_line = <$input_filehandle>;
+my $first_line = $lines[0];
 if ($first_line =~ m/\#\!.*perl/){
 	$language = "Perl";
 }
@@ -44,11 +44,23 @@ if ($first_line =~ m/\#\!.*python/){
 	$language = "Python";
 }
 
-# Close the input file:
-close ($input_filehandle);
+# Determine line numbers format:
+my $line_number_format;
+if ($total_lines >= 1 and $total_lines <= 9) {
+	$line_number_format = "%01d";
+}
+if ($total_lines >= 10 and $total_lines <= 99) {
+	$line_number_format = "%02d";
+}
+if ($total_lines >= 100 and $total_lines <= 999) {
+	$line_number_format = "%03d";
+}
+if ($total_lines >= 1000 and $total_lines <= 9999) {
+	$line_number_format = "%04d";
+}
 
 # Syntax::Highlight::Engine::Kate settings:
- my $hl = new Syntax::Highlight::Engine::Kate(
+ my $highlighter = new Syntax::Highlight::Engine::Kate(
     language => $language,
     substitutions => {
        "<" => "&lt;",
@@ -82,9 +94,6 @@ close ($input_filehandle);
     },
  );
 
-# Open the input file read-only to highlight the syntax:
-open ($input_filehandle, "<", "$input_filename");
-
 # Highlight the syntax of the input file:
 print "<html>\n";
 print "<head>\n";
@@ -93,9 +102,22 @@ print "<title>$input_filename</title>\n";
 print "<style type='text/css'>
 			body {
 				text-align: left;
-				font-family: Helvetica, Arial, sans-serif;
+				font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+				font-size: 14px;
 				background-color: #FFFFFF;
 				color: #000000;
+				}
+			.line_number {
+				-webkit-user-select: none;
+				-webkit-touch-callout: none;
+				user-select: none;
+				background-color: #C0C0C0;
+				color: #000000;
+				padding-left: 3px;
+				padding-right: 3px;
+				padding-top: 2px;
+				padding-bottom: 2px;
+				display: inline-block;
 				}
 	</style>\n";
 
@@ -103,12 +125,17 @@ print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
 print "</head>\n";
 
 print "<body>\n";
-while (my $in = <$input_filehandle>) {
+
+my $line;
+my $line_number;
+my $formatted_line_number;
+foreach $line (@lines){
 	$line_number++;
-	$formatted_line_number = sprintf("%04d", $line_number);
-	print "<a id='$line_number'>$formatted_line_number</a> &nbsp;";
-	print $hl->highlightText ($in);
+	$formatted_line_number = sprintf ($line_number_format, $line_number);
+	print "<a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
+	print $highlighter->highlightText ($line);
 }
+
 print "</body>\n";
 
 print "</html>\n";

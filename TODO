@@ -7,8 +7,9 @@ Permanent TODO priorities:
 Perl debugger interaction:
 - source viewer output as a sequence of pages when lines > 50
 - buttons for the most common operations like: next, step into, continue and quit
-- intelligent way of numerating code lines in the source browser
+- better line numbering in the source browser - no copying of line numbers
 - highlight the current line
+- display value on mouse over variable (using jQuery and request to debugger?)
 - function names to be links and to step into on click
 
 Locally executed scripts:

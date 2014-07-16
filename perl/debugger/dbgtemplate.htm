@@ -10,22 +10,17 @@
 			div.debugger {
 				background-color: #000000;
 				color: #00FF00;
+				font-family: "Consolas", "Monaco", "Bitstream Vera Sans Mono", "Courier New", Courier, monospace;
+				font-size: 14px;
 				padding: 16px;
 				width: 100%;
 				height: 32%;
 				overflow: auto;
-				font-family: monospace;
 			}
 		</style>
 		<script type="text/javascript">
-		// TODO: it looks like prompt is not working as expected.
-		function sendCommand(cmd, ask=false) {
-			if (ask !== false) {
-				var answer = prompt(ask);
-				document.getElementById("command").value = cmd+' '+answer;
-			} else {
-				document.getElementById("command").value = cmd;
-			}
+		function sendCommand (cmd) {
+			document.getElementById ("command").value = cmd;
 		}
 		</script>
 	</head>
@@ -48,6 +43,8 @@
 
 				<div class="form-group">
 					<input type="submit" style="visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;" />
+					<a href='perl-debugger://select-file/restart' class="btn btn-info btn-xs"
+						title="Select another Perl script and restart debugger">File</a>
 					Commands: 
 					<button onClick="sendCommand('n')" class='btn btn-info btn-xs' title="Next line">n</button>
 					<button onClick="sendCommand('c')" class='btn btn-info btn-xs' title="Continue">c</button>
