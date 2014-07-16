@@ -15,3 +15,5 @@ peb.o
 copy-win32
 upcopy
 upgit
+
+db/test.db

@@ -102,7 +102,7 @@ print "<title>$input_filename</title>\n";
 print "<style type='text/css'>
 			body {
 				text-align: left;
-				font-family: 'Consolas', 'Monaco', 'Bitstream Vera Sans Mono', 'Courier New', Courier, monospace;
+				font-family: monospace;
 				font-size: 14px;
 				background-color: #FFFFFF;
 				color: #000000;
