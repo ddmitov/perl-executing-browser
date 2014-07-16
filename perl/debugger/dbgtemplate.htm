@@ -43,10 +43,9 @@
 
 				<div class="form-group">
 					<input type="submit" style="visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;" />
-					<a href='perl-debugger://select-file/restart' class="btn btn-info btn-xs"
-						title="Select another Perl script and restart debugger">File</a>
 					Commands: 
 					<button onClick="sendCommand('n')" class='btn btn-info btn-xs' title="Next line">n</button>
+					<button onClick="sendCommand('r')" class='btn btn-info btn-xs' title="Return from subroutine">r</button>
 					<button onClick="sendCommand('c')" class='btn btn-info btn-xs' title="Continue">c</button>
 					<button onClick="sendCommand('M')" class='btn btn-info btn-xs' title="List All Modules">M</button>
 					<button onClick="sendCommand('S')" class='btn btn-info btn-xs' title="List All Subroutine Names">S</button>
