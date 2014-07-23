@@ -5,6 +5,7 @@
 # modify it under the same terms as Perl itself.
 
 use strict;
+use warnings;
 use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
@@ -41,6 +42,9 @@ open ($input_filehandle, "<", "$input_filename");
 my @lines = <$input_filehandle>;
 my $total_lines = scalar @lines;
 
+# Close the input file:
+close ($input_filehandle);
+
 # Detect Perl and Python using the shebang line.
 # Perl and Python scripts may not have a file extension.
 my $first_line = $lines[0];
@@ -49,21 +53,6 @@ if ($first_line =~ m/\#\!.*perl/){
 }
 if ($first_line =~ m/\#\!.*python/){
 	$language = "Python";
-}
-
-# Determine line numbers format:
-my $line_number_format;
-if ($total_lines >= 1 and $total_lines <= 9) {
-	$line_number_format = "%01d";
-}
-if ($total_lines >= 10 and $total_lines <= 99) {
-	$line_number_format = "%02d";
-}
-if ($total_lines >= 100 and $total_lines <= 999) {
-	$line_number_format = "%03d";
-}
-if ($total_lines >= 1000 and $total_lines <= 9999) {
-	$line_number_format = "%04d";
 }
 
 # Syntax::Highlight::Engine::Kate settings:
@@ -106,6 +95,7 @@ print "<html>\n";
 print "<head>\n";
 print "<title>$input_filename</title>\n";
 
+# Output CSS styling:
 print "<style type='text/css'>
 			body {
 				text-align: left;
@@ -113,18 +103,14 @@ print "<style type='text/css'>
 				font-size: 14px;
 				background-color: #FFFFFF;
 				color: #000000;
-				}
-			.line_number {
 				-webkit-user-select: none;
-				-webkit-touch-callout: none;
-				user-select: none;
+				}
+			ol {
+				list-style-type: decimal;
 				background-color: #C0C0C0;
-				color: #000000;
-				padding-left: 3px;
-				padding-right: 3px;
-				padding-top: 2px;
-				padding-bottom: 2px;
-				display: inline-block;
+				padding-left: 6%;
+				text-indent: 1.5%;
+				border: green solid 3px;
 				}
 	</style>\n";
 
@@ -133,27 +119,51 @@ print "</head>\n";
 
 print "<body>\n";
 
-my $line;
+print "<p align='center' style='-webkit-user-select: auto;'><font size='3'>Syntax-highlighted source: $input_filename</font></p>\n";
+
+print "<ol>\n";
+
 my $line_number;
-my $formatted_line_number;
+my $start_line;
+my $end_line;
 
-foreach $line (@lines){
-	$line_number++;
-	$formatted_line_number = sprintf ($line_number_format, $line_number);
-
-	if ($line_number eq $line_to_underline) {
-		print "<div style=\"background-color:#cccccc\"><a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
-	} else {
-		print "<div><a id='$line_number' class='line_number'>$formatted_line_number</a> &nbsp;";
-	}
-
-	print $highlighter->highlightText ($line);
-	print '</div>';
+if ($line_to_underline == 0) {
+	$start_line = 1;
+	$end_line = $total_lines;
 }
+
+if ($total_lines <= 15 and $line_to_underline > 0) {
+	$start_line = 1;
+	$end_line = $total_lines;
+}
+
+if ($total_lines > 15 and $line_to_underline > 0) {
+	$start_line = $line_to_underline - 15;
+	$end_line = $line_to_underline + 15;
+}
+
+foreach my $line (@lines){
+	$line_number++;
+
+	if ($line_number >= $start_line and $line_number <= $end_line) {
+		my $highlighted_line = $highlighter->highlightText ($line);
+
+		if (length($line) > 2) {
+			$highlighted_line =~ s/<BR>\n//g;
+		}
+
+		if ($line_number eq $line_to_underline) {
+			print "<li style='background-color: #CCCCCC;' value='$line_number'><a name='$line_number'></a><div style='-webkit-user-select: auto;'>".$highlighted_line."</div>";
+		} else {
+			print "<li style='background-color: #FFFFFF;' value='$line_number'><a name='$line_number'></a><div style='-webkit-user-select: auto;'>".$highlighted_line."</div>";
+		}
+
+		print "</li>\n";
+	}
+}
+
+print "</ol>\n";
 
 print "</body>\n";
 
 print "</html>\n";
-
-# Close the input file:
-close ($input_filehandle);

@@ -497,6 +497,8 @@ signals:
 
     void reloadSignal();
 
+    void closeWindowSignal();
+
     void quitFromURLSignal();
 
 public slots:
@@ -565,21 +567,13 @@ public slots:
 
     void startScriptSlot (QUrl url, QByteArray postDataArray)
     {
-        scriptLastUrl = url;
         qDebug() << "Script URL:" << url.toString();
 
-        if (url.toString().contains ("http://")) {
-            QString relativeFilePath = url.toString (QUrl::RemoveScheme
-                                                     | QUrl::RemoveAuthority
-                                                     | QUrl::RemoveQuery);
-            scriptFullFilePath = QDir::toNativeSeparators
-                    (settings.rootDirName+relativeFilePath);
-        }
-        if (url.toString().contains ("file://")) {
-            scriptFullFilePath = QDir::toNativeSeparators (url.toLocalFile());
-//            scriptFullFilePath = QDir::toNativeSeparators
-//                    (url.toString().replace ("file://", ""));
-        }
+        QString relativeFilePath = url.toString (QUrl::RemoveScheme
+                                                 | QUrl::RemoveAuthority
+                                                 | QUrl::RemoveQuery);
+        scriptFullFilePath = QDir::toNativeSeparators
+                (settings.rootDirName+relativeFilePath);
 
         QString queryString = url.toString (QUrl::RemoveScheme
                                             | QUrl::RemoveAuthority
@@ -637,13 +631,6 @@ public slots:
 
             if (queryString.contains ("source=enabled")) {
                 // Default values for displaying source code outside of the Perl debugger:
-                sourceEnabled = true;
-                scriptOutputThemeEnabled = false;
-                scriptOutputType = "final";
-            }
-
-            if (url.toString().contains ("file://")) {
-                // Default values for displaying source code within the Perl debugger GUI:
                 sourceEnabled = true;
                 scriptOutputThemeEnabled = false;
                 scriptOutputType = "final";
@@ -718,9 +705,6 @@ public slots:
                     QStringList sourceViewerCommandLine;
                     sourceViewerCommandLine = sourceViewerMandatoryArguments;
                     sourceViewerCommandLine.append (sourceFilepath);
-                    if (scriptLastUrl.toString().contains ("file://")) {
-                        sourceViewerCommandLine.append (debuggerLineInfoLastLine);
-                    }
 
                     scriptHandler.start (settings.perlInterpreter, sourceViewerCommandLine,
                                          QProcess::Unbuffered | QProcess::ReadWrite);
@@ -846,17 +830,15 @@ public slots:
             targetFrame = Page::currentFrame();
         }
 
-        if (!scriptLastUrl.toString().contains ("file://")) {
-            if (scriptOutputType == "latest") {
+        if (scriptOutputType == "latest") {
+            targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
+        }
+        if (scriptOutputType == "accumulation") {
+            if (scriptOutputScrollDown == false) {
                 targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
             }
-            if (scriptOutputType == "accumulation") {
-                if (scriptOutputScrollDown == false) {
-                    targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
-                }
-                if (scriptOutputScrollDown == true) {
-                    targetFrame->setUrl (scriptOutputFilePath+"#latest");
-                }
+            if (scriptOutputScrollDown == true) {
+                targetFrame->setUrl (scriptOutputFilePath+"#latest");
             }
         }
 
@@ -880,10 +862,7 @@ public slots:
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
-                if (!scriptLastUrl.toString().contains ("file://")) {
-                    targetFrame->setUrl
-                            (QUrl::fromLocalFile (scriptOutputFilePath));
-                }
+                targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
             }
 
             if (scriptAccumulatedErrors.length() > 0 and
@@ -910,7 +889,6 @@ public slots:
                     }
 
                     emit displayErrorsSignal (scriptErrorFilePath);
-
                 }
             }
 
@@ -925,14 +903,8 @@ public slots:
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
 
-        if (!scriptLastUrl.toString().contains ("file://")) {
-            QFile scriptOutputFile (scriptOutputFilePath);
-            scriptOutputFile.remove();
-        }
-
-        if (scriptLastUrl.toString().contains ("file://")) {
-            emit sourceCodeForDebuggerReadySignal();
-        }
+        QFile scriptOutputFile (scriptOutputFilePath);
+        scriptOutputFile.remove();
     }
 
     void scriptTimeoutSlot ()
@@ -962,33 +934,33 @@ public slots:
     // Implementation of an idea proposed by Valcho Nedelchev.
     void selectDebuggingPerlInterpreterSlot()
     {
-        QFileDialog selectInterpreterDialog;
-        selectInterpreterDialog.setFileMode (QFileDialog::AnyFile);
-        selectInterpreterDialog.setViewMode (QFileDialog::Detail);
-        selectInterpreterDialog.setWindowModality (Qt::WindowModal);
-        selectInterpreterDialog.setWindowIcon (settings.icon);
-        debuggingInterpreter = selectInterpreterDialog.getOpenFileName
+        QFileDialog debuggerInterpreterSelectorDialog;
+        debuggerInterpreterSelectorDialog.setFileMode (QFileDialog::AnyFile);
+        debuggerInterpreterSelectorDialog.setViewMode (QFileDialog::Detail);
+        debuggerInterpreterSelectorDialog.setWindowModality (Qt::WindowModal);
+        debuggerInterpreterSelectorDialog.setWindowIcon (settings.icon);
+        debuggerInterpreter = debuggerInterpreterSelectorDialog.getOpenFileName
                 (0, tr ("Select Interpreter"),
                  QDir::currentPath(), tr ("All files (*)"));
-        qDebug() << "Selected interpreter:" << debuggingInterpreter;
+        qDebug() << "Selected interpreter:" << debuggerInterpreter;
         qDebug() << "===============";
-        selectInterpreterDialog.close();
-        selectInterpreterDialog.deleteLater();
+        debuggerInterpreterSelectorDialog.close();
+        debuggerInterpreterSelectorDialog.deleteLater();
 
-        QFileDialog selectPerlLibDialog;
-        selectPerlLibDialog.setFileMode (QFileDialog::AnyFile);
-        selectPerlLibDialog.setViewMode (QFileDialog::Detail);
-        selectPerlLibDialog.setWindowModality (Qt::WindowModal);
-        selectPerlLibDialog.setWindowIcon (settings.icon);
-        QString perlLibFolderNameString = selectPerlLibDialog.getExistingDirectory
+        QFileDialog debuggerPerlLibSelectorDialog;
+        debuggerPerlLibSelectorDialog.setFileMode (QFileDialog::AnyFile);
+        debuggerPerlLibSelectorDialog.setViewMode (QFileDialog::Detail);
+        debuggerPerlLibSelectorDialog.setWindowModality (Qt::WindowModal);
+        debuggerPerlLibSelectorDialog.setWindowIcon (settings.icon);
+        QString perlLibFolderNameString = debuggerPerlLibSelectorDialog.getExistingDirectory
                 (0, tr ("Select PERLLIB"), QDir::currentPath());
         QByteArray perlLibFolderName;
         perlLibFolderName.append (perlLibFolderNameString);
         qputenv ("PERLLIB", perlLibFolderName);
         qDebug() << "Selected PERLLIB:" << perlLibFolderName;
         qDebug() << "===============";
-        selectPerlLibDialog.close();
-        selectPerlLibDialog.deleteLater();
+        debuggerPerlLibSelectorDialog.close();
+        debuggerPerlLibSelectorDialog.deleteLater();
     }
 
     void startPerlDebuggerSlot (QUrl debuggerUrl)
@@ -998,7 +970,7 @@ public slots:
                 .replace ("?", "");
 
         if ((!filePath.contains ("select-file")) and (!filePath.contains ("execute"))) {
-            debuggedScriptFilePath = filePath;
+            debuggerScriptFilePath = filePath;
         }
 
         debuggerQueryString = debuggerUrl.toString (QUrl::RemoveScheme
@@ -1010,24 +982,23 @@ public slots:
                 .replace ("/", "");
 
         qDebug() << "File passed to Perl debugger:"
-                 << QDir::toNativeSeparators (debuggedScriptFilePath);
+                 << QDir::toNativeSeparators (debuggerScriptFilePath);
 
         // Define Perl interpreter to be used for debugging:
-        QString debuggedScriptExtension = debuggedScriptFilePath.section (".", 1, 1);
+        QString debuggedScriptExtension = debuggerScriptFilePath.section (".", 1, 1);
         if (debuggedScriptExtension.length() == 0)
             debuggedScriptExtension = "pl";
-        qDebug() << "Extension:" << debuggedScriptExtension;
 
         if (settings.debuggerInterpreter == "current") {
-            settings.defineInterpreter (debuggedScriptFilePath);
-            debuggingInterpreter = settings.interpreter;
+            settings.defineInterpreter (debuggerScriptFilePath);
+            debuggerInterpreter = settings.interpreter;
         }
 
         if (settings.debuggerInterpreter == "select") {
             selectDebuggingPerlInterpreterSlot();
         }
 
-        qDebug() << "Interpreter:" << debuggingInterpreter;
+        qDebug() << "Interpreter:" << debuggerInterpreter;
 
         // Clean accumulated debugger output from previous debugger session:
         debuggerAccumulatedOutput = "";
@@ -1051,6 +1022,7 @@ public slots:
             debuggerCommand.append (QString ("\n").toLatin1());
             debuggerHandler.write (debuggerCommand);
 
+            // Define human readable debugger commands:
             if (debuggerQueryString == "M") {
                 debuggerCommandHumanReadable = "Show module versions (M)";
             }
@@ -1084,7 +1056,7 @@ public slots:
 
             debuggerHandler.setProcessEnvironment (env);
 
-            QFileInfo scriptAbsoluteFilePath (debuggedScriptFilePath);
+            QFileInfo scriptAbsoluteFilePath (debuggerScriptFilePath);
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             debuggerHandler.setWorkingDirectory (scriptDirectory);
             qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
@@ -1093,9 +1065,9 @@ public slots:
             qDebug() << "===============";
 
             debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
-            debuggerHandler.start (debuggingInterpreter, QStringList()
+            debuggerHandler.start (debuggerInterpreter, QStringList()
                                    << "-d" <<
-                                   QDir::toNativeSeparators (debuggedScriptFilePath)
+                                   QDir::toNativeSeparators (debuggerScriptFilePath)
                                    << "-emacs",
                                    QProcess::Unbuffered | QProcess::ReadWrite);
 
@@ -1121,79 +1093,123 @@ public slots:
 
     void debuggerOutputSlot()
     {
+        // Read debugger output:
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
-        // Remove SUB characters:
+        // Remove all "substitute" characters (U+001A):
         static const QChar subChar[] = {0x001A};
         int size = sizeof (subChar) / sizeof (QChar);
         QString subStr = QString::fromRawData (subChar, size);
         debuggerOutput.replace (subStr, "");
 
-        QRegExp debuggerOutputRegExp01 ("\\[\\d{1,2}\\w{1,3}|DB|\\<\\d{1,3}\\>|\e|[\x80-\x9f]|\x08|\r");
+        // Remove "Editor support available."
+        QRegExp debuggerOutputRegExp01 ("Editor support \\w{1,20}.");
         debuggerOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (debuggerOutputRegExp01, "");
 
-        QRegExp debuggerOutputRegExp02 ("Editor support \\w{1,20}.");
+        // Remove "Enter h or `h h' for help, or `man perldebug' for more help."
+        QRegExp debuggerOutputRegExp02 ("Enter h .{40,80}\n");
         debuggerOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (debuggerOutputRegExp02, "");
 
-        QRegExp debuggerOutputRegExp03 ("Enter h .{40,80}\n");
+        // Remove debugger prompt: "DB<line_number>"
+        QRegExp debuggerOutputRegExp03 ("DB\\<\\d{1,5}\\>");
         debuggerOutputRegExp03.setCaseSensitivity (Qt::CaseSensitive);
         debuggerOutput.replace (debuggerOutputRegExp03, "");
 
-        QRegExp debuggerOutputRegExp04 (debuggedScriptFilePath+":\\d{1,5}:\\d{1,5}\n");
-        debuggerOutputRegExp04.setCaseSensitivity (Qt::CaseSensitive);
-        int outputRegExp04pos = debuggerOutputRegExp04.indexIn (debuggerOutput);
-        Q_UNUSED (outputRegExp04pos);
-        QString lineInfo = debuggerOutputRegExp04.capturedTexts().first();
-        debuggerLineInfoLastLine = lineInfo.section (":", 1, 1);
+        // Remove empty lines or lines with only whitespace characters:
+        QRegExp debuggerOutputRegExp04 ("^\\s{0,}\n");
         debuggerOutput.replace (debuggerOutputRegExp04, "");
 
-        QRegExp debuggerOutputRegExp05 ("^\\s{0,}\n");
-        debuggerOutput.replace (debuggerOutputRegExp05, "");
-
+        // Replace backtick with single quote:
         debuggerOutput.replace ("`", "'");
 
+        // Capture the name of the file, which has to be highlighted,
+        // and take the value of LineInfoLastLine variable:
+        QString sourceToHighlightFileName;
+        QRegExp debuggerOutputRegExp05 ("^.{1,}:\\d{1,}:\\d{1,}\n");
+        int outputRegExp05pos = debuggerOutputRegExp05.indexIn (debuggerOutput);
+        Q_UNUSED (outputRegExp05pos);
+        QString lineInfo = debuggerOutputRegExp05.capturedTexts().first();
+        if (lineInfo.length() > 0) {
+            QStringList debuggerLineInfoList = lineInfo.split (":");
+            sourceToHighlightFileName = debuggerLineInfoList[0];
+            debuggerLineInfoLastLine = debuggerLineInfoList[1];
+        } else {
+            sourceToHighlightFileName = debuggerScriptFilePath;
+            debuggerLineInfoLastLine = "1";
+        }
+        debuggerOutput.replace (debuggerOutputRegExp05, "");
+
+        // Make HTML-compatible line endings:
         debuggerOutput.replace ("\n", "<br>\n");
 
+        // Append last output from the debugger to the accumulated debugger output:
         debuggerAccumulatedOutput.append (debuggerOutput);
 
-        QRegExp debuggerAccumulatedOutputRegExp01 ("\\s*\n");
-        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp01, "\n");
-
-        QRegExp debuggerAccumulatedOutputRegExp02 ("\n\\s{4,}");
-        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp02, "\n");
-
-        if (debuggerAccumulatedOutput.contains ("Show module versions")) {
-            QRegExp debuggerAccumulatedOutputRegExp03 ("\n\\s{3,}");
-            debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp03, "\n");
-        }
-
-        QRegExp debuggerAccumulatedOutputRegExp04 ("\n{2,}");
-        debuggerAccumulatedOutput.replace (debuggerAccumulatedOutputRegExp04, "\n");
-
-        if (debuggerQueryString != "V" and debuggerQueryString != "X") {
-            debuggerAccumulatedOutput.replace ("  ", " ");
-        }
-
+        // Preserve extra spacing within the output from
+        // "List variables in package" and "List variables in current package" commands:
         if (debuggerQueryString == "V") {
             debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
         }
-
         if (debuggerQueryString == "X") {
             debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
         }
 
+        // If there is no human readable version for the last command,
+        // last command becomes last human readable command.
         if (debuggerCommandHumanReadable.length() == 0) {
             debuggerCommandHumanReadable = debuggerQueryString;
         }
 
-        if (!scriptHandler.isOpen()) {
-            QByteArray emptyPostDataArray;
-            QUrl fileToDisplayAsSourceCode (QUrl::fromLocalFile (debuggedScriptFilePath));
-            startScriptSlot (fileToDisplayAsSourceCode, emptyPostDataArray);
+        // Start highlighting the necessary source code:
+        if (!debuggerSyntaxHighlighter.isOpen()) {
+            qDebug() << "Source viewer for the Perl debugger started.";
+            qDebug() << "File to display:" << debuggerScriptFilePath;
+
+            debuggerSyntaxHighlighter.setProcessEnvironment (scriptEnvironment);
+
+            QString sourceFilepath = QDir::toNativeSeparators (sourceToHighlightFileName);
+
+            QStringList sourceViewerCommandLine;
+            sourceViewerCommandLine = sourceViewerMandatoryArguments;
+            sourceViewerCommandLine.append (sourceFilepath);
+            sourceViewerCommandLine.append (debuggerLineInfoLastLine);
+
+            debuggerSyntaxHighlighter.start (settings.perlInterpreter, sourceViewerCommandLine,
+                                 QProcess::Unbuffered | QProcess::ReadWrite);
+        }
+    }
+
+    void debuggerSyntaxHighlighterReadySlot()
+    {
+        // Read all output from the syntax highlighter script:
+        QString output = debuggerSyntaxHighlighter.readAllStandardOutput();
+
+        // Syntax highlighted source code file path:
+        debuggerHighlightedSourceFilePath = QDir::toNativeSeparators
+                (QDir::tempPath()+QDir::separator()+"source.htm");
+        QFile sourceOutputFile (debuggerHighlightedSourceFilePath);
+
+        // Delete previous highlighted source HTML file:
+        if (sourceOutputFile.exists()) {
+            sourceOutputFile.remove();
         }
 
+        // Save highlighted source as a new HTML file:
+        if (sourceOutputFile.open (QIODevice::ReadWrite)) {
+            QTextStream stream (&sourceOutputFile);
+            stream << output << endl;
+        }
+
+        qDebug() << "Syntax highlighted source file:"
+                 << debuggerHighlightedSourceFilePath;
+        qDebug() << "===============";
+
+        // Close syntax highlighter process:
+        debuggerSyntaxHighlighter.close();
+
+        emit sourceCodeForDebuggerReadySignal();
     }
 
     void displaySourceCodeAndDebuggerOutputSlot()
@@ -1204,9 +1220,20 @@ public slots:
         QString debuggerHtmlOutput = QString (debuggerHtmlTemplateFile.readAll());
         debuggerHtmlTemplateFile.close();
 
-        debuggerHtmlOutput.replace ("[% Script %]", debuggedScriptFilePath);
+        debuggerHtmlOutput.replace ("[% Script %]", debuggerScriptFilePath);
+
+        int debuggerHighlightedSourceScrollToLineInt;
+        if (debuggerLineInfoLastLine.toInt() > 5) {
+            debuggerHighlightedSourceScrollToLineInt = debuggerLineInfoLastLine.toInt() - 5;
+        } else {
+            debuggerHighlightedSourceScrollToLineInt = 1;
+        }
+        QString debuggerHighlightedSourceScrollToLine =
+                QString::number (debuggerHighlightedSourceScrollToLineInt);
         debuggerHtmlOutput.replace ("[% Source %]",
-                                    scriptOutputFilePath+"#"+debuggerLineInfoLastLine);
+                                    debuggerHighlightedSourceFilePath+
+                                    "#"+debuggerHighlightedSourceScrollToLine);
+
         debuggerHtmlOutput.replace ("[% Debugger Output %]", debuggerAccumulatedOutput);
 
         if (debuggerCommandHumanReadable.length() > 0) {
@@ -1235,7 +1262,7 @@ public slots:
 
         targetFrame->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
 
-        debuggerOutputFile.remove();
+        //debuggerOutputFile.remove();
     }
 
 public:
@@ -1273,7 +1300,6 @@ private:
     QProcessEnvironment scriptEnvironment;
     bool scriptTimedOut;
     bool scriptKilled;
-    QUrl scriptLastUrl;
     QString scriptOutputFilePath;
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
@@ -1282,15 +1308,17 @@ private:
     bool scriptOutputScrollDown;
 
     QWebView* debuggerNewWindow;
+    QString debuggerScriptUrl;
+    QString debuggerScriptFilePath;
     QString debuggerQueryString;
-    QString debuggedScriptUrl;
-    QString debuggedScriptFilePath;
-    QString debuggingInterpreter;
+    QString debuggerInterpreter;
     QProcess debuggerHandler;
     QString debuggerCommandHumanReadable;
     QString debuggerLineInfoLastLine;
     QString debuggerAccumulatedOutput;
     QString debuggerOutputFilePath;
+    QProcess debuggerSyntaxHighlighter;
+    QString debuggerHighlightedSourceFilePath;
 
 };
 

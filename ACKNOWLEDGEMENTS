@@ -36,13 +36,13 @@
  http://hackafe.org/
  http://www.youtube.com/watch?v=Z9mVQzHqcKo (in Bulgarian)
 
- Thanks to Peter Palfrader, author of Code2HTML script, the first syntax highlighter used by the browser.
- Although it is now not enabled by default, it was quite helpfull to develop and test syntax highlight capability.
+ Thanks to Peter Palfrader, author of Code2HTML script, the first syntax highlighter of Perl Executing Browser.
+ Although replaced by Syntax::Highlight::Engine::Kate, it was quite helpfull to develop and test syntax highlight capability.
  http://www.palfrader.org/code/code2html/
  http://sourceforge.net/projects/code2html/
 
  Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.
- This is currently the default syntax highlighter of Perl Executing Browser.
+ This is the current syntax highlighter of Perl Executing Browser.
  https://metacpan.org/release/Syntax-Highlight-Engine-Kate
 
  https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
@@ -165,7 +165,7 @@
  http://msturm.p7.de/programming_qprocess.php
  http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
  http://mvclogic.com/qt/qt-code-example-new-file-open-file-save-file-save-as-file-file-print-print-preview-file-print-preview-print-preview/
- http://ubuntuforums.org/showthread.php?t=174362
+ http://ubuntuforums.org/showthread.php?t=174362 (checking for root priveleges in C++)
  http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
  http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
  http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
@@ -175,3 +175,6 @@
  http://en.wikipedia.org/wiki/INI_file
  http://matthewjamestaylor.com/blog/adding-css-to-html-with-link-embed-inline-and-import
  http://www.w3.org/TR/html401/present/graphics.html
+ http://www.w3schools.com/html/html_lists.asp
+ http://highlight.hohli.com/
+ http://www.techrepublic.com/blog/how-do-i/how-do-i-control-the-format-of-html-lists-with-css/

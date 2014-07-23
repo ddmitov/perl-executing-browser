@@ -796,8 +796,12 @@ Page::Page()
 
     QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
                        this, SLOT (debuggerOutputSlot()));
+
     QObject::connect (this, SIGNAL (sourceCodeForDebuggerReadySignal()),
                        this, SLOT (displaySourceCodeAndDebuggerOutputSlot()));
+
+    QObject::connect (&debuggerSyntaxHighlighter, SIGNAL (finished (int, QProcess::ExitStatus)),
+                           this, SLOT (debuggerSyntaxHighlighterReadySlot()));
 
     // Safe environment for all scripts:
     QStringList systemEnvironment =
@@ -906,6 +910,9 @@ TopLevel::TopLevel (QString type)
     }
 
     mainPage = new Page();
+
+    QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
+                          this, SLOT (close()));
 
     if (type == "mainWindow") {
         // Connect signals and slots - main window:
@@ -1213,6 +1220,18 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     }
 #endif
 
+    // Close window from URL:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ("closewindow")) {
+
+        qDebug() << "Close window requested from URL.";
+        qDebug() << "===============";
+
+        emit closeWindowSignal();
+
+        return false;
+    }
+
     // Quit application from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("quit")) {
@@ -1414,7 +1433,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains ("external")) {
 
-        QString externalCommand = request.url().toString().replace ("external:", "");
+        QString externalCommand = request.url().toString (QUrl::RemoveScheme);
 
         qDebug() << "External command:" << externalCommand;
         qDebug() << "===============";
