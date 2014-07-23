@@ -1301,6 +1301,8 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
                 }
 
                 return false;
+            } else {
+                return false;
             }
         }
     }
