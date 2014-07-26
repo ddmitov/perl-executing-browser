@@ -27,6 +27,9 @@ my $language;
 if ($input_filename =~ ".pl" or $input_filename =~ ".PL"){
 	$language = "Perl";
 }
+if ($input_filename =~ ".pm" or $input_filename =~ ".PM"){
+	$language = "Perl";
+}
 if ($input_filename =~ ".py" or $input_filename =~ ".PY"){
 	$language = "Python";
 }
