@@ -1194,6 +1194,8 @@ public slots:
         // Read all output from the syntax highlighter script:
         QString output = debuggerSyntaxHighlighter.readAllStandardOutput();
 
+        debuggerSyntaxHighlighter.close();
+
         // Syntax highlighted source code file path:
         debuggerHighlighterOutputFilePath = QDir::toNativeSeparators
                 (QDir::tempPath()+QDir::separator()+"source.htm");

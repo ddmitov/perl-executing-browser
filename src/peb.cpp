@@ -260,8 +260,9 @@ int main (int argc, char** argv)
     if (isatty (fileno (stdin))) {
 
         if (userEuid > 0) {
-            qDebug() << "Started from terminal.";
+            qDebug() << "Started from terminal with normal user privileges.";
             qDebug() << "Will start another instance of the program and quit this one.";
+            qDebug() << " ";
         }
 
         if (settings.logging == "enable") {
@@ -1296,7 +1297,16 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
                 if (Page::mainFrame()->childFrames().contains (frame) or
                         (request.url().toString().contains ("restart"))) {
+
+                    // Clear these variables before starting a new session
+                    // with a new file to debug. This is necessary for
+                    // synchronizing debugger output and highlighted source.
+                    debuggerSourceToHighlightFilePath = "";
+                    debuggerLineInfoLastLine = "";
+
+                    // Close open handler from a previous debugger session:
                     debuggerHandler.close();
+
                     startPerlDebuggerSlot (scriptToDebugUrl);
                 }
 
