@@ -1107,6 +1107,21 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         return false;
     }
 
+
+    // Set predefined theme:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ("settheme")) {
+
+        QString theme = request.url()
+                .toString (QUrl::RemoveScheme)
+                .replace ("//", "");;
+
+        setThemeSlot (theme);
+
+        return false;
+    }
+
+
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("selecttheme")) {
@@ -1361,7 +1376,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
     // Open allowed web content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (Page::currentFrame() == frame) and
+            (Page::mainFrame()->childFrames().contains (frame)) and
             (settings.allowedWebSites.contains (request.url().authority()))) {
 
         qDebug() << "Allowed web link in the same window:" << request.url().toString();

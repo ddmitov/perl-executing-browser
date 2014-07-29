@@ -118,6 +118,9 @@ public slots:
             if (extension.contains (cssExtension)) {
                 interpreter = "browser-css";
             }
+            if (extension.contains (jsExtension)) {
+                interpreter = "browser-js";
+            }
             if (extension.contains (pngExtension)) {
                 interpreter = "browser-image";
             }
@@ -502,6 +505,36 @@ signals:
     void quitFromURLSignal();
 
 public slots:
+
+    void setThemeSlot (QString theme)
+    {
+        theme.prepend (settings.allThemesDirectory+QDir::separator());
+        theme.append (".theme");
+
+        if (theme.length() > 0) {
+            if (QFile::exists (
+                        QDir::toNativeSeparators (
+                            settings.defaultThemeDirectory+
+                            QDir::separator()+"current.css"))) {
+                QFile::remove (
+                            QDir::toNativeSeparators (
+                                settings.defaultThemeDirectory+
+                                QDir::separator()+"current.css"));
+            }
+            QFile::copy (theme,
+                         QDir::toNativeSeparators (
+                             settings.defaultThemeDirectory+
+                             QDir::separator()+"current.css"));
+
+            emit reloadSignal();
+
+            qDebug() << "Selected new theme:" << theme;
+            qDebug() << "===============";
+        } else {
+            qDebug() << "No new theme selected.";
+            qDebug() << "===============";
+        }
+    }
 
     void selectThemeSlot()
     {
@@ -1008,9 +1041,6 @@ public slots:
         if (debuggerOutputFile.exists())
             debuggerOutputFile.remove();
 
-        // Clean last debugger command in human-readable form:
-        debuggerCommandHumanReadable = "";
-
         // Start a new debugger session with a new file to debug:
         if (debuggerUrl.path().contains ("select-file")) {
             debuggerHandler.close();
@@ -1021,20 +1051,6 @@ public slots:
             debuggerCommand.append (debuggerQueryString.toLatin1());
             debuggerCommand.append (QString ("\n").toLatin1());
             debuggerHandler.write (debuggerCommand);
-
-            // Define human readable debugger commands:
-            if (debuggerQueryString == "M") {
-                debuggerCommandHumanReadable = "Show module versions (M)";
-            }
-            if (debuggerQueryString == "S") {
-                debuggerCommandHumanReadable = "List subroutine names (S)";
-            }
-            if (debuggerQueryString == "V") {
-                debuggerCommandHumanReadable = "List variables in package (V)";
-            }
-            if (debuggerQueryString == "X") {
-                debuggerCommandHumanReadable = "List variables in current package (X)";
-            }
         } else {
             QStringList systemEnvironment =
                     QProcessEnvironment::systemEnvironment().toStringList();
@@ -1051,12 +1067,10 @@ public slots:
                 }
             }
 
-
 //            env.insert ("COLUMNS", "80");
 //            env.insert ("LINES", "24");
 
             env.insert ("PERLDB_OPTS", "ReadLine=0 CreateTTY=2");
-
 
             debuggerHandler.setProcessEnvironment (env);
 
@@ -1085,19 +1099,6 @@ public slots:
             debuggerCommand.append (debuggerQueryString.toLatin1());
             debuggerCommand.append (QString ("\n").toLatin1());
             debuggerHandler.write (debuggerCommand);
-
-            if (debuggerQueryString == "M") {
-                debuggerCommandHumanReadable = "Show module versions (M)";
-            }
-            if (debuggerQueryString == "S") {
-                debuggerCommandHumanReadable = "List subroutine names (S)";
-            }
-            if (debuggerQueryString == "V") {
-                debuggerCommandHumanReadable = "List variables in package (V)";
-            }
-            if (debuggerQueryString == "X") {
-                debuggerCommandHumanReadable = "List variables in current package (X)";
-            }
         }
     }
 
@@ -1164,11 +1165,23 @@ public slots:
             debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
         }
 
-        // If there is no human readable version for the last command,
-        // last command becomes last human readable command.
-        if (debuggerCommandHumanReadable.length() == 0) {
-            debuggerCommandHumanReadable = debuggerQueryString;
-        }
+        // Capture any HTML output from the Perl debugger and display it as source code:
+//        QRegExp debuggerAccumulatedOutputRegExp01 ("(\\<\\!DOCTYPE HTML|\\<html\\>).*\\<\\/html\\>");
+//        debuggerAccumulatedOutputRegExp01.setCaseSensitivity (Qt::CaseInsensitive);
+//        debuggerAccumulatedOutputRegExp01.indexIn (debuggerAccumulatedOutput);
+//        QString html = debuggerAccumulatedOutputRegExp01.capturedTexts().first();
+//        if (html.length() > 0) {
+//            qDebug() << "HTML output found.";
+//        }
+
+//        QString debuggerHtmlOutputFilePath = QDir::toNativeSeparators
+//                (QDir::tempPath()+QDir::separator()+"dbghtmloutput.htm");
+
+//        QFile debuggerHtmlOutputFile (debuggerHtmlOutputFilePath);
+//        if (debuggerHtmlOutputFile.open (QIODevice::ReadWrite)) {
+//            QTextStream debuggerHtmlOutputStream (&debuggerHtmlOutputFile);
+//            debuggerHtmlOutputStream << html << endl;
+//        }
 
         // Start highlighting the necessary source code:
         if (!debuggerSyntaxHighlighter.isOpen()) {
@@ -1246,9 +1259,9 @@ public slots:
 
         debuggerHtmlOutput.replace ("[% Debugger Output %]", debuggerAccumulatedOutput);
 
-        if (debuggerCommandHumanReadable.length() > 0) {
+        if (debuggerQueryString.length() > 0) {
             debuggerHtmlOutput.replace ("[% Debugger Command %]",
-                                        "Last command: "+debuggerCommandHumanReadable);
+                                        "Last command: "+debuggerQueryString);
         } else {
             debuggerHtmlOutput.replace ("[% Debugger Command %]", "");
         }
@@ -1323,7 +1336,7 @@ private:
     QString debuggerQueryString;
     QString debuggerInterpreter;
     QProcess debuggerHandler;
-    QString debuggerCommandHumanReadable;
+    //QString debuggerCommandHumanReadable;
     QString debuggerLineInfoLastLine;
     QString debuggerAccumulatedOutput;
     QString debuggerOutputFilePath;
