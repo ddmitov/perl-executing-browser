@@ -5,7 +5,6 @@ use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
 use CGI qw (:standard);
 
-# http://perlmeme.org/faqs/file_io/directory_listing.html
 opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
 print "<html>\n";
@@ -25,24 +24,28 @@ print "<br><br>\n";
 
 print "Conversion started.<br>\n";
 
+my $output_directory_name = "peb-converted-images";
+my $output_directory = $FOLDER_TO_OPEN."/".$output_directory_name;
+unless (-e $output_directory or mkdir $output_directory) {
+	die "Unable to create $output_directory <br>\n";
+}
+
 while (my $file = readdir (DIR)) {
 	# We only want files
 	next unless (-f "$FOLDER_TO_OPEN/$file");
 	# Use a regular expression to find files ending in .jpg
 	next unless ($file =~ m/\.jpg$/);
 
-	my $slash = "/";
-	my $filepath = $FOLDER_TO_OPEN.$slash.$file;
-	my $converted = "_converted.jpg";
-	my $file_converted = $filepath.$converted;
+	my $filepath_to_read = $FOLDER_TO_OPEN."/".$file;
+	my $filepath_to_write = $FOLDER_TO_OPEN."/".$output_directory_name."/".$file;
 
 	print "Converting $file ...<br>\n";
-	my $result = `convert $filepath -resize 20% $file_converted`;
+	my $result = `convert $filepath_to_read -resize 20% $filepath_to_write`;
 }
 
 closedir (DIR);
 
-print "Conversion successfully completed!\n";
+print "Conversion successfully completed!<br>\n";
 
 print "</font></p>\n";
 

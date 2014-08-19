@@ -13,7 +13,7 @@ print <<HTML
 <head>
 <title>Perl Executing Browser - Dynamic Startpage</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<link href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' rel='stylesheet'/>
+<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
 </head>
 
 <body>
@@ -178,24 +178,6 @@ function notAllowedContent() {
 
 <p align='center'><font size='5'>
 <a href='https://www.yahoo.com/'>Not Allowed External Link in Default Browser</a>
-</font></p>
-
-<hr width='95%'>
-
-<p align='center'><font size='5'>
-Filesystem Interaction
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='newfile://'>Create New File</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='openfile://'>Open Existing File</a>
-</font></p>
-
-<p align='center'><font size='5'>
-<a href='openfolder://'>Open Existing Folder or Create a New One</a>
 </font></p>
 
 <hr width='95%'>

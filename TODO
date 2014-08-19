@@ -4,26 +4,27 @@ Permanent TODO priorities:
 - documentation, commented code
 ====================================
 
+v. 0.2
+====================================
+
 Perl debugger interaction:
 - source viewer output as a sequence of pages when lines > 50
 - display value on mouse over variable (using jQuery and request to debugger?)
 - function names to be links and to step into on click
+- show source code and highlight current line only when current line is known, otherwise do not display source code
+- show highlighted HTML source code when scripts produce HTML within the debugger GUI
 
 Locally executed scripts:
-- option to display or hide STDERR
-- option to display STDERR in TXT or HTML
+- option to discard user PATH from script PATH
+- HTML formatted STDERR output
 
 GUI:
 - working maximized window setting on Mac
 
 Configuration & help:
-- custom algorithm for reading and writing configuration file instead of QSettings
-- check file paths to determine if they are absolute or relative paths
-- default values for missing or corrupt configuration values
-- configuration interface using 'config' URL and HTML interface
+- 'config' URL with a nice HTML interface
 - 'restart' URL for applying configuration changes that need restart
-- 'help' URL
-- Keyboard shortcuts listed
+- 'help' URL; keyboard shortcuts listed
 
 Compilation, packaging & installation:
 - build script for command line compilation of the browser

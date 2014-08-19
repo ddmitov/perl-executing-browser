@@ -13,7 +13,7 @@
 	<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/bootstrap-min.js"></script>
 	<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/bootstrap-dropdown.js"></script>
 
-	<link href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" rel="stylesheet" />
+	<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
 
 </head>
 
@@ -32,6 +32,17 @@
 			</li>
 
 			<li>
+				<a id="requests" role="button" data-toggle="dropdown" data-target="#"
+				href="http://perl-executing-browser-pseudodomain/html/index.htm">
+				Local Test Requests<span class="caret"></span>
+				</a>
+				<ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+					<li><a href="http://perl-executing-browser-pseudodomain/html/get.htm" target="iframe_a">Local GET Request</a></li>
+					<li><a href="http://perl-executing-browser-pseudodomain/html/post.htm" target="iframe_a">Local POST Request</a></li>
+				</ul>
+			</li>
+
+			<!-- <li>
 				<a href="http://perl-executing-browser-pseudodomain/html/get.htm" target="iframe_a"
 				title="Form of a Locally Executed Perl Script - GET method">Local GET Request</a>
 			</li>
@@ -41,7 +52,7 @@
 				title="Form of a Locally Executed Perl Script - POST method">Local POST Request</a>
 			</li>
 
-			<!-- <li>
+			<li>
 				<a href="selecttheme://" class="btn">Change Theme</a>
 			</li> -->
 

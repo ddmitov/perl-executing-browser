@@ -22,12 +22,6 @@ print "<p align='center'><font size='5' face='SansSerif'>\n";
 print "Test Results\n";
 print "</font></p>\n";
 
-print "<p align='left'><font size='3' face='SansSerif'>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/html/main.htm'>Home</a>\n";
-print "</font></p>\n";
-
-print "</font></p>\n";
-
 print "<p align='left'><font size='4' face='SansSerif'>\n";
 print "FORM DATA:\n";
 print "</font></p>\n";

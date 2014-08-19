@@ -36,6 +36,10 @@
 #include <QPrintDialog>
 #endif
 
+#if ZIP == 1
+#include <quazip/JlCompress.h> // for unpacking root folder from a zip file
+#endif
+
 
 // Global variables:
 // Application start date and time for filenames of per-session log files:
@@ -101,10 +105,25 @@ void customMessageHandler (QtMsgType type, const char* message)
    }
 }
 
+
 int main (int argc, char** argv)
 {
 
     QApplication application (argc, argv);
+
+#if ZIP == 1
+    // Extracting root folder from a separate zip file:
+    QStringList extractedFiles = JlCompress::extractDir (QApplication::applicationDirPath()+
+                                                         QDir::separator()+"peb.zip",
+                                                         QApplication::applicationDirPath()+
+                                                         QDir::separator()+"testdir");
+    // Extracting root folder from a zip file, that was appended to the binary (!) using
+    // 'cat peb-bin-only peb.zip > peb-with-data'
+    QStringList extractedFiles = JlCompress::extractDir (QApplication::applicationFilePath(),
+                                                         QApplication::applicationDirPath()+
+                                                         QDir::separator()+"testdir");
+    qDebug() << "Extracted files:" << extractedFiles;
+#endif
 
     // Use UTF-8 encoding within the application:
 #if QT_VERSION >= 0x050000
@@ -164,8 +183,6 @@ int main (int argc, char** argv)
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
             std::cout << "  --ini       -I    absolute path of browser configuration file"
-                      << std::endl;
-            std::cout << "  --root      -R    absolute path of browser root folder"
                       << std::endl;
             std::cout << "  --help      -H    this help"
                       << std::endl;
@@ -374,15 +391,30 @@ int main (int argc, char** argv)
     qDebug() << "ENVIRONMENT SETTINGS:";
     qDebug() << "===============";
     qDebug() << "PERLLIB folder:" << settings.perlLib;
+    qDebug() << "Append user PATH:" << settings.appendUserPath;
+
+    qDebug() << "===============";
+    qDebug() << "INTERPRETERS:";
+    qDebug() << "===============";
     qDebug() << "Default Perl interpreter" << settings.perlInterpreter;
     qDebug() << "Default Python interpreter" << settings.pythonInterpreter;
     qDebug() << "Default PHP interpreter" << settings.phpInterpreter;
+
+    qDebug() << "===============";
+    qDebug() << "SCRIPTS SETTINGS:";
+    qDebug() << "===============";
+    qDebug() << "Script Timeout:" << settings.scriptTimeout;
+    qDebug() << "Display STDERR from scripts:" << settings.displayStderr;
 
     qDebug() << "===============";
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Debugger interpreter:" << settings.debuggerInterpreter;
     qDebug() << "Debugger HTML template:" << settings.debuggerHtmlTemplate;
+
+    qDebug() << "===============";
+    qDebug() << "SOURCE VIEWER SETTINGS:";
+    qDebug() << "===============";
     qDebug() << "Source viewer:" << settings.sourceViewer;
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
@@ -442,52 +474,57 @@ int main (int argc, char** argv)
     QApplication::setWindowIcon (settings.icon);
 
     // ENVIRONMENT VARIABLES:
-    // Browser-specific environment variables:
-    qputenv ("FILE_TO_OPEN", "");
-    qputenv ("FILE_TO_CREATE", "");
-    qputenv ("FOLDER_TO_OPEN", "");
-
     // PATH:
     // Get the existing PATH and set the separator sign:
+    QByteArray userPath;
     QByteArray path;
     QString pathSeparator;
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-    QByteArray oldPath = qgetenv ("PATH");
+    if (settings.appendUserPath == "enable") {
+        userPath = qgetenv ("PATH");
+    }
     pathSeparator = ":";
 #endif
 #ifdef Q_OS_WIN // Windows
-    QByteArray oldPath = qgetenv ("Path");
+    if (settings.appendUserPath == "enable") {
+        userPath = qgetenv ("Path");
+    }
     pathSeparator = ";";
 #endif
-    path.append (oldPath);
-    path.append (pathSeparator);
+
+    if (settings.appendUserPath == "enable") {
+        path.append (userPath);
+        path.append (pathSeparator);
+    }
+
     // Read the INI file for folders to insert into the PATH environment variable:
     QString equalSign = "=";
-    QRegExp absolutePath ("^absolute_path");
-    QRegExp relativePath ("^relative_path");
     if (!settingsFile.open (QIODevice::ReadOnly | QIODevice::Text))
         return 1;
     QTextStream settingsStream (&settingsFile);
     while (!settingsStream.atEnd()) {
         QString line = settingsStream.readLine();
-        if (line.contains (absolutePath)) {
-            QString absolutePathToAdd = line.section (equalSign, 1, 1);
-            absolutePathToAdd.replace (QString ("\n"), "");
-            path.append (QDir::toNativeSeparators (absolutePathToAdd));
-            path.append (pathSeparator);
-        }
-        if (line.contains (relativePath)) {
-            QString relativePathToAdd = line.section (equalSign, 1, 1);
-            relativePathToAdd.replace (QString ("\n"), "");
-            path.append (QDir::toNativeSeparators (
-                             settings.rootDirName+relativePathToAdd));
-            path.append (pathSeparator);
+        if (line.contains (QRegExp ("^path"))) {
+            QString pathToAddSetting = line.section (equalSign, 1, 1);
+            pathToAddSetting.replace (QString ("\n"), "");
+            QString pathToAdd;
+            QDir pathDir (pathToAddSetting);
+            if (pathDir.exists()) {
+                if (pathDir.isRelative()) {
+                    pathToAdd = QDir::toNativeSeparators (settings.rootDirName+pathToAddSetting);
+                }
+                if (pathDir.isAbsolute()) {
+                    pathToAdd = QDir::toNativeSeparators (pathToAddSetting);
+                }
+                path.append (pathToAdd);
+                path.append (pathSeparator);
+            }
         }
     }
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+
+#ifndef Q_OS_WIN
     qputenv ("PATH", path);
-#endif
-#ifdef Q_OS_WIN // Windows
+#else
     qputenv ("Path", path);
 #endif
 
@@ -498,11 +535,10 @@ int main (int argc, char** argv)
 
     // PERLLIB:
     QByteArray perlLib;
-    QString perlLibFullPath = QDir::toNativeSeparators (settings.rootDirName+settings.perlLib);
-    perlLib.append (perlLibFullPath);
+    perlLib.append (settings.perlLib);
     qputenv ("PERLLIB", perlLib);
 
-    TopLevel toplevel (QString ("mainWindow"));
+    TopLevel toplevel;
 
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
                       &toplevel, SLOT (quitApplicationSlot()));
@@ -540,16 +576,13 @@ Settings::Settings()
     foreach (QString argument, arguments){
         if (argument.contains ("--ini") or argument.contains ("-I")) {
             settingsFileName = QDir::toNativeSeparators (argument.section ("=", 1, 1));
-            settingsDir = QFileInfo(
-                        QDir::toNativeSeparators (settingsFileName)).absolutePath();
+            settingsDir = QFileInfo (QDir::toNativeSeparators
+                                     (settingsFileName)).absolutePath();
             settingsDirName = settingsDir.absolutePath().toLatin1();
         } else {
-#ifndef Q_OS_MAC
             settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
-#endif
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
         settingsDir.cdUp();
         settingsDir.cdUp();
     }
@@ -562,66 +595,72 @@ Settings::Settings()
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
     // Root directory:
-    foreach (QString argument, arguments){
-        if (argument.contains ("--root") or argument.contains ("-R")) {
-            rootDirName = QDir::toNativeSeparators (argument.section ("=", 1, 1));
-            rootDirName.replace ("\n", "");
-        } else {
-            QString rootDirNameSetting = settings.value ("root/root").toString();
-            if (rootDirNameSetting == "current") {
-                rootDirName = settingsDirName;
-            } else {
-                rootDirName = QDir::toNativeSeparators (rootDirNameSetting);
-            }
-        }
+    QString rootDirNameSetting = settings.value ("root/root").toString();
+    if (rootDirNameSetting == "current") {
+        rootDirName = settingsDirName;
+    } else {
+        rootDirName = QDir::toNativeSeparators (rootDirNameSetting);
     }
     if (!rootDirName.endsWith (QDir::separator())) {
         rootDirName.append (QDir::separator());
     }
 
-    // Environment settings:
-    perlLib = settings.value ("environment/perllib").toString();
+    // Environment:
+    appendUserPath = settings.value ("environment/append_user_path").toString();
+
+    QString perlLibSetting = settings.value ("environment/perllib").toString();
+    QDir perlLibDir (perlLibSetting);
+    if (perlLibDir.isRelative()) {
+        perlLib = QDir::toNativeSeparators (rootDirName+perlLibSetting);
+    }
+    if (perlLibDir.isAbsolute()) {
+        perlLib = QDir::toNativeSeparators (perlLibSetting);
+    }
 
     // Interpreters:
     perlInterpreter = settings.value ("interpreters/perl").toString();
+
     pythonInterpreter = settings.value ("interpreters/python").toString();
+
     phpInterpreter = settings.value ("interpreters/php").toString();
+
+    // Script:
+    scriptTimeout = settings.value ("scripts/script_timeout").toString();
+
+    displayStderr = settings.value ("scripts/display_stderr").toString();
 
     // Perl debugger settings:
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
 
     QString debuggerHtmlTemplateSetting = settings.value (
                 "perl_debugger/debugger_html_template").toString();
-    debuggerHtmlTemplate = QDir::toNativeSeparators (
-                rootDirName+debuggerHtmlTemplateSetting);
+    QFileInfo debuggerHtmlTemplateFile (debuggerHtmlTemplateSetting);
+    if (debuggerHtmlTemplateFile.isRelative()) {
+        debuggerHtmlTemplate = QDir::toNativeSeparators (
+                    rootDirName+debuggerHtmlTemplateSetting);
+    }
+    if (debuggerHtmlTemplateFile.isAbsolute()) {
+        debuggerHtmlTemplate = QDir::toNativeSeparators (debuggerHtmlTemplateSetting);
+    }
 
     // Source viewer settings:
     QString sourceViewerSetting = settings.value ("source_viewer/source_viewer").toString();
-    sourceViewer = QDir::toNativeSeparators (rootDirName+sourceViewerSetting);
+    QFileInfo sourceViewerFile (sourceViewerSetting);
+    if (sourceViewerFile.isRelative()) {
+        sourceViewer = QDir::toNativeSeparators (
+                    rootDirName+sourceViewerSetting);
+    }
+    if (sourceViewerFile.isAbsolute()) {
+        sourceViewer = QDir::toNativeSeparators (sourceViewerSetting);
+    }
 
     QString sourceViewerArgumentsSetting =
             settings.value ("source_viewer/source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
-    // Networking settings:
+    // User agent:
     userAgent = settings.value ("networking/user_agent").toString();
-
-    // Read the INI file for a list of allowed web sites:
-    QFile settingsFile (settingsFileName);
-    QString equalSign = "=";
-    QRegExp allowedWebsite ("^allowed_website");
-    if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream settingsStream (&settingsFile);
-        while (!settingsStream.atEnd()) {
-            QString line = settingsStream.readLine();
-            if (line.contains (allowedWebsite)) {
-                QString allowedWebsiteToAdd = line.section (equalSign, 1, 1);
-                allowedWebsiteToAdd.replace (QString ("\n"), "");
-                allowedWebSites.append (allowedWebsiteToAdd);
-            }
-        }
-    }
 
     // Start page:
     startPageSetting = settings.value ("gui/start_page").toString();
@@ -629,14 +668,18 @@ Settings::Settings()
 
     // Basic GUI settings:
     windowSize = settings.value ("gui/window_size").toString();
-    stayOnTop = settings.value ("gui/stay_on_top") .toString();
-    browserTitle = settings.value ("gui/browser_title").toString();
-    contextMenu = settings.value ("gui/context_menu").toString();
-    webInspector = settings.value ("gui/web_inspector").toString();
     if (windowSize != "maximized" or windowSize != "fullscreen") {
         fixedWidth = windowSize.section ("x", 0, 0) .toInt();
         fixedHeight = windowSize.section ("x", 1, 1) .toInt();
     }
+
+    stayOnTop = settings.value ("gui/stay_on_top") .toString();
+
+    browserTitle = settings.value ("gui/browser_title").toString();
+
+    contextMenu = settings.value ("gui/context_menu").toString();
+
+    webInspector = settings.value ("gui/web_inspector").toString();
 
     // Icon:
     QString iconPathNameSetting = settings.value ("gui/icon").toString();
@@ -646,40 +689,68 @@ Settings::Settings()
 
     // GUI theme:
     defaultTheme = settings.value ("gui/default_theme").toString();
+
     QString defaultThemeDirectorySetting =
             settings.value ("gui/default_theme_directory").toString();
-    defaultThemeDirectory =
-            QDir::toNativeSeparators (rootDirName+defaultThemeDirectorySetting);
+    QDir defaultThemeDir (defaultThemeDirectorySetting);
+    if (defaultThemeDir.isRelative()) {
+        defaultThemeDirectory = QDir::toNativeSeparators (
+                    rootDirName+defaultThemeDirectorySetting);
+    }
+    if (defaultThemeDir.isAbsolute()) {
+        defaultThemeDirectory = QDir::toNativeSeparators (defaultThemeDirectorySetting);
+    }
+
     QString allThemesDirectorySetting =
             settings.value ("gui/all_themes_directory").toString();
-    allThemesDirectory =
-            QDir::toNativeSeparators (rootDirName+allThemesDirectorySetting);
+    QDir allThemesDir (allThemesDirectorySetting);
+    if (allThemesDir.isRelative()) {
+        allThemesDirectory = QDir::toNativeSeparators (rootDirName+allThemesDirectorySetting);
+    }
+    if (allThemesDir.isAbsolute()) {
+        allThemesDirectory = QDir::toNativeSeparators (allThemesDirectorySetting);
+    }
 
     // Translation:
     defaultTranslation = settings.value ("gui/default_translation").toString();
+
     QString allTranslationsDirectorySetting =
             settings.value ("gui/all_translations_directory").toString();
-    allTranslationsDirectory = QDir::toNativeSeparators (
-                rootDirName+allTranslationsDirectorySetting);
+    QDir translationsDir (allTranslationsDirectorySetting);
+    if (translationsDir.isRelative()) {
+        allTranslationsDirectory = QDir::toNativeSeparators (
+                    rootDirName+allTranslationsDirectorySetting);
+    }
+    if (translationsDir.isAbsolute()) {
+        allTranslationsDirectory = QDir::toNativeSeparators (allTranslationsDirectorySetting);
+    }
 
     // Help:
     QString helpDirectorySetting =
             settings.value ("gui/help_directory").toString();
-    helpDirectory = QDir::toNativeSeparators (
-                rootDirName+helpDirectorySetting);
+    QDir helpDir (helpDirectorySetting);
+    if (helpDir.isRelative()) {
+        helpDirectory = QDir::toNativeSeparators (rootDirName+helpDirectorySetting);
+    }
+    if (helpDir.isAbsolute()) {
+        helpDirectory = QDir::toNativeSeparators (helpDirectorySetting);
+    }
 
     // System tray icon:
     systrayIcon = settings.value ("gui/systray_icon").toString();
+
     systrayIconDoubleClickAction =
             settings.value ("gui/systray_icon_double_click_action").toString();
 
     // Logging:
     logging = settings.value ("logging/logging").toString();
+
     logMode = settings.value ("logging/logging_mode").toString();
+
     logDirName = settings.value ("logging/logging_directory").toString();
     QDir logDir (logDirName);
     if (!logDir.exists ()) {
-        logDir.mkpath(".");
+       logDir.mkpath(".");
     }
     if (logDir.isRelative()) {
         logDirFullPath = QDir::toNativeSeparators (rootDirName+logDirName);
@@ -687,7 +758,23 @@ Settings::Settings()
     if (logDir.isAbsolute()) {
         logDirFullPath = QDir::toNativeSeparators (logDirName);
     }
+
     logPrefix = settings.value ("logging/logging_prefix").toString();
+
+    // Allowed domain names:
+    QFile settingsFile (settingsFileName);
+    QString equalSign = "=";
+    if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
+        QTextStream settingsStream (&settingsFile);
+        while (!settingsStream.atEnd()) {
+            QString line = settingsStream.readLine();
+            if (line.contains (QRegExp ("^allowed_domain"))) {
+                QString allowedWebsiteToAdd = line.section (equalSign, 1, 1);
+                allowedWebsiteToAdd.replace (QString ("\n"), "");
+                allowedWebSites.append (allowedWebsiteToAdd);
+            }
+        }
+    }
 
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
@@ -814,9 +901,6 @@ Page::Page()
 #endif
     allowedEnvironmentVariables.append ("DOCUMENT_ROOT");
     allowedEnvironmentVariables.append ("PERLLIB");
-    allowedEnvironmentVariables.append ("FILE_TO_OPEN");
-    allowedEnvironmentVariables.append ("FILE_TO_CREATE");
-    allowedEnvironmentVariables.append ("FOLDER_TO_OPEN");
 
     foreach (QString environmentVariable, systemEnvironment) {
         QStringList environmentVariableList = environmentVariable.split ("=");
@@ -843,71 +927,60 @@ Page::Page()
 }
 
 
-TopLevel::TopLevel (QString type)
+TopLevel::TopLevel ()
     : QWebView(0)
 {
 
-    if (type == "mainWindow") {
-        // Configure keyboard shortcuts - main window:
-        QShortcut* minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
-        QObject::connect (minimizeShortcut, SIGNAL (activated()),
-                          this, SLOT (minimizeSlot()));
+    // Configure keyboard shortcuts - main window:
+    QShortcut* minimizeShortcut = new QShortcut (Qt::Key_Escape, this);
+    QObject::connect (minimizeShortcut, SIGNAL (activated()),
+                      this, SLOT (minimizeSlot()));
 
-        QShortcut* maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
-        QObject::connect (maximizeShortcut, SIGNAL (activated()),
-                          this, SLOT (maximizeSlot()));
+    QShortcut* maximizeShortcut = new QShortcut (QKeySequence ("Ctrl+M"), this);
+    QObject::connect (maximizeShortcut, SIGNAL (activated()),
+                      this, SLOT (maximizeSlot()));
 
-        QShortcut* toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
-        QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
-                          this, SLOT (toggleFullScreenSlot()));
+    QShortcut* toggleFullScreenShortcut = new QShortcut (Qt::Key_F11, this);
+    QObject::connect (toggleFullScreenShortcut, SIGNAL (activated()),
+                      this, SLOT (toggleFullScreenSlot()));
 
-        QShortcut* homeShortcut = new QShortcut (Qt::Key_F12, this);
-        QObject::connect (homeShortcut, SIGNAL (activated()),
-                          this, SLOT (loadStartPageSlot()));
+    QShortcut* homeShortcut = new QShortcut (Qt::Key_F12, this);
+    QObject::connect (homeShortcut, SIGNAL (activated()),
+                      this, SLOT (loadStartPageSlot()));
 
-        QShortcut* reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
-        QObject::connect (reloadShortcut, SIGNAL (activated()),
-                          this, SLOT (reloadSlot()));
+    QShortcut* reloadShortcut = new QShortcut (QKeySequence ("Ctrl+R"), this);
+    QObject::connect (reloadShortcut, SIGNAL (activated()),
+                      this, SLOT (reloadSlot()));
 
-        QShortcut* printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
-        QObject::connect (printShortcut, SIGNAL (activated()),
-                          this, SLOT (printSlot()));
+    QShortcut* printShortcut = new QShortcut (QKeySequence ("Ctrl+P"), this);
+    QObject::connect (printShortcut, SIGNAL (activated()),
+                      this, SLOT (printSlot()));
 
-        QShortcut* closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
-        QObject::connect (closeAppShortcut, SIGNAL (activated()),
-                          this, SLOT (quitApplicationSlot()));
+    QShortcut* closeAppShortcut = new QShortcut (QKeySequence ("Ctrl+X"), this);
+    QObject::connect (closeAppShortcut, SIGNAL (activated()),
+                      this, SLOT (quitApplicationSlot()));
 
-        // Configure screen appearance - main window:
-        if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
-            setFixedSize (settings.fixedWidth, settings.fixedHeight);
-            QRect screenRect = QDesktopWidget().screen()->rect();
-            move (QPoint (screenRect.width() / 2 - width() / 2,
-                          screenRect.height() / 2 - height() / 2));
-        }
-        if (settings.windowSize == "maximized") {
-            showMaximized();
-        }
-        if (settings.windowSize == "fullscreen") {
-            showFullScreen();
-        }
-        if (settings.stayOnTop == "enable") {
-            setWindowFlags (Qt::WindowStaysOnTopHint);
-        }
-        if (settings.browserTitle != "dynamic") {
-            setWindowTitle (settings.browserTitle);
-        }
-        if (settings.contextMenu == "disable") {
-            setContextMenuPolicy (Qt::NoContextMenu);
-        }
+    // Configure screen appearance - main window:
+    if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
+        setFixedSize (settings.fixedWidth, settings.fixedHeight);
+        QRect screenRect = QDesktopWidget().screen()->rect();
+        move (QPoint (screenRect.width() / 2 - width() / 2,
+                      screenRect.height() / 2 - height() / 2));
     }
-
-    if (type == "messageBox") {
-        // Configure keyboard shortcuts - message box:
-        QShortcut* escapeShortcut = new QShortcut (Qt::Key_Escape, this);
-        QObject::connect (escapeShortcut, SIGNAL (activated()), this, SLOT (close()));
-
-        QShortcut* enterShortcut = new QShortcut (Qt::Key_Return, this);
-        QObject::connect (enterShortcut, SIGNAL (activated()), this, SLOT (close()));
+    if (settings.windowSize == "maximized") {
+        showMaximized();
+    }
+    if (settings.windowSize == "fullscreen") {
+        showFullScreen();
+    }
+    if (settings.stayOnTop == "enable") {
+        setWindowFlags (Qt::WindowStaysOnTopHint);
+    }
+    if (settings.browserTitle != "dynamic") {
+        setWindowTitle (settings.browserTitle);
+    }
+    if (settings.contextMenu == "disable") {
+        setContextMenuPolicy (Qt::NoContextMenu);
     }
 
     mainPage = new Page();
@@ -915,40 +988,32 @@ TopLevel::TopLevel (QString type)
     QObject::connect (mainPage, SIGNAL (closeWindowSignal()),
                           this, SLOT (close()));
 
-    if (type == "mainWindow") {
-        // Connect signals and slots - main window:
-        QObject::connect (mainPage, SIGNAL (displayErrorsSignal (QString)),
-                          this, SLOT (displayErrorsSlot (QString)));
+    // Connect signals and slots - main window:
+    QObject::connect (mainPage, SIGNAL (displayErrorsSignal (QString)),
+                      this, SLOT (displayErrorsSlot (QString)));
 
-        QObject::connect (this, SIGNAL (selectThemeSignal()),
-                          mainPage, SLOT (selectThemeSlot()));
+    QObject::connect (this, SIGNAL (selectThemeSignal()),
+                      mainPage, SLOT (selectThemeSlot()));
 
-        QObject::connect (mainPage, SIGNAL (printPreviewSignal()),
-                          this, SLOT (startPrintPreviewSlot()));
-        QObject::connect (mainPage, SIGNAL (printSignal()),
-                          this, SLOT (printSlot()));
-        QObject::connect (mainPage, SIGNAL (saveAsPdfSignal()),
-                          this, SLOT (saveAsPdfSlot()));
+    QObject::connect (mainPage, SIGNAL (printPreviewSignal()),
+                      this, SLOT (startPrintPreviewSlot()));
+    QObject::connect (mainPage, SIGNAL (printSignal()),
+                      this, SLOT (printSlot()));
+    QObject::connect (mainPage, SIGNAL (saveAsPdfSignal()),
+                      this, SLOT (saveAsPdfSlot()));
 
-        QObject::connect (mainPage, SIGNAL (reloadSignal()),
-                          this, SLOT (reloadSlot()));
+    QObject::connect (mainPage, SIGNAL (reloadSignal()),
+                      this, SLOT (reloadSlot()));
 
-        QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
-                          this, SLOT (quitApplicationSlot()));
+    QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
+                      this, SLOT (quitApplicationSlot()));
 
-        if (settings.browserTitle == "dynamic") {
-            QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                              this, SLOT (pageLoadedDynamicTitleSlot (bool)));
-        } else {
-            QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                              this, SLOT (pageLoadedStaticTitleSlot (bool)));
-        }
-    }
-
-    if (type == "messageBox") {
-        // Connect signals and slots - message box:
+    if (settings.browserTitle == "dynamic") {
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
                           this, SLOT (pageLoadedDynamicTitleSlot (bool)));
+    } else {
+        QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
+                          this, SLOT (pageLoadedStaticTitleSlot (bool)));
     }
 
     setPage (mainPage);
@@ -966,48 +1031,35 @@ TopLevel::TopLevel (QString type)
     QWebHistory* history = mainPage->history();
     history->setMaximumItemCount (0);
 
-    if (type == "mainWindow") {
-        // Cookies and HTTPS support:
-        QNetworkCookieJar* jar = new QNetworkCookieJar;
-        nam->setCookieJar (jar);
-        QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
-                          this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
+    // Cookies and HTTPS support:
+    QNetworkCookieJar* jar = new QNetworkCookieJar;
+    nam->setCookieJar (jar);
+    QObject::connect (nam, SIGNAL (sslErrors (QNetworkReply*, QList<QSslError>)),
+                      this, SLOT (sslErrors (QNetworkReply*, QList<QSslError>)));
 
-        // Configure scroll bars:
-        mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
-        mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
+    // Configure scroll bars:
+    mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAsNeeded);
+    mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAsNeeded);
 
-        // Context menu settings:
-        mainPage->action (QWebPage::SetTextDirectionLeftToRight)->setVisible (false);
-        mainPage->action (QWebPage::SetTextDirectionRightToLeft)->setVisible (false);
+    // Context menu settings:
+    mainPage->action (QWebPage::SetTextDirectionLeftToRight)->setVisible (false);
+    mainPage->action (QWebPage::SetTextDirectionRightToLeft)->setVisible (false);
 
-        mainPage->action (QWebPage::Back)->setVisible (false);
-        mainPage->action (QWebPage::Forward)->setVisible (false);
-        mainPage->action (QWebPage::Reload)->setVisible (false);
-        mainPage->action (QWebPage::Stop)->setVisible (false);
+    mainPage->action (QWebPage::Back)->setVisible (false);
+    mainPage->action (QWebPage::Forward)->setVisible (false);
+    mainPage->action (QWebPage::Reload)->setVisible (false);
+    mainPage->action (QWebPage::Stop)->setVisible (false);
 
-        mainPage->action (QWebPage::OpenLink)->setVisible (false);
-        mainPage->action (QWebPage::CopyLinkToClipboard)->setVisible (false);
-        mainPage->action (QWebPage::OpenLinkInNewWindow)->setVisible (false);
-        mainPage->action (QWebPage::DownloadLinkToDisk)->setVisible (false);
-        mainPage->action (QWebPage::OpenFrameInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::OpenLink)->setVisible (false);
+    mainPage->action (QWebPage::CopyLinkToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::OpenLinkInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::DownloadLinkToDisk)->setVisible (false);
+    mainPage->action (QWebPage::OpenFrameInNewWindow)->setVisible (false);
 
-        mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
-        mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
-        mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
-        mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
-    }
-
-    if (type == "messageBox") {
-        mainPage->setLinkDelegationPolicy (QWebPage::DelegateAllLinks);
-        mainPage->mainFrame()->setScrollBarPolicy (Qt::Horizontal, Qt::ScrollBarAlwaysOff);
-        mainPage->mainFrame()->setScrollBarPolicy (Qt::Vertical, Qt::ScrollBarAlwaysOff);
-
-        setWindowIcon (settings.icon);
-        setWindowFlags (Qt::WindowStaysOnTopHint);
-        setContextMenuPolicy (Qt::NoContextMenu);
-    }
-
+    mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
+    mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
 }
 
 // Manage clicking of links:
@@ -1046,11 +1098,13 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
             selectPerlLibDialog.close();
             selectPerlLibDialog.deleteLater();
 
-            QByteArray perlLibFolderName;
-            perlLibFolderName.append (perlLibFolderNameString);
-            qputenv ("PERLLIB", perlLibFolderName);
+            QByteArray perlLibFolderNameArray;
+            perlLibFolderNameArray.append (perlLibFolderNameString);
+            qputenv ("PERLLIB", perlLibFolderNameArray);
+            scriptEnvironment.insert ("PERLLIB", perlLibFolderNameString);
+            settings.saveSetting (QString ("perllib"), perlLibFolderNameString);
 
-            qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+            qDebug() << "Selected PERLLIB:" << perlLibFolderNameArray;
             qDebug() << "===============";
         }
 
@@ -1148,7 +1202,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
-        qputenv ("FILE_TO_OPEN", fileName);
+        scriptEnvironment.insert ("FILE_TO_OPEN", fileName);
 
         qDebug() << "File to open:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
@@ -1175,7 +1229,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
-        qputenv ("FILE_TO_CREATE", fileName);
+        scriptEnvironment.insert ("FILE_TO_CREATE", fileName);
 
         qDebug() << "New file:" << QDir::toNativeSeparators (fileName);
         qDebug() << "===============";
@@ -1199,7 +1253,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
         QByteArray folderName;
         folderName.append (folderNameToOpenString);
-        qputenv ("FOLDER_TO_OPEN", folderName);
+        scriptEnvironment.insert ("FOLDER_TO_OPEN", folderName);
 
         qDebug() << "Folder to open:" << QDir::toNativeSeparators (folderName);
         qDebug() << "===============";
@@ -1302,7 +1356,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
                 // but only after a Perl script for debugging has been selected:
                 if ((!Page::mainFrame()->childFrames().contains (frame) and
                      (!request.url().toString().contains ("restart")))) {
-                    debuggerNewWindow = new TopLevel (QString ("mainWindow"));
+                    debuggerNewWindow = new TopLevel ();
                     debuggerNewWindow->setWindowIcon (settings.icon);
                     debuggerNewWindow->setAttribute (Qt::WA_DeleteOnClose, true);
                     debuggerNewWindow->setUrl (scriptToDebugUrl);
@@ -1395,7 +1449,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         qDebug() << "Allowed web link in a new window:" << request.url().toString();
         qDebug() << "===============";
 
-        newWindow = new TopLevel (QString ("mainWindow"));
+        newWindow = new TopLevel ();
         newWindow->setWindowIcon (settings.icon);
         newWindow->setAttribute (Qt::WA_DeleteOnClose, true);
         newWindow->setUrl (request.url());
@@ -1424,9 +1478,16 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
              request.url().scheme().contains ("file")) {
 
+#ifdef Q_OS_WIN
+        QString filepath = request.url()
+                .toString (QUrl::RemoveScheme)
+                .replace ("///", "");
+
+#else
         QString filepath = request.url()
                 .toString (QUrl::RemoveScheme)
                 .replace ("///", "/");
+#endif
 
         QFile file (QDir::toNativeSeparators (filepath));
         if (file.exists()) {
