@@ -9,7 +9,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing loca
 * **1. Easy GUI for local scripts:**  
     use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl, Python or PHP scripts  
 
-* **2. Specialized web client:**  
+* **2. Special purpose web client:**  
     use locally executed Perl, Python or PHP scripts to convert or verify large amounts of user data before upload;  
 
 * **3. Zero installation when needed:**  
@@ -20,6 +20,9 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing loca
 
 * **5. Secure user space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program. Administrative privileges may be needed only to install or update the browser and it's files with an increased level of security, if so desired.  
+
+* **6. Avoiding dependency hell:**  
+    if some functionality outside of the standard Qt classes is needed for the browser, all the necessary source code must be included in the source package and all external libraries must be statically linked within the binary. If Qt libraries are also linked statically, a single file executable has to be possible.  
   
 ## Features
   
@@ -52,7 +55,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing loca
 * Browser root folder can be any folder.  
 * Basic program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
-* Use your favorite logo as a custom icon to be displayed on windows an message boxes.  
+* Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
@@ -91,7 +94,7 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
 * Starting the browser as root on Linux is not allowed - it exits with a warning message.  
 * PEB does not download locally executed scripts from any remote locations and it does not use Perl, Python or PHP interpreters as helper applications for online content. This is not going to be implemented due to the huge security risks involved!  
 * User has no dialog to select an arbitrary local script for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URI (currently ```http://perl-executing-browser-pseudodomain/```). Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents the browser from executing untrusted code. Executing as root ```chown --recursive root peb-root-folder```, ```chgrp --recursive root peb-root-folder``` and ```chmod --recursive 755 peb-root-folder``` on a Linux machine is enough to do the job. The same commands should be applied to the binary file to prevent it's unauthorized replacing or modification. Although locally executed scripts don't have to be made executable because they are always given as an argument to their respective interpreters, mode 755 is necessary to avoid 'cannot read directory' error for ordinary users.  
-* Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from debugged Perl scripts does exist and future versions will probably have a compile-time option to switch off Perl debugger interaction in end-user binaries.  
+* Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from a debugged Perl script does exist and future versions will probably have a compile-time option to switch off Perl debugger interaction in end-user binaries.  
 * It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
 ## History
