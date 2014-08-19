@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl, Python or PHP scripts locally without a web server. CGI-like and long-running scripts can be executed locally in serverless mode and they can be fed from HTML forms using CGI protocol GET and POST methods. Serverless execution of local scripts is separated from the traditional browser access to local or remote servers. Limited interaction with the built-in Perl debugger is also supported.  
+Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing local CGI and long-running Perl, Python or PHP scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -13,28 +13,28 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
     use locally executed Perl, Python or PHP scripts to convert or verify large amounts of user data before upload;  
 
 * **3. Zero installation when needed:**  
-    put together your Perl modules and even your version of Perl, Python or PHP with a copy of PEB and its Qt libraries and run your scripts from every folder, even from USB sticks;  
+    put together your Perl scripts and modules and even your version of Perl, Python or PHP with a copy of PEB and its Qt libraries and run your applications from every folder, even from USB sticks;  
 
 * **4. Cross-platform availability:**  
-    use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt can be compiled;  
+    use it on every platform and device (desktop, tablet, smartphone), where Perl and Qt are available;  
 
-* **5. User space solution:**  
-    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered, no need for administrative privileges and everything remains in the userspace.  
+* **5. Secure user space solution:**  
+    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program. Administrative privileges may be needed only to install or update the browser and it's files with an increased level of security, if so desired.  
   
 ## Features
   
 **No feature or implementation should be considered final at this early stage of development!**
   
 **Scripting:**  
-* CGI scripts can be executed locally in a serverless mode, feeding them from standard forms using CGI protocol GET and POST methods.  
+* CGI scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
 * Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
 * Any version of Perl, Python or PHP can be selected from configuration file or by clicking a special URL.  
-* Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
+* Multiple directories can be added to the PATH environment variable of every locally executed script.  
   
 **Networking:**  
 * PEB can open pages from localhost or from a predefined list of allowed websites.  
-* PEB can be used as a site-specific browser or a special purpose web client.  
+* User agent name can be changed easily from configuration file.  
   
 **Local filesystem:**  
 * PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
@@ -52,14 +52,14 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * Browser root folder can be any folder.  
 * Basic program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
-* Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
+* Use your favorite logo as a custom icon to be displayed on windows an message boxes.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
 ## Possible Applications
   
-* Perl, Python or PHP desktop applications with HTML4/5 & CSS2/3 GUI;  
-* Web clients with enhanced scripting capabilities based on Perl, Python, PHP & JavaScript;  
+* Perl, Python or PHP desktop applications with HTML4/5, CSS2/3 & JavaScript GUI;  
+* Web clients or site-specific browsers with enhanced scripting capabilities based on Perl, Python, PHP & JavaScript;  
 * GUI for the Perl debugger.  
   
 ## Compile-time Requirements
@@ -88,9 +88,11 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
 ## Security Features & Considerations
   
 * Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to system resources as the user, who started the browser.  
-* Starting the browser as root on Linux is not possible - it exits with a warning message.  
-* Downloading locally executed scripts from remote locations or using Perl, Python or PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved!  
-* It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
+* Starting the browser as root on Linux is not allowed - it exits with a warning message.  
+* PEB does not download locally executed scripts from any remote locations and it does not use Perl, Python or PHP interpreters as helper applications for online content. This is not going to be implemented due to the huge security risks involved!  
+* User has no dialog to select an arbitrary local script for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URI (currently ```http://perl-executing-browser-pseudodomain/```). Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents the browser from executing untrusted code. Executing as root ```chown --recursive root peb-root-folder```, ```chgrp --recursive root peb-root-folder``` and ```chmod --recursive 755 peb-root-folder``` on a Linux machine is enough to do the job. The same commands should be applied to the binary file to prevent it's unauthorized replacing or modification. Although locally executed scripts don't have to be made executable because they are always given as an argument to their respective interpreters, mode 755 is necessary to avoid 'cannot read directory' error for ordinary users.  
+* Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from debugged Perl scripts does exist and future versions will probably have a compile-time option to switch off Perl debugger interaction in end-user binaries.  
+* It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
 ## History
   
