@@ -33,8 +33,8 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 * Several absolute or relative path directories can be added to the PATH environment variable of every locally executed script.  
   
 **Networking:**  
-* PEB can load scripts and pages from localhost or from a predefined list of allowed websites.  
-* PEB can be used as a site-specific browser or a specialised web client.  
+* PEB can open pages from localhost or from a predefined list of allowed websites.  
+* PEB can be used as a site-specific browser or a special purpose web client.  
   
 **Local filesystem:**  
 * PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
@@ -43,13 +43,13 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* PEB can interact with the built-in Perl debugger. An arbitrary Perl script can be selected and loaded in debug mode. Graphical step-by-step debugging capability is under development and output from debugger commands is displayed together with the syntax highlighted source code of the debugged script. Different versions of Perl can be selected for every debugging session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* PEB can interact with the built-in Perl debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Different versions of Perl can be selected for every debugging session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Every Perl, Python or PHP script can be displayed as syntax highlighted source code.  
 * Extensive logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
-* Configurable from configuration file and command line.  
-* Browser root folder can be any folder and this is configurable from configuration file or command line.  
+* All settings are stored in one single INI file with comments included.  
+* Browser root folder can be any folder.  
 * Basic program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Rebrandable - program icon can be changed without recompilation, user agent can also be changed.  
@@ -60,17 +60,18 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing Perl
   
 * Perl, Python or PHP desktop applications with HTML4/5 & CSS2/3 GUI;  
 * Web clients with enhanced scripting capabilities based on Perl, Python, PHP & JavaScript;  
-* (Limited) GUI for the Perl debugger.  
+* GUI for the Perl debugger.  
   
 ## Compile-time Requirements
   
 Compiled and tested successfully using:  
 * Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux  
-(main development and testing platform),  
+(main development and testing platform - Dimitar D. Mitov),  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
-* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5.  
+* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5  
+(main development and testing platform - Valcho Nedelchev),  
 Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
   
 ## Runtime Requirements
@@ -84,9 +85,12 @@ Qt Creator, Qt headers and GCC compiler from any standard Qt4 or Qt5 development
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
   
-## Security Considerations
+## Security Features & Considerations
   
-Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to system resources as the user, who started the browser. However, downloading locally executed scripts from remote locations or using Perl, Python or PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved! It is also not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
+* Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to system resources as the user, who started the browser.  
+* Starting the browser as root on Linux is not possible - it exits with a warning message.  
+* Downloading locally executed scripts from remote locations or using Perl, Python or PHP interpreters as helper applications for online content are not going to be implemented because of the huge security risks involved!  
+* It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside.  
   
 ## History
   
