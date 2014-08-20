@@ -59,31 +59,6 @@ class Settings : public QSettings
 
 public slots:
 
-    void saveSetting (QString key, QString value)
-    {
-        QString temp;
-
-        QFile settingsFile (settingsFileName);
-        if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
-            QTextStream input (&settingsFile);
-            while (!input.atEnd()) {
-                QString line = input.readLine();
-                if (line.contains (QRegExp ("^"+key+"="))) {
-                    line = key+"="+value;
-                }
-                temp.append (line);
-                temp.append ("\n");
-            }
-            settingsFile.close();
-        }
-
-        if (settingsFile.open (QIODevice::WriteOnly | QIODevice::Text)) {
-            QTextStream output (&settingsFile);
-            output << temp;
-            settingsFile.close();
-        }
-    }
-
     void defineInterpreter (QString filepath)
     {
         interpreter = "undefined";
@@ -187,6 +162,7 @@ public:
     QDir settingsDir;
 
     QString appendUserPath;
+    QStringList pathToAddList;
     QString perlLib;
 
     QString perlInterpreter;
@@ -203,7 +179,7 @@ public:
     QStringList sourceViewerArguments;
 
     QString userAgent;
-    QStringList allowedWebSites;
+    QStringList allowedDomainsList;
 
     QString startPageSetting;
     QString startPage;
@@ -446,7 +422,7 @@ protected:
              operation == PutOperation) and
                 ((request.url().scheme().contains ("file")) or
                  (request.url().toString().contains (PEB_DOMAIN)) or
-                 (settings.allowedWebSites.contains (request.url().authority())))) {
+                 (settings.allowedDomainsList.contains (request.url().authority())))) {
 
             qDebug() << "Allowed link:" << request.url().toString();
             qDebug() << "===============";

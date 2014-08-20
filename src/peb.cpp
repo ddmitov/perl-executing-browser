@@ -390,8 +390,12 @@ int main (int argc, char** argv)
     qDebug() << "===============";
     qDebug() << "ENVIRONMENT SETTINGS:";
     qDebug() << "===============";
-    qDebug() << "PERLLIB folder:" << settings.perlLib;
     qDebug() << "Append user PATH:" << settings.appendUserPath;
+    qDebug() << "Folders to add to PATH:";
+    foreach (QString pathEntry, settings.pathToAddList) {
+        qDebug() << pathEntry;
+    }
+    qDebug() << "PERLLIB folder:" << settings.perlLib;
 
     qDebug() << "===============";
     qDebug() << "INTERPRETERS:";
@@ -419,7 +423,13 @@ int main (int argc, char** argv)
     qDebug() << "Source viewer arguments:" << settings.sourceViewerArguments;
 
     qDebug() << "===============";
+    qDebug() << "NETWORKING SETTINGS:";
+    qDebug() << "===============";
     qDebug() << "User Agent:" << settings.userAgent;
+    qDebug() << "Allowed domain names:";
+    foreach (QString allowedDomainsListEntry, settings.allowedDomainsList) {
+        qDebug() << allowedDomainsListEntry;
+    }
 
     qDebug() << "===============";
     qDebug() << "GUI SETTINGS:";
@@ -475,7 +485,7 @@ int main (int argc, char** argv)
 
     // ENVIRONMENT VARIABLES:
     // PATH:
-    // Get the existing PATH and set the separator sign:
+    // Get the existing user PATH and set the separator sign:
     QByteArray userPath;
     QByteArray path;
     QString pathSeparator;
@@ -491,37 +501,26 @@ int main (int argc, char** argv)
     }
     pathSeparator = ";";
 #endif
-
+    // Append user PATH, if settings file says so:
     if (settings.appendUserPath == "enable") {
         path.append (userPath);
         path.append (pathSeparator);
     }
-
-    // Read the INI file for folders to insert into the PATH environment variable:
-    QString equalSign = "=";
-    if (!settingsFile.open (QIODevice::ReadOnly | QIODevice::Text))
-        return 1;
-    QTextStream settingsStream (&settingsFile);
-    while (!settingsStream.atEnd()) {
-        QString line = settingsStream.readLine();
-        if (line.contains (QRegExp ("^path"))) {
-            QString pathToAddSetting = line.section (equalSign, 1, 1);
-            pathToAddSetting.replace (QString ("\n"), "");
-            QString pathToAdd;
-            QDir pathDir (pathToAddSetting);
-            if (pathDir.exists()) {
-                if (pathDir.isRelative()) {
-                    pathToAdd = QDir::toNativeSeparators (settings.rootDirName+pathToAddSetting);
-                }
-                if (pathDir.isAbsolute()) {
-                    pathToAdd = QDir::toNativeSeparators (pathToAddSetting);
-                }
-                path.append (pathToAdd);
-                path.append (pathSeparator);
+    // Append all additional, browser-specific folder names to PATH:
+    foreach (QString pathEntry, settings.pathToAddList) {
+        QDir pathDir (pathEntry);
+        if (pathDir.exists()) {
+            if (pathDir.isRelative()) {
+                pathEntry = QDir::toNativeSeparators (settings.rootDirName+pathEntry);
             }
+            if (pathDir.isAbsolute()) {
+                pathEntry = QDir::toNativeSeparators (pathEntry);
+            }
+            path.append (pathEntry);
+            path.append (pathSeparator);
         }
     }
-
+    // Insert modified PATH variable into the actual environment of the browser:
 #ifndef Q_OS_WIN
     qputenv ("PATH", path);
 #else
@@ -538,6 +537,7 @@ int main (int argc, char** argv)
     perlLib.append (settings.perlLib);
     qputenv ("PERLLIB", perlLib);
 
+    // Initialize the main GUI class:
     TopLevel toplevel;
 
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
@@ -547,6 +547,7 @@ int main (int argc, char** argv)
     toplevel.loadStartPageSlot();
     toplevel.show();
 
+    // Initialize the system tray icon class:
     TrayIcon trayicon;
 
     if (settings.systrayIcon == "enable") {
@@ -572,7 +573,7 @@ Settings::Settings()
     // Get command line arguments:
     QStringList arguments = QCoreApplication::arguments();
 
-    // Settings file:
+    // SETTINGS FILE:
     foreach (QString argument, arguments){
         if (argument.contains ("--ini") or argument.contains ("-I")) {
             settingsFileName = QDir::toNativeSeparators (argument.section ("=", 1, 1));
@@ -594,7 +595,7 @@ Settings::Settings()
     }
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
-    // Root directory:
+    // ROOT DIRECTORY:
     QString rootDirNameSetting = settings.value ("root/root").toString();
     if (rootDirNameSetting == "current") {
         rootDirName = settingsDirName;
@@ -605,9 +606,20 @@ Settings::Settings()
         rootDirName.append (QDir::separator());
     }
 
-    // Environment:
+    // ENVIRONMENT:
+    // Append user path - 'enable' or 'disable':
     appendUserPath = settings.value ("environment/append_user_path").toString();
 
+    // Folders to add to PATH:
+    int pathSize = settings.beginReadArray("environment/path");
+    for (int index = 0; index < pathSize; ++index) {
+        settings.setArrayIndex (index);
+        QString pathSetting = settings.value ("name").toString();
+        pathToAddList.append (pathSetting);
+    }
+    settings.endArray();
+
+    // PERLLIB:
     QString perlLibSetting = settings.value ("environment/perllib").toString();
     QDir perlLibDir (perlLibSetting);
     if (perlLibDir.isRelative()) {
@@ -617,21 +629,26 @@ Settings::Settings()
         perlLib = QDir::toNativeSeparators (perlLibSetting);
     }
 
-    // Interpreters:
+    // INTERPRETERS:
     perlInterpreter = settings.value ("interpreters/perl").toString();
 
     pythonInterpreter = settings.value ("interpreters/python").toString();
 
     phpInterpreter = settings.value ("interpreters/php").toString();
 
-    // Script:
+    // SCRIPTS:
+    // Timeout for CGI scripts (not long-running ones):
     scriptTimeout = settings.value ("scripts/script_timeout").toString();
 
+    // Display or hide STDERR from scripts - 'enable' or 'disable';
     displayStderr = settings.value ("scripts/display_stderr").toString();
 
-    // Perl debugger settings:
+    // PERL DEBUGGER:
+    // Use the same debugger for execution of scripts and debugging or
+    // choose a separate interpreter for each debugging session.
     debuggerInterpreter = settings.value ("perl_debugger/debugger_interpreter").toString();
 
+    // Perl debugger HTML template:
     QString debuggerHtmlTemplateSetting = settings.value (
                 "perl_debugger/debugger_html_template").toString();
     QFileInfo debuggerHtmlTemplateFile (debuggerHtmlTemplateSetting);
@@ -643,7 +660,8 @@ Settings::Settings()
         debuggerHtmlTemplate = QDir::toNativeSeparators (debuggerHtmlTemplateSetting);
     }
 
-    // Source viewer settings:
+    // SOURCE VIEWER:
+    // Path to the selected source viewer:
     QString sourceViewerSetting = settings.value ("source_viewer/source_viewer").toString();
     QFileInfo sourceViewerFile (sourceViewerSetting);
     if (sourceViewerFile.isRelative()) {
@@ -654,31 +672,51 @@ Settings::Settings()
         sourceViewer = QDir::toNativeSeparators (sourceViewerSetting);
     }
 
+    // Optional source viewer command line arguments.
+    // They will be given to the source viewer whenever it is started by the browser..
     QString sourceViewerArgumentsSetting =
             settings.value ("source_viewer/source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
 
+    // NETWORKING:
     // User agent:
     userAgent = settings.value ("networking/user_agent").toString();
 
-    // Start page:
+    // Allowed domains:
+    int domainsSize = settings.beginReadArray("networking/allowed_domains");
+    for (int index = 0; index < domainsSize; ++index) {
+        settings.setArrayIndex (index);
+        QString pathSetting = settings.value ("name").toString();
+        allowedDomainsList.append (pathSetting);
+    }
+    settings.endArray();
+
+    // GUI:
+    // - path must be relative to the PEB root directory:
+    // HTML file or script are equally usable as a start page:
     startPageSetting = settings.value ("gui/start_page").toString();
     startPage = QDir::toNativeSeparators (rootDirName+startPageSetting);
 
-    // Basic GUI settings:
+    // Window size - 'maximized', 'fullscreen' or numeric value like
+    // '800x600' or '1024x756' etc.:
     windowSize = settings.value ("gui/window_size").toString();
     if (windowSize != "maximized" or windowSize != "fullscreen") {
         fixedWidth = windowSize.section ("x", 0, 0) .toInt();
         fixedHeight = windowSize.section ("x", 1, 1) .toInt();
     }
 
+    // Stay on top of all other windows - 'enable' or 'disable':
     stayOnTop = settings.value ("gui/stay_on_top") .toString();
 
+    // Browser title -'dynamic' or 'My Favorite Title'
+    // 'dynamic' title is taken from every HTML <title> tag.
     browserTitle = settings.value ("gui/browser_title").toString();
 
+    // Right click context menu - 'enable' or 'disable':
     contextMenu = settings.value ("gui/context_menu").toString();
 
+    // Web Inspector from context menu - 'enable' or 'disable':
     webInspector = settings.value ("gui/web_inspector").toString();
 
     // Icon:
@@ -687,9 +725,10 @@ Settings::Settings()
             QDir::toNativeSeparators (rootDirName+iconPathNameSetting);
     icon.load (iconPathName);
 
-    // GUI theme:
+    // Name of the current GUI theme:
     defaultTheme = settings.value ("gui/default_theme").toString();
 
+    // Directory of the current GUI theme:
     QString defaultThemeDirectorySetting =
             settings.value ("gui/default_theme_directory").toString();
     QDir defaultThemeDir (defaultThemeDirectorySetting);
@@ -701,6 +740,7 @@ Settings::Settings()
         defaultThemeDirectory = QDir::toNativeSeparators (defaultThemeDirectorySetting);
     }
 
+    // Directory for all GUI themes:
     QString allThemesDirectorySetting =
             settings.value ("gui/all_themes_directory").toString();
     QDir allThemesDir (allThemesDirectorySetting);
@@ -711,9 +751,10 @@ Settings::Settings()
         allThemesDirectory = QDir::toNativeSeparators (allThemesDirectorySetting);
     }
 
-    // Translation:
+    // Current translation:
     defaultTranslation = settings.value ("gui/default_translation").toString();
 
+    // Directory for all translations:
     QString allTranslationsDirectorySetting =
             settings.value ("gui/all_translations_directory").toString();
     QDir translationsDir (allTranslationsDirectorySetting);
@@ -725,7 +766,7 @@ Settings::Settings()
         allTranslationsDirectory = QDir::toNativeSeparators (allTranslationsDirectorySetting);
     }
 
-    // Help:
+    // Help directory:
     QString helpDirectorySetting =
             settings.value ("gui/help_directory").toString();
     QDir helpDir (helpDirectorySetting);
@@ -736,17 +777,25 @@ Settings::Settings()
         helpDirectory = QDir::toNativeSeparators (helpDirectorySetting);
     }
 
-    // System tray icon:
+    // System tray icon - 'enable' or 'disable':
     systrayIcon = settings.value ("gui/systray_icon").toString();
 
+    // Double-clicking the system tray icon can quit the program or minimize all of it's windows.
+    // User is asked for confirmation before quitting the program.
+    // Available options: 'quit' or 'minimize_all_windows'
     systrayIconDoubleClickAction =
             settings.value ("gui/systray_icon_double_click_action").toString();
 
-    // Logging:
+    // Logging - 'enable' or 'disable':
     logging = settings.value ("logging/logging").toString();
 
+    // Logging mode - 'per_session_file' or 'single_file'.
+    // 'single_file' means that only one single log file is created.
+    // 'per_session' means that a separate log file is created for every browser ssession.
+    // Application start date and time are appended to the file name in this scenario.
     logMode = settings.value ("logging/logging_mode").toString();
 
+    // Log files directory:
     logDirName = settings.value ("logging/logging_directory").toString();
     QDir logDir (logDirName);
     if (!logDir.exists ()) {
@@ -759,22 +808,8 @@ Settings::Settings()
         logDirFullPath = QDir::toNativeSeparators (logDirName);
     }
 
+    // Log filename prefix:
     logPrefix = settings.value ("logging/logging_prefix").toString();
-
-    // Allowed domain names:
-    QFile settingsFile (settingsFileName);
-    QString equalSign = "=";
-    if (settingsFile.open (QIODevice::ReadOnly | QIODevice::Text)) {
-        QTextStream settingsStream (&settingsFile);
-        while (!settingsStream.atEnd()) {
-            QString line = settingsStream.readLine();
-            if (line.contains (QRegExp ("^allowed_domain"))) {
-                QString allowedWebsiteToAdd = line.section (equalSign, 1, 1);
-                allowedWebsiteToAdd.replace (QString ("\n"), "");
-                allowedWebSites.append (allowedWebsiteToAdd);
-            }
-        }
-    }
 
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
@@ -1084,7 +1119,10 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         dialog.deleteLater();
 
         if (perlInterpreter.length() > 0) {
-            settings.saveSetting (QString ("perl"), perlInterpreter);
+            settings.perlInterpreter = perlInterpreter;
+            QSettings perlInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
+            perlInterpreterSetting.setValue ("interpreters/perl", perlInterpreter);
+            perlInterpreterSetting.sync();
 
             qDebug() << "Selected Perl interpreter:" << perlInterpreter;
 
@@ -1102,7 +1140,11 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
             perlLibFolderNameArray.append (perlLibFolderNameString);
             qputenv ("PERLLIB", perlLibFolderNameArray);
             scriptEnvironment.insert ("PERLLIB", perlLibFolderNameString);
-            settings.saveSetting (QString ("perllib"), perlLibFolderNameString);
+
+            settings.perlLib = perlLibFolderNameString;
+            QSettings perlLibSetting (settings.settingsFileName, QSettings::IniFormat);
+            perlLibSetting.setValue ("environment/perllib", perlLibFolderNameString);
+            perlLibSetting.sync();
 
             qDebug() << "Selected PERLLIB:" << perlLibFolderNameArray;
             qDebug() << "===============";
@@ -1127,7 +1169,10 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         dialog.deleteLater();
 
         if (pythonInterpreter.length() > 0) {
-            settings.saveSetting (QString ("python"), pythonInterpreter);
+            settings.pythonInterpreter = pythonInterpreter;
+            QSettings pythonInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
+            pythonInterpreterSetting.setValue ("interpreters/python", pythonInterpreter);
+            pythonInterpreterSetting.sync();
 
             qDebug() << "Selected Python interpreter:" << pythonInterpreter;
             qDebug() << "===============";
@@ -1152,7 +1197,10 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         dialog.deleteLater();
 
         if (phpInterpreter.length() > 0) {
-            settings.saveSetting (QString ("php"), phpInterpreter);
+            settings.phpInterpreter = phpInterpreter;
+            QSettings phpInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
+            phpInterpreterSetting.setValue ("interpreters/php", phpInterpreter);
+            phpInterpreterSetting.sync();
 
             qDebug() << "Selected PHP interpreter:" << phpInterpreter;
             qDebug() << "===============";
@@ -1431,7 +1479,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     // Open allowed web content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (Page::mainFrame()->childFrames().contains (frame)) and
-            (settings.allowedWebSites.contains (request.url().authority()))) {
+            (settings.allowedDomainsList.contains (request.url().authority()))) {
 
         qDebug() << "Allowed web link in the same window:" << request.url().toString();
         qDebug() << "===============";
@@ -1444,7 +1492,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     // Open allowed web content in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (!Page::mainFrame()->childFrames().contains (frame)) and
-            (settings.allowedWebSites.contains (request.url().authority()))) {
+            (settings.allowedDomainsList.contains (request.url().authority()))) {
 
         qDebug() << "Allowed web link in a new window:" << request.url().toString();
         qDebug() << "===============";
@@ -1463,7 +1511,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
             request.url().scheme().contains ("http") and
             (!request.url().toString().contains (PEB_DOMAIN)) and
             (!request.url().authority().contains ("localhost")) and
-            (!settings.allowedWebSites.contains (request.url().authority()))) {
+            (!settings.allowedDomainsList.contains (request.url().authority()))) {
 
         qDebug() << "Default browser called for not allowed web link:"
                  << request.url().toString();
