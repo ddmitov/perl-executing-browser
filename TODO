@@ -15,7 +15,6 @@ Perl debugger interaction:
 - show highlighted HTML source code when scripts produce HTML within the debugger GUI
 
 Locally executed scripts:
-- option to discard user PATH from script PATH
 - HTML formatted STDERR output
 
 GUI:

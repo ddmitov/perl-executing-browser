@@ -182,9 +182,11 @@ int main (int argc, char** argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --ini       -I    absolute path of browser configuration file"
+            std::cout << "  --fullscreen     -F    start browser in fullscreen mode"
                       << std::endl;
-            std::cout << "  --help      -H    this help"
+            std::cout << "  --maximized      -M    start browser in a maximized window"
+                      << std::endl;
+            std::cout << "  --help           -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
             if (settings.logging == "enable") {
@@ -570,29 +572,18 @@ Settings::Settings()
     : QSettings (0)
 {
 
-    // Get command line arguments:
-    QStringList arguments = QCoreApplication::arguments();
-
     // SETTINGS FILE:
-    foreach (QString argument, arguments){
-        if (argument.contains ("--ini") or argument.contains ("-I")) {
-            settingsFileName = QDir::toNativeSeparators (argument.section ("=", 1, 1));
-            settingsDir = QFileInfo (QDir::toNativeSeparators
-                                     (settingsFileName)).absolutePath();
-            settingsDirName = settingsDir.absolutePath().toLatin1();
-        } else {
-            settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
+    settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
         settingsDir.cdUp();
         settingsDir.cdUp();
     }
 #endif
-            settingsDirName = settingsDir.absolutePath().toLatin1();
-            settingsFileName = QDir::toNativeSeparators
-                    (settingsDirName+QDir::separator()+"peb.ini");
-        }
-    }
+    settingsDirName = settingsDir.absolutePath().toLatin1();
+    settingsFileName = QDir::toNativeSeparators
+            (settingsDirName+QDir::separator()+"peb.ini");
+    // Defining INI file format for storing settings:
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
     // ROOT DIRECTORY:
@@ -816,6 +807,21 @@ Settings::Settings()
     // Log filename prefix:
     logPrefix = settings.value ("logging/logging_prefix").toString();
 
+    // COMMAND LINE ARGUMENTS:
+    QStringList arguments = QCoreApplication::arguments();
+
+    // Command line arguments overwrite configuration file settings with the same name:
+    foreach (QString argument, arguments){
+        if (argument.contains ("--fullscreen") or argument.contains ("-F")) {
+            windowSize = "fullscreen";
+        }
+        if (argument.contains ("--maximized") or argument.contains ("-M")) {
+            fixedWidth = 1;
+            fixedHeight = 1;
+            windowSize = "maximized";
+        }
+    }
+
     // FILE TYPE DETECTION:
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
@@ -1007,7 +1013,10 @@ TopLevel::TopLevel ()
         QRect screenRect = QDesktopWidget().screen()->rect();
         move (QPoint (screenRect.width() / 2 - width() / 2,
                       screenRect.height() / 2 - height() / 2));
+    } else {
+        showMaximized();
     }
+
     if (settings.windowSize == "maximized") {
         showMaximized();
     }
