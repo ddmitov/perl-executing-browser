@@ -725,12 +725,13 @@ Settings::Settings()
             QDir::toNativeSeparators (rootDirName+iconPathNameSetting);
     icon.load (iconPathName);
 
+    // THEMES:
     // Name of the current GUI theme:
-    defaultTheme = settings.value ("gui/default_theme").toString();
+    defaultTheme = settings.value ("themes/default_theme").toString();
 
     // Directory of the current GUI theme:
     QString defaultThemeDirectorySetting =
-            settings.value ("gui/default_theme_directory").toString();
+            settings.value ("themes/default_theme_directory").toString();
     QDir defaultThemeDir (defaultThemeDirectorySetting);
     if (defaultThemeDir.isRelative()) {
         defaultThemeDirectory = QDir::toNativeSeparators (
@@ -742,7 +743,7 @@ Settings::Settings()
 
     // Directory for all GUI themes:
     QString allThemesDirectorySetting =
-            settings.value ("gui/all_themes_directory").toString();
+            settings.value ("themes/all_themes_directory").toString();
     QDir allThemesDir (allThemesDirectorySetting);
     if (allThemesDir.isRelative()) {
         allThemesDirectory = QDir::toNativeSeparators (rootDirName+allThemesDirectorySetting);
@@ -751,12 +752,13 @@ Settings::Settings()
         allThemesDirectory = QDir::toNativeSeparators (allThemesDirectorySetting);
     }
 
+    // TRANSLATIONS:
     // Current translation:
-    defaultTranslation = settings.value ("gui/default_translation").toString();
+    defaultTranslation = settings.value ("translations/default_translation").toString();
 
     // Directory for all translations:
     QString allTranslationsDirectorySetting =
-            settings.value ("gui/all_translations_directory").toString();
+            settings.value ("translations/all_translations_directory").toString();
     QDir translationsDir (allTranslationsDirectorySetting);
     if (translationsDir.isRelative()) {
         allTranslationsDirectory = QDir::toNativeSeparators (
@@ -766,9 +768,10 @@ Settings::Settings()
         allTranslationsDirectory = QDir::toNativeSeparators (allTranslationsDirectorySetting);
     }
 
+    // HELP:
     // Help directory:
     QString helpDirectorySetting =
-            settings.value ("gui/help_directory").toString();
+            settings.value ("help/help_directory").toString();
     QDir helpDir (helpDirectorySetting);
     if (helpDir.isRelative()) {
         helpDirectory = QDir::toNativeSeparators (rootDirName+helpDirectorySetting);
@@ -777,15 +780,17 @@ Settings::Settings()
         helpDirectory = QDir::toNativeSeparators (helpDirectorySetting);
     }
 
+    // SYSTEM TRAY:
     // System tray icon - 'enable' or 'disable':
-    systrayIcon = settings.value ("gui/systray_icon").toString();
+    systrayIcon = settings.value ("system_tray/systray_icon").toString();
 
     // Double-clicking the system tray icon can quit the program or minimize all of it's windows.
     // User is asked for confirmation before quitting the program.
     // Available options: 'quit' or 'minimize_all_windows'
     systrayIconDoubleClickAction =
-            settings.value ("gui/systray_icon_double_click_action").toString();
+            settings.value ("system_tray/systray_icon_double_click_action").toString();
 
+    // LOGGING:
     // Logging - 'enable' or 'disable':
     logging = settings.value ("logging/logging").toString();
 
@@ -811,6 +816,7 @@ Settings::Settings()
     // Log filename prefix:
     logPrefix = settings.value ("logging/logging_prefix").toString();
 
+    // FILE TYPE DETECTION:
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
     pythonShebang.setPattern ("#!/.{1,}python");
