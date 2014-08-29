@@ -22,7 +22,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing loca
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program. Administrative privileges may be needed only to install or update the browser and it's files with an increased level of security, if so desired.  
 
 * **6. Avoiding dependency hell:**  
-    if some functionality outside of the standard Qt classes is needed for the browser, all the necessary source code must be included in the source package and all external libraries must be statically linked within the binary. If Qt libraries are also linked statically, a single file executable has to be possible.  
+    if some functionality outside of the standard Qt classes is needed for the browser, all the necessary source code must be included in the source package and all external libraries must be statically linked within the binary. No code other than the PEB source package has to be downloaded separately in order to build the compiled part of the program.  
 
 * **7. No user-specific logic or data in the compiled executable:**  
     no programming logic or data specific to a given user or online service should be part of the compiled Qt executable of the browser. All C++ code must comply with Qt open source license(s) and PEB should be fit for the widest possible array of tasks without recompilation.  
@@ -54,7 +54,7 @@ Perl Executing Browser (PEB) is a Qt4/5 WebKit browser capable of executing loca
 * Extensive logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
-* All settings are stored in one single INI file with comments included.  
+* All settings are stored in an INI file with comments included.  
 * Browser root folder can be any folder.  
 * Basic program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
