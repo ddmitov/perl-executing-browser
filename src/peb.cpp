@@ -37,7 +37,8 @@
 #endif
 
 #if ZIP == 1
-#include <quazip/JlCompress.h> // for unpacking root folder from a zip file
+#include <osdabzip/unzip.h> // for unpacking root folder from a zip file
+#include <osdabzip/zip.h> // for packing root folder as a zip file
 #endif
 
 
@@ -110,20 +111,6 @@ int main (int argc, char** argv)
 {
 
     QApplication application (argc, argv);
-
-#if ZIP == 1
-    // Extracting root folder from a separate zip file:
-    QStringList extractedFiles = JlCompress::extractDir (QApplication::applicationDirPath()+
-                                                         QDir::separator()+"peb.zip",
-                                                         QApplication::applicationDirPath()+
-                                                         QDir::separator()+"testdir");
-    // Extracting root folder from a zip file, that was appended to the binary (!) using
-    // 'cat peb-bin-only peb.zip > peb-with-data'
-    QStringList extractedFiles = JlCompress::extractDir (QApplication::applicationFilePath(),
-                                                         QApplication::applicationDirPath()+
-                                                         QDir::separator()+"testdir");
-    qDebug() << "Extracted files:" << extractedFiles;
-#endif
 
     // Use UTF-8 encoding within the application:
 #if QT_VERSION >= 0x050000
@@ -207,6 +194,76 @@ int main (int argc, char** argv)
     QPixmap emptyTransparentIcon (16, 16);
     emptyTransparentIcon.fill (Qt::transparent);
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
+
+    // Support for extracting root folder from an (encrypted) ZIP package or
+    // creating (encrypted) ZIP package from an existing PEB root folder- experimental:
+#if ZIP == 1
+    // ZIP package file path:
+    QString zipPackageFilePath = QApplication::applicationDirPath()+QDir::separator()+"peb.zip";
+
+    // EXTRACT THE CONTENTS OF A ZIP PACKAGE:
+    UnZip packageToUnzip;
+    packageToUnzip.setPassword ("test");
+    UnZip::ErrorCode unzipErrorCode = packageToUnzip.openArchive (zipPackageFilePath);
+
+    // Handle errors while opening a ZIP package:
+    if (!unzipErrorCode == UnZip::Ok) {
+        qDebug() << "Errors were encountered while opening ZIP package:"
+                 << zipPackageFilePath;
+    }
+
+    // Read ZIP package comment:
+    QString comment = packageToUnzip.archiveComment();
+    if (comment.length() > 0) {
+        qDebug() << "ZIP package comment:" << comment;
+    }
+
+    // List ZIP package files:
+    QList<UnZip::ZipEntry> fileList = packageToUnzip.entryList();
+    for (int index = 0; index < fileList.size(); ++index) {
+        const UnZip::ZipEntry& entry = fileList.at (index);
+        QString file = entry.filename;
+        if (entry.encrypted)
+            file.append ("*");
+        qDebug() << "ZIP package file:" << file.toAscii().data();
+    }
+
+    // Extract all files in a ZIP package:
+    unzipErrorCode = packageToUnzip.extractAll (QApplication::applicationDirPath()+
+                                    QDir::separator()+"testdir");
+
+    // Handle errors while extracting a ZIP package:
+    if (unzipErrorCode != UnZip::Ok) {
+        qDebug() << "Errors were encountered while extracting ZIP package:"
+                 << zipPackageFilePath;
+    }
+
+    // Close ZIP package and free all used resources:
+    packageToUnzip.closeArchive();
+
+    // CREATE ZIP PACKAGE:
+    Zip packageToZip;
+    Zip::ErrorCode zipErrorCode = packageToZip.createArchive (zipPackageFilePath);
+
+    // Handle errors while creating a ZIP package:
+    if (!zipErrorCode == UnZip::Ok) {
+        qDebug() << "Errors were encountered while creating ZIP package:"
+                 << zipPackageFilePath;
+    }
+
+    // Set password:
+    packageToZip.setPassword ("test");
+
+    // Add directory:
+    zipErrorCode = packageToZip.addDirectory (QApplication::applicationDirPath()+
+                                              QDir::separator()+"scripts");
+
+    // Add comments:
+    packageToZip.setArchiveComment ("Test comment!");
+
+    // Close ZIP package and free all used resources:
+    packageToZip.closeArchive();
+#endif
 
     // Settings file:
     QFile settingsFile (settings.settingsFileName);
