@@ -47,8 +47,8 @@ SOURCES += peb.cpp
 # DEFINES += "ZIP=1"
 # ZIP_SUPPORT = 1
 #######################################################################################
-DEFINES += "ZIP=0"
-ZIP_SUPPORT = 0
+DEFINES += "ZIP=1"
+ZIP_SUPPORT = 1
 
 equals (ZIP_SUPPORT, 1) {
     message ("Building with ZIP support...")

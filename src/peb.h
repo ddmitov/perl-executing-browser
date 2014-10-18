@@ -161,6 +161,8 @@ public:
     QString settingsDirName;
     QDir settingsDir;
 
+    QStringList allowedPackagesList;
+
     QString appendUserPath;
     QStringList pathToAddList;
     QString perlLib;

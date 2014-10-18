@@ -173,6 +173,12 @@ int main (int argc, char** argv)
                       << std::endl;
             std::cout << "  --maximized      -M    start browser in a maximized window"
                       << std::endl;
+
+
+            std::cout << "  --package        -P    start browser with a specified full path to package"
+                      << std::endl;
+
+
             std::cout << "  --help           -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
@@ -194,76 +200,6 @@ int main (int argc, char** argv)
     QPixmap emptyTransparentIcon (16, 16);
     emptyTransparentIcon.fill (Qt::transparent);
     QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
-
-    // Support for extracting root folder from an (encrypted) ZIP package or
-    // creating (encrypted) ZIP package from an existing PEB root folder- experimental:
-#if ZIP == 1
-    // ZIP package file path:
-    QString zipPackageFilePath = QApplication::applicationDirPath()+QDir::separator()+"peb.zip";
-
-    // EXTRACT THE CONTENTS OF A ZIP PACKAGE:
-    UnZip packageToUnzip;
-    packageToUnzip.setPassword ("test");
-    UnZip::ErrorCode unzipErrorCode = packageToUnzip.openArchive (zipPackageFilePath);
-
-    // Handle errors while opening a ZIP package:
-    if (!unzipErrorCode == UnZip::Ok) {
-        qDebug() << "Errors were encountered while opening ZIP package:"
-                 << zipPackageFilePath;
-    }
-
-    // Read ZIP package comment:
-    QString comment = packageToUnzip.archiveComment();
-    if (comment.length() > 0) {
-        qDebug() << "ZIP package comment:" << comment;
-    }
-
-    // List ZIP package files:
-    QList<UnZip::ZipEntry> fileList = packageToUnzip.entryList();
-    for (int index = 0; index < fileList.size(); ++index) {
-        const UnZip::ZipEntry& entry = fileList.at (index);
-        QString file = entry.filename;
-        if (entry.encrypted)
-            file.append ("*");
-        qDebug() << "ZIP package file:" << file.toAscii().data();
-    }
-
-    // Extract all files in a ZIP package:
-    unzipErrorCode = packageToUnzip.extractAll (QApplication::applicationDirPath()+
-                                    QDir::separator()+"testdir");
-
-    // Handle errors while extracting a ZIP package:
-    if (unzipErrorCode != UnZip::Ok) {
-        qDebug() << "Errors were encountered while extracting ZIP package:"
-                 << zipPackageFilePath;
-    }
-
-    // Close ZIP package and free all used resources:
-    packageToUnzip.closeArchive();
-
-    // CREATE ZIP PACKAGE:
-    Zip packageToZip;
-    Zip::ErrorCode zipErrorCode = packageToZip.createArchive (zipPackageFilePath);
-
-    // Handle errors while creating a ZIP package:
-    if (!zipErrorCode == UnZip::Ok) {
-        qDebug() << "Errors were encountered while creating ZIP package:"
-                 << zipPackageFilePath;
-    }
-
-    // Set password:
-    packageToZip.setPassword ("test");
-
-    // Add directory:
-    zipErrorCode = packageToZip.addDirectory (QApplication::applicationDirPath()+
-                                              QDir::separator()+"scripts");
-
-    // Add comments:
-    packageToZip.setArchiveComment ("Test comment!");
-
-    // Close ZIP package and free all used resources:
-    packageToZip.closeArchive();
-#endif
 
     // Settings file:
     QFile settingsFile (settings.settingsFileName);
@@ -338,7 +274,7 @@ int main (int argc, char** argv)
         if (userEuid > 0) {
             qDebug() << "Started from terminal with normal user privileges.";
             qDebug() << "Will start another instance of the program and quit this one.";
-            qDebug() << " ";
+            qDebug() << "===============";
         }
 
         if (settings.logging == "enable") {
@@ -433,11 +369,116 @@ int main (int argc, char** argv)
     }
 #endif
 
-    int screenWidth = QDesktopWidget().screen()->rect().width();
-    int screenHeight = QDesktopWidget().screen()->rect().height();
+#if ZIP == 1
+    // Support for extracting root folder from an (encrypted) ZIP package - experimental:
+    // ZIP package file path:
+    QString zipPackageFilePathToCheck;
+    QString zipPackageFilePath;
+
+    foreach (QString argument, arguments){
+        if (argument.contains ("--package") or argument.contains ("-P")) {
+            zipPackageFilePathToCheck = argument.section ("=", 1, 1);
+
+            if (settings.allowedPackagesList.contains (zipPackageFilePathToCheck)) {
+                zipPackageFilePath = zipPackageFilePathToCheck;
+
+                qDebug() << "===============";
+                qDebug() << "Allowed ZIP package:" << zipPackageFilePath;
+
+                // Package name:
+                QString packageName = (zipPackageFilePath.section (QDir::separator(), -1, -1))
+                        .section (".", 0, 0);
+
+                // Package file:
+                QFile packageFile (zipPackageFilePath);
+
+                // Check if package file exists:
+                if (packageFile.exists()) {
+
+                    // Extract the contents of a ZIP package:
+                    UnZip packageToUnzip;
+                    packageToUnzip.setPassword ("test");
+                    UnZip::ErrorCode unzipErrorCode =
+                            packageToUnzip.openArchive (zipPackageFilePath);
+
+                    // Handle errors while opening a ZIP package:
+                    if (!unzipErrorCode == UnZip::Ok) {
+                        qDebug() << "Errors were encountered while opening ZIP package:"
+                                 << zipPackageFilePath;
+                    }
+
+                    // Read ZIP package comment:
+                    QString comment = packageToUnzip.archiveComment();
+                    if (comment.length() > 0) {
+                        qDebug() << "ZIP package comment:" << comment;
+                    }
+
+                    // List ZIP package files:
+                    QList<UnZip::ZipEntry> fileList = packageToUnzip.entryList();
+                    for (int index = 0; index < fileList.size(); ++index) {
+                        const UnZip::ZipEntry& entry = fileList.at (index);
+                        QString file = entry.filename;
+                        if (entry.encrypted)
+                            file.append ("*");
+                        qDebug() << "ZIP package entry:" << file.toAscii().data();
+                    }
+
+                    // Extract all files in a ZIP package:
+                    unzipErrorCode = packageToUnzip.extractAll (QDir::tempPath()+
+                                                                QDir::separator()+packageName);
+                    qDebug() << "All files from ZIP package extracted sucessfully!";
+
+                    // Handle errors while extracting a ZIP package:
+                    if (unzipErrorCode != UnZip::Ok) {
+                        qDebug() << "Errors were encountered while extracting ZIP package:"
+                                 << zipPackageFilePath;
+                    }
+
+                    // Close ZIP package and free all used resources:
+                    packageToUnzip.closeArchive();
+
+                } else {
+                    qDebug() << "Non-existing ZIP package:" << zipPackageFilePath;
+                }
+
+            } else {
+                qDebug() << "Not allowed ZIP package:" << zipPackageFilePathToCheck;
+            }
+        }
+    }
+
+    // Support for creating (encrypted) ZIP package from
+    // an existing PEB root folder- experimental:
+
+//    Zip packageToZip;
+//    Zip::ErrorCode zipErrorCode = packageToZip.createArchive (zipPackageFilePath);
+
+    // Handle errors while creating a ZIP package:
+//    if (!zipErrorCode == UnZip::Ok) {
+//        qDebug() << "Errors were encountered while creating ZIP package:"
+//                 << zipPackageFilePath;
+//    }
+
+    // Set password:
+//    packageToZip.setPassword ("test");
+
+    // Add directory:
+//    zipErrorCode = packageToZip.addDirectory (QApplication::applicationDirPath()+
+//                                              QDir::separator()+"scripts");
+
+    // Add comments:
+//    packageToZip.setArchiveComment ("Perl Executing Browser ZIP Package");
+
+    // Close ZIP package and free all used resources:
+//    packageToZip.closeArchive();
+#endif
+
+    qDebug() << "===============";
 
     // Screen resolution:
-    qDebug() << "Screen resolution:" << screenWidth << "x" << screenHeight;
+    int screenWidth = QDesktopWidget().screen()->rect().width();
+    int screenHeight = QDesktopWidget().screen()->rect().height();
+    qDebug() << "SCREEN RESOLUTION:" << screenWidth << "x" << screenHeight;
 
     // Log all settings:
     qDebug() << "===============";
@@ -445,6 +486,10 @@ int main (int argc, char** argv)
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
     qDebug() << "Settings file name:" << settings.settingsFileName;
+    qDebug() << "Allowed packages:";
+    foreach (QString allowedPackageEntry, settings.allowedPackagesList) {
+        qDebug() << allowedPackageEntry;
+    }
 
     qDebug() << "===============";
     qDebug() << "ENVIRONMENT SETTINGS:";
@@ -640,8 +685,18 @@ Settings::Settings()
     settingsDirName = settingsDir.absolutePath().toLatin1();
     settingsFileName = QDir::toNativeSeparators
             (settingsDirName+QDir::separator()+"peb.ini");
+
     // Defining INI file format for storing settings:
     QSettings settings (settingsFileName, QSettings::IniFormat);
+
+    // ALLOWED PACKAGES:
+    int allowedPackagesSize = settings.beginReadArray("packages/packages");
+    for (int index = 0; index < allowedPackagesSize; ++index) {
+        settings.setArrayIndex (index);
+        QString allowedPackage = settings.value ("name").toString();
+        allowedPackagesList.append (allowedPackage);
+    }
+    settings.endArray();
 
     // ROOT DIRECTORY:
     QString rootDirNameSetting = settings.value ("root/root").toString();

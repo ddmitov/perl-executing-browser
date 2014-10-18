@@ -12,7 +12,7 @@ Perl debugger interaction:
 - display value on mouse over variable (using jQuery and request to debugger?)
 - function names to be links and to step into on click
 - show source code and highlight current line only when current line is known, otherwise do not display source code
-- show highlighted HTML source code when scripts produce HTML within the debugger GUI
+- show highlighted HTML source code when scripts produce HTML output within the debugger GUI
 
 Locally executed scripts:
 - HTML formatted STDERR output
@@ -25,6 +25,12 @@ Configuration & help:
 - 'restart' URL for applying configuration changes that need restart
 - 'help' URL; keyboard shortcuts listed
 
+Web presence for the project:
+- Github webpage
+- Github Wiki page
+
 Compilation, packaging & installation:
 - build script for command line compilation of the browser
 - windeployqt script for win32 deployment
+- NSIS script for a secure installation with administrative privileges
+- NSIS script for installation with user privileges
