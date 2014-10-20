@@ -9,18 +9,28 @@ VERSION = 0.1
 
 # Mac specific settings:
 macx {
-  #############################
+  ##########################################################
   # To make a bundle-less application:
   # (recommended)
   # DEFINES += "BUNDLE=0"
   # CONFIG -= app_bundle
-  #############################
+  ##########################################################
   # To make a bundle (peb.app):
   # DEFINES += "BUNDLE=1"
   # CONFIG += app_bundle
-  #############################
+  ##########################################################
   DEFINES += "BUNDLE=0"
   CONFIG -= app_bundle
+
+  ##########################################################
+  # Set the version number of QMAKE_MAC_SDK to
+  # the version number of your MacOSX SDK.
+  # Updating MacOSX SDK (Xcode) without changing the
+  # version number of QMAKE_MAC_SDK may
+  # prevent you from successfully compiling the program.
+  ##########################################################
+  QMAKE_MAC_SDK = macosx10.9
+
   ICON = camel.icns
 }
 
@@ -42,11 +52,12 @@ greaterThan (QT_MAJOR_VERSION, 4) {
 HEADERS += peb.h
 SOURCES += peb.cpp
 
-#######################################################################################
-# To link statically OSDaB-Zip library for unpacking root folder from a zip file:
+##########################################################
+# To link statically OSDaB-Zip library for
+# unpacking root folder from a zip file:
 # DEFINES += "ZIP=1"
 # ZIP_SUPPORT = 1
-#######################################################################################
+##########################################################
 DEFINES += "ZIP=0"
 ZIP_SUPPORT = 0
 
