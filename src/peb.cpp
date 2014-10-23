@@ -36,11 +36,6 @@
 #include <QPrintDialog>
 #endif
 
-#if ZIP == 1
-#include <osdabzip/unzip.h> // for unpacking root folder from a zip file
-#include <osdabzip/zip.h> // for packing root folder as a zip file
-#endif
-
 
 // Global variables:
 // Application start date and time for filenames of per-session log files:
@@ -173,12 +168,6 @@ int main (int argc, char** argv)
                       << std::endl;
             std::cout << "  --maximized      -M    start browser in a maximized window"
                       << std::endl;
-
-
-            std::cout << "  --package        -P    start browser with a specified full path to package"
-                      << std::endl;
-
-
             std::cout << "  --help           -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
@@ -259,7 +248,9 @@ int main (int argc, char** argv)
     userEuid = geteuid();
 
     if (userEuid == 0) {
+        qDebug() << "";
         qDebug() << "Program started with root privileges. Aborting!";
+        qDebug() << "Please start again with normal user privileges.";
     }
 #endif
 
@@ -274,7 +265,7 @@ int main (int argc, char** argv)
         if (userEuid > 0) {
             qDebug() << "Started from terminal with normal user privileges.";
             qDebug() << "Will start another instance of the program and quit this one.";
-            qDebug() << "===============";
+            qDebug() << "";
         }
 
         if (settings.logging == "enable") {
@@ -369,110 +360,6 @@ int main (int argc, char** argv)
     }
 #endif
 
-#if ZIP == 1
-    // Support for extracting root folder from an (encrypted) ZIP package - experimental:
-    // ZIP package file path:
-    QString zipPackageFilePathToCheck;
-    QString zipPackageFilePath;
-
-    foreach (QString argument, arguments){
-        if (argument.contains ("--package") or argument.contains ("-P")) {
-            zipPackageFilePathToCheck = argument.section ("=", 1, 1);
-
-            if (settings.allowedPackagesList.contains (zipPackageFilePathToCheck)) {
-                zipPackageFilePath = zipPackageFilePathToCheck;
-
-                qDebug() << "===============";
-                qDebug() << "Allowed ZIP package:" << zipPackageFilePath;
-
-                // Package name:
-                QString packageName = (zipPackageFilePath.section (QDir::separator(), -1, -1))
-                        .section (".", 0, 0);
-
-                // Package file:
-                QFile packageFile (zipPackageFilePath);
-
-                // Check if package file exists:
-                if (packageFile.exists()) {
-
-                    // Extract the contents of a ZIP package:
-                    UnZip packageToUnzip;
-                    packageToUnzip.setPassword ("test");
-                    UnZip::ErrorCode unzipErrorCode =
-                            packageToUnzip.openArchive (zipPackageFilePath);
-
-                    // Handle errors while opening a ZIP package:
-                    if (!unzipErrorCode == UnZip::Ok) {
-                        qDebug() << "Errors were encountered while opening ZIP package:"
-                                 << zipPackageFilePath;
-                    }
-
-                    // Read ZIP package comment:
-                    QString comment = packageToUnzip.archiveComment();
-                    if (comment.length() > 0) {
-                        qDebug() << "ZIP package comment:" << comment;
-                    }
-
-                    // List ZIP package files:
-                    QList<UnZip::ZipEntry> fileList = packageToUnzip.entryList();
-                    for (int index = 0; index < fileList.size(); ++index) {
-                        const UnZip::ZipEntry& entry = fileList.at (index);
-                        QString file = entry.filename;
-                        if (entry.encrypted)
-                            file.append ("*");
-                        qDebug() << "ZIP package entry:" << file.toAscii().data();
-                    }
-
-                    // Extract all files in a ZIP package:
-                    unzipErrorCode = packageToUnzip.extractAll (QDir::tempPath()+
-                                                                QDir::separator()+packageName);
-                    qDebug() << "All files from ZIP package extracted sucessfully!";
-
-                    // Handle errors while extracting a ZIP package:
-                    if (unzipErrorCode != UnZip::Ok) {
-                        qDebug() << "Errors were encountered while extracting ZIP package:"
-                                 << zipPackageFilePath;
-                    }
-
-                    // Close ZIP package and free all used resources:
-                    packageToUnzip.closeArchive();
-
-                } else {
-                    qDebug() << "Non-existing ZIP package:" << zipPackageFilePath;
-                }
-
-            } else {
-                qDebug() << "Not allowed ZIP package:" << zipPackageFilePathToCheck;
-            }
-        }
-    }
-
-    // Support for creating (encrypted) ZIP package from
-    // an existing PEB root folder- experimental:
-
-//    Zip packageToZip;
-//    Zip::ErrorCode zipErrorCode = packageToZip.createArchive (zipPackageFilePath);
-
-    // Handle errors while creating a ZIP package:
-//    if (!zipErrorCode == UnZip::Ok) {
-//        qDebug() << "Errors were encountered while creating ZIP package:"
-//                 << zipPackageFilePath;
-//    }
-
-    // Set password:
-//    packageToZip.setPassword ("test");
-
-    // Add directory:
-//    zipErrorCode = packageToZip.addDirectory (QApplication::applicationDirPath()+
-//                                              QDir::separator()+"scripts");
-
-    // Add comments:
-//    packageToZip.setArchiveComment ("Perl Executing Browser ZIP Package");
-
-    // Close ZIP package and free all used resources:
-//    packageToZip.closeArchive();
-#endif
-
     qDebug() << "===============";
 
     // Screen resolution:
@@ -486,10 +373,6 @@ int main (int argc, char** argv)
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (settings.rootDirName);
     qDebug() << "Settings file name:" << settings.settingsFileName;
-    qDebug() << "Allowed packages:";
-    foreach (QString allowedPackageEntry, settings.allowedPackagesList) {
-        qDebug() << allowedPackageEntry;
-    }
 
     qDebug() << "===============";
     qDebug() << "ENVIRONMENT SETTINGS:";
@@ -689,15 +572,6 @@ Settings::Settings()
     // Defining INI file format for storing settings:
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
-    // ALLOWED PACKAGES:
-    int allowedPackagesSize = settings.beginReadArray("packages/packages");
-    for (int index = 0; index < allowedPackagesSize; ++index) {
-        settings.setArrayIndex (index);
-        QString allowedPackage = settings.value ("name").toString();
-        allowedPackagesList.append (allowedPackage);
-    }
-    settings.endArray();
-
     // ROOT DIRECTORY:
     QString rootDirNameSetting = settings.value ("root/root").toString();
     if (rootDirNameSetting == "current") {
@@ -796,7 +670,7 @@ Settings::Settings()
     settings.endArray();
 
     // GUI:
-    // - path must be relative to the PEB root directory:
+    // Start page - path must be relative to the PEB root directory:
     // HTML file or script are equally usable as a start page:
     startPageSetting = settings.value ("gui/start_page").toString();
     startPage = QDir::toNativeSeparators (rootDirName+startPageSetting);

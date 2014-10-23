@@ -52,24 +52,6 @@ greaterThan (QT_MAJOR_VERSION, 4) {
 HEADERS += peb.h
 SOURCES += peb.cpp
 
-##########################################################
-# To link statically OSDaB-Zip library for
-# unpacking root folder from a zip file:
-# DEFINES += "ZIP=1"
-# ZIP_SUPPORT = 1
-##########################################################
-DEFINES += "ZIP=0"
-ZIP_SUPPORT = 0
-
-equals (ZIP_SUPPORT, 1) {
-    message ("Building with ZIP support...")
-    INCLUDEPATH += <. zlib>
-    HEADERS += osdabzip/unzip.h osdabzip/unzip_p.h \
-    osdabzip/zip.h osdabzip/zip_p.h \
-    osdabzip/zipentry_p.h osdabzip/zipglobal.h
-    SOURCES += osdabzip/unzip.cpp osdabzip/zip.cpp osdabzip/zipglobal.cpp
-}
-
 OTHER_FILES += peb.rc camel.ico
 
 MOC_DIR = tmp
