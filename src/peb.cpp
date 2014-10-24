@@ -164,11 +164,13 @@ int main (int argc, char** argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --fullscreen     -F    start browser in fullscreen mode"
+            std::cout << "  --index-dir     -I    start browser in a subfolder of the root folder"
                       << std::endl;
-            std::cout << "  --maximized      -M    start browser in a maximized window"
+            std::cout << "  --fullscreen    -F    start browser in fullscreen mode"
                       << std::endl;
-            std::cout << "  --help           -H    this help"
+            std::cout << "  --maximized     -M    start browser in a maximized window"
+                      << std::endl;
+            std::cout << "  --help          -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
             if (settings.logging == "enable") {
@@ -557,6 +559,9 @@ Settings::Settings()
     : QSettings (0)
 {
 
+    // COMMAND LINE ARGUMENTS - PART 1:
+    QStringList arguments = QCoreApplication::arguments();
+
     // SETTINGS FILE:
     settingsDir = QDir::toNativeSeparators (QApplication::applicationDirPath());
 #ifdef Q_OS_MAC
@@ -673,7 +678,21 @@ Settings::Settings()
     // Start page - path must be relative to the PEB root directory:
     // HTML file or script are equally usable as a start page:
     startPageSetting = settings.value ("gui/start_page").toString();
-    startPage = QDir::toNativeSeparators (rootDirName+startPageSetting);
+
+    QString indexDirectoryName = rootDirName;
+
+    // Start page directory could also be given as a command line argument,
+    // but it must be a subfolder of the browser root folder:
+    foreach (QString argument, arguments){
+        if (argument.contains ("--index-dir") or argument.contains ("-I")) {
+            QString subfolder = argument.section ("=", 1, 1);
+            subfolder.replace (QString ("\n"), "");
+            indexDirectoryName.append (subfolder);
+            indexDirectoryName.append (QDir::separator());
+        }
+    }
+
+    startPage = QDir::toNativeSeparators (indexDirectoryName+startPageSetting);
 
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:
@@ -793,9 +812,7 @@ Settings::Settings()
     // Log filename prefix:
     logPrefix = settings.value ("logging/logging_prefix").toString();
 
-    // COMMAND LINE ARGUMENTS:
-    QStringList arguments = QCoreApplication::arguments();
-
+    // COMMAND LINE ARGUMENTS - PART 2:
     // Command line arguments overwrite configuration file settings with the same name:
     foreach (QString argument, arguments){
         if (argument.contains ("--fullscreen") or argument.contains ("-F")) {
