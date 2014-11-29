@@ -7,7 +7,7 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
 ## Design Objectives
   
 * **1. Easy GUI for local scripts:**  
-    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl 5 scripts  
+    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl 5 scripts;  
 
 * **2. Zero installation when needed:**  
     put together your Perl 5 scripts and modules and even your version of Perl 5 with a copy of PEB and its Qt libraries and run your applications from every folder, even from USB sticks;  
@@ -16,10 +16,10 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
     use it on every platform, where Perl 5 and Qt are available;  
 
 * **4. Secure user space solution:**  
-    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program. Administrative privileges may be needed only to install or update the browser and it's files with an increased level of security, if so desired.  
+    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program.  
 
 * **5. Avoiding dependency hell:**  
-    if some functionality outside of the standard Qt classes is needed for the compiled binary of the browser, all the necessary source code must be included in the source package and all external libraries must be statically linked within the binary. No code other than the PEB source package has to be downloaded separately in order to build the compiled part of the program.  
+    if some functionality outside of the standard Qt classes is needed for the compiled binary of the browser, all the necessary source code must be included in the source package and all external libraries must be statically linked within the binary.  
 
 * **6. No user-specific logic or data in the compiled executable:**  
     no programming logic or data specific to a given user or online service should be part of the compiled Qt executable of the browser. All C++ code must comply with Qt open source license(s) and PEB should be fit for the widest possible array of tasks without recompilation.  
@@ -61,7 +61,7 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
 ## Possible Applications
   
 * Perl 5 desktop applications with HTML4/5, CSS2/3 & JavaScript GUI;  
-* Web clients or site-specific browsers with enhanced scripting capabilities based on Perl 5 & JavaScript;  
+* Custom Perl-based GUI web clients;  
 * GUI for the Perl debugger.  
   
 ## Compile-time Requirements
@@ -80,7 +80,7 @@ Compiled and tested successfully using:
   
 ## Runtime Requirements
   
-* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes or Qt5 libraries, if you compiled the program using Qt5 classes.  
+* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes, or Qt5 libraries, if you compiled the program using Qt5 classes.  
 * Perl 5 distribution - any standard Linux or Mac Perl distribution or Strawberry Perl for Windows.  
   
 ## Limitations
@@ -126,6 +126,6 @@ Possible new name: **QtCamel Browser**
   
 ## Authors
   
-Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com  
+Dimitar D. Mitov, 2013 - 2014,  
 Valcho Nedelchev, 2014  
   

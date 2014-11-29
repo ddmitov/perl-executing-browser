@@ -15,5 +15,5 @@ Compiled and tested successfully using:
 
 Runtime Requirements:
 
-* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes or Qt5 libraries, if you compiled the program using Qt5 classes.
+* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes, or Qt5 libraries, if you compiled the program using Qt5 classes.
 * Perl 5 distribution - any standard Linux or Mac Perl distribution or Strawberry Perl for Windows.

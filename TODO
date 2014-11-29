@@ -29,8 +29,5 @@ Web presence for the project:
 - Github webpage
 - Github Wiki page
 
-Compilation, packaging & installation:
+Compilation:
 - build script for command line compilation of the browser
-- windeployqt script for win32 deployment
-- NSIS script for a secure installation with administrative privileges
-- NSIS script for installation with user privileges

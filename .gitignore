@@ -1,18 +1,20 @@
+
 build-peb-Desktop_Qt_5_2_1_clang_64bit-Debug/
+
 src/peb.pro.user
-src/peb.pro.user.qt4
-src/peb.pro.user.qt5
-src/peb.pro.user.qt5.win32
+
 html/current.css
+
 peb
 peb.exe
-peb-qt-5-2-0
+
 peb.log
 peb*.log
+
 moc_peb.cpp
 moc_peb.o
 peb.o
-copy-win32
+
 upcopy
 upgit
 
