@@ -53,4 +53,4 @@ print  <<FOOTER;
 
 FOOTER
 
-$db->disconnect; 
+$db->disconnect;

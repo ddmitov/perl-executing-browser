@@ -387,11 +387,7 @@ int main (int argc, char** argv)
     qDebug() << "PERLLIB folder:" << settings.perlLib;
 
     qDebug() << "===============";
-    qDebug() << "INTERPRETERS:";
-    qDebug() << "===============";
-    qDebug() << "Default Perl interpreter" << settings.perlInterpreter;
-    qDebug() << "Default Python interpreter" << settings.pythonInterpreter;
-    qDebug() << "Default PHP interpreter" << settings.phpInterpreter;
+    qDebug() << "Perl interpreter" << settings.perlInterpreter;
 
     qDebug() << "===============";
     qDebug() << "SCRIPTS SETTINGS:";
@@ -611,12 +607,8 @@ Settings::Settings()
         perlLib = QDir::toNativeSeparators (perlLibSetting);
     }
 
-    // INTERPRETERS:
+    // PERL INTERPRETER:
     perlInterpreter = settings.value ("interpreters/perl").toString();
-
-    pythonInterpreter = settings.value ("interpreters/python").toString();
-
-    phpInterpreter = settings.value ("interpreters/php").toString();
 
     // SCRIPTS:
     // Timeout for CGI scripts (not long-running ones):
@@ -828,8 +820,6 @@ Settings::Settings()
     // FILE TYPE DETECTION:
     // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern ("#!/.{1,}perl");
-    pythonShebang.setPattern ("#!/.{1,}python");
-    phpShebang.setPattern ("#!/.{1,}php");
 
     // Regular expressions for file type detection by extension:
     htmlExtensions.setPattern ("htm");
@@ -852,12 +842,6 @@ Settings::Settings()
 
     plExtension.setPattern ("pl");
     plExtension.setCaseSensitivity (Qt::CaseInsensitive);
-
-    pyExtension.setPattern ("py");
-    pyExtension.setCaseSensitivity (Qt::CaseInsensitive);
-
-    phpExtension.setPattern ("php");
-    phpExtension.setCaseSensitivity (Qt::CaseInsensitive);
 
 }
 
@@ -1010,7 +994,7 @@ TopLevel::TopLevel ()
     QObject::connect (closeAppShortcut, SIGNAL (activated()),
                       this, SLOT (quitApplicationSlot()));
 
-    // Configure screen appearance - main window:
+    // Configure screen appearance:
     if (settings.fixedWidth > 100 and settings.fixedHeight > 100) {
         setFixedSize (settings.fixedWidth, settings.fixedHeight);
         QRect screenRect = QDesktopWidget().screen()->rect();
@@ -1170,63 +1154,6 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
         return false;
     }
-
-    // Select Python interpreter:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("selectpython")) {
-
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (settings.icon);
-        QString pythonInterpreter = dialog.getOpenFileName
-                (0, tr ("Select Python Interpreter"),
-                 QDir::currentPath(), tr ("All files (*)"));
-        dialog.close();
-        dialog.deleteLater();
-
-        if (pythonInterpreter.length() > 0) {
-            settings.pythonInterpreter = pythonInterpreter;
-            QSettings pythonInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
-            pythonInterpreterSetting.setValue ("interpreters/python", pythonInterpreter);
-            pythonInterpreterSetting.sync();
-
-            qDebug() << "Selected Python interpreter:" << pythonInterpreter;
-            qDebug() << "===============";
-        }
-
-        return false;
-    }
-
-    // Select PHP interpreter:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-         request.url().scheme().contains ("selectphp")) {
-
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (settings.icon);
-        QString phpInterpreter = dialog.getOpenFileName
-                (0, tr ("Select PHP Interpreter"),
-                 QDir::currentPath(), tr ("All files (*)"));
-        dialog.close();
-        dialog.deleteLater();
-
-        if (phpInterpreter.length() > 0) {
-            settings.phpInterpreter = phpInterpreter;
-            QSettings phpInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
-            phpInterpreterSetting.setValue ("interpreters/php", phpInterpreter);
-            phpInterpreterSetting.sync();
-
-            qDebug() << "Selected PHP interpreter:" << phpInterpreter;
-            qDebug() << "===============";
-        }
-
-        return false;
-    }
-
 
     // Set predefined theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -1536,64 +1463,6 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         qDebug() << "===============";
 
         QDesktopServices::openUrl (request.url());
-
-        return false;
-    }
-
-    // Open local file using default application:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-             request.url().scheme().contains ("file")) {
-
-#ifdef Q_OS_WIN
-        QString filepath = request.url()
-                .toString (QUrl::RemoveScheme)
-                .replace ("///", "");
-
-#else
-        QString filepath = request.url()
-                .toString (QUrl::RemoveScheme)
-                .replace ("///", "/");
-#endif
-
-        QFile file (QDir::toNativeSeparators (filepath));
-        if (file.exists()) {
-
-            qDebug() << "Opening file with default application:" << filepath;
-            qDebug() << "===============";
-
-            QDesktopServices::openUrl (request.url());
-
-            return false;
-
-        } else {
-
-            QMessageBox msgBox;
-            msgBox.setWindowModality (Qt::WindowModal);
-            msgBox.setIcon (QMessageBox::Critical);
-            msgBox.setWindowTitle (tr ("Missing file"));
-            msgBox.setText (filepath+
-                            tr (" is missing.<br>Please restore the missing file."));
-            msgBox.setDefaultButton (QMessageBox::Ok);
-            msgBox.exec();
-
-            qDebug() << "Missing file:" << filepath;
-            qDebug() << "===============";
-
-            return false;
-        }
-    }
-
-    // Execute external command or application:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains ("external")) {
-
-        QString externalCommand = request.url().toString (QUrl::RemoveScheme);
-
-        qDebug() << "External command:" << externalCommand;
-        qDebug() << "===============";
-
-        QProcess externalProcess;
-        externalProcess.startDetached (externalCommand);
 
         return false;
     }

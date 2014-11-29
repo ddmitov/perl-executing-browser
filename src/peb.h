@@ -76,12 +76,6 @@ public slots:
             if (firstLine.contains (perlShebang)) {
                 interpreter = perlInterpreter;
             }
-            if (firstLine.contains (pythonShebang)) {
-                interpreter = pythonInterpreter;
-            }
-            if (firstLine.contains (phpShebang)) {
-                interpreter = phpInterpreter;
-            }
         } else {
             if (extension.contains (htmlExtensions)) {
                 interpreter = "browser-html";
@@ -104,12 +98,6 @@ public slots:
 
             if (extension == "pl") {
                 interpreter = perlInterpreter;
-            }
-            if (extension == "py") {
-                interpreter = pythonInterpreter;
-            }
-            if (extension == "php") {
-                interpreter = phpInterpreter;
             }
         }
     }
@@ -166,8 +154,6 @@ public:
     QString perlLib;
 
     QString perlInterpreter;
-    QString pythonInterpreter;
-    QString phpInterpreter;
 
     QString scriptTimeout;
     QString displayStderr;
@@ -223,8 +209,6 @@ private:
 
     // Regular expressions for file type detection by shebang line:
     QRegExp perlShebang;
-    QRegExp pythonShebang;
-    QRegExp phpShebang;
 
     // Regular expressions for file type detection by extension:
     QRegExp htmlExtensions;
@@ -235,8 +219,6 @@ private:
     QRegExp gifExtension;
 
     QRegExp plExtension;
-    QRegExp pyExtension;
-    QRegExp phpExtension;
 
 };
 
@@ -348,7 +330,7 @@ protected:
                          QNetworkRequest (networkRequest));
             }
 
-            // Local Perl, Python or PHP scripts:
+            // Local Perl scripts:
             if ((!settings.interpreter.contains ("undefined")) and
                     (!settings.interpreter.contains ("browser"))) {
 

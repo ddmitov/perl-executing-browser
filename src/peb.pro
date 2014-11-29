@@ -7,6 +7,8 @@ DEPENDPATH += .
 CONFIG += openssl-linked
 VERSION = 0.1
 
+QT += network
+
 # Mac specific settings:
 macx {
   ##########################################################
