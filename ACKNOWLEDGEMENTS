@@ -21,10 +21,6 @@
  http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
  http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
 
- Thanks to Michael Accardo, the author of the CPAN module HTML::Perlinfo.
- HTML-Perlinfo was used as a testing tool for loading modules from a directory, without system-wide installation.
- https://metacpan.org/pod/HTML::Perlinfo
-
  Thanks to Jennifer Maher-Bontrager, author of the Camel icon.
  http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html
  http://www.totoro.org/jen/
@@ -34,7 +30,6 @@
  for beeing welcoming host of the first public presentation of Perl Executing Browser
  on the 2nd of March 2014 and for their helpfull proposals.
  http://hackafe.org/
- http://www.youtube.com/watch?v=Z9mVQzHqcKo (in Bulgarian)
 
  Thanks to Peter Palfrader, author of Code2HTML script, the first syntax highlighter of Perl Executing Browser.
  Although replaced by Syntax::Highlight::Engine::Kate, it was quite helpfull to develop and test syntax highlight capability.
@@ -45,8 +40,9 @@
  This is the current syntax highlighter of Perl Executing Browser.
  https://metacpan.org/release/Syntax-Highlight-Engine-Kate
  
- Thanks to Sergey A. Tachenov and his contributors for their QuaZip library used to unpack root folder from ZIP file.
- http://quazip.sourceforge.net/
+ Thanks to Andy Armstrong, Gábor Szabó and their contributors for developing and maintaining CGI::Simple CPAN module.
+ It is used to handle local GET and POST requests to CGI-like scripts within Perl Executing Browser.
+ https://metacpan.org/release/CGI-Simple
  
  QT
  ==

@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN FILE_TO_CREATE FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
-use CGI qw (:standard);
+use CGI::Simple::Standard qw (:standard);
 
 print "Content-type: text/html; charset=utf-8\n\n";
 
