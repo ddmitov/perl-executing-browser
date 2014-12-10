@@ -164,8 +164,6 @@ int main (int argc, char** argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --index-dir     -I    start browser in a subfolder of the root folder"
-                      << std::endl;
             std::cout << "  --fullscreen    -F    start browser in fullscreen mode"
                       << std::endl;
             std::cout << "  --maximized     -M    start browser in a maximized window"
@@ -379,14 +377,15 @@ int main (int argc, char** argv)
     qDebug() << "===============";
     qDebug() << "ENVIRONMENT SETTINGS:";
     qDebug() << "===============";
-    qDebug() << "Append user PATH:" << settings.appendUserPath;
     qDebug() << "Folders to add to PATH:";
     foreach (QString pathEntry, settings.pathToAddList) {
         qDebug() << pathEntry;
     }
-    qDebug() << "PERLLIB folder:" << settings.perlLib;
 
     qDebug() << "===============";
+    qDebug() << "PERL SETTINGS:";
+    qDebug() << "===============";
+    qDebug() << "PERLLIB folder:" << settings.perlLib;
     qDebug() << "Perl interpreter" << settings.perlInterpreter;
 
     qDebug() << "===============";
@@ -470,28 +469,16 @@ int main (int argc, char** argv)
 
     // ENVIRONMENT VARIABLES:
     // PATH:
-    // Get the existing user PATH and set the separator sign:
-    QByteArray userPath;
     QByteArray path;
     QString pathSeparator;
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-    if (settings.appendUserPath == "enable") {
-        userPath = qgetenv ("PATH");
-    }
     pathSeparator = ":";
 #endif
 #ifdef Q_OS_WIN // Windows
-    if (settings.appendUserPath == "enable") {
-        userPath = qgetenv ("Path");
-    }
     pathSeparator = ";";
 #endif
-    // Append user PATH, if settings file says so:
-    if (settings.appendUserPath == "enable") {
-        path.append (userPath);
-        path.append (pathSeparator);
-    }
-    // Append all additional, browser-specific folder names to PATH:
+
+    // Add all browser-specific folder names to PATH:
     foreach (QString pathEntry, settings.pathToAddList) {
         QDir pathDir (pathEntry);
         if (pathDir.exists()) {
@@ -505,7 +492,8 @@ int main (int argc, char** argv)
             path.append (pathSeparator);
         }
     }
-    // Insert modified PATH variable into the actual environment of the browser:
+    // Insert the new browser-specific PATH variable into
+    // the actual environment of the browser:
 #ifndef Q_OS_WIN
     qputenv ("PATH", path);
 #else
@@ -585,9 +573,6 @@ Settings::Settings()
     }
 
     // ENVIRONMENT:
-    // Append user path - 'enable' or 'disable':
-    appendUserPath = settings.value ("environment/append_user_path").toString();
-
     // Folders to add to PATH:
     int pathSize = settings.beginReadArray("environment/path");
     for (int index = 0; index < pathSize; ++index) {
@@ -608,7 +593,15 @@ Settings::Settings()
     }
 
     // PERL INTERPRETER:
-    perlInterpreter = settings.value ("interpreters/perl").toString();
+    //perlInterpreter = settings.value ("interpreters/perl").toString();
+    QString perlInterpreterSetting = settings.value ("interpreters/perl").toString();
+    QDir interpreterFile (perlInterpreterSetting);
+    if (interpreterFile.isRelative()) {
+        perlInterpreter = QDir::toNativeSeparators (rootDirName+perlInterpreterSetting);
+    }
+    if (interpreterFile.isAbsolute()) {
+        perlInterpreter = QDir::toNativeSeparators (perlInterpreterSetting);
+    }
 
     // SCRIPTS:
     // Timeout for CGI scripts (not long-running ones):
@@ -670,21 +663,7 @@ Settings::Settings()
     // Start page - path must be relative to the PEB root directory:
     // HTML file or script are equally usable as a start page:
     startPageSetting = settings.value ("gui/start_page").toString();
-
-    QString indexDirectoryName = rootDirName;
-
-    // Start page directory could also be given as a command line argument,
-    // but it must be a subfolder of the browser root folder:
-    foreach (QString argument, arguments){
-        if (argument.contains ("--index-dir") or argument.contains ("-I")) {
-            QString subfolder = argument.section ("=", 1, 1);
-            subfolder.replace (QString ("\n"), "");
-            indexDirectoryName.append (subfolder);
-            indexDirectoryName.append (QDir::separator());
-        }
-    }
-
-    startPage = QDir::toNativeSeparators (indexDirectoryName+startPageSetting);
+    startPage = QDir::toNativeSeparators (rootDirName+startPageSetting);
 
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:

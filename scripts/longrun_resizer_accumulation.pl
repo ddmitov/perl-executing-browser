@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
-use CGI qw (:standard);
+use CGI::Simple::Standard qw (:standard);
 
 opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
@@ -40,7 +40,7 @@ while (my $file = readdir (DIR)) {
 	my $filepath_to_write = $FOLDER_TO_OPEN."/".$output_directory_name."/".$file;
 
 	print "Converting $file ...<br>\n";
-	my $result = `convert $filepath_to_read -resize 20% $filepath_to_write`;
+	my $result = `/usr/bin/convert $filepath_to_read -resize 20% $filepath_to_write`;
 }
 
 closedir (DIR);
