@@ -593,7 +593,6 @@ Settings::Settings()
     }
 
     // PERL INTERPRETER:
-    //perlInterpreter = settings.value ("interpreters/perl").toString();
     QString perlInterpreterSetting = settings.value ("interpreters/perl").toString();
     QDir interpreterFile (perlInterpreterSetting);
     if (interpreterFile.isRelative()) {

@@ -1806,7 +1806,6 @@ private:
     QString filepath;
     QWebView* newWindow;
 
-    QWebView* aboutDialog;
     QWebView* errorsWindow;
 
 };

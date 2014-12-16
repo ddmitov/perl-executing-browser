@@ -15,7 +15,7 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl 5 and Qt are available;  
 
-* **4. Secure user space solution:**  
+* **4. User space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program.  
 
 * **5. No user-specific logic or data in the compiled executable:**  
@@ -57,9 +57,14 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
   
 ## Possible Applications
   
-* Perl 5 desktop applications with HTML4/5, CSS2/3 & JavaScript GUI;  
+* Perl 5 desktop applications with HTML4/5, CSS2/3 & JavaScript GUI.  
 * GUI for the Perl debugger.  
   
+## Target Audience
+  
+* Advanced users and Perl enthusiasts willing to create rapidly a custom desktop scripting solution for internal use, which can not be easily implemented using only compiled software.  
+* Perl developers willing to use the built-in Perl debugger in graphical mode.  
+
 ## Compile-time Requirements
   
 Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
@@ -83,24 +88,29 @@ Compiled and tested successfully using:
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
   
+## What Perl Executing Browser is not
+* PEB is not a general purpose web browser and does not have the traditional feature set of a general purpose web browser. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary to inspect the final result of file upload or other communication with a specific web service.  
+* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for custom desktop-oriented scripts for manipulation of local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
+  
 ## Security Features & Considerations
   
-* Local scripts are executed with only few necessary environment variables (others are removed), but otherwise have the same privileges and access to system resources as the user, who started the browser.  
+* Local scripts are executed with only few necessary environment variables (others are removed, including user's PATH), but otherwise have the same privileges and access to system resources as the user, who started the browser.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message.  
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
-* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```). Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents the browser from executing untrusted code. Executing as root on a Linux machine:  
+* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
+* Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents the users from executing untrusted code. Executing as root on a Linux machine:  
 ```chown --recursive root peb-root-folder```  
 ```chgrp --recursive root peb-root-folder```  
 ```chmod --recursive 755 peb-root-folder```  
-is enough to do the job. The same commands could be applied to the folder of the binary file (if it is not already owned by root) to prevent unauthorized replacing or modification of the PEB executable. Although locally executed scripts don't have to be made executable because they are always given as an argument to their respective interpreters, mode 755 is necessary to avoid ```cannot read directory``` error for ordinary users.  
+is enough to do the job. The same commands could be applied to the folder of the binary file (if it is not already owned by root) to prevent unauthorized replacing or modification of the PEB executable. Locally executed scripts don't have to be made executable because they are always given as an argument to the interpreter, but mode 755 is necessary to avoid ```cannot read directory``` error.  
 Essentially the same protection on a Windows(TM) machine could be achieved by installing PEB from the administrator's account in a location that is read-only for all other users.  
-Note however, that a portable version of PEB running from a flash drive or external harddisk and owned by an ordinary user will not have this extra protection.  
+Note however, that a portable version of PEB running from a flash drive or external harddisk and owned by an ordinary user will not have this extra protection. The same is true if the administrator and the user of a given machine are the same person and this person unknowingly installs insecure or malicious scripts.  
 * Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from a debugged Perl script does exist and future versions will probably have a compile-time option to switch off Perl debugger interaction in end-user binaries.  
 * It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
 ## Windows Patch for the built-in Perl Debugger 
   
-Tests showed, that the operation of the built-in Perl debugger within PEB on Windows(TM) is impossible without a small, one-line modification of the ```perl5db.pl``` file, which makes ```$console``` variable ```undef``` on Windows platforms. Modifying the debugger itself was not wanted and was avoided initially due to the conviction that changes in a debugger have to be introduced with extreme caution and a lot of testing to prevent introducing bugs in an instrument created to hunt them down. However, tests showed that undef-ing the ```$console``` variable is a minor change, which does not affect the normal operation and output of the built-in debugger. This alteration is necessary because Qprocess class doesn't use the default console of the underlying operating system to start processes, including the Perl debugger, and without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of perl5db.pl file using ```{perl-executing-browser-root}/perl/debugger/perl5db-win32.patch```.
+Tests showed, that the operation of the built-in Perl debugger within PEB on Windows(TM) is impossible without a small, one-line modification of the ```perl5db.pl``` file, which makes ```$console``` variable ```undef``` on Windows platforms. Modifying the debugger itself was not wanted initially due to the conviction that changes in the debugger have to be avoided to prevent introducing bugs in an instrument created to hunt them down. However, tests showed that undef-ing the ```$console``` variable is a minor change, which does not affect the normal operation and output of the built-in debugger. This alteration is necessary because Qprocess class doesn't use the default console of the underlying operating system to start processes, including the Perl debugger, and without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of perl5db.pl file using ```{perl-executing-browser-root}/perl/debugger/perl5db-win32.patch```.
   
 ## History
   

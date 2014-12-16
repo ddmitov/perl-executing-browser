@@ -36,42 +36,7 @@ foreach my $p (param()) {
 print "</font></p>\n";
 
 print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "MODIFIED AND NEW ENVIRONMENT VARIABLES:\n";
-print "</font></p>\n";
-print "<p align='left'><font size='3' face='SansSerif'>\n";
-
-if (defined $PATH){
-	print "PATH = $PATH<br>\n";
-}
-if (defined $DOCUMENT_ROOT){
-	print "DOCUMENT_ROOT = $DOCUMENT_ROOT<br>\n";
-}
-if (defined $FILE_TO_OPEN){
-	print "FILE_TO_OPEN = $FILE_TO_OPEN<br>\n";
-}
-if (defined $FILE_TO_CREATE){
-	print "FILE_TO_CREATE = $FILE_TO_CREATE<br>\n";
-}
-if (defined $FOLDER_TO_OPEN){
-	print "FOLDER_TO_OPEN = $FOLDER_TO_OPEN<br>\n";
-}
-if (defined $PERL5LIB){
-	print "PERL5LIB = $PERL5LIB<br>\n";
-}
-if (defined $QUERY_STRING){
-	print "QUERY_STRING = $QUERY_STRING<br>\n";
-}
-if (defined $REQUEST_METHOD){
-	print "REQUEST_METHOD = $REQUEST_METHOD<br>\n";
-}
-if (defined $CONTENT_LENGTH){
-	print "CONTENT_LENGTH = $CONTENT_LENGTH<br>\n";
-}
-
-print "</font></p>\n";
-
-print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "ALL ENVIRONMENT VARIABLES:\n";
+print "ENVIRONMENT VARIABLES:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
 
