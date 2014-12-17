@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing local CGI-like and long-running Perl 5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of executing local CGI-like and long-running Perl 5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -15,7 +15,7 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl 5 and Qt are available;  
 
-* **4. User space solution:**  
+* **4. User-space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program.  
 
 * **5. No user-specific logic or data in the compiled executable:**  
@@ -62,7 +62,7 @@ Perl Executing Browser (PEB) is a C++ Qt4/5 WebKit browser capable of executing 
   
 ## Target Audience
   
-* Advanced users and Perl enthusiasts willing to create rapidly a custom desktop scripting solution for internal use, which can not be easily implemented using only compiled software.  
+* Advanced users and Perl enthusiasts willing to create rapidly custom desktop scripting solutions for internal use, which can not be easily implemented using other software.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
 
 ## Compile-time Requirements
@@ -89,8 +89,9 @@ Compiled and tested successfully using:
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
   
 ## What Perl Executing Browser is not
-* PEB is not a general purpose web browser and does not have the traditional feature set of a general purpose web browser. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary to inspect the final result of file upload or other communication with a specific web service.  
-* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for custom desktop-oriented scripts for manipulation of local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
+* PEB is not a general purpose web browser and does not have the traditional feature set of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary to inspect the final result of file upload or other communication with a specific web service.  
+* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
+* PEB is not a product for end-users with no understanding of the Perl programming language. It should not be used without knowing of what exactly local scripts are going to do. Inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
@@ -98,7 +99,7 @@ Compiled and tested successfully using:
 * Starting the browser as root on Linux is not allowed - it exits with a warning message.  
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
-* Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents the users from executing untrusted code. Executing as root on a Linux machine:  
+* Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents users from executing untrusted code. Executing as root on a Linux machine:  
 ```chown --recursive root peb-root-folder```  
 ```chgrp --recursive root peb-root-folder```  
 ```chmod --recursive 755 peb-root-folder```  
