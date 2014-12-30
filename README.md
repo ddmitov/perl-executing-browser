@@ -96,9 +96,9 @@ Compiled and tested successfully using:
 ## Security Features & Considerations
   
 * Local scripts are executed with the minimum of necessary environment variables. These are:  
-1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations,  
+1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
 2) environment variables borrowed from the CGI protocol and used for finding local files and communication between HTML forms and local Perl scripts:  
-```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```.  
+```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```;  
 3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
 ```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.  
 All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
