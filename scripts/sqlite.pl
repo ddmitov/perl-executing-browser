@@ -4,16 +4,32 @@
 
 use strict;
 use warnings;
+use 5.010;
 
 use utf8;
 use open ':std', ':encoding(UTF-8)';
+
+#~ unlink "/tmp/test.pl.pl";
+
+#~ my $relative_filepath = $ARGV[0];
+#~ open my $filehandle, '<', "$ENV{'DOCUMENT_ROOT'}$relative_filepath" or die "Missing file!\n";
+#~ close $filehandle;
+
+#~ open my $filehandle, '<', "/tmp/test.pl" or die;
+#~ close $filehandle;
+
+#~ use Tralala;
+
+#~ $ENV{'DOCUMENT_ROOT'} = "/tmp/test";
+#~ $ENV{'FILE_TO_OPEN'} = "/tmp/test";
+#~ $ENV{'FILE_TO_CREATE'} = "/tmp/test";
+#~ $ENV{'FOLDER_TO_OPEN'} = "/tmp/test";
 
 use DBI;
 use Env qw (PATH PERL5LIB DOCUMENT_ROOT QUERY_STRING REQUEST_METHOD);
 
 my $database_relative_pathname = "/db/test.db";
-my $database_full_pathname = $DOCUMENT_ROOT.$database_relative_pathname;
-my $db = DBI->connect("dbi:SQLite:$database_full_pathname","","", {sqlite_unicode => 1}) or die "Could not connect to database";
+my $db = DBI->connect("dbi:SQLite:$ENV{'DOCUMENT_ROOT'}$database_relative_pathname","","", {sqlite_unicode => 1}) or die "Could not connect to database";
 
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
 $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Linus', 'Torvalds')");

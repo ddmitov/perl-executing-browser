@@ -14,11 +14,6 @@
 #ifndef PEB_H
 #define PEB_H
 
-// The domain of Perl Executing Browser:
-#ifndef PEB_DOMAIN
-#define PEB_DOMAIN "http://perl-executing-browser-pseudodomain/"
-#endif
-
 #include <QApplication>
 #include <QUrl>
 #include <QWebPage>
@@ -704,10 +699,30 @@ public slots:
 
                     startedScripts.append (sourceFilepath);
                 } else {
-                    scriptHandler.start (settings.interpreter, QStringList() <<
-                                         QDir::toNativeSeparators
-                                         (scriptFullFilePath),
+
+
+//                    scriptHandler.start (settings.interpreter, QStringList() <<
+//                                         QDir::toNativeSeparators
+//                                         (scriptFullFilePath),
+//                                         QProcess::Unbuffered | QProcess::ReadWrite);
+
+
+                    QString censorScriptFileName (QDir::toNativeSeparators (
+                                          settings.rootDirName+
+                                          "perl/censor.pl"));
+                    QFile censorScriptFile (censorScriptFileName);
+                    censorScriptFile.open (QIODevice::ReadOnly | QIODevice::Text);
+                    QTextStream stream (&censorScriptFile);
+                    QString censorScriptContents = stream.readAll();
+                    censorScriptFile.close();
+
+                    scriptHandler.start (settings.interpreter, QStringList()
+                                         << "-se"
+                                         << censorScriptContents
+                                         << "--"
+                                         << QDir::toNativeSeparators (scriptFullFilePath),
                                          QProcess::Unbuffered | QProcess::ReadWrite);
+
 
                     startedScripts.append (scriptFullFilePath);
 
@@ -1471,7 +1486,7 @@ public slots:
         qDebug() << "===============";
 
         QProcess externalProcess;
-        externalProcess.startDetached ("padre", QStringList() << fileToEdit);
+        externalProcess.startDetached ("/usr/bin/scite", QStringList() << fileToEdit);
     }
 
     void viewSourceFromContextMenuSlot()

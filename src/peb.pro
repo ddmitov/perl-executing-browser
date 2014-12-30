@@ -1,15 +1,15 @@
 
 TEMPLATE = app
 TARGET = peb
+DEPENDPATH += .
+VERSION = 0.1
 TRANSLATIONS = $${TARGET}_bg_BG.ts
 
-DEPENDPATH += .
-CONFIG += openssl-linked
-VERSION = 0.1
-
+# Network support:
 QT += network
+CONFIG += openssl-linked # necessary for handling https adresses
 
-# Mac specific settings:
+# Macintosh specific settings:
 macx {
   ##########################################################
   # To make a bundle-less application:
@@ -33,10 +33,13 @@ macx {
   ##########################################################
   QMAKE_MAC_SDK = macosx10.9
 
-  ICON = camel.icns
+  ICON = icons/camel.icns
 }
 
+# Windows specific settings:
 win32 {
+  # Resource and icon files:
+  OTHER_FILES += peb.rc icons/camel.ico
   RC_FILE = peb.rc
 }
 
@@ -51,10 +54,13 @@ greaterThan (QT_MAJOR_VERSION, 4) {
   DEFINES += HAVE_QT5
 }
 
+# Source files:
 HEADERS += peb.h
 SOURCES += peb.cpp
 
-OTHER_FILES += peb.rc camel.ico
-
+# Temporary folder:
 MOC_DIR = tmp
 OBJECTS_DIR = tmp
+
+# The domain of Perl Executing Browser:
+DEFINES += PEB_DOMAIN=\\\"http://perl-executing-browser-pseudodomain/\\\"

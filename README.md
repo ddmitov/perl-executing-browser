@@ -44,12 +44,12 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 * Local scripts and pages can be edited in external editor using context menu entry.  
 * PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Different versions of Perl can be selected for every debugging session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Every Perl 5 script can be displayed as syntax highlighted source code.  
-* Extensive logging of all browser activities, including the execution of local scripts.  
+* Extensive optional logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
 * All settings are stored in an INI file with comments included.  
 * Browser root folder can be any folder.  
-* Basic program functions are accessible from special URLs or from a right-click context menu.  
+* Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to HTML, CSS and JavaScript interfaces.  
@@ -88,24 +88,31 @@ Compiled and tested successfully using:
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
   
-## What Perl Executing Browser is not
-* PEB is not a general purpose web browser and does not have the traditional feature set of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary to inspect the final result of file upload or other communication with a specific web service.  
-* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
+## What Perl Executing Browser Is Not
+* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
+* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a full-fledged sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
 * PEB is not a product for end-users with no understanding of the Perl programming language. It should not be used without knowing of what exactly local scripts are going to do. Inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
-* Local scripts are executed with only few necessary environment variables (others are removed, including user's PATH), but otherwise have the same privileges and access to system resources as the user, who started the browser.  
+* Local scripts are executed with the minimum of necessary environment variables. These are:  
+1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations,  
+2) environment variables borrowed from the CGI protocol and used for finding local files and communication between HTML forms and local Perl scripts:  
+```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```.
+3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
+```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.
+All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
+* Local scripts are executed only after a security check, implemented in the special ```censor.pl``` script, which bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message.  
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
-* Securing configuration file and root folder as owned by root/administrator and read-only for all ordinary users effectively prevents users from executing untrusted code. Executing as root on a Linux machine:  
+* If user is not administrator of his/her machine and configuration file and root folder are owned by root/administrator and read-only for all others, user will be effectively prevented from executing untrusted code. Executing as root on a Linux machine:  
 ```chown --recursive root peb-root-folder```  
 ```chgrp --recursive root peb-root-folder```  
 ```chmod --recursive 755 peb-root-folder```  
-is enough to do the job. The same commands could be applied to the folder of the binary file (if it is not already owned by root) to prevent unauthorized replacing or modification of the PEB executable. Locally executed scripts don't have to be made executable because they are always given as an argument to the interpreter, but mode 755 is necessary to avoid ```cannot read directory``` error.  
+is enough to do the job. The same commands could be applied to the folder of the binary file to prevent it's unauthorized replacing or modification. Locally executed scripts don't have to be made executable because they are always given as an argument to the interpreter, but mode 755 is necessary to avoid ```cannot read directory``` error.  
 Essentially the same protection on a Windows(TM) machine could be achieved by installing PEB from the administrator's account in a location that is read-only for all other users.  
-Note however, that a portable version of PEB running from a flash drive or external harddisk and owned by an ordinary user will not have this extra protection. The same is true if the administrator and the user of a given machine are the same person and this person unknowingly installs insecure or malicious scripts.  
+Note however, that a copy of PEB running from a flash drive or external harddisk and owned by an ordinary user will not have this extra protection.  
 * Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from a debugged Perl script does exist and future versions will probably have a compile-time option to switch off Perl debugger interaction in end-user binaries.  
 * It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
