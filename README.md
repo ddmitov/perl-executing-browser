@@ -100,7 +100,7 @@ Compiled and tested successfully using:
 2) environment variables borrowed from the CGI protocol and used for finding local files and communication between HTML forms and local Perl scripts:  
 ```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```.  
 3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
-```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.
+```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.  
 All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
 * Local scripts are executed only after a security check, implemented in the special ```censor.pl``` script, which bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message.  
