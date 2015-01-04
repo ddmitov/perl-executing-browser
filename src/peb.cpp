@@ -222,6 +222,7 @@ int main (int argc, char** argv)
     // Log basic program information:
     qDebug() << "";
     qDebug() << application.applicationName().toLatin1().constData()
+             << "version"
              << application.applicationVersion().toLatin1().constData()
              << "started on:"
              << applicationStartForLogContents.toLatin1().constData();
@@ -478,7 +479,9 @@ int main (int argc, char** argv)
     pathSeparator = ";";
 #endif
 
-    // Add all browser-specific folder names to PATH:
+    // Add all browser-specific folders to PATH,
+    // but first check if these directories exist,
+    // then resolve all relative paths, if any:
     foreach (QString pathEntry, settings.pathToAddList) {
         QDir pathDir (pathEntry);
         if (pathDir.exists()) {
@@ -1083,6 +1086,88 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
                                     QWebPage::NavigationType navigationType)
 {
 
+    // Select folder to add to the PATH environment variable:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+         request.url().scheme().contains ("addtopath")) {
+
+        QFileDialog addToPathDialog;
+        addToPathDialog.setFileMode (QFileDialog::AnyFile);
+        addToPathDialog.setViewMode (QFileDialog::Detail);
+        addToPathDialog.setWindowModality (Qt::WindowModal);
+        addToPathDialog.setWindowIcon (settings.icon);
+        QString pathFolderString = addToPathDialog.getExistingDirectory
+                (0, tr ("Select folder to add to PATH"), QDir::currentPath());
+        addToPathDialog.close();
+        addToPathDialog.deleteLater();
+
+        qDebug() << "Folder to add to PATH:" << pathFolderString;
+        qDebug() << "===============";
+
+        // Open the settings file:
+        QSettings pathFoldersSetting (settings.settingsFileName,
+                                          QSettings::IniFormat);
+
+        // Get list of all folders on the current PATH:
+        QStringList pathList;
+        int pathArraySize = pathFoldersSetting.beginReadArray("environment/path");
+        for (int index = 0; index < pathArraySize; ++index) {
+            pathFoldersSetting.setArrayIndex (index);
+            QString pathSetting = pathFoldersSetting.value ("name").toString();
+            pathList.append (pathSetting);
+        }
+        pathFoldersSetting.endArray();
+
+        // Append the new folder name to
+        // the list of all folders on the current PATH:
+        pathList.append (pathFolderString);
+
+        // Append the new folder name in the
+        // appropriate section of the settings file:
+        pathFoldersSetting.beginWriteArray ("environment/path");
+        pathFoldersSetting.setArrayIndex (pathArraySize);
+        pathFoldersSetting.setValue ("name", pathFolderString);
+        pathFoldersSetting.endArray();
+
+        // Define separator between PATH folders:
+        QByteArray path;
+        QString pathSeparator;
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+        pathSeparator = ":";
+#endif
+#ifdef Q_OS_WIN // Windows
+        pathSeparator = ";";
+#endif
+
+        // Add all browser-specific folders to PATH,
+        // but first check if these directories exist,
+        // then resolve all relative paths, if any:
+        foreach (QString pathEntry, pathList) {
+            QDir pathDir (pathEntry);
+            if (pathDir.exists()) {
+                if (pathDir.isRelative()) {
+                    pathEntry = QDir::toNativeSeparators (settings.rootDirName+pathEntry);
+                }
+                if (pathDir.isAbsolute()) {
+                    pathEntry = QDir::toNativeSeparators (pathEntry);
+                }
+                path.append (pathEntry);
+                path.append (pathSeparator);
+            }
+        }
+
+        // Insert the new browser-specific PATH variable into
+        // the environment of the browser and all local scripts executed by the browser:
+#ifndef Q_OS_WIN // Unix-based or similar operating systems
+        qputenv ("PATH", path);
+        scriptEnvironment.insert ("PATH", path);
+#else // Windows
+        qputenv ("Path", path);
+        scriptEnvironment.insert ("Path", path);
+#endif
+
+        return false;
+    }
+
     // Select Perl interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("selectperl")) {
@@ -1100,6 +1185,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
         if (perlInterpreter.length() > 0) {
             settings.perlInterpreter = perlInterpreter;
+
             QSettings perlInterpreterSetting (settings.settingsFileName, QSettings::IniFormat);
             perlInterpreterSetting.setValue ("interpreters/perl", perlInterpreter);
             perlInterpreterSetting.sync();

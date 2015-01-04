@@ -158,6 +158,7 @@
  http://stackoverflow.com/questions/3214297/how-can-my-c-c-application-determine-if-the-root-user-is-executing-the-command
  http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
  http://stackoverflow.com/questions/1712500/qt-qsettings-on-windows-with-ini-files-and-comments
+ http://stackoverflow.com/questions/16250994/how-to-properly-use-qsettings
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -186,6 +187,7 @@
  http://perlmeme.org/faqs/file_io/directory_listing.html
  http://www.caveofprogramming.com/frontpage/articles/perl/perl-mkdir-how-to-create-directories-in-perl/
  http://www.perl.com/pub/2002/05/14/mod_perl.html
+ http://www.tizag.com/perlT/perlhashes.php
  
  MAC
  ===

@@ -888,28 +888,37 @@ public slots:
             if (settings.displayStderr == "enable") {
                 if (scriptAccumulatedErrors.length() > 0 and
                         scriptKilled == false) {
-                    QMessageBox showErrorsMessageBox;
-                    showErrorsMessageBox.setWindowModality (Qt::WindowModal);
-                    showErrorsMessageBox.setWindowTitle (tr ("Errors"));
-                    showErrorsMessageBox.setIconPixmap (settings.icon);
-                    showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
-                                                  tr ("Do you want to see them?"));
-                    showErrorsMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-                    showErrorsMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-                    showErrorsMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-                    showErrorsMessageBox.setDefaultButton (QMessageBox::Yes);
 
-                    if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
-                        QString scriptErrorFilePath = QDir::toNativeSeparators
-                                (QDir::tempPath()+QDir::separator()+"lrerror.txt");
+                    settings.cssLinker (scriptAccumulatedErrors);
+                    scriptAccumulatedErrors = settings.cssLinkedHtml;
 
-                        QFile scriptErrorFile (scriptErrorFilePath);
-                        if (scriptErrorFile.open (QIODevice::ReadWrite)) {
-                            QTextStream stream (&scriptErrorFile);
-                            stream << scriptAccumulatedErrors << endl;
+                    QString scriptErrorFilePath = QDir::toNativeSeparators
+                            (QDir::tempPath()+QDir::separator()+"stderr.htm");
+
+                    QFile scriptErrorFile (scriptErrorFilePath);
+                    if (scriptErrorFile.open (QIODevice::ReadWrite)) {
+                        QTextStream stream (&scriptErrorFile);
+                        stream << scriptAccumulatedErrors << endl;
+
+                        if (scriptAccumulatedOutput.length() == 0) {
+                            targetFrame->setUrl (QUrl::fromLocalFile (scriptErrorFilePath));
+                            scriptErrorFile.remove();
+                        } else {
+                            QMessageBox showErrorsMessageBox;
+                            showErrorsMessageBox.setWindowModality (Qt::WindowModal);
+                            showErrorsMessageBox.setWindowTitle (tr ("Errors"));
+                            showErrorsMessageBox.setIconPixmap (settings.icon);
+                            showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
+                                                          tr ("Do you want to see them?"));
+                            showErrorsMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
+                            showErrorsMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
+                            showErrorsMessageBox.setButtonText (QMessageBox::No, tr ("No"));
+                            showErrorsMessageBox.setDefaultButton (QMessageBox::Yes);
+
+                            if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
+                                emit displayErrorsSignal (scriptErrorFilePath);
+                            }
                         }
-
-                        emit displayErrorsSignal (scriptErrorFilePath);
                     }
                 }
             }
@@ -931,7 +940,8 @@ public slots:
 
     void scriptTimeoutSlot ()
     {
-        if (scriptHandler.isOpen()) {
+        if (scriptHandler.isOpen() and
+                scriptAccumulatedErrors.length() == 0) {
 
             scriptTimedOut = true;
             scriptHandler.close();
@@ -1536,11 +1546,13 @@ public slots:
     void displayErrorsSlot (QString errorsFilePath)
     {
         errorsWindow = new TopLevel ();
-        QUrl aboutUrl = "file://"+errorsFilePath;
-        errorsWindow->setWindowTitle ("Script Errors");
-        errorsWindow->setUrl (aboutUrl);
+        QUrl errorsFileUrl = "file://"+errorsFilePath;
+        errorsWindow->setUrl (errorsFileUrl);
         errorsWindow->setFocus();
         errorsWindow->show();
+
+        QFile scriptErrorsFile (errorsFilePath);
+        scriptErrorsFile.remove();
     }
 
     void contextMenuEvent (QContextMenuEvent* event)

@@ -15,9 +15,10 @@ my @allowed_use_pragmas_or_module_names = (@allowed_use_pragmas, @allowed_module
 my @prohibited_core_functions = qw (fork unlink);
 my $prohibited_core_functions = join (' ', @prohibited_core_functions);
 
+my %problematic_lines;
+
 my $line_number;
 my $real_line_number;
-my @problematic_lines;
 foreach my $line (@user_code) {
 	$line_number++;
 	$real_line_number = $line_number - 1;
@@ -33,9 +34,7 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 		if ($line =~ m/#.*\$ENV{'DOCUMENT_ROOT'}/) {
 			next;
 		} else {
-			push @problematic_lines, $line;
-			print STDERR "Forbidden manipulation of 'DOCUMENT_ROOT' environment variable detected at line $real_line_number!\n\n";
-			print STDERR "Line $real_line_number: $line\n";
+			$problematic_lines{$line} = "Forbidden manipulation of 'DOCUMENT_ROOT' environment variable detected!";
 		}
 	}
 
@@ -43,9 +42,7 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 		if ($line =~ m/#.*\$ENV{'FILE_TO_OPEN'}/) {
 			next;
 		} else {
-			push @problematic_lines, $line;
-			print STDERR "Forbidden manipulation of 'FILE_TO_OPEN' environment variable detected at line $real_line_number!\n\n";
-			print STDERR "Line $real_line_number: $line\n";
+			$problematic_lines{$line} = "Forbidden manipulation of 'FILE_TO_OPEN' environment variable detected!";
 		}
 	}
 
@@ -53,9 +50,7 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 		if ($line =~ m/#.*\$ENV{'FILE_TO_CREATE'}/) {
 			next;
 		} else {
-			push @problematic_lines, $line;
-			print STDERR "Forbidden manipulation of 'FILE_TO_CREATE' environment variable detected at line $real_line_number!\n\n";
-			print STDERR "Line $real_line_number: $line\n";
+			$problematic_lines{$line} = "Forbidden manipulation of 'FILE_TO_CREATE' environment variable detected!";
 		}
 	}
 
@@ -63,9 +58,7 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 		if ($line =~ m/#.*\$ENV{'FOLDER_TO_OPEN'}/) {
 			next;
 		} else {
-			push @problematic_lines, $line;
-			print STDERR "Forbidden manipulation of 'FOLDER_TO_OPEN' environment variable detected at line $real_line_number!\n\n";
-			print STDERR "Line $real_line_number: $line\n";
+			$problematic_lines{$line} = "Forbidden manipulation of 'FOLDER_TO_OPEN' environment variable detected!";
 		}
 	}
 
@@ -82,9 +75,7 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 				next;
 			# every other use of 'open' is not allowed
 			} else {
-				push @problematic_lines, $line;
-				print STDERR "Forbidden use of 'open' function detected at line $real_line_number!\n\n";
-				print STDERR "Line $real_line_number: $line\n";
+				$problematic_lines{$line} = "Forbidden use of 'open' function detected!";
 			}
 		}
 	}
@@ -104,22 +95,52 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 			} elsif (grep (/$use_pragma_or_module_name/, @allowed_use_pragmas_or_module_names)) { 
 				next;
 			} else {
-				push @problematic_lines, $line;
-				print STDERR "Forbidden 'use' pragma or unauthorized module detected at line $real_line_number!\n\n";
-				print STDERR "Line $real_line_number: $line\n";
+				$problematic_lines{$line} = "Forbidden 'use' pragma or unauthorized module detected!";
 			}
 		}
 	}
 
 }
 
-if (scalar (@problematic_lines) == 0) {
+my $header = "
+<html>
+
+<head>
+	<title>Perl Executing Browser - SQLite Example</title>
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+</head>
+
+<body>
+
+	<p align='left'><font size='3' face='SansSerif'>";
+
+my $footer = "
+	</font></p>
+
+</body>
+
+</html>";
+
+if (scalar (keys %problematic_lines) == 0) {
 	my $user_code = join ('', @user_code);
 	eval ($user_code);
 } else {
-	print STDERR "Security violations were found and execution of user script was not attempted!\n";
+	print STDERR $header;
+	print STDERR "Security violations were found and execution of user script was not attempted!<br>\n<br>\n";
+	while ((my $line, my $explanation) = each (%problematic_lines)){
+		print STDERR "$line<br>\n";
+		print STDERR "$explanation<br><br>\n";
+	}
+	print STDERR $footer;
+	exit;
 }
 
 if ($@) {
-	die "Unsecure code was blocked or script died due to it's own problems!\n$@";
+	if ($@ =~ m/trapped/) {
+		print STDERR "$header Unsecure code was blocked:<br>\n<br>\n $@ $footer";
+		exit;
+	} else {
+		print STDERR "$header Script died due to it's own problems:<br>\n<br>\n $@ $footer";
+		exit;
+	}
 }
