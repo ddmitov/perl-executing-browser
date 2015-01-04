@@ -141,5 +141,5 @@ Possible new name: **QtCamel Browser**
 ## Authors
   
 Dimitar D. Mitov, 2013 - 2015,  
-Valcho Nedelchev, 2015  
+Valcho Nedelchev, 2014 - 2015.  
   
