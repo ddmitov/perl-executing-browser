@@ -2,8 +2,7 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
-use CGI::Simple::Standard qw (:standard);
+use Env qw (FOLDER_TO_OPEN);
 
 sub html_header() {
 	print "<html>\n";

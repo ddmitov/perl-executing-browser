@@ -4,13 +4,21 @@ use strict;
 use warnings;
 use 5.010;
 
+# http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (not executing program)"
+# http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"
+
+open (my $saved_stderr_filehandle, '>&', \*STDERR)  or die "Can't duplicate STDERR: $!";
+close STDERR;
+my $stderr;
+open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
+
 my $file = $ARGV[0];
 open my $filehandle, '<', $file or die;
 my @user_code = <$filehandle>;
 close $filehandle;
 
 my @allowed_use_pragmas = qw (attributes autodie autouse base bigint bignum bigrat open strict warnings utf8);
-my @allowed_modules = qw (CGI::Simple::Standard Cwd DBI Env);
+my @allowed_modules = qw (CGI::Simple::Standard Cwd DBI Env XML::LibXML);
 my @allowed_use_pragmas_or_module_names = (@allowed_use_pragmas, @allowed_modules);
 my @prohibited_core_functions = qw (fork unlink);
 my $prohibited_core_functions = join (' ', @prohibited_core_functions);
@@ -102,45 +110,64 @@ if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
 
 }
 
-my $header = "
-<html>
+my $header = "<html>
 
 <head>
-	<title>Perl Executing Browser - SQLite Example</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<title>Perl Executing Browser - Errors</title>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<style type='text/css'>body {text-align: left}</style>\n
 </head>
 
-<body>
+<body>";
 
-	<p align='left'><font size='3' face='SansSerif'>";
-
-my $footer = "
-	</font></p>
-
-</body>
+my $footer = "</body>
 
 </html>";
 
 if (scalar (keys %problematic_lines) == 0) {
 	my $user_code = join ('', @user_code);
 	eval ($user_code);
+
+	close (STDERR) or die "Can't close STDERR: $!";
+	open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR: $!";
 } else {
+	close (STDERR) or die "Can't close STDERR: $!";
+	open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR: $!";
+
 	print STDERR $header;
-	print STDERR "Security violations were found and execution of user script was not attempted!<br>\n<br>\n";
+	print STDERR "<p align='center'><font size='5' face='SansSerif'>";
+	print STDERR "Script execution was not attempted due to security violations:</font></p>\n";
+	
 	while ((my $line, my $explanation) = each (%problematic_lines)){
-		print STDERR "$line<br>\n";
-		print STDERR "$explanation<br><br>\n";
+		print STDERR "<pre>";
+		print STDERR "$line";
+		print STDERR "$explanation";
+		print STDERR "</pre>";
 	}
+	
 	print STDERR $footer;
 	exit;
 }
 
 if ($@) {
 	if ($@ =~ m/trapped/) {
-		print STDERR "$header Unsecure code was blocked:<br>\n<br>\n $@ $footer";
+		print STDERR $header;
+		print STDERR "<p align='center'><font size='5' face='SansSerif'>Unsecure code was blocked:</font></p>\n";
+		print STDERR "<pre>$@</pre>";
+		print STDERR $footer;
 		exit;
 	} else {
-		print STDERR "$header Script died due to it's own problems:<br>\n<br>\n $@ $footer";
+		print STDERR $header;
+		print STDERR "<p align='center'><font size='5' face='SansSerif'>Errors were found during script execution:</font></p>\n";
+		print STDERR "<pre>$@</pre>";
+		print STDERR $footer;
 		exit;
 	}
+}
+
+if (defined($stderr)) {
+	print STDERR $header;
+	print STDERR "<p align='center'><font size='5' face='SansSerif'>Errors were found during script execution:</font></p>\n";
+	print STDERR "<pre>$stderr</pre>";
+	print STDERR $footer;
 }

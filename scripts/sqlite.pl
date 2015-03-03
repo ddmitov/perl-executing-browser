@@ -9,24 +9,9 @@ use open ':std', ':encoding(UTF-8)';
 
 use DBI;
 
-#~ unlink "/tmp/test.pl.pl";
-
-#~ my $relative_filepath = $ARGV[0];
-#~ open my $filehandle, '<', "$ENV{'DOCUMENT_ROOT'}$relative_filepath" or die "Missing file!\n";
-#~ close $filehandle;
-
-#~ open my $filehandle, '<', "/tmp/test.pl" or die;
-#~ close $filehandle;
-
-#~ use Tralala;
-
-#~ $ENV{'DOCUMENT_ROOT'} = "/tmp/test";
-#~ $ENV{'FILE_TO_OPEN'} = "/tmp/test";
-#~ $ENV{'FILE_TO_CREATE'} = "/tmp/test";
-#~ $ENV{'FOLDER_TO_OPEN'} = "/tmp/test";
-
 my $database_relative_pathname = "/db/test.db";
-my $db = DBI->connect ("dbi:SQLite:$ENV{'DOCUMENT_ROOT'}$database_relative_pathname","","", {sqlite_unicode => 1}) or die "Could not connect to database";
+my $db = DBI->connect ("dbi:SQLite:$ENV{'DOCUMENT_ROOT'}$database_relative_pathname","","", {sqlite_unicode => 1}) or
+	die "Could not connect to database";
 
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
 $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Linus', 'Torvalds')");
@@ -36,33 +21,27 @@ $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Ричард', 'Столм�
 
 my $all = $db->selectall_arrayref ("SELECT * FROM USER");
 
-print  <<HEADER;
-<html>
+print "<html>
 
 <head>
-	<title>Perl Executing Browser - SQLite Example</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+<title>Perl Executing Browser - SQLite Example</title>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 </head>
 
 <body>
 
-	<p align='left'><font size='3' face='SansSerif'>
-
-HEADER
+<p align='left'><font size='3' face='SansSerif'>\n";
 
 foreach my $row (@$all) {
 	my ($id, $name, $surname) = @$row;
 	print "$id $name $surname <br>\n";
 }
 
-print  <<FOOTER;
-
-	</font></p>
+print "\n
+</font></p>
 
 </body>
 
-</html>
-
-FOOTER
+</html>\n";
 
 $db->disconnect;

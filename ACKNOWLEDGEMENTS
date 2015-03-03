@@ -115,6 +115,7 @@
  http://www.qtforum.org/article/18224/get-directory-path.html
  http://www.qtforum.org/article/15030/passing-parameters-to-the-constructor.html
  http://www.qtforum.org/article/27658/how-to-prevent-closing-of-a-window-by-alt-f4-solved.html
+ http://www.qtforum.org/article/10001/is-there-a-qt-command-to-lunch-the-default-web-browser-win-maclinux.html
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
  http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
  http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
@@ -159,6 +160,7 @@
  http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
  http://stackoverflow.com/questions/1712500/qt-qsettings-on-windows-with-ini-files-and-comments
  http://stackoverflow.com/questions/16250994/how-to-properly-use-qsettings
+ http://stackoverflow.com/questions/7228826/how-can-i-convert-qvariant-to-qstring-and-vice-versa-in-qt
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu

@@ -14,9 +14,6 @@ Perl debugger interaction:
 - show source code and highlight current line only when current line is known, otherwise do not display source code
 - show highlighted HTML source code when scripts produce HTML output within the debugger GUI
 
-Locally executed scripts:
-- HTML formatted STDERR output
-
 GUI:
 - working maximized window setting on Mac
 
