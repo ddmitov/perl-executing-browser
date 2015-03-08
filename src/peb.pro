@@ -5,6 +5,13 @@ DEPENDPATH += .
 VERSION = 0.1
 TRANSLATIONS = $${TARGET}_bg_BG.ts
 
+CONFIG (debug, debug|release) { 
+    DESTDIR = ../
+}
+CONFIG (release, debug|release) { 
+    DESTDIR = ../
+}
+
 # Network support:
 QT += network
 CONFIG += openssl-linked # necessary for handling https adresses
@@ -59,8 +66,9 @@ HEADERS += peb.h
 SOURCES += peb.cpp
 
 # Temporary folder:
-MOC_DIR = tmp
-OBJECTS_DIR = tmp
+MOC_DIR = ../tmp
+OBJECTS_DIR = ../tmp
+RCC_DIR = ../tmp
 
 # The domain of Perl Executing Browser:
 DEFINES += PEB_DOMAIN=\\\"http://perl-executing-browser-pseudodomain/\\\"

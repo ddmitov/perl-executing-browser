@@ -161,6 +161,7 @@
  http://stackoverflow.com/questions/1712500/qt-qsettings-on-windows-with-ini-files-and-comments
  http://stackoverflow.com/questions/16250994/how-to-properly-use-qsettings
  http://stackoverflow.com/questions/7228826/how-can-i-convert-qvariant-to-qstring-and-vice-versa-in-qt
+ http://stackoverflow.com/questions/2580934/how-to-specify-different-debug-release-output-directories-in-qmake-pro-file
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
  http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
