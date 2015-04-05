@@ -22,6 +22,8 @@
 #include <QtWebKit>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QProcess>
+#include <QSpacerItem>
+#include <QGridLayout>
 #include <QMessageBox>
 #include <QFileDialog>
 #include <QPrintPreviewDialog>
@@ -1663,6 +1665,7 @@ public slots:
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
 
         QMessageBox aboutBox;
+        QSpacerItem* horizontalSpacer = new QSpacerItem (500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
         aboutBox.setWindowTitle ("About Perl Executing Browser");
         aboutBox.setIconPixmap ((qApp->property ("icon").toString()));
         aboutBox.setText ("Perl Executing Browser, version 0.1<br>"
@@ -1683,6 +1686,8 @@ public slots:
                         "Valcho Nedelchev, 2014 - 2015<br><br>"
                         "<a href='https://github.com/ddmitov/perl-executing-browser'>"
                         "https://github.com/ddmitov/perl-executing-browser</a><br>");
+        QGridLayout* layout = (QGridLayout*)aboutBox.layout();
+        layout->addItem (horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
         aboutBox.setDefaultButton (QMessageBox::Ok);
         aboutBox.exec();
     }
