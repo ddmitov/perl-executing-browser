@@ -1586,21 +1586,5 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         return false;
     }
 
-    // Open clicked links to NOT allowed network content using default browser:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains ("http") and
-            (!request.url().toString().contains (PEB_DOMAIN)) and
-            (!(qApp->property ("allowedDomainsList").toStringList())
-             .contains (request.url().authority()))) {
-
-        qDebug() << "Default browser called for not allowed network link:"
-                 << request.url().toString();
-        qDebug() << "===============";
-
-        Page::openBrowser (request.url().toString());
-
-        return false;
-    }
-
     return QWebPage::acceptNavigationRequest (frame, request, navigationType);
 }

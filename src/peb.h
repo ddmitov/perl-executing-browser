@@ -1212,18 +1212,6 @@ public slots:
         //debuggerOutputFile.remove();
     }
 
-    void openBrowser (QUrl url)
-    {
-#ifdef Q_OS_LINUX
-        QProcess externalBrowserProcess;
-        externalBrowserProcess
-                .startDetached ("/usr/bin/chromium-browser",
-                                QStringList() << url.toString());
-#else
-        QDesktopServices::openUrl (url);
-#endif
-    }
-
 public:
 
     Page();
@@ -1544,8 +1532,7 @@ public slots:
                 }
             }
 
-            if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL) or
-                    qWebHitTestURL.toString().contains ("localhost")) {
+            if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL)) {
 
                 QAction* openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
                 QObject::connect (openInNewWindowAct, SIGNAL (triggered()),

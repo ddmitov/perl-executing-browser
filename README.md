@@ -33,7 +33,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
   
 **Networking:**  
-* PEB can open pages from localhost or from a predefined list of allowed websites.  
+* PEB will open only pages from a predefined list of allowed domain names.  
 * User agent name can be changed easily from configuration file.  
   
 **Local filesystem:**  
