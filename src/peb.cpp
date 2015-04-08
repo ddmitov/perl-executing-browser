@@ -215,12 +215,6 @@ int main (int argc, char** argv)
     application.setProperty ("displayStderr", displayStderr);
 
     // PERL DEBUGGER:
-    // Use the same debugger for execution of scripts and debugging or
-    // choose a separate interpreter for each debugging session.
-    QString debuggerInterpreter =
-            settings.value ("perl_debugger/debugger_interpreter").toString();
-    application.setProperty ("debuggerInterpreter", debuggerInterpreter);
-
     // Perl debugger HTML template:
     QString debuggerHtmlTemplateSetting = settings.value (
                 "perl_debugger/debugger_html_template").toString();
@@ -699,7 +693,6 @@ int main (int argc, char** argv)
     qDebug() << "===============";
     qDebug() << "DEBUGGER SETTINGS:";
     qDebug() << "===============";
-    qDebug() << "Debugger interpreter:" << debuggerInterpreter;
     qDebug() << "Debugger HTML template:" << debuggerHtmlTemplate;
 
     qDebug() << "===============";

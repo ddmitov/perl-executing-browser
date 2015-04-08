@@ -28,7 +28,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 **Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
-* Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
+* Perl modules can be loaded from a custom directory without system-wide installation using PATH and/or PERLLIB environment variables.  
 * Any version of Perl 5 can be selected from configuration file or by clicking a special URL.  
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
   
@@ -42,7 +42,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 **Development goodies:**  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Different versions of Perl can be selected for every debugging session. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Every Perl 5 script can be displayed as syntax highlighted source code.  
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
   

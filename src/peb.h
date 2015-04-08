@@ -891,39 +891,6 @@ public slots:
         }
     }
 
-    // Perl debugger interaction.
-    // Implementation of an idea proposed by Valcho Nedelchev.
-    void selectDebuggingPerlInterpreterSlot()
-    {
-        QFileDialog debuggerInterpreterSelectorDialog;
-        debuggerInterpreterSelectorDialog.setFileMode (QFileDialog::AnyFile);
-        debuggerInterpreterSelectorDialog.setViewMode (QFileDialog::Detail);
-        debuggerInterpreterSelectorDialog.setWindowModality (Qt::WindowModal);
-        debuggerInterpreterSelectorDialog.setWindowIcon (icon);
-        debuggerInterpreter = debuggerInterpreterSelectorDialog.getOpenFileName
-                (0, tr ("Select Interpreter"),
-                 QDir::currentPath(), tr ("All files (*)"));
-        qDebug() << "Selected interpreter:" << debuggerInterpreter;
-        qDebug() << "===============";
-        debuggerInterpreterSelectorDialog.close();
-        debuggerInterpreterSelectorDialog.deleteLater();
-
-        QFileDialog debuggerPerlLibSelectorDialog;
-        debuggerPerlLibSelectorDialog.setFileMode (QFileDialog::AnyFile);
-        debuggerPerlLibSelectorDialog.setViewMode (QFileDialog::Detail);
-        debuggerPerlLibSelectorDialog.setWindowModality (Qt::WindowModal);
-        debuggerPerlLibSelectorDialog.setWindowIcon (icon);
-        QString perlLibFolderNameString = debuggerPerlLibSelectorDialog.getExistingDirectory
-                (0, tr ("Select PERLLIB"), QDir::currentPath());
-        QByteArray perlLibFolderName;
-        perlLibFolderName.append (perlLibFolderNameString);
-        qputenv ("PERLLIB", perlLibFolderName);
-        qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-        qDebug() << "===============";
-        debuggerPerlLibSelectorDialog.close();
-        debuggerPerlLibSelectorDialog.deleteLater();
-    }
-
     void startPerlDebuggerSlot (QUrl debuggerUrl)
     {
         QString filePath = debuggerUrl.toString (QUrl::RemoveQuery)
@@ -949,21 +916,8 @@ public slots:
         qDebug() << "File passed to Perl debugger:"
                  << QDir::toNativeSeparators (debuggerScriptToDebugFilePath);
 
-        // Define Perl interpreter to be used for debugging:
-        QString debuggedScriptExtension = debuggerScriptToDebugFilePath.section (".", 1, 1);
-        if (debuggedScriptExtension.length() == 0)
-            debuggedScriptExtension = "pl";
-
-        if ((qApp->property ("debuggerInterpreter").toString()) == "current") {
-            FileDetector detector;
-            detector.defineInterpreter (debuggerScriptToDebugFilePath);
-            debuggerInterpreter = detector.interpreter;
-        }
-
-        if ((qApp->property ("debuggerInterpreter").toString()) == "select") {
-            selectDebuggingPerlInterpreterSlot();
-        }
-
+        // Perl interpreter to be used for debugging:
+        QString debuggerInterpreter = (qApp->property ("perlInterpreter").toString());
         qDebug() << "Interpreter:" << debuggerInterpreter;
 
         // Clean accumulated debugger output from previous debugger session:
@@ -1255,7 +1209,6 @@ private:
     QString debuggerScriptUrl;
     QString debuggerScriptToDebugFilePath;
     QString debuggerQueryString;
-    QString debuggerInterpreter;
     QProcess debuggerHandler;
     QString debuggerLineInfoLastLine;
     QString debuggerAccumulatedOutput;
