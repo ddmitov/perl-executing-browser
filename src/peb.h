@@ -627,30 +627,32 @@ public slots:
                     startedScripts.append (sourceFilepath);
                 } else {
 
+                    if (SCRIPT_CENSORING == 0) {
+                        scriptHandler.start ((qApp->property ("perlInterpreter").toString()),
+                                             QStringList() <<
+                                             QDir::toNativeSeparators
+                                             (scriptFullFilePath),
+                                             QProcess::Unbuffered | QProcess::ReadWrite);
+                    }
 
-//                    scriptHandler.start (settings.interpreter, QStringList() <<
-//                                         QDir::toNativeSeparators
-//                                         (scriptFullFilePath),
-//                                         QProcess::Unbuffered | QProcess::ReadWrite);
+                    if (SCRIPT_CENSORING == 1) {
+                        QString censorScriptFileName (QDir::toNativeSeparators (
+                                                          (qApp->property ("rootDirName").toString())+
+                                                          "perl/censor.pl"));
+                        QFile censorScriptFile (censorScriptFileName);
+                        censorScriptFile.open (QIODevice::ReadOnly | QIODevice::Text);
+                        QTextStream stream (&censorScriptFile);
+                        QString censorScriptContents = stream.readAll();
+                        censorScriptFile.close();
 
-
-                    QString censorScriptFileName (QDir::toNativeSeparators (
-                                          (qApp->property ("rootDirName").toString())+
-                                          "perl/censor.pl"));
-                    QFile censorScriptFile (censorScriptFileName);
-                    censorScriptFile.open (QIODevice::ReadOnly | QIODevice::Text);
-                    QTextStream stream (&censorScriptFile);
-                    QString censorScriptContents = stream.readAll();
-                    censorScriptFile.close();
-
-                    scriptHandler.start ((qApp->property ("perlInterpreter").toString()),
-                                         QStringList()
-                                         << "-se"
-                                         << censorScriptContents
-                                         << "--"
-                                         << QDir::toNativeSeparators (scriptFullFilePath),
-                                         QProcess::Unbuffered | QProcess::ReadWrite);
-
+                        scriptHandler.start ((qApp->property ("perlInterpreter").toString()),
+                                             QStringList()
+                                             << "-se"
+                                             << censorScriptContents
+                                             << "--"
+                                             << QDir::toNativeSeparators (scriptFullFilePath),
+                                             QProcess::Unbuffered | QProcess::ReadWrite);
+                    }
 
                     startedScripts.append (scriptFullFilePath);
 

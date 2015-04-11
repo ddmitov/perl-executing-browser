@@ -1,3 +1,18 @@
+message ("")
+message ("Starting Perl Executing Browser (PEB) build procedure...")
+message ("")
+message ("Qt version: $$[QT_VERSION]")
+message ("Qt is installed in: $$[QT_INSTALL_PREFIX]")
+message ("Qt resources can be found in the following locations:")
+message ("Qt Documentation: $$[QT_INSTALL_DOCS]")
+message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
+message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
+message ("Qt Binary files (executables): $$[QT_INSTALL_BINS]")
+message ("Qt Plugins: $$[QT_INSTALL_PLUGINS]")
+message ("Qt Data files: $$[QT_INSTALL_DATA]")
+message ("Qt Translation files: $$[QT_INSTALL_TRANSLATIONS]")
+message ("Qt Settings: $$[QT_INSTALL_SETTINGS]")
+message ("")
 
 TEMPLATE = app
 TARGET = peb
@@ -19,17 +34,25 @@ CONFIG += openssl-linked # necessary for handling https adresses
 # Macintosh specific settings:
 macx {
   ##########################################################
-  # To make a bundle-less application:
-  # (recommended)
-  # DEFINES += "BUNDLE=0"
+  # To make a bundle-less application: (recommended)
+  # BUNDLE = 0
   # CONFIG -= app_bundle
   ##########################################################
   # To make a bundle (peb.app):
-  # DEFINES += "BUNDLE=1"
+  # BUNDLE = 1
   # CONFIG += app_bundle
   ##########################################################
-  DEFINES += "BUNDLE=0"
+  BUNDLE = 0
   CONFIG -= app_bundle
+
+  DEFINES += "BUNDLE=$$BUNDLE"
+
+  equals (BUNDLE, 0) {
+      message ("Going to build without Mac OSX bundle support...")
+  }
+  equals (BUNDLE, 1) {
+      message ("Going to build with Mac OSX bundle support...")
+  }
 
   ##########################################################
   # Set the version number of QMAKE_MAC_SDK to
@@ -71,4 +94,29 @@ OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
 # The domain of Perl Executing Browser:
-DEFINES += PEB_DOMAIN=\\\"http://perl-executing-browser-pseudodomain/\\\"
+PEB_DOMAIN = "http://perl-executing-browser-pseudodomain/"
+
+DEFINES += PEB_DOMAIN=\\\"$$PEB_DOMAIN\\\"
+message ("PEB pseudo-domain: $$PEB_DOMAIN")
+
+##########################################################
+# To guard against security issues of user-supplied Perl scripts:
+# SCRIPT_CENSORING = 1
+# If this option is enabled,
+# every Perl script going to be executed by the browser
+# is scanned by a special super-script, censor.pl, and
+# if any security issues are found, the offending script
+# is blocked and error message is displayed.
+##########################################################
+SCRIPT_CENSORING = 1
+
+DEFINES += "SCRIPT_CENSORING=$$SCRIPT_CENSORING"
+
+equals (SCRIPT_CENSORING, 0) {
+    message ("Going to build without script censoring support...")
+}
+equals (SCRIPT_CENSORING, 1) {
+    message ("Going to build with script censoring support...")
+}
+
+message ("")
