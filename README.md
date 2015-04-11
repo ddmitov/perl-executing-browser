@@ -73,7 +73,8 @@ Compiled and tested successfully using:
 * Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux,  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
-* Qt Creator 3.2.1 and Qt 4.8.6 on 32-bit Debian Linux  
+* Qt Creator 3.2.1 and Qt 4.8.6 on 32-bit Debian Linux,  
+* Qt Creator 3.1.1 and Qt 5.3.0 on 64-bit Lubuntu 14.10 Linux  
 (main development and testing platform - Dimitar D. Mitov),  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
 * Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5  
