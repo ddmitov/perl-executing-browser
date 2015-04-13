@@ -690,10 +690,12 @@ int main (int argc, char** argv)
     qDebug() << "Script Timeout:" << scriptTimeout;
     qDebug() << "Display STDERR from scripts:" << displayStderr;
 
-    qDebug() << "===============";
-    qDebug() << "DEBUGGER SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Debugger HTML template:" << debuggerHtmlTemplate;
+    if (PERL_DEBUGGER_INTERACTION == 1) {
+        qDebug() << "===============";
+        qDebug() << "DEBUGGER SETTINGS:";
+        qDebug() << "===============";
+        qDebug() << "Debugger HTML template:" << debuggerHtmlTemplate;
+    }
 
     qDebug() << "===============";
     qDebug() << "SOURCE VIEWER SETTINGS:";
@@ -941,14 +943,16 @@ Page::Page()
     QObject::connect (&scriptHandler, SIGNAL (finished (int, QProcess::ExitStatus)),
                        this, SLOT (scriptFinishedSlot()));
 
-    QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
-                       this, SLOT (debuggerOutputSlot()));
+    if (PERL_DEBUGGER_INTERACTION == 1) {
+        QObject::connect (&debuggerHandler, SIGNAL (readyReadStandardOutput()),
+                          this, SLOT (debuggerOutputSlot()));
 
-    QObject::connect (this, SIGNAL (sourceCodeForDebuggerReadySignal()),
-                       this, SLOT (displaySourceCodeAndDebuggerOutputSlot()));
+        QObject::connect (this, SIGNAL (sourceCodeForDebuggerReadySignal()),
+                          this, SLOT (displaySourceCodeAndDebuggerOutputSlot()));
 
-    QObject::connect (&debuggerSyntaxHighlighter, SIGNAL (finished (int, QProcess::ExitStatus)),
-                           this, SLOT (debuggerSyntaxHighlighterReadySlot()));
+        QObject::connect (&debuggerSyntaxHighlighter, SIGNAL (finished (int, QProcess::ExitStatus)),
+                          this, SLOT (debuggerSyntaxHighlighterReadySlot()));
+    }
 
     // Safe environment for all scripts:
     QStringList systemEnvironment =
@@ -1094,8 +1098,11 @@ TopLevel::TopLevel ()
 
     QObject::connect (nam, SIGNAL (startScriptSignal (QUrl, QByteArray)),
                       mainPage, SLOT (startScriptSlot (QUrl, QByteArray)));
-    QObject::connect (nam, SIGNAL (startPerlDebuggerSignal (QUrl)),
-                      mainPage, SLOT (startPerlDebuggerSlot (QUrl)));
+
+    if (PERL_DEBUGGER_INTERACTION == 1) {
+        QObject::connect (nam, SIGNAL (startPerlDebuggerSignal (QUrl)),
+                          mainPage, SLOT (startPerlDebuggerSlot (QUrl)));
+    }
 
     // Disable history:
     QWebHistory* history = mainPage->history();
@@ -1424,91 +1431,94 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
     // Perl debugger interaction.
     // Implementation of an idea proposed by Valcho Nedelchev.
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains ("perl-debugger")) {
+    if (PERL_DEBUGGER_INTERACTION == 1) {
 
-        if (Page::mainFrame()->childFrames().contains (frame)) {
-            targetFrame = frame;
-        }
+        if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                request.url().scheme().contains ("perl-debugger")) {
 
-        // Select a Perl script for debugging:
-        if (request.url().toString().contains ("select-file")) {
-            QFileDialog dialog;
-            dialog.setFileMode (QFileDialog::ExistingFile);
-            dialog.setViewMode (QFileDialog::Detail);
-            dialog.setWindowModality (Qt::WindowModal);
-            dialog.setWindowIcon (icon);
-            QString scriptToDebug = dialog.getOpenFileName
-                    (0, tr ("Select Perl File"), QDir::currentPath(),
-                     tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
-            dialog.close();
-            dialog.deleteLater();
+            if (Page::mainFrame()->childFrames().contains (frame)) {
+                targetFrame = frame;
+            }
 
-            if (scriptToDebug.length() > 1) {
-                QUrl scriptToDebugUrl (QUrl::fromLocalFile (scriptToDebug));
-                QString debuggerQueryString = request.url().toString (QUrl::RemoveScheme
-                                                                      | QUrl::RemoveAuthority
-                                                                      | QUrl::RemovePath)
-                        .replace ("?", "")
-                        .replace ("command=", "");
+            // Select a Perl script for debugging:
+            if (request.url().toString().contains ("select-file")) {
+                QFileDialog dialog;
+                dialog.setFileMode (QFileDialog::ExistingFile);
+                dialog.setViewMode (QFileDialog::Detail);
+                dialog.setWindowModality (Qt::WindowModal);
+                dialog.setWindowIcon (icon);
+                QString scriptToDebug = dialog.getOpenFileName
+                        (0, tr ("Select Perl File"), QDir::currentPath(),
+                         tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
+                dialog.close();
+                dialog.deleteLater();
+
+                if (scriptToDebug.length() > 1) {
+                    QUrl scriptToDebugUrl (QUrl::fromLocalFile (scriptToDebug));
+                    QString debuggerQueryString = request.url().toString (QUrl::RemoveScheme
+                                                                          | QUrl::RemoveAuthority
+                                                                          | QUrl::RemovePath)
+                            .replace ("?", "")
+                            .replace ("command=", "");
 #if QT_VERSION >= 0x050000
-                QUrlQuery debuggerQuery;
-                debuggerQuery.addQueryItem (QString ("command"),
-                                            QString (debuggerQueryString));
-                scriptToDebugUrl.setQuery (debuggerQuery);
+                    QUrlQuery debuggerQuery;
+                    debuggerQuery.addQueryItem (QString ("command"),
+                                                QString (debuggerQueryString));
+                    scriptToDebugUrl.setQuery (debuggerQuery);
 #else
-                scriptToDebugUrl
-                        .addQueryItem (QString ("command"),
-                                       QString (debuggerQueryString));
+                    scriptToDebugUrl
+                            .addQueryItem (QString ("command"),
+                                           QString (debuggerQueryString));
 #endif
-                qDebug() << "Perl Debugger URL:" << scriptToDebugUrl.toString();
-                qDebug() << "===============";
+                    qDebug() << "Perl Debugger URL:" << scriptToDebugUrl.toString();
+                    qDebug() << "===============";
 
-                // Create new window, if requested,
-                // but only after a Perl script for debugging has been selected:
-                if ((!Page::mainFrame()->childFrames().contains (frame) and
-                     (!request.url().toString().contains ("restart")))) {
-                    debuggerNewWindow = new TopLevel ();
-                    QString iconPathName = qApp->property ("iconPathName").toString();
-                    QPixmap icon;
-                    icon.load (iconPathName);
-                    debuggerNewWindow->setWindowIcon (icon);
-                    debuggerNewWindow->setAttribute (Qt::WA_DeleteOnClose, true);
-                    debuggerNewWindow->setUrl (scriptToDebugUrl);
-                    debuggerNewWindow->show();
-                    debuggerNewWindow->raise();
+                    // Create new window, if requested,
+                    // but only after a Perl script for debugging has been selected:
+                    if ((!Page::mainFrame()->childFrames().contains (frame) and
+                         (!request.url().toString().contains ("restart")))) {
+                        debuggerNewWindow = new TopLevel ();
+                        QString iconPathName = qApp->property ("iconPathName").toString();
+                        QPixmap icon;
+                        icon.load (iconPathName);
+                        debuggerNewWindow->setWindowIcon (icon);
+                        debuggerNewWindow->setAttribute (Qt::WA_DeleteOnClose, true);
+                        debuggerNewWindow->setUrl (scriptToDebugUrl);
+                        debuggerNewWindow->show();
+                        debuggerNewWindow->raise();
+                    }
+
+                    if (Page::mainFrame()->childFrames().contains (frame) or
+                            (request.url().toString().contains ("restart"))) {
+
+                        // Clear these variables before starting a new session
+                        // with a new file to debug. This is necessary for
+                        // synchronizing debugger output and highlighted source.
+                        debuggerSourceToHighlightFilePath = "";
+                        debuggerLineInfoLastLine = "";
+
+                        // Close open handler from a previous debugger session:
+                        debuggerHandler.close();
+
+                        startPerlDebuggerSlot (scriptToDebugUrl);
+                    }
+
+                    return false;
+                } else {
+                    return false;
                 }
-
-                if (Page::mainFrame()->childFrames().contains (frame) or
-                        (request.url().toString().contains ("restart"))) {
-
-                    // Clear these variables before starting a new session
-                    // with a new file to debug. This is necessary for
-                    // synchronizing debugger output and highlighted source.
-                    debuggerSourceToHighlightFilePath = "";
-                    debuggerLineInfoLastLine = "";
-
-                    // Close open handler from a previous debugger session:
-                    debuggerHandler.close();
-
-                    startPerlDebuggerSlot (scriptToDebugUrl);
-                }
-
-                return false;
-            } else {
-                return false;
             }
         }
-    }
 
-    // Transmit requests to Perl debugger (within the same page):
-    if (navigationType == QWebPage::NavigationTypeFormSubmitted and
-            request.url().scheme().contains ("perl-debugger")) {
+        // Transmit requests to Perl debugger (within the same page):
+        if (navigationType == QWebPage::NavigationTypeFormSubmitted and
+                request.url().scheme().contains ("perl-debugger")) {
 
-        targetFrame = frame;
-        startPerlDebuggerSlot (request.url());
+            targetFrame = frame;
+            startPerlDebuggerSlot (request.url());
 
-        return false;
+            return false;
+        }
     }
 
     // Load local content in the same window:

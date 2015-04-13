@@ -107,6 +107,8 @@ message ("PEB pseudo-domain: $$PEB_DOMAIN")
 # is scanned by a special super-script, censor.pl, and
 # if any security issues are found, the offending script
 # is blocked and error message is displayed.
+# To turn off security checks of user-supplied Perl scripts:
+# SCRIPT_CENSORING = 0
 ##########################################################
 SCRIPT_CENSORING = 1
 
@@ -117,6 +119,25 @@ equals (SCRIPT_CENSORING, 0) {
 }
 equals (SCRIPT_CENSORING, 1) {
     message ("Going to build with script censoring support...")
+}
+
+##########################################################
+# To switch off Perl debugger interaction:
+# PERL_DEBUGGER_INTERACTION = 0
+# If PEB is going to be compiled for end users and
+# interaction with the biult-in Perl debugger is
+# not needed or not wanted for security reasons,
+# this functionality can be turned off.
+##########################################################
+PERL_DEBUGGER_INTERACTION = 1
+
+DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+
+equals (PERL_DEBUGGER_INTERACTION, 0) {
+    message ("Going to build without Perl debugger interaction...")
+}
+equals (PERL_DEBUGGER_INTERACTION, 1) {
+    message ("Going to build with Perl debugger interaction...")
 }
 
 message ("")
