@@ -764,51 +764,6 @@ int main (int argc, char** argv)
     // Set application window icon from an external file:
     QApplication::setWindowIcon (icon);
 
-    // ENVIRONMENT VARIABLES:
-    // PATH:
-    QByteArray path;
-    QString pathSeparator;
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-    pathSeparator = ":";
-#endif
-#ifdef Q_OS_WIN // Windows
-    pathSeparator = ";";
-#endif
-
-    // Add all browser-specific folders to PATH,
-    // but first check if these directories exist,
-    // then resolve all relative paths, if any:
-    foreach (QString pathEntry, pathToAddList) {
-        QDir pathDir (pathEntry);
-        if (pathDir.exists()) {
-            if (pathDir.isRelative()) {
-                pathEntry = QDir::toNativeSeparators (rootDirName+pathEntry);
-            }
-            if (pathDir.isAbsolute()) {
-                pathEntry = QDir::toNativeSeparators (pathEntry);
-            }
-            path.append (pathEntry);
-            path.append (pathSeparator);
-        }
-    }
-    // Insert the new browser-specific PATH variable into
-    // the actual environment of the browser:
-#ifndef Q_OS_WIN
-    qputenv ("PATH", path);
-#else
-    qputenv ("Path", path);
-#endif
-
-    // DOCUMENT_ROOT:
-    QByteArray documentRoot;
-    documentRoot.append (QDir::toNativeSeparators (rootDirName));
-    qputenv ("DOCUMENT_ROOT", documentRoot);
-
-    // PERLLIB:
-    QByteArray perlLibByteArray;
-    perlLibByteArray.append (perlLib);
-    qputenv ("PERLLIB", perlLibByteArray);
-
     // Initialize the main GUI class:
     TopLevel toplevel;
 
@@ -954,16 +909,9 @@ Page::Page()
                           this, SLOT (debuggerSyntaxHighlighterReadySlot()));
     }
 
-    // Safe environment for all scripts:
+    // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
     QStringList systemEnvironment =
             QProcessEnvironment::systemEnvironment().toStringList();
-
-    allowedEnvironmentVariables.append ("PATH");
-#ifdef Q_OS_WIN // Windows
-    allowedEnvironmentVariables.append ("Path");
-#endif
-    allowedEnvironmentVariables.append ("DOCUMENT_ROOT");
-    allowedEnvironmentVariables.append ("PERLLIB");
 
     foreach (QString environmentVariable, systemEnvironment) {
         QStringList environmentVariableList = environmentVariable.split ("=");
@@ -975,6 +923,51 @@ Page::Page()
                         environmentVariableList.first(), environmentVariableList[1]);
         }
     }
+
+    // DOCUMENT_ROOT:
+    scriptEnvironment.remove ("DOCUMENT_ROOT");
+    scriptEnvironment.insert ("DOCUMENT_ROOT", qApp->property ("rootDirName").toString());
+
+    // PERLLIB:
+    scriptEnvironment.remove ("PERLLIB");
+    scriptEnvironment.insert ("PERLLIB", qApp->property ("perlLib").toString());
+
+    // PATH:
+    QString path;
+    QString pathSeparator;
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+    pathSeparator = ":";
+#endif
+#ifdef Q_OS_WIN // Windows
+    pathSeparator = ";";
+#endif
+
+    // Add all browser-specific folders to the PATH of all local scripts,
+    // but first check if these directories exist,
+    // then resolve all relative paths, if any:
+    foreach (QString pathEntry, qApp->property ("pathToAddList").toString()) {
+        QDir pathDir (pathEntry);
+        if (pathDir.exists()) {
+            if (pathDir.isRelative()) {
+                pathEntry = QDir::toNativeSeparators (qApp->property ("rootDirName").toString()
+                                                      +pathEntry);
+            }
+            if (pathDir.isAbsolute()) {
+                pathEntry = QDir::toNativeSeparators (pathEntry);
+            }
+            path.append (pathEntry);
+            path.append (pathSeparator);
+        }
+    }
+
+#ifndef Q_OS_WIN // Linux and Mac
+    scriptEnvironment.remove ("PATH");
+    scriptEnvironment.insert ("PATH", path);
+#endif
+#ifdef Q_OS_WIN // Windows
+    scriptEnvironment.remove ("Path");
+    scriptEnvironment.insert ("Path", path);
+#endif
 
     // Source viewer mandatory, or minimal, command line:
     sourceViewerMandatoryCommandLine.append (
@@ -1135,7 +1128,7 @@ TopLevel::TopLevel ()
 
     mainPage->action (QWebPage::CopyImageUrlToClipboard)->setVisible (false);
     mainPage->action (QWebPage::CopyImageToClipboard)->setVisible (false);
-    mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (false);
+    mainPage->action (QWebPage::OpenImageInNewWindow)->setVisible (true);
     mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
 
     // Icon for windows:
