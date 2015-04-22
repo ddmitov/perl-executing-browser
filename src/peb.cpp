@@ -307,13 +307,21 @@ int main (int argc, char** argv)
     QString webInspector = settings.value ("gui/web_inspector").toString();
     application.setProperty ("webInspector", webInspector);
 
-    // Icon:
+    // Icons:
     QString iconPathNameSetting = settings.value ("gui/icon").toString();
     QString iconPathName =
             QDir::toNativeSeparators (rootDirName+iconPathNameSetting);
     QPixmap icon;
     icon.load (iconPathName);
     application.setProperty ("iconPathName", iconPathName);
+
+    QString systrayIconPathNameSetting = settings.value ("gui/icon_systray").toString();
+    if (systrayIconPathNameSetting.length() == 0) {
+        systrayIconPathNameSetting = iconPathNameSetting;
+    }
+    QString systrayIconPathName =
+            QDir::toNativeSeparators (rootDirName+systrayIconPathNameSetting);
+    application.setProperty ("systrayIconPathName", systrayIconPathName);
 
     // THEMES:
     // Name of the current GUI theme:
@@ -721,7 +729,8 @@ int main (int argc, char** argv)
     qDebug() << "Browser title:" << browserTitle;
     qDebug() << "Context menu:" << contextMenu;
     qDebug() << "Web Inspector from context menu:" << webInspector;
-    qDebug() << "Application icon:" << iconPathName;
+    qDebug() << "Window icon file:" << iconPathName;
+    qDebug() << "System tray icon file:" << systrayIconPathName;
     qDebug() << "Default theme:" << defaultTheme;
     qDebug() << "Default theme directory:" << defaultThemeDirectory;
     qDebug() << "All themes directory:" << allThemesDirectory;
@@ -831,7 +840,7 @@ TrayIcon::TrayIcon()
 
     if ((qApp->property ("systrayIcon").toString()) == "enable") {
         trayIcon = new QSystemTrayIcon();
-        QString iconPathName = qApp->property ("iconPathName").toString();
+        QString iconPathName = qApp->property ("systrayIconPathName").toString();
         QPixmap icon;
         icon.load (iconPathName);
         trayIcon->setIcon (icon);
