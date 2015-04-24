@@ -246,13 +246,12 @@ protected:
                 qDebug() << "File type not recognized!";
                 qDebug() << "===============";
 
-
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
-                         ((qApp->property ("rootDirName").toString())+
-                          "help/notrecognized.htm"));
-
+                         ((qApp->property ("helpDirectory").toString())+
+                          QDir::separator()+
+                          "notrecognized.htm"));
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
@@ -307,13 +306,12 @@ protected:
             qDebug() << "Not allowed link:" << request.url().toString();
             qDebug() << "===============";
 
-
             QNetworkRequest networkRequest;
             networkRequest.setUrl
                     (QUrl::fromLocalFile
-                     ((qApp->property ("rootDirName").toString())+
-                      "help/forbidden.htm"));
-
+                     ((qApp->property ("helpDirectory").toString())+
+                      QDir::separator()+
+                      "forbidden.htm"));
 
             return QNetworkAccessManager::createRequest
                     (QNetworkAccessManager::GetOperation,

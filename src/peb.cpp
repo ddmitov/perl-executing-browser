@@ -736,6 +736,7 @@ int main (int argc, char** argv)
     qDebug() << "All themes directory:" << allThemesDirectory;
     qDebug() << "Default translation:" << defaultTranslation;
     qDebug() << "Translations directory:" << allTranslationsDirectory;
+    qDebug() << "Help and error messages directory:" << helpDirectory;
     qDebug() << "System tray icon:" << systrayIcon;
     qDebug() << "System tray icon double-click action:"
              << systrayIconDoubleClickAction;
