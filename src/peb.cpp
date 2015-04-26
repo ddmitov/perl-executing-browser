@@ -7,8 +7,8 @@
  either version 3 of the License, or (at your option) any later version.
  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
- Valcho Nedelchev, 2014
+ Dimitar D. Mitov, 2013 - 2015, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014 - 2015
 */
 
 #include <QApplication>
@@ -37,11 +37,7 @@
 #endif
 
 
-// Global variables:
-// Application start date and time for filenames of per-session log files:
-static QString applicationStartForLogFileName =
-        QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
-
+// Global variable -
 // Dynamic global list of all scripts, that are started and still running in any given moment:
 QStringList startedScripts;
 
@@ -96,7 +92,7 @@ void customMessageHandler (QtMsgType type, const char* message)
                        QDir::separator()+
                        (qApp->property ("logPrefix").toString())+
                        "-started-at-"+
-                       applicationStartForLogFileName+
+                       (qApp->property ("applicationStartDateAndTime").toString())+
                        ".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
@@ -120,6 +116,20 @@ int main (int argc, char** argv)
     // Basic application variables:
     application.setApplicationName ("Perl Executing Browser");
     application.setApplicationVersion ("0.1");
+
+    // Application start date and time for logging and temporary folder name:
+    QString applicationStartDateAndTime =
+            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
+    application.setProperty ("applicationStartDateAndTime", applicationStartDateAndTime);
+
+    // Application temporary folder:
+    QString applicationBinaryName = QFileInfo (QApplication::applicationFilePath()).fileName();
+    QString applicationTempDirectoryName = QDir::tempPath()+QDir::separator()+
+            applicationBinaryName+"--"+
+            applicationStartDateAndTime;
+    application.setProperty ("applicationTempDirectory", applicationTempDirectoryName);
+    QDir applicationTempDirectory (applicationTempDirectoryName);
+    applicationTempDirectory.mkpath(".");
 
     // SETTINGS:
     // Settings file:
@@ -676,6 +686,7 @@ int main (int argc, char** argv)
     qDebug() << "GENERAL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (rootDirName);
+    qDebug() << "Temporary folder:" << applicationTempDirectoryName;
     qDebug() << "Settings file name:" << settingsFileName;
 
     qDebug() << "===============";

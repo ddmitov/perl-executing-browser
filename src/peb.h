@@ -7,8 +7,8 @@
  either version 3 of the License, or (at your option) any later version.
  This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2014, ddmitov (at) yahoo (dot) com
- Valcho Nedelchev, 2014
+ Dimitar D. Mitov, 2013 - 2015, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014 - 2015
 */
 
 #ifndef PEB_H
@@ -725,10 +725,12 @@ public slots:
             scriptAccumulatedOutput.append (output);
 
             scriptOutputFilePath = QDir::toNativeSeparators
-                    (QDir::tempPath()+QDir::separator()+"output.htm");
+                    ((qApp->property ("applicationTempDirectory").toString())+
+                     QDir::separator()+"output.htm");
         } else {
             scriptOutputFilePath = QDir::toNativeSeparators
-                    (QDir::tempPath()+QDir::separator()+"lroutput.htm");
+                    ((qApp->property ("applicationTempDirectory").toString())+
+                     QDir::separator()+"lroutput.htm");
         }
 
         QFile scriptOutputFile (scriptOutputFilePath);
@@ -1096,7 +1098,7 @@ public slots:
             debuggerSyntaxHighlighter.close();
 
             // Syntax highlighted source code file path:
-            debuggerHighlighterOutputFilePath = QDir::tempPath()+
+            debuggerHighlighterOutputFilePath = (qApp->property ("applicationTempDirectory").toString())+
                     QDir::separator()+"source.htm";
             QFile sourceOutputFile (debuggerHighlighterOutputFilePath);
 
@@ -1159,7 +1161,8 @@ public slots:
             debuggerHtmlOutput = cssLinkedHtml;
 
             debuggerOutputFilePath = QDir::toNativeSeparators
-                    (QDir::tempPath()+QDir::separator()+"dbgoutput.htm");
+                    ((qApp->property ("applicationTempDirectory").toString())+
+                     QDir::separator()+"dbgoutput.htm");
 
             QFile debuggerOutputFile (debuggerOutputFilePath);
             if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
@@ -1267,7 +1270,8 @@ public slots:
             setWindowTitle (TopLevel::title());
             QFile::remove
                     (QDir::toNativeSeparators
-                     (QDir::tempPath()+QDir::separator()+"output.htm"));
+                     ((qApp->property ("applicationTempDirectory").toString())
+                      +QDir::separator()+"output.htm"));
         }
     }
 
@@ -1276,7 +1280,8 @@ public slots:
         if (ok) {
             QFile::remove
                     (QDir::toNativeSeparators
-                     (QDir::tempPath()+QDir::separator()+"output.htm"));
+                     ((qApp->property ("applicationTempDirectory").toString())+
+                      QDir::separator()+"output.htm"));
         }
     }
 
@@ -1688,13 +1693,37 @@ public slots:
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 QFile::remove
                         (QDir::toNativeSeparators
-                         (QDir::tempPath()+QDir::separator()+"output.htm"));
+                         ((qApp->property ("applicationTempDirectory").toString())+
+                          QDir::separator()+"output.htm"));
                 QApplication::exit();
             }
         } else {
-            QFile::remove
-                    (QDir::toNativeSeparators
-                     (QDir::tempPath()+QDir::separator()+"output.htm"));
+
+
+
+//            QDirIterator fileIterator ((qApp->property ("applicationTempDirectory").toString()),
+//                            QDir::Files, QDirIterator::Subdirectories);
+//            while (fileIterator.hasNext()) {
+//                if (QFileInfo (fileIterator.filePath()).isFile()) {
+//                    QFile::remove (fileIterator.filePath());
+//                }
+//            }
+
+//            QDirIterator dirIterator ((qApp->property ("applicationTempDirectory").toString()),
+//                            QDir::Dirs, QDirIterator::Subdirectories);
+//            while (dirIterator.hasNext()) {
+//                if (QFileInfo (dirIterator.filePath()).isDir()) {
+//                    QDir dir (dirIterator.filePath());
+//                    dir.rmdir (dirIterator.filePath());
+//                }
+//            }
+
+            QDir applicationTempDirectory (qApp->property ("applicationTempDirectory").toString());
+//            applicationTempDirectory.rmdir (qApp->property ("applicationTempDirectory").toString());
+            applicationTempDirectory.removeRecursively();
+
+
+
             QApplication::exit();
         }
 
