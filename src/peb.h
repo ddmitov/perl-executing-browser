@@ -725,11 +725,11 @@ public slots:
             scriptAccumulatedOutput.append (output);
 
             scriptOutputFilePath = QDir::toNativeSeparators
-                    ((qApp->property ("applicationTempDirectory").toString())+
+                    ((qApp->property ("applicationOutputDirectory").toString())+
                      QDir::separator()+"output.htm");
         } else {
             scriptOutputFilePath = QDir::toNativeSeparators
-                    ((qApp->property ("applicationTempDirectory").toString())+
+                    ((qApp->property ("applicationOutputDirectory").toString())+
                      QDir::separator()+"lroutput.htm");
         }
 
@@ -1098,7 +1098,7 @@ public slots:
             debuggerSyntaxHighlighter.close();
 
             // Syntax highlighted source code file path:
-            debuggerHighlighterOutputFilePath = (qApp->property ("applicationTempDirectory").toString())+
+            debuggerHighlighterOutputFilePath = (qApp->property ("applicationOutputDirectory").toString())+
                     QDir::separator()+"source.htm";
             QFile sourceOutputFile (debuggerHighlighterOutputFilePath);
 
@@ -1161,7 +1161,7 @@ public slots:
             debuggerHtmlOutput = cssLinkedHtml;
 
             debuggerOutputFilePath = QDir::toNativeSeparators
-                    ((qApp->property ("applicationTempDirectory").toString())+
+                    ((qApp->property ("applicationOutputDirectory").toString())+
                      QDir::separator()+"dbgoutput.htm");
 
             QFile debuggerOutputFile (debuggerOutputFilePath);
@@ -1270,7 +1270,7 @@ public slots:
             setWindowTitle (TopLevel::title());
             QFile::remove
                     (QDir::toNativeSeparators
-                     ((qApp->property ("applicationTempDirectory").toString())
+                     ((qApp->property ("applicationOutputDirectory").toString())
                       +QDir::separator()+"output.htm"));
         }
     }
@@ -1280,7 +1280,7 @@ public slots:
         if (ok) {
             QFile::remove
                     (QDir::toNativeSeparators
-                     ((qApp->property ("applicationTempDirectory").toString())+
+                     ((qApp->property ("applicationOutputDirectory").toString())+
                       QDir::separator()+"output.htm"));
         }
     }
@@ -1691,39 +1691,29 @@ public slots:
             confirmExitMessageBox.setButtonText (QMessageBox::No, tr ("No"));
             confirmExitMessageBox.setDefaultButton (QMessageBox::No);
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                QFile::remove
-                        (QDir::toNativeSeparators
-                         ((qApp->property ("applicationTempDirectory").toString())+
-                          QDir::separator()+"output.htm"));
+                // Perl temp folder removal code:
+                QProcess cleanerProcess;
+                cleanerProcess.startDetached ((qApp->property ("perlInterpreter").toString()),
+                                              QStringList()
+                                              << "-se"
+                                              << "use File::Path;  rmtree (@ARGV);"
+                                              << "--"
+                                              << (qApp->property ("applicationTempDirectory").toString()));
                 QApplication::exit();
             }
         } else {
+            // Qt5 temp folder removal code - Qt4 incompatible:
+            //QDir applicationTempDirectory (qApp->property ("applicationTempDirectory").toString());
+            //applicationTempDirectory.removeRecursively();
 
-
-
-//            QDirIterator fileIterator ((qApp->property ("applicationTempDirectory").toString()),
-//                            QDir::Files, QDirIterator::Subdirectories);
-//            while (fileIterator.hasNext()) {
-//                if (QFileInfo (fileIterator.filePath()).isFile()) {
-//                    QFile::remove (fileIterator.filePath());
-//                }
-//            }
-
-//            QDirIterator dirIterator ((qApp->property ("applicationTempDirectory").toString()),
-//                            QDir::Dirs, QDirIterator::Subdirectories);
-//            while (dirIterator.hasNext()) {
-//                if (QFileInfo (dirIterator.filePath()).isDir()) {
-//                    QDir dir (dirIterator.filePath());
-//                    dir.rmdir (dirIterator.filePath());
-//                }
-//            }
-
-            QDir applicationTempDirectory (qApp->property ("applicationTempDirectory").toString());
-//            applicationTempDirectory.rmdir (qApp->property ("applicationTempDirectory").toString());
-            applicationTempDirectory.removeRecursively();
-
-
-
+            // Perl temp folder removal code:
+            QProcess cleanerProcess;
+            cleanerProcess.startDetached ((qApp->property ("perlInterpreter").toString()),
+                                          QStringList()
+                                          << "-se"
+                                          << "use File::Path;  rmtree (@ARGV);"
+                                          << "--"
+                                          << (qApp->property ("applicationTempDirectory").toString()));
             QApplication::exit();
         }
 

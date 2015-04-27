@@ -122,14 +122,20 @@ int main (int argc, char** argv)
             QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
     application.setProperty ("applicationStartDateAndTime", applicationStartDateAndTime);
 
-    // Application temporary folder:
+    // Application temporary folders hierarchy:
     QString applicationBinaryName = QFileInfo (QApplication::applicationFilePath()).fileName();
+
     QString applicationTempDirectoryName = QDir::tempPath()+QDir::separator()+
-            applicationBinaryName+"--"+
-            applicationStartDateAndTime;
+            applicationBinaryName+"--"+applicationStartDateAndTime;
     application.setProperty ("applicationTempDirectory", applicationTempDirectoryName);
     QDir applicationTempDirectory (applicationTempDirectoryName);
     applicationTempDirectory.mkpath(".");
+
+    QString applicationOutputDirectoryName = QDir::tempPath()+QDir::separator()+
+            applicationBinaryName+"--"+applicationStartDateAndTime+QDir::separator()+"output";
+    application.setProperty ("applicationOutputDirectory", applicationOutputDirectoryName);
+    QDir applicationOutputDirectory (applicationOutputDirectoryName);
+    applicationOutputDirectory.mkpath(".");
 
     // SETTINGS:
     // Settings file:
@@ -686,7 +692,7 @@ int main (int argc, char** argv)
     qDebug() << "GENERAL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (rootDirName);
-    qDebug() << "Temporary folder:" << applicationTempDirectoryName;
+    qDebug() << "Temporary folder:" << applicationOutputDirectoryName;
     qDebug() << "Settings file name:" << settingsFileName;
 
     qDebug() << "===============";
