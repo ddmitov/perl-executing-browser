@@ -93,11 +93,21 @@ MOC_DIR = ../tmp
 OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
-# The domain of Perl Executing Browser:
+##########################################################
+# Application version:
+##########################################################
+APPLICATION_VERSION = "0.1"
+
+DEFINES += APPLICATION_VERSION=\\\"$$APPLICATION_VERSION\\\"
+message ("Application version: $$APPLICATION_VERSION")
+
+##########################################################
+# The pseudo-domain of the browser:
+##########################################################
 PEB_DOMAIN = "http://perl-executing-browser-pseudodomain/"
 
 DEFINES += PEB_DOMAIN=\\\"$$PEB_DOMAIN\\\"
-message ("PEB pseudo-domain: $$PEB_DOMAIN")
+message ("Browser pseudo-domain: $$PEB_DOMAIN")
 
 ##########################################################
 # To guard against security issues of user-supplied Perl scripts:
@@ -115,10 +125,46 @@ SCRIPT_CENSORING = 1
 DEFINES += "SCRIPT_CENSORING=$$SCRIPT_CENSORING"
 
 equals (SCRIPT_CENSORING, 0) {
-    message ("Going to build without script censoring support...")
+    message ("Going to build without script censoring support.")
 }
 equals (SCRIPT_CENSORING, 1) {
-    message ("Going to build with script censoring support...")
+    RESOURCES += peb.qrc
+    message ("Going to build with script censoring support.")
+}
+
+##########################################################
+# To link statically QuaZip library for unpacking root folder from a ZIP file:
+# ZIP_SUPPORT = 1
+##########################################################
+ZIP_SUPPORT = 1
+
+DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
+
+equals (ZIP_SUPPORT, 0) {
+    message ("Going to build without support for ZIP packages.")
+}
+
+equals (ZIP_SUPPORT, 1) {
+    message ("Going to build with support for ZIP packages.")
+    CONFIG += warn_off
+    DEFINES += "QUAZIP_STATIC=1"
+    HEADERS += zlib/crc32.h zlib/gzguts.h zlib/inffixed.h \
+    zlib/inftrees.h zlib/zconf.h zlib/zutil.h zlib/deflate.h \
+    zlib/inffast.h zlib/inflate.h zlib/trees.h zlib/zlib.h
+    SOURCES += zlib/adler32.c zlib/crc32.c zlib/gzclose.c \
+    zlib/gzread.c zlib/infback.c zlib/inflate.c zlib/trees.c \
+    zlib/zutil.c zlib/compress.c zlib/deflate.c zlib/gzlib.c \
+    zlib/gzwrite.c zlib/inffast.c zlib/inftrees.c zlib/uncompr.c
+    HEADERS += quazip/crypt.h quazip/ioapi.h quazip/JlCompress.h \
+    quazip/quaadler32.h quazip/quachecksum32.h quazip/quacrc32.h \
+    quazip/quagzipfile.h quazip/quaziodevice.h quazip/quazipdir.h \
+    quazip/quazipfile.h quazip/quazipfileinfo.h quazip/quazip_global.h \
+    quazip/quazip.h quazip/zip.h quazip/quazipnewinfo.h quazip/unzip.h
+    SOURCES += quazip/unzip.c  quazip/zip.c \
+    quazip/JlCompress.cpp quazip/qioapi.cpp quazip/quaadler32.cpp \
+    quazip/quacrc32.cpp quazip/quagzipfile.cpp quazip/quaziodevice.cpp \
+    quazip/quazip.cpp quazip/quazipdir.cpp quazip/quazipfile.cpp \
+    quazip/quazipfileinfo.cpp quazip/quazipnewinfo.cpp
 }
 
 ##########################################################
@@ -134,10 +180,10 @@ PERL_DEBUGGER_INTERACTION = 1
 DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
 
 equals (PERL_DEBUGGER_INTERACTION, 0) {
-    message ("Going to build without Perl debugger interaction...")
+    message ("Going to build without Perl debugger interaction capability.")
 }
 equals (PERL_DEBUGGER_INTERACTION, 1) {
-    message ("Going to build with Perl debugger interaction...")
+    message ("Going to build with Perl debugger interaction capability.")
 }
 
 message ("")

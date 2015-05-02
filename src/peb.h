@@ -636,9 +636,8 @@ public slots:
                     }
 
                     if (SCRIPT_CENSORING == 1) {
-                        QString censorScriptFileName (QDir::toNativeSeparators (
-                                                          (qApp->property ("rootDirName").toString())+
-                                                          "perl/censor.pl"));
+                        // 'censor.pl' is compiled into the resources of the binary file and called from there.
+                        QString censorScriptFileName (":/scripts/censor.pl");
                         QFile censorScriptFile (censorScriptFileName);
                         censorScriptFile.open (QIODevice::ReadOnly | QIODevice::Text);
                         QTextStream stream (&censorScriptFile);

@@ -36,6 +36,10 @@
 #include <QPrintDialog>
 #endif
 
+#if ZIP_SUPPORT == 1
+#include <quazip/JlCompress.h> // for unpacking root folder from a zip file
+#endif
+
 
 // Global variable -
 // Dynamic global list of all scripts, that are started and still running in any given moment:
@@ -106,6 +110,15 @@ int main (int argc, char** argv)
 
     QApplication application (argc, argv);
 
+    // ==============================
+    // SET BASIC APPLICATION VARIABLES:
+    // ==============================
+    application.setApplicationName ("Perl Executing Browser");
+    application.setApplicationVersion (APPLICATION_VERSION);
+
+    // ==============================
+    // SET UTF-8 ENCODING APPLICATION-WIDE:
+    // ==============================
     // Use UTF-8 encoding within the application:
 #if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale (QTextCodec::codecForName ("UTF8"));
@@ -113,42 +126,226 @@ int main (int argc, char** argv)
     QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF8"));
 #endif
 
-    // Basic application variables:
-    application.setApplicationName ("Perl Executing Browser");
-    application.setApplicationVersion ("0.1");
-
-    // Application start date and time for logging and temporary folder name:
+    // ==============================
+    // CREATE TEMPORARY FOLDERS:
+    // ==============================
+    // Application start date and time for temporary folder name:
     QString applicationStartDateAndTime =
             QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
     application.setProperty ("applicationStartDateAndTime", applicationStartDateAndTime);
 
-    // Application temporary folders hierarchy:
+    // Get the name of the browser binary:
     QString applicationBinaryName = QFileInfo (QApplication::applicationFilePath()).fileName();
 
+    // Create the main temporary folder for the current browser session:
     QString applicationTempDirectoryName = QDir::tempPath()+QDir::separator()+
             applicationBinaryName+"--"+applicationStartDateAndTime;
     application.setProperty ("applicationTempDirectory", applicationTempDirectoryName);
     QDir applicationTempDirectory (applicationTempDirectoryName);
     applicationTempDirectory.mkpath(".");
 
+    // Create the output directory:
+    // all HTML output from local scripts is temporarily stored and loaded from there.
     QString applicationOutputDirectoryName = QDir::tempPath()+QDir::separator()+
             applicationBinaryName+"--"+applicationStartDateAndTime+QDir::separator()+"output";
     application.setProperty ("applicationOutputDirectory", applicationOutputDirectoryName);
     QDir applicationOutputDirectory (applicationOutputDirectoryName);
     applicationOutputDirectory.mkpath(".");
 
-    // SETTINGS:
-    // Settings file:
-    QDir settingsDir = QDir::toNativeSeparators (application.applicationDirPath());
-#ifdef Q_OS_MAC
-    if (BUNDLE == 1) {
-        settingsDir.cdUp();
-        settingsDir.cdUp();
+    // ==============================
+    // GET COMMAND LINE ARGUMENTS:
+    // ==============================
+    QStringList commandLineArguments = QCoreApplication::arguments();
+    QString allArguments;
+    foreach (QString argument, commandLineArguments){
+        allArguments.append (argument);
+        allArguments.append (" ");
+    }
+    allArguments.replace (QRegExp ("\\s$"), "");
+
+    // ==============================
+    // DISPLAY COMMAND LINE HELP:
+    // ==============================
+    foreach (QString argument, commandLineArguments){
+        if (argument.contains ("--help") or argument.contains ("-H")) {
+            std::cout << " " << std::endl;
+            std::cout << application.applicationName().toLatin1().constData()
+                      << " v." << application.applicationVersion().toLatin1().constData()
+                      << std::endl;
+            std::cout << "Application file path: "
+                      << (QDir::toNativeSeparators (
+                              QApplication::applicationFilePath()).toLatin1().constData())
+                      << std::endl;
+            std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
+            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "Usage:" << std::endl;
+            std::cout << "  peb --option=value -o=value" << std::endl;
+            std::cout << " " << std::endl;
+            std::cout << "Command line options:" << std::endl;
+            std::cout << "  --fullscreen    -F    start browser in fullscreen mode"
+                      << std::endl;
+            std::cout << "  --maximized     -M    start browser in a maximized window"
+                      << std::endl;
+            std::cout << "  --help          -H    this help"
+                      << std::endl;
+            std::cout << " " << std::endl;
+            return 1;
+            QApplication::exit();
+        }
+    }
+
+    // ==============================
+    // DETECT USER PRIVILEGES AND APPLICATION START FROM TERMINAL - Linux and Mac only:
+    // ==============================
+#ifndef Q_OS_WIN
+    // Detect user privileges:
+    int userEuid;
+    userEuid = geteuid();
+
+    // Detect if the program is started from terminal - Linux and Mac only.
+    // If the browser is started from terminal, it will start another copy of itself and
+    // close the first one. This is necessary for a working interaction with the Perl debugger.
+    if (isatty (fileno (stdin))) {
+        std::cout << " " << std::endl;
+        std::cout << application.applicationName().toLatin1().constData()
+                  << " v." << application.applicationVersion().toLatin1().constData()
+                  << std::endl;
+        std::cout << "Application file path: "
+                  << (QDir::toNativeSeparators (
+                          QApplication::applicationFilePath()).toLatin1().constData())
+                  << std::endl;
+        std::cout << "Command line: "
+                  << allArguments.toLatin1().constData() << std::endl;
+        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
+        std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
+        std::cout << "License: " << QLibraryInfo::licensedProducts()
+                     .toLatin1().constData() << std::endl;
+        std::cout << "Libraries Path: "
+                  << QLibraryInfo::location (QLibraryInfo::LibrariesPath)
+                     .toLatin1().constData() << std::endl;
+
+        // Prevent starting as root from command line:
+        if (userEuid == 0) {
+            std::cout << "Started from terminal with root privileges. Aborting!" << std::endl;
+            std::cout << " " << std::endl;
+            return 1;
+            QApplication::exit();
+        } else {
+            std::cout << "Started from terminal with normal user privileges." << std::endl;
+            if (PERL_DEBUGGER_INTERACTION == 1) {
+                std::cout << "Will start another instance of the program and quit this one."
+                          << std::endl;
+            }
+            std::cout << " " << std::endl;
+        }
+
+        if (PERL_DEBUGGER_INTERACTION == 1) {
+            // Fork another instance of the browser:
+            int pid = fork();
+
+            if (pid < 0) {
+                return 1;
+                QApplication::exit();
+            }
+
+            if (pid == 0) {
+                // Detach all standard I/O descriptors:
+                close (0);
+                close (1);
+                close (2);
+                // Enter a new session:
+                setsid();
+                // New instance is now detached from terminal:
+                QProcess anotherInstance;
+                anotherInstance.startDetached (
+                            QApplication::applicationFilePath(), commandLineArguments);
+                if (anotherInstance.waitForStarted (-1)) {
+                    return 1;
+                    QApplication::exit();
+                }
+            } else {
+                // The parent instance should be closed now:
+                return 1;
+                QApplication::exit();
+            }
+        }
+    }
+
+    // Prevent starting as root in graphical mode:
+    if (userEuid == 0) {
+        QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
+        msgBox.setIcon (QMessageBox::Critical);
+        msgBox.setWindowTitle (QMessageBox::tr ("Started as root"));
+        msgBox.setText (QMessageBox::tr ("Browser was started as root.<br>")+
+                        QMessageBox::tr ("This is definitely not a good idea!<br>")+
+                        QMessageBox::tr ("Going to quit now."));
+        msgBox.setDefaultButton (QMessageBox::Ok);
+        msgBox.exec();
+
+        return 1;
+        QApplication::exit();
     }
 #endif
-    QString settingsDirName = settingsDir.absolutePath().toLatin1();
-    QString settingsFileName = QDir::toNativeSeparators
-            (settingsDirName+QDir::separator()+"peb.ini");
+
+    // ==============================
+    // DEFINE SETTINGS FILE VARIABLES:
+    // ==============================
+    QString settingsDirName;
+    QString settingsFileName;
+
+    // ==============================
+    // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
+    // ==============================
+#if ZIP_SUPPORT == 1
+    QString defaultZipPackageName = QApplication::applicationDirPath()+
+            QDir::separator()+"default.peb";
+    QFile defaultZipPackage (defaultZipPackageName);
+    QStringList extractedFiles;
+    bool zipPackageRootFolderConformant = false;
+    bool zipPackageConfigurationFileConformant = false;
+
+    if (defaultZipPackage.exists()) {
+        QStringList allZipPackageEntries = JlCompress::getFileList (defaultZipPackageName);
+        foreach (QString fileEntry, allZipPackageEntries) {
+            if (fileEntry.contains("root/")) {
+                zipPackageRootFolderConformant = true;
+            }
+            if (fileEntry.contains("peb.ini")) {
+                zipPackageConfigurationFileConformant = true;
+            }
+        }
+        // Extracting root folder from a ZIP file:
+        if (zipPackageRootFolderConformant == true and
+                zipPackageConfigurationFileConformant == true) {
+            extractedFiles = JlCompress::extractDir (defaultZipPackageName,
+                                                     applicationTempDirectoryName);
+
+            // Settings file from the extracted ZIP package:
+            settingsDirName = applicationTempDirectoryName+QDir::separator()+"root";
+            settingsFileName = settingsDirName+QDir::separator()+"peb.ini";
+        }
+    }
+#endif
+
+    // ==============================
+    // MANAGE APPLICATION SETTINGS:
+    // ==============================
+    // Settings file from the directory of the binary file
+    // if no settings file from a ZIP package is found:
+    if (settingsDirName.length() == 0 and settingsFileName.length() == 0) {
+        QDir settingsDir = QDir::toNativeSeparators (application.applicationDirPath());
+#ifdef Q_OS_MAC
+        if (BUNDLE == 1) {
+            settingsDir.cdUp();
+            settingsDir.cdUp();
+        }
+#endif
+        settingsDirName = settingsDir.absolutePath().toLatin1();
+        settingsFileName = QDir::toNativeSeparators
+                (settingsDirName+QDir::separator()+"peb.ini");
+    }
 
     application.setProperty ("settingsFileName", settingsFileName);
     QFile settingsFile (settingsFileName);
@@ -289,9 +486,29 @@ int main (int argc, char** argv)
     // Start page - path must be relative to the PEB root directory:
     // HTML file or script are equally usable as a start page:
     QString startPagePath = settings.value ("gui/start_page").toString();
-    QString startPage = QDir::toNativeSeparators (rootDirName+startPagePath);
-    application.setProperty ("startPagePath", startPagePath);
-    application.setProperty ("startPage", startPage);
+    QString startPage;
+
+    if (startPagePath.length() > 0) {
+        startPage = QDir::toNativeSeparators (rootDirName+startPagePath);
+        application.setProperty ("startPagePath", startPagePath);
+        application.setProperty ("startPage", startPage);
+    }
+
+    // Check if start page exists:
+    QFile startPageFile (startPage);
+    if (!startPageFile.exists()) {
+        QMessageBox msgBox;
+        msgBox.setWindowModality (Qt::WindowModal);
+        msgBox.setIcon (QMessageBox::Critical);
+        msgBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
+        msgBox.setText (QMessageBox::tr (
+                            "Start page is missing.<br>Please select a start page."));
+        msgBox.setDefaultButton (QMessageBox::Ok);
+        msgBox.exec();
+
+        return 1;
+        QApplication::exit();
+    }
 
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:
@@ -323,21 +540,54 @@ int main (int argc, char** argv)
     QString webInspector = settings.value ("gui/web_inspector").toString();
     application.setProperty ("webInspector", webInspector);
 
-    // Icons:
+    // Icon for windows and message boxes:
     QString iconPathNameSetting = settings.value ("gui/icon").toString();
-    QString iconPathName =
-            QDir::toNativeSeparators (rootDirName+iconPathNameSetting);
-    QPixmap icon;
-    icon.load (iconPathName);
-    application.setProperty ("iconPathName", iconPathName);
+    QString iconPathName;
 
-    QString systrayIconPathNameSetting = settings.value ("gui/icon_systray").toString();
-    if (systrayIconPathNameSetting.length() == 0) {
-        systrayIconPathNameSetting = iconPathNameSetting;
+    if (iconPathNameSetting.length() > 0) {
+        QFileInfo iconFileInfo (iconPathNameSetting);
+        if (iconFileInfo.isRelative()) {
+            iconPathName = QDir::toNativeSeparators (
+                        rootDirName+iconPathNameSetting);
+        }
+        if (iconFileInfo.isAbsolute()) {
+            iconPathName = QDir::toNativeSeparators (iconPathNameSetting);
+        }
     }
-    QString systrayIconPathName =
-            QDir::toNativeSeparators (rootDirName+systrayIconPathNameSetting);
-    application.setProperty ("systrayIconPathName", systrayIconPathName);
+
+    QFile iconFile (iconPathName);
+    QPixmap icon (32, 32);
+    if (iconFile.exists()) {
+        application.setProperty ("iconPathName", iconPathName);
+        icon.load (iconPathName);
+        QApplication::setWindowIcon (icon);
+    } else {
+        // Set an empty, transparent icon for windows and message boxes in case no icon file is found:
+        icon.fill (Qt::transparent);
+        QApplication::setWindowIcon (icon);
+    }
+
+    // Systray icon:
+    // This setting was created to circumvent Qt bug QTBUG-35832 -
+    // inability to display transparent background of system tray icons in Qt5 on Linux.
+    // An icon without a transparent background should be used as a systray icon
+    // when the binary is compiled using Qt5 for Linux.
+    QString systrayIconPathNameSetting = settings.value ("gui/icon_systray").toString();
+    QString systrayIconPathName;
+    // If 'icon_systray' setting is empty, the window icon will be used as a systray icon.
+    if (systrayIconPathNameSetting.length() == 0) {
+        application.setProperty ("systrayIconPathName", iconPathName);
+    } else {
+        QFileInfo systrayIconFileInfo (systrayIconPathNameSetting);
+        if (systrayIconFileInfo.isRelative()) {
+            systrayIconPathName = QDir::toNativeSeparators (
+                        rootDirName+systrayIconPathNameSetting);
+        }
+        if (systrayIconFileInfo.isAbsolute()) {
+            systrayIconPathName = QDir::toNativeSeparators (systrayIconPathNameSetting);
+        }
+        application.setProperty ("systrayIconPathName", systrayIconPathName);
+    }
 
     // THEMES:
     // Name of the current GUI theme:
@@ -371,6 +621,14 @@ int main (int argc, char** argv)
     }
     application.setProperty ("allThemesDirectory", allThemesDirectory);
 
+    // Check if default theme file exists, if not - copy it from themes folder:
+    if (!QFile::exists (defaultThemeDirectory+
+                        QDir::separator()+
+                        "current.css")) {
+        QFile::copy (allThemesDirectory+QDir::separator()+defaultTheme,
+                     defaultThemeDirectory+QDir::separator()+"current.css");
+    }
+
     // TRANSLATIONS:
     // Current translation:
     QString defaultTranslation =
@@ -390,6 +648,13 @@ int main (int argc, char** argv)
         allTranslationsDirectory = QDir::toNativeSeparators (allTranslationsDirectorySetting);
     }
     application.setProperty ("allTranslationsDirectory", allTranslationsDirectory);
+
+    // Install default translation, if any:
+    QTranslator translator;
+    if (defaultTranslation != "none") {
+        translator.load (defaultTranslation, allTranslationsDirectory);
+    }
+    application.installTranslator (&translator);
 
     // HELP:
     // Help directory:
@@ -422,6 +687,17 @@ int main (int argc, char** argv)
     QString logging = settings.value ("logging/logging").toString();
     application.setProperty ("logging", logging);
 
+    // Install custom message handler for redirecting all debug messages to a log file:
+    if ((qApp->property ("logging").toString()) == "enable") {
+#if QT_VERSION >= 0x050000
+        // Qt5 code:
+        qInstallMessageHandler (customMessageHandler);
+#else
+        // Qt4 code:
+        qInstallMsgHandler (customMessageHandler);
+#endif
+    }
+
     // Logging mode - 'per_session_file' or 'single_file'.
     // 'single_file' means that only one single log file is created.
     // 'per_session' means that a separate log file is created for every browser ssession.
@@ -448,112 +724,35 @@ int main (int argc, char** argv)
     QString logPrefix = settings.value ("logging/logging_prefix").toString();
     application.setProperty ("logPrefix", logPrefix);
 
-    // Command line arguments overwrite configuration file settings with the same name:
-    QStringList arguments = application.arguments();
-    foreach (QString argument, arguments) {
+    // ==============================
+    // COMMAND LINE SETTING OVERRIDES:
+    // ==============================
+    // Command line arguments override configuration file settings with the same name:
+    foreach (QString argument, commandLineArguments) {
         if (argument.contains ("--fullscreen") or argument.contains ("-F")) {
             windowSize = "fullscreen";
+            application.setProperty ("windowSize", windowSize);
         }
         if (argument.contains ("--maximized") or argument.contains ("-M")) {
             fixedWidth = 1;
             fixedHeight = 1;
             windowSize = "maximized";
+            application.setProperty ("windowSize", windowSize);
         }
     }
 
-    // TRANSLATION:
-    QTranslator translator;
-    if (defaultTranslation != "none") {
-        translator.load (defaultTranslation, allTranslationsDirectory);
-    }
-    application.installTranslator (&translator);
-
-    // Install custom message handler for redirecting all debug messages to a log file:
-    if ((qApp->property ("logging").toString()) == "enable") {
-#if QT_VERSION >= 0x050000
-        // Qt5 code:
-        qInstallMessageHandler (customMessageHandler);
-#else
-        // Qt4 code:
-        qInstallMsgHandler (customMessageHandler);
-#endif
-    }
-
-    // Get current date and time for the log file and the command line output:
-    QString applicationStartForLogContents = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-
-    // Get command line arguments:
-    //QStringList arguments = QCoreApplication::arguments();
-
-    // Display command line help and exit:
-    foreach (QString argument, arguments){
-        if (argument.contains ("--help") or argument.contains ("-H")) {
-            std::cout << " " << std::endl;
-            std::cout << application.applicationName().toLatin1().constData()
-                      << " v." << application.applicationVersion().toLatin1().constData()
-                      << " started on: "
-                      << applicationStartForLogContents.toLatin1().constData() << std::endl;
-            std::cout << "Application file path: "
-                      << (QDir::toNativeSeparators (
-                              QApplication::applicationFilePath()).toLatin1().constData())
-                      << std::endl;
-            std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
-            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-            std::cout << " " << std::endl;
-            std::cout << "Usage:" << std::endl;
-            std::cout << "  peb --option=value -o=value" << std::endl;
-            std::cout << " " << std::endl;
-            std::cout << "Command line options:" << std::endl;
-            std::cout << "  --fullscreen    -F    start browser in fullscreen mode"
-                      << std::endl;
-            std::cout << "  --maximized     -M    start browser in a maximized window"
-                      << std::endl;
-            std::cout << "  --help          -H    this help"
-                      << std::endl;
-            std::cout << " " << std::endl;
-            if ((qApp->property ("logging").toString()) == "enable") {
-                QString dateTimeString =
-                        QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-                qDebug() << application.applicationName().toLatin1().constData()
-                         << application.applicationVersion().toLatin1().constData()
-                         << "displayed help and terminated normally on:"
-                         << dateTimeString;
-                qDebug() << "===============";
-            }
-            return 1;
-            QApplication::exit();
-        }
-    }
-
-    // Set an empty, transparent icon for message boxes in case no icon file is found:
-    QPixmap emptyTransparentIcon (16, 16);
-    emptyTransparentIcon.fill (Qt::transparent);
-    QApplication::setWindowIcon (QIcon (emptyTransparentIcon));
-
-    // Check if default theme file exists, if not - copy it from themes folder:
-    if (!QFile::exists (defaultThemeDirectory+
-                        QDir::separator()+
-                        "current.css")) {
-        QFile::copy (allThemesDirectory+QDir::separator()+defaultTheme,
-                     defaultThemeDirectory+QDir::separator()+"current.css");
-    }
-
+    // ==============================
+    // LOG ALL SETTINGS:
+    // ==============================
     // Log basic program information:
     qDebug() << "";
     qDebug() << application.applicationName().toLatin1().constData()
              << "version"
              << application.applicationVersion().toLatin1().constData()
-             << "started on:"
-             << applicationStartForLogContents.toLatin1().constData();
+             << "started.";
     qDebug() << "Application file path:"
              << QDir::toNativeSeparators (QApplication::applicationFilePath())
                 .toLatin1().constData();
-    QString allArguments;
-    foreach (QString argument, arguments){
-        allArguments.append (argument);
-        allArguments.append (" ");
-    }
-    allArguments.replace (QRegExp ("\\s$"), "");
     qDebug() << "Command line:" << allArguments.toLatin1().constData();
     qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
@@ -561,138 +760,41 @@ int main (int argc, char** argv)
              << QLibraryInfo::licensedProducts().toLatin1().constData();
     qDebug() << "Libraries Path:"
              << QLibraryInfo::location (QLibraryInfo::LibrariesPath).toLatin1().constData();
-
-    // Prevent starting the program as root - part 1 (Linux and Mac only):
-#ifndef Q_OS_WIN
-    int userEuid;
-    userEuid = geteuid();
-
-    if (userEuid == 0) {
-        qDebug() << "";
-        qDebug() << "Program started with root privileges. Aborting!";
-        qDebug() << "Please start again with normal user privileges.";
-    }
-#endif
-
     qDebug() << "";
 
-#ifndef Q_OS_WIN
-    // Detect if the program is started from terminal (Linux and Mac only).
-    // If the browser is started from terminal, it will start another copy of itself and
-    // close the first one. This is necessary for a working interaction with the Perl debugger.
-    if (isatty (fileno (stdin))) {
+    // Get screen resolution:
+    int screenWidth = QDesktopWidget().screen()->rect().width();
+    int screenHeight = QDesktopWidget().screen()->rect().height();
+    qDebug() << "===============";
+    qDebug() << "SCREEN RESOLUTION:" << screenWidth << "x" << screenHeight;
 
-        if (userEuid > 0) {
-            qDebug() << "Started from terminal with normal user privileges.";
-            qDebug() << "Will start another instance of the program and quit this one.";
-            qDebug() << "";
-        }
-
-        if ((qApp->property ("logging").toString()) == "enable") {
-            std::cout << " " << std::endl;
-            std::cout << application.applicationName().toLatin1().constData()
-                      << " v." << application.applicationVersion().toLatin1().constData()
-                      << " started on:"
-                      << applicationStartForLogContents.toLatin1().constData() << std::endl;
-            std::cout << "Application file path: "
-                      << (QDir::toNativeSeparators (
-                              QApplication::applicationFilePath()).toLatin1().constData())
-                      << std::endl;
-            std::cout << "Command line: "
-                      << allArguments.toLatin1().constData() << std::endl;
-            std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
-            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-            std::cout << "License: " << QLibraryInfo::licensedProducts()
-                         .toLatin1().constData() << std::endl;
-            std::cout << "Libraries Path: "
-                      << QLibraryInfo::location (QLibraryInfo::LibrariesPath)
-                         .toLatin1().constData() << std::endl;
-
-            if (userEuid == 0) {
-                std::cout << "Program started with root privileges. Aborting!" << std::endl;
-                std::cout << " " << std::endl;
-                return 1;
-                QApplication::exit();
-            } else {
-                std::cout << "Started from terminal with normal user privileges." << std::endl;
-                std::cout << "Will start another instance of the program and quit this one."
-                          << std::endl;
-                std::cout << " " << std::endl;
-            }
-        }
-
-        // Prevent starting the program as root - part 2:
-        if (userEuid == 0) {
-            return 1;
-            QApplication::exit();
-        }
-
-        // Fork another instance of the browser:
-        int pid = fork();
-
-        if (pid < 0) {
-            // Report error and exit:
-            qDebug() << "PID less than zero. Aborting.";
-            return 1;
-            QApplication::exit();
-        }
-
-        if (pid == 0) {
-            // Detach all standard I/O descriptors:
-            close (0);
-            close (1);
-            close (2);
-            // Enter a new session:
-            setsid();
-            // New instance is now detached from terminal:
-            QProcess anotherInstance;
-            anotherInstance.startDetached (
-                        QApplication::applicationFilePath(), arguments);
-            if (anotherInstance.waitForStarted (-1)) {
-                return 1;
-                QApplication::exit();
-            }
-        } else {
-            // The parent instance should be closed now:
-            return 1;
-            QApplication::exit();
-        }
-    } else {
-        if (userEuid > 0) {
-            qDebug() << "Started without terminal or inside Qt Creator with user privileges.";
-        }
+    // Log all ZIP package activity:
+#if ZIP_SUPPORT == 1
+    // Log rejection of a non-standard ZIP package, i.e.
+    // ZIP package without:
+    // (1.) root folder named 'root' and
+    // (2.) configuration file named 'peb.ini'.
+    if (zipPackageRootFolderConformant == false or
+            zipPackageConfigurationFileConformant == false) {
+        qDebug() << "===============";
+        qDebug() << "Non-standard ZIP package found and it was not extracted and used!";
     }
 
-    // Prevent starting the program as root - part 3:
-    if (userEuid == 0) {
-        QMessageBox msgBox;
-        msgBox.setWindowModality (Qt::WindowModal);
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle (QMessageBox::tr ("Started as root"));
-        msgBox.setText (QMessageBox::tr ("Browser was started as root.<br>")+
-                        QMessageBox::tr ("This is definitely not a good idea!<br>")+
-                        QMessageBox::tr ("Going to quit now."));
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
-
-        return 1;
-        QApplication::exit();
+    // Log all extracted archive entries from a ZIP package:
+    if (extractedFiles.length() > 0) {
+        qDebug() << "===============";
+        qDebug() << "ZIP package found and the following entries were extracted:";
+        foreach (QString fileEntry, extractedFiles) {
+            qDebug() << fileEntry;
+        }
     }
 #endif
 
-    qDebug() << "===============";
-
-    // Screen resolution:
-    int screenWidth = QDesktopWidget().screen()->rect().width();
-    int screenHeight = QDesktopWidget().screen()->rect().height();
-    qDebug() << "SCREEN RESOLUTION:" << screenWidth << "x" << screenHeight;
-
-    // Log all settings:
     qDebug() << "===============";
     qDebug() << "GENERAL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (rootDirName);
-    qDebug() << "Temporary folder:" << applicationOutputDirectoryName;
+    qDebug() << "Temporary folder:" << applicationTempDirectoryName;
     qDebug() << "Settings file name:" << settingsFileName;
 
     qDebug() << "===============";
@@ -767,31 +869,9 @@ int main (int argc, char** argv)
     qDebug() << "Logfiles prefix:" << logPrefix;
     qDebug() << "===============";
 
-    // Check if start page exists:
-    QFile startPageFile (startPage);
-    if (!startPageFile.exists()) {
-        qDebug() << "Start page is missing.";
-        qDebug() << "Please select a start page.";
-        qDebug() << "Exiting.";
-        qDebug() << "===============";
-
-        QMessageBox msgBox;
-        msgBox.setWindowModality (Qt::WindowModal);
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
-        msgBox.setText (QMessageBox::tr (
-                            "Start page is missing.<br>Please select a start page."));
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
-
-        return 1;
-        QApplication::exit();
-    }
-
-    // Set application window icon from an external file:
-    QApplication::setWindowIcon (icon);
-
-    // Initialize the main GUI class:
+    // ==============================
+    // MAIN GUI CLASS INITIALIZATION:
+    // ==============================
     TopLevel toplevel;
 
     QObject::connect (qApp, SIGNAL (lastWindowClosed()),
@@ -801,18 +881,19 @@ int main (int argc, char** argv)
     toplevel.loadStartPageSlot();
     toplevel.show();
 
-    // Initialize the system tray icon class:
-    TrayIcon trayicon;
-
+    // ==============================
+    // SYSTEM TRAY ICON CLASS INITIALIZATION:
+    // ==============================
+    TrayIcon trayIcon;
     if (systrayIcon == "enable") {
-        QObject::connect (trayicon.aboutAction, SIGNAL (triggered()),
+        QObject::connect (trayIcon.aboutAction, SIGNAL (triggered()),
                           &toplevel, SLOT (aboutSlot()));
 
-        QObject::connect (trayicon.quitAction, SIGNAL (triggered()),
+        QObject::connect (trayIcon.quitAction, SIGNAL (triggered()),
                           &toplevel, SLOT (quitApplicationSlot()));
 
         QObject::connect (&toplevel, SIGNAL (trayIconHideSignal()),
-                          &trayicon, SLOT (trayIconHideSlot()));
+                          &trayIcon, SLOT (trayIconHideSlot()));
     }
 
     return application.exec();
