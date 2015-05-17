@@ -2,8 +2,6 @@
 
 use strict;
 use warnings;
-use Env qw (PATH PERL5LIB DOCUMENT_ROOT FILE_TO_OPEN FILE_TO_CREATE FOLDER_TO_OPEN QUERY_STRING REQUEST_METHOD CONTENT_LENGTH);
-use CGI::Simple::Standard qw (:standard);
 
 print "Content-type: text/html; charset=utf-8\n\n";
 
@@ -27,10 +25,23 @@ print "FORM DATA:\n";
 print "</font></p>\n";
 print "<p align='left'><font size='3' face='SansSerif'>\n";
 
-my %form;
-foreach my $p (param()) {
-	$form{$p} = param($p);
-	print "$p = $form{$p}<br>\n";
+# Read input:
+my ($buffer, @pairs, $pair, $name, $value, %FORM);
+$ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
+if ($ENV{'REQUEST_METHOD'} eq "POST") {
+	read (STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
+} else {
+	$buffer = $ENV{'QUERY_STRING'};
+}
+
+# Split information into name/value pairs:
+@pairs = split(/&/, $buffer);
+foreach $pair (@pairs) {
+	($name, $value) = split(/=/, $pair);
+	$value =~ tr/+/ /;
+	$value =~ s/%(..)/pack("C", hex($1))/eg;
+	$FORM{$name} = $value;
+	print "$name = $value<br>\n";
 }
 
 print "</font></p>\n";

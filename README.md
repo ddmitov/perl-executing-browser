@@ -120,7 +120,7 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
   
 ## History
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and current version (0.1) should be considered alpha pre-release. Do not use it for production purposes! Exhaustive documentation is still missing and current examples are basic.  
+PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and the current version 0.1, code name "Camel Calf", should be considered alpha pre-release. Do not use it for production purposes! Exhaustive documentation is still missing and current examples are basic.  
   
 ## License
   

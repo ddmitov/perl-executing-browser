@@ -16,6 +16,7 @@ print <<HTML
 </head>
 
 <body>
+
 <p align='center'><font size='5' face='SansSerif'>Perl Extensionless Script</font></p>
 <p align='center'><font size='3' face='SansSerif'>Hello from a Perl script without extension!</font></p>
 </body>

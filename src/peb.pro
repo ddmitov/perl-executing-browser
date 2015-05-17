@@ -94,6 +94,15 @@ OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
 ##########################################################
+# Application name:
+# ATTENTION - replace spaces with underscore like that:
+# "Perl_Executing_Browser" but not "Perl Executing Browser"!
+##########################################################
+APPLICATION_NAME = "Perl_Executing_Browser"
+
+DEFINES += APPLICATION_NAME=\\\"$$APPLICATION_NAME\\\"
+
+##########################################################
 # Application version:
 ##########################################################
 APPLICATION_VERSION = "0.1"
@@ -117,6 +126,7 @@ message ("Browser pseudo-domain: $$PEB_DOMAIN")
 # is scanned by a special super-script, censor.pl, and
 # if any security issues are found, the offending script
 # is blocked and error message is displayed.
+##########################################################
 # To turn off security checks of user-supplied Perl scripts:
 # SCRIPT_CENSORING = 0
 ##########################################################
@@ -135,6 +145,9 @@ equals (SCRIPT_CENSORING, 1) {
 ##########################################################
 # To link statically QuaZip library for unpacking root folder from a ZIP file:
 # ZIP_SUPPORT = 1
+##########################################################
+# To compile without the ability to unpack root folder from a ZIP file:
+# ZIP_SUPPORT = 0
 ##########################################################
 ZIP_SUPPORT = 1
 
@@ -174,6 +187,9 @@ equals (ZIP_SUPPORT, 1) {
 # interaction with the biult-in Perl debugger is
 # not needed or not wanted for security reasons,
 # this functionality can be turned off.
+##########################################################
+# To compile with Perl debugger interaction:
+# PERL_DEBUGGER_INTERACTION = 1
 ##########################################################
 PERL_DEBUGGER_INTERACTION = 1
 

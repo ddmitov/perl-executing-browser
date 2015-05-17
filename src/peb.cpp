@@ -13,11 +13,11 @@
 
 #include <QApplication>
 #include <QShortcut>
-#include <QDesktopServices>
+//#include <QDesktopServices>
 #include <QDateTime>
 #include <QTranslator>
+#include <QStyleFactory>
 #include <QDebug>
-
 #include <qglobal.h>
 #include "peb.h"
 #include <iostream> // for std::cout
@@ -41,7 +41,7 @@
 #endif
 
 
-// Global variable -
+// Global variable:
 // Dynamic global list of all scripts, that are started and still running in any given moment:
 QStringList startedScripts;
 
@@ -79,24 +79,24 @@ void customMessageHandler (QtMsgType type, const char* message)
         break;
     }
 
-   if ((qApp->property ("logMode").toString()) == "single_file") {
+   if ((qApp->property("logMode").toString()) == "single_file") {
        QFile logFile (QDir::toNativeSeparators
-                      ((qApp->property ("logDirFullPath").toString())+
+                      ((qApp->property("logDirFullPath").toString())+
                        QDir::separator()+
-                       (qApp->property ("logPrefix").toString())+
+                       (qApp->property("logPrefix").toString())+
                        ".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
        textStream << text << endl;
    }
 
-   if ((qApp->property ("logMode").toString()) == "per_session_file") {
+   if ((qApp->property("logMode").toString()) == "per_session_file") {
        QFile logFile (QDir::toNativeSeparators
-                      ((qApp->property ("logDirFullPath").toString())+
+                      ((qApp->property("logDirFullPath").toString())+
                        QDir::separator()+
-                       (qApp->property ("logPrefix").toString())+
+                       (qApp->property("logPrefix").toString())+
                        "-started-at-"+
-                       (qApp->property ("applicationStartDateAndTime").toString())+
+                       (qApp->property("applicationStartDateAndTime").toString())+
                        ".log"));
        logFile.open (QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
        QTextStream textStream (&logFile);
@@ -113,7 +113,11 @@ int main (int argc, char** argv)
     // ==============================
     // SET BASIC APPLICATION VARIABLES:
     // ==============================
-    application.setApplicationName ("Perl Executing Browser");
+    QString applicationName = APPLICATION_NAME;
+    if (applicationName.contains("_")) {
+        applicationName.replace ("_", " ");
+    }
+    application.setApplicationName (applicationName);
     application.setApplicationVersion (APPLICATION_VERSION);
 
     // ==============================
@@ -125,32 +129,6 @@ int main (int argc, char** argv)
 #else
     QTextCodec::setCodecForCStrings (QTextCodec::codecForName ("UTF8"));
 #endif
-
-    // ==============================
-    // CREATE TEMPORARY FOLDERS:
-    // ==============================
-    // Application start date and time for temporary folder name:
-    QString applicationStartDateAndTime =
-            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
-    application.setProperty ("applicationStartDateAndTime", applicationStartDateAndTime);
-
-    // Get the name of the browser binary:
-    QString applicationBinaryName = QFileInfo (QApplication::applicationFilePath()).fileName();
-
-    // Create the main temporary folder for the current browser session:
-    QString applicationTempDirectoryName = QDir::tempPath()+QDir::separator()+
-            applicationBinaryName+"--"+applicationStartDateAndTime;
-    application.setProperty ("applicationTempDirectory", applicationTempDirectoryName);
-    QDir applicationTempDirectory (applicationTempDirectoryName);
-    applicationTempDirectory.mkpath(".");
-
-    // Create the output directory:
-    // all HTML output from local scripts is temporarily stored and loaded from there.
-    QString applicationOutputDirectoryName = QDir::tempPath()+QDir::separator()+
-            applicationBinaryName+"--"+applicationStartDateAndTime+QDir::separator()+"output";
-    application.setProperty ("applicationOutputDirectory", applicationOutputDirectoryName);
-    QDir applicationOutputDirectory (applicationOutputDirectoryName);
-    applicationOutputDirectory.mkpath(".");
 
     // ==============================
     // GET COMMAND LINE ARGUMENTS:
@@ -196,14 +174,15 @@ int main (int argc, char** argv)
     }
 
     // ==============================
-    // DETECT USER PRIVILEGES AND APPLICATION START FROM TERMINAL - Linux and Mac only:
+    // DETECT USER PRIVILEGES AND
+    // APPLICATION START FROM TERMINAL:
+    // Linux and Mac only:
     // ==============================
 #ifndef Q_OS_WIN
     // Detect user privileges:
     int userEuid;
     userEuid = geteuid();
 
-    // Detect if the program is started from terminal - Linux and Mac only.
     // If the browser is started from terminal, it will start another copy of itself and
     // close the first one. This is necessary for a working interaction with the Perl debugger.
     if (isatty (fileno (stdin))) {
@@ -274,15 +253,15 @@ int main (int argc, char** argv)
 
     // Prevent starting as root in graphical mode:
     if (userEuid == 0) {
-        QMessageBox msgBox;
-        msgBox.setWindowModality (Qt::WindowModal);
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle (QMessageBox::tr ("Started as root"));
-        msgBox.setText (QMessageBox::tr ("Browser was started as root.<br>")+
+        QMessageBox startedAsRootMessageBox;
+        startedAsRootMessageBox.setWindowModality (Qt::WindowModal);
+        startedAsRootMessageBox.setIcon (QMessageBox::Critical);
+        startedAsRootMessageBox.setWindowTitle (QMessageBox::tr ("Started as root"));
+        startedAsRootMessageBox.setText (QMessageBox::tr ("Browser was started as root.<br>")+
                         QMessageBox::tr ("This is definitely not a good idea!<br>")+
                         QMessageBox::tr ("Going to quit now."));
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
+        startedAsRootMessageBox.setDefaultButton (QMessageBox::Ok);
+        startedAsRootMessageBox.exec();
 
         return 1;
         QApplication::exit();
@@ -294,6 +273,32 @@ int main (int argc, char** argv)
     // ==============================
     QString settingsDirName;
     QString settingsFileName;
+
+    // ==============================
+    // CREATE TEMPORARY FOLDERS:
+    // ==============================
+    // Application start date and time for temporary folder name:
+    QString applicationStartDateAndTime =
+            QDateTime::currentDateTime().toString ("yyyy-MM-dd--hh-mm-ss");
+    application.setProperty("applicationStartDateAndTime", applicationStartDateAndTime);
+
+    // Get the name of the browser binary:
+    QString applicationBinaryName = QFileInfo (QApplication::applicationFilePath()).fileName();
+
+    // Create the main temporary folder for the current browser session:
+    QString applicationTempDirectoryName = QDir::tempPath()+QDir::separator()+
+            applicationBinaryName+"--"+applicationStartDateAndTime;
+    application.setProperty("applicationTempDirectory", applicationTempDirectoryName);
+    QDir applicationTempDirectory (applicationTempDirectoryName);
+    applicationTempDirectory.mkpath(".");
+
+    // Create the output directory:
+    // all HTML output from local scripts is temporarily stored and loaded from there.
+    QString applicationOutputDirectoryName = QDir::tempPath()+QDir::separator()+
+            applicationBinaryName+"--"+applicationStartDateAndTime+QDir::separator()+"output";
+    application.setProperty("applicationOutputDirectory", applicationOutputDirectoryName);
+    QDir applicationOutputDirectory (applicationOutputDirectoryName);
+    applicationOutputDirectory.mkpath(".");
 
     // ==============================
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
@@ -347,20 +352,20 @@ int main (int argc, char** argv)
                 (settingsDirName+QDir::separator()+"peb.ini");
     }
 
-    application.setProperty ("settingsFileName", settingsFileName);
+    application.setProperty("settingsFileName", settingsFileName);
     QFile settingsFile (settingsFileName);
 
     // Check if settings file exists:
     if (!settingsFile.exists()) {
-        QMessageBox msgBox;
-        msgBox.setWindowModality (Qt::WindowModal);
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle (QMessageBox::tr ("Missing configuration file"));
-        msgBox.setText (QMessageBox::tr ("Configuration file<br>")+
+        QMessageBox missingConfigurationFileMessageBox;
+        missingConfigurationFileMessageBox.setWindowModality (Qt::WindowModal);
+        missingConfigurationFileMessageBox.setIcon (QMessageBox::Critical);
+        missingConfigurationFileMessageBox.setWindowTitle (QMessageBox::tr ("Missing configuration file"));
+        missingConfigurationFileMessageBox.setText (QMessageBox::tr ("Configuration file<br>")+
                         settingsFileName+
                         QMessageBox::tr ("<br>is missing.<br>Please restore it."));
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
+        missingConfigurationFileMessageBox.setDefaultButton (QMessageBox::Ok);
+        missingConfigurationFileMessageBox.exec();
 
         return 1;
         QApplication::exit();
@@ -369,7 +374,7 @@ int main (int argc, char** argv)
     // Define INI file format for storing settings:
     QSettings settings (settingsFileName, QSettings::IniFormat);
 
-    // ROOT DIRECTORY:
+    // ROOT DIRECTORY SETTING:
     QString rootDirName;
     QString rootDirNameSetting = settings.value ("root/root").toString();
     if (rootDirNameSetting == "current") {
@@ -380,34 +385,22 @@ int main (int argc, char** argv)
     if (!rootDirName.endsWith (QDir::separator())) {
         rootDirName.append (QDir::separator());
     }
-    application.setProperty ("rootDirName", rootDirName);
+    application.setProperty("rootDirName", rootDirName);
 
-    // ENVIRONMENT:
+    // PERL SCRIPT SETTINGS:
     // Folders to add to PATH:
     QStringList pathToAddList;
-    int pathSize = settings.beginReadArray("environment/path");
+    int pathSize = settings.beginReadArray("perl/path");
     for (int index = 0; index < pathSize; ++index) {
         settings.setArrayIndex (index);
         QString pathSetting = settings.value ("name").toString();
         pathToAddList.append (pathSetting);
     }
     settings.endArray();
-    application.setProperty ("pathToAddList", pathToAddList);
+    application.setProperty("pathToAddList", pathToAddList);
 
-    // PERLLIB:
-    QString perlLibSetting = settings.value ("environment/perllib").toString();
-    QDir perlLibDir (perlLibSetting);
-    QString perlLib;
-    if (perlLibDir.isRelative()) {
-        perlLib = QDir::toNativeSeparators (rootDirName+perlLibSetting);
-    }
-    if (perlLibDir.isAbsolute()) {
-        perlLib = QDir::toNativeSeparators (perlLibSetting);
-    }
-    application.setProperty ("perlLib", perlLib);
-
-    // PERL INTERPRETER:
-    QString perlInterpreterSetting = settings.value ("interpreters/perl").toString();
+    // Perl interpreter:
+    QString perlInterpreterSetting = settings.value ("perl/perl").toString();
     QDir interpreterFile (perlInterpreterSetting);
     QString perlInterpreter;
     if (interpreterFile.isRelative()) {
@@ -416,21 +409,23 @@ int main (int argc, char** argv)
     if (interpreterFile.isAbsolute()) {
         perlInterpreter = QDir::toNativeSeparators (perlInterpreterSetting);
     }
-    application.setProperty ("perlInterpreter", perlInterpreter);
+    application.setProperty("perlInterpreter", perlInterpreter);
 
-    // SCRIPTS:
-    // Timeout for CGI scripts (not long-running ones):
-    QString scriptTimeout = settings.value ("scripts/script_timeout").toString();
-    application.setProperty ("scriptTimeout", scriptTimeout);
+    // PERLLIB environment variable:
+    QString perlLibSetting = settings.value ("perl/perllib").toString();
+    QDir perlLibDir (perlLibSetting);
+    QString perlLib;
+    if (perlLibDir.isRelative()) {
+        perlLib = QDir::toNativeSeparators (rootDirName+perlLibSetting);
+    }
+    if (perlLibDir.isAbsolute()) {
+        perlLib = QDir::toNativeSeparators (perlLibSetting);
+    }
+    application.setProperty("perlLib", perlLib);
 
-    // Display or hide STDERR from scripts - 'enable' or 'disable';
-    QString displayStderr = settings.value ("scripts/display_stderr").toString();
-    application.setProperty ("displayStderr", displayStderr);
-
-    // PERL DEBUGGER:
     // Perl debugger HTML template:
     QString debuggerHtmlTemplateSetting = settings.value (
-                "perl_debugger/debugger_html_template").toString();
+                "perl/perl_debugger_html_template").toString();
     QString debuggerHtmlTemplate;
     QFileInfo debuggerHtmlTemplateFile (debuggerHtmlTemplateSetting);
     if (debuggerHtmlTemplateFile.isRelative()) {
@@ -440,12 +435,19 @@ int main (int argc, char** argv)
     if (debuggerHtmlTemplateFile.isAbsolute()) {
         debuggerHtmlTemplate = QDir::toNativeSeparators (debuggerHtmlTemplateSetting);
     }
-    application.setProperty ("debuggerHtmlTemplate", debuggerHtmlTemplate);
+    application.setProperty("debuggerHtmlTemplate", debuggerHtmlTemplate);
 
-    // SOURCE VIEWER:
-    // Path to the selected source viewer:
+    // Display or hide STDERR from scripts:
+    QString displayStderr = settings.value ("perl/perl_display_stderr").toString();
+    application.setProperty("displayStderr", displayStderr);
+
+    // Timeout for CGI scripts (not long-running ones):
+    QString scriptTimeout = settings.value ("perl/perl_script_timeout").toString();
+    application.setProperty("scriptTimeout", scriptTimeout);
+
+    // Source viewer script path:
     QString sourceViewerSetting =
-            settings.value ("source_viewer/source_viewer").toString();
+            settings.value ("perl/perl_source_viewer").toString();
     QFileInfo sourceViewerFile (sourceViewerSetting);
     QString sourceViewer;
     if (sourceViewerFile.isRelative()) {
@@ -455,21 +457,21 @@ int main (int argc, char** argv)
     if (sourceViewerFile.isAbsolute()) {
         sourceViewer = QDir::toNativeSeparators (sourceViewerSetting);
     }
-    application.setProperty ("sourceViewer", sourceViewer);
+    application.setProperty("sourceViewer", sourceViewer);
 
     // Optional source viewer command line arguments.
     // They will be given to the source viewer whenever it is started by the browser.
     QString sourceViewerArgumentsSetting =
-            settings.value ("source_viewer/source_viewer_arguments").toString();
+            settings.value ("perl/perl_source_viewer_arguments").toString();
     sourceViewerArgumentsSetting.replace ("\n", "");
     QStringList sourceViewerArguments;
     sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
-    application.setProperty ("sourceViewerArgumentsSetting", sourceViewerArguments);
+    application.setProperty("sourceViewerArgumentsSetting", sourceViewerArguments);
 
     // NETWORKING:
     // User agent:
     QString userAgent = settings.value ("networking/user_agent").toString();
-    application.setProperty ("userAgent", userAgent);
+    application.setProperty("userAgent", userAgent);
 
     // Allowed domains:
     QStringList allowedDomainsList;
@@ -480,7 +482,7 @@ int main (int argc, char** argv)
         allowedDomainsList.append (pathSetting);
     }
     settings.endArray();
-    application.setProperty ("allowedDomainsList", allowedDomainsList);
+    application.setProperty("allowedDomainsList", allowedDomainsList);
 
     // GUI:
     // Start page - path must be relative to the PEB root directory:
@@ -490,21 +492,21 @@ int main (int argc, char** argv)
 
     if (startPagePath.length() > 0) {
         startPage = QDir::toNativeSeparators (rootDirName+startPagePath);
-        application.setProperty ("startPagePath", startPagePath);
-        application.setProperty ("startPage", startPage);
+        application.setProperty("startPagePath", startPagePath);
+        application.setProperty("startPage", startPage);
     }
 
     // Check if start page exists:
     QFile startPageFile (startPage);
     if (!startPageFile.exists()) {
-        QMessageBox msgBox;
-        msgBox.setWindowModality (Qt::WindowModal);
-        msgBox.setIcon (QMessageBox::Critical);
-        msgBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
-        msgBox.setText (QMessageBox::tr (
+        QMessageBox missingStartPageMessageBox;
+        missingStartPageMessageBox.setWindowModality (Qt::WindowModal);
+        missingStartPageMessageBox.setIcon (QMessageBox::Critical);
+        missingStartPageMessageBox.setWindowTitle (QMessageBox::tr ("Missing start page"));
+        missingStartPageMessageBox.setText (QMessageBox::tr (
                             "Start page is missing.<br>Please select a start page."));
-        msgBox.setDefaultButton (QMessageBox::Ok);
-        msgBox.exec();
+        missingStartPageMessageBox.setDefaultButton (QMessageBox::Ok);
+        missingStartPageMessageBox.exec();
 
         return 1;
         QApplication::exit();
@@ -518,27 +520,27 @@ int main (int argc, char** argv)
     if (windowSize != "maximized" or windowSize != "fullscreen") {
         fixedWidth = windowSize.section ("x", 0, 0) .toInt();
         fixedHeight = windowSize.section ("x", 1, 1) .toInt();
-        application.setProperty ("fixedWidth", fixedWidth);
-        application.setProperty ("fixedHeight", fixedHeight);
+        application.setProperty("fixedWidth", fixedWidth);
+        application.setProperty("fixedHeight", fixedHeight);
     }
-    application.setProperty ("windowSize", windowSize);
+    application.setProperty("windowSize", windowSize);
 
-    // Stay on top of all other windows - 'enable' or 'disable':
+    // Stay on top of all other windows enable/disable switch:
     QString stayOnTop = settings.value ("gui/stay_on_top") .toString();
-    application.setProperty ("stayOnTop", stayOnTop);
+    application.setProperty("stayOnTop", stayOnTop);
 
     // Browser title -'dynamic' or 'My Favorite Title'
     // 'dynamic' title is taken from every HTML <title> tag.
     QString browserTitle = settings.value ("gui/browser_title").toString();
-    application.setProperty ("browserTitle", browserTitle);
+    application.setProperty("browserTitle", browserTitle);
 
-    // Right click context menu - 'enable' or 'disable':
+    // Right click context menu enable/disable switch:
     QString contextMenu = settings.value ("gui/context_menu").toString();
-    application.setProperty ("contextMenu", contextMenu);
+    application.setProperty("contextMenu", contextMenu);
 
-    // Web Inspector from context menu - 'enable' or 'disable':
+    // Web Inspector from context menu enable/disable switch:
     QString webInspector = settings.value ("gui/web_inspector").toString();
-    application.setProperty ("webInspector", webInspector);
+    application.setProperty("webInspector", webInspector);
 
     // Icon for windows and message boxes:
     QString iconPathNameSetting = settings.value ("gui/icon").toString();
@@ -558,7 +560,7 @@ int main (int argc, char** argv)
     QFile iconFile (iconPathName);
     QPixmap icon (32, 32);
     if (iconFile.exists()) {
-        application.setProperty ("iconPathName", iconPathName);
+        application.setProperty("iconPathName", iconPathName);
         icon.load (iconPathName);
         QApplication::setWindowIcon (icon);
     } else {
@@ -567,16 +569,33 @@ int main (int argc, char** argv)
         QApplication::setWindowIcon (icon);
     }
 
-    // Systray icon:
+    // Global Qt style for the whole application:
+    // Disabling default Qt style and explicitly setting another Qt style
+    // may be usefull to avoid minor graphical issues and warnings.
+    QString qtStyleSetting = settings.value ("gui/qt_style").toString();
+    QString qtStyle;
+    QStringList availableStyles = QStyleFactory::keys();
+    foreach (QString availableStyle, availableStyles) {
+        if (availableStyle == qtStyleSetting) {
+            qtStyle = availableStyle;
+            application.setStyle (QStyleFactory::create (qtStyle));
+        }
+    }
+
+    // System tray icon enable/disable switch:
+    QString systrayIcon = settings.value ("gui/systray_icon").toString();
+    application.setProperty("systrayIcon", systrayIcon);
+
+    // System tray icon file:
     // This setting was created to circumvent Qt bug QTBUG-35832 -
     // inability to display transparent background of system tray icons in Qt5 on Linux.
     // An icon without a transparent background should be used as a systray icon
     // when the binary is compiled using Qt5 for Linux.
-    QString systrayIconPathNameSetting = settings.value ("gui/icon_systray").toString();
+    QString systrayIconPathNameSetting = settings.value ("gui/systray_icon_file").toString();
     QString systrayIconPathName;
     // If 'icon_systray' setting is empty, the window icon will be used as a systray icon.
     if (systrayIconPathNameSetting.length() == 0) {
-        application.setProperty ("systrayIconPathName", iconPathName);
+        application.setProperty("systrayIconPathName", iconPathName);
     } else {
         QFileInfo systrayIconFileInfo (systrayIconPathNameSetting);
         if (systrayIconFileInfo.isRelative()) {
@@ -586,17 +605,23 @@ int main (int argc, char** argv)
         if (systrayIconFileInfo.isAbsolute()) {
             systrayIconPathName = QDir::toNativeSeparators (systrayIconPathNameSetting);
         }
-        application.setProperty ("systrayIconPathName", systrayIconPathName);
+        application.setProperty("systrayIconPathName", systrayIconPathName);
     }
 
-    // THEMES:
-    // Name of the current GUI theme:
-    QString defaultTheme = settings.value ("themes/default_theme").toString();
-    application.setProperty ("defaultTheme", defaultTheme);
+    // System tray icon double-click action:
+    // Double-clicking the system tray icon can quit the program or minimize all of it's windows.
+    // User is asked for confirmation before quitting the program.
+    QString systrayIconDoubleClickAction =
+            settings.value ("gui/systray_icon_double_click_action").toString();
+    application.setProperty("systrayIconDoubleClickAction", systrayIconDoubleClickAction);
 
-    // Directory of the current GUI theme:
+    // Name of the default GUI theme:
+    QString defaultTheme = settings.value ("gui/theme_default").toString();
+    application.setProperty("defaultTheme", defaultTheme);
+
+    // Directory of the default GUI theme:
     QString defaultThemeDirectorySetting =
-            settings.value ("themes/default_theme_directory").toString();
+            settings.value ("gui/theme_default_directory").toString();
     QString defaultThemeDirectory;
     QDir defaultThemeDir (defaultThemeDirectorySetting);
     if (defaultThemeDir.isRelative()) {
@@ -606,11 +631,11 @@ int main (int argc, char** argv)
     if (defaultThemeDir.isAbsolute()) {
         defaultThemeDirectory = QDir::toNativeSeparators (defaultThemeDirectorySetting);
     }
-    application.setProperty ("defaultThemeDirectory", defaultThemeDirectory);
+    application.setProperty("defaultThemeDirectory", defaultThemeDirectory);
 
     // Directory for all GUI themes:
     QString allThemesDirectorySetting =
-            settings.value ("themes/all_themes_directory").toString();
+            settings.value ("gui/themes_directory").toString();
     QString allThemesDirectory;
     QDir allThemesDir (allThemesDirectorySetting);
     if (allThemesDir.isRelative()) {
@@ -619,7 +644,7 @@ int main (int argc, char** argv)
     if (allThemesDir.isAbsolute()) {
         allThemesDirectory = QDir::toNativeSeparators (allThemesDirectorySetting);
     }
-    application.setProperty ("allThemesDirectory", allThemesDirectory);
+    application.setProperty("allThemesDirectory", allThemesDirectory);
 
     // Check if default theme file exists, if not - copy it from themes folder:
     if (!QFile::exists (defaultThemeDirectory+
@@ -629,15 +654,14 @@ int main (int argc, char** argv)
                      defaultThemeDirectory+QDir::separator()+"current.css");
     }
 
-    // TRANSLATIONS:
-    // Current translation:
+    // Default translation:
     QString defaultTranslation =
-            settings.value ("translations/default_translation").toString();
-    application.setProperty ("defaultTranslation", defaultTranslation);
+            settings.value ("gui/translation_default").toString();
+    application.setProperty("defaultTranslation", defaultTranslation);
 
     // Directory for all translations:
     QString allTranslationsDirectorySetting =
-            settings.value ("translations/all_translations_directory").toString();
+            settings.value ("gui/translations_directory").toString();
     QDir translationsDir (allTranslationsDirectorySetting);
     QString allTranslationsDirectory;
     if (translationsDir.isRelative()) {
@@ -647,7 +671,7 @@ int main (int argc, char** argv)
     if (translationsDir.isAbsolute()) {
         allTranslationsDirectory = QDir::toNativeSeparators (allTranslationsDirectorySetting);
     }
-    application.setProperty ("allTranslationsDirectory", allTranslationsDirectory);
+    application.setProperty("allTranslationsDirectory", allTranslationsDirectory);
 
     // Install default translation, if any:
     QTranslator translator;
@@ -656,10 +680,9 @@ int main (int argc, char** argv)
     }
     application.installTranslator (&translator);
 
-    // HELP:
     // Help directory:
     QString helpDirectorySetting =
-            settings.value ("help/help_directory").toString();
+            settings.value ("gui/help_directory").toString();
     QDir helpDir (helpDirectorySetting);
     QString helpDirectory;
     if (helpDir.isRelative()) {
@@ -668,27 +691,15 @@ int main (int argc, char** argv)
     if (helpDir.isAbsolute()) {
         helpDirectory = QDir::toNativeSeparators (helpDirectorySetting);
     }
-    application.setProperty ("helpDirectory", helpDirectory);
-
-    // SYSTEM TRAY:
-    // System tray icon - 'enable' or 'disable':
-    QString systrayIcon = settings.value ("system_tray/systray_icon").toString();
-    application.setProperty ("systrayIcon", systrayIcon);
-
-    // Double-clicking the system tray icon can quit the program or minimize all of it's windows.
-    // User is asked for confirmation before quitting the program.
-    // Available options: 'quit' or 'minimize_all_windows'
-    QString systrayIconDoubleClickAction =
-            settings.value ("system_tray/systray_icon_double_click_action").toString();
-    application.setProperty ("systrayIconDoubleClickAction", systrayIconDoubleClickAction);
+    application.setProperty("helpDirectory", helpDirectory);
 
     // LOGGING:
-    // Logging - 'enable' or 'disable':
+    // Logging enable/disable switch:
     QString logging = settings.value ("logging/logging").toString();
-    application.setProperty ("logging", logging);
+    application.setProperty("logging", logging);
 
     // Install custom message handler for redirecting all debug messages to a log file:
-    if ((qApp->property ("logging").toString()) == "enable") {
+    if ((qApp->property("logging").toString()) == "enable") {
 #if QT_VERSION >= 0x050000
         // Qt5 code:
         qInstallMessageHandler (customMessageHandler);
@@ -703,7 +714,7 @@ int main (int argc, char** argv)
     // 'per_session' means that a separate log file is created for every browser ssession.
     // Application start date and time are appended to the file name in this scenario.
     QString logMode = settings.value ("logging/logging_mode").toString();
-    application.setProperty ("logMode", logMode);
+    application.setProperty("logMode", logMode);
 
     // Log files directory:
     QString logDirName = settings.value ("logging/logging_directory").toString();
@@ -718,11 +729,11 @@ int main (int argc, char** argv)
     if (logDir.isAbsolute()) {
         logDirFullPath = QDir::toNativeSeparators (logDirName);
     }
-    application.setProperty ("logDirFullPath", logDirFullPath);
+    application.setProperty("logDirFullPath", logDirFullPath);
 
     // Log filename prefix:
     QString logPrefix = settings.value ("logging/logging_prefix").toString();
-    application.setProperty ("logPrefix", logPrefix);
+    application.setProperty("logPrefix", logPrefix);
 
     // ==============================
     // COMMAND LINE SETTING OVERRIDES:
@@ -731,13 +742,13 @@ int main (int argc, char** argv)
     foreach (QString argument, commandLineArguments) {
         if (argument.contains ("--fullscreen") or argument.contains ("-F")) {
             windowSize = "fullscreen";
-            application.setProperty ("windowSize", windowSize);
+            application.setProperty("windowSize", windowSize);
         }
         if (argument.contains ("--maximized") or argument.contains ("-M")) {
             fixedWidth = 1;
             fixedHeight = 1;
             windowSize = "maximized";
-            application.setProperty ("windowSize", windowSize);
+            application.setProperty("windowSize", windowSize);
         }
     }
 
@@ -762,12 +773,6 @@ int main (int argc, char** argv)
              << QLibraryInfo::location (QLibraryInfo::LibrariesPath).toLatin1().constData();
     qDebug() << "";
 
-    // Get screen resolution:
-    int screenWidth = QDesktopWidget().screen()->rect().width();
-    int screenHeight = QDesktopWidget().screen()->rect().height();
-    qDebug() << "===============";
-    qDebug() << "SCREEN RESOLUTION:" << screenWidth << "x" << screenHeight;
-
     // Log all ZIP package activity:
 #if ZIP_SUPPORT == 1
     // Log rejection of a non-standard ZIP package, i.e.
@@ -776,13 +781,11 @@ int main (int argc, char** argv)
     // (2.) configuration file named 'peb.ini'.
     if (zipPackageRootFolderConformant == false or
             zipPackageConfigurationFileConformant == false) {
-        qDebug() << "===============";
         qDebug() << "Non-standard ZIP package found and it was not extracted and used!";
     }
 
     // Log all extracted archive entries from a ZIP package:
     if (extractedFiles.length() > 0) {
-        qDebug() << "===============";
         qDebug() << "ZIP package found and the following entries were extracted:";
         foreach (QString fileEntry, extractedFiles) {
             qDebug() << fileEntry;
@@ -791,42 +794,26 @@ int main (int argc, char** argv)
 #endif
 
     qDebug() << "===============";
-    qDebug() << "GENERAL SETTINGS:";
+    qDebug() << "BASIC SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators (rootDirName);
     qDebug() << "Temporary folder:" << applicationTempDirectoryName;
     qDebug() << "Settings file name:" << settingsFileName;
 
     qDebug() << "===============";
-    qDebug() << "ENVIRONMENT SETTINGS:";
+    qDebug() << "PERL SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Folders to add to PATH:";
     foreach (QString pathEntry, pathToAddList) {
         qDebug() << pathEntry;
     }
-
-    qDebug() << "===============";
-    qDebug() << "PERL SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "PERLLIB folder:" << perlLib;
     qDebug() << "Perl interpreter" << perlInterpreter;
-
-    qDebug() << "===============";
-    qDebug() << "SCRIPTS SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Script Timeout:" << scriptTimeout;
-    qDebug() << "Display STDERR from scripts:" << displayStderr;
-
+    qDebug() << "PERLLIB folder:" << perlLib;
     if (PERL_DEBUGGER_INTERACTION == 1) {
-        qDebug() << "===============";
-        qDebug() << "DEBUGGER SETTINGS:";
-        qDebug() << "===============";
         qDebug() << "Debugger HTML template:" << debuggerHtmlTemplate;
     }
-
-    qDebug() << "===============";
-    qDebug() << "SOURCE VIEWER SETTINGS:";
-    qDebug() << "===============";
+    qDebug() << "Display STDERR from scripts:" << displayStderr;
+    qDebug() << "Script Timeout:" << scriptTimeout;
     qDebug() << "Source viewer:" << sourceViewer;
     qDebug() << "Source viewer arguments:" << sourceViewerArguments;
 
@@ -843,22 +830,29 @@ int main (int argc, char** argv)
     qDebug() << "GUI SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Start page:" << startPagePath;
+    // Get screen resolution:
+    int screenWidth = QDesktopWidget().screen()->rect().width();
+    int screenHeight = QDesktopWidget().screen()->rect().height();
+    qDebug() << "Screen resolution:" << screenWidth << "x" << screenHeight;
     qDebug() << "Window size:" << windowSize;
     qDebug() << "Stay on top:" << stayOnTop;
     qDebug() << "Browser title:" << browserTitle;
     qDebug() << "Context menu:" << contextMenu;
-    qDebug() << "Web Inspector from context menu:" << webInspector;
-    qDebug() << "Window icon file:" << iconPathName;
-    qDebug() << "System tray icon file:" << systrayIconPathName;
+    qDebug() << "Windows and dialogs icon file:" << iconPathName;
+    if (qtStyle.length() > 0) {
+        qDebug() << "Global Qt style:" << qtStyle;
+    }
     qDebug() << "Default theme:" << defaultTheme;
     qDebug() << "Default theme directory:" << defaultThemeDirectory;
     qDebug() << "All themes directory:" << allThemesDirectory;
     qDebug() << "Default translation:" << defaultTranslation;
     qDebug() << "Translations directory:" << allTranslationsDirectory;
     qDebug() << "Help and error messages directory:" << helpDirectory;
-    qDebug() << "System tray icon:" << systrayIcon;
+    qDebug() << "System tray icon switch:" << systrayIcon;
+    qDebug() << "System tray icon file:" << systrayIconPathName;
     qDebug() << "System tray icon double-click action:"
              << systrayIconDoubleClickAction;
+    qDebug() << "Web Inspector from context menu:" << webInspector;
 
     qDebug() << "===============";
     qDebug() << "LOGGING SETTINGS:";
@@ -937,9 +931,9 @@ TrayIcon::TrayIcon()
     : QSystemTrayIcon(0)
 {
 
-    if ((qApp->property ("systrayIcon").toString()) == "enable") {
+    if ((qApp->property("systrayIcon").toString()) == "enable") {
         trayIcon = new QSystemTrayIcon();
-        QString iconPathName = qApp->property ("systrayIconPathName").toString();
+        QString iconPathName = qApp->property("systrayIconPathName").toString();
         QPixmap icon;
         icon.load (iconPathName);
         trayIcon->setIcon (icon);
@@ -986,7 +980,7 @@ Page::Page()
             setAttribute (QWebSettings::LinksIncludedInFocusChain, true);
     QWebSettings::globalSettings()->
             setAttribute (QWebSettings::AutoLoadImages, true);
-    if ((qApp->property ("webInspector").toString()) == "enable") {
+    if ((qApp->property("webInspector").toString()) == "enable") {
         QWebSettings::globalSettings()->
                 setAttribute (QWebSettings::DeveloperExtrasEnabled, true);
     }
@@ -1034,11 +1028,11 @@ Page::Page()
 
     // DOCUMENT_ROOT:
     scriptEnvironment.remove ("DOCUMENT_ROOT");
-    scriptEnvironment.insert ("DOCUMENT_ROOT", qApp->property ("rootDirName").toString());
+    scriptEnvironment.insert ("DOCUMENT_ROOT", qApp->property("rootDirName").toString());
 
     // PERLLIB:
     scriptEnvironment.remove ("PERLLIB");
-    scriptEnvironment.insert ("PERLLIB", qApp->property ("perlLib").toString());
+    scriptEnvironment.insert ("PERLLIB", qApp->property("perlLib").toString());
 
     // PATH:
     QString path;
@@ -1053,11 +1047,11 @@ Page::Page()
     // Add all browser-specific folders to the PATH of all local scripts,
     // but first check if these directories exist,
     // then resolve all relative paths, if any:
-    foreach (QString pathEntry, qApp->property ("pathToAddList").toString()) {
+    foreach (QString pathEntry, qApp->property("pathToAddList").toString()) {
         QDir pathDir (pathEntry);
         if (pathDir.exists()) {
             if (pathDir.isRelative()) {
-                pathEntry = QDir::toNativeSeparators (qApp->property ("rootDirName").toString()
+                pathEntry = QDir::toNativeSeparators (qApp->property("rootDirName").toString()
                                                       +pathEntry);
             }
             if (pathDir.isAbsolute()) {
@@ -1079,10 +1073,10 @@ Page::Page()
 
     // Source viewer mandatory, or minimal, command line:
     sourceViewerMandatoryCommandLine.append (
-                (qApp->property ("sourceViewer").toString()));
-    if ((qApp->property ("sourceViewerArguments").toStringList()).length() > 1) {
+                (qApp->property("sourceViewer").toString()));
+    if ((qApp->property("sourceViewerArguments").toStringList()).length() > 1) {
         foreach (QString argument,
-                 (qApp->property ("sourceViewerArguments").toStringList())) {
+                 (qApp->property("sourceViewerArguments").toStringList())) {
             sourceViewerMandatoryCommandLine.append (argument);
         }
     }
@@ -1091,8 +1085,7 @@ Page::Page()
     targetFrame = Page::mainFrame();
 
     // Icon for dialogs:
-    QString iconPathName = qApp->property ("icon").toString();
-    icon.load (iconPathName);
+    icon.load (qApp->property("iconPathName").toString());
 
 }
 
@@ -1131,10 +1124,10 @@ TopLevel::TopLevel ()
                       this, SLOT (quitApplicationSlot()));
 
     // Configure screen appearance:
-    if ((qApp->property ("fixedWidth").toInt()) > 100 and
-            (qApp->property ("fixedHeight").toInt()) > 100) {
-        setFixedSize ((qApp->property ("fixedWidth").toInt()),
-                      (qApp->property ("fixedHeight").toInt()));
+    if ((qApp->property("fixedWidth").toInt()) > 100 and
+            (qApp->property("fixedHeight").toInt()) > 100) {
+        setFixedSize ((qApp->property("fixedWidth").toInt()),
+                      (qApp->property("fixedHeight").toInt()));
         QRect screenRect = QDesktopWidget().screen()->rect();
         move (QPoint (screenRect.width() / 2 - width() / 2,
                       screenRect.height() / 2 - height() / 2));
@@ -1142,19 +1135,19 @@ TopLevel::TopLevel ()
         showMaximized();
     }
 
-    if ((qApp->property ("windowSize").toString()) == "maximized") {
+    if ((qApp->property("windowSize").toString()) == "maximized") {
         showMaximized();
     }
-    if ((qApp->property ("windowSize").toString()) == "fullscreen") {
+    if ((qApp->property("windowSize").toString()) == "fullscreen") {
         showFullScreen();
     }
-    if ((qApp->property ("stayOnTop").toString()) == "enable") {
+    if ((qApp->property("stayOnTop").toString()) == "enable") {
         setWindowFlags (Qt::WindowStaysOnTopHint);
     }
-    if ((qApp->property ("browserTitle").toString()) != "dynamic") {
-        setWindowTitle ((qApp->property ("browserTitle").toString()));
+    if ((qApp->property("browserTitle").toString()) != "dynamic") {
+        setWindowTitle ((qApp->property("browserTitle").toString()));
     }
-    if ((qApp->property ("contextMenu").toString()) == "disable") {
+    if ((qApp->property("contextMenu").toString()) == "disable") {
         setContextMenuPolicy (Qt::NoContextMenu);
     }
 
@@ -1183,7 +1176,7 @@ TopLevel::TopLevel ()
     QObject::connect (mainPage, SIGNAL (quitFromURLSignal()),
                       this, SLOT (quitApplicationSlot()));
 
-    if ((qApp->property ("browserTitle").toString()) == "dynamic") {
+    if ((qApp->property("browserTitle").toString()) == "dynamic") {
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
                           this, SLOT (pageLoadedDynamicTitleSlot (bool)));
     } else {
@@ -1240,8 +1233,7 @@ TopLevel::TopLevel ()
     mainPage->action (QWebPage::DownloadImageToDisk)->setVisible (false);
 
     // Icon for windows:
-    QString iconPathName = qApp->property ("iconPathName").toString();
-    icon.load (iconPathName);
+    icon.load (qApp->property("iconPathName").toString());
 
 }
 
@@ -1269,7 +1261,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
         qDebug() << "===============";
 
         // Open the settings file:
-        QSettings pathFoldersSetting ((qApp->property ("settingsFileName").toString()),
+        QSettings pathFoldersSetting ((qApp->property("settingsFileName").toString()),
                                       QSettings::IniFormat);
 
         // Get list of all folders on the current PATH:
@@ -1311,7 +1303,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
             if (pathDir.exists()) {
                 if (pathDir.isRelative()) {
                     pathEntry = QDir::toNativeSeparators (
-                                (qApp->property ("rootDirName").toString())+
+                                (qApp->property("rootDirName").toString())+
                                 pathEntry);
                 }
                 if (pathDir.isAbsolute()) {
@@ -1339,19 +1331,19 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("selectperl")) {
 
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (icon);
-        QString perlInterpreter = dialog.getOpenFileName
+        QFileDialog selectPerlInterpreterDialog;
+        selectPerlInterpreterDialog.setFileMode (QFileDialog::AnyFile);
+        selectPerlInterpreterDialog.setViewMode (QFileDialog::Detail);
+        selectPerlInterpreterDialog.setWindowModality (Qt::WindowModal);
+        selectPerlInterpreterDialog.setWindowIcon (icon);
+        QString perlInterpreter = selectPerlInterpreterDialog.getOpenFileName
                 (0, tr ("Select Perl Interpreter"),
                  QDir::currentPath(), tr ("All files (*)"));
-        dialog.close();
-        dialog.deleteLater();
+        selectPerlInterpreterDialog.close();
+        selectPerlInterpreterDialog.deleteLater();
 
         if (perlInterpreter.length() > 0) {
-            QSettings perlInterpreterSetting ((qApp->property ("settingsFileName").toString()),
+            QSettings perlInterpreterSetting ((qApp->property("settingsFileName").toString()),
                                               QSettings::IniFormat);
             perlInterpreterSetting.setValue ("interpreters/perl", perlInterpreter);
             perlInterpreterSetting.sync();
@@ -1368,7 +1360,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
             selectPerlLibDialog.close();
             selectPerlLibDialog.deleteLater();
 
-            QSettings perlLibSetting ((qApp->property ("settingsFileName").toString()),
+            QSettings perlLibSetting ((qApp->property("settingsFileName").toString()),
                                       QSettings::IniFormat);
             perlLibSetting.setValue ("environment/perllib", perlLibFolderName);
             perlLibSetting.sync();
@@ -1407,16 +1399,16 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("openfile")) {
 
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (icon);
-        QString fileNameToOpenString = dialog.getOpenFileName
+        QFileDialog openFileDialog;
+        openFileDialog.setFileMode (QFileDialog::AnyFile);
+        openFileDialog.setViewMode (QFileDialog::Detail);
+        openFileDialog.setWindowModality (Qt::WindowModal);
+        openFileDialog.setWindowIcon (icon);
+        QString fileNameToOpenString = openFileDialog.getOpenFileName
                 (0, tr ("Select File"),
                  QDir::currentPath(), tr ("All files (*)"));
-        dialog.close();
-        dialog.deleteLater();
+        openFileDialog.close();
+        openFileDialog.deleteLater();
 
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
@@ -1432,18 +1424,18 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("newfile")) {
 
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (icon);
-        QString fileNameToOpenString = dialog.getSaveFileName
+        QFileDialog newFileDialog;
+        newFileDialog.setFileMode (QFileDialog::AnyFile);
+        newFileDialog.setViewMode (QFileDialog::Detail);
+        newFileDialog.setWindowModality (Qt::WindowModal);
+        newFileDialog.setWindowIcon (icon);
+        QString fileNameToOpenString = newFileDialog.getSaveFileName
                 (0, tr ("Create New File"),
                  QDir::currentPath(), tr ("All files (*)"));
         if (fileNameToOpenString.isEmpty())
             return false;
-        dialog.close();
-        dialog.deleteLater();
+        newFileDialog.close();
+        newFileDialog.deleteLater();
 
         QByteArray fileName;
         fileName.append (fileNameToOpenString);
@@ -1459,15 +1451,15 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
          request.url().scheme().contains ("openfolder")) {
 
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (icon);
-        QString folderNameToOpenString = dialog.getExistingDirectory
+        QFileDialog openFolderDialog;
+        openFolderDialog.setFileMode (QFileDialog::AnyFile);
+        openFolderDialog.setViewMode (QFileDialog::Detail);
+        openFolderDialog.setWindowModality (Qt::WindowModal);
+        openFolderDialog.setWindowIcon (icon);
+        QString folderNameToOpenString = openFolderDialog.getExistingDirectory
                 (0, tr ("Select Folder"), QDir::currentPath());
-        dialog.close();
-        dialog.deleteLater();
+        openFolderDialog.close();
+        openFolderDialog.deleteLater();
 
         QByteArray folderName;
         folderName.append (folderNameToOpenString);
@@ -1543,16 +1535,17 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
 
             // Select a Perl script for debugging:
             if (request.url().toString().contains ("select-file")) {
-                QFileDialog dialog;
-                dialog.setFileMode (QFileDialog::ExistingFile);
-                dialog.setViewMode (QFileDialog::Detail);
-                dialog.setWindowModality (Qt::WindowModal);
-                dialog.setWindowIcon (icon);
-                QString scriptToDebug = dialog.getOpenFileName
+
+                QFileDialog selectScriptToDebugDialog;
+                selectScriptToDebugDialog.setFileMode (QFileDialog::ExistingFile);
+                selectScriptToDebugDialog.setViewMode (QFileDialog::Detail);
+                selectScriptToDebugDialog.setWindowModality (Qt::WindowModal);
+                selectScriptToDebugDialog.setWindowIcon (icon);
+                QString scriptToDebug = selectScriptToDebugDialog.getOpenFileName
                         (0, tr ("Select Perl File"), QDir::currentPath(),
                          tr ("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
-                dialog.close();
-                dialog.deleteLater();
+                selectScriptToDebugDialog.close();
+                selectScriptToDebugDialog.deleteLater();
 
                 if (scriptToDebug.length() > 1) {
                     QUrl scriptToDebugUrl (QUrl::fromLocalFile (scriptToDebug));
@@ -1579,7 +1572,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
                     if ((!Page::mainFrame()->childFrames().contains (frame) and
                          (!request.url().toString().contains ("restart")))) {
                         debuggerNewWindow = new TopLevel ();
-                        QString iconPathName = qApp->property ("iconPathName").toString();
+                        QString iconPathName = qApp->property("iconPathName").toString();
                         QPixmap icon;
                         icon.load (iconPathName);
                         debuggerNewWindow->setWindowIcon (icon);
@@ -1641,13 +1634,13 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
                     .toString (QUrl::RemoveScheme
                                | QUrl::RemoveAuthority
                                | QUrl::RemoveFragment);
-            QString fullFilePath = (qApp->property ("rootDirName").toString())+
+            QString fullFilePath = (qApp->property("rootDirName").toString())+
                     relativeFilePath;
             checkFileExistenceSlot (fullFilePath);
 
             frame->load (QUrl::fromLocalFile
                          (QDir::toNativeSeparators
-                          ((qApp->property ("rootDirName").toString())+
+                          ((qApp->property("rootDirName").toString())+
                            request.url().toString (
                                QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
@@ -1658,7 +1651,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     // Open allowed network content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (Page::mainFrame()->childFrames().contains (frame)) and
-            ((qApp->property ("allowedDomainsList").toStringList())
+            ((qApp->property("allowedDomainsList").toStringList())
              .contains (request.url().authority()))) {
 
         qDebug() << "Allowed network link in the same window:" << request.url().toString();
@@ -1672,14 +1665,14 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     // Open allowed network content in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (!Page::mainFrame()->childFrames().contains (frame)) and
-            ((qApp->property ("allowedDomainsList").toStringList())
+            ((qApp->property("allowedDomainsList").toStringList())
              .contains (request.url().authority()))) {
 
         qDebug() << "Allowed network link in a new window:" << request.url().toString();
         qDebug() << "===============";
 
         newWindow = new TopLevel ();
-        QString iconPathName = qApp->property ("iconPathName").toString();
+        QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load (iconPathName);
         newWindow->setWindowIcon (icon);

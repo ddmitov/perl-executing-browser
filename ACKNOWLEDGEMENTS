@@ -96,7 +96,7 @@
  
  http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://doc.qt.digia.com/4.6/internationalization.html
- 
+
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
  http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
@@ -127,6 +127,8 @@
  http://www.qtforum.org/article/10001/is-there-a-qt-command-to-lunch-the-default-web-browser-win-maclinux.html
  
  http://doc.qt.io/qt-4.8/qmake-advanced-usage.html
+ http://doc.qt.io/qt-4.8/qwebframe.html
+ http://doc.qt.io/qt-4.8/qstylefactory.html
  
  http://forum.qt.io/topic/24213/qmessagebox-too-small
  
@@ -181,6 +183,7 @@
  http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
  http://stackoverflow.com/questions/4515602/how-to-get-executable-name-in-qt
  http://stackoverflow.com/questions/18667291/disable-wall-compiler-warnings-in-a-qt-project
+ http://stackoverflow.com/questions/6740333/can-i-run-a-qt-application-with-a-specific-theme-on-linux
  
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
@@ -198,7 +201,10 @@
  http://ubuntuforums.org/showthread.php?t=174362 (checking for root privileges in C++)
  http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
  http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
+ http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
  
+ QT LIBRARIES
+ ============
  http://quazip.sourceforge.net/annotated.html
  
  CGI
@@ -207,17 +213,16 @@
  
  PERL
  ====
- http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
- 
  http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
  http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner
- 
- http://www.perlmonks.org/index.pl?node_id=162876
- 
+ http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web
+
+ http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
  http://perlmeme.org/faqs/file_io/directory_listing.html
  http://www.caveofprogramming.com/frontpage/articles/perl/perl-mkdir-how-to-create-directories-in-perl/
  http://www.perl.com/pub/2002/05/14/mod_perl.html
  http://www.tizag.com/perlT/perlhashes.php
+ http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input
  
  MAC
  ===
