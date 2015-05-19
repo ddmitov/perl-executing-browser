@@ -201,7 +201,7 @@ protected:
     {
         // GET requests to local content:
         if (operation == GetOperation and
-                (QUrl (PEB_DOMAIN)).isParentOf (request.url())) {
+                (QUrl (PSEUDO_DOMAIN)).isParentOf (request.url())) {
 
             QString filepath = request.url()
                     .toString (QUrl::RemoveScheme
@@ -262,7 +262,7 @@ protected:
         // Take data from a local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                (QUrl (PEB_DOMAIN)).isParentOf (request.url())) {
+                (QUrl (PSEUDO_DOMAIN)).isParentOf (request.url())) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
@@ -289,7 +289,7 @@ protected:
              operation == PostOperation or
              operation == PutOperation) and
                 ((request.url().scheme().contains ("file")) or
-                 (request.url().toString().contains (PEB_DOMAIN)) or
+                 (request.url().toString().contains (PSEUDO_DOMAIN)) or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains (request.url().authority())))) {
 
@@ -330,7 +330,7 @@ class Page : public QWebPage
 
 signals:
 
-    void displayErrorsSignal (QString errorsFilePath);
+    void displayErrorsSignal (QString errors);
 
     void sourceCodeForDebuggerReadySignal();
 
@@ -483,9 +483,13 @@ public slots:
         QString relativeFilePath = url.toString (QUrl::RemoveScheme
                                                  | QUrl::RemoveAuthority
                                                  | QUrl::RemoveQuery);
+
+        // Replace initial slash at the beginning of the relative path;
+        // it is redundant because root directory setting already has a trailing slash.
+        relativeFilePath.replace (QRegExp ("^\/"), "");
+
         scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString())+
-                 relativeFilePath);
+                ((qApp->property("rootDirName").toString())+relativeFilePath);
 
         QString queryString = url.toString (QUrl::RemoveScheme
                                             | QUrl::RemoveAuthority
@@ -533,7 +537,6 @@ public slots:
                 sourceEnabled = false;
                 scriptOutputThemeEnabled = true;
                 scriptOutputType = "accumulation";
-                scriptOutputScrollDown = false;
             } else {
                 // Default values for CGI-like scripts:
                 sourceEnabled = false;
@@ -566,11 +569,6 @@ public slots:
             if (queryString.contains ("output=final")) {
                 scriptOutputType = "final";
                 queryString.replace ("output=final", "");
-            }
-
-            if (queryString.contains ("scrolldown=enabled")) {
-                scriptOutputScrollDown = true;
-                queryString.replace ("scrolldown=enabled", "");
             }
 
             QRegExp multipleAmpersands ("&{2,}");
@@ -608,8 +606,6 @@ public slots:
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             scriptHandler.setWorkingDirectory (scriptDirectory);
             qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
-
-            qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
             qDebug() << "===============";
 
             if (!scriptHandler.isOpen()) {
@@ -696,47 +692,17 @@ public slots:
             if (postData.length() > 0) {
                 scriptEnvironment.remove ("CONTENT_LENGTH");
             }
-
         }
     }
 
     void scriptOutputSlot()
     {
+        qDebug() << QDateTime::currentMSecsSinceEpoch() << "msecs from epoch: output from" << scriptFullFilePath;
+
         QString output = scriptHandler.readAllStandardOutput();
 
-        if (scriptOutputType == "accumulation") {
-            if (scriptOutputScrollDown == true) {
-                scriptAccumulatedOutput.replace ("<a name='latest'>", "");
-
-                QString modifiedOutput;
-                modifiedOutput = output;
-                modifiedOutput.prepend ("<a name='latest'>");
-
-                scriptAccumulatedOutput.append (modifiedOutput);
-            }
-
-            if (scriptOutputScrollDown == false) {
-                scriptAccumulatedOutput.append (output);
-            }
-        }
-
-        if (scriptOutputType == "final") {
+        if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
             scriptAccumulatedOutput.append (output);
-
-            scriptOutputFilePath = QDir::toNativeSeparators
-                    ((qApp->property("applicationOutputDirectory").toString())+
-                     QDir::separator()+"output.htm");
-        } else {
-            scriptOutputFilePath = QDir::toNativeSeparators
-                    ((qApp->property("applicationOutputDirectory").toString())+
-                     QDir::separator()+"lroutput.htm");
-        }
-
-        QFile scriptOutputFile (scriptOutputFilePath);
-
-        //Delete previous output file:
-        if (scriptOutputFile.exists()) {
-            scriptOutputFile.remove();
         }
 
         // Latest output:
@@ -749,16 +715,10 @@ public slots:
                 cssLinker (output);
                 output = cssLinkedHtml;
             }
-
-            if (scriptOutputFile.open (QIODevice::ReadWrite)) {
-                QTextStream stream (&scriptOutputFile);
-                stream << output << endl;
-            }
         }
 
         // Accumulated output:
-        if (scriptOutputType == "accumulation" or
-                scriptOutputType == "final") {
+        if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
 
             httpHeaderCleaner (scriptAccumulatedOutput);
             scriptAccumulatedOutput = httpHeadersCleanedHtml;
@@ -767,35 +727,19 @@ public slots:
                 cssLinker (scriptAccumulatedOutput);
                 scriptAccumulatedOutput = cssLinkedHtml;
             }
-
-            if (scriptOutputFile.open (QIODevice::ReadWrite)) {
-                QTextStream stream (&scriptOutputFile);
-                stream << scriptAccumulatedOutput << endl;
-            }
         }
-
-        // http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
-        qDebug() << QDateTime::currentMSecsSinceEpoch() << "msecs from epoch: Output from script received.";
-        qDebug() << "Script output file:" << scriptOutputFilePath;
-        qDebug() << "===============";
 
         if (!Page::mainFrame()->childFrames().contains (targetFrame)) {
             targetFrame = Page::currentFrame();
         }
 
         if (scriptOutputType == "latest") {
-            targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
+            targetFrame->setHtml (output);
         }
 
         if (scriptOutputType == "accumulation") {
-            if (scriptOutputScrollDown == false) {
-                targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
-            }
-            if (scriptOutputScrollDown == true) {
-                targetFrame->setUrl (QUrl ("file://"+scriptOutputFilePath+"#latest"));
-            }
+            targetFrame->setHtml (scriptAccumulatedOutput);
         }
-
     }
 
     void scriptErrorSlot()
@@ -816,42 +760,31 @@ public slots:
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
-                targetFrame->setUrl (QUrl::fromLocalFile (scriptOutputFilePath));
+                targetFrame->setHtml (scriptAccumulatedOutput);
             }
 
             if ((qApp->property("displayStderr").toString()) == "enable") {
-                if (scriptAccumulatedErrors.length() > 0 and
-                        scriptKilled == false) {
+                if (scriptAccumulatedErrors.length() > 0 and scriptKilled == false) {
 
                     cssLinker (scriptAccumulatedErrors);
                     scriptAccumulatedErrors = cssLinkedHtml;
 
-                    QString scriptErrorFilePath = QDir::toNativeSeparators
-                            (QDir::tempPath()+QDir::separator()+"stderr.htm");
+                    if (scriptAccumulatedOutput.length() == 0) {
+                        targetFrame->setHtml (scriptAccumulatedErrors);
+                    } else {
+                        QMessageBox showErrorsMessageBox;
+                        showErrorsMessageBox.setWindowModality (Qt::WindowModal);
+                        showErrorsMessageBox.setWindowTitle (tr ("Errors"));
+                        showErrorsMessageBox.setIconPixmap ((qApp->property("icon").toString()));
+                        showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
+                                                      tr ("Do you want to see them?"));
+                        showErrorsMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
+                        showErrorsMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
+                        showErrorsMessageBox.setButtonText (QMessageBox::No, tr ("No"));
+                        showErrorsMessageBox.setDefaultButton (QMessageBox::Yes);
 
-                    QFile scriptErrorFile (scriptErrorFilePath);
-                    if (scriptErrorFile.open (QIODevice::ReadWrite)) {
-                        QTextStream stream (&scriptErrorFile);
-                        stream << scriptAccumulatedErrors << endl;
-
-                        if (scriptAccumulatedOutput.length() == 0) {
-                            targetFrame->setUrl (QUrl::fromLocalFile (scriptErrorFilePath));
-                            scriptErrorFile.remove();
-                        } else {
-                            QMessageBox showErrorsMessageBox;
-                            showErrorsMessageBox.setWindowModality (Qt::WindowModal);
-                            showErrorsMessageBox.setWindowTitle (tr ("Errors"));
-                            showErrorsMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                            showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
-                                                          tr ("Do you want to see them?"));
-                            showErrorsMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-                            showErrorsMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-                            showErrorsMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-                            showErrorsMessageBox.setDefaultButton (QMessageBox::Yes);
-
-                            if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
-                                emit displayErrorsSignal (scriptErrorFilePath);
-                            }
+                        if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
+                            emit displayErrorsSignal (scriptAccumulatedErrors);
                         }
                     }
                 }
@@ -867,9 +800,6 @@ public slots:
 
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
-
-        QFile scriptOutputFile (scriptOutputFilePath);
-        scriptOutputFile.remove();
     }
 
     void scriptTimeoutSlot ()
@@ -970,8 +900,6 @@ public slots:
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 debuggerHandler.setWorkingDirectory (scriptDirectory);
                 qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
-
-                qDebug() << "TEMP folder:" << QDir::toNativeSeparators (QDir::tempPath());
                 qDebug() << "===============";
 
                 debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
@@ -1219,7 +1147,6 @@ private:
     QString scriptAccumulatedErrors;
     bool scriptOutputThemeEnabled;
     QString scriptOutputType;
-    bool scriptOutputScrollDown;
 
     QWebView* debuggerNewWindow;
     QString debuggerScriptUrl;
@@ -1260,8 +1187,7 @@ public slots:
                     (QDir::toNativeSeparators
                      ((qApp->property("startPage").toString()))));
         } else {
-            setUrl (QUrl (QString (PEB_DOMAIN+
-                                   (qApp->property("startPagePath").toString()))));
+            setUrl (QUrl (QString (PSEUDO_DOMAIN+(qApp->property("startPagePath").toString()))));
         }
     }
 
@@ -1269,20 +1195,6 @@ public slots:
     {
         if (ok) {
             setWindowTitle (TopLevel::title());
-            QFile::remove
-                    (QDir::toNativeSeparators
-                     ((qApp->property("applicationOutputDirectory").toString())
-                      +QDir::separator()+"output.htm"));
-        }
-    }
-
-    void pageLoadedStaticTitleSlot (bool ok)
-    {
-        if (ok) {
-            QFile::remove
-                    (QDir::toNativeSeparators
-                     ((qApp->property("applicationOutputDirectory").toString())+
-                      QDir::separator()+"output.htm"));
         }
     }
 
@@ -1325,17 +1237,17 @@ public slots:
         printer.setPrintRange (QPrinter::AllPages);
         printer.setNumCopies (1);
 
-        QPrintDialog* dialog = new QPrintDialog (&printer);
-        dialog->setWindowModality (Qt::WindowModal);
-        QSize dialogSize = dialog->sizeHint();
+        QPrintDialog *printDialog = new QPrintDialog (&printer);
+        printDialog->setWindowModality (Qt::WindowModal);
+        QSize dialogSize = printDialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
-        dialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
+        printDialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
                               screenRect.height() / 2 - dialogSize.height() / 2));
-        if (dialog->exec() == QDialog::Accepted) {
+        if (printDialog->exec() == QDialog::Accepted) {
             TopLevel::print (&printer);
         }
-        dialog->close();
-        dialog->deleteLater();
+        printDialog->close();
+        printDialog->deleteLater();
 #endif
     }
 
@@ -1345,12 +1257,12 @@ public slots:
 
         qDebug() << "Save as PDF requested.";
 
-        QFileDialog dialog;
-        dialog.setFileMode (QFileDialog::AnyFile);
-        dialog.setViewMode (QFileDialog::Detail);
-        dialog.setWindowModality (Qt::WindowModal);
-        dialog.setWindowIcon (icon);
-        QString fileName = dialog.getSaveFileName
+        QFileDialog saveAsPdfDialog;
+        saveAsPdfDialog.setFileMode (QFileDialog::AnyFile);
+        saveAsPdfDialog.setViewMode (QFileDialog::Detail);
+        saveAsPdfDialog.setWindowModality (Qt::WindowModal);
+        saveAsPdfDialog.setWindowIcon (icon);
+        QString fileName = saveAsPdfDialog.getSaveFileName
                 (0, tr ("Save as PDF"),
                  QDir::currentPath(), tr ("PDF files (*.pdf)"));
         if (!fileName.isEmpty()) {
@@ -1360,21 +1272,21 @@ public slots:
 
             qDebug() << "PDF file:" << fileName;
 
-            QPrinter printer;
-            printer.setOrientation (QPrinter::Portrait);
-            printer.setPageSize (QPrinter::A4);
-            printer.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
-            printer.setResolution (QPrinter::HighResolution);
-            printer.setColorMode (QPrinter::Color);
-            printer.setPrintRange (QPrinter::AllPages);
-            printer.setNumCopies (1);
-            printer.setOutputFormat (QPrinter::PdfFormat);
-            printer.setOutputFileName (fileName);
-            TopLevel::print (&printer);
+            QPrinter pdfPrinter;
+            pdfPrinter.setOrientation (QPrinter::Portrait);
+            pdfPrinter.setPageSize (QPrinter::A4);
+            pdfPrinter.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
+            pdfPrinter.setResolution (QPrinter::HighResolution);
+            pdfPrinter.setColorMode (QPrinter::Color);
+            pdfPrinter.setPrintRange (QPrinter::AllPages);
+            pdfPrinter.setNumCopies (1);
+            pdfPrinter.setOutputFormat (QPrinter::PdfFormat);
+            pdfPrinter.setOutputFileName (fileName);
+            TopLevel::print (&pdfPrinter);
         }
 
-        dialog.close();
-        dialog.deleteLater();
+        saveAsPdfDialog.close();
+        saveAsPdfDialog.deleteLater();
 
         qDebug() << "===============";
 #endif
@@ -1398,8 +1310,8 @@ public slots:
         qDebug() << "File to edit:" << fileToEdit;
         qDebug() << "===============";
 
-        QProcess externalProcess;
-        externalProcess.startDetached ("/usr/bin/scite", QStringList() << fileToEdit);
+        QProcess externalEditor;
+        externalEditor.startDetached ("/usr/bin/scite", QStringList() << fileToEdit);
     }
 
     void viewSourceFromContextMenuSlot()
@@ -1454,15 +1366,14 @@ public slots:
         newWindow->show();
     }
 
-    void displayErrorsSlot (QString errorsFilePath)
+    void displayErrorsSlot (QString errors)
     {
         errorsWindow = new TopLevel ();
-        QUrl errorsFileUrl = "file://"+errorsFilePath;
-        errorsWindow->setUrl (errorsFileUrl);
+        errorsWindow->setHtml (errors);
         errorsWindow->setFocus();
         errorsWindow->show();
 
-        QFile scriptErrorsFile (errorsFilePath);
+        QFile scriptErrorsFile (errors);
         scriptErrorsFile.remove();
     }
 
@@ -1476,7 +1387,7 @@ public slots:
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
 
-            if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL)) {
+            if (QUrl (PSEUDO_DOMAIN).isParentOf (qWebHitTestURL)) {
 
                 menu->addSeparator ();
 
@@ -1503,7 +1414,7 @@ public slots:
                 }
             }
 
-            if (QUrl (PEB_DOMAIN).isParentOf (qWebHitTestURL)) {
+            if (QUrl (PSEUDO_DOMAIN).isParentOf (qWebHitTestURL)) {
 
                 QAction* openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
                 QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
@@ -1538,13 +1449,13 @@ public slots:
             QObject::connect (minimizeAct, SIGNAL (triggered()),
                               this, SLOT (minimizeSlot()));
 
-            if (!TopLevel::url().toString().contains ("lroutput")) {
+            //if (!TopLevel::url().toString().contains ("lroutput")) {
                 QAction* homeAct = menu->addAction (tr ("&Home"));
                 QObject::connect (homeAct, SIGNAL (triggered()),
                                   this, SLOT (loadStartPageSlot()));
-            }
+            //}
 
-            if ((!TopLevel::url().toString().contains ("output"))) {
+            if (TopLevel::url().toString().length() > 0) {
                 QAction* reloadAct = menu->addAction (tr ("&Reload"));
                 QObject::connect (reloadAct, SIGNAL (triggered()),
                                   this, SLOT (reloadSlot()));
@@ -1562,7 +1473,7 @@ public slots:
             QObject::connect (saveAsPdfAct, SIGNAL (triggered()),
                               this, SLOT (saveAsPdfSlot()));
 
-            if ((!TopLevel::url().toString().contains ("output"))) {
+            if (TopLevel::url().toString().length() > 0) {
                 QAction* selectThemeAct = menu->addAction (tr ("&Select theme"));
                 QObject::connect (selectThemeAct, SIGNAL (triggered()),
                                   this, SLOT (selectThemeFromContextMenuSlot()));

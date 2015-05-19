@@ -6,22 +6,33 @@ use Env qw (FOLDER_TO_OPEN);
 
 opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
-print "<html>\n";
+print <<HEADER
+<html>
 
-print "<head>\n";
-print "<title>Perl Executing Browser - Image Resizer Test</title>\n";
-print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
-print "</head>\n";
+<head>
+<title>Perl Executing Browser - Image Resizer Test</title>
+<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 
-print "<body>\n";
+<script type="text/javascript">
+function scrollDown()
+{
+	window.scrollTo(0, document.body.scrollHeight);
+}
+</script>
 
-print "<p align='center'><font size='5'>\n";
+</head>
 
-print "<br>\n";
-print "<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_accumulation.pl?action=kill'><button type='button' autofocus>Kill Script</button></a>\n";
-print "<br><br>\n";
+<body onload="scrollDown()">
 
-print "Conversion started.<br>\n";
+<p align='center'><font size='5'>
+
+<br>
+<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_accumulation.pl?action=kill'><button type='button' autofocus>Kill Script</button></a>
+<br><br>
+
+Conversion started.<br>
+HEADER
+;
 
 my $output_directory_name = "peb-converted-images";
 my $output_directory = $FOLDER_TO_OPEN."/".$output_directory_name;
@@ -44,10 +55,13 @@ while (my $file = readdir (DIR)) {
 
 closedir (DIR);
 
-print "Conversion successfully completed!<br>\n";
+print <<FOOTER
+<br>Conversion successfully completed!<br><br>
 
-print "</font></p>\n";
+</font></p>
 
-print "</body>\n";
+</body>
 
-print "</html>\n";
+</html>
+FOOTER
+;

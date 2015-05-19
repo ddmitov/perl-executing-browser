@@ -113,10 +113,10 @@ message ("Application version: $$APPLICATION_VERSION")
 ##########################################################
 # The pseudo-domain of the browser:
 ##########################################################
-PEB_DOMAIN = "http://perl-executing-browser-pseudodomain/"
+PSEUDO_DOMAIN = "http://perl-executing-browser-pseudodomain/"
 
-DEFINES += PEB_DOMAIN=\\\"$$PEB_DOMAIN\\\"
-message ("Browser pseudo-domain: $$PEB_DOMAIN")
+DEFINES += PSEUDO_DOMAIN=\\\"$$PSEUDO_DOMAIN\\\"
+message ("Browser pseudo-domain: $$PSEUDO_DOMAIN")
 
 ##########################################################
 # To guard against security issues of user-supplied Perl scripts:

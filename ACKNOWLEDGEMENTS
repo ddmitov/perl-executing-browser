@@ -96,7 +96,7 @@
  
  http://doc.qt.digia.com/qtcreator-extending/coding-style.html
  http://doc.qt.digia.com/4.6/internationalization.html
-
+ 
  http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
  http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
  http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
@@ -184,6 +184,7 @@
  http://stackoverflow.com/questions/4515602/how-to-get-executable-name-in-qt
  http://stackoverflow.com/questions/18667291/disable-wall-compiler-warnings-in-a-qt-project
  http://stackoverflow.com/questions/6740333/can-i-run-a-qt-application-with-a-specific-theme-on-linux
+ http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
  
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
@@ -237,7 +238,6 @@
  http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
  http://matthewjamestaylor.com/blog/adding-css-to-html-with-link-embed-inline-and-import
  http://www.w3.org/TR/html401/present/graphics.html
- http://www.w3schools.com/html/html_lists.asp
  http://highlight.hohli.com/
  http://www.techrepublic.com/blog/how-do-i/how-do-i-control-the-format-of-html-lists-with-css/
  http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php
@@ -245,4 +245,8 @@
  http://www.tutorialspoint.com/bootstrap/bootstrap_dropdown_plugin.htm
  http://getbootstrap.com/components/#dropdowns
  http://twitter-bootstrap.node1.zygote.cc/javascript.html
+ http://www.sourcetricks.com/2010/07/javascript-scroll-to-bottom-of-page.html
+ 
+ http://www.w3schools.com/html/html_lists.asp
+ http://www.w3schools.com/jsref/event_onclick.asp
  

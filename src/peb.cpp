@@ -46,6 +46,11 @@
 QStringList startedScripts;
 
 
+//void showHtml (QString html)
+//{
+//    Page::mainFrame()->setHtml(html);
+//}
+
 // Custom message handler for redirecting all debug messages to a log file:
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -1179,9 +1184,6 @@ TopLevel::TopLevel ()
     if ((qApp->property("browserTitle").toString()) == "dynamic") {
         QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
                           this, SLOT (pageLoadedDynamicTitleSlot (bool)));
-    } else {
-        QObject::connect (mainPage, SIGNAL (loadFinished (bool)),
-                          this, SLOT (pageLoadedStaticTitleSlot (bool)));
     }
 
     setPage (mainPage);
@@ -1620,7 +1622,7 @@ bool Page::acceptNavigationRequest (QWebFrame* frame,
     htmlExtensions.setCaseSensitivity (Qt::CaseInsensitive);
 
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (QUrl (PEB_DOMAIN)).isParentOf (request.url()) and
+            (QUrl (PSEUDO_DOMAIN)).isParentOf (request.url()) and
             (Page::mainFrame()->childFrames().contains (frame))) {
 
         if (!request.url().path().contains (htmlExtensions)) {
