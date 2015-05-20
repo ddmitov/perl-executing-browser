@@ -4,31 +4,27 @@ use strict;
 use warnings;
 use Env qw (FOLDER_TO_OPEN);
 
-sub html_header() {
+opendir (DIR, $FOLDER_TO_OPEN) or die $!;
+
 print <<HEADER
 <html>
 
 	<head>
-	<title>Perl Executing Browser - Image Resizer with Only Latest Results</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<title>Perl Executing Browser - Image Resizer with Accumulation of Results</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<script type="text/javascript">
+		function scrollDown()
+		{
+			window.scrollTo(0, document.body.scrollHeight);
+		}
+		</script>
 	</head>
 
-	<body>
-		<p align='center'><font size='5'>
+	<body onload="scrollDown()">
+		<p align='center'>
+			<font size='5'>
 HEADER
 ;
-}
-
-sub html_footer() {
-print <<FOOTER
-		</font></p>
-	</body>
-</html>
-FOOTER
-;
-}
-
-opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
 my $output_directory_name = "peb-converted-images";
 my $output_directory_full_path = $FOLDER_TO_OPEN."/".$output_directory_name;
@@ -45,14 +41,18 @@ while (my $file = readdir (DIR)) {
 	my $filepath_to_read = $FOLDER_TO_OPEN."/".$file;
 	my $filepath_to_write = $output_directory_full_path."/".$file;
 
-	html_header();
 	print "Resizing $file ...<br>\n";
 	my $result = `/usr/bin/convert $filepath_to_read -resize 20% $filepath_to_write`;
-	html_footer();
 }
 
 closedir (DIR);
 
-html_header();
-print "Resizing successfully completed!\n";
-html_footer();
+print <<FOOTER
+				Resizing successfully completed!
+			</font>
+		</p>
+	</body>
+
+</html>
+FOOTER
+;

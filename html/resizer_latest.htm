@@ -1,0 +1,32 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+
+	<head>
+		<title>Perl Executing Browser - Image Resizer with Only Latest Results</title>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
+		<script>
+			function folderSelected()
+			{
+				document.getElementById("FolderSelection").innerHTML="Select another folder";
+			}
+		</script>
+	</head>
+
+
+	<body>
+		<br>
+		<p align='center'><font size='5'>Image Resizer with Only Latest Results</font></p>
+		<a href="openfolder://now" onclick="folderSelected()" id="FolderSelection" class="btn btn-info btn-sm">Select folder</a>
+		<a href="http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_latest.pl?output=latest" target="results" class="btn btn-info btn-sm">Start Script</a>
+		<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_resizer_latest.pl?action=kill' target="results" class="btn btn-danger btn-sm">Kill Script</a>
+		<br><br>
+		<iframe frameborder="0" width="100%" height="70%" name="results"></iframe>
+		<footer>
+			This page uses iframe to display all results from the long-running script. Do not put it inside another iframe in order to see the results!<br>
+			Select writable folder containing JPG files and start the script - a new folder inside your original folder will be created and smaller versions<br>
+			of your original files will be written there. They will be only 20% of the original files. ImageMagick 'convert' binary has to be installed in '/usr/bin/'.<br>
+			The purpose of this (currently Linux-only) example is to demonstrate a simple long-running script inside Perl Executing Browser.
+		</footer>
+	</body>
+
+</html>
