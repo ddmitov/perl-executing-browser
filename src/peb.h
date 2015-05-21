@@ -47,7 +47,7 @@
 
 
 // Global variable:
-extern QStringList startedScripts;
+extern QStringList runningScriptsGlobalList;
 
 
 class FileDetector : public QObject
@@ -620,7 +620,8 @@ public slots:
                                          sourceViewerCommandLine,
                                          QProcess::Unbuffered | QProcess::ReadWrite);
 
-                    startedScripts.append (sourceFilepath);
+                    runningScriptsGlobalList.append (sourceFilepath);
+                    runningScriptsInCurrentWindowList.append (sourceFilepath);
                 } else {
 
                     if (SCRIPT_CENSORING == 0) {
@@ -649,7 +650,8 @@ public slots:
                                              QProcess::Unbuffered | QProcess::ReadWrite);
                     }
 
-                    startedScripts.append (scriptFullFilePath);
+                    runningScriptsGlobalList.append (scriptFullFilePath);
+                    runningScriptsInCurrentWindowList.append (scriptFullFilePath);
 
                     if (postData.length() > 0) {
                         scriptHandler.write (postDataArray);
@@ -796,7 +798,8 @@ public slots:
             qDebug() << "===============";
         }
 
-        startedScripts.removeOne (scriptFullFilePath);
+        runningScriptsGlobalList.removeOne (scriptFullFilePath);
+        runningScriptsInCurrentWindowList.removeOne (scriptFullFilePath);
 
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
@@ -810,7 +813,8 @@ public slots:
             scriptTimedOut = true;
             scriptHandler.close();
 
-            startedScripts.removeOne (scriptFullFilePath);
+            runningScriptsGlobalList.removeOne (scriptFullFilePath);
+            runningScriptsInCurrentWindowList.removeOne (scriptFullFilePath);
 
             qDebug() << "Script timed out:" << scriptFullFilePath;
             qDebug() << "===============";
@@ -1115,6 +1119,8 @@ public:
     Page();
     QString scriptFullFilePath;
     QProcess scriptHandler;
+
+    QStringList runningScriptsInCurrentWindowList;
 
 protected:
 
@@ -1449,13 +1455,14 @@ public slots:
             QObject::connect (minimizeAct, SIGNAL (triggered()),
                               this, SLOT (minimizeSlot()));
 
-            //if (!TopLevel::url().toString().contains ("lroutput")) {
+            if (mainPage->runningScriptsInCurrentWindowList.length() == 0) {
                 QAction* homeAct = menu->addAction (tr ("&Home"));
                 QObject::connect (homeAct, SIGNAL (triggered()),
                                   this, SLOT (loadStartPageSlot()));
-            //}
+            }
 
-            if (TopLevel::url().toString().length() > 0) {
+            if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
+                    TopLevel::url().toString().length() > 0) {
                 QAction* reloadAct = menu->addAction (tr ("&Reload"));
                 QObject::connect (reloadAct, SIGNAL (triggered()),
                                   this, SLOT (reloadSlot()));
@@ -1473,7 +1480,8 @@ public slots:
             QObject::connect (saveAsPdfAct, SIGNAL (triggered()),
                               this, SLOT (saveAsPdfSlot()));
 
-            if (TopLevel::url().toString().length() > 0) {
+            if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
+                    TopLevel::url().toString().length() > 0) {
                 QAction* selectThemeAct = menu->addAction (tr ("&Select theme"));
                 QObject::connect (selectThemeAct, SIGNAL (triggered()),
                                   this, SLOT (selectThemeFromContextMenuSlot()));
@@ -1568,7 +1576,7 @@ public slots:
             confirmExitMessageBox.setWindowModality (Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle (tr ("Quit"));
             confirmExitMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-            confirmExitMessageBox.setText (tr ("You are going to quit the program,<br>")+
+            confirmExitMessageBox.setText (tr ("You are going to close window or quit the program,<br>")+
                                            tr ("but at least one long-running script is still running.<br>")+
                                            tr ("Are you sure?"));
             confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
@@ -1588,7 +1596,7 @@ public slots:
 
     void quitApplicationSlot()
     {
-        if (startedScripts.length () > 0) {
+        if (runningScriptsGlobalList.length() > 0) {
             QMessageBox confirmExitMessageBox;
             confirmExitMessageBox.setWindowModality (Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle (tr ("Quit"));

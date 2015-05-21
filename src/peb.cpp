@@ -43,7 +43,7 @@
 
 // Global variable:
 // Dynamic global list of all scripts, that are started and still running in any given moment:
-QStringList startedScripts;
+QStringList runningScriptsGlobalList;
 
 
 //void showHtml (QString html)
@@ -1091,6 +1091,8 @@ Page::Page()
 
     // Icon for dialogs:
     icon.load (qApp->property("iconPathName").toString());
+
+    runningScriptsInCurrentWindowList.clear();
 
 }
 
