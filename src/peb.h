@@ -15,24 +15,27 @@
 #define PEB_H
 
 #include <QApplication>
+#include <QtWebKit>
+#include <QtNetwork/QNetworkAccessManager>
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
 #include <QWebFrame>
-#include <QtWebKit>
-#include <QtNetwork/QNetworkAccessManager>
 #include <QProcess>
+#include <QDebug>
+#include <QFileDialog>
+#include <QMessageBox>
 #include <QSpacerItem>
 #include <QGridLayout>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QPrintPreviewDialog>
 #include <QMenu>
 #include <QDesktopWidget>
-#include <QDateTime>
 #include <QSystemTrayIcon>
-#include <QDebug>
 
+// ==============================
+// PRINT SUPPORT:
+// ==============================
+#ifndef QT_NO_PRINTER
+#include <QPrintPreviewDialog>
 #include <qglobal.h>
 #if QT_VERSION >= 0x050000
 // Qt5 code:
@@ -44,52 +47,50 @@
 #include <QPrintDialog>
 #include <QPrinter>
 #endif
+#endif
 
-
-// Global variable:
-extern QStringList runningScriptsGlobalList;
-
-
+// ==============================
+// FILE DETECTOR CLASS DEFINITION:
+// ==============================
 class FileDetector : public QObject
 {
     Q_OBJECT
 
 public slots:
-
-    void defineInterpreter (QString filepath)
+    void defineInterpreter(QString filepath)
     {
         interpreter = "undefined";
 
-        extension = filepath.section (".", 1, 1);
+        extension = filepath.section(".", 1, 1);
 
         if (extension.length() == 0) {
             QString firstLine;
 
-            QFile file (filepath);
-            if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
+            QFile file(filepath);
+            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
                 firstLine = file.readLine();
             }
 
-            if (firstLine.contains (perlShebang)) {
+            if (firstLine.contains(perlShebang)) {
                 interpreter = (qApp->property("perlInterpreter").toString());
             }
         } else {
-            if (extension.contains (htmlExtensions)) {
+            if (extension.contains(htmlExtensions)) {
                 interpreter = "browser-html";
             }
-            if (extension.contains (cssExtension)) {
+            if (extension.contains(cssExtension)) {
                 interpreter = "browser-css";
             }
-            if (extension.contains (jsExtension)) {
+            if (extension.contains(jsExtension)) {
                 interpreter = "browser-js";
             }
-            if (extension.contains (pngExtension)) {
+            if (extension.contains(pngExtension)) {
                 interpreter = "browser-image";
             }
-            if (extension.contains (jpgExtensions)) {
+            if (extension.contains(jpgExtensions)) {
                 interpreter = "browser-image";
             }
-            if (extension.contains (gifExtension)) {
+            if (extension.contains(gifExtension)) {
                 interpreter = "browser-image";
             }
 
@@ -100,14 +101,12 @@ public slots:
     }
 
 public:
-
     FileDetector();
 
     QString extension;
     QString interpreter;
 
 private:
-
     // Regular expressions for file type detection by shebang line:
     QRegExp perlShebang;
 
@@ -120,38 +119,37 @@ private:
     QRegExp gifExtension;
 
     QRegExp plExtension;
-
 };
 
-
+// ==============================
+// SYSTEM TRAY ICON CLASS DEFINITION:
+// ==============================
 class TrayIcon : public QSystemTrayIcon
 {
-
     Q_OBJECT
 
 public slots:
-
-    void trayIconActivatedSlot (QSystemTrayIcon::ActivationReason reason)
+    void trayIconActivatedSlot(QSystemTrayIcon::ActivationReason reason)
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
 
             if ((qApp->property("systrayIconDoubleClickAction").toString()) == "quit") {
                 QMessageBox confirmExitMessageBox;
-                confirmExitMessageBox.setWindowModality (Qt::WindowModal);
-                confirmExitMessageBox.setWindowTitle (tr ("Quit"));
-                confirmExitMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                confirmExitMessageBox.setText (tr ("You are going to quit the program.<br>Are you sure?"));
-                confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-                confirmExitMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-                confirmExitMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-                confirmExitMessageBox.setDefaultButton (QMessageBox::No);
+                confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+                confirmExitMessageBox.setWindowTitle(tr("Quit"));
+                confirmExitMessageBox.setIconPixmap((qApp->property("icon").toString()));
+                confirmExitMessageBox.setText(tr("You are going to quit the program.<br>Are you sure?"));
+                confirmExitMessageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+                confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+                confirmExitMessageBox.setDefaultButton(QMessageBox::No);
                 if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                     QApplication::quit();
                 }
             }
 
             if ((qApp->property("systrayIconDoubleClickAction").toString()) == "minimize_all_windows") {
-                foreach (QWidget* window, QApplication::topLevelWidgets()) {
+                foreach (QWidget *window, QApplication::topLevelWidgets()) {
                     if (window->isVisible()) {
                         window->showMinimized();
                     }
@@ -167,81 +165,76 @@ public slots:
     }
 
 public:
-
     TrayIcon();
 
-    QAction* quitAction;
-    QAction* aboutAction;
-    QAction* aboutQtAction;
+    QAction *quitAction;
+    QAction *aboutAction;
+    QAction *aboutQtAction;
 
 private:
-
-    QSystemTrayIcon* trayIcon;
-    QMenu* trayIconMenu;
-
+    QSystemTrayIcon *trayIcon;
+    QMenu *trayIconMenu;
 };
 
-
+// ==============================
+// NETWORK ACCESS MANAGER CLASS DEFINITION:
+// ==============================
 class ModifiedNetworkAccessManager : public QNetworkAccessManager
 {
-
     Q_OBJECT
 
 signals:
-
-    void startScriptSignal (QUrl url, QByteArray postDataArray);
-
-    void startPerlDebuggerSignal (QUrl debuggerUrl);
+    void startScriptSignal(QUrl url, QByteArray postDataArray);
+    void startPerlDebuggerSignal(QUrl debuggerUrl);
 
 protected:
-
-    virtual QNetworkReply* createRequest (Operation operation,
-                                          const QNetworkRequest &request,
-                                          QIODevice* outgoingData = 0)
+    virtual QNetworkReply *createRequest(Operation operation,
+                                         const QNetworkRequest &request,
+                                         QIODevice *outgoingData = 0)
     {
         // GET requests to local content:
         if (operation == GetOperation and
-                (QUrl (PSEUDO_DOMAIN)).isParentOf (request.url())) {
+                (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url())) {
 
             QString filepath = request.url()
-                    .toString (QUrl::RemoveScheme
-                               | QUrl::RemoveAuthority
-                               | QUrl::RemoveQuery
-                               | QUrl::RemoveFragment);
+                    .toString(QUrl::RemoveScheme
+                              | QUrl::RemoveAuthority
+                              | QUrl::RemoveQuery
+                              | QUrl::RemoveFragment);
 
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())+
                      filepath);
 
-            FileDetector detector;
-            detector.defineInterpreter (fullFilePath);
+            FileDetector fileDetector;
+            fileDetector.defineInterpreter(fullFilePath);
 
             // Local HTML, CSS, JS or supported image files:
-            if (detector.interpreter.contains ("browser")) {
+            if (fileDetector.interpreter.contains ("browser")) {
 
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl
                         (QUrl::fromLocalFile
-                         (QDir::toNativeSeparators (
+                         (QDir::toNativeSeparators(
                               (qApp->property("rootDirName").toString())+
-                              request.url().toString (
+                              request.url().toString(
                                   QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest (networkRequest));
+                         QNetworkRequest(networkRequest));
             }
 
             // Local Perl scripts:
-            if ((!detector.interpreter.contains ("undefined")) and
-                    (!detector.interpreter.contains ("browser"))) {
+            if ((!fileDetector.interpreter.contains("undefined")) and
+                    (!fileDetector.interpreter.contains("browser"))) {
 
                 QByteArray emptyPostDataArray;
-                emit startScriptSignal (request.url(), emptyPostDataArray);
+                emit startScriptSignal(request.url(), emptyPostDataArray);
             }
 
             // Local files without recognized file type:
-            if (detector.interpreter.contains ("undefined")) {
+            if (fileDetector.interpreter.contains("undefined")) {
 
                 qDebug() << "File type not recognized!";
                 qDebug() << "===============";
@@ -255,18 +248,18 @@ protected:
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest (networkRequest));
+                         QNetworkRequest(networkRequest));
             }
         }
 
         // Take data from a local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                (QUrl (PSEUDO_DOMAIN)).isParentOf (request.url())) {
+                (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url())) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
-                emit startScriptSignal (request.url(), postDataArray);
+                emit startScriptSignal(request.url(), postDataArray);
             }
         }
 
@@ -275,10 +268,10 @@ protected:
             // Implementation of an idea proposed by Valcho Nedelchev.
             // Transmit requests to Perl debugger in case debugger is started in a new window:
             if (operation == GetOperation and
-                    request.url().scheme().contains ("file") and
+                    request.url().scheme().contains("file") and
                     request.url().hasQuery()) {
 
-                emit startPerlDebuggerSignal (request.url());
+                emit startPerlDebuggerSignal(request.url());
 
             }
         }
@@ -288,20 +281,20 @@ protected:
         if ((operation == GetOperation or
              operation == PostOperation or
              operation == PutOperation) and
-                ((request.url().scheme().contains ("file")) or
-                 (request.url().toString().contains (PSEUDO_DOMAIN)) or
+                ((request.url().scheme().contains("file")) or
+                 (request.url().toString().contains(PSEUDO_DOMAIN)) or
                  ((qApp->property("allowedDomainsList").toStringList())
-                  .contains (request.url().authority())))) {
+                  .contains(request.url().authority())))) {
 
             qDebug() << "Allowed link:" << request.url().toString();
             qDebug() << "===============";
 
             QNetworkRequest networkRequest;
-            networkRequest.setUrl (request.url());
+            networkRequest.setUrl(request.url());
 
             return QNetworkAccessManager::createRequest
                     (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest (networkRequest));
+                     QNetworkRequest(networkRequest));
         } else {
             qDebug() << "Not allowed link:" << request.url().toString();
             qDebug() << "===============";
@@ -315,51 +308,43 @@ protected:
 
             return QNetworkAccessManager::createRequest
                     (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest (networkRequest));
+                     QNetworkRequest(networkRequest));
         }
 
-        return QNetworkAccessManager::createRequest (operation, request);
+        return QNetworkAccessManager::createRequest(operation, request);
     }
-
 };
 
-
+// ==============================
+// WEB PAGE CLASS CONSTRUCTOR:
+// ==============================
 class Page : public QWebPage
 {
     Q_OBJECT
 
 signals:
-
-    void displayErrorsSignal (QString errors);
-
+    void displayErrorsSignal(QString errors);
     void sourceCodeForDebuggerReadySignal();
-
     void printPreviewSignal();
-
     void printSignal();
-
     void saveAsPdfSignal();
-
     void reloadSignal();
-
     void closeWindowSignal();
-
     void quitFromURLSignal();
 
 public slots:
-
-    void cssLinker (QString htmlInput)
+    void cssLinker(QString htmlInput)
     {
         cssLinkedHtml = "";
 
-        if ((htmlInput.contains ("</title>")) and
-                (!htmlInput.contains ("current.css"))) {
+        if ((htmlInput.contains("</title>")) and
+                (!htmlInput.contains("current.css"))) {
             QString cssLink;
 
-            cssLink.append ("</title>\n");
-            cssLink.append ("<link rel=\"stylesheet\" type=\"text/css\"");
-            cssLink.append ("href=\"http://perl-executing-browser-pseudodomain/html/current.css\" media=\"all\" />");
-            htmlInput.replace ("</title>", cssLink);
+            cssLink.append("</title>\n");
+            cssLink.append("<link rel=\"stylesheet\" type=\"text/css\"");
+            cssLink.append("href=\"http://perl-executing-browser-pseudodomain/html/current.css\" media=\"all\" />");
+            htmlInput.replace("</title>", cssLink);
 
             cssLinkedHtml = htmlInput;
         } else {
@@ -367,42 +352,42 @@ public slots:
         }
     }
 
-    void httpHeaderCleaner (QString input)
+    void httpHeaderCleaner(QString input)
     {
         httpHeadersCleanedHtml = "";
 
-        if (input.contains ("<!DOCTYPE")) {
-            QString htmlContent = input.section ("<!DOCTYPE", 1, 1);
+        if (input.contains("<!DOCTYPE")) {
+            QString htmlContent = input.section("<!DOCTYPE", 1, 1);
             httpHeadersCleanedHtml = "<!DOCTYPE";
-            httpHeadersCleanedHtml.append (htmlContent);
+            httpHeadersCleanedHtml.append(htmlContent);
         }
 
-        if (input.contains ("<html>")) {
-            QString htmlContent = input.section ("<html>", 1, 1);
+        if (input.contains("<html>")) {
+            QString htmlContent = input.section("<html>", 1, 1);
             httpHeadersCleanedHtml = "<html>";
-            httpHeadersCleanedHtml.append (htmlContent);
+            httpHeadersCleanedHtml.append(htmlContent);
         }
     }
 
-    void setThemeSlot (QString theme)
+    void setThemeSlot(QString theme)
     {
-        theme.prepend ((qApp->property("allThemesDirectory").toString())+QDir::separator());
-        theme.append (".theme");
+        theme.prepend((qApp->property("allThemesDirectory").toString())+QDir::separator());
+        theme.append(".theme");
 
         if (theme.length() > 0) {
-            if (QFile::exists (
-                        QDir::toNativeSeparators (
+            if (QFile::exists(
+                        QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectory").toString())+
                             QDir::separator()+"current.css"))) {
-                QFile::remove (
-                            QDir::toNativeSeparators (
+                QFile::remove(
+                            QDir::toNativeSeparators(
                                 (qApp->property("defaultThemeDirectory").toString())+
                                 QDir::separator()+"current.css"));
             }
-            QFile::copy (theme,
-                         QDir::toNativeSeparators (
-                             (qApp->property("defaultThemeDirectory").toString())+
-                             QDir::separator()+"current.css"));
+            QFile::copy(theme,
+                        QDir::toNativeSeparators(
+                            (qApp->property("defaultThemeDirectory").toString())+
+                            QDir::separator()+"current.css"));
 
             emit reloadSignal();
 
@@ -417,30 +402,30 @@ public slots:
     void selectThemeSlot()
     {
         QFileDialog selectThemeDialog;
-        selectThemeDialog.setFileMode (QFileDialog::AnyFile);
-        selectThemeDialog.setViewMode (QFileDialog::Detail);
-        selectThemeDialog.setWindowModality (Qt::WindowModal);
-        selectThemeDialog.setWindowIcon (icon);
+        selectThemeDialog.setFileMode(QFileDialog::AnyFile);
+        selectThemeDialog.setViewMode(QFileDialog::Detail);
+        selectThemeDialog.setWindowModality(Qt::WindowModal);
+        selectThemeDialog.setWindowIcon(icon);
         QString newTheme = selectThemeDialog.getOpenFileName
-                (0, tr ("Select Browser Theme"),
+                (0, tr("Select Browser Theme"),
                  (qApp->property("allThemesDirectory").toString()),
-                 tr ("Browser theme (*.theme)"));
+                 tr("Browser theme (*.theme)"));
         selectThemeDialog.close();
         selectThemeDialog.deleteLater();
         if (newTheme.length() > 0) {
-            if (QFile::exists (
-                        QDir::toNativeSeparators (
+            if (QFile::exists(
+                        QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectory").toString())+
                             QDir::separator()+"current.css"))) {
-                QFile::remove (
-                            QDir::toNativeSeparators (
+                QFile::remove(
+                            QDir::toNativeSeparators(
                                 (qApp->property("defaultThemeDirectory").toString())+
                                 QDir::separator()+"current.css"));
             }
-            QFile::copy (newTheme,
-                         QDir::toNativeSeparators (
-                             (qApp->property("defaultThemeDirectory").toString())+
-                             QDir::separator()+"current.css"));
+            QFile::copy(newTheme,
+                        QDir::toNativeSeparators(
+                            (qApp->property("defaultThemeDirectory").toString())+
+                            QDir::separator()+"current.css"));
 
             emit reloadSignal();
 
@@ -455,54 +440,54 @@ public slots:
     void missingFileMessageSlot()
     {
         QMessageBox missingFileMessageBox;
-        missingFileMessageBox.setWindowModality (Qt::WindowModal);
-        missingFileMessageBox.setIcon (QMessageBox::Critical);
-        missingFileMessageBox.setWindowTitle (tr ("Missing file"));
-        missingFileMessageBox.setText (QDir::toNativeSeparators (scriptFullFilePath)+
-                        tr (" is missing.<br>Please restore the missing file."));
-        missingFileMessageBox.setDefaultButton (QMessageBox::Ok);
+        missingFileMessageBox.setWindowModality(Qt::WindowModal);
+        missingFileMessageBox.setIcon(QMessageBox::Critical);
+        missingFileMessageBox.setWindowTitle(tr("Missing file"));
+        missingFileMessageBox.setText(QDir::toNativeSeparators(scriptFullFilePath)+
+                                      tr(" is missing.<br>Please restore the missing file."));
+        missingFileMessageBox.setDefaultButton(QMessageBox::Ok);
         missingFileMessageBox.exec();
-        qDebug() << QDir::toNativeSeparators (scriptFullFilePath) <<
+        qDebug() << QDir::toNativeSeparators(scriptFullFilePath) <<
                     "is missing.";
         qDebug() << "Please restore the missing file.";
         qDebug() << "===============";
     }
 
-    void checkFileExistenceSlot (QString fullFilePath)
+    void checkFileExistenceSlot(QString fullFilePath)
     {
-        QFile file (QDir::toNativeSeparators (fullFilePath));
+        QFile file(QDir::toNativeSeparators(fullFilePath));
         if (!file.exists()) {
             missingFileMessageSlot();
         }
     }
 
-    void startScriptSlot (QUrl url, QByteArray postDataArray)
+    void startScriptSlot(QUrl url, QByteArray postDataArray)
     {
         qDebug() << "Script URL:" << url.toString();
 
-        QString relativeFilePath = url.toString (QUrl::RemoveScheme
-                                                 | QUrl::RemoveAuthority
-                                                 | QUrl::RemoveQuery);
+        QString relativeFilePath = url.toString(QUrl::RemoveScheme
+                                                | QUrl::RemoveAuthority
+                                                | QUrl::RemoveQuery);
 
         // Replace initial slash at the beginning of the relative path;
         // it is redundant because root directory setting already has a trailing slash.
-        relativeFilePath.replace (QRegExp ("^\/"), "");
+        relativeFilePath.replace(QRegExp("^\/"), "");
 
         scriptFullFilePath = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString())+relativeFilePath);
 
-        QString queryString = url.toString (QUrl::RemoveScheme
-                                            | QUrl::RemoveAuthority
-                                            | QUrl::RemovePath)
-                .replace ("?", "")
-                .replace ("//", "");
+        QString queryString = url.toString(QUrl::RemoveScheme
+                                           | QUrl::RemoveAuthority
+                                           | QUrl::RemovePath)
+                .replace("?", "")
+                .replace("//", "");
 
         scriptKilled = false;
 
-        QString postData (postDataArray);
+        QString postData(postDataArray);
 
-        if (queryString.contains ("action=kill") or
-                postData.contains ("action=kill")) {
+        if (queryString.contains("action=kill") or
+                postData.contains("action=kill")) {
             if (scriptHandler.isOpen()) {
                 qDebug() << "Script is going to be terminated by user request.";
 
@@ -510,29 +495,30 @@ public slots:
                 scriptKilled = true;
 
                 QMessageBox scriptKilledMessageBox;
-                scriptKilledMessageBox.setWindowModality (Qt::WindowModal);
-                scriptKilledMessageBox.setWindowTitle (tr ("Script Killed"));
-                scriptKilledMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                scriptKilledMessageBox.setText (tr ("This script is terminated as requested:<br>")+
-                                scriptFullFilePath);
-                scriptKilledMessageBox.setDefaultButton (QMessageBox::Ok);
+                scriptKilledMessageBox.setWindowModality(Qt::WindowModal);
+                scriptKilledMessageBox.setWindowTitle(tr("Script Killed"));
+                scriptKilledMessageBox.setIconPixmap((qApp->property("icon").toString()));
+                scriptKilledMessageBox.setText(tr("This script is terminated as requested:<br>")+
+                                               scriptFullFilePath);
+                scriptKilledMessageBox.setDefaultButton(QMessageBox::Ok);
                 scriptKilledMessageBox.exec();
             } else {
                 scriptKilled = true;
 
                 QMessageBox scriptAlreadyFinishedMessageBox;
-                scriptAlreadyFinishedMessageBox.setWindowModality (Qt::WindowModal);
-                scriptAlreadyFinishedMessageBox.setWindowTitle (tr ("Script Finished"));
-                scriptAlreadyFinishedMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                scriptAlreadyFinishedMessageBox.setText (tr ("This script finished before script termination was requested:<br>")+
-                                scriptFullFilePath);
-                scriptAlreadyFinishedMessageBox.setDefaultButton (QMessageBox::Ok);
+                scriptAlreadyFinishedMessageBox.setWindowModality(Qt::WindowModal);
+                scriptAlreadyFinishedMessageBox.setWindowTitle(tr("Script Finished"));
+                scriptAlreadyFinishedMessageBox.setIconPixmap((qApp->property("icon").toString()));
+                scriptAlreadyFinishedMessageBox
+                        .setText(tr("This script did not start or<br>finished before script termination was requested:<br>")+
+                                 scriptFullFilePath);
+                scriptAlreadyFinishedMessageBox.setDefaultButton(QMessageBox::Ok);
                 scriptAlreadyFinishedMessageBox.exec();
             }
         } else {
             bool sourceEnabled;
 
-            if (scriptFullFilePath.contains ("longrun")) {
+            if (scriptFullFilePath.contains("longrun")) {
                 // Default values for long-running scripts:
                 sourceEnabled = false;
                 scriptOutputThemeEnabled = true;
@@ -544,117 +530,123 @@ public slots:
                 scriptOutputType = "final";
             }
 
-            if (queryString.contains ("source=enabled")) {
+            if (queryString.contains("source=enabled")) {
                 // Default values for displaying source code outside of the Perl debugger:
                 sourceEnabled = true;
                 scriptOutputThemeEnabled = false;
                 scriptOutputType = "final";
             }
 
-            if (queryString.contains ("theme=disabled")) {
+            if (queryString.contains("theme=disabled")) {
                 scriptOutputThemeEnabled = false;
-                queryString.replace ("theme=disabled", "");
+                queryString.replace("theme=disabled", "");
             }
 
-            if (queryString.contains ("output=latest")) {
+            if (queryString.contains("output=latest")) {
                 scriptOutputType = "latest";
-                queryString.replace ("output=latest", "");
+                queryString.replace("output=latest", "");
             }
 
-            if (queryString.contains ("output=accumulation")) {
+            if (queryString.contains("output=accumulation")) {
                 scriptOutputType = "accumulation";
-                queryString.replace ("output=accumulation", "");
+                queryString.replace("output=accumulation", "");
             }
 
-            if (queryString.contains ("output=final")) {
+            if (queryString.contains("output=final")) {
                 scriptOutputType = "final";
-                queryString.replace ("output=final", "");
+                queryString.replace("output=final", "");
             }
 
-            QRegExp multipleAmpersands ("&{2,}");
-            queryString.replace (multipleAmpersands, "");
-            QRegExp finalAmpersand ("&$");
-            queryString.replace (finalAmpersand, "");
-            QRegExp finalQuestionMark ("\\?$");
-            queryString.replace (finalQuestionMark, "");
+            QRegExp multipleAmpersands("&{2,}");
+            queryString.replace(multipleAmpersands, "");
+            QRegExp finalAmpersand("&$");
+            queryString.replace(finalAmpersand, "");
+            QRegExp finalQuestionMark("\\?$");
+            queryString.replace(finalQuestionMark, "");
 
-            checkFileExistenceSlot (scriptFullFilePath);
+            checkFileExistenceSlot(scriptFullFilePath);
 
-            FileDetector detector;
-            detector.defineInterpreter (scriptFullFilePath);
+            FileDetector fileDetector;
+            fileDetector.defineInterpreter(scriptFullFilePath);
 
             qDebug() << "File path:" << scriptFullFilePath;
-            qDebug() << "Extension:" << detector.extension;
-            qDebug() << "Interpreter:" << detector.interpreter;
+            qDebug() << "Extension:" << fileDetector.extension;
+            qDebug() << "Interpreter:" << fileDetector.interpreter;
 
             if (queryString.length() > 0) {
-                scriptEnvironment.insert ("REQUEST_METHOD", "GET");
-                scriptEnvironment.insert ("QUERY_STRING", queryString);
+                scriptEnvironment.insert("REQUEST_METHOD", "GET");
+                scriptEnvironment.insert("QUERY_STRING", queryString);
                 qDebug() << "Query string:" << queryString;
             }
 
             if (postData.length() > 0) {
-                scriptEnvironment.insert ("REQUEST_METHOD", "POST");
-                QString postDataSize = QString::number (postData.size());
-                scriptEnvironment.insert ("CONTENT_LENGTH", postDataSize);
+                scriptEnvironment.insert("REQUEST_METHOD", "POST");
+                QString postDataSize = QString::number(postData.size());
+                scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
                 qDebug() << "POST data:" << postData;
             }
 
-            scriptHandler.setProcessEnvironment (scriptEnvironment);
+            scriptHandler.setProcessEnvironment(scriptEnvironment);
 
-            QFileInfo scriptAbsoluteFilePath (QDir::toNativeSeparators (scriptFullFilePath));
+            QFileInfo scriptAbsoluteFilePath(QDir::toNativeSeparators(scriptFullFilePath));
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-            scriptHandler.setWorkingDirectory (scriptDirectory);
-            qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+            scriptHandler.setWorkingDirectory(scriptDirectory);
+            qDebug() << "Working directory:" << QDir::toNativeSeparators(scriptDirectory);
             qDebug() << "===============";
 
             if (!scriptHandler.isOpen()) {
                 if (sourceEnabled == true) {
-                    QString sourceFilepath = QDir::toNativeSeparators (scriptFullFilePath);
+                    QString sourceFilepath = QDir::toNativeSeparators(scriptFullFilePath);
 
                     QStringList sourceViewerCommandLine;
                     sourceViewerCommandLine = sourceViewerMandatoryCommandLine;
-                    sourceViewerCommandLine.append (sourceFilepath);
+                    sourceViewerCommandLine.append(sourceFilepath);
 
-                    scriptHandler.start ((qApp->property("perlInterpreter").toString()),
-                                         sourceViewerCommandLine,
-                                         QProcess::Unbuffered | QProcess::ReadWrite);
+                    scriptHandler.start((qApp->property("perlInterpreter").toString()),
+                                        sourceViewerCommandLine,
+                                        QProcess::Unbuffered | QProcess::ReadWrite);
 
-                    runningScriptsGlobalList.append (sourceFilepath);
-                    runningScriptsInCurrentWindowList.append (sourceFilepath);
+                    runningScriptsInCurrentWindowList.append(sourceFilepath);
+
+                    QStringList runningScriptsGlobalCurrentList = qApp->property("runningScriptsGlobalList").toStringList();
+                    runningScriptsGlobalCurrentList.append(sourceFilepath);
+                    qApp->setProperty("runningScriptsGlobalList", runningScriptsGlobalCurrentList);
                 } else {
 
                     if (SCRIPT_CENSORING == 0) {
-                        scriptHandler.start ((qApp->property("perlInterpreter").toString()),
-                                             QStringList() <<
-                                             QDir::toNativeSeparators
-                                             (scriptFullFilePath),
-                                             QProcess::Unbuffered | QProcess::ReadWrite);
+                        scriptHandler.start((qApp->property("perlInterpreter").toString()),
+                                            QStringList() <<
+                                            QDir::toNativeSeparators
+                                            (scriptFullFilePath),
+                                            QProcess::Unbuffered | QProcess::ReadWrite);
                     }
 
                     if (SCRIPT_CENSORING == 1) {
                         // 'censor.pl' is compiled into the resources of the binary file and called from there.
-                        QString censorScriptFileName (":/scripts/censor.pl");
-                        QFile censorScriptFile (censorScriptFileName);
-                        censorScriptFile.open (QIODevice::ReadOnly | QIODevice::Text);
-                        QTextStream stream (&censorScriptFile);
+                        QString censorScriptFileName(":/scripts/censor.pl");
+                        QFile censorScriptFile(censorScriptFileName);
+                        censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
+                        QTextStream stream(&censorScriptFile);
                         QString censorScriptContents = stream.readAll();
                         censorScriptFile.close();
 
-                        scriptHandler.start ((qApp->property("perlInterpreter").toString()),
-                                             QStringList()
-                                             << "-se"
-                                             << censorScriptContents
-                                             << "--"
-                                             << QDir::toNativeSeparators (scriptFullFilePath),
-                                             QProcess::Unbuffered | QProcess::ReadWrite);
+                        scriptHandler.start((qApp->property("perlInterpreter").toString()),
+                                            QStringList()
+                                            << "-se"
+                                            << censorScriptContents
+                                            << "--"
+                                            << QDir::toNativeSeparators(scriptFullFilePath),
+                                            QProcess::Unbuffered | QProcess::ReadWrite);
                     }
 
-                    runningScriptsGlobalList.append (scriptFullFilePath);
-                    runningScriptsInCurrentWindowList.append (scriptFullFilePath);
+                    runningScriptsInCurrentWindowList.append(scriptFullFilePath);
+
+                    QStringList runningScriptsGlobalCurrentList = qApp->property("runningScriptsGlobalList").toStringList();
+                    runningScriptsGlobalCurrentList.append(scriptFullFilePath);
+                    qApp->setProperty("runningScriptsGlobalList", runningScriptsGlobalCurrentList);
 
                     if (postData.length() > 0) {
-                        scriptHandler.write (postDataArray);
+                        scriptHandler.write(postDataArray);
                     }
                 }
             } else {
@@ -662,37 +654,37 @@ public slots:
                 qDebug() << "===============";
 
                 QMessageBox scriptAlreadyStartedMessageBox;
-                scriptAlreadyStartedMessageBox.setWindowModality (Qt::WindowModal);
-                scriptAlreadyStartedMessageBox.setWindowTitle (tr ("Script Already Started"));
-                scriptAlreadyStartedMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                scriptAlreadyStartedMessageBox.setText (tr ("This script is already started and still running:<br>")+
-                                scriptFullFilePath);
-                scriptAlreadyStartedMessageBox.setDefaultButton (QMessageBox::Ok);
+                scriptAlreadyStartedMessageBox.setWindowModality(Qt::WindowModal);
+                scriptAlreadyStartedMessageBox.setWindowTitle(tr("Script Already Started"));
+                scriptAlreadyStartedMessageBox.setIconPixmap((qApp->property("icon").toString()));
+                scriptAlreadyStartedMessageBox.setText(tr("This script is already started and still running:<br>")+
+                                                       scriptFullFilePath);
+                scriptAlreadyStartedMessageBox.setDefaultButton(QMessageBox::Ok);
                 scriptAlreadyStartedMessageBox.exec();
             }
 
             scriptTimedOut = false;
 
-            if (!scriptFullFilePath.contains ("longrun")) {
+            if (!scriptFullFilePath.contains("longrun")) {
                 int scriptTimeoutNumeric =
                         (qApp->property("scriptTimeout").toInt());
                 int maximumTimeMilliseconds = scriptTimeoutNumeric * 1000 ;
-                QTimer::singleShot (maximumTimeMilliseconds, this, SLOT (scriptTimeoutSlot()));
+                QTimer::singleShot(maximumTimeMilliseconds, this, SLOT(scriptTimeoutSlot()));
             }
 
             QWebSettings::clearMemoryCaches();
 
-            scriptEnvironment.remove ("FILE_TO_OPEN");
-            scriptEnvironment.remove ("FILE_TO_CREATE");
-            scriptEnvironment.remove ("FOLDER_TO_OPEN");
-            scriptEnvironment.remove ("REQUEST_METHOD");
+            scriptEnvironment.remove("FILE_TO_OPEN");
+            scriptEnvironment.remove("FILE_TO_CREATE");
+            scriptEnvironment.remove("FOLDER_TO_OPEN");
+            scriptEnvironment.remove("REQUEST_METHOD");
 
             if (queryString.length() > 0) {
-                scriptEnvironment.remove ("QUERY_STRING");
+                scriptEnvironment.remove("QUERY_STRING");
             }
 
             if (postData.length() > 0) {
-                scriptEnvironment.remove ("CONTENT_LENGTH");
+                scriptEnvironment.remove("CONTENT_LENGTH");
             }
         }
     }
@@ -704,17 +696,17 @@ public slots:
         QString output = scriptHandler.readAllStandardOutput();
 
         if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
-            scriptAccumulatedOutput.append (output);
+            scriptAccumulatedOutput.append(output);
         }
 
         // Latest output:
         if (scriptOutputType == "latest") {
 
-            httpHeaderCleaner (output);
+            httpHeaderCleaner(output);
             output = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                cssLinker (output);
+                cssLinker(output);
                 output = cssLinkedHtml;
             }
         }
@@ -722,33 +714,33 @@ public slots:
         // Accumulated output:
         if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
 
-            httpHeaderCleaner (scriptAccumulatedOutput);
+            httpHeaderCleaner(scriptAccumulatedOutput);
             scriptAccumulatedOutput = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                cssLinker (scriptAccumulatedOutput);
+                cssLinker(scriptAccumulatedOutput);
                 scriptAccumulatedOutput = cssLinkedHtml;
             }
         }
 
-        if (!Page::mainFrame()->childFrames().contains (targetFrame)) {
+        if (!Page::mainFrame()->childFrames().contains(targetFrame)) {
             targetFrame = Page::currentFrame();
         }
 
         if (scriptOutputType == "latest") {
-            targetFrame->setHtml (output);
+            targetFrame->setHtml(output);
         }
 
         if (scriptOutputType == "accumulation") {
-            targetFrame->setHtml (scriptAccumulatedOutput);
+            targetFrame->setHtml(scriptAccumulatedOutput);
         }
     }
 
     void scriptErrorSlot()
     {
         QString error = scriptHandler.readAllStandardError();
-        scriptAccumulatedErrors.append (error);
-        scriptAccumulatedErrors.append ("\n");
+        scriptAccumulatedErrors.append(error);
+        scriptAccumulatedErrors.append("\n");
 
         qDebug() << "Script error:" << error;
         qDebug() << "===============";
@@ -756,37 +748,37 @@ public slots:
 
     void scriptFinishedSlot()
     {
-        if (!Page::mainFrame()->childFrames().contains (targetFrame)) {
+        if (!Page::mainFrame()->childFrames().contains(targetFrame)) {
             targetFrame = Page::currentFrame();
         }
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
-                targetFrame->setHtml (scriptAccumulatedOutput);
+                targetFrame->setHtml(scriptAccumulatedOutput);
             }
 
             if ((qApp->property("displayStderr").toString()) == "enable") {
                 if (scriptAccumulatedErrors.length() > 0 and scriptKilled == false) {
 
-                    cssLinker (scriptAccumulatedErrors);
+                    cssLinker(scriptAccumulatedErrors);
                     scriptAccumulatedErrors = cssLinkedHtml;
 
                     if (scriptAccumulatedOutput.length() == 0) {
-                        targetFrame->setHtml (scriptAccumulatedErrors);
+                        targetFrame->setHtml(scriptAccumulatedErrors);
                     } else {
                         QMessageBox showErrorsMessageBox;
-                        showErrorsMessageBox.setWindowModality (Qt::WindowModal);
-                        showErrorsMessageBox.setWindowTitle (tr ("Errors"));
-                        showErrorsMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-                        showErrorsMessageBox.setText (tr ("Errors were found during script execution.<br>")+
-                                                      tr ("Do you want to see them?"));
-                        showErrorsMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-                        showErrorsMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-                        showErrorsMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-                        showErrorsMessageBox.setDefaultButton (QMessageBox::Yes);
+                        showErrorsMessageBox.setWindowModality(Qt::WindowModal);
+                        showErrorsMessageBox.setWindowTitle(tr("Errors"));
+                        showErrorsMessageBox.setIconPixmap((qApp->property("icon").toString()));
+                        showErrorsMessageBox.setText(tr("Errors were found during script execution.<br>")+
+                                                     tr("Do you want to see them?"));
+                        showErrorsMessageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                        showErrorsMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+                        showErrorsMessageBox.setButtonText(QMessageBox::No, tr("No"));
+                        showErrorsMessageBox.setDefaultButton(QMessageBox::Yes);
 
                         if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
-                            emit displayErrorsSignal (scriptAccumulatedErrors);
+                            emit displayErrorsSignal(scriptAccumulatedErrors);
                         }
                     }
                 }
@@ -798,14 +790,17 @@ public slots:
             qDebug() << "===============";
         }
 
-        runningScriptsGlobalList.removeOne (scriptFullFilePath);
-        runningScriptsInCurrentWindowList.removeOne (scriptFullFilePath);
+        runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
+
+        QStringList runningScriptsGlobalCurrentList = qApp->property("runningScriptsGlobalList").toStringList();
+        runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
+        qApp->setProperty("runningScriptsGlobalList", runningScriptsGlobalCurrentList);
 
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
     }
 
-    void scriptTimeoutSlot ()
+    void scriptTimeoutSlot()
     {
         if (scriptHandler.isOpen() and
                 scriptAccumulatedErrors.length() == 0) {
@@ -813,50 +808,53 @@ public slots:
             scriptTimedOut = true;
             scriptHandler.close();
 
-            runningScriptsGlobalList.removeOne (scriptFullFilePath);
-            runningScriptsInCurrentWindowList.removeOne (scriptFullFilePath);
+            runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
+
+            QStringList runningScriptsGlobalCurrentList = qApp->property("runningScriptsGlobalList").toStringList();
+            runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
+            qApp->setProperty("runningScriptsGlobalList", runningScriptsGlobalCurrentList);
 
             qDebug() << "Script timed out:" << scriptFullFilePath;
             qDebug() << "===============";
 
             QMessageBox scriptTimeoutMessageBox;
-            scriptTimeoutMessageBox.setWindowModality (Qt::WindowModal);
-            scriptTimeoutMessageBox.setWindowTitle (tr ("Script Timeout"));
-            scriptTimeoutMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-            scriptTimeoutMessageBox.setText (tr ("Your script timed out!<br>")+
-                            tr ("Consider starting it as a long-running script."));
-            scriptTimeoutMessageBox.setDefaultButton (QMessageBox::Ok);
+            scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
+            scriptTimeoutMessageBox.setWindowTitle(tr("Script Timeout"));
+            scriptTimeoutMessageBox.setIconPixmap((qApp->property("icon").toString()));
+            scriptTimeoutMessageBox.setText(tr("Your script timed out!<br>")+
+                                            tr("Consider starting it as a long-running script."));
+            scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
             scriptTimeoutMessageBox.exec();
         }
     }
 
     // Perl debugger interaction.
     // Implementation of an idea proposed by Valcho Nedelchev.
-    void startPerlDebuggerSlot (QUrl debuggerUrl)
+    void startPerlDebuggerSlot(QUrl debuggerUrl)
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            QString filePath = debuggerUrl.toString (QUrl::RemoveQuery)
-                    .replace ("file://", "")
-                    .replace ("?", "");
+            QString filePath = debuggerUrl.toString(QUrl::RemoveQuery)
+                    .replace("file://", "")
+                    .replace("?", "");
 
 #ifdef Q_OS_WIN
-            filePath.replace (QRegExp ("^\\/"), "");
+            filePath.replace(QRegExp("^\\/"), "");
 #endif
 
-            if ((!filePath.contains ("select-file")) and (!filePath.contains ("execute"))) {
+            if ((!filePath.contains("select-file")) and (!filePath.contains("execute"))) {
                 debuggerScriptToDebugFilePath = filePath;
             }
 
-            debuggerQueryString = debuggerUrl.toString (QUrl::RemoveScheme
-                                                        | QUrl::RemoveAuthority
-                                                        | QUrl::RemovePath)
-                    .replace ("?", "")
-                    .replace ("command=", "")
-                    .replace ("+", " ")
-                    .replace ("/", "");
+            debuggerQueryString = debuggerUrl.toString(QUrl::RemoveScheme
+                                                       | QUrl::RemoveAuthority
+                                                       | QUrl::RemovePath)
+                    .replace("?", "")
+                    .replace("command=", "")
+                    .replace("+", " ")
+                    .replace("/", "");
 
             qDebug() << "File passed to Perl debugger:"
-                     << QDir::toNativeSeparators (debuggerScriptToDebugFilePath);
+                     << QDir::toNativeSeparators(debuggerScriptToDebugFilePath);
 
             // Perl interpreter to be used for debugging:
             QString debuggerInterpreter = (qApp->property("perlInterpreter").toString());
@@ -866,56 +864,56 @@ public slots:
             debuggerAccumulatedOutput = "";
 
             // Clean debugger output file from previous debugger session:
-            QFile debuggerOutputFile (debuggerOutputFilePath);
+            QFile debuggerOutputFile(debuggerOutputFilePath);
             if (debuggerOutputFile.exists())
                 debuggerOutputFile.remove();
 
             // Start a new debugger session with a new file to debug:
-            if (debuggerUrl.path().contains ("select-file")) {
+            if (debuggerUrl.path().contains("select-file")) {
                 debuggerHandler.close();
             }
 
             if (debuggerHandler.isOpen()) {
                 QByteArray debuggerCommand;
-                debuggerCommand.append (debuggerQueryString.toLatin1());
-                debuggerCommand.append (QString ("\n").toLatin1());
-                debuggerHandler.write (debuggerCommand);
+                debuggerCommand.append(debuggerQueryString.toLatin1());
+                debuggerCommand.append(QString("\n").toLatin1());
+                debuggerHandler.write(debuggerCommand);
             } else {
                 QStringList systemEnvironment =
                         QProcessEnvironment::systemEnvironment().toStringList();
 
-                QProcessEnvironment env;
+                QProcessEnvironment processEnvironment;
 
                 foreach (QString environmentVariable, systemEnvironment) {
-                    QStringList environmentVariableList = environmentVariable.split ("=");
+                    QStringList environmentVariableList = environmentVariable.split("=");
                     QString environmentVariableName = environmentVariableList.first();
-                    if (!allowedEnvironmentVariables.contains (environmentVariableName)) {
-                        env.remove (environmentVariable);
+                    if (!allowedEnvironmentVariables.contains(environmentVariableName)) {
+                        processEnvironment.remove(environmentVariable);
                     } else {
-                        env.insert (environmentVariableList.first(), environmentVariableList[1]);
+                        processEnvironment.insert(environmentVariableList.first(), environmentVariableList[1]);
                     }
                 }
 
-                env.insert ("PERLDB_OPTS", "ReadLine=0");
+                processEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
 
-                debuggerHandler.setProcessEnvironment (env);
+                debuggerHandler.setProcessEnvironment(processEnvironment);
 
-                QFileInfo scriptAbsoluteFilePath (debuggerScriptToDebugFilePath);
+                QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebugFilePath);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-                debuggerHandler.setWorkingDirectory (scriptDirectory);
-                qDebug() << "Working directory:" << QDir::toNativeSeparators (scriptDirectory);
+                debuggerHandler.setWorkingDirectory(scriptDirectory);
+                qDebug() << "Working directory:" << QDir::toNativeSeparators(scriptDirectory);
                 qDebug() << "===============";
 
-                debuggerHandler.setProcessChannelMode (QProcess::MergedChannels);
-                debuggerHandler.start (debuggerInterpreter, QStringList()
-                                       << "-d" <<
-                                       QDir::toNativeSeparators (debuggerScriptToDebugFilePath),
-                                       QProcess::Unbuffered | QProcess::ReadWrite);
+                debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
+                debuggerHandler.start(debuggerInterpreter, QStringList()
+                                      << "-d" <<
+                                      QDir::toNativeSeparators(debuggerScriptToDebugFilePath),
+                                      QProcess::Unbuffered | QProcess::ReadWrite);
 
                 QByteArray debuggerCommand;
-                debuggerCommand.append (debuggerQueryString.toLatin1());
-                debuggerCommand.append (QString ("\n").toLatin1());
-                debuggerHandler.write (debuggerCommand);
+                debuggerCommand.append(debuggerQueryString.toLatin1());
+                debuggerCommand.append(QString("\n").toLatin1());
+                debuggerHandler.write(debuggerCommand);
             }
         }
     }
@@ -927,77 +925,77 @@ public slots:
             QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
             // Replace backtick with single quote:
-            debuggerOutput.replace ("`", "'");
+            debuggerOutput.replace("`", "'");
 
             // Remove "Editor support available."
-            QRegExp debuggerOutputRegExp01 ("Editor support \\w{1,20}.");
-            debuggerOutputRegExp01.setCaseSensitivity (Qt::CaseSensitive);
-            debuggerOutput.replace (debuggerOutputRegExp01, "");
+            QRegExp debuggerOutputRegExp01("Editor support \\w{1,20}.");
+            debuggerOutputRegExp01.setCaseSensitivity(Qt::CaseSensitive);
+            debuggerOutput.replace(debuggerOutputRegExp01, "");
 
             // Remove debugger prompt: "DB<line_number>"
-            QRegExp debuggerOutputRegExp02 ("DB\\<\\d{1,5}\\>");
-            debuggerOutputRegExp02.setCaseSensitivity (Qt::CaseSensitive);
-            debuggerOutput.replace (debuggerOutputRegExp02, "");
+            QRegExp debuggerOutputRegExp02("DB\\<\\d{1,5}\\>");
+            debuggerOutputRegExp02.setCaseSensitivity(Qt::CaseSensitive);
+            debuggerOutput.replace(debuggerOutputRegExp02, "");
 
             // Remove initial empty line:
-            QRegExp debuggerOutputRegExp03 ("^\\s{0,}\n");
-            debuggerOutput.replace (debuggerOutputRegExp03, "");
+            QRegExp debuggerOutputRegExp03("^\\s{0,}\n");
+            debuggerOutput.replace(debuggerOutputRegExp03, "");
 
             // Replace two or more empty lines with a single empty line:
-            QRegExp debuggerOutputRegExp04 ("\n{3,}");
-            debuggerOutput.replace (debuggerOutputRegExp04, "\n\n");
+            QRegExp debuggerOutputRegExp04("\n{3,}");
+            debuggerOutput.replace(debuggerOutputRegExp04, "\n\n");
 
             // Capture the name of the file, which has to be highlighted,
             // and take the value of LineInfoLastLine variable:
-            QRegExp debuggerOutputRegExp05 ("\\(.*:{1,}[1-9]{0,}\\)");
-            debuggerOutputRegExp05.indexIn (debuggerOutput);
+            QRegExp debuggerOutputRegExp05("\\(.*:{1,}[1-9]{0,}\\)");
+            debuggerOutputRegExp05.indexIn(debuggerOutput);
             QString lineInfo = debuggerOutputRegExp05.capturedTexts().first();
             if (lineInfo.length() > 0) {
-                if (lineInfo.contains ("[")) {
-                    QStringList debuggerLineInfoEvalList = lineInfo.split ("[");
+                if (lineInfo.contains("[")) {
+                    QStringList debuggerLineInfoEvalList = lineInfo.split("[");
                     QString actualLineInfo = debuggerLineInfoEvalList[1];
-                    QStringList debuggerLineInfoList = actualLineInfo.split (":");
+                    QStringList debuggerLineInfoList = actualLineInfo.split(":");
 #ifdef Q_OS_WIN
                     debuggerSourceToHighlightFilePath = "";
-                    debuggerSourceToHighlightFilePath.append (debuggerLineInfoList[0]);
-                    debuggerSourceToHighlightFilePath.append (debuggerLineInfoList[1]);
+                    debuggerSourceToHighlightFilePath.append(debuggerLineInfoList[0]);
+                    debuggerSourceToHighlightFilePath.append(debuggerLineInfoList[1]);
                     debuggerLineInfoLastLine = debuggerLineInfoList[2];
 #else
                     debuggerSourceToHighlightFilePath = debuggerLineInfoList[0];
                     debuggerLineInfoLastLine = debuggerLineInfoList[1];
 #endif
-                    debuggerLineInfoLastLine.replace ("]", "");
+                    debuggerLineInfoLastLine.replace("]", "");
                 } else {
-                    QStringList debuggerLineInfoList = lineInfo.split (":");
+                    QStringList debuggerLineInfoList = lineInfo.split(":");
 
 #ifdef Q_OS_WIN
                     debuggerSourceToHighlightFilePath = "";
-                    debuggerSourceToHighlightFilePath.append (debuggerLineInfoList[0]);
-                    debuggerSourceToHighlightFilePath.append (":");
-                    debuggerSourceToHighlightFilePath.append (debuggerLineInfoList[1]);
+                    debuggerSourceToHighlightFilePath.append(debuggerLineInfoList[0]);
+                    debuggerSourceToHighlightFilePath.append(":");
+                    debuggerSourceToHighlightFilePath.append(debuggerLineInfoList[1]);
                     debuggerLineInfoLastLine = debuggerLineInfoList[2];
 #else
                     debuggerSourceToHighlightFilePath = debuggerLineInfoList[0];
                     debuggerLineInfoLastLine = debuggerLineInfoList[1];
 #endif
-                    debuggerSourceToHighlightFilePath.replace ("(", "");
-                    debuggerLineInfoLastLine.replace (")", "");
+                    debuggerSourceToHighlightFilePath.replace("(", "");
+                    debuggerLineInfoLastLine.replace(")", "");
                 }
             }
 
             // Make HTML-compatible line endings:
-            debuggerOutput.replace ("\n", "<br>\n");
+            debuggerOutput.replace("\n", "<br>\n");
 
             // Append last output from the debugger to the accumulated debugger output:
-            debuggerAccumulatedOutput.append (debuggerOutput);
+            debuggerAccumulatedOutput.append(debuggerOutput);
 
             // Preserve extra spacing within the output from
             // "List variables in package" and "List variables in current package" commands:
             if (debuggerQueryString == "V") {
-                debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
+                debuggerAccumulatedOutput.replace("  ", "&nbsp;&nbsp;");
             }
             if (debuggerQueryString == "X") {
-                debuggerAccumulatedOutput.replace ("  ", "&nbsp;&nbsp;");
+                debuggerAccumulatedOutput.replace("  ", "&nbsp;&nbsp;");
             }
 
             // Start highlighting the necessary source code:
@@ -1005,18 +1003,18 @@ public slots:
                 qDebug() << "Source viewer for the Perl debugger started.";
                 qDebug() << "File to display:" << debuggerScriptToDebugFilePath;
 
-                debuggerSyntaxHighlighter.setProcessEnvironment (scriptEnvironment);
+                debuggerSyntaxHighlighter.setProcessEnvironment(scriptEnvironment);
 
                 if (debuggerSourceToHighlightFilePath.length() > 0) {
                     QStringList sourceViewerCommandLine;
                     sourceViewerCommandLine = sourceViewerMandatoryCommandLine;
-                    sourceViewerCommandLine.append (QDir::toNativeSeparators (
-                                                        debuggerSourceToHighlightFilePath));
-                    sourceViewerCommandLine.append (debuggerLineInfoLastLine);
+                    sourceViewerCommandLine.append(QDir::toNativeSeparators(
+                                                       debuggerSourceToHighlightFilePath));
+                    sourceViewerCommandLine.append(debuggerLineInfoLastLine);
 
-                    debuggerSyntaxHighlighter.start ((qApp->property("perlInterpreter").toString()),
-                                                     sourceViewerCommandLine,
-                                                     QProcess::Unbuffered | QProcess::ReadWrite);
+                    debuggerSyntaxHighlighter.start((qApp->property("perlInterpreter").toString()),
+                                                    sourceViewerCommandLine,
+                                                    QProcess::Unbuffered | QProcess::ReadWrite);
                 }
             }
         }
@@ -1033,7 +1031,7 @@ public slots:
             // Syntax highlighted source code file path:
             debuggerHighlighterOutputFilePath = (qApp->property("applicationOutputDirectory").toString())+
                     QDir::separator()+"source.htm";
-            QFile sourceOutputFile (debuggerHighlighterOutputFilePath);
+            QFile sourceOutputFile(debuggerHighlighterOutputFilePath);
 
             // Delete previous highlighted source HTML file:
             if (sourceOutputFile.exists()) {
@@ -1041,8 +1039,8 @@ public slots:
             }
 
             // Save highlighted source as a new HTML file:
-            if (sourceOutputFile.open (QIODevice::ReadWrite)) {
-                QTextStream stream (&sourceOutputFile);
+            if (sourceOutputFile.open(QIODevice::ReadWrite)) {
+                QTextStream stream(&sourceOutputFile);
                 stream << output << endl;
             }
 
@@ -1060,14 +1058,14 @@ public slots:
     void displaySourceCodeAndDebuggerOutputSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            QFile debuggerHtmlTemplateFile (
-                        QDir::toNativeSeparators (
+            QFile debuggerHtmlTemplateFile(
+                        QDir::toNativeSeparators(
                             (qApp->property("debuggerHtmlTemplate").toString())));
-            debuggerHtmlTemplateFile.open (QFile::ReadOnly | QFile::Text);
-            QString debuggerHtmlOutput = QString (debuggerHtmlTemplateFile.readAll());
+            debuggerHtmlTemplateFile.open(QFile::ReadOnly | QFile::Text);
+            QString debuggerHtmlOutput = QString(debuggerHtmlTemplateFile.readAll());
             debuggerHtmlTemplateFile.close();
 
-            debuggerHtmlOutput.replace ("[% Script %]", debuggerScriptToDebugFilePath);
+            debuggerHtmlOutput.replace("[% Script %]", debuggerScriptToDebugFilePath);
 
             int debuggerHighlightedSourceScrollToLineInt;
             if (debuggerLineInfoLastLine.toInt() > 5) {
@@ -1076,30 +1074,30 @@ public slots:
                 debuggerHighlightedSourceScrollToLineInt = 1;
             }
             QString debuggerHighlightedSourceScrollToLine =
-                    QString::number (debuggerHighlightedSourceScrollToLineInt);
-            debuggerHtmlOutput.replace ("[% Source %]",
-                                        "source.htm#"
-                                        +debuggerHighlightedSourceScrollToLine);
+                    QString::number(debuggerHighlightedSourceScrollToLineInt);
+            debuggerHtmlOutput.replace("[% Source %]",
+                                       "source.htm#"
+                                       +debuggerHighlightedSourceScrollToLine);
 
-            debuggerHtmlOutput.replace ("[% Debugger Output %]", debuggerAccumulatedOutput);
+            debuggerHtmlOutput.replace("[% Debugger Output %]", debuggerAccumulatedOutput);
 
             if (debuggerQueryString.length() > 0) {
-                debuggerHtmlOutput.replace ("[% Debugger Command %]",
-                                            "Last command: "+debuggerQueryString);
+                debuggerHtmlOutput.replace("[% Debugger Command %]",
+                                           "Last command: "+debuggerQueryString);
             } else {
-                debuggerHtmlOutput.replace ("[% Debugger Command %]", "");
+                debuggerHtmlOutput.replace("[% Debugger Command %]", "");
             }
 
-            cssLinker (debuggerHtmlOutput);
+            cssLinker(debuggerHtmlOutput);
             debuggerHtmlOutput = cssLinkedHtml;
 
             debuggerOutputFilePath = QDir::toNativeSeparators
                     ((qApp->property("applicationOutputDirectory").toString())+
                      QDir::separator()+"dbgoutput.htm");
 
-            QFile debuggerOutputFile (debuggerOutputFilePath);
-            if (debuggerOutputFile.open (QIODevice::ReadWrite)) {
-                QTextStream debuggerOutputStream (&debuggerOutputFile);
+            QFile debuggerOutputFile(debuggerOutputFilePath);
+            if (debuggerOutputFile.open(QIODevice::ReadWrite)) {
+                QTextStream debuggerOutputStream(&debuggerOutputFile);
                 debuggerOutputStream << debuggerHtmlOutput << endl;
             }
 
@@ -1108,36 +1106,32 @@ public slots:
             qDebug() << "Perl debugger output file:" << debuggerOutputFilePath;
             qDebug() << "===============";
 
-            targetFrame->setUrl (QUrl::fromLocalFile (debuggerOutputFilePath));
+            targetFrame->setUrl(QUrl::fromLocalFile(debuggerOutputFilePath));
 
             //debuggerOutputFile.remove();
         }
     }
 
 public:
-
     Page();
     QString scriptFullFilePath;
     QProcess scriptHandler;
-
     QStringList runningScriptsInCurrentWindowList;
 
 protected:
-
-    bool acceptNavigationRequest (QWebFrame* frame,
-                                  const QNetworkRequest &request,
-                                  QWebPage::NavigationType type);
+    bool acceptNavigationRequest(QWebFrame *frame,
+                                 const QNetworkRequest &request,
+                                 QWebPage::NavigationType type);
 
 private:
-
-    QString userAgentForUrl (const QUrl &url) const
+    QString userAgentForUrl(const QUrl &url) const
     {
-        Q_UNUSED (url);
+        Q_UNUSED(url);
         return (qApp->property("userAgent").toString());
     }
 
-    QWebView* newWindow;
-    QWebFrame* targetFrame;
+    QWebView *newWindow;
+    QWebFrame *targetFrame;
 
     QString cssLinkedHtml;
     QString httpHeadersCleanedHtml;
@@ -1154,7 +1148,7 @@ private:
     bool scriptOutputThemeEnabled;
     QString scriptOutputType;
 
-    QWebView* debuggerNewWindow;
+    QWebView *debuggerNewWindow;
     QString debuggerScriptUrl;
     QString debuggerScriptToDebugFilePath;
     QString debuggerQueryString;
@@ -1167,63 +1161,61 @@ private:
     QString debuggerHighlighterOutputFilePath;
 
     QPixmap icon;
-
 };
 
-
+// ==============================
+// WEB VIEW CLASS DEFINITION:
+// ==============================
 class TopLevel : public QWebView
 {
     Q_OBJECT
 
 signals:
-
     void selectThemeSignal();
-
     void trayIconHideSignal();
 
 public slots:
-
     void loadStartPageSlot()
     {
-        FileDetector detector;
-        detector.defineInterpreter ((qApp->property("startPage").toString()));
+        FileDetector fileDetector;
+        fileDetector.defineInterpreter((qApp->property("startPage").toString()));
 
-        if (detector.interpreter.contains ("browser-html")) {
-            setUrl (QUrl::fromLocalFile
-                    (QDir::toNativeSeparators
-                     ((qApp->property("startPage").toString()))));
+        if (fileDetector.interpreter.contains("browser-html")) {
+            setUrl(QUrl::fromLocalFile
+                   (QDir::toNativeSeparators
+                    ((qApp->property("startPage").toString()))));
         } else {
-            setUrl (QUrl (QString (PSEUDO_DOMAIN+(qApp->property("startPagePath").toString()))));
+            setUrl(QUrl(QString(PSEUDO_DOMAIN+(qApp->property("startPagePath").toString()))));
         }
     }
 
-    void pageLoadedDynamicTitleSlot (bool ok)
+    void pageLoadedDynamicTitleSlot(bool ok)
     {
         if (ok) {
-            setWindowTitle (TopLevel::title());
+            setWindowTitle(TopLevel::title());
         }
     }
 
     void startPrintPreviewSlot()
     {
 #ifndef QT_NO_PRINTER
-        QPrinter printer (QPrinter::HighResolution);
-        QPrintPreviewDialog preview (&printer, this);
-        preview.setWindowModality (Qt::WindowModal);
-        preview.setMinimumSize (QDesktopWidget().screen()->rect().width()*  0.8,
-                                QDesktopWidget().screen()->rect().height()*  0.8);
-        connect (&preview, SIGNAL (paintRequested (QPrinter* )),
-                 SLOT (printPreviewSlot (QPrinter* )));
+        QPrinter printer(QPrinter::HighResolution);
+        QPrintPreviewDialog preview(&printer, this);
+        preview.setWindowModality(Qt::WindowModal);
+        preview.setMinimumSize(QDesktopWidget().screen()->rect().width() * 0.8,
+                               QDesktopWidget().screen()->rect().height() * 0.8);
+        connect(&preview, SIGNAL(paintRequested(QPrinter*)),
+                SLOT(printPreviewSlot(QPrinter*)));
         preview.exec();
 #endif
     }
 
-    void printPreviewSlot (QPrinter* printer)
+    void printPreviewSlot(QPrinter *printer)
     {
 #ifdef QT_NO_PRINTER
-        Q_UNUSED (printer);
+        Q_UNUSED(printer);
 #else
-        TopLevel::print (printer);
+        TopLevel::print(printer);
 #endif
     }
 
@@ -1235,22 +1227,22 @@ public slots:
         qDebug() << "===============";
 
         QPrinter printer;
-        printer.setOrientation (QPrinter::Portrait);
-        printer.setPageSize (QPrinter::A4);
-        printer.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
-        printer.setResolution (QPrinter::HighResolution);
-        printer.setColorMode (QPrinter::Color);
-        printer.setPrintRange (QPrinter::AllPages);
-        printer.setNumCopies (1);
+        printer.setOrientation(QPrinter::Portrait);
+        printer.setPageSize(QPrinter::A4);
+        printer.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
+        printer.setResolution(QPrinter::HighResolution);
+        printer.setColorMode(QPrinter::Color);
+        printer.setPrintRange(QPrinter::AllPages);
+        printer.setNumCopies(1);
 
-        QPrintDialog *printDialog = new QPrintDialog (&printer);
-        printDialog->setWindowModality (Qt::WindowModal);
+        QPrintDialog *printDialog = new QPrintDialog(&printer);
+        printDialog->setWindowModality(Qt::WindowModal);
         QSize dialogSize = printDialog->sizeHint();
         QRect screenRect = QDesktopWidget().screen()->rect();
-        printDialog->move (QPoint (screenRect.width() / 2 - dialogSize.width() / 2,
-                              screenRect.height() / 2 - dialogSize.height() / 2));
+        printDialog->move(QPoint(screenRect.width() / 2 - dialogSize.width() / 2,
+                                 screenRect.height() / 2 - dialogSize.height() / 2));
         if (printDialog->exec() == QDialog::Accepted) {
-            TopLevel::print (&printer);
+            TopLevel::print(&printer);
         }
         printDialog->close();
         printDialog->deleteLater();
@@ -1264,31 +1256,31 @@ public slots:
         qDebug() << "Save as PDF requested.";
 
         QFileDialog saveAsPdfDialog;
-        saveAsPdfDialog.setFileMode (QFileDialog::AnyFile);
-        saveAsPdfDialog.setViewMode (QFileDialog::Detail);
-        saveAsPdfDialog.setWindowModality (Qt::WindowModal);
-        saveAsPdfDialog.setWindowIcon (icon);
+        saveAsPdfDialog.setFileMode(QFileDialog::AnyFile);
+        saveAsPdfDialog.setViewMode(QFileDialog::Detail);
+        saveAsPdfDialog.setWindowModality(Qt::WindowModal);
+        saveAsPdfDialog.setWindowIcon(icon);
         QString fileName = saveAsPdfDialog.getSaveFileName
-                (0, tr ("Save as PDF"),
-                 QDir::currentPath(), tr ("PDF files (*.pdf)"));
+                (0, tr("Save as PDF"),
+                 QDir::currentPath(), tr("PDF files (*.pdf)"));
         if (!fileName.isEmpty()) {
-            if (QFileInfo (fileName).suffix().isEmpty()) {
+            if (QFileInfo(fileName).suffix().isEmpty()) {
                 fileName.append(".pdf");
             }
 
             qDebug() << "PDF file:" << fileName;
 
             QPrinter pdfPrinter;
-            pdfPrinter.setOrientation (QPrinter::Portrait);
-            pdfPrinter.setPageSize (QPrinter::A4);
-            pdfPrinter.setPageMargins (10, 10, 10, 10, QPrinter::Millimeter);
-            pdfPrinter.setResolution (QPrinter::HighResolution);
-            pdfPrinter.setColorMode (QPrinter::Color);
-            pdfPrinter.setPrintRange (QPrinter::AllPages);
-            pdfPrinter.setNumCopies (1);
-            pdfPrinter.setOutputFormat (QPrinter::PdfFormat);
-            pdfPrinter.setOutputFileName (fileName);
-            TopLevel::print (&pdfPrinter);
+            pdfPrinter.setOrientation(QPrinter::Portrait);
+            pdfPrinter.setPageSize(QPrinter::A4);
+            pdfPrinter.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
+            pdfPrinter.setResolution(QPrinter::HighResolution);
+            pdfPrinter.setColorMode(QPrinter::Color);
+            pdfPrinter.setPrintRange(QPrinter::AllPages);
+            pdfPrinter.setNumCopies(1);
+            pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
+            pdfPrinter.setOutputFileName(fileName);
+            TopLevel::print(&pdfPrinter);
         }
 
         saveAsPdfDialog.close();
@@ -1301,7 +1293,7 @@ public slots:
     void reloadSlot()
     {
         QUrl currentUrl = mainPage->mainFrame()->url();
-        setUrl (currentUrl);
+        setUrl(currentUrl);
         raise();
     }
 
@@ -1311,47 +1303,47 @@ public slots:
                 ((qApp->property("rootDirName").toString())+
                  qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority | QUrl::RemoveQuery)
-                 .replace ("?", ""));
+                 .replace("?", ""));
 
         qDebug() << "File to edit:" << fileToEdit;
         qDebug() << "===============";
 
         QProcess externalEditor;
-        externalEditor.startDetached ("/usr/bin/scite", QStringList() << fileToEdit);
+        externalEditor.startDetached("/usr/bin/scite", QStringList() << fileToEdit);
     }
 
     void viewSourceFromContextMenuSlot()
     {
-        newWindow = new TopLevel ();
+        newWindow = new TopLevel();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
-        icon.load (iconPathName);
-        newWindow->setWindowIcon (icon);
+        icon.load(iconPathName);
+        newWindow->setWindowIcon(icon);
 
 #if QT_VERSION >= 0x050000
         QUrlQuery viewSourceUrlQuery;
-        viewSourceUrlQuery.addQueryItem (QString ("source"), QString ("enabled"));
+        viewSourceUrlQuery.addQueryItem(QString("source"), QString("enabled"));
         QUrl viewSourceUrl = qWebHitTestURL;
-        viewSourceUrl.setQuery (viewSourceUrlQuery);
+        viewSourceUrl.setQuery(viewSourceUrlQuery);
 #else
         QUrl viewSourceUrl = qWebHitTestURL;
-        viewSourceUrl.addQueryItem (QString ("source"), QString ("enabled"));
+        viewSourceUrl.addQueryItem(QString("source"), QString("enabled"));
 #endif
 
         qDebug() << "Local script to view as source code:" << qWebHitTestURL.toString();
         qDebug() << "===============";
 
-        newWindow->setUrl (viewSourceUrl);
+        newWindow->setUrl(viewSourceUrl);
         newWindow->show();
     }
 
     void openInNewWindowSlot()
     {
-        newWindow = new TopLevel ();
+        newWindow = new TopLevel();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
-        icon.load (iconPathName);
-        newWindow->setWindowIcon (icon);
+        icon.load(iconPathName);
+        newWindow->setWindowIcon(icon);
 
         qDebug() << "Link to open in a new window:" << qWebHitTestURL.toString();
         qDebug() << "===============";
@@ -1361,45 +1353,45 @@ public slots:
                  qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
-        FileDetector detector;
-        detector.defineInterpreter (fileToOpen);
+        FileDetector fileDetector;
+        fileDetector.defineInterpreter(fileToOpen);
 
-        if (detector.interpreter.contains ("browser-html")) {
-            newWindow->setUrl (QUrl::fromLocalFile (fileToOpen));
+        if (fileDetector.interpreter.contains("browser-html")) {
+            newWindow->setUrl(QUrl::fromLocalFile(fileToOpen));
         } else {
-            newWindow->setUrl (qWebHitTestURL);
+            newWindow->setUrl(qWebHitTestURL);
         }
         newWindow->show();
     }
 
-    void displayErrorsSlot (QString errors)
+    void displayErrorsSlot(QString errors)
     {
-        errorsWindow = new TopLevel ();
-        errorsWindow->setHtml (errors);
+        errorsWindow = new TopLevel();
+        errorsWindow->setHtml(errors);
         errorsWindow->setFocus();
         errorsWindow->show();
 
-        QFile scriptErrorsFile (errors);
+        QFile scriptErrorsFile(errors);
         scriptErrorsFile.remove();
     }
 
-    void contextMenuEvent (QContextMenuEvent* event)
+    void contextMenuEvent(QContextMenuEvent *event)
     {
         QWebHitTestResult qWebHitTestResult =
-                mainPage->mainFrame()->hitTestContent (event->pos());
+                mainPage->mainFrame()->hitTestContent(event->pos());
 
-        QMenu* menu = mainPage->createStandardContextMenu();
+        QMenu *menu = mainPage->createStandardContextMenu();
 
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
 
-            if (QUrl (PSEUDO_DOMAIN).isParentOf (qWebHitTestURL)) {
+            if (QUrl(PSEUDO_DOMAIN).isParentOf(qWebHitTestURL)) {
 
-                menu->addSeparator ();
+                menu->addSeparator();
 
-                QAction* editAct = menu->addAction (tr ("&Edit"));
-                QObject::connect (editAct, SIGNAL (triggered()),
-                                  this, SLOT (editSlot()));
+                QAction *editAct = menu->addAction(tr("&Edit"));
+                QObject::connect(editAct, SIGNAL(triggered()),
+                                 this, SLOT(editSlot()));
 
                 QString fileToOpen = QDir::toNativeSeparators
                         ((qApp->property("rootDirName").toString())+
@@ -1407,24 +1399,24 @@ public slots:
                          (QUrl::RemoveScheme
                           | QUrl::RemoveAuthority
                           | QUrl::RemoveQuery)
-                         .replace ("?", ""));
+                         .replace("?", ""));
 
-                FileDetector detector;
-                detector.defineInterpreter (fileToOpen);
+                FileDetector fileDetector;
+                fileDetector.defineInterpreter(fileToOpen);
 
-                if ((!detector.interpreter.contains ("browser")) and
-                        (!detector.interpreter.contains ("undefined"))) {
-                    QAction* viewSourceAct = menu->addAction (tr ("&View Source"));
-                    QObject::connect (viewSourceAct, SIGNAL (triggered()),
-                                      this, SLOT (viewSourceFromContextMenuSlot()));
+                if ((!fileDetector.interpreter.contains("browser")) and
+                        (!fileDetector.interpreter.contains("undefined"))) {
+                    QAction *viewSourceAct = menu->addAction(tr("&View Source"));
+                    QObject::connect(viewSourceAct, SIGNAL(triggered()),
+                                     this, SLOT(viewSourceFromContextMenuSlot()));
                 }
             }
 
-            if (QUrl (PSEUDO_DOMAIN).isParentOf (qWebHitTestURL)) {
+            if (QUrl(PSEUDO_DOMAIN).isParentOf(qWebHitTestURL)) {
 
-                QAction* openInNewWindowAct = menu->addAction (tr ("&Open in new window"));
-                QObject::connect (openInNewWindowAct, SIGNAL (triggered()),
-                                  this, SLOT (openInNewWindowSlot()));
+                QAction *openInNewWindowAct = menu->addAction(tr("&Open in new window"));
+                QObject::connect(openInNewWindowAct, SIGNAL(triggered()),
+                                 this, SLOT(openInNewWindowSlot()));
             }
         }
 
@@ -1432,82 +1424,81 @@ public slots:
                 qWebHitTestResult.linkUrl().isEmpty() and
                 qWebHitTestResult.imageUrl().isEmpty() and
                 (!qWebHitTestResult.isContentSelected()) and
-                (!qWebHitTestResult.isContentEditable ())) {
+                (!qWebHitTestResult.isContentEditable())) {
 
             menu->addSeparator();
 
             if ((qApp->property("windowSize").toString()) == "maximized" or
                     (qApp->property("windowSize").toString()) == "fullscreen") {
                 if (!TopLevel::isMaximized()) {
-                    QAction* maximizeAct = menu->addAction (tr ("&Maximized window"));
-                    QObject::connect (maximizeAct, SIGNAL (triggered()),
-                                      this, SLOT (maximizeSlot()));
+                    QAction *maximizeAct = menu->addAction(tr("&Maximized window"));
+                    QObject::connect(maximizeAct, SIGNAL(triggered()),
+                                     this, SLOT(maximizeSlot()));
                 }
 
                 if (!TopLevel::isFullScreen()) {
-                QAction* toggleFullScreenAct = menu->addAction (tr ("&Fullscreen"));
-                QObject::connect (toggleFullScreenAct, SIGNAL (triggered()),
-                                  this, SLOT (toggleFullScreenSlot()));
+                    QAction *toggleFullScreenAct = menu->addAction(tr("&Fullscreen"));
+                    QObject::connect(toggleFullScreenAct, SIGNAL(triggered()),
+                                     this, SLOT(toggleFullScreenSlot()));
                 }
             }
 
-            QAction* minimizeAct = menu->addAction (tr ("Mi&nimize"));
-            QObject::connect (minimizeAct, SIGNAL (triggered()),
-                              this, SLOT (minimizeSlot()));
+            QAction *minimizeAct = menu->addAction(tr("Mi&nimize"));
+            QObject::connect(minimizeAct, SIGNAL(triggered()),
+                             this, SLOT(minimizeSlot()));
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0) {
-                QAction* homeAct = menu->addAction (tr ("&Home"));
-                QObject::connect (homeAct, SIGNAL (triggered()),
-                                  this, SLOT (loadStartPageSlot()));
+                QAction *homeAct = menu->addAction(tr("&Home"));
+                QObject::connect(homeAct, SIGNAL(triggered()),
+                                 this, SLOT(loadStartPageSlot()));
             }
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
                     TopLevel::url().toString().length() > 0) {
-                QAction* reloadAct = menu->addAction (tr ("&Reload"));
-                QObject::connect (reloadAct, SIGNAL (triggered()),
-                                  this, SLOT (reloadSlot()));
+                QAction *reloadAct = menu->addAction(tr("&Reload"));
+                QObject::connect(reloadAct, SIGNAL(triggered()),
+                                 this, SLOT(reloadSlot()));
             }
 
-            QAction* printPreviewAct = menu->addAction (tr ("Print pre&view"));
-            QObject::connect (printPreviewAct, SIGNAL (triggered()),
-                              this, SLOT (startPrintPreviewSlot()));
+            QAction *printPreviewAct = menu->addAction(tr("Print pre&view"));
+            QObject::connect(printPreviewAct, SIGNAL(triggered()),
+                             this, SLOT(startPrintPreviewSlot()));
 
-            QAction* printAct = menu->addAction (tr ("&Print"));
-            QObject::connect (printAct, SIGNAL (triggered()),
-                              this, SLOT (printSlot()));
+            QAction *printAct = menu->addAction(tr("&Print"));
+            QObject::connect(printAct, SIGNAL(triggered()),
+                             this, SLOT(printSlot()));
 
-            QAction* saveAsPdfAct = menu->addAction (tr ("Save as P&DF"));
-            QObject::connect (saveAsPdfAct, SIGNAL (triggered()),
-                              this, SLOT (saveAsPdfSlot()));
+            QAction *saveAsPdfAct = menu->addAction(tr("Save as P&DF"));
+            QObject::connect(saveAsPdfAct, SIGNAL(triggered()),
+                             this, SLOT(saveAsPdfSlot()));
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
                     TopLevel::url().toString().length() > 0) {
-                QAction* selectThemeAct = menu->addAction (tr ("&Select theme"));
-                QObject::connect (selectThemeAct, SIGNAL (triggered()),
-                                  this, SLOT (selectThemeFromContextMenuSlot()));
+                QAction *selectThemeAct = menu->addAction(tr("&Select theme"));
+                QObject::connect(selectThemeAct, SIGNAL(triggered()),
+                                 this, SLOT(selectThemeFromContextMenuSlot()));
             }
 
-            QAction* closeWindowAct = menu->addAction (tr ("&Close window"));
-            QObject::connect (closeWindowAct, SIGNAL (triggered()),
-                              this, SLOT (close()));
+            QAction *closeWindowAct = menu->addAction(tr("&Close window"));
+            QObject::connect(closeWindowAct, SIGNAL(triggered()),
+                             this, SLOT(close()));
 
-            QAction* quitAct = menu->addAction (tr ("&Quit"));
-            QObject::connect ( quitAct, SIGNAL (triggered()),
-                               this, SLOT (quitApplicationSlot()));
+            QAction *quitAct = menu->addAction(tr("&Quit"));
+            QObject::connect(quitAct, SIGNAL(triggered()),
+                             this, SLOT(quitApplicationSlot()));
 
             menu->addSeparator();
 
-            QAction* aboutAction = menu->addAction (tr ("&About"));
-            QObject::connect (aboutAction, SIGNAL (triggered()),
-                              this, SLOT (aboutSlot()));
+            QAction *aboutAction = menu->addAction(tr("&About"));
+            QObject::connect(aboutAction, SIGNAL(triggered()),
+                             this, SLOT(aboutSlot()));
 
-            QAction* aboutQtAction = menu->addAction (tr ("About Q&t"));
-            QObject::connect ( aboutQtAction, SIGNAL (triggered()),
-                               qApp, SLOT (aboutQt()));
-
+            QAction *aboutQtAction = menu->addAction(tr("About Q&t"));
+            QObject::connect(aboutQtAction, SIGNAL(triggered()),
+                             qApp, SLOT(aboutQt()));
         }
 
-        menu->exec (mapToGlobal (event->pos()));
+        menu->exec(mapToGlobal(event->pos()));
     }
 
     void maximizeSlot()
@@ -1542,47 +1533,47 @@ public slots:
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
 
         QMessageBox aboutMessageBox;
-        QSpacerItem* horizontalSpacer = new QSpacerItem (500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
-        aboutMessageBox.setWindowTitle ("About "+qApp->applicationName());
-        aboutMessageBox.setIconPixmap (qApp->property("icon").toString());
-        aboutMessageBox.setText (qApp->applicationName()+
-                        " version "+qApp->applicationVersion()+"<br>"+
-                        "Qt WebKit version "+qtWebKitVersion+"<br>"
-                        "Qt version "+qtVersion+"<br><br>"
-                        "This program is free software;<br>"
-                        "you can redistribute it and/or modify it<br>"
-                        "under the terms of the GNU General Public License,<br>"
-                        "as published by the Free Software Foundation;<br>"
-                        "either version 3 of the License,<br>"
-                        "or (at your option) any later version.<br><br>"
-                        "This program is distributed in the hope that it will be useful,<br>"
-                        "but WITHOUT ANY WARRANTY;<br>"
-                        "without even the implied warranty of<br>"
-                        "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>"
-                        "Dimitar D. Mitov, 2013 - 2015,<br>"
-                        "Valcho Nedelchev, 2014 - 2015<br><br>"
-                        "<a href='https://github.com/ddmitov/perl-executing-browser'>"
-                        "https://github.com/ddmitov/perl-executing-browser</a><br>");
-        QGridLayout* layout = (QGridLayout*)aboutMessageBox.layout();
-        layout->addItem (horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
-        aboutMessageBox.setDefaultButton (QMessageBox::Ok);
+        QSpacerItem *horizontalSpacer = new QSpacerItem(500, 0, QSizePolicy::Minimum, QSizePolicy::Expanding);
+        aboutMessageBox.setWindowTitle("About "+qApp->applicationName());
+        aboutMessageBox.setIconPixmap(qApp->property("icon").toString());
+        aboutMessageBox.setText(qApp->applicationName()+
+                                " version "+qApp->applicationVersion()+"<br>"+
+                                "Qt WebKit version "+qtWebKitVersion+"<br>"
+                                "Qt version "+qtVersion+"<br><br>"
+                                "This program is free software;<br>"
+                                "you can redistribute it and/or modify it<br>"
+                                "under the terms of the GNU General Public License,<br>"
+                                "as published by the Free Software Foundation;<br>"
+                                "either version 3 of the License,<br>"
+                                "or (at your option) any later version.<br><br>"
+                                "This program is distributed in the hope that it will be useful,<br>"
+                                "but WITHOUT ANY WARRANTY;<br>"
+                                "without even the implied warranty of<br>"
+                                "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.<br><br>"
+                                "Dimitar D. Mitov, 2013 - 2015,<br>"
+                                "Valcho Nedelchev, 2014 - 2015<br><br>"
+                                "<a href='https://github.com/ddmitov/perl-executing-browser'>"
+                                "https://github.com/ddmitov/perl-executing-browser</a><br>");
+        QGridLayout *layout = (QGridLayout*)aboutMessageBox.layout();
+        layout->addItem(horizontalSpacer, layout->rowCount(), 0, 1, layout->columnCount());
+        aboutMessageBox.setDefaultButton(QMessageBox::Ok);
         aboutMessageBox.exec();
     }
 
-    void closeEvent (QCloseEvent* event)
+    void closeEvent(QCloseEvent *event)
     {
         if (mainPage->scriptHandler.isOpen()) {
             QMessageBox confirmExitMessageBox;
-            confirmExitMessageBox.setWindowModality (Qt::WindowModal);
-            confirmExitMessageBox.setWindowTitle (tr ("Quit"));
-            confirmExitMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-            confirmExitMessageBox.setText (tr ("You are going to close window or quit the program,<br>")+
-                                           tr ("but at least one long-running script is still running.<br>")+
-                                           tr ("Are you sure?"));
-            confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-            confirmExitMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-            confirmExitMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-            confirmExitMessageBox.setDefaultButton (QMessageBox::No);
+            confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+            confirmExitMessageBox.setWindowTitle(tr("Quit"));
+            confirmExitMessageBox.setIconPixmap((qApp->property("icon").toString()));
+            confirmExitMessageBox.setText(tr("You are going to close window or quit the program,<br>")+
+                                          tr("but at least one long-running script is still running.<br>")+
+                                          tr("Are you sure?"));
+            confirmExitMessageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+            confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+            confirmExitMessageBox.setDefaultButton(QMessageBox::No);
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 mainPage->scriptHandler.close();
                 event->accept();
@@ -1596,57 +1587,69 @@ public slots:
 
     void quitApplicationSlot()
     {
-        if (runningScriptsGlobalList.length() > 0) {
+        if (qApp->property("runningScriptsGlobalList").toStringList().length() > 0) {
             QMessageBox confirmExitMessageBox;
-            confirmExitMessageBox.setWindowModality (Qt::WindowModal);
-            confirmExitMessageBox.setWindowTitle (tr ("Quit"));
-            confirmExitMessageBox.setIconPixmap ((qApp->property("icon").toString()));
-            confirmExitMessageBox.setText (tr ("You are going to quit the program,<br>")+
-                                           tr ("but at least one long-running script is still running.<br>")+
-                                           tr ("Are you sure?"));
-            confirmExitMessageBox.setStandardButtons (QMessageBox::Yes | QMessageBox::No);
-            confirmExitMessageBox.setButtonText (QMessageBox::Yes, tr ("Yes"));
-            confirmExitMessageBox.setButtonText (QMessageBox::No, tr ("No"));
-            confirmExitMessageBox.setDefaultButton (QMessageBox::No);
+            confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+            confirmExitMessageBox.setWindowTitle(tr("Quit"));
+            confirmExitMessageBox.setIconPixmap((qApp->property("icon").toString()));
+            confirmExitMessageBox.setText(tr("You are going to quit the program,<br>")+
+                                          tr("but at least one long-running script is still running.<br>")+
+                                          tr("Are you sure?"));
+            confirmExitMessageBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+            confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+            confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+            confirmExitMessageBox.setDefaultButton(QMessageBox::No);
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 // Perl temp folder removal code:
                 QProcess cleanerProcess;
-                cleanerProcess.startDetached ((qApp->property("perlInterpreter").toString()),
-                                              QStringList()
-                                              << "-se"
-                                              << "use File::Path;  rmtree (@ARGV);"
-                                              << "--"
-                                              << (qApp->property("applicationTempDirectory").toString()));
+                cleanerProcess.startDetached((qApp->property("perlInterpreter").toString()),
+                                             QStringList()
+                                             << "-se"
+                                             << "use File::Path;  rmtree (@ARGV);"
+                                             << "--"
+                                             << (qApp->property("applicationTempDirectory").toString()));
+
+                if ((qApp->property("systrayIcon").toString()) == "enable") {
+                    emit trayIconHideSignal();
+                }
+
+                QString dateTimeString = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+                qDebug() << qApp->applicationName().toLatin1().constData()
+                         << qApp->applicationVersion().toLatin1().constData()
+                         << "terminated normally on:" << dateTimeString;
+                qDebug() << "===============";
+
                 QApplication::exit();
             }
         } else {
             // Qt5 temp folder removal code - Qt4 incompatible:
-            //QDir applicationTempDirectory (qApp->property("applicationTempDirectory").toString());
+            //QDir applicationTempDirectory(qApp->property("applicationTempDirectory").toString());
             //applicationTempDirectory.removeRecursively();
 
             // Perl temp folder removal code:
             QProcess cleanerProcess;
-            cleanerProcess.startDetached ((qApp->property("perlInterpreter").toString()),
-                                          QStringList()
-                                          << "-se"
-                                          << "use File::Path;  rmtree (@ARGV);"
-                                          << "--"
-                                          << (qApp->property("applicationTempDirectory").toString()));
+            cleanerProcess.startDetached((qApp->property("perlInterpreter").toString()),
+                                         QStringList()
+                                         << "-se"
+                                         << "use File::Path;  rmtree (@ARGV);"
+                                         << "--"
+                                         << (qApp->property("applicationTempDirectory").toString()));
+
+            if ((qApp->property("systrayIcon").toString()) == "enable") {
+                emit trayIconHideSignal();
+            }
+
+            QString dateTimeString = QDateTime::currentDateTime().toString("dd.MM.yyyy hh:mm:ss");
+            qDebug() << qApp->applicationName().toLatin1().constData()
+                     << qApp->applicationVersion().toLatin1().constData()
+                     << "terminated normally on:" << dateTimeString;
+            qDebug() << "===============";
+
             QApplication::exit();
         }
-
-        if ((qApp->property("systrayIcon").toString()) == "enable") {
-            emit trayIconHideSignal();
-        }
-
-        QString dateTimeString = QDateTime::currentDateTime().toString ("dd.MM.yyyy hh:mm:ss");
-        qDebug() << qApp->applicationName().toLatin1().constData()
-                 << qApp->applicationVersion().toLatin1().constData()
-                 << "terminated normally on:" << dateTimeString;
-        qDebug() << "===============";
     }
 
-    void sslErrors (QNetworkReply* reply, const QList<QSslError> &errors)
+    void sslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
     {
         foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;
@@ -1656,34 +1659,31 @@ public slots:
     }
 
 public:
+    TopLevel();
 
-    TopLevel ();
-
-    QWebView* createWindow (QWebPage::WebWindowType type)
+    QWebView *createWindow(QWebPage::WebWindowType type)
     {
         qDebug() << "New window requested.";
 
-        Q_UNUSED (type);
-        QWebView* window = new TopLevel ();
-        window->setWindowIcon (icon);
-        window->setAttribute (Qt::WA_DeleteOnClose, true);
+        Q_UNUSED(type);
+        QWebView *window = new TopLevel();
+        window->setWindowIcon(icon);
+        window->setAttribute(Qt::WA_DeleteOnClose, true);
         window->show();
 
         return window;
     }
 
 private:
-
-    Page* mainPage;
+    Page *mainPage;
 
     QUrl qWebHitTestURL;
     QString filepath;
-    QWebView* newWindow;
+    QWebView *newWindow;
 
-    QWebView* errorsWindow;
+    QWebView *errorsWindow;
 
     QPixmap icon;
-
 };
 
 #endif // PEB_H

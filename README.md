@@ -80,7 +80,7 @@ Compiled and tested successfully using:
 ## Runtime Requirements
   
 * Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes, or Qt5 libraries, if you compiled the program using Qt5 classes.  
-* Perl 5 distribution - any standard Linux or Mac Perl distribution or Strawberry Perl for Windows.  
+* Perl 5 distribution - any standard Linux, Mac or Windows Perl distribution.  
   
 ## Limitations
   
@@ -89,7 +89,7 @@ Compiled and tested successfully using:
 ## What Perl Executing Browser Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
 * PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a full-fledged sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
-* PEB is not a product for end-users with no understanding of the Perl programming language. It should not be used without knowing of what exactly local scripts are going to do. Inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* PEB has a work-in-progress security system implemented in the```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
@@ -100,8 +100,8 @@ Compiled and tested successfully using:
 3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
 ```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.  
 All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
-* Local scripts are executed only after a security check, implemented in the special ```censor.pl``` script, which bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list. This feature can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
-* Starting the browser as root on Linux is not allowed - it exits with a warning message.  
+* Local scripts are executed in an ```eval``` function and only after a security check, which are implemented in the special ```censor.pl``` script. It bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list; ``` use lib``` is also prohibited. This feature can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
+* Starting the browser as root on Linux is not allowed - it exits with a warning message. By default ```censor.pl``` is compiled in the resources of the browser binary and executed from there at runtime.  
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
 * If user is not administrator of his/her machine and configuration file and root folder are owned by root/administrator and read-only for all others, user will be effectively prevented from executing untrusted code. Executing as root on a Linux machine:  

@@ -1,6 +1,7 @@
-
- PERL EXECUTING BROWSER - THANKS, ACKNOWLEDGEMENTS AND REFERENCES:
-
+ 
+ THANKS, ACKNOWLEDGEMENTS AND REFERENCES FOR
+ PERL EXECUTING BROWSER
+ 
  Amata mea Argeia - gratiam magnam tibi ago!
  Patientia tua in studiis meis computatoriis auxilium meum maximum!
 
@@ -129,8 +130,11 @@
  http://doc.qt.io/qt-4.8/qmake-advanced-usage.html
  http://doc.qt.io/qt-4.8/qwebframe.html
  http://doc.qt.io/qt-4.8/qstylefactory.html
+ http://doc.qt.io/qt-4.8/signalsandslots.html
  
  http://forum.qt.io/topic/24213/qmessagebox-too-small
+ 
+ https://wiki.qt.io/Qt_Coding_Style
  
  http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
  http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
@@ -203,6 +207,7 @@
  http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
  http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
  http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
+ http://habrahabr.ru/post/150329/ (Qt Coding Style)
  
  QT LIBRARIES
  ============
