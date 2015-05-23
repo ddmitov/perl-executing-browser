@@ -89,7 +89,7 @@ Compiled and tested successfully using:
 ## What Perl Executing Browser Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
 * PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a full-fledged sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
-* PEB has a work-in-progress security system implemented in the```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* PEB has a work-in-progress security system implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
