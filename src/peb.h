@@ -344,7 +344,7 @@ signals:
     void quitFromURLSignal();
 
 public slots:
-    void cssLinker(QString htmlInput)
+    void themeLinker(QString htmlInput)
     {
         cssLinkedHtml = "";
 
@@ -353,7 +353,11 @@ public slots:
             QString cssLink;
             cssLink.append("</title>\n");
             cssLink.append("<link rel=\"stylesheet\" type=\"text/css\"");
-            cssLink.append("href=\"http://perl-executing-browser-pseudodomain/html/current.css\" media=\"all\" />");
+            cssLink.append("href=\"");
+            cssLink.append(PSEUDO_DOMAIN);
+            cssLink.append(qApp->property("defaultThemeDirectoryName").toString());
+            cssLink.append("/current.css\" media=\"all\" />");
+
             htmlInput.replace("</title>", cssLink);
 
             cssLinkedHtml = htmlInput;
@@ -388,18 +392,19 @@ public slots:
         if (theme.length() > 0) {
             if (QFile::exists(
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectory")
+                            (qApp->property("defaultThemeDirectoryFullPath")
                              .toString())
                             + QDir::separator() + "current.css"))) {
                 QFile::remove(
                             QDir::toNativeSeparators(
-                                (qApp->property("defaultThemeDirectory")
+                                (qApp->property("defaultThemeDirectoryFullPath")
                                  .toString())
                                 + QDir::separator() + "current.css"));
             }
             QFile::copy(theme,
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectory").toString())
+                            (qApp->property("defaultThemeDirectoryFullPath")
+                             .toString())
                             + QDir::separator() + "current.css"));
 
             emit reloadSignal();
@@ -428,17 +433,19 @@ public slots:
         if (newTheme.length() > 0) {
             if (QFile::exists(
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectory").toString())
+                            (qApp->property("defaultThemeDirectoryFullPath")
+                             .toString())
                             + QDir::separator() + "current.css"))) {
                 QFile::remove(
                             QDir::toNativeSeparators(
-                                (qApp->property("defaultThemeDirectory")
+                                (qApp->property("defaultThemeDirectoryFullPath")
                                  .toString())
                                 + QDir::separator() + "current.css"));
             }
             QFile::copy(newTheme,
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectory").toString())
+                            (qApp->property("defaultThemeDirectoryFullPath")
+                             .toString())
                             + QDir::separator() + "current.css"));
 
             emit reloadSignal();
@@ -753,7 +760,7 @@ public slots:
             output = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                cssLinker(output);
+                themeLinker(output);
                 output = cssLinkedHtml;
             }
         }
@@ -765,7 +772,7 @@ public slots:
             scriptAccumulatedOutput = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                cssLinker(scriptAccumulatedOutput);
+                themeLinker(scriptAccumulatedOutput);
                 scriptAccumulatedOutput = cssLinkedHtml;
             }
         }
@@ -808,7 +815,7 @@ public slots:
                 if (scriptAccumulatedErrors.length() > 0 and
                         scriptKilled == false) {
 
-                    cssLinker(scriptAccumulatedErrors);
+                    themeLinker(scriptAccumulatedErrors);
                     scriptAccumulatedErrors = cssLinkedHtml;
 
                     if (scriptAccumulatedOutput.length() == 0) {
@@ -817,11 +824,11 @@ public slots:
                         QMessageBox showErrorsMessageBox;
                         showErrorsMessageBox.setWindowModality(Qt::WindowModal);
                         showErrorsMessageBox.setWindowTitle(tr("Errors"));
-                        showErrorsMessageBox.
-                                setIconPixmap((qApp->property("icon")
+                        showErrorsMessageBox
+                                .setIconPixmap((qApp->property("icon")
                                                .toString()));
-                        showErrorsMessageBox.
-                                setText(tr("Errors were found during script execution.<br>")
+                        showErrorsMessageBox
+                                .setText(tr("Errors were found during script execution.<br>")
                                         + tr("Do you want to see them?"));
                         showErrorsMessageBox
                                 .setStandardButtons(QMessageBox::Yes
@@ -1179,7 +1186,7 @@ public slots:
                 debuggerHtmlOutput.replace("[% Debugger Command %]", "");
             }
 
-            cssLinker(debuggerHtmlOutput);
+            themeLinker(debuggerHtmlOutput);
             debuggerHtmlOutput = cssLinkedHtml;
 
             debuggerOutputFilePath = QDir::toNativeSeparators

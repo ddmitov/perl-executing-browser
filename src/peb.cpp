@@ -655,17 +655,12 @@ int main(int argc, char **argv)
     // Directory of the default GUI theme:
     QString defaultThemeDirectorySetting =
             settings.value("gui/theme_default_directory").toString();
-    QString defaultThemeDirectory;
-    QDir defaultThemeDir(defaultThemeDirectorySetting);
-    if (defaultThemeDir.isRelative()) {
-        defaultThemeDirectory = QDir::toNativeSeparators(
-                    rootDirName + defaultThemeDirectorySetting);
-    }
-    if (defaultThemeDir.isAbsolute()) {
-        defaultThemeDirectory =
-                QDir::toNativeSeparators(defaultThemeDirectorySetting);
-    }
-    application.setProperty("defaultThemeDirectory", defaultThemeDirectory);
+    application.setProperty("defaultThemeDirectoryName",
+                            defaultThemeDirectorySetting);
+    QString defaultThemeDirectory = QDir::toNativeSeparators(
+                rootDirName + defaultThemeDirectorySetting);
+    application.setProperty("defaultThemeDirectoryFullPath",
+                            defaultThemeDirectory);
 
     // Directory for all GUI themes:
     QString allThemesDirectorySetting =
@@ -823,7 +818,8 @@ int main(int argc, char **argv)
     // (2.) configuration file named 'peb.ini'.
     if (zipPackageRootFolderConformant == false or
             zipPackageConfigurationFileConformant == false) {
-        qDebug() << "Non-standard ZIP package found and it was not extracted and used!";
+        qDebug() << "Non-standard ZIP package found!";
+        qDebug() << "It was not extracted and used.";
     }
 
     // Log all extracted archive entries from a ZIP package:
@@ -1605,7 +1601,8 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                 selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
                 selectScriptToDebugDialog.setWindowModality(Qt::WindowModal);
                 selectScriptToDebugDialog.setWindowIcon(icon);
-                QString scriptToDebug = selectScriptToDebugDialog.getOpenFileName
+                QString scriptToDebug = selectScriptToDebugDialog
+                        .getOpenFileName
                         (0, tr("Select Perl File"), QDir::currentPath(),
                          tr("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
                 selectScriptToDebugDialog.close();
@@ -1613,9 +1610,10 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
 
                 if (scriptToDebug.length() > 1) {
                     QUrl scriptToDebugUrl(QUrl::fromLocalFile(scriptToDebug));
-                    QString debuggerQueryString = request.url().toString(QUrl::RemoveScheme
-                                                                         | QUrl::RemoveAuthority
-                                                                         | QUrl::RemovePath)
+                    QString debuggerQueryString =
+                            request.url().toString(QUrl::RemoveScheme
+                                                   | QUrl::RemoveAuthority
+                                                   | QUrl::RemovePath)
                             .replace("?", "")
                             .replace("command=", "");
 #if QT_VERSION >= 0x050000
