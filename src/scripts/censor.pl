@@ -18,7 +18,7 @@ my @user_code = <$filehandle>;
 close $filehandle;
 
 my @allowed_use_pragmas = qw (attributes autodie autouse base bigint bignum bigrat open strict warnings utf8);
-my @allowed_modules = qw (CGI::Simple::Standard Cwd DBI Env URI::Escape XML::LibXML);
+my @allowed_modules = qw (Cwd DBI Env XML::LibXML);
 my @allowed_use_pragmas_or_module_names = (@allowed_use_pragmas, @allowed_modules);
 my @prohibited_core_functions = qw (fork unlink);
 my $prohibited_core_functions = join (' ', @prohibited_core_functions);

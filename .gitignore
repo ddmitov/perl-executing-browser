@@ -11,10 +11,6 @@ peb.exe
 peb.log
 peb*.log
 
-moc_peb.cpp
-moc_peb.o
-peb.o
-
 upcopy
 upgit
 

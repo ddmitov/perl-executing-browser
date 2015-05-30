@@ -59,7 +59,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
   
 ## Target Audience
   
-* Advanced users and Perl enthusiasts willing to create rapidly custom desktop scripting solutions for internal use, which can not be easily implemented using other software.  
+* Advanced users and Perl enthusiasts willing to create rapidly custom desktop scripting solutions, which can not be easily implemented using other software.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
 
 ## Compile-time Requirements

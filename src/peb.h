@@ -52,12 +52,12 @@
 // ==============================
 // FILE DETECTOR CLASS DEFINITION:
 // ==============================
-class FileDetector : public QObject
+class QFileDetector : public QObject
 {
     Q_OBJECT
 
 public slots:
-    void defineInterpreter(QString filepath)
+    void qDefineInterpreter(QString filepath)
     {
         interpreter = "undefined";
 
@@ -101,7 +101,7 @@ public slots:
     }
 
 public:
-    FileDetector();
+    QFileDetector();
 
     QString extension;
     QString interpreter;
@@ -124,12 +124,12 @@ private:
 // ==============================
 // SYSTEM TRAY ICON CLASS DEFINITION:
 // ==============================
-class TrayIcon : public QSystemTrayIcon
+class QTrayIcon : public QSystemTrayIcon
 {
     Q_OBJECT
 
 public slots:
-    void trayIconActivatedSlot(QSystemTrayIcon::ActivationReason reason)
+    void qTrayIconActivatedSlot(QSystemTrayIcon::ActivationReason reason)
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
 
@@ -168,13 +168,13 @@ public slots:
         }
     }
 
-    void trayIconHideSlot()
+    void qTrayIconHideSlot()
     {
         trayIcon->hide();
     }
 
 public:
-    TrayIcon();
+    QTrayIcon();
 
     QAction *quitAction;
     QAction *aboutAction;
@@ -215,8 +215,8 @@ protected:
                     ((qApp->property("rootDirName").toString())
                      + filepath);
 
-            FileDetector fileDetector;
-            fileDetector.defineInterpreter(fullFilePath);
+            QFileDetector fileDetector;
+            fileDetector.qDefineInterpreter(fullFilePath);
 
             // Local HTML, CSS, JS or supported image files:
             if (fileDetector.interpreter.contains ("browser")) {
@@ -329,7 +329,7 @@ protected:
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
 // ==============================
-class Page : public QWebPage
+class QPage : public QWebPage
 {
     Q_OBJECT
 
@@ -344,7 +344,7 @@ signals:
     void quitFromURLSignal();
 
 public slots:
-    void themeLinker(QString htmlInput)
+    void qThemeLinker(QString htmlInput)
     {
         cssLinkedHtml = "";
 
@@ -366,7 +366,7 @@ public slots:
         }
     }
 
-    void httpHeaderCleaner(QString input)
+    void qHttpHeaderCleaner(QString input)
     {
         httpHeadersCleanedHtml = "";
 
@@ -383,7 +383,7 @@ public slots:
         }
     }
 
-    void setThemeSlot(QString theme)
+    void qThemeSetterSlot(QString theme)
     {
         theme.prepend((qApp->property("allThemesDirectory").toString())
                       + QDir::separator());
@@ -417,7 +417,7 @@ public slots:
         }
     }
 
-    void selectThemeSlot()
+    void qThemeSelectorSlot()
     {
         QFileDialog selectThemeDialog;
         selectThemeDialog.setFileMode(QFileDialog::AnyFile);
@@ -458,7 +458,7 @@ public slots:
         }
     }
 
-    void missingFileMessageSlot()
+    void qMissingFileMessageSlot()
     {
         QMessageBox missingFileMessageBox;
         missingFileMessageBox.setWindowModality(Qt::WindowModal);
@@ -476,15 +476,15 @@ public slots:
         qDebug() << "===============";
     }
 
-    void checkFileExistenceSlot(QString fullFilePath)
+    void qCheckFileExistenceSlot(QString fullFilePath)
     {
         QFile file(QDir::toNativeSeparators(fullFilePath));
         if (!file.exists()) {
-            missingFileMessageSlot();
+            qMissingFileMessageSlot();
         }
     }
 
-    void startScriptSlot(QUrl url, QByteArray postDataArray)
+    void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
         qDebug() << "Script URL:" << url.toString();
 
@@ -494,7 +494,7 @@ public slots:
 
         // Replace initial slash at the beginning of the relative path;
         // it is redundant - root directory setting already has a trailing slash.
-        relativeFilePath.replace(QRegExp("^\/"), "");
+        relativeFilePath.replace(QRegExp("^//"), "");
 
         scriptFullFilePath = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString()) + relativeFilePath);
@@ -594,10 +594,10 @@ public slots:
             QRegExp finalQuestionMark("\\?$");
             queryString.replace(finalQuestionMark, "");
 
-            checkFileExistenceSlot(scriptFullFilePath);
+            qCheckFileExistenceSlot(scriptFullFilePath);
 
-            FileDetector fileDetector;
-            fileDetector.defineInterpreter(scriptFullFilePath);
+            QFileDetector fileDetector;
+            fileDetector.qDefineInterpreter(scriptFullFilePath);
 
             qDebug() << "File path:" << scriptFullFilePath;
             qDebug() << "Extension:" << fileDetector.extension;
@@ -722,7 +722,7 @@ public slots:
                         (qApp->property("scriptTimeout").toInt());
                 int maximumTimeMilliseconds = scriptTimeoutNumeric * 1000 ;
                 QTimer::singleShot(maximumTimeMilliseconds,
-                                   this, SLOT(scriptTimeoutSlot()));
+                                   this, SLOT(qScriptTimeoutSlot()));
             }
 
             QWebSettings::clearMemoryCaches();
@@ -742,7 +742,7 @@ public slots:
         }
     }
 
-    void scriptOutputSlot()
+    void qScriptOutputSlot()
     {
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: output from" << scriptFullFilePath;
@@ -756,11 +756,11 @@ public slots:
         // Latest output:
         if (scriptOutputType == "latest") {
 
-            httpHeaderCleaner(output);
+            qHttpHeaderCleaner(output);
             output = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                themeLinker(output);
+                qThemeLinker(output);
                 output = cssLinkedHtml;
             }
         }
@@ -768,17 +768,17 @@ public slots:
         // Accumulated output:
         if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
 
-            httpHeaderCleaner(scriptAccumulatedOutput);
+            qHttpHeaderCleaner(scriptAccumulatedOutput);
             scriptAccumulatedOutput = httpHeadersCleanedHtml;
 
             if (scriptOutputThemeEnabled == true) {
-                themeLinker(scriptAccumulatedOutput);
+                qThemeLinker(scriptAccumulatedOutput);
                 scriptAccumulatedOutput = cssLinkedHtml;
             }
         }
 
-        if (!Page::mainFrame()->childFrames().contains(targetFrame)) {
-            targetFrame = Page::currentFrame();
+        if (!QPage::mainFrame()->childFrames().contains(targetFrame)) {
+            targetFrame = QPage::currentFrame();
         }
 
         if (scriptOutputType == "latest") {
@@ -790,7 +790,7 @@ public slots:
         }
     }
 
-    void scriptErrorSlot()
+    void qScriptErrorsSlot()
     {
         QString error = scriptHandler.readAllStandardError();
         scriptAccumulatedErrors.append(error);
@@ -800,10 +800,10 @@ public slots:
         qDebug() << "===============";
     }
 
-    void scriptFinishedSlot()
+    void qScriptFinishedSlot()
     {
-        if (!Page::mainFrame()->childFrames().contains(targetFrame)) {
-            targetFrame = Page::currentFrame();
+        if (!QPage::mainFrame()->childFrames().contains(targetFrame)) {
+            targetFrame = QPage::currentFrame();
         }
 
         if (scriptTimedOut == false) {
@@ -815,7 +815,7 @@ public slots:
                 if (scriptAccumulatedErrors.length() > 0 and
                         scriptKilled == false) {
 
-                    themeLinker(scriptAccumulatedErrors);
+                    qThemeLinker(scriptAccumulatedErrors);
                     scriptAccumulatedErrors = cssLinkedHtml;
 
                     if (scriptAccumulatedOutput.length() == 0) {
@@ -864,7 +864,7 @@ public slots:
         scriptAccumulatedErrors = "";
     }
 
-    void scriptTimeoutSlot()
+    void qScriptTimeoutSlot()
     {
         if (scriptHandler.isOpen() and
                 scriptAccumulatedErrors.length() == 0) {
@@ -898,7 +898,7 @@ public slots:
 
     // Perl debugger interaction.
     // Implementation of an idea proposed by Valcho Nedelchev.
-    void startPerlDebuggerSlot(QUrl debuggerUrl)
+    void qStartPerlDebuggerSlot(QUrl debuggerUrl)
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
             QString filePath = debuggerUrl.toString(QUrl::RemoveQuery)
@@ -996,7 +996,7 @@ public slots:
         }
     }
 
-    void debuggerOutputSlot()
+    void qDebuggerOutputSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
             // Read debugger output:
@@ -1110,7 +1110,7 @@ public slots:
         }
     }
 
-    void debuggerSyntaxHighlighterReadySlot()
+    void qDebuggerSyntaxHighlighterReadySlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
             // Read all output from the syntax highlighter script:
@@ -1146,7 +1146,7 @@ public slots:
         }
     }
 
-    void displaySourceCodeAndDebuggerOutputSlot()
+    void qDisplaySourceCodeAndDebuggerOutputSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
             QFile debuggerHtmlTemplateFile(
@@ -1186,7 +1186,7 @@ public slots:
                 debuggerHtmlOutput.replace("[% Debugger Command %]", "");
             }
 
-            themeLinker(debuggerHtmlOutput);
+            qThemeLinker(debuggerHtmlOutput);
             debuggerHtmlOutput = cssLinkedHtml;
 
             debuggerOutputFilePath = QDir::toNativeSeparators
@@ -1211,7 +1211,7 @@ public slots:
     }
 
 public:
-    Page();
+    QPage();
     QString scriptFullFilePath;
     QProcess scriptHandler;
     QStringList runningScriptsInCurrentWindowList;
@@ -1264,7 +1264,7 @@ private:
 // ==============================
 // WEB VIEW CLASS DEFINITION:
 // ==============================
-class TopLevel : public QWebView
+class QTopLevel : public QWebView
 {
     Q_OBJECT
 
@@ -1273,11 +1273,11 @@ signals:
     void trayIconHideSignal();
 
 public slots:
-    void loadStartPageSlot()
+    void qLoadStartPageSlot()
     {
-        FileDetector fileDetector;
+        QFileDetector fileDetector;
         fileDetector
-                .defineInterpreter((qApp->property("startPage").toString()));
+                .qDefineInterpreter((qApp->property("startPage").toString()));
 
         if (fileDetector.interpreter.contains("browser-html")) {
             setUrl(QUrl::fromLocalFile
@@ -1289,14 +1289,14 @@ public slots:
         }
     }
 
-    void pageLoadedDynamicTitleSlot(bool ok)
+    void qPageLoadedDynamicTitleSlot(bool ok)
     {
         if (ok) {
-            setWindowTitle(TopLevel::title());
+            setWindowTitle(QTopLevel::title());
         }
     }
 
-    void startPrintPreviewSlot()
+    void qStartPrintPreviewSlot()
     {
 #ifndef QT_NO_PRINTER
         QPrinter printer(QPrinter::HighResolution);
@@ -1305,21 +1305,21 @@ public slots:
         preview.setMinimumSize(QDesktopWidget().screen()->rect().width() * 0.8,
                                QDesktopWidget().screen()->rect().height() * 0.8);
         connect(&preview, SIGNAL(paintRequested(QPrinter*)),
-                SLOT(printPreviewSlot(QPrinter*)));
+                SLOT(qPrintPreviewSlot(QPrinter*)));
         preview.exec();
 #endif
     }
 
-    void printPreviewSlot(QPrinter *printer)
+    void qPrintPreviewSlot(QPrinter *printer)
     {
 #ifdef QT_NO_PRINTER
         Q_UNUSED(printer);
 #else
-        TopLevel::print(printer);
+        QTopLevel::print(printer);
 #endif
     }
 
-    void printSlot()
+    void qPrintSlot()
     {
 #ifndef QT_NO_PRINTER
 
@@ -1344,14 +1344,14 @@ public slots:
                                  (screenRect.height() / 2)
                                  - (dialogSize.height() / 2)));
         if (printDialog->exec() == QDialog::Accepted) {
-            TopLevel::print(&printer);
+            QTopLevel::print(&printer);
         }
         printDialog->close();
         printDialog->deleteLater();
 #endif
     }
 
-    void saveAsPdfSlot()
+    void qSaveAsPdfSlot()
     {
 #ifndef QT_NO_PRINTER
 
@@ -1382,7 +1382,7 @@ public slots:
             pdfPrinter.setNumCopies(1);
             pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
             pdfPrinter.setOutputFileName(fileName);
-            TopLevel::print(&pdfPrinter);
+            QTopLevel::print(&pdfPrinter);
         }
 
         saveAsPdfDialog.close();
@@ -1392,14 +1392,14 @@ public slots:
 #endif
     }
 
-    void reloadSlot()
+    void qReloadSlot()
     {
         QUrl currentUrl = mainPage->mainFrame()->url();
         setUrl(currentUrl);
         raise();
     }
 
-    void editSlot()
+    void qEditSlot()
     {
         QString fileToEdit = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString())
@@ -1418,9 +1418,9 @@ public slots:
                                QStringList() << fileToEdit);
     }
 
-    void viewSourceFromContextMenuSlot()
+    void qViewSourceFromContextMenuSlot()
     {
-        newWindow = new TopLevel();
+        newWindow = new QTopLevel();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);
@@ -1444,9 +1444,9 @@ public slots:
         newWindow->show();
     }
 
-    void openInNewWindowSlot()
+    void qOpenInNewWindowSlot()
     {
-        newWindow = new TopLevel();
+        newWindow = new QTopLevel();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);
@@ -1461,8 +1461,8 @@ public slots:
                  + qWebHitTestURL.toString
                  (QUrl::RemoveScheme | QUrl::RemoveAuthority));
 
-        FileDetector fileDetector;
-        fileDetector.defineInterpreter(fileToOpen);
+        QFileDetector fileDetector;
+        fileDetector.qDefineInterpreter(fileToOpen);
 
         if (fileDetector.interpreter.contains("browser-html")) {
             newWindow->setUrl(QUrl::fromLocalFile(fileToOpen));
@@ -1472,15 +1472,13 @@ public slots:
         newWindow->show();
     }
 
-    void displayErrorsSlot(QString errors)
+    void qDisplayErrorsSlot(QString errors)
     {
-        errorsWindow = new TopLevel();
+        errorsWindow = new QTopLevel();
         errorsWindow->setHtml(errors);
         errorsWindow->setFocus();
         errorsWindow->show();
 
-        QFile scriptErrorsFile(errors);
-        scriptErrorsFile.remove();
     }
 
     void contextMenuEvent(QContextMenuEvent *event)
@@ -1499,7 +1497,7 @@ public slots:
 
                 QAction *editAct = menu->addAction(tr("&Edit"));
                 QObject::connect(editAct, SIGNAL(triggered()),
-                                 this, SLOT(editSlot()));
+                                 this, SLOT(qEditSlot()));
 
                 QString fileToOpen = QDir::toNativeSeparators
                         ((qApp->property("rootDirName").toString())
@@ -1509,15 +1507,15 @@ public slots:
                              | QUrl::RemoveQuery)
                          .replace("?", ""));
 
-                FileDetector fileDetector;
-                fileDetector.defineInterpreter(fileToOpen);
+                QFileDetector fileDetector;
+                fileDetector.qDefineInterpreter(fileToOpen);
 
                 if ((!fileDetector.interpreter.contains("browser")) and
                         (!fileDetector.interpreter.contains("undefined"))) {
                     QAction *viewSourceAct =
                             menu->addAction(tr("&View Source"));
                     QObject::connect(viewSourceAct, SIGNAL(triggered()),
-                                     this, SLOT(viewSourceFromContextMenuSlot()));
+                                     this, SLOT(qViewSourceFromContextMenuSlot()));
                 }
             }
 
@@ -1526,7 +1524,7 @@ public slots:
                 QAction *openInNewWindowAct =
                         menu->addAction(tr("&Open in new window"));
                 QObject::connect(openInNewWindowAct, SIGNAL(triggered()),
-                                 this, SLOT(openInNewWindowSlot()));
+                                 this, SLOT(qOpenInNewWindowSlot()));
             }
         }
 
@@ -1540,55 +1538,55 @@ public slots:
 
             if ((qApp->property("windowSize").toString()) == "maximized" or
                     (qApp->property("windowSize").toString()) == "fullscreen") {
-                if (!TopLevel::isMaximized()) {
+                if (!QTopLevel::isMaximized()) {
                     QAction *maximizeAct =
                             menu->addAction(tr("&Maximized window"));
                     QObject::connect(maximizeAct, SIGNAL(triggered()),
-                                     this, SLOT(maximizeSlot()));
+                                     this, SLOT(qMaximizeSlot()));
                 }
 
-                if (!TopLevel::isFullScreen()) {
+                if (!QTopLevel::isFullScreen()) {
                     QAction *toggleFullScreenAct =
                             menu->addAction(tr("&Fullscreen"));
                     QObject::connect(toggleFullScreenAct, SIGNAL(triggered()),
-                                     this, SLOT(toggleFullScreenSlot()));
+                                     this, SLOT(qToggleFullScreenSlot()));
                 }
             }
 
             QAction *minimizeAct = menu->addAction(tr("Mi&nimize"));
             QObject::connect(minimizeAct, SIGNAL(triggered()),
-                             this, SLOT(minimizeSlot()));
+                             this, SLOT(qMinimizeSlot()));
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0) {
                 QAction *homeAct = menu->addAction(tr("&Home"));
                 QObject::connect(homeAct, SIGNAL(triggered()),
-                                 this, SLOT(loadStartPageSlot()));
+                                 this, SLOT(qLoadStartPageSlot()));
             }
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                    TopLevel::url().toString().length() > 0) {
+                    QTopLevel::url().toString().length() > 0) {
                 QAction *reloadAct = menu->addAction(tr("&Reload"));
                 QObject::connect(reloadAct, SIGNAL(triggered()),
-                                 this, SLOT(reloadSlot()));
+                                 this, SLOT(qReloadSlot()));
             }
 
             QAction *printPreviewAct = menu->addAction(tr("Print pre&view"));
             QObject::connect(printPreviewAct, SIGNAL(triggered()),
-                             this, SLOT(startPrintPreviewSlot()));
+                             this, SLOT(qStartPrintPreviewSlot()));
 
             QAction *printAct = menu->addAction(tr("&Print"));
             QObject::connect(printAct, SIGNAL(triggered()),
-                             this, SLOT(printSlot()));
+                             this, SLOT(qPrintSlot()));
 
             QAction *saveAsPdfAct = menu->addAction(tr("Save as P&DF"));
             QObject::connect(saveAsPdfAct, SIGNAL(triggered()),
-                             this, SLOT(saveAsPdfSlot()));
+                             this, SLOT(qSaveAsPdfSlot()));
 
             if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                    TopLevel::url().toString().length() > 0) {
+                    QTopLevel::url().toString().length() > 0) {
                 QAction *selectThemeAct = menu->addAction(tr("&Select theme"));
                 QObject::connect(selectThemeAct, SIGNAL(triggered()),
-                                 this, SLOT(selectThemeFromContextMenuSlot()));
+                                 this, SLOT(qSelectThemeFromContextMenuSlot()));
             }
 
             QAction *closeWindowAct = menu->addAction(tr("&Close window"));
@@ -1597,13 +1595,13 @@ public slots:
 
             QAction *quitAct = menu->addAction(tr("&Quit"));
             QObject::connect(quitAct, SIGNAL(triggered()),
-                             this, SLOT(quitApplicationSlot()));
+                             this, SLOT(qExitApplicationSlot()));
 
             menu->addSeparator();
 
             QAction *aboutAction = menu->addAction(tr("&About"));
             QObject::connect(aboutAction, SIGNAL(triggered()),
-                             this, SLOT(aboutSlot()));
+                             this, SLOT(qAboutSlot()));
 
             QAction *aboutQtAction = menu->addAction(tr("About Q&t"));
             QObject::connect(aboutQtAction, SIGNAL(triggered()),
@@ -1613,33 +1611,32 @@ public slots:
         menu->exec(mapToGlobal(event->pos()));
     }
 
-    void maximizeSlot()
+    void qMaximizeSlot()
     {
         raise();
         showMaximized();
     }
 
-    void minimizeSlot()
+    void qMinimizeSlot()
     {
         showMinimized();
     }
 
-    void toggleFullScreenSlot()
+    void qToggleFullScreenSlot()
     {
-        if (isFullScreen())
-        {
+        if (isFullScreen()) {
             showMaximized();
         } else {
             showFullScreen();
         }
     }
 
-    void selectThemeFromContextMenuSlot()
+    void qSelectThemeFromContextMenuSlot()
     {
         emit selectThemeSignal();
     }
 
-    void aboutSlot()
+    void qAboutSlot()
     {
         QString qtVersion = QT_VERSION_STR;
         QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
@@ -1705,7 +1702,7 @@ public slots:
         }
     }
 
-    void quitApplicationSlot()
+    void qExitApplicationSlot()
     {
         if (qApp->property("runningScriptsGlobalList")
                 .toStringList().length() > 0) {
@@ -1733,7 +1730,8 @@ public slots:
                                        << "-se"
                                        << "use File::Path;  rmtree (@ARGV);"
                                        << "--"
-                                       << (qApp->property("applicationTempDirectory").toString()));
+                                       << (qApp->property("applicationTempDirectory")
+                                           .toString()));
 
                 if ((qApp->property("systrayIcon").toString()) == "enable") {
                     emit trayIconHideSignal();
@@ -1780,7 +1778,7 @@ public slots:
         }
     }
 
-    void sslErrors(QNetworkReply *reply, const QList<QSslError> &errors)
+    void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
         foreach (QSslError error, errors) {
             qDebug() << "SSL error: " << error;
@@ -1790,14 +1788,14 @@ public slots:
     }
 
 public:
-    TopLevel();
+    QTopLevel();
 
     QWebView *createWindow(QWebPage::WebWindowType type)
     {
         qDebug() << "New window requested.";
 
         Q_UNUSED(type);
-        QWebView *window = new TopLevel();
+        QWebView *window = new QTopLevel();
         window->setWindowIcon(icon);
         window->setAttribute(Qt::WA_DeleteOnClose, true);
         window->show();
@@ -1806,14 +1804,12 @@ public:
     }
 
 private:
-    Page *mainPage;
+    QPage *mainPage;
+    QWebView *newWindow;
+    QWebView *errorsWindow;
 
     QUrl qWebHitTestURL;
     QString filepath;
-    QWebView *newWindow;
-
-    QWebView *errorsWindow;
-
     QPixmap icon;
 };
 

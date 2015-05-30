@@ -40,13 +40,12 @@
 // Qt5 code:
 void customMessageHandler(QtMsgType type, const QMessageLogContext &context,
                           const QString &message)
+{
+    Q_UNUSED(context);
 #else
 // Qt4 code:
 void customMessageHandler(QtMsgType type, const char *message)
-#endif
 {
-#if QT_VERSION >= 0x050000
-    Q_UNUSED(context);
 #endif
     QString dateAndTime =
             QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
@@ -315,6 +314,10 @@ int main(int argc, char **argv)
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
 #if ZIP_SUPPORT == 1
+
+    qDebug() << QDateTime::currentMSecsSinceEpoch()
+             << "msecs from epoch: extraction started.";
+
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + "default.peb";
     QFile defaultZipPackage(defaultZipPackageName);
@@ -346,11 +349,19 @@ int main(int argc, char **argv)
             settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
         }
     }
+
+    qDebug() << QDateTime::currentMSecsSinceEpoch()
+             << "msecs from epoch: extraction ended.";
+
 #endif
 
     // ==============================
     // MANAGE APPLICATION SETTINGS:
     // ==============================
+
+    qDebug() << QDateTime::currentMSecsSinceEpoch()
+             << "msecs from epoch: reading of settings started";
+
     // Settings file from the directory of the binary file
     // if no settings file from a ZIP package is found:
     if (settingsDirName.length() == 0 and settingsFileName.length() == 0) {
@@ -788,6 +799,9 @@ int main(int argc, char **argv)
         }
     }
 
+    qDebug() << QDateTime::currentMSecsSinceEpoch()
+             << "msecs from epoch: reading of settings ended.";
+
     // ==============================
     // LOG ALL SETTINGS:
     // ==============================
@@ -904,28 +918,28 @@ int main(int argc, char **argv)
     // ==============================
     // MAIN GUI CLASS INITIALIZATION:
     // ==============================
-    TopLevel toplevel;
+    QTopLevel toplevel;
 
     QObject::connect(qApp, SIGNAL(lastWindowClosed()),
-                     &toplevel, SLOT(quitApplicationSlot()));
+                     &toplevel, SLOT(qExitApplicationSlot()));
 
     toplevel.setWindowIcon(icon);
-    toplevel.loadStartPageSlot();
+    toplevel.qLoadStartPageSlot();
     toplevel.show();
 
     // ==============================
     // SYSTEM TRAY ICON CLASS INITIALIZATION:
     // ==============================
-    TrayIcon trayIcon;
+    QTrayIcon trayIcon;
     if (systrayIcon == "enable") {
         QObject::connect(trayIcon.aboutAction, SIGNAL(triggered()),
-                         &toplevel, SLOT(aboutSlot()));
+                         &toplevel, SLOT(qAboutSlot()));
 
         QObject::connect(trayIcon.quitAction, SIGNAL(triggered()),
-                         &toplevel, SLOT(quitApplicationSlot()));
+                         &toplevel, SLOT(qExitApplicationSlot()));
 
         QObject::connect(&toplevel, SIGNAL(trayIconHideSignal()),
-                         &trayIcon, SLOT(trayIconHideSlot()));
+                         &trayIcon, SLOT(qTrayIconHideSlot()));
     }
 
     return application.exec();
@@ -934,7 +948,7 @@ int main(int argc, char **argv)
 // ==============================
 // FILE DETECTOR CLASS CONSTRUCTOR:
 // ==============================
-FileDetector::FileDetector()
+QFileDetector::QFileDetector()
     : QObject(0)
 {
     // Regular expressions for file type detection by shebang line:
@@ -966,7 +980,7 @@ FileDetector::FileDetector()
 // ==============================
 // SYSTEM TRAY ICON CLASS CONSTRUCTOR:
 // ==============================
-TrayIcon::TrayIcon()
+QTrayIcon::QTrayIcon()
     : QSystemTrayIcon(0)
 {
     if ((qApp->property("systrayIcon").toString()) == "enable") {
@@ -975,12 +989,12 @@ TrayIcon::TrayIcon()
         QPixmap icon;
         icon.load(iconPathName);
         trayIcon->setIcon(icon);
-        trayIcon->setToolTip("Camel Calf");
+        trayIcon->setToolTip(qApp->applicationName());
 
         QObject::connect(trayIcon,
                          SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
                          this,
-                         SLOT(trayIconActivatedSlot(
+                         SLOT(qTrayIconActivatedSlot(
                                   QSystemTrayIcon::ActivationReason)));
 
         aboutAction = new QAction(tr("&About"), this);
@@ -1004,7 +1018,7 @@ TrayIcon::TrayIcon()
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
 // ==============================
-Page::Page()
+QPage::QPage()
     : QWebPage(0)
 {
     QWebSettings::globalSettings()->
@@ -1035,23 +1049,23 @@ Page::Page()
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(scriptOutputSlot()));
+                     this, SLOT(qScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(scriptErrorSlot()));
+                     this, SLOT(qScriptErrorsSlot()));
     QObject::connect(&scriptHandler, SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this, SLOT(scriptFinishedSlot()));
+                     this, SLOT(qScriptFinishedSlot()));
 
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
-                         this, SLOT(debuggerOutputSlot()));
+                         this, SLOT(qDebuggerOutputSlot()));
 
         QObject::connect(this, SIGNAL(sourceCodeForDebuggerReadySignal()),
-                         this, SLOT(displaySourceCodeAndDebuggerOutputSlot()));
+                         this, SLOT(qDisplaySourceCodeAndDebuggerOutputSlot()));
 
         QObject::connect(&debuggerSyntaxHighlighter,
                          SIGNAL(finished(int, QProcess::ExitStatus)),
                          this,
-                         SLOT(debuggerSyntaxHighlighterReadySlot()));
+                         SLOT(qDebuggerSyntaxHighlighterReadySlot()));
     }
 
     // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
@@ -1128,7 +1142,7 @@ Page::Page()
     }
 
     // Default frame for local content:
-    targetFrame = Page::mainFrame();
+    targetFrame = QPage::mainFrame();
 
     // Icon for dialogs:
     icon.load(qApp->property("iconPathName").toString());
@@ -1139,37 +1153,37 @@ Page::Page()
 // ==============================
 // WEB VIEW CLASS CONSTRUCTOR:
 // ==============================
-TopLevel::TopLevel()
+QTopLevel::QTopLevel()
     : QWebView(0)
 {
     // Configure keyboard shortcuts - main window:
     QShortcut *minimizeShortcut = new QShortcut(Qt::Key_Escape, this);
     QObject::connect(minimizeShortcut, SIGNAL(activated()),
-                     this, SLOT(minimizeSlot()));
+                     this, SLOT(qMinimizeSlot()));
 
     QShortcut *maximizeShortcut = new QShortcut(QKeySequence("Ctrl+M"), this);
     QObject::connect(maximizeShortcut, SIGNAL(activated()),
-                     this, SLOT(maximizeSlot()));
+                     this, SLOT(qMaximizeSlot()));
 
     QShortcut *toggleFullScreenShortcut = new QShortcut(Qt::Key_F11, this);
     QObject::connect(toggleFullScreenShortcut, SIGNAL(activated()),
-                     this, SLOT(toggleFullScreenSlot()));
+                     this, SLOT(qToggleFullScreenSlot()));
 
     QShortcut *homeShortcut = new QShortcut(Qt::Key_F12, this);
     QObject::connect(homeShortcut, SIGNAL(activated()),
-                     this, SLOT(loadStartPageSlot()));
+                     this, SLOT(qLoadStartPageSlot()));
 
     QShortcut *reloadShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
     QObject::connect(reloadShortcut, SIGNAL(activated()),
-                     this, SLOT(reloadSlot()));
+                     this, SLOT(qReloadSlot()));
 
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
-                     this, SLOT(printSlot()));
+                     this, SLOT(qPrintSlot()));
 
     QShortcut *closeAppShortcut = new QShortcut(QKeySequence("Ctrl+X"), this);
     QObject::connect(closeAppShortcut, SIGNAL(activated()),
-                     this, SLOT(quitApplicationSlot()));
+                     this, SLOT(qExitApplicationSlot()));
 
     // Configure screen appearance:
     if ((qApp->property("fixedWidth").toInt()) > 100 and
@@ -1199,34 +1213,34 @@ TopLevel::TopLevel()
         setContextMenuPolicy(Qt::NoContextMenu);
     }
 
-    mainPage = new Page();
+    mainPage = new QPage();
 
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(close()));
 
     // Connect signals and slots - main window:
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
-                     this, SLOT(displayErrorsSlot(QString)));
+                     this, SLOT(qDisplayErrorsSlot(QString)));
 
     QObject::connect(this, SIGNAL(selectThemeSignal()),
-                     mainPage, SLOT(selectThemeSlot()));
+                     mainPage, SLOT(qThemeSelectorSlot()));
 
     QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
-                     this, SLOT(startPrintPreviewSlot()));
+                     this, SLOT(qStartPrintPreviewSlot()));
     QObject::connect(mainPage, SIGNAL(printSignal()),
-                     this, SLOT(printSlot()));
+                     this, SLOT(qPrintSlot()));
     QObject::connect(mainPage, SIGNAL(saveAsPdfSignal()),
-                     this, SLOT(saveAsPdfSlot()));
+                     this, SLOT(qSaveAsPdfSlot()));
 
     QObject::connect(mainPage, SIGNAL(reloadSignal()),
-                     this, SLOT(reloadSlot()));
+                     this, SLOT(qReloadSlot()));
 
     QObject::connect(mainPage, SIGNAL(quitFromURLSignal()),
-                     this, SLOT(quitApplicationSlot()));
+                     this, SLOT(qExitApplicationSlot()));
 
     if ((qApp->property("browserTitle").toString()) == "dynamic") {
         QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
-                         this, SLOT(pageLoadedDynamicTitleSlot(bool)));
+                         this, SLOT(qPageLoadedDynamicTitleSlot(bool)));
     }
 
     setPage(mainPage);
@@ -1239,13 +1253,13 @@ TopLevel::TopLevel()
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      mainPage,
-                     SLOT(startScriptSlot(QUrl, QByteArray)));
+                     SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(networkAccessManager,
                          SIGNAL(startPerlDebuggerSignal(QUrl)),
                          mainPage,
-                         SLOT(startPerlDebuggerSlot(QUrl)));
+                         SLOT(qStartPerlDebuggerSlot(QUrl)));
     }
 
     // Disable history:
@@ -1258,7 +1272,7 @@ TopLevel::TopLevel()
     QObject::connect(networkAccessManager,
                      SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
                      this,
-                     SLOT(sslErrors(QNetworkReply*, QList<QSslError>)));
+                     SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
 
     // Configure scroll bars:
     mainPage->mainFrame()->setScrollBarPolicy(Qt::Horizontal,
@@ -1293,7 +1307,7 @@ TopLevel::TopLevel()
 // ==============================
 // MANAGE CLICKING OF LINKS:
 // ==============================
-bool Page::acceptNavigationRequest(QWebFrame *frame,
+bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
@@ -1440,7 +1454,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                 .toString(QUrl::RemoveScheme)
                 .replace("//", "");
 
-        setThemeSlot(theme);
+        qThemeSetterSlot(theme);
 
         return false;
     }
@@ -1450,7 +1464,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("selecttheme")) {
 
-        selectThemeSlot();
+        qThemeSelectorSlot();
 
         return false;
     }
@@ -1589,7 +1603,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().scheme().contains("perl-debugger")) {
 
-            if (Page::mainFrame()->childFrames().contains(frame)) {
+            if (QPage::mainFrame()->childFrames().contains(frame)) {
                 targetFrame = frame;
             }
 
@@ -1632,9 +1646,9 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
 
                     // Create new window, if requested, but only after
                     // a Perl script for debugging has been selected:
-                    if ((!Page::mainFrame()->childFrames().contains(frame) and
+                    if ((!QPage::mainFrame()->childFrames().contains(frame) and
                          (!request.url().toString().contains("restart")))) {
-                        debuggerNewWindow = new TopLevel();
+                        debuggerNewWindow = new QTopLevel();
                         QString iconPathName =
                                 qApp->property("iconPathName").toString();
                         QPixmap icon;
@@ -1647,7 +1661,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                         debuggerNewWindow->raise();
                     }
 
-                    if (Page::mainFrame()->childFrames().contains(frame) or
+                    if (QPage::mainFrame()->childFrames().contains(frame) or
                             (request.url().toString().contains("restart"))) {
 
                         // Clear these variables before starting a new session
@@ -1659,7 +1673,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                         // Close open handler from a previous debugger session:
                         debuggerHandler.close();
 
-                        startPerlDebuggerSlot(scriptToDebugUrl);
+                        qStartPerlDebuggerSlot(scriptToDebugUrl);
                     }
 
                     return false;
@@ -1674,7 +1688,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                 request.url().scheme().contains("perl-debugger")) {
 
             targetFrame = frame;
-            startPerlDebuggerSlot(request.url());
+            qStartPerlDebuggerSlot(request.url());
 
             return false;
         }
@@ -1686,7 +1700,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
 
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
-            (Page::mainFrame()->childFrames().contains(frame))) {
+            (QPage::mainFrame()->childFrames().contains(frame))) {
 
         if (!request.url().path().contains(htmlExtensions)) {
             targetFrame = frame;
@@ -1701,7 +1715,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                               | QUrl::RemoveFragment);
             QString fullFilePath = (qApp->property("rootDirName").toString())
                     + relativeFilePath;
-            checkFileExistenceSlot(fullFilePath);
+            qCheckFileExistenceSlot(fullFilePath);
 
             frame->load(QUrl::fromLocalFile
                         (QDir::toNativeSeparators
@@ -1715,7 +1729,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
 
     // Open allowed network content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (Page::mainFrame()->childFrames().contains(frame)) and
+            (QPage::mainFrame()->childFrames().contains(frame)) and
             ((qApp->property("allowedDomainsList").toStringList())
              .contains(request.url().authority()))) {
 
@@ -1730,7 +1744,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
 
     // Open allowed network content in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (!Page::mainFrame()->childFrames().contains(frame)) and
+            (!QPage::mainFrame()->childFrames().contains(frame)) and
             ((qApp->property("allowedDomainsList").toStringList())
              .contains(request.url().authority()))) {
 
@@ -1738,7 +1752,7 @@ bool Page::acceptNavigationRequest(QWebFrame *frame,
                  << request.url().toString();
         qDebug() << "===============";
 
-        newWindow = new TopLevel();
+        newWindow = new QTopLevel();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);
