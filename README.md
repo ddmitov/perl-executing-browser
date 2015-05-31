@@ -6,7 +6,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
   
 ## Design Objectives
   
-* **1. Easy GUI for local scripts:**  
+* **1. Fast and easy GUI for local scripts:**  
     use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl 5 scripts;  
 
 * **2. Zero installation when needed:**  

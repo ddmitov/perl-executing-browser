@@ -74,7 +74,9 @@ void customMessageHandler(QtMsgType type, const char *message)
                        + QDir::separator()
                        + (qApp->property("logPrefix").toString())
                        + ".log"));
-        logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+        logFile.open(QIODevice::WriteOnly
+                     | QIODevice::Append
+                     | QIODevice::Text);
         QTextStream textStream(&logFile);
         textStream << text << endl;
     }
@@ -88,7 +90,9 @@ void customMessageHandler(QtMsgType type, const char *message)
                        + (qApp->property("applicationStartDateAndTime")
                           .toString())
                        + ".log"));
-        logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
+        logFile.open(QIODevice::WriteOnly
+                     | QIODevice::Append
+                     | QIODevice::Text);
         QTextStream textStream(&logFile);
         textStream << text << endl;
     }
@@ -155,9 +159,11 @@ int main(int argc, char **argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
-            std::cout << "  --fullscreen    -F    start browser in fullscreen mode"
+            std::cout << "  --fullscreen    -F    "
+                      << "start browser in fullscreen mode"
                       << std::endl;
-            std::cout << "  --maximized     -M    start browser in a maximized window"
+            std::cout << "  --maximized     -M    "
+                      << "start browser in a maximized window"
                       << std::endl;
             std::cout << "  --help          -H    this help"
                       << std::endl;
@@ -212,7 +218,8 @@ int main(int argc, char **argv)
             std::cout << "Started from terminal with normal user privileges."
                       << std::endl;
             if (PERL_DEBUGGER_INTERACTION == 1) {
-                std::cout << "Will start another instance of the program and quit this one."
+                std::cout << "Will start another instance of "
+                          << "the program and quit this one."
                           << std::endl;
             }
             std::cout << " " << std::endl;
@@ -253,15 +260,15 @@ int main(int argc, char **argv)
 
     // Prevent starting as root in graphical mode:
     if (userEuid == 0) {
+        QString title = (QApplication::tr("Started as root"));
+        QString text = (QApplication::tr("Browser was started as root.<br>")
+                        + QApplication::tr("This is not a good idea!<br>")
+                        + QApplication::tr("Going to quit now."));
         QMessageBox startedAsRootMessageBox;
         startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
         startedAsRootMessageBox.setIcon(QMessageBox::Critical);
-        startedAsRootMessageBox
-                .setWindowTitle(QMessageBox::tr("Started as root"));
-        startedAsRootMessageBox
-                .setText(QMessageBox::tr("Browser was started as root.<br>")
-                         + QMessageBox::tr("This is definitely not a good idea!<br>")
-                         + QMessageBox::tr("Going to quit now."));
+        startedAsRootMessageBox.setWindowTitle(title);
+        startedAsRootMessageBox.setText(text);
         startedAsRootMessageBox.setDefaultButton(QMessageBox::Ok);
         startedAsRootMessageBox.exec();
 
@@ -314,10 +321,6 @@ int main(int argc, char **argv)
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
 #if ZIP_SUPPORT == 1
-
-    qDebug() << QDateTime::currentMSecsSinceEpoch()
-             << "msecs from epoch: extraction started.";
-
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + "default.peb";
     QFile defaultZipPackage(defaultZipPackageName);
@@ -349,19 +352,11 @@ int main(int argc, char **argv)
             settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
         }
     }
-
-    qDebug() << QDateTime::currentMSecsSinceEpoch()
-             << "msecs from epoch: extraction ended.";
-
 #endif
 
     // ==============================
     // MANAGE APPLICATION SETTINGS:
     // ==============================
-
-    qDebug() << QDateTime::currentMSecsSinceEpoch()
-             << "msecs from epoch: reading of settings started";
-
     // Settings file from the directory of the binary file
     // if no settings file from a ZIP package is found:
     if (settingsDirName.length() == 0 and settingsFileName.length() == 0) {
@@ -383,16 +378,16 @@ int main(int argc, char **argv)
 
     // Check if settings file exists:
     if (!settingsFile.exists()) {
+        QString title = (QApplication::tr("Missing configuration file"));
+        QString text = (QApplication::tr("Configuration file<br>")
+                        + settingsFileName
+                        + QMessageBox::tr("<br>is missing.<br>")
+                        + QMessageBox::tr("Please restore it."));
         QMessageBox missingConfigurationFileMessageBox;
         missingConfigurationFileMessageBox.setWindowModality(Qt::WindowModal);
         missingConfigurationFileMessageBox.setIcon(QMessageBox::Critical);
-        missingConfigurationFileMessageBox
-                .setWindowTitle(QMessageBox::tr("Missing configuration file"));
-        missingConfigurationFileMessageBox
-                .setText(QMessageBox::tr("Configuration file<br>")
-                         + settingsFileName
-                         + QMessageBox::tr("<br>is missing.<br>")
-                         + QMessageBox::tr("Please restore it."));
+        missingConfigurationFileMessageBox.setWindowTitle(title);
+        missingConfigurationFileMessageBox.setText(text);
         missingConfigurationFileMessageBox.setDefaultButton(QMessageBox::Ok);
         missingConfigurationFileMessageBox.exec();
 
@@ -534,14 +529,14 @@ int main(int argc, char **argv)
     // Check if start page exists:
     QFile startPageFile(startPage);
     if (!startPageFile.exists()) {
+        QString title = (QApplication::tr("Missing start page"));
+        QString text = (QApplication::tr("Start page is missing.<br>")
+                        + QApplication::tr("Please select a start page."));
         QMessageBox missingStartPageMessageBox;
         missingStartPageMessageBox.setWindowModality(Qt::WindowModal);
         missingStartPageMessageBox.setIcon(QMessageBox::Critical);
-        missingStartPageMessageBox
-                .setWindowTitle(QApplication::tr("Missing start page"));
-        missingStartPageMessageBox
-                .setText(QMessageBox::tr("Start page is missing.<br>")
-                         + QMessageBox::tr("Please select a start page."));
+        missingStartPageMessageBox.setWindowTitle(title);
+        missingStartPageMessageBox.setText(text);
         missingStartPageMessageBox.setDefaultButton(QMessageBox::Ok);
         missingStartPageMessageBox.exec();
 
@@ -684,7 +679,8 @@ int main(int argc, char **argv)
                                          + allThemesDirectorySetting);
     }
     if (allThemesDir.isAbsolute()) {
-        allThemesDirectory = QDir::toNativeSeparators(allThemesDirectorySetting);
+        allThemesDirectory =
+                QDir::toNativeSeparators(allThemesDirectorySetting);
     }
     application.setProperty("allThemesDirectory", allThemesDirectory);
 
@@ -799,9 +795,6 @@ int main(int argc, char **argv)
         }
     }
 
-    qDebug() << QDateTime::currentMSecsSinceEpoch()
-             << "msecs from epoch: reading of settings ended.";
-
     // ==============================
     // LOG ALL SETTINGS:
     // ==============================
@@ -838,7 +831,8 @@ int main(int argc, char **argv)
 
     // Log all extracted archive entries from a ZIP package:
     if (extractedFiles.length() > 0) {
-        qDebug() << "ZIP package found and the following entries were extracted:";
+        qDebug() << "ZIP package found and "
+                 << "the following entries were extracted:";
         foreach (QString fileEntry, extractedFiles) {
             qDebug() << fileEntry;
         }
@@ -1052,8 +1046,10 @@ QPage::QPage()
                      this, SLOT(qScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
                      this, SLOT(qScriptErrorsSlot()));
-    QObject::connect(&scriptHandler, SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this, SLOT(qScriptFinishedSlot()));
+    QObject::connect(&scriptHandler,
+                     SIGNAL(finished(int, QProcess::ExitStatus)),
+                     this,
+                     SLOT(qScriptFinishedSlot()));
 
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
@@ -1336,7 +1332,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         // Get list of all folders on the current PATH:
         QStringList currentPathList;
-        int pathArraySize = pathFoldersSetting.beginReadArray("environment/path");
+        int pathArraySize = pathFoldersSetting
+                .beginReadArray("environment/path");
         for (int index = 0; index < pathArraySize; ++index) {
             pathFoldersSetting.setArrayIndex(index);
             QString pathSetting = pathFoldersSetting.value("name").toString();
@@ -1414,9 +1411,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         selectPerlInterpreterDialog.deleteLater();
 
         if (perlInterpreter.length() > 0) {
-            QSettings perlInterpreterSetting((qApp->property("settingsFileName")
-                                              .toString()),
-                                             QSettings::IniFormat);
+            QSettings perlInterpreterSetting(
+                        (qApp->property("settingsFileName").toString()),
+                        QSettings::IniFormat);
             perlInterpreterSetting.setValue("interpreters/perl",
                                             perlInterpreter);
             perlInterpreterSetting.sync();
@@ -1428,8 +1425,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             selectPerlLibDialog.setViewMode(QFileDialog::Detail);
             selectPerlLibDialog.setWindowModality(Qt::WindowModal);
             selectPerlLibDialog.setWindowIcon(icon);
-            QString perlLibFolderName = selectPerlLibDialog.getExistingDirectory
-                    (0, tr("Select PERLLIB"), QDir::currentPath());
+            QString perlLibFolderName = selectPerlLibDialog
+                    .getExistingDirectory(
+                        0, tr("Select PERLLIB"), QDir::currentPath());
             selectPerlLibDialog.close();
             selectPerlLibDialog.deleteLater();
 
@@ -1611,14 +1609,18 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             if (request.url().toString().contains("select-file")) {
 
                 QFileDialog selectScriptToDebugDialog;
-                selectScriptToDebugDialog.setFileMode(QFileDialog::ExistingFile);
+                selectScriptToDebugDialog
+                        .setFileMode(QFileDialog::ExistingFile);
                 selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
                 selectScriptToDebugDialog.setWindowModality(Qt::WindowModal);
                 selectScriptToDebugDialog.setWindowIcon(icon);
                 QString scriptToDebug = selectScriptToDebugDialog
                         .getOpenFileName
                         (0, tr("Select Perl File"), QDir::currentPath(),
-                         tr("Perl scripts (*.pl);;Perl modules (*.pm);;CGI scripts (*.cgi);;All files (*)"));
+                         tr("Perl scripts (*.pl);;")
+                         + tr("Perl modules (*.pm);;")
+                         + tr("CGI scripts (*.cgi);;")
+                         + tr("All files (*)"));
                 selectScriptToDebugDialog.close();
                 selectScriptToDebugDialog.deleteLater();
 
