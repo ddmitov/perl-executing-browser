@@ -324,33 +324,20 @@ int main(int argc, char **argv)
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + "default.peb";
     QFile defaultZipPackage(defaultZipPackageName);
-    QStringList extractedFiles;
-    bool zipPackageRootFolderConformant = false;
-    bool zipPackageConfigurationFileConformant = false;
 
     if (defaultZipPackage.exists()) {
-        QStringList allZipPackageEntries =
-                JlCompress::getFileList(defaultZipPackageName);
-        foreach (QString fileEntry, allZipPackageEntries) {
-            if (fileEntry.contains("root/")) {
-                zipPackageRootFolderConformant = true;
-            }
-            if (fileEntry.contains("peb.ini")) {
-                zipPackageConfigurationFileConformant = true;
-            }
-        }
-        // Extracting root folder from a ZIP file:
-        if (zipPackageRootFolderConformant == true and
-                zipPackageConfigurationFileConformant == true) {
-            extractedFiles =
-                    JlCompress::extractDir(defaultZipPackageName,
-                                           applicationTempDirectoryName);
+        QProcess unzipper;
+        unzipper.start("/usr/bin/unzip",
+                       QStringList() << defaultZipPackageName
+                       << "-d"
+                       << applicationTempDirectoryName);
+        if (!unzipper.waitForFinished())
+                return false;
 
-            // Settings file from the extracted ZIP package:
-            settingsDirName = applicationTempDirectoryName
-                    + QDir::separator() + "root";
-            settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
-        }
+        // Settings file from the extracted ZIP package:
+        settingsDirName = applicationTempDirectoryName
+                + QDir::separator() + "root";
+        settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
     }
 #endif
 
@@ -816,28 +803,6 @@ int main(int argc, char **argv)
              << QLibraryInfo::location(QLibraryInfo::LibrariesPath)
                 .toLatin1().constData();
     qDebug() << "";
-
-    // Log all ZIP package activity:
-#if ZIP_SUPPORT == 1
-    // Log rejection of a non-standard ZIP package, i.e.
-    // ZIP package without:
-    // (1.) root folder named 'root' and
-    // (2.) configuration file named 'peb.ini'.
-    if (zipPackageRootFolderConformant == false or
-            zipPackageConfigurationFileConformant == false) {
-        qDebug() << "Non-standard ZIP package found!";
-        qDebug() << "It was not extracted and used.";
-    }
-
-    // Log all extracted archive entries from a ZIP package:
-    if (extractedFiles.length() > 0) {
-        qDebug() << "ZIP package found and "
-                 << "the following entries were extracted:";
-        foreach (QString fileEntry, extractedFiles) {
-            qDebug() << fileEntry;
-        }
-    }
-#endif
 
     qDebug() << "===============";
     qDebug() << "BASIC SETTINGS:";

@@ -143,41 +143,21 @@ equals (SCRIPT_CENSORING, 1) {
 }
 
 ##########################################################
-# To link statically QuaZip library for unpacking root folder from a ZIP file:
+# To enable support for unpacking root folder from a ZIP file:
 # ZIP_SUPPORT = 1
 ##########################################################
-# To compile without the ability to unpack root folder from a ZIP file:
+# To compile without support for unpacking root folder from a ZIP file:
 # ZIP_SUPPORT = 0
 ##########################################################
-ZIP_SUPPORT = 0
+ZIP_SUPPORT = 1
 
 DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
 
 equals (ZIP_SUPPORT, 0) {
     message ("Going to build without support for ZIP packages.")
 }
-
 equals (ZIP_SUPPORT, 1) {
     message ("Going to build with support for ZIP packages.")
-    CONFIG += warn_off
-    DEFINES += "QUAZIP_STATIC=1"
-    HEADERS += zlib/crc32.h zlib/gzguts.h zlib/inffixed.h \
-    zlib/inftrees.h zlib/zconf.h zlib/zutil.h zlib/deflate.h \
-    zlib/inffast.h zlib/inflate.h zlib/trees.h zlib/zlib.h
-    SOURCES += zlib/adler32.c zlib/crc32.c zlib/gzclose.c \
-    zlib/gzread.c zlib/infback.c zlib/inflate.c zlib/trees.c \
-    zlib/zutil.c zlib/compress.c zlib/deflate.c zlib/gzlib.c \
-    zlib/gzwrite.c zlib/inffast.c zlib/inftrees.c zlib/uncompr.c
-    HEADERS += quazip/crypt.h quazip/ioapi.h quazip/JlCompress.h \
-    quazip/quaadler32.h quazip/quachecksum32.h quazip/quacrc32.h \
-    quazip/quagzipfile.h quazip/quaziodevice.h quazip/quazipdir.h \
-    quazip/quazipfile.h quazip/quazipfileinfo.h quazip/quazip_global.h \
-    quazip/quazip.h quazip/zip.h quazip/quazipnewinfo.h quazip/unzip.h
-    SOURCES += quazip/unzip.c  quazip/zip.c \
-    quazip/JlCompress.cpp quazip/qioapi.cpp quazip/quaadler32.cpp \
-    quazip/quacrc32.cpp quazip/quagzipfile.cpp quazip/quaziodevice.cpp \
-    quazip/quazip.cpp quazip/quazipdir.cpp quazip/quazipfile.cpp \
-    quazip/quazipfileinfo.cpp quazip/quazipnewinfo.cpp
 }
 
 ##########################################################

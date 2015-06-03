@@ -3,13 +3,13 @@
 # http://perlmaven.com/begin
 # http://stackoverflow.com/questions/174292/what-is-the-best-way-to-delete-a-value-from-an-array-in-perl
 # http://www.wellho.net/mouth/588_changing-inc-where-perl-loads-its-modules.html
-BEGIN {
+#BEGIN {
 
-        my $index = 0;
-        $index++ until $INC[$index] eq '.';
-        splice(@INC, $index, 1);
+#        my $index = 0;
+#        $index++ until $INC[$index] eq '.';
+#        splice(@INC, $index, 1);
 
-        }
+#        }
 
 use strict;
 use warnings;
