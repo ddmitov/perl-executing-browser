@@ -1008,6 +1008,9 @@ public slots:
     void qDebuggerOutputSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
+            // Erase any LineInfo value from previous debugger output.
+            debuggerLineInfoLastLine = "";
+
             // Read debugger output:
             QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 

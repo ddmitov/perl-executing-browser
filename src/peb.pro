@@ -149,7 +149,7 @@ equals (SCRIPT_CENSORING, 1) {
 # To compile without the ability to unpack root folder from a ZIP file:
 # ZIP_SUPPORT = 0
 ##########################################################
-ZIP_SUPPORT = 1
+ZIP_SUPPORT = 0
 
 DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
 
