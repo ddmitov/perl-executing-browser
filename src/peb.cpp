@@ -26,13 +26,6 @@
 #endif
 
 // ==============================
-// ZIP PACKAGES SUPPORT:
-// ==============================
-#if ZIP_SUPPORT == 1
-#include <quazip/JlCompress.h> // for unpacking root folder from a zip file
-#endif
-
-// ==============================
 // MESSAGE HANDLER FOR REDIRECTING
 // ALL DEBUG MESSAGES TO A LOG FILE:
 // ==============================
