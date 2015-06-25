@@ -1,5 +1,7 @@
 #!/usr/bin/env perl
 
+use strict;
+use warnings;
 use Cwd;
 
 print "Content-Type: text/html\r\n\r\n";

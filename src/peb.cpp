@@ -428,20 +428,23 @@ int main(int argc, char **argv)
     }
     application.setProperty("perlLib", perlLib);
 
-    // Perl debugger HTML template:
-    QString debuggerHtmlTemplateSetting = settings.value(
-                "perl/perl_debugger_html_template").toString();
-    QString debuggerHtmlTemplate;
-    QFileInfo debuggerHtmlTemplateFile(debuggerHtmlTemplateSetting);
-    if (debuggerHtmlTemplateFile.isRelative()) {
-        debuggerHtmlTemplate = QDir::toNativeSeparators(
-                    rootDirName + debuggerHtmlTemplateSetting);
+    // Perl debugger output formatter:
+    QString debuggerOutputFormatter;
+    if (PERL_DEBUGGER_INTERACTION == 1) {
+        QString debuggerOutputFormatterSetting = settings.value(
+                    "perl/perl_debugger_output_formatter").toString();
+        QFileInfo debuggerOutputFormatterFile(debuggerOutputFormatterSetting);
+        if (debuggerOutputFormatterFile.isRelative()) {
+            debuggerOutputFormatter = QDir::toNativeSeparators(
+                        rootDirName + debuggerOutputFormatterSetting);
+        }
+        if (debuggerOutputFormatterFile.isAbsolute()) {
+            debuggerOutputFormatter =
+                    QDir::toNativeSeparators(debuggerOutputFormatterSetting);
+        }
+        application.setProperty("debuggerOutputFormatter",
+                                debuggerOutputFormatter);
     }
-    if (debuggerHtmlTemplateFile.isAbsolute()) {
-        debuggerHtmlTemplate =
-                QDir::toNativeSeparators(debuggerHtmlTemplateSetting);
-    }
-    application.setProperty("debuggerHtmlTemplate", debuggerHtmlTemplate);
 
     // Display or hide STDERR from scripts:
     QString displayStderr =
@@ -814,7 +817,7 @@ int main(int argc, char **argv)
     qDebug() << "Perl interpreter" << perlInterpreter;
     qDebug() << "PERLLIB folder:" << perlLib;
     if (PERL_DEBUGGER_INTERACTION == 1) {
-        qDebug() << "Debugger HTML template:" << debuggerHtmlTemplate;
+        qDebug() << "Debugger output formatter:" << debuggerOutputFormatter;
     }
     qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Script Timeout:" << scriptTimeout;
@@ -1013,13 +1016,18 @@ QPage::QPage()
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));
 
-        QObject::connect(this, SIGNAL(sourceCodeForDebuggerReadySignal()),
-                         this, SLOT(qDisplaySourceCodeAndDebuggerOutputSlot()));
-
-        QObject::connect(&debuggerSyntaxHighlighter,
+        QObject::connect(&debuggerOutputHandler,
+                         SIGNAL(readyReadStandardOutput()),
+                         this,
+                         SLOT(qDebuggerHtmlFormatterOutputSlot()));
+        QObject::connect(&debuggerOutputHandler,
+                         SIGNAL(readyReadStandardError()),
+                         this,
+                         SLOT(qDebuggerHtmlFormatterErrorsSlot()));
+        QObject::connect(&debuggerOutputHandler,
                          SIGNAL(finished(int, QProcess::ExitStatus)),
                          this,
-                         SLOT(qDebuggerSyntaxHighlighterReadySlot()));
+                         SLOT(qDebuggerHtmlFormatterFinishedSlot()));
     }
 
     // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
@@ -1623,12 +1631,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
                     if (QPage::mainFrame()->childFrames().contains(frame) or
                             (request.url().toString().contains("restart"))) {
-
-                        // Clear these variables before starting a new session
-                        // with a new file to debug. This is necessary for
-                        // synchronizing debugger output and highlighted source.
-                        debuggerSourceToHighlightFilePath = "";
-                        debuggerLineInfoLastLine = "";
 
                         // Close open handler from a previous debugger session:
                         debuggerHandler.close();

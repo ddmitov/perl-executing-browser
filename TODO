@@ -8,9 +8,6 @@ v. 0.2
 ====================================
 
 Perl debugger interaction:
-- source viewer output as a sequence of pages when lines > 50
-- display value on mouse over variable (using jQuery and request to debugger?)
-- function names to be links and to step into on click
 - show source code and highlight current line only when current line is known, otherwise do not display source code
 - show highlighted HTML source code when scripts produce HTML output within the debugger GUI
 
@@ -19,7 +16,6 @@ GUI:
 
 Configuration & help:
 - 'config' URL with a nice HTML interface
-- 'restart' URL for applying configuration changes that need restart
 - 'help' URL; keyboard shortcuts listed
 
 Web presence for the project:

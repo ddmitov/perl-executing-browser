@@ -148,7 +148,7 @@ if (scalar (keys %problematic_lines) == 0) {
 	print STDERR $header;
 	print STDERR "<p align='center'><font size='5' face='SansSerif'>";
 	print STDERR "Script execution was not attempted due to security violations:</font></p>\n";
-	
+
 	while ((my $line, my $explanation) = each (%problematic_lines)){
 		print STDERR "<pre>";
 		print STDERR "$line";

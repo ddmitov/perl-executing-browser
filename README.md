@@ -28,6 +28,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 * Perl modules can be loaded from a custom directory without system-wide installation using PATH and/or PERLLIB environment variables.  
 * Any version of Perl 5 can be selected from configuration file or by clicking a special URL.  
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
+* Scripts and their HTML-based interfaces can be extracted and run from standard ZIP packages.  
   
 **Networking:**  
 * PEB will open only pages from a predefined list of allowed domain names.  
@@ -44,7 +45,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
-* All settings are stored in an INI file with comments included.  
+* All settings are stored in a single INI file with comments included.  
 * Browser root folder can be any folder.  
 * Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
@@ -59,7 +60,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
   
 ## Target Audience
   
-* Advanced users and Perl enthusiasts willing to create rapidly custom desktop scripting solutions, which can not be easily implemented using other software.  
+* Advanced users and Perl enthusiasts willing to create rapidly custom GUI scripting solutions, which can not be easily implemented using other software.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
 
 ## Compile-time Requirements
@@ -85,6 +86,8 @@ Compiled and tested successfully using:
 ## Limitations
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
+* No means of communication between the browser and a script that is already started. Once you have started a script, you can either wait for it to finish or you can kill it.  
+* No AJAX or AJAJ requests to local scripts.  
   
 ## What Perl Executing Browser Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
@@ -100,7 +103,7 @@ Compiled and tested successfully using:
 3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
 ```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.  
 All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
-* Local scripts are executed in an ```eval``` function and only after a security check. These features are implemented in the special ```censor.pl``` script. It bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list; ``` use lib``` is also prohibited. By default ```censor.pl``` is compiled in the resources of the browser binary and is executed from memory whenever a local Perl script is started. ```censor.pl``` can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
+* Local scripts are executed in an ```eval``` function and only after a security check. These features are implemented in a special script named ```censor.pl```. It bans or limits potentially unsafe core functions and restricts the use of modules to a predefined list; ``` use lib``` is also prohibited. By default ```censor.pl``` is compiled in the resources of the browser binary and is executed from memory whenever a local Perl script is started. ```censor.pl``` can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message. 
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
