@@ -1110,6 +1110,8 @@ QPage::QPage()
     icon.load(qApp->property("iconPathName").toString());
 
     runningScriptsInCurrentWindowList.clear();
+
+    debuggerJustStarted = false;
 }
 
 // ==============================
