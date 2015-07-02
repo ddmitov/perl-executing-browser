@@ -7,16 +7,23 @@ Permanent TODO priorities:
 v. 0.2
 ====================================
 
-Perl debugger interaction:
-- show source code and highlight current line only when current line is known, otherwise do not display source code
-- show highlighted HTML source code when scripts produce HTML output within the debugger GUI
+Security:
+- censor.pl settings
 
-GUI:
-- working maximized window setting on Mac
+Usability:
+- dependency scanner & script packer
 
 Configuration & help:
 - 'config' URL with a nice HTML interface
 - 'help' URL; keyboard shortcuts listed
+- settings in JSON format
+- Perl interpreter check on browser start-up
+- Perl interpreter from user PATH using: perl -e 'print $^X'
+- custom environment variables in script environment
+- compile-time settings printed as qDebug messages
+
+GUI:
+- working maximized window setting on Mac
 
 Web presence for the project:
 - Github webpage

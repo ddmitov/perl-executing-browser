@@ -1013,9 +1013,9 @@ public slots:
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch: output from Perl debugger received.";
 
-            qDebug() << "Debugger raw output:"
-                     << debuggerOutput;
-            qDebug() << "===============";
+//            qDebug() << "Debugger raw output:\n"
+//                     << debuggerOutput;
+//            qDebug() << "===============";
 
             // Formatting of Perl debugger output is started only after
             // the final command prompt comes out of the debugger:
@@ -1071,7 +1071,7 @@ public slots:
 
             QByteArray debuggerAccumulatedOutputArray;
             debuggerAccumulatedOutputArray
-                    .append(debuggerAccumulatedOutput.toLatin1());
+                    .append(debuggerAccumulatedOutput);
             debuggerOutputHandler.write(debuggerAccumulatedOutputArray);
 
             scriptEnvironment.remove("REQUEST_METHOD");

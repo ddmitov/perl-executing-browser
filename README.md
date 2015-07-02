@@ -38,9 +38,9 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 * PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
   
 **Development goodies:**  
+* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * WebKit Web Inspector can be invoked from context menu.  
 * Local scripts and pages can be edited in external editor using context menu entry.  
-* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * Every Perl 5 script can be displayed as syntax highlighted source code.  
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
   
@@ -82,6 +82,7 @@ Compiled and tested successfully using:
   
 * Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes, or Qt5 libraries, if you compiled the program using Qt5 classes.  
 * Perl 5 distribution - any standard Linux, Mac or Windows Perl distribution.  
+* ```unzip``` binary - only if you want to run scripts from ZIP packages.  
   
 ## Limitations
   
