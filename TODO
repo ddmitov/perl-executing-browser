@@ -15,7 +15,6 @@ Usability:
 
 Configuration & help:
 - 'config' URL with a nice HTML interface
-- 'help' URL; keyboard shortcuts listed
 - settings in JSON format
 - Perl interpreter check on browser start-up
 - Perl interpreter from user PATH using: perl -e 'print $^X'

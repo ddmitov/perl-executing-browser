@@ -1160,7 +1160,6 @@ QTopLevel::QTopLevel()
     } else {
         showMaximized();
     }
-
     if ((qApp->property("windowSize").toString()) == "maximized") {
         showMaximized();
     }
