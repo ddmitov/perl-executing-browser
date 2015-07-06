@@ -2,13 +2,12 @@
 Permanent TODO priorities:
 - more and better examples
 - documentation, commented code
+- Github webpage
+- Github Wiki page
 ====================================
 
 v. 0.2
 ====================================
-
-Security:
-- censor.pl settings
 
 Usability:
 - dependency scanner & script packer
@@ -23,7 +22,3 @@ Configuration & help:
 
 GUI:
 - working maximized window setting on Mac
-
-Web presence for the project:
-- Github webpage
-- Github Wiki page
