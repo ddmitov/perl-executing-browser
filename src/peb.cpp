@@ -919,6 +919,21 @@ QFileDetector::QFileDetector()
     jsExtension.setPattern("js");
     jsExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
+    svgExtension.setPattern("svg");
+    svgExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
+    ttfExtension.setPattern("ttf");
+    ttfExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
+    eotExtension.setPattern("eot");
+    eotExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
+    woff2Extension.setPattern("woff2");
+    woff2Extension.setCaseSensitivity(Qt::CaseInsensitive);
+
+    woffExtension.setPattern("woff");
+    woffExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
     pngExtension.setPattern("png");
     pngExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
@@ -1657,19 +1672,21 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
     }
 
-    // Load local content in the same window:
     QRegExp htmlExtensions("\\.htm");
     htmlExtensions.setCaseSensitivity(Qt::CaseInsensitive);
 
+    // Open local content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
             (QPage::mainFrame()->childFrames().contains(frame))) {
 
+        // Start local script in the same window:
         if (!request.url().path().contains(htmlExtensions)) {
             targetFrame = frame;
             frame->load(request.url());
         }
 
+        // Load local HTML page in the same window:
         if (request.url().path().contains(htmlExtensions)) {
 
             QString relativeFilePath = request.url()
@@ -1686,6 +1703,44 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                           + request.url().toString(
                               QUrl::RemoveScheme | QUrl::RemoveAuthority))));
 
+            return false;
+        }
+    }
+
+    // Load local HTML page in a new window:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
+            (!QPage::mainFrame()->childFrames().contains(frame))) {
+
+        if (request.url().path().contains(htmlExtensions)) {
+
+            qDebug() << "Local HTML page in a new window:"
+                     << request.url().toString();
+            qDebug() << "===============";
+
+            QString relativeFilePath = request.url()
+                    .toString(QUrl::RemoveScheme
+                              | QUrl::RemoveAuthority
+                              | QUrl::RemoveFragment);
+            QString fullFilePath = (qApp->property("rootDirName").toString())
+                    + relativeFilePath;
+            qCheckFileExistenceSlot(fullFilePath);
+
+            newWindow = new QTopLevel();
+            QString iconPathName = qApp->property("iconPathName").toString();
+            QPixmap icon;
+            icon.load(iconPathName);
+            newWindow->setWindowIcon(icon);
+            newWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+
+            newWindow->load(QUrl::fromLocalFile
+                            (QDir::toNativeSeparators
+                             ((qApp->property("rootDirName").toString())
+                              + request.url().toString(
+                                  QUrl::RemoveScheme
+                                  | QUrl::RemoveAuthority))));
+
+            newWindow->show();
             return false;
         }
     }

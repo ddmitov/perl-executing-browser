@@ -106,7 +106,7 @@ my @core_modules = qw (AnyDBM_File
 	Safe Scalar::Util SDBM_File Search::Dict SelectSaver
 	SelfLoader Socket Storable Symbol
 	Sys::Hostname Sys::Syslog
-	 TAP::Base TAP::Formatter::Base TAP::Formatter::Color
+        TAP::Base TAP::Formatter::Base TAP::Formatter::Color
 	TAP::Formatter::Console TAP::Formatter::Console::ParallelSession
 	TAP::Formatter::Console::Session TAP::Formatter::File
 	TAP::Formatter::File::Session TAP::Formatter::Session
@@ -138,7 +138,7 @@ my @allowed_non_core_modules = qw (Archive::Zip
 	DBI
 	File::Copy::Recursive
 	Module::ScanDeps
-	XML::LibXML);
+        XML::LibXML);
 
 my @prohibited_core_functions = qw (fork unlink);
 ##############################

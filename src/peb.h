@@ -84,6 +84,21 @@ public slots:
             if (extension.contains(jsExtension)) {
                 interpreter = "browser-js";
             }
+            if (extension.contains(svgExtension)) {
+                interpreter = "browser-svg";
+            }
+            if (extension.contains(ttfExtension)) {
+                interpreter = "browser-ttf";
+            }
+            if (extension.contains(eotExtension)) {
+                interpreter = "browser-eot";
+            }
+            if (extension.contains(woffExtension)) {
+                interpreter = "browser-woff";
+            }
+            if (extension.contains(woff2Extension)) {
+                interpreter = "browser-woff2";
+            }
             if (extension.contains(pngExtension)) {
                 interpreter = "browser-image";
             }
@@ -114,6 +129,11 @@ private:
     QRegExp htmlExtensions;
     QRegExp cssExtension;
     QRegExp jsExtension;
+    QRegExp svgExtension;
+    QRegExp ttfExtension;
+    QRegExp eotExtension;
+    QRegExp woff2Extension;
+    QRegExp woffExtension;
     QRegExp pngExtension;
     QRegExp jpgExtensions;
     QRegExp gifExtension;
@@ -1742,7 +1762,6 @@ private:
     QWebView *errorsWindow;
 
     QUrl qWebHitTestURL;
-    QString filepath;
     QPixmap icon;
 };
 
