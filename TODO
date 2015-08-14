@@ -13,11 +13,10 @@ Usability:
 - configuration file name derived from the file name of the binary file
 - detect file type even when file name has multiple dots
 - configuration option to disable page reload
-- configuration option to disable going to start page from context menu or URL
-- configuration option to set maximized screen size as immutable
+- configuration option to disable going to start page from context menu
 - configuration option to ask for confirmation on exit regardless of how application is being shut down
 - dependency scanner & script packer
-- current Bulgarian translation
+- updated Bulgarian translation
 
 Configuration & help:
 - nice HTML configuration interface
