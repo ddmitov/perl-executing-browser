@@ -184,63 +184,6 @@ foreach my $line (@user_code) {
 	}
 
 ##############################
-# DETECT FORBIDDEN MANIPULATION OF
-# ALL SPECIAL ENVIRONMENT VARIABLES:
-##############################
-	if ($line =~ m/\$ENV{'DOCUMENT_ROOT'}\s*=/) {
-		if ($line =~ m/#.*\$ENV{'DOCUMENT_ROOT'}/) {
-			next;
-		} else {
-			$problematic_lines{$line} = "Forbidden manipulation of 'DOCUMENT_ROOT' environment variable detected!";
-		}
-	}
-
-	if ($line =~ m/\$ENV{'FILE_TO_OPEN'}\s*=/) {
-		if ($line =~ m/#.*\$ENV{'FILE_TO_OPEN'}/) {
-			next;
-		} else {
-			$problematic_lines{$line} = "Forbidden manipulation of 'FILE_TO_OPEN' environment variable detected!";
-		}
-	}
-
-	if ($line =~ m/\$ENV{'FILE_TO_CREATE'}\s*=/) {
-		if ($line =~ m/#.*\$ENV{'FILE_TO_CREATE'}/) {
-			next;
-		} else {
-			$problematic_lines{$line} = "Forbidden manipulation of 'FILE_TO_CREATE' environment variable detected!";
-		}
-	}
-
-	if ($line =~ m/\$ENV{'FOLDER_TO_OPEN'}\s*=/) {
-		if ($line =~ m/#.*\$ENV{'FOLDER_TO_OPEN'}/) {
-			next;
-		} else {
-			$problematic_lines{$line} = "Forbidden manipulation of 'FOLDER_TO_OPEN' environment variable detected!";
-		}
-	}
-
-##############################
-# DETECT FORBIDDEN OPEN:
-##############################
-	if ($line =~ m/open\s/) {
-		# commented 'open' is not a treat and is allowed
-		if ($line =~ m/#.*open/) {
-			next;
-		} else {
-			# 'open' from DOCUMENT_ROOT is allowed
-			if ($line =~ m/(open my \$filehandle, '<', \"\$ENV{'DOCUMENT_ROOT'}\$relative_filepath\" or)/) {
-				next;
-			# 'use open' pragma is also allowed
-			} elsif ($line =~ "use open") {
-				next;
-			# every other use of 'open' is not allowed
-			} else {
-				$problematic_lines{$line} = "Forbidden use of 'open' function detected!";
-			}
-		}
-	}
-
-##############################
 # DETECT FORBIDDEN MODULES OR
 # FORBIDDEN USE PRAGMAS:
 ##############################
