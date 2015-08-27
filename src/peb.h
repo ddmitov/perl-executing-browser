@@ -22,7 +22,6 @@
 #include <QWebView>
 #include <QWebFrame>
 #include <QProcess>
-#include <QDebug>
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSpacerItem>
@@ -237,9 +236,20 @@ protected:
 
             QFileDetector fileDetector;
             fileDetector.qDefineInterpreter(fullFilePath);
+            QString interpreter = fileDetector.interpreter;
 
-            // Local HTML, CSS, JS or supported image files:
-            if (fileDetector.interpreter.contains ("browser")) {
+            // Local Perl scripts:
+            if (interpreter ==
+                    qApp->property("perlInterpreter").toString()) {
+
+                qDebug() << "NAM - local script is going to be executed.";
+
+                QByteArray emptyPostDataArray;
+                emit startScriptSignal(request.url(), emptyPostDataArray);
+            }
+
+            // Local HTML, CSS, JS, web fonts or supported image files:
+            if (interpreter.contains ("browser")) {
 
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl
@@ -255,16 +265,8 @@ protected:
                          QNetworkRequest(networkRequest));
             }
 
-            // Local Perl scripts:
-            if ((!fileDetector.interpreter.contains("undefined")) and
-                    (!fileDetector.interpreter.contains("browser"))) {
-
-                QByteArray emptyPostDataArray;
-                emit startScriptSignal(request.url(), emptyPostDataArray);
-            }
-
             // Local files without recognized file type:
-            if (fileDetector.interpreter.contains("undefined")) {
+            if (interpreter.contains("undefined")) {
 
                 qDebug() << "File type not recognized!";
                 qDebug() << "===============";
@@ -343,7 +345,10 @@ protected:
                      QNetworkRequest(networkRequest));
         }
 
-        return QNetworkAccessManager::createRequest(operation, request);
+        QNetworkRequest emptyNetworkRequest;
+        return QNetworkAccessManager::createRequest
+                (QNetworkAccessManager::GetOperation,
+                 QNetworkRequest(emptyNetworkRequest));
     }
 };
 
@@ -701,7 +706,7 @@ public slots:
                                 .start((qApp->property("perlInterpreter")
                                         .toString()),
                                        QStringList()
-                                       << "-se"
+                                       << "-e"
                                        << censorScriptContents
                                        << "--"
                                        << QDir::toNativeSeparators(
@@ -772,10 +777,12 @@ public slots:
 
     void qScriptOutputSlot()
     {
+        QString output = scriptHandler.readAllStandardOutput();
+
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: output from" << scriptFullFilePath;
-
-        QString output = scriptHandler.readAllStandardOutput();
+//        qDebug() << "Script output:" << output;
+        qDebug() << "===============";
 
         if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
             scriptAccumulatedOutput.append(output);
@@ -824,8 +831,8 @@ public slots:
         scriptAccumulatedErrors.append(error);
         scriptAccumulatedErrors.append("\n");
 
-        qDebug() << "Script error:" << error;
-        qDebug() << "===============";
+//        qDebug() << "Script error:" << error;
+//        qDebug() << "===============";
     }
 
     void qScriptFinishedSlot()
@@ -1032,7 +1039,6 @@ public slots:
 
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch: output from Perl debugger received.";
-
 //            qDebug() << "Debugger raw output:\n"
 //                     << debuggerOutput;
 //            qDebug() << "===============";

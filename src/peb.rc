@@ -1,6 +1,4 @@
-IDI_ICON1               ICON    DISCARDABLE     "camel.ico"
-
-/* http://qt-project.org/forums/viewthread/16520 */
+IDI_ICON1               ICON    DISCARDABLE     "icons/camel.ico"
 
 # include <winver.h>
 
