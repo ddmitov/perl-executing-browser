@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>scripts/censor.pl</file>
+        <file>scripts/jquery-1-11-1-min.js</file>
     </qresource>
 </RCC>

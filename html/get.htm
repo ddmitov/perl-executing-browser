@@ -5,15 +5,6 @@
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
 		<script>
-			function existingFileSelected() {
-				document.getElementById("ExistingFileSelection").innerHTML="Select another file";
-			}
-			function newFileSelected() {
-				document.getElementById("NewFileSelection").innerHTML="Select another file name";
-			}
-			function folderSelected() {
-				document.getElementById("FolderSelection").innerHTML="Select another folder";
-			}
 			function goBack() {
 				window.history.back();
 			return false;
@@ -23,7 +14,7 @@
 
 	<body>
 		<form action="http://perl-executing-browser-pseudodomain/scripts/get_post_test.pl" method="get">
-			<div class="col-lg-4 col-lg-offset-4">
+			<div class="col-lg-10 col-lg-offset-1">
 				<fieldset>
 					<legend>Send GET request to local script</legend>
 					<!-- Inputs 1 and 2 -->
@@ -37,9 +28,18 @@
 					</div>
 					<!-- Select File, Folder or New File  -->
 					<div class="form-group">
-						<a href='openfile://' onclick="existingFileSelected()" id="ExistingFileSelection" class="btn btn-info btn-sm">Select file</a>
-						<a href='newfile://' onclick="newFileSelected()" id="NewFileSelection" class="btn btn-info btn-sm">Select new filename</a>
-						<a href='openfolder://' onclick="folderSelected()" id="FolderSelection" class="btn btn-info btn-sm">Select folder</a>
+						<div class="row">
+							<a href='openfile://' class="btn btn-info btn-sm">Select existing file</a>
+							<div id="ExistingFileSelection">No file selected</div>
+						</div>
+						<div class="row">
+							<a href='newfile://' class="btn btn-info btn-sm">Select new filename</a>
+							<div id="NewFileSelection">No filename selected</div>
+						</div>
+						<div class="row">
+							<a href='openfolder://' class="btn btn-info btn-sm">Select folder</a>
+							<div id="FolderSelection">No folder selected</div>
+						</div>
 					</div>
 					<div class="form-group">
 						<input type="reset" value="Reset" class="btn btn-default" />
@@ -48,7 +48,7 @@
 				</fieldset>
 				<button type="button" onclick="goBack()" class="btn btn-danger btn-sm">
 					Go Back from JavaScript <br/>
-					Intentionally Disabled - Doesn't Work
+					Intentionally Disabled
 				</button>
 			</div>
 		</form>

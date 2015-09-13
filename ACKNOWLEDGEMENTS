@@ -17,7 +17,7 @@
  "How to read POST data "sent" from my own QtWebKit application?":
  http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
 
- I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
+ I am also thankfull to Stack Overflow users Piotr Dobrogost and FÃ¨lix Galindo AlluÃ©
  for their code, which I adopted and modified:
  http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
  http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
@@ -37,13 +37,9 @@
  http://www.palfrader.org/code/code2html/
  http://sourceforge.net/projects/code2html/
 
- Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.
+ Thanks to Hans Jeuken and GÃ¡bor SzabÃ³ for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.
  This is the current syntax highlighter of Perl Executing Browser.
  https://metacpan.org/release/Syntax-Highlight-Engine-Kate
-
- Thanks to Andy Armstrong, Gábor Szabó and their contributors for developing and maintaining CGI::Simple CPAN module.
- It is used to handle local GET and POST requests to CGI-like scripts within Perl Executing Browser.
- https://metacpan.org/release/CGI-Simple
 
  QT
  ==
@@ -131,6 +127,7 @@
  http://doc.qt.io/qt-4.8/qwebframe.html
  http://doc.qt.io/qt-4.8/qstylefactory.html
  http://doc.qt.io/qt-4.8/signalsandslots.html
+ http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html
 
  http://forum.qt.io/topic/24213/qmessagebox-too-small
 
@@ -189,6 +186,7 @@
  http://stackoverflow.com/questions/18667291/disable-wall-compiler-warnings-in-a-qt-project
  http://stackoverflow.com/questions/6740333/can-i-run-a-qt-application-with-a-specific-theme-on-linux
  http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
+ http://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console
 
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp
@@ -243,6 +241,7 @@
 
  http://www.w3schools.com/html/html_lists.asp
  http://www.w3schools.com/jsref/event_onclick.asp
+ http://www.w3schools.com/jquery/html_html.asp
 
  http://www.javascriptkit.com/script/cut19.shtml
  http://matthewjamestaylor.com/blog/adding-css-to-html-with-link-embed-inline-and-import

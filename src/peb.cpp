@@ -1018,15 +1018,7 @@ QPage::QPage()
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qScriptOutputSlot()));
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qScriptErrorsSlot()));
-    QObject::connect(&scriptHandler,
-                     SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this,
-                     SLOT(qScriptFinishedSlot()));
-
+    // SIGNALS AND SLOTS FOR THE PERL DEBUGGER:
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));
@@ -1044,6 +1036,16 @@ QPage::QPage()
                          this,
                          SLOT(qDebuggerHtmlFormatterFinishedSlot()));
     }
+
+    // SIGNALS AND SLOTS FOR ALL LOCAL PERL SCRIPTS:
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
+                     this, SLOT(qScriptOutputSlot()));
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
+                     this, SLOT(qScriptErrorsSlot()));
+    QObject::connect(&scriptHandler,
+                     SIGNAL(finished(int, QProcess::ExitStatus)),
+                     this,
+                     SLOT(qScriptFinishedSlot()));
 
     // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
     QStringList systemEnvironment =
@@ -1118,15 +1120,26 @@ QPage::QPage()
         }
     }
 
+    runningScriptsInCurrentWindowList.clear();
+
+    debuggerJustStarted = false;
+
     // Default frame for local content:
     targetFrame = QPage::mainFrame();
 
     // Icon for dialogs:
     icon.load(qApp->property("iconPathName").toString());
 
-    runningScriptsInCurrentWindowList.clear();
+    // Internally compiled jQuery necessary for JavaScript bridges:
+    QFile file;
+    file.setFileName(":/scripts/jquery-1-11-1-min.js");
+    file.open(QIODevice::ReadOnly);
+    jQuery = file.readAll();
+    file.close();
 
-    debuggerJustStarted = false;
+    jQuery.append("\n");
+    jQuery.append("var qt = {'jQuery': jQuery.noConflict(true)};");
+    jQuery.append("null");
 }
 
 // ==============================
@@ -1294,13 +1307,14 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("addtopath")) {
 
-        QFileDialog addToPathDialog;
+        QFileDialog addToPathDialog (qApp->activeWindow());
         addToPathDialog.setFileMode(QFileDialog::AnyFile);
         addToPathDialog.setViewMode(QFileDialog::Detail);
         addToPathDialog.setWindowModality(Qt::WindowModal);
-        addToPathDialog.setWindowIcon(icon);
-        QString pathFolderString = addToPathDialog.getExistingDirectory
-                (0, tr("Select folder to add to PATH"), QDir::currentPath());
+        QString pathFolderString = addToPathDialog.getExistingDirectory(
+                    qApp->activeWindow(),
+                    tr("Select folder to add to PATH"),
+                    QDir::currentPath());
         addToPathDialog.close();
         addToPathDialog.deleteLater();
 
@@ -1381,13 +1395,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("selectperl")) {
 
-        QFileDialog selectPerlInterpreterDialog;
+        QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
         selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
         selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
         selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
-        selectPerlInterpreterDialog.setWindowIcon(icon);
         QString perlInterpreter = selectPerlInterpreterDialog.getOpenFileName
-                (0, tr("Select Perl Interpreter"),
+                (qApp->activeWindow(), tr("Select Perl Interpreter"),
                  QDir::currentPath(), tr("All files (*)"));
         selectPerlInterpreterDialog.close();
         selectPerlInterpreterDialog.deleteLater();
@@ -1402,14 +1415,15 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
             qDebug() << "Selected Perl interpreter:" << perlInterpreter;
 
-            QFileDialog selectPerlLibDialog;
+            QFileDialog selectPerlLibDialog (qApp->activeWindow());
             selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
             selectPerlLibDialog.setViewMode(QFileDialog::Detail);
             selectPerlLibDialog.setWindowModality(Qt::WindowModal);
-            selectPerlLibDialog.setWindowIcon(icon);
             QString perlLibFolderName = selectPerlLibDialog
                     .getExistingDirectory(
-                        0, tr("Select PERLLIB"), QDir::currentPath());
+                        qApp->activeWindow(),
+                        tr("Select PERLLIB"),
+                        QDir::currentPath());
             selectPerlLibDialog.close();
             selectPerlLibDialog.deleteLater();
 
@@ -1453,23 +1467,30 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("openfile")) {
 
-        QFileDialog openFileDialog;
+        QFileDialog openFileDialog (qApp->activeWindow());
         openFileDialog.setFileMode(QFileDialog::AnyFile);
         openFileDialog.setViewMode(QFileDialog::Detail);
         openFileDialog.setWindowModality(Qt::WindowModal);
-        openFileDialog.setWindowIcon(icon);
-        QString fileNameToOpenString = openFileDialog.getOpenFileName
-                (0, tr("Select File"),
-                 QDir::currentPath(), tr("All files (*)"));
+        QString fileNameToOpenString = openFileDialog.getOpenFileName(
+                    qApp->activeWindow(), tr("Select File"),
+                    QDir::currentPath(), tr("All files (*)"));
         openFileDialog.close();
         openFileDialog.deleteLater();
 
-        QByteArray fileName;
-        fileName.append(fileNameToOpenString);
-        scriptEnvironment.insert("FILE_TO_OPEN", fileName);
+        if (!fileNameToOpenString.isEmpty()) {
+            QByteArray fileName;
+            fileName.append(fileNameToOpenString);
+            scriptEnvironment.insert("FILE_TO_OPEN", fileName);
 
-        qDebug() << "File to open:" << QDir::toNativeSeparators(fileName);
-        qDebug() << "===============";
+            // JavaScript bridge back to the HTML page where request originated:
+            currentFrame()->evaluateJavaScript(jQuery);
+            QString javaScript = "qt.jQuery(\"#ExistingFileSelection\").html(\""
+                    + fileNameToOpenString + "\");";
+            currentFrame()->evaluateJavaScript(javaScript + "; null");
+
+            qDebug() << "File to open:" << QDir::toNativeSeparators(fileName);
+            qDebug() << "===============";
+        }
 
         return false;
     }
@@ -1478,25 +1499,32 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("newfile")) {
 
-        QFileDialog newFileDialog;
+        QFileDialog newFileDialog (qApp->activeWindow());
         newFileDialog.setFileMode(QFileDialog::AnyFile);
         newFileDialog.setViewMode(QFileDialog::Detail);
         newFileDialog.setWindowModality(Qt::WindowModal);
-        newFileDialog.setWindowIcon(icon);
-        QString fileNameToOpenString = newFileDialog.getSaveFileName
-                (0, tr("Create New File"),
-                 QDir::currentPath(), tr("All files (*)"));
-        if (fileNameToOpenString.isEmpty())
-            return false;
+        QString fileNameToCreateString = newFileDialog.getSaveFileName(
+                    qApp->activeWindow(),
+                    tr("Create New File"),
+                    QDir::currentPath(),
+                    tr("All files (*)"));
         newFileDialog.close();
         newFileDialog.deleteLater();
 
-        QByteArray fileName;
-        fileName.append(fileNameToOpenString);
-        scriptEnvironment.insert("FILE_TO_CREATE", fileName);
+        if (!fileNameToCreateString.isEmpty()) {
+            QByteArray fileName;
+            fileName.append(fileNameToCreateString);
+            scriptEnvironment.insert("FILE_TO_CREATE", fileName);
 
-        qDebug() << "New file:" << QDir::toNativeSeparators(fileName);
-        qDebug() << "===============";
+            // JavaScript bridge back to the HTML page where request originated:
+            currentFrame()->evaluateJavaScript(jQuery);
+            QString javaScript = "qt.jQuery(\"#NewFileSelection\").html(\""
+                    + fileNameToCreateString + "\");";
+            currentFrame()->evaluateJavaScript(javaScript + "; null");
+
+            qDebug() << "New file:" << QDir::toNativeSeparators(fileName);
+            qDebug() << "===============";
+        }
 
         return false;
     }
@@ -1505,22 +1533,31 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("openfolder")) {
 
-        QFileDialog openFolderDialog;
+        QFileDialog openFolderDialog (qApp->activeWindow());
         openFolderDialog.setFileMode(QFileDialog::AnyFile);
         openFolderDialog.setViewMode(QFileDialog::Detail);
         openFolderDialog.setWindowModality(Qt::WindowModal);
-        openFolderDialog.setWindowIcon(icon);
-        QString folderNameToOpenString = openFolderDialog.getExistingDirectory
-                (0, tr("Select Folder"), QDir::currentPath());
+        QString folderNameToOpenString = openFolderDialog.getExistingDirectory(
+                    qApp->activeWindow(),
+                    tr("Select Folder"),
+                    QDir::currentPath());
         openFolderDialog.close();
         openFolderDialog.deleteLater();
 
-        QByteArray folderName;
-        folderName.append(folderNameToOpenString);
-        scriptEnvironment.insert("FOLDER_TO_OPEN", folderName);
+        if (!folderNameToOpenString.isEmpty()) {
+            QByteArray folderName;
+            folderName.append(folderNameToOpenString);
+            scriptEnvironment.insert("FOLDER_TO_OPEN", folderName);
 
-        qDebug() << "Folder to open:" << QDir::toNativeSeparators(folderName);
-        qDebug() << "===============";
+            // JavaScript bridge back to the HTML page where request originated:
+            currentFrame()->evaluateJavaScript(jQuery);
+            QString javaScript = "qt.jQuery(\"#FolderSelection\").html(\""
+                    + folderNameToOpenString + "\");";
+            currentFrame()->evaluateJavaScript(javaScript + "; null");
+
+            qDebug() << "Folder to open:" << QDir::toNativeSeparators(folderName);
+            qDebug() << "===============";
+        }
 
         return false;
     }
@@ -1590,7 +1627,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             // Select a Perl script for debugging:
             if (request.url().toString().contains("select-file")) {
 
-                QFileDialog selectScriptToDebugDialog;
+                QFileDialog selectScriptToDebugDialog (qApp->activeWindow());
                 selectScriptToDebugDialog
                         .setFileMode(QFileDialog::ExistingFile);
                 selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
@@ -1598,7 +1635,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 selectScriptToDebugDialog.setWindowIcon(icon);
                 QString scriptToDebug = selectScriptToDebugDialog
                         .getOpenFileName
-                        (0, tr("Select Perl File"), QDir::currentPath(),
+                        (qApp->activeWindow(),
+                         tr("Select Perl File"),
+                         QDir::currentPath(),
                          tr("Perl scripts (*.pl);;")
                          + tr("Perl modules (*.pm);;")
                          + tr("CGI scripts (*.cgi);;")
@@ -1683,7 +1722,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // Start local script in the same window:
         if (!request.url().path().contains(htmlExtensions)) {
             targetFrame = frame;
-            frame->load(request.url());
+
+            QByteArray emptyPostDataArray;
+            qStartScriptSlot(request.url(), emptyPostDataArray);
+            return false;
+
+            //frame->load(request.url());
         }
 
         // Load local HTML page in the same window:

@@ -154,7 +154,7 @@ public slots:
 
             if ((qApp->property("systrayIconDoubleClickAction")
                  .toString()) == "quit") {
-                QMessageBox confirmExitMessageBox;
+                QMessageBox confirmExitMessageBox (qApp->activeWindow());
                 confirmExitMessageBox.setWindowModality(Qt::WindowModal);
                 confirmExitMessageBox.setWindowTitle(tr("Quit"));
                 confirmExitMessageBox
@@ -242,10 +242,13 @@ protected:
             if (interpreter ==
                     qApp->property("perlInterpreter").toString()) {
 
-                qDebug() << "NAM - local script is going to be executed.";
-
                 QByteArray emptyPostDataArray;
                 emit startScriptSignal(request.url(), emptyPostDataArray);
+
+                QNetworkRequest emptyNetworkRequest;
+                return QNetworkAccessManager::createRequest
+                        (QNetworkAccessManager::GetOperation,
+                         QNetworkRequest(emptyNetworkRequest));
             }
 
             // Local HTML, CSS, JS, web fonts or supported image files:
@@ -344,11 +347,6 @@ protected:
                     (QNetworkAccessManager::GetOperation,
                      QNetworkRequest(networkRequest));
         }
-
-        QNetworkRequest emptyNetworkRequest;
-        return QNetworkAccessManager::createRequest
-                (QNetworkAccessManager::GetOperation,
-                 QNetworkRequest(emptyNetworkRequest));
     }
 };
 
@@ -361,7 +359,6 @@ class QPage : public QWebPage
 
 signals:
     void displayErrorsSignal(QString errors);
-//    void sourceCodeForDebuggerReadySignal();
     void printPreviewSignal();
     void printSignal();
     void saveAsPdfSignal();
@@ -370,6 +367,7 @@ signals:
     void quitFromURLSignal();
 
 public slots:
+
     void qThemeLinker(QString htmlInput)
     {
         cssLinkedHtml = "";
@@ -446,18 +444,19 @@ public slots:
 
     void qThemeSelectorSlot()
     {
-        QFileDialog selectThemeDialog;
+        QFileDialog selectThemeDialog (qApp->activeWindow());
         selectThemeDialog.setFileMode(QFileDialog::AnyFile);
         selectThemeDialog.setViewMode(QFileDialog::Detail);
         selectThemeDialog.setWindowModality(Qt::WindowModal);
-        selectThemeDialog.setWindowIcon(icon);
-        QString newTheme = selectThemeDialog.getOpenFileName
-                (0, tr("Select Browser Theme"),
-                 (qApp->property("allThemesDirectory").toString()),
-                 tr("Browser theme (*.theme)"));
+        QString newTheme = selectThemeDialog.getOpenFileName(
+                    qApp->activeWindow(),
+                    tr("Select Browser Theme"),
+                    (qApp->property("allThemesDirectory").toString()),
+                    tr("Browser theme (*.theme)"));
         selectThemeDialog.close();
         selectThemeDialog.deleteLater();
-        if (newTheme.length() > 0) {
+
+        if (!newTheme.isEmpty()) {
             if (QFile::exists(
                         QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectoryFullPath")
@@ -487,7 +486,7 @@ public slots:
 
     void qMissingFileMessageSlot()
     {
-        QMessageBox missingFileMessageBox;
+        QMessageBox missingFileMessageBox (qApp->activeWindow());
         missingFileMessageBox.setWindowModality(Qt::WindowModal);
         missingFileMessageBox.setIcon(QMessageBox::Critical);
         missingFileMessageBox.setWindowTitle(tr("Missing file"));
@@ -544,7 +543,7 @@ public slots:
                 scriptHandler.close();
                 scriptKilled = true;
 
-                QMessageBox scriptKilledMessageBox;
+                QMessageBox scriptKilledMessageBox (qApp->activeWindow());
                 scriptKilledMessageBox.setWindowModality(Qt::WindowModal);
                 scriptKilledMessageBox.setWindowTitle(tr("Script Killed"));
                 scriptKilledMessageBox
@@ -558,7 +557,8 @@ public slots:
             } else {
                 scriptKilled = true;
 
-                QMessageBox scriptAlreadyFinishedMessageBox;
+                QMessageBox scriptAlreadyFinishedMessageBox (
+                            qApp->activeWindow());
                 scriptAlreadyFinishedMessageBox
                         .setWindowModality(Qt::WindowModal);
                 scriptAlreadyFinishedMessageBox
@@ -733,7 +733,7 @@ public slots:
                 qDebug() << "Script already started:" << scriptFullFilePath;
                 qDebug() << "===============";
 
-                QMessageBox scriptStartedMessageBox;
+                QMessageBox scriptStartedMessageBox (qApp->activeWindow());
                 scriptStartedMessageBox
                         .setWindowModality(Qt::WindowModal);
                 scriptStartedMessageBox
@@ -856,7 +856,7 @@ public slots:
                     if (scriptAccumulatedOutput.length() == 0) {
                         targetFrame->setHtml(scriptAccumulatedErrors);
                     } else {
-                        QMessageBox showErrorsMessageBox;
+                        QMessageBox showErrorsMessageBox (qApp->activeWindow());
                         showErrorsMessageBox.setWindowModality(Qt::WindowModal);
                         showErrorsMessageBox.setWindowTitle(tr("Errors"));
                         showErrorsMessageBox
@@ -919,7 +919,7 @@ public slots:
             qDebug() << "Script timed out:" << scriptFullFilePath;
             qDebug() << "===============";
 
-            QMessageBox scriptTimeoutMessageBox;
+            QMessageBox scriptTimeoutMessageBox (qApp->activeWindow());
             scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
             scriptTimeoutMessageBox.setWindowTitle(tr("Script Timeout"));
             scriptTimeoutMessageBox
@@ -1173,6 +1173,8 @@ private:
     QString cssLinkedHtml;
     QString httpHeadersCleanedHtml;
 
+    QString jQuery;
+
     QStringList allowedEnvironmentVariables;
     QStringList sourceViewerMandatoryCommandLine;
 
@@ -1296,14 +1298,18 @@ public slots:
 
         qDebug() << "Save as PDF requested.";
 
-        QFileDialog saveAsPdfDialog;
+        QFileDialog saveAsPdfDialog (qApp->activeWindow());
         saveAsPdfDialog.setFileMode(QFileDialog::AnyFile);
         saveAsPdfDialog.setViewMode(QFileDialog::Detail);
         saveAsPdfDialog.setWindowModality(Qt::WindowModal);
-        saveAsPdfDialog.setWindowIcon(icon);
-        QString fileName = saveAsPdfDialog.getSaveFileName
-                (0, tr("Save as PDF"),
-                 QDir::currentPath(), tr("PDF files (*.pdf)"));
+        QString fileName = saveAsPdfDialog.getSaveFileName(
+                    qApp->activeWindow(),
+                    tr("Save as PDF"),
+                    QDir::currentPath(),
+                    tr("PDF files (*.pdf)"));
+        saveAsPdfDialog.close();
+        saveAsPdfDialog.deleteLater();
+
         if (!fileName.isEmpty()) {
             if (QFileInfo(fileName).suffix().isEmpty()) {
                 fileName.append(".pdf");
@@ -1323,9 +1329,6 @@ public slots:
             pdfPrinter.setOutputFileName(fileName);
             QTopLevel::print(&pdfPrinter);
         }
-
-        saveAsPdfDialog.close();
-        saveAsPdfDialog.deleteLater();
 
         qDebug() << "===============";
 #endif
@@ -1607,7 +1610,7 @@ public slots:
                  + "'https://github.com/ddmitov/perl-executing-browser'>"
                  + "https://github.com/ddmitov/perl-executing-browser</a><br>");
 
-        QMessageBox aboutMessageBox;
+        QMessageBox aboutMessageBox (qApp->activeWindow());
         QSpacerItem *horizontalSpacer =
                 new QSpacerItem(500, 0,
                                 QSizePolicy::Minimum, QSizePolicy::Expanding);
@@ -1625,7 +1628,7 @@ public slots:
     void closeEvent(QCloseEvent *event)
     {
         if (mainPage->scriptHandler.isOpen()) {
-            QMessageBox confirmExitMessageBox;
+            QMessageBox confirmExitMessageBox (qApp->activeWindow());
             confirmExitMessageBox.setWindowModality(Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle(tr("Quit"));
             confirmExitMessageBox
@@ -1657,7 +1660,7 @@ public slots:
     {
         if (qApp->property("runningScriptsGlobalList")
                 .toStringList().length() > 0) {
-            QMessageBox confirmExitMessageBox;
+            QMessageBox confirmExitMessageBox (qApp->activeWindow());
             confirmExitMessageBox.setWindowModality(Qt::WindowModal);
             confirmExitMessageBox.setWindowTitle(tr("Quit"));
             confirmExitMessageBox

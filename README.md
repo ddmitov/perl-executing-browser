@@ -7,13 +7,13 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
 ## Design Objectives
   
 * **1. Fast and easy GUI for local scripts:**  
-    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful interfaces for custom Perl 5 scripts;  
+    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful Perl 5 desktop applications;  
 
 * **2. Zero installation when needed:**  
     put together your Perl 5 scripts and modules and even your version of Perl 5 with a copy of PEB and its Qt libraries and run your applications from every folder, even from USB sticks;  
 
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl 5 and Qt are available;  
+    use it on every platform, where Perl 5, Qt and QtWebKit are available;  
 
 * **4. User-space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program.  
@@ -92,8 +92,10 @@ Compiled and tested successfully using:
   
 ## What Perl Executing Browser Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
-* PEB does not embed a Perl interpreter in itself and does not run Perl scripts in a full-fledged sandbox like JavaScript is run in general purpose web browsers. PEB uses Perl for desktop-oriented scripts created to manipulate local data with an optional network access and does not compete JavaScript in HTML DOM manipulation.  
-* PEB has a work-in-progress security system implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
+* PEB has no sandbox for local Perl scripts. A work-in-progress security system is implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without opening any ports or any other means of communication with the outside world.  
+* Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to HTML DOM.  
   
 ## Security Features & Considerations
   
