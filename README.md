@@ -132,7 +132,7 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
 * F12 - go to start page  
 * Ctrl+R - reload current page  
 * Ctrl+P - print current page  
-* Ctrl+X - exit application  
+* Ctrl+Q - exit application  
   
 ## History
   

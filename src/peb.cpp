@@ -1173,7 +1173,7 @@ QTopLevel::QTopLevel()
     QObject::connect(printShortcut, SIGNAL(activated()),
                      this, SLOT(qPrintSlot()));
 
-    QShortcut *closeAppShortcut = new QShortcut(QKeySequence("Ctrl+X"), this);
+    QShortcut *closeAppShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
     QObject::connect(closeAppShortcut, SIGNAL(activated()),
                      this, SLOT(qExitApplicationSlot()));
 
