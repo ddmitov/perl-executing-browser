@@ -277,7 +277,7 @@ int main(int argc, char **argv)
     QString settingsFileName;
 
     // ==============================
-    // CREATE TEMPORARY FOLDERS:
+    // GET BASIC APPLICATION INFO:
     // ==============================
     // Application start date and time for temporary folder name:
     QString applicationStartDateAndTime =
@@ -290,6 +290,9 @@ int main(int argc, char **argv)
     QString applicationBinaryName =
             QFileInfo(QApplication::applicationFilePath()).fileName();
 
+    // ==============================
+    // CREATE TEMPORARY FOLDERS:
+    // ==============================
     // Create the main temporary folder for the current browser session:
     QString applicationTempDirectoryName = QDir::tempPath() + QDir::separator()
             + applicationBinaryName + "--" + applicationStartDateAndTime;
@@ -527,6 +530,10 @@ int main(int argc, char **argv)
         QApplication::exit();
     }
 
+    // Warn on exit:
+    QString warnOnExit = settings.value("gui/warn_on_exit") .toString();
+    application.setProperty("warnOnExit", warnOnExit);
+
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:
     QString windowSize = settings.value("gui/window_size").toString();
@@ -627,15 +634,6 @@ int main(int argc, char **argv)
         }
         application.setProperty("systrayIconPathName", systrayIconPathName);
     }
-
-    // System tray icon double-click action:
-    // Double-clicking the system tray icon can quit the program or
-    // minimize all of it's windows.
-    // User is asked for confirmation before quitting the program.
-    QString systrayIconDoubleClickAction =
-            settings.value("gui/systray_icon_double_click_action").toString();
-    application.setProperty("systrayIconDoubleClickAction",
-                            systrayIconDoubleClickAction);
 
     // Name of the default GUI theme:
     QString defaultTheme = settings.value("gui/theme_default").toString();
@@ -837,6 +835,7 @@ int main(int argc, char **argv)
     qDebug() << "GUI SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Start page:" << startPagePath;
+    qDebug() << "Warn on exit:" << warnOnExit;
     // Get screen resolution:
     int screenWidth = QDesktopWidget().screen()->rect().width();
     int screenHeight = QDesktopWidget().screen()->rect().height();
@@ -857,8 +856,6 @@ int main(int argc, char **argv)
     qDebug() << "Help and error messages directory:" << helpDirectory;
     qDebug() << "System tray icon switch:" << systrayIcon;
     qDebug() << "System tray icon file:" << systrayIconPathName;
-    qDebug() << "System tray icon double-click action:"
-             << systrayIconDoubleClickAction;
     qDebug() << "Web Inspector from context menu:" << webInspector;
 
     qDebug() << "===============";

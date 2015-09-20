@@ -151,39 +151,11 @@ public slots:
     void qTrayIconActivatedSlot(QSystemTrayIcon::ActivationReason reason)
     {
         if (reason == QSystemTrayIcon::DoubleClick) {
-
-            if ((qApp->property("systrayIconDoubleClickAction")
-                 .toString()) == "quit") {
-                QMessageBox confirmExitMessageBox (qApp->activeWindow());
-                confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-                confirmExitMessageBox.setWindowTitle(tr("Quit"));
-                confirmExitMessageBox
-                        .setIconPixmap((qApp->property("icon").toString()));
-                confirmExitMessageBox
-                        .setText(tr("You are going to quit the program.<br>")
-                                 + tr("Are you sure?"));
-                confirmExitMessageBox
-                        .setStandardButtons(QMessageBox::Yes
-                                            | QMessageBox::No);
-                confirmExitMessageBox.setButtonText(QMessageBox::Yes,
-                                                    tr("Yes"));
-                confirmExitMessageBox.setButtonText(QMessageBox::No,
-                                                    tr("No"));
-                confirmExitMessageBox.setDefaultButton(QMessageBox::No);
-                if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                    QApplication::quit();
+            foreach (QWidget *window, QApplication::topLevelWidgets()) {
+                if (window->isVisible()) {
+                    window->showMinimized();
                 }
             }
-
-            if ((qApp->property("systrayIconDoubleClickAction")
-                 .toString()) == "minimize_all_windows") {
-                foreach (QWidget *window, QApplication::topLevelWidgets()) {
-                    if (window->isVisible()) {
-                        window->showMinimized();
-                    }
-                }
-            }
-
         }
     }
 
@@ -1635,9 +1607,9 @@ public slots:
                     .setIconPixmap((qApp->property("icon").toString()));
             confirmExitMessageBox
                     .setText(
-                        tr("You are going to close window or quit the program,")
+                        tr("You are going to close this window,")
                         + "<br>"
-                        + tr("but at least one script is still running.")
+                        + tr("but a script is still running.")
                         + "<br>"
                         + tr("Are you sure?"));
             confirmExitMessageBox
@@ -1652,7 +1624,33 @@ public slots:
                 event->ignore();
             }
         } else {
-            event->accept();
+            if (qApp->property("warnOnExit").toString() == "enable") {
+                QMessageBox confirmExitMessageBox (qApp->activeWindow());
+                confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+                confirmExitMessageBox.setWindowTitle(tr("Quit"));
+                confirmExitMessageBox
+                        .setIconPixmap((qApp->property("icon").toString()));
+                confirmExitMessageBox
+                        .setText(
+                            tr("You are going to close this window and")
+                            + "<br>"
+                            + tr("any unsaved data will be lost!")
+                            + "<br>"
+                            + tr("Are you sure?"));
+                confirmExitMessageBox
+                        .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+                confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+                confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+                confirmExitMessageBox.setDefaultButton(QMessageBox::No);
+                if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
+                    mainPage->scriptHandler.close();
+                    event->accept();
+                } else {
+                    event->ignore();
+                }
+            } else {
+                event->accept();
+            }
         }
     }
 
@@ -1668,7 +1666,7 @@ public slots:
             confirmExitMessageBox
                     .setText(tr("You are going to quit the program,")
                              + "<br>"
-                             + tr("but at least one script is still running.")
+                             + tr("but a script is still running.")
                              + "<br>"
                              + tr("Are you sure?"));
             confirmExitMessageBox.setStandardButtons(QMessageBox::Yes
@@ -1677,67 +1675,65 @@ public slots:
             confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
             confirmExitMessageBox.setDefaultButton(QMessageBox::No);
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                // Perl temp folder removal code:
-                QProcess cleanerProcess;
-                cleanerProcess
-                        .startDetached((qApp->property("perlInterpreter")
-                                        .toString()),
-                                       QStringList()
-                                       << "-se"
-                                       << "use File::Path;  rmtree (@ARGV);"
-                                       << "--"
-                                       << (qApp->property(
-                                               "applicationTempDirectory")
-                                           .toString()));
-
-                if ((qApp->property("systrayIcon").toString()) == "enable") {
-                    emit trayIconHideSignal();
-                }
-
-                QString dateTimeString =
-                        QDateTime::currentDateTime()
-                        .toString("dd.MM.yyyy hh:mm:ss");
-                qDebug() << qApp->applicationName().toLatin1().constData()
-                         << qApp->applicationVersion().toLatin1().constData()
-                         << "terminated normally on:" << dateTimeString;
-                qDebug() << "===============";
-
-                QApplication::exit();
+                qExitApplicationSequence();
             }
         } else {
-            // Qt5 temp folder removal code - Qt4 incompatible:
-//            QDir applicationTempDirectory(
-//                        qApp->property("applicationTempDirectory")
-//                        .toString());
-//            applicationTempDirectory.removeRecursively();
-
-            // Perl temp folder removal code:
-            QProcess cleanerProcess;
-            cleanerProcess
-                    .startDetached((qApp->property("perlInterpreter")
-                                    .toString()),
-                                   QStringList()
-                                   << "-se"
-                                   << "use File::Path;  rmtree (@ARGV);"
-                                   << "--"
-                                   << (qApp->property(
-                                           "applicationTempDirectory")
-                                       .toString()));
-
-            if ((qApp->property("systrayIcon").toString()) == "enable") {
-                emit trayIconHideSignal();
+            if (qApp->property("warnOnExit").toString() == "enable") {
+                QMessageBox confirmExitMessageBox (qApp->activeWindow());
+                confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+                confirmExitMessageBox.setWindowTitle(tr("Quit"));
+                confirmExitMessageBox
+                        .setIconPixmap((qApp->property("icon").toString()));
+                confirmExitMessageBox
+                        .setText(
+                            tr("You are going to quit the program and")
+                            + "<br>"
+                            + tr("any unsaved data will be lost!")
+                            + "<br>"
+                            + tr("Are you sure?"));
+                confirmExitMessageBox.setStandardButtons(QMessageBox::Yes
+                                                         | QMessageBox::No);
+                confirmExitMessageBox
+                        .setButtonText(QMessageBox::Yes, tr("Yes"));
+                confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+                confirmExitMessageBox.setDefaultButton(QMessageBox::No);
+                if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
+                    qExitApplicationSequence();
+                }
+            } else {
+                qExitApplicationSequence();
             }
-
-            QString dateTimeString =
-                    QDateTime::currentDateTime()
-                    .toString("dd.MM.yyyy hh:mm:ss");
-            qDebug() << qApp->applicationName().toLatin1().constData()
-                     << qApp->applicationVersion().toLatin1().constData()
-                     << "terminated normally on:" << dateTimeString;
-            qDebug() << "===============";
-
-            QApplication::exit();
         }
+    }
+
+    void qExitApplicationSequence()
+    {
+        // Perl temp folder removal code:
+        QProcess cleanerProcess;
+        cleanerProcess
+                .startDetached((qApp->property("perlInterpreter")
+                                .toString()),
+                               QStringList()
+                               << "-se"
+                               << "use File::Path;  rmtree (@ARGV);"
+                               << "--"
+                               << (qApp->property(
+                                       "applicationTempDirectory")
+                                   .toString()));
+
+        if ((qApp->property("systrayIcon").toString()) == "enable") {
+            emit trayIconHideSignal();
+        }
+
+        QString dateTimeString =
+                QDateTime::currentDateTime()
+                .toString("dd.MM.yyyy hh:mm:ss");
+        qDebug() << qApp->applicationName().toLatin1().constData()
+                 << qApp->applicationVersion().toLatin1().constData()
+                 << "terminated normally on:" << dateTimeString;
+        qDebug() << "===============";
+
+        QApplication::exit();
     }
 
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)

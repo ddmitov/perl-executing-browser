@@ -14,7 +14,6 @@ Usability:
 - detect file type even when file name has multiple dots
 - configuration option to disable page reload
 - configuration option to disable going to start page from context menu
-- configuration option to ask for confirmation on exit regardless of how application is being shut down
 - dependency scanner & script packer
 - updated Bulgarian translation
 
