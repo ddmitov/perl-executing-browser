@@ -1560,7 +1560,7 @@ public slots:
                  + tr(" version ")
                  + qApp->applicationVersion() + "<br>"
                  + "Qt WebKit"+ tr(" version ") + qtWebKitVersion + "<br>"
-                 "Qt"+ tr(" version ") + qtVersion + "<br><br>"
+                 + "Qt" + tr(" version ") + qtVersion + "<br><br>"
                  + tr("This program is free software;") + "<br>"
                  + tr("you can redistribute it and/or modify it") + "<br>"
                  + tr("under the terms of")
@@ -1576,7 +1576,7 @@ public slots:
                  + tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
                  + "<br><br>"
                  + tr("Dimitar D. Mitov, 2013 - 2015,") + "<br>"
-                 + tr("Valcho Nedelchev, 2014 - 2015")
+                 + tr("Valcho Nedelchev, 2014 - 2015.")
                  + "<br><br>"
                  + "<a href="
                  + "'https://github.com/ddmitov/perl-executing-browser'>"
@@ -1602,7 +1602,7 @@ public slots:
         if (mainPage->scriptHandler.isOpen()) {
             QMessageBox confirmExitMessageBox (qApp->activeWindow());
             confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-            confirmExitMessageBox.setWindowTitle(tr("Quit"));
+            confirmExitMessageBox.setWindowTitle(tr("Close window"));
             confirmExitMessageBox
                     .setIconPixmap((qApp->property("icon").toString()));
             confirmExitMessageBox
@@ -1620,6 +1620,7 @@ public slots:
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 mainPage->scriptHandler.close();
                 event->accept();
+                windowClosingStarted = true;
             } else {
                 event->ignore();
             }
@@ -1627,7 +1628,7 @@ public slots:
             if (qApp->property("warnOnExit").toString() == "enable") {
                 QMessageBox confirmExitMessageBox (qApp->activeWindow());
                 confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-                confirmExitMessageBox.setWindowTitle(tr("Quit"));
+                confirmExitMessageBox.setWindowTitle(tr("Close window"));
                 confirmExitMessageBox
                         .setIconPixmap((qApp->property("icon").toString()));
                 confirmExitMessageBox
@@ -1639,12 +1640,15 @@ public slots:
                             + tr("Are you sure?"));
                 confirmExitMessageBox
                         .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-                confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
-                confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
+                confirmExitMessageBox
+                        .setButtonText(QMessageBox::Yes, tr("Yes"));
+                confirmExitMessageBox
+                        .setButtonText(QMessageBox::No, tr("No"));
                 confirmExitMessageBox.setDefaultButton(QMessageBox::No);
                 if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                     mainPage->scriptHandler.close();
                     event->accept();
+                    windowClosingStarted = true;
                 } else {
                     event->ignore();
                 }
@@ -1678,7 +1682,8 @@ public slots:
                 qExitApplicationSequence();
             }
         } else {
-            if (qApp->property("warnOnExit").toString() == "enable") {
+            if (qApp->property("warnOnExit").toString() == "enable" and
+                    windowClosingStarted == false) {
                 QMessageBox confirmExitMessageBox (qApp->activeWindow());
                 confirmExitMessageBox.setWindowModality(Qt::WindowModal);
                 confirmExitMessageBox.setWindowTitle(tr("Quit"));
@@ -1768,6 +1773,7 @@ private:
 
     QUrl qWebHitTestURL;
     QPixmap icon;
+    bool windowClosingStarted;
 };
 
 #endif // PEB_H

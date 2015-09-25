@@ -19,10 +19,33 @@
 #include <QDebug>
 #include <qglobal.h>
 #include "peb.h"
-#include <iostream> // for std::cout
 
 #ifndef Q_OS_WIN
+#include <iostream> // for std::cout
 #include <unistd.h> // for isatty()
+#endif
+
+#ifdef Q_OS_WIN
+#include <windows.h>
+#include <stdio.h>
+
+BOOL IsUserAdmin(void)
+{
+    BOOL bResult;
+    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
+    PSID AdministratorsGroup;
+    bResult = AllocateAndInitializeSid(
+                &NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
+                DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
+                &AdministratorsGroup);
+    if (bResult) {
+        if (!CheckTokenMembership(NULL, AdministratorsGroup, &bResult)) {
+            bResult = FALSE;
+        }
+        FreeSid(AdministratorsGroup);
+    }
+    return(bResult);
+}
 #endif
 
 // ==============================
@@ -134,6 +157,7 @@ int main(int argc, char **argv)
     // ==============================
     foreach (QString argument, commandLineArguments){
         if (argument.contains("--help") or argument.contains("-H")) {
+#ifndef Q_OS_WIN
             std::cout << " " << std::endl;
             std::cout << application.applicationName().toLatin1().constData()
                       << " v." << application.applicationVersion()
@@ -161,6 +185,28 @@ int main(int argc, char **argv)
             std::cout << "  --help          -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
+#endif
+
+#ifdef Q_OS_WIN
+            QMessageBox commandLineHelp;
+            commandLineHelp.setWindowModality(Qt::WindowModal);
+            commandLineHelp.setIcon(QMessageBox::Information);
+            commandLineHelp.setWindowTitle(
+                        (QApplication::tr("Command-Line Options")));
+            commandLineHelp.setText(
+                        "  --fullscreen -F<br>"
+                        + (QApplication::tr(
+                               "start browser in fullscreen mode"))
+                        + "<br><br>"
+                        + "  --maximized -M<br>"
+                        + (QApplication::tr(
+                               "start browser in a maximized window"))
+                        + "<br><br>"
+                        + "  --help -H<br>"
+                        + (QApplication::tr("this help")));
+            commandLineHelp.setDefaultButton(QMessageBox::Ok);
+            commandLineHelp.exec();
+#endif
             return 1;
             QApplication::exit();
         }
@@ -262,6 +308,29 @@ int main(int argc, char **argv)
         startedAsRootMessageBox.setIcon(QMessageBox::Critical);
         startedAsRootMessageBox.setWindowTitle(title);
         startedAsRootMessageBox.setText(text);
+        startedAsRootMessageBox.setDefaultButton(QMessageBox::Ok);
+        startedAsRootMessageBox.exec();
+
+        return 1;
+        QApplication::exit();
+    }
+#endif
+
+#ifdef Q_OS_WIN
+    if (IsUserAdmin()) {
+        QMessageBox startedAsRootMessageBox;
+        startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
+        startedAsRootMessageBox.setIcon(QMessageBox::Critical);
+        startedAsRootMessageBox.setWindowTitle(
+                    QApplication::tr(
+                        "Started by administrator"));
+        startedAsRootMessageBox.setText(
+                    QApplication::tr(
+                        "Browser was started with administrative privileges.")
+                    + "<br>"
+                    + QApplication::tr("This is not a good idea!")
+                    + "&nbsp;"
+                    + QApplication::tr("Going to quit now."));
         startedAsRootMessageBox.setDefaultButton(QMessageBox::Ok);
         startedAsRootMessageBox.exec();
 
@@ -1290,6 +1359,8 @@ QTopLevel::QTopLevel()
 
     // Icon for windows:
     icon.load(qApp->property("iconPathName").toString());
+
+    windowClosingStarted = false;
 }
 
 // ==============================
