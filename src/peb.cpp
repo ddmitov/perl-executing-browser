@@ -394,12 +394,11 @@ int main(int argc, char **argv)
     // ==============================
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
+    QStringList extractedFiles;
 #if ZIP_SUPPORT == 1
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + "default.peb";
     QFile defaultZipPackage(defaultZipPackageName);
-
-    QStringList extractedFiles;
 
     if (defaultZipPackage.exists()) {
         // Extracting root folder from a separate zip file:
@@ -974,12 +973,14 @@ int main(int argc, char **argv)
     qDebug() << "Logfiles prefix:" << logPrefix;
     qDebug() << "===============";
 
-    qDebug() << "ZIP package found.";
-    qDebug() << "Extracted files:";
-    foreach (QString extractedFile, extractedFiles) {
-        qDebug() << extractedFile;
+    if (extractedFiles.length() > 0) {
+        qDebug() << "ZIP package found.";
+        qDebug() << "Extracted files:";
+        foreach (QString extractedFile, extractedFiles) {
+            qDebug() << extractedFile;
+        }
+        qDebug() << "===============";
     }
-    qDebug() << "===============";
 
     // ==============================
     // MAIN GUI CLASS INITIALIZATION:
