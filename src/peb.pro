@@ -31,6 +31,7 @@ CONFIG (release, debug|release) {
 QT += network
 CONFIG += openssl-linked # necessary for handling https adresses
 
+
 # Macintosh specific settings:
 macx {
   ##########################################################
@@ -66,6 +67,7 @@ macx {
   ICON = icons/camel.icns
 }
 
+
 # Windows specific settings:
 win32 {
   # Resource and icon files:
@@ -73,16 +75,19 @@ win32 {
   RC_FILE = peb.rc
 }
 
+
 # Qt4 specific settings:
 lessThan (QT_MAJOR_VERSION, 5) {
   QT += webkit
 }
+
 
 # Qt5 specific settings:
 greaterThan (QT_MAJOR_VERSION, 4) {
   QT += widgets webkitwidgets printsupport
   DEFINES += HAVE_QT5
 }
+
 
 # Source files:
 HEADERS += peb.h
@@ -93,6 +98,7 @@ MOC_DIR = ../tmp
 OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
+
 ##########################################################
 # Application name:
 # ATTENTION - replace spaces with underscore like that:
@@ -102,6 +108,7 @@ APPLICATION_NAME = "Perl_Executing_Browser"
 
 DEFINES += APPLICATION_NAME=\\\"$$APPLICATION_NAME\\\"
 
+
 ##########################################################
 # Application version:
 ##########################################################
@@ -109,6 +116,7 @@ APPLICATION_VERSION = "0.1"
 
 DEFINES += APPLICATION_VERSION=\\\"$$APPLICATION_VERSION\\\"
 message ("Application version: $$APPLICATION_VERSION")
+
 
 ##########################################################
 # The pseudo-domain of the browser:
@@ -118,8 +126,9 @@ PSEUDO_DOMAIN = "http://perl-executing-browser-pseudodomain/"
 DEFINES += PSEUDO_DOMAIN=\\\"$$PSEUDO_DOMAIN\\\"
 message ("Browser pseudo-domain: $$PSEUDO_DOMAIN")
 
+
 ##########################################################
-# To guard against security issues of user-supplied Perl scripts:
+# To guard against some security issues with user-supplied Perl scripts:
 # SCRIPT_CENSORING = 1
 # If this option is enabled,
 # every Perl script going to be executed by the browser
@@ -142,14 +151,18 @@ equals (SCRIPT_CENSORING, 1) {
     message ("Going to build with script censoring support.")
 }
 
-##########################################################
-# To enable support for unpacking root folder from a ZIP file:
-# ZIP_SUPPORT = 1
+
 ##########################################################
 # To compile without support for unpacking root folder from a ZIP file:
 # ZIP_SUPPORT = 0
 ##########################################################
-ZIP_SUPPORT = 1
+# To enable internal support for unpacking root folder from a ZIP file:
+# ZIP_SUPPORT = 1
+##########################################################
+# To enable external support for unpacking root folder from a ZIP file:
+# ZIP_SUPPORT = 2
+##########################################################
+ZIP_SUPPORT = 0
 
 DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
 
@@ -157,8 +170,25 @@ equals (ZIP_SUPPORT, 0) {
     message ("Going to build without support for ZIP packages.")
 }
 equals (ZIP_SUPPORT, 1) {
-    message ("Going to build with support for ZIP packages.")
+    message ("Going to build with internal support for ZIP packages.")
+    DEFINES += "QUAZIP_STATIC=1"
+    INCLUDEPATH += $PRO_FILE_PWD/zlib
+    LIBS += -L$PRO_FILE_PWD/zlib -lz
+    HEADERS += quazip/crypt.h quazip/ioapi.h quazip/JlCompress.h \
+    quazip/quaadler32.h quazip/quachecksum32.h quazip/quacrc32.h \
+    quazip/quagzipfile.h quazip/quaziodevice.h quazip/quazipdir.h \
+    quazip/quazipfile.h quazip/quazipfileinfo.h quazip/quazip_global.h \
+    quazip/quazip.h quazip/zip.h quazip/quazipnewinfo.h quazip/unzip.h
+    SOURCES += quazip/unzip.c quazip/zip.c \
+    quazip/JlCompress.cpp quazip/qioapi.cpp quazip/quaadler32.cpp \
+    quazip/quacrc32.cpp quazip/quagzipfile.cpp quazip/quaziodevice.cpp \
+    quazip/quazip.cpp quazip/quazipdir.cpp quazip/quazipfile.cpp \
+    quazip/quazipfileinfo.cpp quazip/quazipnewinfo.cpp
 }
+equals (ZIP_SUPPORT, 2) {
+    message ("Going to build with external support for ZIP packages.")
+}
+
 
 ##########################################################
 # To switch off Perl debugger interaction:

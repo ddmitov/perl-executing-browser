@@ -20,6 +20,10 @@
 #include <qglobal.h>
 #include "peb.h"
 
+#if ZIP_SUPPORT == 1
+#include <quazip/JlCompress.h> // for unpacking root folder from a ZIP file
+#endif
+
 #ifndef Q_OS_WIN
 #include <iostream> // for std::cout
 #include <unistd.h> // for isatty()
@@ -29,6 +33,9 @@
 #include <windows.h>
 #include <stdio.h>
 
+// ==============================
+// DETECT WINDOWS USER PRIVILEGES SUBROUTINE:
+// ==============================
 BOOL IsUserAdmin(void)
 {
     BOOL bResult;
@@ -158,6 +165,7 @@ int main(int argc, char **argv)
     foreach (QString argument, commandLineArguments){
         if (argument.contains("--help") or argument.contains("-H")) {
 #ifndef Q_OS_WIN
+            // Linux & Mac:
             std::cout << " " << std::endl;
             std::cout << application.applicationName().toLatin1().constData()
                       << " v." << application.applicationVersion()
@@ -188,6 +196,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef Q_OS_WIN
+            // Windows:
             QMessageBox commandLineHelp;
             commandLineHelp.setWindowModality(Qt::WindowModal);
             commandLineHelp.setIcon(QMessageBox::Information);
@@ -215,10 +224,9 @@ int main(int argc, char **argv)
     // ==============================
     // DETECT USER PRIVILEGES AND
     // APPLICATION START FROM TERMINAL:
-    // Linux and Mac only:
     // ==============================
 #ifndef Q_OS_WIN
-    // Detect user privileges:
+    // Detect user privileges - Linux and Mac:
     int userEuid;
     userEuid = geteuid();
 
@@ -317,6 +325,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef Q_OS_WIN
+    // Detect user privileges - Windows:
     if (IsUserAdmin()) {
         QMessageBox startedAsRootMessageBox;
         startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
@@ -386,6 +395,35 @@ int main(int argc, char **argv)
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
 #if ZIP_SUPPORT == 1
+    QString defaultZipPackageName = QApplication::applicationDirPath()
+            + QDir::separator() + "default.peb";
+    QFile defaultZipPackage(defaultZipPackageName);
+
+    QStringList extractedFiles;
+
+    if (defaultZipPackage.exists()) {
+        // Extracting root folder from a separate zip file:
+        extractedFiles = JlCompress::extractDir (
+                    QApplication::applicationDirPath()
+                    + QDir::separator() + "default.peb",
+                    applicationTempDirectoryName);
+
+        // Extracting root folder from a zip file,
+        // that was appended to the binary (!) using
+        // 'cat peb-bin-only peb.zip > peb-with-data'
+//        extractedFiles = JlCompress::extractDir (
+//                    QApplication::applicationDirPath()
+//                    + QDir::separator() + "default.peb",
+//                    applicationTempDirectoryName);
+
+        // Settings file from the extracted ZIP package:
+        settingsDirName = applicationTempDirectoryName
+                + QDir::separator() + "root";
+        settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
+    }
+#endif
+
+#if ZIP_SUPPORT == 2
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + "default.peb";
     QFile defaultZipPackage(defaultZipPackageName);
@@ -934,6 +972,13 @@ int main(int argc, char **argv)
     qDebug() << "Logging mode:" << logMode;
     qDebug() << "Logfiles directory:" << logDirFullPath;
     qDebug() << "Logfiles prefix:" << logPrefix;
+    qDebug() << "===============";
+
+    qDebug() << "ZIP package found.";
+    qDebug() << "Extracted files:";
+    foreach (QString extractedFile, extractedFiles) {
+        qDebug() << extractedFile;
+    }
     qDebug() << "===============";
 
     // ==============================

@@ -130,6 +130,7 @@
  http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html
 
  http://forum.qt.io/topic/24213/qmessagebox-too-small
+ https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file/3
 
  https://wiki.qt.io/Qt_Coding_Style
 
@@ -207,6 +208,7 @@
  http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
  http://habrahabr.ru/post/150329/ (Qt Coding Style)
  http://okolovich.info/tag/code-snippets-c/
+ http://www.antonioborondo.com/2014/10/22/zipping-and-unzipping-files-with-qt/
 
  CGI
  ===
