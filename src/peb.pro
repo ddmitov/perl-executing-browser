@@ -172,8 +172,8 @@ equals (ZIP_SUPPORT, 0) {
 equals (ZIP_SUPPORT, 1) {
     message ("Going to build with internal support for ZIP packages.")
     DEFINES += "QUAZIP_STATIC=1"
-    INCLUDEPATH += $PRO_FILE_PWD/zlib
-    LIBS += -L$PRO_FILE_PWD/zlib -lz
+    INCLUDEPATH += $$[QT_INSTALL_PREFIX]/src/3rdparty/zlib
+    LIBS += -L$$[QT_INSTALL_PREFIX]/src/3rdparty/zlib -lz
     HEADERS += quazip/crypt.h quazip/ioapi.h quazip/JlCompress.h \
     quazip/quaadler32.h quazip/quachecksum32.h quazip/quacrc32.h \
     quazip/quagzipfile.h quazip/quaziodevice.h quazip/quazipdir.h \

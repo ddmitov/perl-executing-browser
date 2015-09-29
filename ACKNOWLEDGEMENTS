@@ -188,6 +188,7 @@
  http://stackoverflow.com/questions/6740333/can-i-run-a-qt-application-with-a-specific-theme-on-linux
  http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
  http://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console
+ http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
 
  https://github.com/rsdn/avalon/blob/master/web_view.cpp
  https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp

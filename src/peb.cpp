@@ -411,8 +411,7 @@ int main(int argc, char **argv)
         // that was appended to the binary (!) using
         // 'cat peb-bin-only peb.zip > peb-with-data'
 //        extractedFiles = JlCompress::extractDir (
-//                    QApplication::applicationDirPath()
-//                    + QDir::separator() + "default.peb",
+//                    QApplication::applicationFilePath(),
 //                    applicationTempDirectoryName);
 
         // Settings file from the extracted ZIP package:
@@ -975,7 +974,7 @@ int main(int argc, char **argv)
 
     if (extractedFiles.length() > 0) {
         qDebug() << "ZIP package found.";
-        qDebug() << "Extracted files:";
+        qDebug() << "Extracted directories and files:";
         foreach (QString extractedFile, extractedFiles) {
             qDebug() << extractedFile;
         }
