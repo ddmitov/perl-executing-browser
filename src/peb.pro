@@ -55,15 +55,6 @@ macx {
       message ("Going to build with Mac OSX bundle support...")
   }
 
-  ##########################################################
-  # Set the version number of QMAKE_MAC_SDK to
-  # the version number of your MacOSX SDK.
-  # Updating MacOSX SDK (Xcode) without changing the
-  # version number of QMAKE_MAC_SDK may
-  # prevent you from successfully compiling the program.
-  ##########################################################
-  QMAKE_MAC_SDK = macosx10.9
-
   ICON = icons/camel.icns
 }
 
