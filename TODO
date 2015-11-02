@@ -10,16 +10,18 @@ v. 0.2
 ====================================
 
 Usability:
-- configuration file name derived from the file name of the binary file
 - detect file type even when file name has multiple dots
-- configuration option to disable page reload
-- configuration option to disable going to start page from context menu
 - dependency scanner & script packer
 - updated Bulgarian translation
 
-Configuration & help:
+Configuration:
+- configuration file name derived from the file name of the binary file
 - nice HTML configuration interface
 - settings in JSON format
+- configuration option to disable page reload from context menu
+- configuration option to disable going to start page from context menu
+
+Scripting:
 - Perl interpreter check on browser start-up
 - Perl interpreter from user PATH using: perl -e 'print $^X'
 - custom environment variables in script environment

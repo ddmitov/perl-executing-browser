@@ -665,6 +665,16 @@ int main(int argc, char **argv)
     QString contextMenu = settings.value("gui/context_menu").toString();
     application.setProperty("contextMenu", contextMenu);
 
+    // Keyboard shortcut for going to start page enable/disable switch:
+    QString keyboardShortcutGoHome =
+            settings.value("gui/keyboard_shortcut_go_home").toString();
+    application.setProperty("keyboardShortcutGoHome", keyboardShortcutGoHome);
+
+    // Keyboard shortcut for page reload enable/disable switch:
+    QString keyboardShortcutReload =
+            settings.value("gui/keyboard_shortcut_reload").toString();
+    application.setProperty("keyboardShortcutReload", keyboardShortcutReload);
+
     // Web Inspector from context menu enable/disable switch:
     QString webInspector = settings.value("gui/web_inspector").toString();
     application.setProperty("webInspector", webInspector);
@@ -949,6 +959,9 @@ int main(int argc, char **argv)
     qDebug() << "Stay on top:" << stayOnTop;
     qDebug() << "Browser title:" << browserTitle;
     qDebug() << "Context menu:" << contextMenu;
+    qDebug() << "Keyboard shortcut for going to start page:"
+             << keyboardShortcutGoHome;
+    qDebug() << "Keyboard shortcut for page reload:" << keyboardShortcutReload;
     qDebug() << "Windows and dialogs icon file:" << iconPathName;
     if (qtStyle.length() > 0) {
         qDebug() << "Global Qt style:" << qtStyle;
@@ -1272,13 +1285,17 @@ QTopLevel::QTopLevel()
     QObject::connect(toggleFullScreenShortcut, SIGNAL(activated()),
                      this, SLOT(qToggleFullScreenSlot()));
 
-    QShortcut *homeShortcut = new QShortcut(Qt::Key_F12, this);
-    QObject::connect(homeShortcut, SIGNAL(activated()),
-                     this, SLOT(qLoadStartPageSlot()));
+    if ((qApp->property("keyboardShortcutGoHome").toString()) == "enable") {
+        QShortcut *homeShortcut = new QShortcut(Qt::Key_F12, this);
+        QObject::connect(homeShortcut, SIGNAL(activated()),
+                         this, SLOT(qLoadStartPageSlot()));
+    }
 
-    QShortcut *reloadShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
-    QObject::connect(reloadShortcut, SIGNAL(activated()),
-                     this, SLOT(qReloadSlot()));
+    if ((qApp->property("keyboardShortcutReload").toString()) == "enable") {
+        QShortcut *reloadShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+        QObject::connect(reloadShortcut, SIGNAL(activated()),
+                         this, SLOT(qReloadSlot()));
+    }
 
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
@@ -1830,7 +1847,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     // Open local content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
-            (QPage::mainFrame()->childFrames().contains(frame))) {
+            (QPage::mainFrame()->childFrames().contains(frame) or
+             QPage::mainFrame()->childFrames().isEmpty())) {
 
         // Start local script in the same window:
         if (!request.url().path().contains(htmlExtensions)) {
@@ -1839,8 +1857,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             QByteArray emptyPostDataArray;
             qStartScriptSlot(request.url(), emptyPostDataArray);
             return false;
-
-            //frame->load(request.url());
         }
 
         // Load local HTML page in the same window:
@@ -1870,7 +1886,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             (!QPage::mainFrame()->childFrames().contains(frame))) {
 
         if (request.url().path().contains(htmlExtensions)) {
-
             qDebug() << "Local HTML page in a new window:"
                      << request.url().toString();
             qDebug() << "===============";
