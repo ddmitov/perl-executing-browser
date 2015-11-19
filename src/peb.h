@@ -60,14 +60,14 @@ public slots:
     {
         interpreter = "undefined";
 
-        QFileInfo file (filepath);
+        QFileInfo file(filepath);
         extension = file.suffix();
 
         if (extension.length() == 0) {
             QString firstLine;
 
             QFile file(filepath);
-            if (file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
                 firstLine = file.readLine();
             }
 
