@@ -10,7 +10,7 @@ v. 0.2
 ====================================
 
 Usability:
-- detect file type even when file name has multiple dots
+- support for local AJAX requests
 - dependency scanner & script packer
 - updated Bulgarian translation
 

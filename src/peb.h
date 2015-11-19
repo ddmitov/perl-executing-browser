@@ -60,7 +60,8 @@ public slots:
     {
         interpreter = "undefined";
 
-        extension = filepath.section(".", 1, 1);
+        QFileInfo file (filepath);
+        extension = file.suffix();
 
         if (extension.length() == 0) {
             QString firstLine;
