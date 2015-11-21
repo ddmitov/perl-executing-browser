@@ -366,7 +366,7 @@ int main(int argc, char **argv)
 
     // Get the name of the browser binary:
     QString applicationBinaryName =
-            QFileInfo(QApplication::applicationFilePath()).fileName();
+            QFileInfo(QApplication::applicationFilePath()).baseName();
 
     // ==============================
     // CREATE TEMPORARY FOLDERS:
@@ -417,7 +417,8 @@ int main(int argc, char **argv)
         // Settings file from the extracted ZIP package:
         settingsDirName = applicationTempDirectoryName
                 + QDir::separator() + "root";
-        settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
+        settingsFileName = settingsDirName + QDir::separator()
+                + applicationBinaryName + ".ini";
     }
 #endif
 
@@ -438,7 +439,8 @@ int main(int argc, char **argv)
         // Settings file from the extracted ZIP package:
         settingsDirName = applicationTempDirectoryName
                 + QDir::separator() + "root";
-        settingsFileName = settingsDirName + QDir::separator() + "peb.ini";
+        settingsFileName = settingsDirName + QDir::separator()
+                + applicationBinaryName + ".ini";
     }
 #endif
 
@@ -458,7 +460,8 @@ int main(int argc, char **argv)
 #endif
         settingsDirName = settingsDir.absolutePath().toLatin1();
         settingsFileName = QDir::toNativeSeparators
-                (settingsDirName + QDir::separator() + "peb.ini");
+                (settingsDirName + QDir::separator()
+                 + applicationBinaryName + ".ini");
     }
 
     application.setProperty("settingsFileName", settingsFileName);

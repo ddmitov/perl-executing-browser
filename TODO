@@ -15,7 +15,6 @@ Usability:
 - updated Bulgarian translation
 
 Configuration:
-- configuration file name derived from the file name of the binary file
 - nice HTML configuration interface
 - settings in JSON format
 - configuration option to disable page reload from context menu
