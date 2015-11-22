@@ -397,14 +397,14 @@ int main(int argc, char **argv)
     QStringList extractedFiles;
 #if ZIP_SUPPORT == 1
     QString defaultZipPackageName = QApplication::applicationDirPath()
-            + QDir::separator() + "default.peb";
+            + QDir::separator() + applicationBinaryName + ".peb";
     QFile defaultZipPackage(defaultZipPackageName);
 
     if (defaultZipPackage.exists()) {
         // Extracting root folder from a separate zip file:
         extractedFiles = JlCompress::extractDir (
                     QApplication::applicationDirPath()
-                    + QDir::separator() + "default.peb",
+                    + QDir::separator() + applicationBinaryName + ".peb",
                     applicationTempDirectoryName);
 
         // Extracting root folder from a zip file,
@@ -424,7 +424,7 @@ int main(int argc, char **argv)
 
 #if ZIP_SUPPORT == 2
     QString defaultZipPackageName = QApplication::applicationDirPath()
-            + QDir::separator() + "default.peb";
+            + QDir::separator() + applicationBinaryName + ".peb";
     QFile defaultZipPackage(defaultZipPackageName);
 
     if (defaultZipPackage.exists()) {
