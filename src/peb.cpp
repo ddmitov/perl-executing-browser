@@ -1600,6 +1600,13 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("openfile")) {
 
+        QString target = request.url().toString(QUrl::RemoveScheme
+                                                | QUrl::RemoveAuthority
+                                                | QUrl::RemovePath)
+                .replace("?", "")
+                .replace("//", "")
+                .replace("target=", "");
+
         QFileDialog openFileDialog (qApp->activeWindow());
         openFileDialog.setFileMode(QFileDialog::AnyFile);
         openFileDialog.setViewMode(QFileDialog::Detail);
@@ -1617,7 +1624,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
             // JavaScript bridge back to the HTML page where request originated:
             currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#ExistingFileSelection\").html(\""
+            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
                     + fileNameToOpenString + "\");";
             currentFrame()->evaluateJavaScript(javaScript + "; null");
 
@@ -1631,6 +1638,13 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     // Invoke 'New file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("newfile")) {
+
+        QString target = request.url().toString(QUrl::RemoveScheme
+                                                | QUrl::RemoveAuthority
+                                                | QUrl::RemovePath)
+                .replace("?", "")
+                .replace("//", "")
+                .replace("target=", "");
 
         QFileDialog newFileDialog (qApp->activeWindow());
         newFileDialog.setFileMode(QFileDialog::AnyFile);
@@ -1651,8 +1665,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
             // JavaScript bridge back to the HTML page where request originated:
             currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#NewFileSelection\").html(\""
-                    + fileNameToCreateString + "\");";
+            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
+                    + fileName + "\");";
             currentFrame()->evaluateJavaScript(javaScript + "; null");
 
             qDebug() << "New file:" << QDir::toNativeSeparators(fileName);
@@ -1665,6 +1679,13 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     // Invoke 'Open folder' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("openfolder")) {
+
+        QString target = request.url().toString(QUrl::RemoveScheme
+                                                | QUrl::RemoveAuthority
+                                                | QUrl::RemovePath)
+                .replace("?", "")
+                .replace("//", "")
+                .replace("target=", "");
 
         QFileDialog openFolderDialog (qApp->activeWindow());
         openFolderDialog.setFileMode(QFileDialog::AnyFile);
@@ -1684,8 +1705,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
             // JavaScript bridge back to the HTML page where request originated:
             currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#FolderSelection\").html(\""
-                    + folderNameToOpenString + "\");";
+            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
+                    + folderName + "\");";
             currentFrame()->evaluateJavaScript(javaScript + "; null");
 
             qDebug() << "Folder to open:" << QDir::toNativeSeparators(folderName);
