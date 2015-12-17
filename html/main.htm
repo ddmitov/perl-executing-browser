@@ -3,7 +3,8 @@
 <head>
 <title>Perl Executing Browser</title>
 <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' />
+<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-page-pseudodomain/html/current.css' media='all' />
+<script type="text/javascript" src="http://perl-executing-browser-page-pseudodomain/js/jquery-1.11.1.min.js"></script>
 </head>
 
 <body>
@@ -15,11 +16,11 @@ Local CGI-like Scripts
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl'>Perl SQLite Example</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/sqlite.pl'>Perl SQLite Example</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/sqlite.pl?source=enabled' target='_blank'>Perl SQLite Example as source code</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/sqlite.pl?source=enabled' target='_blank'>Perl SQLite Example as source code</a>
 </font><br>
 <font size='3'>
 (will open in a new window)<br>
@@ -34,19 +35,19 @@ Local Long-Running Scripts
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_counter.pl?output=latest'>Simple Perl 35 Seconds Counter in This Window</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/longrun_counter.pl?output=latest'>Simple Perl 35 Seconds Counter in This Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/longrun_counter.pl?output=latest' target='_blank'>Simple Perl 35 Seconds Counter in a New Window</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/longrun_counter.pl?output=latest' target='_blank'>Simple Perl 35 Seconds Counter in a New Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/resizer_accumulation.htm' target='_blank'>Image Resizer with Accumulation of Results in a New Window</a>
+<a href='http://perl-executing-browser-page-pseudodomain/html/resizer_accumulation.htm' target='_blank'>Image Resizer with Accumulation of Results in a New Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/resizer_latest.htm' target='_blank'>Image Resizer with Only Latest Results in a New Window</a>
+<a href='http://perl-executing-browser-page-pseudodomain/html/resizer_latest.htm' target='_blank'>Image Resizer with Only Latest Results in a New Window</a>
 </font></p>
 
 <hr width='95%'>
@@ -56,32 +57,36 @@ Local Scripting Tests
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/env.pl'>Environment and @INC array</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/env.pl'>Environment and @INC array</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>
+<a href='http://perl-executing-browser-page-pseudodomain/html/get.htm'>Form of a Locally Executed Perl Script - GET method</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/post.htm'>Form of a Locally Executed Perl Script - POST method</a>
+<a href='http://perl-executing-browser-page-pseudodomain/html/post.htm'>Form of a Locally Executed Perl Script - POST method</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/noextpl'>Perl Extensionless Script</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/noextpl'>Perl Extensionless Script</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/dummy'>Unrecognizable File Type Test</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/dummy'>Unrecognizable File Type Test</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/timeout_test.pl'>Script Timeout Test</a>
 </font></p>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/scripts/security_test.pl'>Security Test</a>
+<a href='http://perl-executing-browser-page-pseudodomain/scripts/security_test.pl'>Security Test</a>
 </font></p>
+
+<div id='results'>
+<button id='ajax-button' class='btn btn-primary'>AJAX Test</button>
+</div>
 
 <hr width='95%'>
 
@@ -180,7 +185,7 @@ Printing & PDF Creation
 <hr width='95%'>
 
 <p align='center'><font size='5'>
-<a href='http://perl-executing-browser-pseudodomain/html/index.htm' target='_blank'>Start Page in a New Window</a>
+<a href='http://perl-executing-browser-page-pseudodomain/html/index.htm' target='_blank'>Start Page in a New Window</a>
 </font></p>
 
 <p align='center'><font size='5'>
@@ -188,6 +193,20 @@ Printing & PDF Creation
 </font></p>
 
 </div>
+
+<script>
+$(document).ready(function() {
+	$("#ajax-button").click(function() {
+		$.ajax({
+			url: 'http://perl-executing-browser-ajax-pseudodomain/scripts/ajax.pl',
+			method: 'GET',
+			success: function(data) {
+				$("#results").html(data);
+			}
+		});
+	});
+});
+</script>
 
 </body>
 

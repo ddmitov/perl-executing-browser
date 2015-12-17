@@ -110,12 +110,17 @@ message ("Application version: $$APPLICATION_VERSION")
 
 
 ##########################################################
-# The pseudo-domain of the browser:
+# The pseudo-domains of the browser:
 ##########################################################
-PSEUDO_DOMAIN = "http://perl-executing-browser-pseudodomain/"
+PAGE_PSEUDO_DOMAIN = "perl-executing-browser-page-pseudodomain"
 
-DEFINES += PSEUDO_DOMAIN=\\\"$$PSEUDO_DOMAIN\\\"
-message ("Browser pseudo-domain: $$PSEUDO_DOMAIN")
+DEFINES += PAGE_PSEUDO_DOMAIN=\\\"$$PAGE_PSEUDO_DOMAIN\\\"
+message ("Page pseudo-domain: $$PAGE_PSEUDO_DOMAIN")
+
+AJAX_PSEUDO_DOMAIN = "perl-executing-browser-ajax-pseudodomain"
+
+DEFINES += AJAX_PSEUDO_DOMAIN=\\\"$$AJAX_PSEUDO_DOMAIN\\\"
+message ("Page pseudo-domain: $$AJAX_PSEUDO_DOMAIN")
 
 
 ##########################################################

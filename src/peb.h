@@ -1,4 +1,4 @@
-/*
+﻿/*
  Perl Executing Browser, v. 0.1
 
  This program is free software;
@@ -29,6 +29,10 @@
 #include <QMenu>
 #include <QDesktopWidget>
 #include <QSystemTrayIcon>
+
+
+#include <QNetworkReply>
+
 
 // ==============================
 // PRINT SUPPORT:
@@ -115,6 +119,32 @@ public slots:
         }
     }
 
+    void qCheckFileExistence(QString fullFilePath)
+    {
+        QFile file(QDir::toNativeSeparators(fullFilePath));
+        if (!file.exists()) {
+            qMissingFileMessage(QDir::toNativeSeparators(fullFilePath));
+        }
+    }
+
+    void qMissingFileMessage(QString fullFilePath)
+    {
+        QMessageBox missingFileMessageBox (qApp->activeWindow());
+        missingFileMessageBox.setWindowModality(Qt::WindowModal);
+        missingFileMessageBox.setIcon(QMessageBox::Critical);
+        missingFileMessageBox.setWindowTitle(tr("Missing file"));
+        missingFileMessageBox
+                .setText(QDir::toNativeSeparators(fullFilePath)
+                         + tr("<br>is missing.<br>")
+                         + tr("Please restore the missing file."));
+        missingFileMessageBox.setDefaultButton(QMessageBox::Ok);
+        missingFileMessageBox.exec();
+        qDebug() << QDir::toNativeSeparators(fullFilePath) <<
+                    "is missing.";
+        qDebug() << "Please restore the missing file.";
+        qDebug() << "===============";
+    }
+
 public:
     QFileDetector();
 
@@ -139,6 +169,20 @@ private:
     QRegExp gifExtension;
 
     QRegExp plExtension;
+};
+
+// ==============================
+// SCRIPT ENVIRONMENT CLASS DEFINITION:
+// ==============================
+class QScriptEnvironment : public QObject
+{
+    Q_OBJECT
+
+public:
+    QScriptEnvironment();
+
+    QStringList allowedEnvironmentVariables;
+    QProcessEnvironment scriptEnvironment;
 };
 
 // ==============================
@@ -178,6 +222,31 @@ private:
 };
 
 // ==============================
+// CUSTOM NETWORK REPLY CLASS DEFINITION:
+// ==============================
+class QCustomNetworkReply : public QNetworkReply
+{
+    Q_OBJECT
+
+public:
+
+    QCustomNetworkReply(const QUrl &url, QString &data);
+    ~QCustomNetworkReply();
+
+    void abort();
+    qint64 bytesAvailable() const;
+    bool isSequential() const;
+    qint64 size() const;
+
+protected:
+    qint64 read(char *data, qint64 maxSize);
+    qint64 readData(char *data, qint64 maxSize);
+
+private:
+    struct QCustomNetworkReplyPrivate *reply;
+};
+
+// ==============================
 // NETWORK ACCESS MANAGER CLASS DEFINITION:
 // ==============================
 class ModifiedNetworkAccessManager : public QNetworkAccessManager
@@ -193,9 +262,180 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+
+        // Local AJAX GET and POST requests.
+        if ((operation == GetOperation or
+             operation == PostOperation) and
+                request.url().authority() == AJAX_PSEUDO_DOMAIN) {
+
+            QUrl url = request.url();
+            qDebug() << "AJAX Script URL:" << url.toString();
+
+            QString relativeFilePath = url.toString(QUrl::RemoveScheme
+                                                    | QUrl::RemoveAuthority
+                                                    | QUrl::RemoveQuery);
+
+            // Replace initial slash at the beginning of the relative path;
+            // root directory setting already has a trailing slash.
+            relativeFilePath.replace(QRegExp("^//"), "");
+
+            QString scriptFullFilePath = QDir::toNativeSeparators
+                    ((qApp->property("rootDirName").toString())
+                     + relativeFilePath);
+
+            QString queryString = url.toString(QUrl::RemoveScheme
+                                               | QUrl::RemoveAuthority
+                                               | QUrl::RemovePath)
+                    .replace("?", "")
+                    .replace("//", "");
+
+            QByteArray postDataArray;
+            if (outgoingData) {
+                postDataArray = outgoingData->readAll();
+            }
+            QString postData(postDataArray);
+
+            QFileDetector fileDetector;
+            fileDetector.qCheckFileExistence(scriptFullFilePath);
+            fileDetector.qDefineInterpreter(scriptFullFilePath);
+
+            qDebug() << "File path:" << scriptFullFilePath;
+            qDebug() << "Extension:" << fileDetector.extension;
+            qDebug() << "Interpreter:" << fileDetector.interpreter;
+
+            QScriptEnvironment initialScriptEnvironment;
+            QProcessEnvironment scriptEnvironment;
+            scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
+
+            if (queryString.length() > 0) {
+                scriptEnvironment.insert("REQUEST_METHOD", "GET");
+                scriptEnvironment.insert("QUERY_STRING", queryString);
+                qDebug() << "Query string:" << queryString;
+            }
+
+            if (postData.length() > 0) {
+                scriptEnvironment.insert("REQUEST_METHOD", "POST");
+                QString postDataSize = QString::number(postData.size());
+                scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
+                qDebug() << "POST data:" << postData;
+            }
+
+            QProcess scriptHandler;
+            scriptHandler.setProcessEnvironment(scriptEnvironment);
+
+            QFileInfo scriptAbsoluteFilePath(
+                        QDir::toNativeSeparators(scriptFullFilePath));
+            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+            scriptHandler.setWorkingDirectory(scriptDirectory);
+            qDebug() << "Working directory:"
+                     << QDir::toNativeSeparators(scriptDirectory);
+            qDebug() << "===============";
+
+            QEventLoop scriptHandlerWaitingLoop;
+            QObject::connect(&scriptHandler,
+                             SIGNAL(finished(int, QProcess::ExitStatus)),
+                             &scriptHandlerWaitingLoop,
+                             SLOT(quit()));
+
+            QString scriptResultString;
+            if (!scriptHandler.isOpen()) {
+                if (SCRIPT_CENSORING == 0) {
+                    scriptHandler.start((qApp->property("perlInterpreter")
+                                         .toString()),
+                                        QStringList() <<
+                                        QDir::toNativeSeparators
+                                        (scriptFullFilePath),
+                                        QProcess::Unbuffered
+                                        | QProcess::ReadWrite);
+                }
+
+                if (SCRIPT_CENSORING == 1) {
+                    // 'censor.pl' is compiled into the resources of
+                    // the binary file and called from there.
+                    QString censorScriptFileName(":/scripts/censor.pl");
+                    QFile censorScriptFile(censorScriptFileName);
+                    censorScriptFile.open(QIODevice::ReadOnly
+                                          | QIODevice::Text);
+                    QTextStream stream(&censorScriptFile);
+                    QString censorScriptContents = stream.readAll();
+                    censorScriptFile.close();
+
+                    scriptHandler
+                            .start((qApp->property("perlInterpreter")
+                                    .toString()),
+                                   QStringList()
+                                   << "-e"
+                                   << censorScriptContents
+                                   << "--"
+                                   << QDir::toNativeSeparators(
+                                       scriptFullFilePath),
+                                   QProcess::Unbuffered
+                                   | QProcess::ReadWrite);
+                }
+
+                QStringList runningScriptsGlobalCurrentList =
+                        qApp->property("runningScriptsGlobalList")
+                        .toStringList();
+                runningScriptsGlobalCurrentList.append(scriptFullFilePath);
+                qApp->setProperty("runningScriptsGlobalList",
+                                  runningScriptsGlobalCurrentList);
+
+                if (postData.length() > 0) {
+                    scriptHandler.write(postDataArray);
+                }
+
+                scriptHandlerWaitingLoop.exec();
+                QByteArray scriptResultArray = scriptHandler.readAll();
+                scriptResultString =
+                        QString::fromLatin1(scriptResultArray);
+            } else {
+                qDebug() << "Script already started:" << scriptFullFilePath;
+                qDebug() << "===============";
+
+                QMessageBox scriptStartedMessageBox (qApp->activeWindow());
+                scriptStartedMessageBox
+                        .setWindowModality(Qt::WindowModal);
+                scriptStartedMessageBox
+                        .setWindowTitle(tr("Script Already Started"));
+                scriptStartedMessageBox
+                        .setIconPixmap((qApp->property("icon").toString()));
+                scriptStartedMessageBox
+                        .setText(tr("This script is already started ")
+                                 + tr("and still running:<br>")
+                                 + scriptFullFilePath);
+                scriptStartedMessageBox.setDefaultButton(QMessageBox::Ok);
+                scriptStartedMessageBox.exec();
+            }
+
+            QWebSettings::clearMemoryCaches();
+
+            scriptEnvironment.remove("FILE_TO_OPEN");
+            scriptEnvironment.remove("FILE_TO_CREATE");
+            scriptEnvironment.remove("FOLDER_TO_OPEN");
+            scriptEnvironment.remove("REQUEST_METHOD");
+
+            if (queryString.length() > 0) {
+                scriptEnvironment.remove("QUERY_STRING");
+            }
+
+            if (postData.length() > 0) {
+                scriptEnvironment.remove("CONTENT_LENGTH");
+            }
+
+            QStringList runningScriptsGlobalCurrentList
+                    = qApp->property("runningScriptsGlobalList").toStringList();
+            runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
+            qApp->setProperty("runningScriptsGlobalList",
+                              runningScriptsGlobalCurrentList);
+
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), scriptResultString);
+            return reply;
+        }
+
         // GET requests to local content:
         if (operation == GetOperation and
-                (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url())) {
+                request.url().authority() == PAGE_PSEUDO_DOMAIN) {
 
             QString filepath = request.url()
                     .toString(QUrl::RemoveScheme
@@ -263,12 +503,17 @@ protected:
         // Take data from a local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url())) {
+                request.url().authority() == PAGE_PSEUDO_DOMAIN) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
                 emit startScriptSignal(request.url(), postDataArray);
             }
+
+            QNetworkRequest emptyNetworkRequest;
+            return QNetworkAccessManager::createRequest
+                    (QNetworkAccessManager::GetOperation,
+                     QNetworkRequest(emptyNetworkRequest));
         }
 
         if (PERL_DEBUGGER_INTERACTION == 1) {
@@ -292,7 +537,7 @@ protected:
              operation == PutOperation) and
                 ((request.url().scheme().contains("file")) or
                  (request.url().toString().contains("data:image")) or
-                 (request.url().toString().contains(PSEUDO_DOMAIN)) or
+                 (request.url().authority() == PAGE_PSEUDO_DOMAIN) or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
 
@@ -350,8 +595,9 @@ public slots:
             QString cssLink;
             cssLink.append("</title>\n");
             cssLink.append("<link rel=\"stylesheet\" type=\"text/css\"");
-            cssLink.append("href=\"");
-            cssLink.append(PSEUDO_DOMAIN);
+            cssLink.append("href=\"http://");
+            cssLink.append(PAGE_PSEUDO_DOMAIN);
+            cssLink.append("/");
             cssLink.append(qApp->property("defaultThemeDirectoryName")
                            .toString());
             cssLink.append("/current.css\" media=\"all\" />");
@@ -454,32 +700,6 @@ public slots:
         } else {
             qDebug() << "No new theme selected.";
             qDebug() << "===============";
-        }
-    }
-
-    void qMissingFileMessageSlot()
-    {
-        QMessageBox missingFileMessageBox (qApp->activeWindow());
-        missingFileMessageBox.setWindowModality(Qt::WindowModal);
-        missingFileMessageBox.setIcon(QMessageBox::Critical);
-        missingFileMessageBox.setWindowTitle(tr("Missing file"));
-        missingFileMessageBox
-                .setText(QDir::toNativeSeparators(scriptFullFilePath)
-                         + tr("<br>is missing.<br>")
-                         + tr("Please restore the missing file."));
-        missingFileMessageBox.setDefaultButton(QMessageBox::Ok);
-        missingFileMessageBox.exec();
-        qDebug() << QDir::toNativeSeparators(scriptFullFilePath) <<
-                    "is missing.";
-        qDebug() << "Please restore the missing file.";
-        qDebug() << "===============";
-    }
-
-    void qCheckFileExistenceSlot(QString fullFilePath)
-    {
-        QFile file(QDir::toNativeSeparators(fullFilePath));
-        if (!file.exists()) {
-            qMissingFileMessageSlot();
         }
     }
 
@@ -598,9 +818,8 @@ public slots:
             QRegExp finalQuestionMark("\\?$");
             queryString.replace(finalQuestionMark, "");
 
-            qCheckFileExistenceSlot(scriptFullFilePath);
-
             QFileDetector fileDetector;
+            fileDetector.qCheckFileExistence(scriptFullFilePath);
             fileDetector.qDefineInterpreter(scriptFullFilePath);
 
             qDebug() << "File path:" << scriptFullFilePath;
@@ -1148,10 +1367,11 @@ private:
 
     QString jQuery;
 
-    QStringList allowedEnvironmentVariables;
     QStringList sourceViewerMandatoryCommandLine;
 
+    QStringList allowedEnvironmentVariables;
     QProcessEnvironment scriptEnvironment;
+
     bool scriptTimedOut;
     bool scriptKilled;
     QString scriptAccumulatedOutput;
@@ -1195,9 +1415,8 @@ public slots:
                    (QDir::toNativeSeparators
                     ((qApp->property("startPage").toString()))));
         } else {
-            setUrl(QUrl(QString(PSEUDO_DOMAIN
-                                + (qApp->property(
-                                       "startPagePath").toString()))));
+            setUrl(QUrl("http://" + QString(PAGE_PSEUDO_DOMAIN) + "/"
+                        + (qApp->property("startPagePath").toString())));
         }
     }
 
@@ -1406,7 +1625,7 @@ public slots:
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
 
-            if (QUrl(PSEUDO_DOMAIN).isParentOf(qWebHitTestURL)) {
+            if (qWebHitTestURL.authority() == PAGE_PSEUDO_DOMAIN) {
 
                 menu->addSeparator();
 
@@ -1436,7 +1655,7 @@ public slots:
                 }
             }
 
-            if (QUrl(PSEUDO_DOMAIN).isParentOf(qWebHitTestURL)) {
+            if (qWebHitTestURL.authority() == PAGE_PSEUDO_DOMAIN) {
 
                 QAction *openInNewWindowAct =
                         menu->addAction(tr("&Open in new window"));

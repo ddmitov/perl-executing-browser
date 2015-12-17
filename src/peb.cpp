@@ -1075,6 +1075,76 @@ QFileDetector::QFileDetector()
 }
 
 // ==============================
+// SCRIPT ENVIRONMENT CLASS CONSTRUCTOR:
+// ==============================
+QScriptEnvironment::QScriptEnvironment()
+    : QObject(0)
+{
+    // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
+    QStringList systemEnvironment =
+            QProcessEnvironment::systemEnvironment().toStringList();
+
+    foreach (QString environmentVariable, systemEnvironment) {
+        QStringList environmentVariableList = environmentVariable.split("=");
+        QString environmentVariableName = environmentVariableList.first();
+        if (!allowedEnvironmentVariables.contains(environmentVariableName)) {
+            scriptEnvironment.remove(environmentVariable);
+        } else {
+            scriptEnvironment.insert(
+                        environmentVariableList.first(),
+                        environmentVariableList[1]);
+        }
+    }
+
+    // DOCUMENT_ROOT:
+    scriptEnvironment.remove("DOCUMENT_ROOT");
+    scriptEnvironment.insert("DOCUMENT_ROOT",
+                             qApp->property("rootDirName").toString());
+
+    // PERLLIB:
+    scriptEnvironment.remove("PERLLIB");
+    scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());
+
+    // PATH:
+    QString path;
+    QString pathSeparator;
+#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
+    pathSeparator = ":";
+#endif
+#ifdef Q_OS_WIN // Windows
+    pathSeparator = ";";
+#endif
+
+    // Add all browser-specific folders to the PATH of all local scripts,
+    // but first check if these directories exist,
+    // then resolve all relative paths, if any:
+    foreach (QString pathEntry, qApp->property("pathToAddList").toString()) {
+        QDir pathDir(pathEntry);
+        if (pathDir.exists()) {
+            if (pathDir.isRelative()) {
+                pathEntry = QDir::toNativeSeparators(
+                            qApp->property("rootDirName").toString()
+                            + pathEntry);
+            }
+            if (pathDir.isAbsolute()) {
+                pathEntry = QDir::toNativeSeparators(pathEntry);
+            }
+            path.append(pathEntry);
+            path.append(pathSeparator);
+        }
+    }
+
+#ifndef Q_OS_WIN // Linux and Mac
+    scriptEnvironment.remove("PATH");
+    scriptEnvironment.insert("PATH", path);
+#endif
+#ifdef Q_OS_WIN // Windows
+    scriptEnvironment.remove("Path");
+    scriptEnvironment.insert("Path", path);
+#endif
+}
+
+// ==============================
 // SYSTEM TRAY ICON CLASS CONSTRUCTOR:
 // ==============================
 QTrayIcon::QTrayIcon()
@@ -1110,6 +1180,86 @@ QTrayIcon::QTrayIcon()
         trayIconMenu->addAction(quitAction);
         trayIcon->show();
     }
+}
+
+// ==============================
+// CUSTOM NETWORK REPLY CONSTRUCTOR:
+// ==============================
+struct QCustomNetworkReplyPrivate
+{
+    QByteArray data;
+    int offset;
+};
+
+QCustomNetworkReply::QCustomNetworkReply(const QUrl &url, QString &data)
+    : QNetworkReply()
+{
+    setFinished(true);
+    open(ReadOnly | Unbuffered);
+
+    reply = new QCustomNetworkReplyPrivate;
+    reply->offset = 0;
+
+    setUrl(url);
+
+    setHeader(QNetworkRequest::ContentTypeHeader,
+              QVariant("text/html; charset=UTF-8"));
+    setHeader(QNetworkRequest::ContentLengthHeader,
+              QVariant(reply->data.size()));
+    setHeader(QNetworkRequest::LastModifiedHeader,
+              QVariant(QDateTime::currentDateTimeUtc()));
+
+    QTimer::singleShot(0, this, SIGNAL(metaDataChanged()));
+
+    setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
+    setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, "OK");
+
+    reply->data = data.toUtf8();
+
+    QTimer::singleShot(0, this, SIGNAL(readyRead()));
+    QTimer::singleShot(0, this, SIGNAL(finished()));
+}
+
+QCustomNetworkReply::~QCustomNetworkReply()
+{
+    delete reply;
+}
+
+qint64 QCustomNetworkReply::size() const
+{
+    return reply->data.size();
+}
+
+void QCustomNetworkReply::abort()
+{
+    // !!! no need to implement code here, but must be declared !!!
+}
+
+qint64 QCustomNetworkReply::bytesAvailable() const
+{
+    return size();
+}
+
+bool QCustomNetworkReply::isSequential() const
+{
+    return true;
+}
+
+qint64 QCustomNetworkReply::read(char *data, qint64 maxSize)
+{
+    return readData(data, maxSize);
+}
+
+qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
+{
+    if (reply->offset >= reply->data.size()) {
+        return -1;
+    }
+
+    qint64 number = qMin(maxSize, (qint64) reply->data.size() - reply->offset);
+    memcpy(data, reply->data.constData() + reply->offset, number);
+    reply->offset += number;
+    return number;
 }
 
 // ==============================
@@ -1174,6 +1324,7 @@ QPage::QPage()
                      this,
                      SLOT(qScriptFinishedSlot()));
 
+
     // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
     QStringList systemEnvironment =
             QProcessEnvironment::systemEnvironment().toStringList();
@@ -1236,6 +1387,7 @@ QPage::QPage()
     scriptEnvironment.remove("Path");
     scriptEnvironment.insert("Path", path);
 #endif
+
 
     // Source viewer mandatory, or minimal, command line:
     sourceViewerMandatoryCommandLine.append(
@@ -1870,7 +2022,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Open local content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
+            request.url().authority() == PAGE_PSEUDO_DOMAIN and
             (QPage::mainFrame()->childFrames().contains(frame) or
              QPage::mainFrame()->childFrames().isEmpty())) {
 
@@ -1892,7 +2044,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                               | QUrl::RemoveFragment);
             QString fullFilePath = (qApp->property("rootDirName").toString())
                     + relativeFilePath;
-            qCheckFileExistenceSlot(fullFilePath);
+            QFileDetector fileDetector;
+            fileDetector.qCheckFileExistence(fullFilePath);
 
             frame->load(QUrl::fromLocalFile
                         (QDir::toNativeSeparators
@@ -1906,7 +2059,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Load local HTML page in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (QUrl(PSEUDO_DOMAIN)).isParentOf(request.url()) and
+            request.url().authority() == PAGE_PSEUDO_DOMAIN and
             (!QPage::mainFrame()->childFrames().contains(frame))) {
 
         if (request.url().path().contains(htmlExtensions)) {
@@ -1920,7 +2073,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                               | QUrl::RemoveFragment);
             QString fullFilePath = (qApp->property("rootDirName").toString())
                     + relativeFilePath;
-            qCheckFileExistenceSlot(fullFilePath);
+            QFileDetector fileDetector;
+            fileDetector.qCheckFileExistence(fullFilePath);
 
             newWindow = new QTopLevel();
             QString iconPathName = qApp->property("iconPathName").toString();

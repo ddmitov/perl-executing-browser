@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of executing local CGI-like and long-running Perl 5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of executing local CGI-like, AJAX or long-running Perl 5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -24,6 +24,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit browser capable of ex
   
 **Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
+* jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
 * Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
 * Perl modules can be loaded from a custom directory without system-wide installation using PATH and/or PERLLIB environment variables.  
 * Any version of Perl 5 can be selected from configuration file or by clicking a special URL.  
@@ -87,8 +88,7 @@ Compiled and tested successfully using:
 ## Limitations
   
 * No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No means of communication between the browser and a script that is already started. Once you have started a script, you can either wait for it to finish or you can kill it.  
-* No AJAX or AJAJ requests to local scripts.  
+* No means of communication between the browser and a script that is already started. Once you have started a script, you can only wait for it to finish or kill it.  
   
 ## What Perl Executing Browser Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  

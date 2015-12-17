@@ -4,6 +4,74 @@ use strict;
 use warnings;
 use 5.010;
 
+BEGIN {
+
+	*CORE::GLOBAL::chdir = sub (*;$@) {
+		my $dir = shift;
+		if ($dir =~ "/tmp") {
+			print "Changing dir to $dir\n";
+			CORE::chdir $dir;
+		} else {
+			print "Directory change not allowed!\n";
+			die;
+		}
+	};
+
+	*CORE::GLOBAL::open = sub (*;$@) {
+		(my $package, my $filename, my $line) = caller();
+		print STDERR "Intercepted `open` call from (package: '$package', file: '$filename', line: '$line')'\n";
+		my $handle =shift;
+
+		if (@_ == 1) {
+			if ($_[0] =~ $ARGV[0]) {
+				return CORE::open($handle, $_[1]);
+			} else {
+				print STDERR "File open not allowed!\n";
+				#~ die;
+			}
+
+		} elsif (@_ == 2) {
+			if ($_[1] =~ $ARGV[0]) {
+				return CORE::open($handle, $_[1]);
+			} else {
+				print STDERR "File open not allowed!\n";
+				#~ die;
+			}
+
+		} elsif (@_ == 3) {
+			if (defined $_[2]) {
+
+				if ($_[2] =~ "/tmp") {
+					CORE::open $handle, $_[1], $_[2];
+				} else {
+					print "File open not allowed!\n";
+					die;
+				}
+
+			} else {
+
+				if ($_[1] =~ "/tmp") {
+					CORE::open $handle, $_[1], undef; # special case
+				} else {
+					print "File open not allowed!\n";
+					die;
+				}
+
+			}
+		} else {
+
+				if ($_[1] =~ "/tmp" or $_[2] =~ "/tmp") {
+					CORE::open $handle, $_[1], $_[2], @_[3..$#_];
+				} else {
+					print "File open not allowed!\n";
+					die;
+				}
+
+		}
+	};
+
+}
+
 ##############################
 # CENSOR.PL SETTINGS:
 ##############################
@@ -19,17 +87,17 @@ my $prohibited_core_functions = join (' ', @prohibited_core_functions);
 ##############################
 # REDIRECT STDERR TO A VARIABLE:
 ##############################
-open (my $saved_stderr_filehandle, '>&', \*STDERR)  or die "Can't duplicate STDERR: $!";
+CORE::open (my $saved_stderr_filehandle, '>&', \*STDERR)  or die "Can't duplicate STDERR: $!";
 close STDERR;
 my $stderr;
-open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
+CORE::open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
 
 ##############################
 # READ USER SCRIPT FROM
 # THE FIRST COMMAND LINE ARGUMENT:
 ##############################
 my $file = $ARGV[0];
-open my $filehandle, '<', $file or die;
+CORE::open my $filehandle, '<', $file or die;
 my @user_code = <$filehandle>;
 close $filehandle;
 

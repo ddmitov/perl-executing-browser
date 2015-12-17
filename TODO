@@ -10,7 +10,6 @@ v. 0.2
 ====================================
 
 Usability:
-- support for local AJAX requests
 - dependency scanner & script packer
 - updated Bulgarian translation
 
@@ -19,12 +18,12 @@ Configuration:
 - settings in JSON format
 - configuration option to disable page reload from context menu
 - configuration option to disable going to start page from context menu
+- compile-time settings printed as qDebug messages
 
 Scripting:
 - Perl interpreter check on browser start-up
 - Perl interpreter from user PATH using: perl -e 'print $^X'
 - custom environment variables in script environment
-- compile-time settings printed as qDebug messages
 
 GUI:
 - working maximized window setting on Mac
