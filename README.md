@@ -150,7 +150,7 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ## Name
   
 'Perl Executing Browser' is a descriptive, technical name, probably not the shortest one.  
-Possible new names: **QtCamel Browser**, **QamelKit**  
+Possible new names: **QtCamel Browser**, **QtCamelKit**, **QtCamel**.  
   
 ## Authors
   
