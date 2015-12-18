@@ -84,8 +84,8 @@ Local Scripting Tests
 <a href='http://perl-executing-browser-page-pseudodomain/scripts/security_test.pl'>Security Test</a>
 </font></p>
 
-<div id='results'>
-<button id='ajax-button' class='btn btn-primary'>AJAX Test</button>
+<div id='ajax-results'>
+<button id='ajax-button' class='btn btn-primary'>AJAX Document Root File Lister</button>
 </div>
 
 <hr width='95%'>
@@ -196,12 +196,18 @@ Printing & PDF Creation
 
 <script>
 $(document).ready(function() {
-	$("#ajax-button").click(function() {
+	$('#ajax-button').click(function() {
 		$.ajax({
 			url: 'http://perl-executing-browser-ajax-pseudodomain/scripts/ajax.pl',
 			method: 'GET',
+			dataType: 'text',
 			success: function(data) {
-				$("#results").html(data);
+				var dataItems = data.split(",");
+				var text = '';
+				for (index = 0; index < dataItems.length; index++) {
+					text += dataItems[index] + "<br>";
+				}
+				$('#ajax-results').html(text);
 			}
 		});
 	});
