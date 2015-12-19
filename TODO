@@ -18,7 +18,6 @@ Configuration:
 - settings in JSON format
 - configuration option to disable page reload from context menu
 - configuration option to disable going to start page from context menu
-- compile-time settings printed as qDebug messages
 
 Scripting:
 - Perl interpreter check on browser start-up

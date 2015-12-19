@@ -29,10 +29,7 @@
 #include <QMenu>
 #include <QDesktopWidget>
 #include <QSystemTrayIcon>
-
-
 #include <QNetworkReply>
-
 
 // ==============================
 // PRINT SUPPORT:
@@ -64,8 +61,8 @@ public slots:
     {
         interpreter = "undefined";
 
-        QFileInfo file(filepath);
-        extension = file.suffix();
+        QFileInfo fileInfo(filepath);
+        extension = fileInfo.suffix();
 
         if (extension.length() == 0) {
             QString firstLine;
@@ -82,35 +79,16 @@ public slots:
             if (extension.contains(htmlExtensions)) {
                 interpreter = "browser-html";
             }
-            if (extension.contains(cssExtension)) {
-                interpreter = "browser-css";
-            }
-            if (extension.contains(jsExtension)) {
-                interpreter = "browser-js";
-            }
-            if (extension.contains(svgExtension)) {
-                interpreter = "browser-svg";
-            }
-            if (extension.contains(ttfExtension)) {
-                interpreter = "browser-ttf";
-            }
-            if (extension.contains(eotExtension)) {
-                interpreter = "browser-eot";
-            }
-            if (extension.contains(woffExtension)) {
-                interpreter = "browser-woff";
-            }
-            if (extension.contains(woff2Extension)) {
-                interpreter = "browser-woff2";
-            }
-            if (extension.contains(pngExtension)) {
-                interpreter = "browser-image";
-            }
-            if (extension.contains(jpgExtensions)) {
-                interpreter = "browser-image";
-            }
-            if (extension.contains(gifExtension)) {
-                interpreter = "browser-image";
+            if (extension.contains(cssExtension) or
+                    extension.contains(jsExtension) or
+                    extension.contains(ttfExtension) or
+                    extension.contains(eotExtension) or
+                    extension.contains(woffExtensions) or
+                    extension.contains(svgExtension) or
+                    extension.contains(pngExtension) or
+                    extension.contains(jpgExtensions) or
+                    extension.contains(gifExtension)) {
+                interpreter = "browser";
             }
 
             if (extension == "pl") {
@@ -147,28 +125,25 @@ public slots:
 
 public:
     QFileDetector();
-
-    QString extension;
     QString interpreter;
 
+    QRegExp plExtension;
+    QRegExp htmlExtensions;
+
 private:
-    // Regular expressions for file type detection by shebang line:
+    QString extension;
     QRegExp perlShebang;
 
     // Regular expressions for file type detection by extension:
-    QRegExp htmlExtensions;
     QRegExp cssExtension;
     QRegExp jsExtension;
     QRegExp svgExtension;
     QRegExp ttfExtension;
     QRegExp eotExtension;
-    QRegExp woff2Extension;
-    QRegExp woffExtension;
+    QRegExp woffExtensions;
     QRegExp pngExtension;
     QRegExp jpgExtensions;
     QRegExp gifExtension;
-
-    QRegExp plExtension;
 };
 
 // ==============================
@@ -266,7 +241,8 @@ protected:
         // Local AJAX GET and POST requests.
         if ((operation == GetOperation or
              operation == PostOperation) and
-                request.url().authority() == AJAX_PSEUDO_DOMAIN) {
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().path().contains("ajax")) {
 
             QUrl url = request.url();
             qDebug() << "AJAX Script URL:" << url.toString();
@@ -300,7 +276,6 @@ protected:
             fileDetector.qDefineInterpreter(scriptFullFilePath);
 
             qDebug() << "File path:" << scriptFullFilePath;
-            qDebug() << "Extension:" << fileDetector.extension;
             qDebug() << "Interpreter:" << fileDetector.interpreter;
 
             QScriptEnvironment initialScriptEnvironment;
@@ -332,12 +307,15 @@ protected:
             qDebug() << "===============";
 
             QEventLoop scriptHandlerWaitingLoop;
+
             QObject::connect(&scriptHandler,
                              SIGNAL(finished(int, QProcess::ExitStatus)),
                              &scriptHandlerWaitingLoop,
                              SLOT(quit()));
+            QTimer::singleShot(2000, &scriptHandlerWaitingLoop, SLOT(quit()));
 
             QString scriptResultString;
+
             if (!scriptHandler.isOpen()) {
                 if (SCRIPT_CENSORING == 0) {
                     scriptHandler.start((qApp->property("perlInterpreter")
@@ -385,7 +363,9 @@ protected:
                 }
 
                 scriptHandlerWaitingLoop.exec();
-                QByteArray scriptResultArray = scriptHandler.readAll();
+
+                QByteArray scriptResultArray =
+                        scriptHandler.readAll();
                 scriptResultString =
                         QString::fromLatin1(scriptResultArray);
             } else {
@@ -435,7 +415,8 @@ protected:
 
         // GET requests to local content:
         if (operation == GetOperation and
-                request.url().authority() == PAGE_PSEUDO_DOMAIN) {
+                request.url().authority() == PSEUDO_DOMAIN and
+                (!request.url().path().contains("ajax"))) {
 
             QString filepath = request.url()
                     .toString(QUrl::RemoveScheme
@@ -503,7 +484,8 @@ protected:
         // Take data from a local form using CGI POST method and
         // execute associated local script:
         if (operation == PostOperation and
-                request.url().authority() == PAGE_PSEUDO_DOMAIN) {
+                request.url().authority() == PSEUDO_DOMAIN and
+                (!request.url().path().contains("ajax"))) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
@@ -526,7 +508,6 @@ protected:
                     request.url().hasQuery()) {
 
                 emit startPerlDebuggerSignal(request.url());
-
             }
         }
 
@@ -537,7 +518,7 @@ protected:
              operation == PutOperation) and
                 ((request.url().scheme().contains("file")) or
                  (request.url().toString().contains("data:image")) or
-                 (request.url().authority() == PAGE_PSEUDO_DOMAIN) or
+                 (request.url().authority() == PSEUDO_DOMAIN) or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
 
@@ -596,7 +577,7 @@ public slots:
             cssLink.append("</title>\n");
             cssLink.append("<link rel=\"stylesheet\" type=\"text/css\"");
             cssLink.append("href=\"http://");
-            cssLink.append(PAGE_PSEUDO_DOMAIN);
+            cssLink.append(PSEUDO_DOMAIN);
             cssLink.append("/");
             cssLink.append(qApp->property("defaultThemeDirectoryName")
                            .toString());
@@ -823,7 +804,6 @@ public slots:
             fileDetector.qDefineInterpreter(scriptFullFilePath);
 
             qDebug() << "File path:" << scriptFullFilePath;
-            qDebug() << "Extension:" << fileDetector.extension;
             qDebug() << "Interpreter:" << fileDetector.interpreter;
 
             if (queryString.length() > 0) {
@@ -1367,10 +1347,9 @@ private:
 
     QString jQuery;
 
-    QStringList sourceViewerMandatoryCommandLine;
-
-    QStringList allowedEnvironmentVariables;
     QProcessEnvironment scriptEnvironment;
+
+    QStringList sourceViewerMandatoryCommandLine;
 
     bool scriptTimedOut;
     bool scriptKilled;
@@ -1415,7 +1394,7 @@ public slots:
                    (QDir::toNativeSeparators
                     ((qApp->property("startPage").toString()))));
         } else {
-            setUrl(QUrl("http://" + QString(PAGE_PSEUDO_DOMAIN) + "/"
+            setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN) + "/"
                         + (qApp->property("startPagePath").toString())));
         }
     }
@@ -1625,7 +1604,7 @@ public slots:
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
 
-            if (qWebHitTestURL.authority() == PAGE_PSEUDO_DOMAIN) {
+            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN) {
 
                 menu->addSeparator();
 
@@ -1655,7 +1634,7 @@ public slots:
                 }
             }
 
-            if (qWebHitTestURL.authority() == PAGE_PSEUDO_DOMAIN) {
+            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN) {
 
                 QAction *openInNewWindowAct =
                         menu->addAction(tr("&Open in new window"));

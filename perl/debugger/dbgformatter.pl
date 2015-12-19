@@ -14,7 +14,7 @@ my $html = "<html>
 
     <head>
         <meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-        <link rel='stylesheet' type='text/css' href='http://perl-executing-browser-page-pseudodomain/html/current.css' media='all' />
+        <link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' />
         <title>Perl Debugger GUI</title>
 
         <style type='text/css'>

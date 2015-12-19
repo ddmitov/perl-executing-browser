@@ -562,7 +562,7 @@ int main(int argc, char **argv)
             settings.value("perl/perl_display_stderr").toString();
     application.setProperty("displayStderr", displayStderr);
 
-    // Timeout for CGI scripts (not long-running ones):
+    // Timeout for CGI-like scripts (not long-running ones):
     QString scriptTimeout =
             settings.value("perl/perl_script_timeout").toString();
     application.setProperty("scriptTimeout", scriptTimeout);
@@ -917,14 +917,40 @@ int main(int argc, char **argv)
     qDebug() << "";
 
     qDebug() << "===============";
-    qDebug() << "BASIC SETTINGS:";
+    qDebug() << "COMPILE-TIME SETTINGS:";
+    qDebug() << "===============";
+    qDebug() << "Local pseudo-domain:" << PSEUDO_DOMAIN;
+    if (SCRIPT_CENSORING == 0) {
+        qDebug() << "Script censoring disabled.";
+    }
+    if (SCRIPT_CENSORING == 1) {
+        qDebug() << "Script censoring enabled.";
+    }
+    if (ZIP_SUPPORT == 0) {
+        qDebug() << "ZIP packages support disabled.";
+    }
+    if (ZIP_SUPPORT == 1) {
+        qDebug() << "ZIP packages support enabled using internal code.";
+    }
+    if (ZIP_SUPPORT == 2) {
+        qDebug() << "ZIP packages support enabled using external unpacker.";
+    }
+    if (PERL_DEBUGGER_INTERACTION == 0) {
+        qDebug() << "Perl debugger interaction disabled.";
+    }
+    if (PERL_DEBUGGER_INTERACTION == 1) {
+        qDebug() << "Perl debugger interaction enabled.";
+    }
+
+    qDebug() << "===============";
+    qDebug() << "BASIC RUNTIME SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Root folder:" << QDir::toNativeSeparators(rootDirName);
     qDebug() << "Temporary folder:" << applicationTempDirectoryName;
     qDebug() << "Settings file name:" << settingsFileName;
 
     qDebug() << "===============";
-    qDebug() << "PERL SETTINGS:";
+    qDebug() << "PERL RUNTIME SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Folders to add to PATH:";
     foreach (QString pathEntry, pathToAddList) {
@@ -941,7 +967,7 @@ int main(int argc, char **argv)
     qDebug() << "Source viewer arguments:" << sourceViewerArguments;
 
     qDebug() << "===============";
-    qDebug() << "NETWORKING SETTINGS:";
+    qDebug() << "NETWORKING RUNTIME SETTINGS:";
     qDebug() << "===============";
     qDebug() << "User Agent:" << userAgent;
     qDebug() << "Allowed domain names:";
@@ -950,7 +976,7 @@ int main(int argc, char **argv)
     }
 
     qDebug() << "===============";
-    qDebug() << "GUI SETTINGS:";
+    qDebug() << "GUI RUNTIME SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Start page:" << startPagePath;
     qDebug() << "Warn on exit:" << warnOnExit;
@@ -980,7 +1006,7 @@ int main(int argc, char **argv)
     qDebug() << "Web Inspector from context menu:" << webInspector;
 
     qDebug() << "===============";
-    qDebug() << "LOGGING SETTINGS:";
+    qDebug() << "LOGGING RUNTIME SETTINGS:";
     qDebug() << "===============";
     qDebug() << "Logging:" << logging;
     qDebug() << "Logging mode:" << logMode;
@@ -1033,10 +1059,12 @@ int main(int argc, char **argv)
 QFileDetector::QFileDetector()
     : QObject(0)
 {
-    // Regular expressions for file type detection by shebang line:
     perlShebang.setPattern("#!/.{1,}perl");
 
     // Regular expressions for file type detection by extension:
+    plExtension.setPattern("pl");
+    plExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
     htmlExtensions.setPattern("htm");
     htmlExtensions.setCaseSensitivity(Qt::CaseInsensitive);
 
@@ -1046,20 +1074,17 @@ QFileDetector::QFileDetector()
     jsExtension.setPattern("js");
     jsExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
-    svgExtension.setPattern("svg");
-    svgExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
     ttfExtension.setPattern("ttf");
     ttfExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
     eotExtension.setPattern("eot");
     eotExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
-    woff2Extension.setPattern("woff2");
-    woff2Extension.setCaseSensitivity(Qt::CaseInsensitive);
+    woffExtensions.setPattern("woff");
+    woffExtensions.setCaseSensitivity(Qt::CaseInsensitive);
 
-    woffExtension.setPattern("woff");
-    woffExtension.setCaseSensitivity(Qt::CaseInsensitive);
+    svgExtension.setPattern("svg");
+    svgExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
     pngExtension.setPattern("png");
     pngExtension.setCaseSensitivity(Qt::CaseInsensitive);
@@ -1069,9 +1094,6 @@ QFileDetector::QFileDetector()
 
     gifExtension.setPattern("gif");
     gifExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    plExtension.setPattern("pl");
-    plExtension.setCaseSensitivity(Qt::CaseInsensitive);
 }
 
 // ==============================
@@ -1282,6 +1304,8 @@ QPage::QPage()
             setAttribute(QWebSettings::LinksIncludedInFocusChain, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
     if ((qApp->property("webInspector").toString()) == "enable") {
         QWebSettings::globalSettings()->
                 setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
@@ -1324,72 +1348,11 @@ QPage::QPage()
                      this,
                      SLOT(qScriptFinishedSlot()));
 
+    // SCRIPT ENVIRONMENT:
+    QScriptEnvironment initialScriptEnvironment;
+    scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
 
-    // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
-    QStringList systemEnvironment =
-            QProcessEnvironment::systemEnvironment().toStringList();
-
-    foreach (QString environmentVariable, systemEnvironment) {
-        QStringList environmentVariableList = environmentVariable.split("=");
-        QString environmentVariableName = environmentVariableList.first();
-        if (!allowedEnvironmentVariables.contains(environmentVariableName)) {
-            scriptEnvironment.remove(environmentVariable);
-        } else {
-            scriptEnvironment.insert(
-                        environmentVariableList.first(),
-                        environmentVariableList[1]);
-        }
-    }
-
-    // DOCUMENT_ROOT:
-    scriptEnvironment.remove("DOCUMENT_ROOT");
-    scriptEnvironment.insert("DOCUMENT_ROOT",
-                             qApp->property("rootDirName").toString());
-
-    // PERLLIB:
-    scriptEnvironment.remove("PERLLIB");
-    scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());
-
-    // PATH:
-    QString path;
-    QString pathSeparator;
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-    pathSeparator = ":";
-#endif
-#ifdef Q_OS_WIN // Windows
-    pathSeparator = ";";
-#endif
-
-    // Add all browser-specific folders to the PATH of all local scripts,
-    // but first check if these directories exist,
-    // then resolve all relative paths, if any:
-    foreach (QString pathEntry, qApp->property("pathToAddList").toString()) {
-        QDir pathDir(pathEntry);
-        if (pathDir.exists()) {
-            if (pathDir.isRelative()) {
-                pathEntry = QDir::toNativeSeparators(
-                            qApp->property("rootDirName").toString()
-                            + pathEntry);
-            }
-            if (pathDir.isAbsolute()) {
-                pathEntry = QDir::toNativeSeparators(pathEntry);
-            }
-            path.append(pathEntry);
-            path.append(pathSeparator);
-        }
-    }
-
-#ifndef Q_OS_WIN // Linux and Mac
-    scriptEnvironment.remove("PATH");
-    scriptEnvironment.insert("PATH", path);
-#endif
-#ifdef Q_OS_WIN // Windows
-    scriptEnvironment.remove("Path");
-    scriptEnvironment.insert("Path", path);
-#endif
-
-
-    // Source viewer mandatory, or minimal, command line:
+    // SOURCE VIEWER MANDATORY COMMAND LINE:
     sourceViewerMandatoryCommandLine.append(
                 (qApp->property("sourceViewer").toString()));
     if ((qApp->property("sourceViewerArguments").toStringList()).length() > 1) {
@@ -1399,17 +1362,13 @@ QPage::QPage()
         }
     }
 
-    runningScriptsInCurrentWindowList.clear();
-
-    debuggerJustStarted = false;
-
-    // Default frame for local content:
+    // DEFAULT FRAME FOR LOCAL CONTENT:
     targetFrame = QPage::mainFrame();
 
-    // Icon for dialogs:
+    // ICON FOR DIALOGS:
     icon.load(qApp->property("iconPathName").toString());
 
-    // Internally compiled jQuery necessary for JavaScript bridges:
+    // INTERNALLY COMPILED JQUERY NECESSARY FOR JAVASCRIPT BRIDGES:
     QFile file;
     file.setFileName(":/scripts/jquery-1-11-1-min.js");
     file.open(QIODevice::ReadOnly);
@@ -1419,6 +1378,9 @@ QPage::QPage()
     jQuery.append("\n");
     jQuery.append("var qt = {'jQuery': jQuery.noConflict(true)};");
     jQuery.append("null");
+
+    // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
+    debuggerJustStarted = false;
 }
 
 // ==============================
@@ -1738,7 +1700,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         return false;
     }
 
-
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().scheme().contains("selecttheme")) {
@@ -2017,17 +1978,18 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
     }
 
-    QRegExp htmlExtensions("\\.htm");
-    htmlExtensions.setCaseSensitivity(Qt::CaseInsensitive);
+    QFileDetector fileDetector;
 
     // Open local content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().authority() == PAGE_PSEUDO_DOMAIN and
+            request.url().authority() == PSEUDO_DOMAIN and
+            (!request.url().path().contains("ajax")) and
             (QPage::mainFrame()->childFrames().contains(frame) or
              QPage::mainFrame()->childFrames().isEmpty())) {
 
         // Start local script in the same window:
-        if (!request.url().path().contains(htmlExtensions)) {
+        if (request.url().path()
+                .contains(fileDetector.plExtension)) {
             targetFrame = frame;
 
             QByteArray emptyPostDataArray;
@@ -2036,7 +1998,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
 
         // Load local HTML page in the same window:
-        if (request.url().path().contains(htmlExtensions)) {
+        if (request.url().path()
+                .contains(fileDetector.htmlExtensions)) {
 
             QString relativeFilePath = request.url()
                     .toString(QUrl::RemoveScheme
@@ -2059,10 +2022,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Load local HTML page in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().authority() == PAGE_PSEUDO_DOMAIN and
+            request.url().authority() == PSEUDO_DOMAIN and
+            (!request.url().path().contains("ajax")) and
             (!QPage::mainFrame()->childFrames().contains(frame))) {
 
-        if (request.url().path().contains(htmlExtensions)) {
+        if (request.url().path()
+                .contains(fileDetector.htmlExtensions)) {
             qDebug() << "Local HTML page in a new window:"
                      << request.url().toString();
             qDebug() << "===============";
