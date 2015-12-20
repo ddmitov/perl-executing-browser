@@ -2,71 +2,73 @@
 
 use strict;
 use warnings;
+use POSIX qw(strftime);
 use 5.010;
 
 BEGIN {
+	my $DOCUMENT_ROOT = $ENV{'DOCUMENT_ROOT'};
+
+	my $FOLDER_TO_OPEN = rand().strftime '%d-%m-%Y--%H-%M-%S', gmtime();;
+	if (defined($ENV{'FOLDER_TO_OPEN'})) {
+		$FOLDER_TO_OPEN = $ENV{'FOLDER_TO_OPEN'};
+	}
+
+	my $FILE_TO_OPEN = rand().strftime '%d-%m-%Y--%H-%M-%S', gmtime();
+	if (defined($ENV{'FILE_TO_OPEN'})) {
+		$FILE_TO_OPEN = $ENV{'FILE_TO_OPEN'};
+	}
 
 	*CORE::GLOBAL::chdir = sub (*;$@) {
+		(my $package, my $filename, my $line) = caller();
 		my $dir = shift;
-		if ($dir =~ "/tmp") {
-			print "Changing dir to $dir\n";
+		if ($dir =~ $DOCUMENT_ROOT or $dir =~ $FOLDER_TO_OPEN) {
 			CORE::chdir $dir;
 		} else {
-			print "Directory change not allowed!\n";
-			die;
+			die "Intercepted insecure 'chdir' call from (package: '$package', file: '$filename', line: '$line'). Directory change not allowed for $dir!\n";
 		}
 	};
 
 	*CORE::GLOBAL::open = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
-		print STDERR "Intercepted `open` call from (package: '$package', file: '$filename', line: '$line')'\n";
 		my $handle =shift;
-
 		if (@_ == 1) {
-			if ($_[0] =~ $ARGV[0]) {
+			my $filepath = $_[0];
+			if ($_[0] =~ $DOCUMENT_ROOT or $_[0] =~ $FOLDER_TO_OPEN or $_[0] =~ $FILE_TO_OPEN) {
 				return CORE::open($handle, $_[1]);
 			} else {
-				print STDERR "File open not allowed!\n";
-				#~ die;
+				die "Intercepted insecure 'open' call from (package: '$package', file: '$filename', line: '$line'). File open not allowed for $filepath!\n";
 			}
-
 		} elsif (@_ == 2) {
-			if ($_[1] =~ $ARGV[0]) {
+			my $filepath = $_[1];
+			if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN) {
 				return CORE::open($handle, $_[1]);
 			} else {
-				print STDERR "File open not allowed!\n";
-				#~ die;
+				die "Intercepted insecure 'open' call from (package: '$package', file: '$filename', line: '$line'). File open not allowed for $filepath!\n";
 			}
-
 		} elsif (@_ == 3) {
 			if (defined $_[2]) {
-
-				if ($_[2] =~ "/tmp") {
+				my $filepath = $_[2];
+				if ($_[2] =~ $DOCUMENT_ROOT or $_[2] =~ $FOLDER_TO_OPEN or $_[2] =~ $FILE_TO_OPEN) {
 					CORE::open $handle, $_[1], $_[2];
 				} else {
-					print "File open not allowed!\n";
-					die;
+					die "Intercepted insecure 'open' call from (package: '$package', file: '$filename', line: '$line'). File open not allowed for $filepath!\n";
 				}
-
 			} else {
-
-				if ($_[1] =~ "/tmp") {
+				my $filepath = $_[1];
+				if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN) {
 					CORE::open $handle, $_[1], undef; # special case
 				} else {
-					print "File open not allowed!\n";
-					die;
+					die "Intercepted insecure 'open' call from (package: '$package', file: '$filename', line: '$line'). File open not allowed for $filepath!\n";
 				}
-
 			}
 		} else {
-
-				if ($_[1] =~ "/tmp" or $_[2] =~ "/tmp") {
-					CORE::open $handle, $_[1], $_[2], @_[3..$#_];
-				} else {
-					print "File open not allowed!\n";
-					die;
-				}
-
+			my $filepath = $_[1];
+			if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN or
+				$_[2] =~ $DOCUMENT_ROOT or $_[2] =~ $FOLDER_TO_OPEN or $_[2] =~ $FILE_TO_OPEN) {
+				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
+			} else {
+				die "Intercepted insecure 'open' call from (package: '$package', file: '$filename', line: '$line'). File open not allowed for $filepath!\n";
+			}
 		}
 	};
 
@@ -122,9 +124,9 @@ foreach my $line (@user_code) {
 my $header = "<html>
 
 <head>
-<title>Perl Executing Browser - Errors</title>
-<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-<style type='text/css'>body {text-align: left}</style>\n
+	<title>Perl Executing Browser - Errors</title>
+	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+	<style type='text/css'>body {text-align: left}</style>\n
 </head>
 
 <body>";
@@ -140,7 +142,7 @@ my $user_code = join ('', @user_code);
 eval ($user_code);
 
 close (STDERR) or die "Can't close STDERR: $!";
-open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR: $!";
+CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR: $!";
 
 ##############################
 # PRINT SAVED STDERR, IF ANY:
@@ -148,7 +150,7 @@ open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR: $!";
 if ($@) {
 	if ($@ =~ m/trapped/) {
 		print STDERR $header;
-		print STDERR "<p align='center'><font size='5' face='SansSerif'>Unsecure code was blocked:</font></p>\n";
+		print STDERR "<p align='center'><font size='5' face='SansSerif'>insecure code was blocked:</font></p>\n";
 		print STDERR "<pre>$@</pre>";
 		print STDERR $footer;
 		exit;

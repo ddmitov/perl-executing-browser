@@ -251,13 +251,13 @@ protected:
                                                     | QUrl::RemoveAuthority
                                                     | QUrl::RemoveQuery);
 
-            // Replace initial slash at the beginning of the relative path;
-            // root directory setting already has a trailing slash.
-            relativeFilePath.replace(QRegExp("^//"), "");
-
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
                      + relativeFilePath);
+
+            // Replace initial slash at the beginning of the relative path;
+            // root directory setting already has a trailing slash.
+            scriptFullFilePath = scriptFullFilePath.replace("//", "/");
 
             QString queryString = url.toString(QUrl::RemoveScheme
                                                | QUrl::RemoveAuthority
@@ -315,6 +315,7 @@ protected:
             QTimer::singleShot(2000, &scriptHandlerWaitingLoop, SLOT(quit()));
 
             QString scriptResultString;
+            QString scriptErrorString;
 
             if (!scriptHandler.isOpen()) {
                 if (SCRIPT_CENSORING == 0) {
@@ -365,9 +366,33 @@ protected:
                 scriptHandlerWaitingLoop.exec();
 
                 QByteArray scriptResultArray =
-                        scriptHandler.readAll();
+                        scriptHandler.readAllStandardOutput();
                 scriptResultString =
                         QString::fromLatin1(scriptResultArray);
+
+                QByteArray scriptErrorArray =
+                        scriptHandler.readAllStandardError();
+                scriptErrorString =
+                        QString::fromLatin1(scriptErrorArray);
+
+                if (scriptResultString.length() == 0 and
+                        scriptErrorString == 0) {
+                    qDebug() << "AJAX Script timed out:" << scriptFullFilePath;
+                    qDebug() << "===============";
+
+                    QMessageBox scriptTimeoutMessageBox (qApp->activeWindow());
+                    scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
+                    scriptTimeoutMessageBox
+                            .setWindowTitle(tr("AJAX Script Timeout"));
+                    scriptTimeoutMessageBox
+                            .setIconPixmap((qApp->property("icon").toString()));
+                    scriptTimeoutMessageBox
+                            .setText(
+                                tr("Your AJAX script timed out:<br>")
+                                + scriptFullFilePath);
+                    scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
+                    scriptTimeoutMessageBox.exec();
+                }
             } else {
                 qDebug() << "Script already started:" << scriptFullFilePath;
                 qDebug() << "===============";
@@ -376,11 +401,11 @@ protected:
                 scriptStartedMessageBox
                         .setWindowModality(Qt::WindowModal);
                 scriptStartedMessageBox
-                        .setWindowTitle(tr("Script Already Started"));
+                        .setWindowTitle(tr("AJAX Script Already Started"));
                 scriptStartedMessageBox
                         .setIconPixmap((qApp->property("icon").toString()));
                 scriptStartedMessageBox
-                        .setText(tr("This script is already started ")
+                        .setText(tr("This AJAX script is already started ")
                                  + tr("and still running:<br>")
                                  + scriptFullFilePath);
                 scriptStartedMessageBox.setDefaultButton(QMessageBox::Ok);
@@ -692,12 +717,11 @@ public slots:
                                                 | QUrl::RemoveAuthority
                                                 | QUrl::RemoveQuery);
 
-        // Replace initial slash at the beginning of the relative path;
-        // root directory setting already has a trailing slash.
-        relativeFilePath.replace(QRegExp("^//"), "");
-
         scriptFullFilePath = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString()) + relativeFilePath);
+        // Replace initial slash at the beginning of the relative path;
+        // root directory setting already has a trailing slash.
+        scriptFullFilePath.replace("//", "/");
 
         QString queryString = url.toString(QUrl::RemoveScheme
                                            | QUrl::RemoveAuthority
@@ -1098,15 +1122,18 @@ public slots:
                     .setIconPixmap((qApp->property("icon").toString()));
             scriptTimeoutMessageBox
                     .setText(
-                        tr("Your script timed out!<br>")
+                        tr("Your script timed out:<br>")
+                        + scriptFullFilePath + "<br>"
                         + tr("Consider starting it as a long-running script."));
             scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
             scriptTimeoutMessageBox.exec();
         }
     }
 
-    // Perl debugger interaction.
+    // ==============================
+    // PERL DEBUGGER INTERACTION.
     // Implementation of an idea proposed by Valcho Nedelchev.
+    // ==============================
     void qStartPerlDebuggerSlot(QUrl debuggerUrl)
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {

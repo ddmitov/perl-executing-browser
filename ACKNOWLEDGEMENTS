@@ -225,11 +225,15 @@ PERL
 ====
 http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (not executing program)"
 http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"
+http://www.perlmonks.org/?node_id=722050 "CORE::GLOBAL::* for auditing which files are read and written?"
+
+http://perlmaven.com/simple-timestamp-generation-using-posix-strftime
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
 http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web
 http://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting
+http://stackoverflow.com/questions/651124/how-do-i-redefine-built-in-perl-functions
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
 http://perlmeme.org/faqs/file_io/directory_listing.html

@@ -3,6 +3,9 @@
 use strict;
 use warnings;
 
+# Uncomment to test Perl AJAX script timeout:
+#~ sleep(3);
+
 my $DOCUMENT_ROOT = $ENV{'DOCUMENT_ROOT'};
 
 my @file_entries;
