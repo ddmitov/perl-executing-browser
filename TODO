@@ -21,6 +21,3 @@ Scripting:
 - Perl interpreter check on browser start-up
 - Perl interpreter from user PATH using: perl -e 'print $^X'
 - custom environment variables in script environment
-
-GUI:
-- working maximized window setting on Mac

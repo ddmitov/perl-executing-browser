@@ -381,15 +381,15 @@ int main(int argc, char **argv)
     applicationTempDirectory.mkpath(".");
 
     // Create the output directory:
-    QString applicationOutputDirectoryName = QDir::tempPath()
-            + QDir::separator()
-            + applicationBinaryName + "--" + applicationStartDateAndTime
-            + QDir::separator() + "output";
-    application
-            .setProperty("applicationOutputDirectory",
-                         applicationOutputDirectoryName);
-    QDir applicationOutputDirectory(applicationOutputDirectoryName);
-    applicationOutputDirectory.mkpath(".");
+//    QString applicationOutputDirectoryName = QDir::tempPath()
+//            + QDir::separator()
+//            + applicationBinaryName + "--" + applicationStartDateAndTime
+//            + QDir::separator() + "output";
+//    application
+//            .setProperty("applicationOutputDirectory",
+//                         applicationOutputDirectoryName);
+//    QDir applicationOutputDirectory(applicationOutputDirectoryName);
+//    applicationOutputDirectory.mkpath(".");
 
     // ==============================
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
@@ -642,6 +642,7 @@ int main(int argc, char **argv)
     QString warnOnExit = settings.value("gui/warn_on_exit") .toString();
     application.setProperty("warnOnExit", warnOnExit);
 
+#ifndef Q_OS_MAC
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:
     QString windowSize = settings.value("gui/window_size").toString();
@@ -654,10 +655,7 @@ int main(int argc, char **argv)
         application.setProperty("fixedHeight", fixedHeight);
     }
     application.setProperty("windowSize", windowSize);
-
-    // Stay on top of all other windows enable/disable switch:
-    QString stayOnTop = settings.value("gui/stay_on_top") .toString();
-    application.setProperty("stayOnTop", stayOnTop);
+#endif
 
     // Browser title -'dynamic' or 'My Favorite Title'
     // 'dynamic' title is taken from every HTML <title> tag.
@@ -984,8 +982,9 @@ int main(int argc, char **argv)
     int screenWidth = QDesktopWidget().screen()->rect().width();
     int screenHeight = QDesktopWidget().screen()->rect().height();
     qDebug() << "Screen resolution:" << screenWidth << "x" << screenHeight;
+#ifndef Q_OS_MAC
     qDebug() << "Window size:" << windowSize;
-    qDebug() << "Stay on top:" << stayOnTop;
+#endif
     qDebug() << "Browser title:" << browserTitle;
     qDebug() << "Context menu:" << contextMenu;
     qDebug() << "Go to start page capability:"
@@ -1407,6 +1406,7 @@ QTopLevel::QTopLevel()
                      this, SLOT(qPrintSlot()));
 #endif
 
+#ifndef Q_OS_MAC
     // Configure screen appearance:
     if ((qApp->property("fixedWidth").toInt()) > 100 and
             (qApp->property("fixedHeight").toInt()) > 100) {
@@ -1424,12 +1424,14 @@ QTopLevel::QTopLevel()
     if ((qApp->property("windowSize").toString()) == "fullscreen") {
         showFullScreen();
     }
-    if ((qApp->property("stayOnTop").toString()) == "enable") {
-        setWindowFlags(Qt::WindowStaysOnTopHint);
-    }
+#endif
+
+    // Configure browser title:
     if ((qApp->property("browserTitle").toString()) != "dynamic") {
         setWindowTitle((qApp->property("browserTitle").toString()));
     }
+
+    // Configure context menu:
     if ((qApp->property("contextMenu").toString()) == "disable") {
         setContextMenuPolicy(Qt::NoContextMenu);
     }

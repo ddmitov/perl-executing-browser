@@ -1911,7 +1911,13 @@ public slots:
 
     void qExitApplicationSequence()
     {
-        // Perl temp folder removal code:
+        // Temporary folder removal:
+#if QT_VERSION >= 0x050000
+        // Qt5 code:
+        QDir tempDir(qApp->property("applicationTempDirectory").toString());
+        tempDir.removeRecursively();
+#else
+        // Qt4 code based on Perl one-liner using Perl core module:
         QProcess cleanerProcess;
         cleanerProcess
                 .startDetached((qApp->property("perlInterpreter")
@@ -1923,6 +1929,7 @@ public slots:
                                << (qApp->property(
                                        "applicationTempDirectory")
                                    .toString()));
+#endif
 
         if ((qApp->property("systrayIcon").toString()) == "enable") {
             emit trayIconHideSignal();

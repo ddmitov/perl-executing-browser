@@ -11,7 +11,6 @@ message ("Qt Binary files (executables): $$[QT_INSTALL_BINS]")
 message ("Qt Plugins: $$[QT_INSTALL_PLUGINS]")
 message ("Qt Data files: $$[QT_INSTALL_DATA]")
 message ("Qt Translation files: $$[QT_INSTALL_TRANSLATIONS]")
-message ("Qt Settings: $$[QT_INSTALL_SETTINGS]")
 message ("")
 
 TEMPLATE = app
