@@ -668,15 +668,15 @@ int main(int argc, char **argv)
     QString contextMenu = settings.value("gui/context_menu").toString();
     application.setProperty("contextMenu", contextMenu);
 
-    // Keyboard shortcut for going to start page enable/disable switch:
-    QString keyboardShortcutGoHome =
-            settings.value("gui/keyboard_shortcut_go_home").toString();
-    application.setProperty("keyboardShortcutGoHome", keyboardShortcutGoHome);
+    // Going to start page enable/disable switch:
+    QString goHomeCapability =
+            settings.value("gui/go_home_capability").toString();
+    application.setProperty("goHomeCapability", goHomeCapability);
 
-    // Keyboard shortcut for page reload enable/disable switch:
-    QString keyboardShortcutReload =
-            settings.value("gui/keyboard_shortcut_reload").toString();
-    application.setProperty("keyboardShortcutReload", keyboardShortcutReload);
+    // Page reload enable/disable switch:
+    QString reloadCapability =
+            settings.value("gui/reload_capability").toString();
+    application.setProperty("reloadCapability", reloadCapability);
 
     // Web Inspector from context menu enable/disable switch:
     QString webInspector = settings.value("gui/web_inspector").toString();
@@ -988,10 +988,15 @@ int main(int argc, char **argv)
     qDebug() << "Stay on top:" << stayOnTop;
     qDebug() << "Browser title:" << browserTitle;
     qDebug() << "Context menu:" << contextMenu;
-    qDebug() << "Keyboard shortcut for going to start page:"
-             << keyboardShortcutGoHome;
-    qDebug() << "Keyboard shortcut for page reload:" << keyboardShortcutReload;
+    qDebug() << "Go to start page capability:"
+             << goHomeCapability;
+    qDebug() << "Page reload capability:" << reloadCapability;
     qDebug() << "Windows and dialogs icon file:" << iconPathName;
+    qDebug() << "Available Qt styles:";
+    QStringList allAvailableStyles = QStyleFactory::keys();
+    foreach (QString availableStyle, allAvailableStyles) {
+        qDebug() << availableStyle;
+    }
     if (qtStyle.length() > 0) {
         qDebug() << "Global Qt style:" << qtStyle;
     }
@@ -1179,12 +1184,6 @@ QTrayIcon::QTrayIcon()
         icon.load(iconPathName);
         trayIcon->setIcon(icon);
         trayIcon->setToolTip(qApp->applicationName());
-
-        QObject::connect(trayIcon,
-                         SIGNAL(activated(QSystemTrayIcon::ActivationReason)),
-                         this,
-                         SLOT(qTrayIconActivatedSlot(
-                                  QSystemTrayIcon::ActivationReason)));
 
         aboutAction = new QAction(tr("&About"), this);
 
@@ -1389,38 +1388,24 @@ QPage::QPage()
 QTopLevel::QTopLevel()
     : QWebView(0)
 {
-    // Configure keyboard shortcuts - main window:
-    QShortcut *minimizeShortcut = new QShortcut(Qt::Key_Escape, this);
-    QObject::connect(minimizeShortcut, SIGNAL(activated()),
-                     this, SLOT(qMinimizeSlot()));
-
-    QShortcut *maximizeShortcut = new QShortcut(QKeySequence("Ctrl+M"), this);
-    QObject::connect(maximizeShortcut, SIGNAL(activated()),
-                     this, SLOT(qMaximizeSlot()));
-
-    QShortcut *toggleFullScreenShortcut = new QShortcut(Qt::Key_F11, this);
-    QObject::connect(toggleFullScreenShortcut, SIGNAL(activated()),
-                     this, SLOT(qToggleFullScreenSlot()));
-
-    if ((qApp->property("keyboardShortcutGoHome").toString()) == "enable") {
-        QShortcut *homeShortcut = new QShortcut(Qt::Key_F12, this);
+    // Configure keyboard shortcuts:
+    if ((qApp->property("goHomeCapability").toString()) == "enable") {
+        QShortcut *homeShortcut = new QShortcut(QKeySequence("Ctrl+H"), this);
         QObject::connect(homeShortcut, SIGNAL(activated()),
                          this, SLOT(qLoadStartPageSlot()));
     }
 
-    if ((qApp->property("keyboardShortcutReload").toString()) == "enable") {
+    if ((qApp->property("reloadCapability").toString()) == "enable") {
         QShortcut *reloadShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
         QObject::connect(reloadShortcut, SIGNAL(activated()),
                          this, SLOT(qReloadSlot()));
     }
 
+#ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
                      this, SLOT(qPrintSlot()));
-
-    QShortcut *closeAppShortcut = new QShortcut(QKeySequence("Ctrl+Q"), this);
-    QObject::connect(closeAppShortcut, SIGNAL(activated()),
-                     this, SLOT(qExitApplicationSlot()));
+#endif
 
     // Configure screen appearance:
     if ((qApp->property("fixedWidth").toInt()) > 100 and

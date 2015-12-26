@@ -168,17 +168,6 @@ class QTrayIcon : public QSystemTrayIcon
     Q_OBJECT
 
 public slots:
-    void qTrayIconActivatedSlot(QSystemTrayIcon::ActivationReason reason)
-    {
-        if (reason == QSystemTrayIcon::DoubleClick) {
-            foreach (QWidget *window, QApplication::topLevelWidgets()) {
-                if (window->isVisible()) {
-                    window->showMinimized();
-                }
-            }
-        }
-    }
-
     void qTrayIconHideSlot()
     {
         trayIcon->hide();
@@ -1677,38 +1666,21 @@ public slots:
 
             menu->addSeparator();
 
-            if ((qApp->property("windowSize").toString()) == "maximized" or
-                    (qApp->property("windowSize").toString()) == "fullscreen") {
-                if (!QTopLevel::isMaximized()) {
-                    QAction *maximizeAct =
-                            menu->addAction(tr("&Maximized window"));
-                    QObject::connect(maximizeAct, SIGNAL(triggered()),
-                                     this, SLOT(qMaximizeSlot()));
-                }
-
-                if (!QTopLevel::isFullScreen()) {
-                    QAction *toggleFullScreenAct =
-                            menu->addAction(tr("&Fullscreen"));
-                    QObject::connect(toggleFullScreenAct, SIGNAL(triggered()),
-                                     this, SLOT(qToggleFullScreenSlot()));
+            if ((qApp->property("goHomeCapability").toString()) == "enable") {
+                if (mainPage->runningScriptsInCurrentWindowList.length() == 0) {
+                    QAction *homeAct = menu->addAction(tr("&Home"));
+                    QObject::connect(homeAct, SIGNAL(triggered()),
+                                     this, SLOT(qLoadStartPageSlot()));
                 }
             }
 
-            QAction *minimizeAct = menu->addAction(tr("Mi&nimize"));
-            QObject::connect(minimizeAct, SIGNAL(triggered()),
-                             this, SLOT(qMinimizeSlot()));
-
-            if (mainPage->runningScriptsInCurrentWindowList.length() == 0) {
-                QAction *homeAct = menu->addAction(tr("&Home"));
-                QObject::connect(homeAct, SIGNAL(triggered()),
-                                 this, SLOT(qLoadStartPageSlot()));
-            }
-
-            if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                    QTopLevel::url().toString().length() > 0) {
-                QAction *reloadAct = menu->addAction(tr("&Reload"));
-                QObject::connect(reloadAct, SIGNAL(triggered()),
-                                 this, SLOT(qReloadSlot()));
+            if ((qApp->property("reloadCapability").toString()) == "enable") {
+                if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
+                        QTopLevel::url().toString().length() > 0) {
+                    QAction *reloadAct = menu->addAction(tr("&Reload"));
+                    QObject::connect(reloadAct, SIGNAL(triggered()),
+                                     this, SLOT(qReloadSlot()));
+                }
             }
 
             QAction *printPreviewAct = menu->addAction(tr("Print pre&view"));
@@ -1723,11 +1695,16 @@ public slots:
             QObject::connect(saveAsPdfAct, SIGNAL(triggered()),
                              this, SLOT(qSaveAsPdfSlot()));
 
-            if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                    QTopLevel::url().toString().length() > 0) {
-                QAction *selectThemeAct = menu->addAction(tr("&Select theme"));
-                QObject::connect(selectThemeAct, SIGNAL(triggered()),
-                                 this, SLOT(qSelectThemeFromContextMenuSlot()));
+            if ((qApp->property("reloadCapability").toString()) == "enable") {
+                if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
+                        QTopLevel::url().toString().length() > 0) {
+                    QAction *selectThemeAct =
+                            menu->addAction(tr("&Select theme"));
+                    QObject::connect(selectThemeAct,
+                                     SIGNAL(triggered()),
+                                     this,
+                                     SLOT(qSelectThemeFromContextMenuSlot()));
+                }
             }
 
             QAction *closeWindowAct = menu->addAction(tr("&Close window"));
@@ -1756,11 +1733,6 @@ public slots:
     {
         raise();
         showMaximized();
-    }
-
-    void qMinimizeSlot()
-    {
-        showMinimized();
     }
 
     void qToggleFullScreenSlot()

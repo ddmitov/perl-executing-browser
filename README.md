@@ -126,13 +126,11 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
   
 ## Keyboard Shortcuts
   
-* Escape - minimize current window  
-* Ctrl+M - maximize current window  
-* F11 - toggle fullscreen on current window  
-* F12 - go to start page  
-* Ctrl+R - reload current page  
+* Alt+F4 - close current window  
+* Ctrl+H - go to start page  
 * Ctrl+P - print current page  
-* Ctrl+Q - exit application  
+* Ctrl+R - reload current page  
+* F11 - toggle fullscreen  
   
 ## History
   
