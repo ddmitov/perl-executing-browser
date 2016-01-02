@@ -6,7 +6,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
   
 ## Design Objectives
   
-* **1. Fast and easy GUI for local scripts:**  
+* **1. Fast and easy GUI for desktop scripts:**  
     use HTML, CSS and JavaScript to craft and deploy rapidly beautiful Perl5 desktop applications;  
 
 * **2. Zero installation when needed:**  
@@ -15,11 +15,11 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl5, Qt and QtWebKit are available;  
 
-* **4. User-space solution:**  
+* **4. Secure user-space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program;  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
-    use as much as possible from existing web technologies, standards and their documentation to build secure desktop applications.  
+    use as much as possible from existing web technologies, standards and their documentation to build desktop applications..  
 
 ## Features
   
@@ -49,7 +49,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
-* All settings are stored in a single INI file with comments included.  
+* All settings are stored in a single configuration file with comments included.  
 * Browser root folder can be any folder.  
 * Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
@@ -64,7 +64,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
   
 ## Target Audience
   
-* Advanced users and Perl - JavaScript enthusiasts willing to create rapidly custom GUI desktop applications, which can not be easily implemented using other programming languages.  
+* Advanced users and Perl - JavaScript enthusiasts willing to create rapidly custom desktop GUI applications.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
 
 ## Compile-time Requirements
@@ -137,7 +137,7 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
   
 ## History
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and the current version 0.1, code name "Camel Calf", should be considered alpha pre-release. Do not use it for production purposes! Exhaustive documentation is still missing and current examples are basic.  
+PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and the current version 0.1, code name "Camel Calf", should be considered alpha pre-release. Exhaustive documentation is still missing and current examples are basic.  
   
 ## License
   
@@ -155,6 +155,6 @@ Possible new names: **QtCamel Browser**, **QtCamelKit**, **QtCamel**.
   
 ## Authors
   
-Dimitar D. Mitov, 2013 - 2015,  
-Valcho Nedelchev, 2014 - 2015.  
+Dimitar D. Mitov, 2013 - 2016,  
+Valcho Nedelchev, 2014 - 2016.  
   

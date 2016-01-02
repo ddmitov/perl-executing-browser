@@ -4,20 +4,17 @@ Permanent to do priorities:
 - documentation, commented code
 - Github webpage
 - Github Wiki page
+- up-to-date translations
 ====================================
 
 v. 0.2
 ====================================
-
-Usability:
-- dependency scanner & script packer
-- updated Bulgarian translation
-
-Configuration:
 - nice HTML configuration interface
 - settings in JSON format
-
-Scripting:
 - Perl interpreter check on browser start-up
 - Perl interpreter from user PATH using: perl -e 'print $^X'
+
+v. 0.3
+====================================
+- dependency scanner & script packer
 - custom environment variables in script environment

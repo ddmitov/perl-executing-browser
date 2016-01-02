@@ -1171,38 +1171,6 @@ QScriptEnvironment::QScriptEnvironment()
 }
 
 // ==============================
-// SYSTEM TRAY ICON CLASS CONSTRUCTOR:
-// ==============================
-QTrayIcon::QTrayIcon()
-    : QSystemTrayIcon(0)
-{
-    if ((qApp->property("systrayIcon").toString()) == "enable") {
-        trayIcon = new QSystemTrayIcon();
-        QString iconPathName = qApp->property("systrayIconPathName").toString();
-        QPixmap icon;
-        icon.load(iconPathName);
-        trayIcon->setIcon(icon);
-        trayIcon->setToolTip(qApp->applicationName());
-
-        aboutAction = new QAction(tr("&About"), this);
-
-        aboutQtAction = new QAction(tr("About Q&t"), this);
-        QObject::connect(aboutQtAction, SIGNAL(triggered()),
-                         qApp, SLOT(aboutQt()));
-
-        quitAction = new QAction(tr("&Quit"), this);
-
-        trayIconMenu = new QMenu();
-        trayIcon->setContextMenu(trayIconMenu);
-        trayIconMenu->addAction(aboutAction);
-        trayIconMenu->addAction(aboutQtAction);
-        trayIconMenu->addSeparator();
-        trayIconMenu->addAction(quitAction);
-        trayIcon->show();
-    }
-}
-
-// ==============================
 // CUSTOM NETWORK REPLY CONSTRUCTOR:
 // ==============================
 struct QCustomNetworkReplyPrivate
@@ -1438,9 +1406,6 @@ QTopLevel::QTopLevel()
 
     mainPage = new QPage();
 
-    QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
-                     this, SLOT(close()));
-
     // Connect signals and slots - main window:
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
                      this, SLOT(qDisplayErrorsSlot(QString)));
@@ -1530,6 +1495,38 @@ QTopLevel::QTopLevel()
 }
 
 // ==============================
+// SYSTEM TRAY ICON CLASS CONSTRUCTOR:
+// ==============================
+QTrayIcon::QTrayIcon()
+    : QSystemTrayIcon(0)
+{
+    if ((qApp->property("systrayIcon").toString()) == "enable") {
+        trayIcon = new QSystemTrayIcon();
+        QString iconPathName = qApp->property("systrayIconPathName").toString();
+        QPixmap icon;
+        icon.load(iconPathName);
+        trayIcon->setIcon(icon);
+        trayIcon->setToolTip(qApp->applicationName());
+
+        aboutAction = new QAction(tr("&About"), this);
+
+        aboutQtAction = new QAction(tr("About Q&t"), this);
+        QObject::connect(aboutQtAction, SIGNAL(triggered()),
+                         qApp, SLOT(aboutQt()));
+
+        quitAction = new QAction(tr("&Quit"), this);
+
+        trayIconMenu = new QMenu();
+        trayIcon->setContextMenu(trayIconMenu);
+        trayIconMenu->addAction(aboutAction);
+        trayIconMenu->addAction(aboutQtAction);
+        trayIconMenu->addSeparator();
+        trayIconMenu->addAction(quitAction);
+        trayIcon->show();
+    }
+}
+
+// ==============================
 // MANAGE CLICKING OF LINKS:
 // ==============================
 bool QPage::acceptNavigationRequest(QWebFrame *frame,
@@ -1539,7 +1536,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Select folder to add to the PATH environment variable:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("addtopath")) {
+            request.url().fileName() == "path.setting" and
+            request.url().query() == ("action=add")) {
 
         QFileDialog addToPathDialog (qApp->activeWindow());
         addToPathDialog.setFileMode(QFileDialog::AnyFile);
@@ -1577,7 +1575,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         // Append the new folder name in the
         // appropriate section of the settings file:
-        pathFoldersSetting.beginWriteArray("environment/path");
+        pathFoldersSetting.beginWriteArray("perl/path");
         pathFoldersSetting.setArrayIndex(pathArraySize);
         pathFoldersSetting.setValue("name", pathFolderString);
         pathFoldersSetting.endArray();
@@ -1615,72 +1613,23 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // the environment of the browser and
         // all local scripts executed by the browser:
 #ifndef Q_OS_WIN // Unix-based or similar operating systems
-        qputenv("PATH", path);
         scriptEnvironment.insert("PATH", path);
 #else // Windows
-        qputenv("Path", path);
         scriptEnvironment.insert("Path", path);
 #endif
 
         return false;
     }
 
-    // Select Perl interpreter:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("selectperl")) {
-
-        QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
-        selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
-        selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
-        selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
-        QString perlInterpreter = selectPerlInterpreterDialog.getOpenFileName
-                (qApp->activeWindow(), tr("Select Perl Interpreter"),
-                 QDir::currentPath(), tr("All files (*)"));
-        selectPerlInterpreterDialog.close();
-        selectPerlInterpreterDialog.deleteLater();
-
-        if (perlInterpreter.length() > 0) {
-            QSettings perlInterpreterSetting(
-                        (qApp->property("settingsFileName").toString()),
-                        QSettings::IniFormat);
-            perlInterpreterSetting.setValue("interpreters/perl",
-                                            perlInterpreter);
-            perlInterpreterSetting.sync();
-
-            qDebug() << "Selected Perl interpreter:" << perlInterpreter;
-
-            QFileDialog selectPerlLibDialog (qApp->activeWindow());
-            selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
-            selectPerlLibDialog.setViewMode(QFileDialog::Detail);
-            selectPerlLibDialog.setWindowModality(Qt::WindowModal);
-            QString perlLibFolderName = selectPerlLibDialog
-                    .getExistingDirectory(
-                        qApp->activeWindow(),
-                        tr("Select PERLLIB"),
-                        QDir::currentPath());
-            selectPerlLibDialog.close();
-            selectPerlLibDialog.deleteLater();
-
-            QSettings perlLibSetting((qApp->property("settingsFileName").
-                                      toString()),
-                                     QSettings::IniFormat);
-            perlLibSetting.setValue("environment/perllib", perlLibFolderName);
-            perlLibSetting.sync();
-
-            qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-            qDebug() << "===============";
-        }
-
-        return false;
-    }
-
     // Set predefined theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("settheme")) {
+            request.url().fileName() == "theme.function" and
+            request.url().query().contains("action=set")) {
 
-        QString theme = request.url()
-                .toString(QUrl::RemoveScheme)
-                .replace("//", "");
+        QString theme = request.url().query()
+                .replace("action=set", "")
+                .replace("&", "")
+                .replace("theme=", "");
 
         qThemeSetterSlot(theme);
 
@@ -1689,7 +1638,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Select another theme:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("selecttheme")) {
+            request.url().fileName() == "theme.function" and
+            request.url().query() == ("action=select")) {
 
         qThemeSelectorSlot();
 
@@ -1809,7 +1759,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                     + folderName + "\");";
             currentFrame()->evaluateJavaScript(javaScript + "; null");
 
-            qDebug() << "Folder to open:" << QDir::toNativeSeparators(folderName);
+            qDebug() << "Folder to open:"
+                     << QDir::toNativeSeparators(folderName);
             qDebug() << "===============";
         }
 
@@ -1819,7 +1770,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 #ifndef QT_NO_PRINTER
     // Print preview from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("printpreview")) {
+            request.url().fileName() == "print.function" and
+            request.url().query() == ("action=preview")) {
 
         emit printPreviewSignal();
 
@@ -1828,7 +1780,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Print page from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("printing")) {
+            request.url().fileName() == "print.function" and
+            request.url().query() == ("action=print")) {
 
         emit printSignal();
 
@@ -1837,7 +1790,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Save as PDF from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("pdf")) {
+            request.url().fileName() == "print.function" and
+            request.url().query() == ("action=pdf")) {
 
         emit saveAsPdfSignal();
 
@@ -1845,21 +1799,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     }
 #endif
 
-    // Close window from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("closewindow")) {
-
-        qDebug() << "Close window requested from URL.";
-        qDebug() << "===============";
-
-        emit closeWindowSignal();
-
-        return false;
-    }
-
     // Quit application from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("quit")) {
+            request.url().fileName() == "quit.function") {
 
         qDebug() << "Application termination requested from URL.";
         emit quitFromURLSignal();

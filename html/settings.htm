@@ -1,0 +1,68 @@
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser Settings</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+
+		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/bootstrap.css" media="all"/>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' />
+
+	</head>
+
+	<body>
+
+		<div class='container'>
+
+			<p align='center'>
+				<font size='5'>
+					<a href='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+						data-placement='right'>
+					Select Perl Interpreter</a>
+				</font>
+			<br>
+				<font size='3'>
+					(will take effect immediately)
+				</font>
+			</p>
+
+			<p align='center'>
+				<font size='5'>
+					<a href='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+						data-placement='right'>
+					Select Folder to Add to PATH of Local Scripts</a>
+				</font>
+			<br>
+				<font size='3'>
+					(will take effect immediately)
+				</font>
+			</p>
+
+			<p align='center'>
+				<font size='5'>
+					<a href='http://perl-executing-browser-pseudodomain/theme.function?action=select'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/theme.function?action=select'
+						data-placement='right'>
+					Select Browser Theme</a>
+				</font>
+			<br>
+				<font size='3'>
+					(current page will be reloaded and the new theme will be used immediately)
+				</font>
+			</p>
+
+		</div>
+
+		<script>
+			$(document).ready(function() {
+				$('[data-toggle="tooltip"]').tooltip();
+			});
+		</script>
+
+	</body>
+
+</html>

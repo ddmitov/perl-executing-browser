@@ -1,22 +1,30 @@
 <html>
 
 	<head>
+
 		<title>Perl Executing Browser - send POST request to local script</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
+
 		<script>
 			function goBack() {
 				window.history.back();
 			return false;
 			}
 		</script>
+
 	</head>
 
 	<body>
-		<form action="http://perl-executing-browser-pseudodomain/scripts/get_post_test.pl" method="post">
+
+		<form action="http://perl-executing-browser-pseudodomain/scripts/get-post-test.pl" method="post">
+
 			<div class="col-lg-10 col-lg-offset-1">
+
 				<fieldset>
+
 					<legend>Send POST request to local script</legend>
+
 					<!-- Inputs 1 and 2 -->
 					<div class="form-group">
 						<div class="input-prepend">
@@ -26,6 +34,7 @@
 							<input type="text" id="value2" name="value2" class="form-control" placeholder="Value 2" title="Value 2"/>
 						</div>
 					</div>
+
 					<!-- Select File, Folder or New File  -->
 					<div class="form-group">
 						<div class="row">
@@ -41,17 +50,23 @@
 							<div id="FolderSelection">No folder selected</div>
 						</div>
 					</div>
+
 					<div class="form-group">
 						<input type="reset" value="Reset" class="btn btn-default" />
 						<input type="submit" value="Submit" class="btn btn-primary" />
 					</div>
+
 				</fieldset>
+
 				<button type="button" onclick="goBack()" class="btn btn-danger btn-sm">
 					Go Back from JavaScript <br/>
 					Intentionally Disabled
 				</button>
+
 			</div>
+
 		</form>
+
 	</body>
 
 </html>

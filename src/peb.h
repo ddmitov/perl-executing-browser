@@ -427,11 +427,70 @@ protected:
             return reply;
         }
 
-        // GET requests to local content:
+        // GET requests to the browser pseudodomain:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
 
+            // SET NEW BROWSER SETTINGS:
+            // Set the Perl interpreter:
+            if (request.url().fileName() == "perl.setting" and
+                    request.url().query() == ("action=set")) {
+
+                QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
+                selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
+                selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
+                selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
+                QString perlInterpreter = selectPerlInterpreterDialog
+                        .getOpenFileName
+                        (qApp->activeWindow(), tr("Select Perl Interpreter"),
+                         QDir::currentPath(), tr("All files (*)"));
+                selectPerlInterpreterDialog.close();
+                selectPerlInterpreterDialog.deleteLater();
+
+                if (perlInterpreter.length() > 0) {
+                    QSettings perlInterpreterSetting(
+                                (qApp->property("settingsFileName").toString()),
+                                QSettings::IniFormat);
+                    perlInterpreterSetting.setValue("perl/perl",
+                                                    perlInterpreter);
+                    perlInterpreterSetting.sync();
+
+                    qApp->setProperty("perlInterpreter", perlInterpreter);
+
+                    qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+
+                    QFileDialog selectPerlLibDialog (qApp->activeWindow());
+                    selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
+                    selectPerlLibDialog.setViewMode(QFileDialog::Detail);
+                    selectPerlLibDialog.setWindowModality(Qt::WindowModal);
+                    QString perlLibFolderName = selectPerlLibDialog
+                            .getExistingDirectory(
+                                qApp->activeWindow(),
+                                tr("Select PERLLIB"),
+                                QDir::currentPath());
+                    selectPerlLibDialog.close();
+                    selectPerlLibDialog.deleteLater();
+
+                    QSettings perlLibSetting((qApp->property("settingsFileName")
+                                              .toString()),
+                                             QSettings::IniFormat);
+                    perlLibSetting.setValue("perl/perllib", perlLibFolderName);
+                    perlLibSetting.sync();
+
+                    qApp->setProperty("perlLib", perlLibFolderName);
+
+                    qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+                    qDebug() << "===============";
+                }
+
+                QNetworkRequest emptyNetworkRequest;
+                return QNetworkAccessManager::createRequest
+                        (QNetworkAccessManager::GetOperation,
+                         QNetworkRequest(emptyNetworkRequest));
+            }
+
+            // Get the full file path and file extension:
             QString filepath = request.url()
                     .toString(QUrl::RemoveScheme
                               | QUrl::RemoveAuthority
@@ -446,7 +505,7 @@ protected:
             fileDetector.qDefineInterpreter(fullFilePath);
             QString interpreter = fileDetector.interpreter;
 
-            // Local Perl scripts:
+            // Handle local Perl scripts:
             if (interpreter ==
                     qApp->property("perlInterpreter").toString()) {
 
@@ -459,7 +518,7 @@ protected:
                          QNetworkRequest(emptyNetworkRequest));
             }
 
-            // Local HTML, CSS, JS, web fonts or supported image files:
+            // Handle local HTML, CSS, JS, web fonts or supported image files:
             if (interpreter.contains ("browser")) {
 
                 QNetworkRequest networkRequest;
@@ -576,7 +635,6 @@ signals:
     void printSignal();
     void saveAsPdfSignal();
     void reloadSignal();
-    void closeWindowSignal();
     void quitFromURLSignal();
 
 public slots:
