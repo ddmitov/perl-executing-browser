@@ -19,7 +19,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program;  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
-    use as much as possible from existing web technologies, standards and their documentation to build desktop applications..  
+    use as much as possible from existing web technologies, standards and their documentation to build desktop applications.  
 
 ## Features
   
@@ -150,7 +150,7 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
   
 ## Name
   
-'Perl Executing Browser' is a descriptive, technical name, probably not the shortest one.  
+'Perl Executing Browser' is a descriptive, probably a little boring, technical name.  
 Possible new names: **QtCamel Browser**, **QtCamelKit**, **QtCamel**.  
   
 ## Authors

@@ -1,1 +1,1 @@
-This folder should contain any SQLite or other file-based databases. 
+This folder should contain any SQLite or other file-based database. 
