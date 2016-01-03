@@ -1,20 +1,21 @@
 
-Permanent to do priorities:
-- more and better examples
-- documentation, commented code
-- Github webpage
-- Github Wiki page
-- up-to-date translations
+Permanent TO-DO priorities:
+- more and better examples,
+- documentation,
+- commented code,
+- up-to-date translations,
+- GitHub Wiki page,
+- GitHub webpage.
+
 ====================================
 
 v. 0.2
 ====================================
-- nice HTML configuration interface
+- nice HTML settings interface
 - settings in JSON format
 - Perl interpreter check on browser start-up
-- Perl interpreter from user PATH using: perl -e 'print $^X'
 
 v. 0.3
 ====================================
 - dependency scanner & script packer
-- custom environment variables in script environment
+- user-defined environment variables in script environment

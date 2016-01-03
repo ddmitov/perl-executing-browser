@@ -145,7 +145,7 @@ int main(int argc, char **argv)
     // ==============================
     QStringList commandLineArguments = QCoreApplication::arguments();
     QString allArguments;
-    foreach (QString argument, commandLineArguments){
+    foreach (QString argument, commandLineArguments) {
         allArguments.append(argument);
         allArguments.append(" ");
     }
@@ -154,7 +154,7 @@ int main(int argc, char **argv)
     // ==============================
     // DISPLAY COMMAND LINE HELP:
     // ==============================
-    foreach (QString argument, commandLineArguments){
+    foreach (QString argument, commandLineArguments) {
         if (argument.contains("--help") or argument.contains("-H")) {
 #ifndef Q_OS_WIN
             // Linux & Mac:
@@ -358,7 +358,7 @@ int main(int argc, char **argv)
             QFileInfo(QApplication::applicationFilePath()).baseName();
 
     // ==============================
-    // CREATE TEMPORARY FOLDERS:
+    // CREATE TEMPORARY FOLDER:
     // ==============================
     // Create the main temporary folder for the current browser session:
     QString applicationTempDirectoryName = QDir::tempPath() + QDir::separator()
@@ -373,14 +373,14 @@ int main(int argc, char **argv)
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
     QStringList extractedFiles;
-#if ZIP_SUPPORT == 1
     QString defaultZipPackageName = QApplication::applicationDirPath()
             + QDir::separator() + applicationBinaryName + ".zip";
     QFile defaultZipPackage(defaultZipPackageName);
 
+    // Extracting root folder from a ZIP package:
     if (defaultZipPackage.exists()) {
-        // Extracting root folder from a separate zip file:
-        extractedFiles = JlCompress::extractDir (
+#if ZIP_SUPPORT == 1
+        extractedFiles = JlCompress::extractDir(
                     defaultZipPackageName,
                     applicationTempDirectoryName);
 
@@ -390,21 +390,9 @@ int main(int argc, char **argv)
 //        extractedFiles = JlCompress::extractDir (
 //                    QApplication::applicationFilePath(),
 //                    applicationTempDirectoryName);
-
-        // Settings file from the extracted ZIP package:
-        settingsDirName = applicationTempDirectoryName
-                + QDir::separator() + "root";
-        settingsFileName = settingsDirName + QDir::separator()
-                + applicationBinaryName + ".ini";
-    }
 #endif
 
 #if ZIP_SUPPORT == 2
-    QString defaultZipPackageName = QApplication::applicationDirPath()
-            + QDir::separator() + applicationBinaryName + ".peb";
-    QFile defaultZipPackage(defaultZipPackageName);
-
-    if (defaultZipPackage.exists()) {
         QProcess unzipper;
         unzipper.start("/usr/bin/unzip",
                        QStringList() << defaultZipPackageName
@@ -412,6 +400,7 @@ int main(int argc, char **argv)
                        << applicationTempDirectoryName);
         if (!unzipper.waitForFinished())
                 return false;
+#endif
 
         // Settings file from the extracted ZIP package:
         settingsDirName = applicationTempDirectoryName
@@ -419,7 +408,6 @@ int main(int argc, char **argv)
         settingsFileName = settingsDirName + QDir::separator()
                 + applicationBinaryName + ".ini";
     }
-#endif
 
     // ==============================
     // MANAGE APPLICATION SETTINGS:
@@ -493,14 +481,30 @@ int main(int argc, char **argv)
 
     // Perl interpreter:
     QString perlInterpreterSetting = settings.value("perl/perl").toString();
-    QDir interpreterFile(perlInterpreterSetting);
     QString perlInterpreter;
-    if (interpreterFile.isRelative()) {
-        perlInterpreter =
-                QDir::toNativeSeparators(rootDirName + perlInterpreterSetting);
-    }
-    if (interpreterFile.isAbsolute()) {
-        perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
+
+    if (perlInterpreterSetting == "system") {
+        QProcess systemPerlTester;
+        systemPerlTester.start("perl",
+                               QStringList()
+                               << "-e"
+                               << "print $^X;");
+        if (systemPerlTester.waitForFinished()) {
+            QByteArray testingScriptResultArray =
+                    systemPerlTester.readAllStandardOutput();
+            perlInterpreter =
+                    QString::fromLatin1(testingScriptResultArray);
+        }
+    } else {
+        QDir interpreterFile(perlInterpreterSetting);
+        if (interpreterFile.isRelative()) {
+            perlInterpreter =
+                    QDir::toNativeSeparators(rootDirName
+                                             + perlInterpreterSetting);
+        }
+        if (interpreterFile.isAbsolute()) {
+            perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
+        }
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 

@@ -49,12 +49,12 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
   
 **Configuration:**  
-* All settings are stored in a single configuration file with comments included.  
+* All settings are stored in a single settings file with comments included.  
 * Browser root folder can be any folder.  
 * Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
-* 100% of the browser screen area are dedicated to your HTML interfaces.  
+* 100% of the browser screen area are dedicated to your HTML interface.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
 ## Applications
