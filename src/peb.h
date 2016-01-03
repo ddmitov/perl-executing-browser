@@ -5,10 +5,12 @@
  you can redistribute it and/or modify it under the terms of the
  GNU General Public License, as published by the Free Software Foundation;
  either version 3 of the License, or (at your option) any later version.
- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2015, ddmitov (at) yahoo (dot) com
- Valcho Nedelchev, 2014 - 2015
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY;
+ without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.
+ Dimitar D. Mitov, 2013 - 2016, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014 - 2016
 */
 
 #ifndef PEB_H
@@ -37,16 +39,9 @@
 #ifndef QT_NO_PRINTER
 #include <QPrintPreviewDialog>
 #include <qglobal.h>
-#if QT_VERSION >= 0x050000
-// Qt5 code:
 #include <QtPrintSupport/QPrinter>
 #include <QtPrintSupport/QPrintDialog>
 #include <QUrlQuery>
-#else
-// Qt4 code:
-#include <QPrintDialog>
-#include <QPrinter>
-#endif
 #endif
 
 // ==============================
@@ -1613,15 +1608,10 @@ public slots:
         icon.load(iconPathName);
         newWindow->setWindowIcon(icon);
 
-#if QT_VERSION >= 0x050000
         QUrlQuery viewSourceUrlQuery;
         viewSourceUrlQuery.addQueryItem(QString("source"), QString("enabled"));
         QUrl viewSourceUrl = qWebHitTestURL;
         viewSourceUrl.setQuery(viewSourceUrlQuery);
-#else
-        QUrl viewSourceUrl = qWebHitTestURL;
-        viewSourceUrl.addQueryItem(QString("source"), QString("enabled"));
-#endif
 
         qDebug() << "Local script to view as source code:"
                  << qWebHitTestURL.toString();
@@ -1810,12 +1800,10 @@ public slots:
     void qAboutSlot()
     {
         QString qtVersion = QT_VERSION_STR;
-        QString qtWebKitVersion = QTWEBKIT_VERSION_STR;
         QString text =
                 (qApp->applicationName()
                  + tr(" version ")
                  + qApp->applicationVersion() + "<br>"
-                 + "Qt WebKit"+ tr(" version ") + qtWebKitVersion + "<br>"
                  + "Qt" + tr(" version ") + qtVersion + "<br><br>"
                  + tr("This program is free software;") + "<br>"
                  + tr("you can redistribute it and/or modify it") + "<br>"
@@ -1831,8 +1819,8 @@ public slots:
                  + tr("without even the implied warranty of") + "<br>"
                  + tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
                  + "<br><br>"
-                 + tr("Dimitar D. Mitov, 2013 - 2015,") + "<br>"
-                 + tr("Valcho Nedelchev, 2014 - 2015.")
+                 + tr("Dimitar D. Mitov, 2013 - 2016,") + "<br>"
+                 + tr("Valcho Nedelchev, 2014 - 2016.")
                  + "<br><br>"
                  + "<a href="
                  + "'https://github.com/ddmitov/perl-executing-browser'>"
@@ -1970,24 +1958,8 @@ public slots:
     void qExitApplicationSequence()
     {
         // Temporary folder removal:
-#if QT_VERSION >= 0x050000
-        // Qt5 code:
         QDir tempDir(qApp->property("applicationTempDirectory").toString());
         tempDir.removeRecursively();
-#else
-        // Qt4 code based on Perl one-liner using Perl core module:
-        QProcess cleanerProcess;
-        cleanerProcess
-                .startDetached((qApp->property("perlInterpreter")
-                                .toString()),
-                               QStringList()
-                               << "-se"
-                               << "use File::Path;  rmtree (@ARGV);"
-                               << "--"
-                               << (qApp->property(
-                                       "applicationTempDirectory")
-                                   .toString()));
-#endif
 
         if ((qApp->property("systrayIcon").toString()) == "enable") {
             emit trayIconHideSignal();

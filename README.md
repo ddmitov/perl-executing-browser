@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capable of executing local CGI-like, AJAX or long-running Perl5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable of executing local CGI-like, AJAX or long-running Perl5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -54,7 +54,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
 * Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
-* 100% of the browser screen area are dedicated to your HTML4/5 interfaces.  
+* 100% of the browser screen area are dedicated to your HTML interfaces.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
 ## Applications
@@ -69,23 +69,21 @@ Perl Executing Browser (PEB) is a limited C++ Qt4/5 WebKit desktop browser capab
 
 ## Compile-time Requirements
   
-Qt headers and GCC compiler from any standard Qt4 or Qt5 development bundle are the only compile-time requirements of the project.  
+GCC compiler and Qt5 headers from any standard Qt5 development bundle are the only compile-time requirements of the project.  
   
 Compiled and tested successfully using:  
-* Qt Creator 2.5.0 and Qt 4.8.2 on 32-bit Debian Linux,  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
-* Qt Creator 3.2.1 and Qt 4.8.6 on 32-bit Debian Linux,  
 * Qt Creator 3.1.1 and Qt 5.3.0 on 64-bit Lubuntu 14.10 Linux,
 * Qt Creator 3.1.1 and Qt 5.4.1 on 64-bit Lubuntu 15.04 Linux  
 (main development and testing platform - Dimitar D. Mitov),  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
 * Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5  
-(main development and testing platform - Valcho Nedelchev),  
+(main development and testing platform - Valcho Nedelchev).  
   
 ## Runtime Requirements
   
-* Qt libraries - Qt4 libraries, if you compiled the program using Qt4 classes, or Qt5 libraries, if you compiled the program using Qt5 classes.  
+* Qt5 libraries,  
 * Perl5 distribution - any standard Linux, Mac or Windows Perl distribution.  
   
 ## Limitations

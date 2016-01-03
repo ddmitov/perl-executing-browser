@@ -5,10 +5,12 @@
  you can redistribute it and/or modify it under the terms of the
  GNU General Public License, as published by the Free Software Foundation;
  either version 3 of the License, or (at your option) any later version.
- This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;
- without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2015, ddmitov (at) yahoo (dot) com
- Valcho Nedelchev, 2014 - 2015
+ This program is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY;
+ without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.
+ Dimitar D. Mitov, 2013 - 2016, ddmitov (at) yahoo (dot) com
+ Valcho Nedelchev, 2014 - 2016
 */
 
 #include <QApplication>
@@ -59,17 +61,11 @@ BOOL IsUserAdmin(void)
 // MESSAGE HANDLER FOR REDIRECTING
 // ALL DEBUG MESSAGES TO A LOG FILE:
 // ==============================
-#if QT_VERSION >= 0x050000
-// Qt5 code:
-void customMessageHandler(QtMsgType type, const QMessageLogContext &context,
+void customMessageHandler(QtMsgType type,
+                          const QMessageLogContext &context,
                           const QString &message)
 {
     Q_UNUSED(context);
-#else
-// Qt4 code:
-void customMessageHandler(QtMsgType type, const char *message)
-{
-#endif
     QString dateAndTime =
             QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
     QString text = QString("[%1] ").arg(dateAndTime);
@@ -142,11 +138,7 @@ int main(int argc, char **argv)
     // SET UTF-8 ENCODING APPLICATION-WIDE:
     // ==============================
     // Use UTF-8 encoding within the application:
-#if QT_VERSION >= 0x050000
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
-#else
-    QTextCodec::setCodecForCStrings(QTextCodec::codecForName("UTF8"));
-#endif
 
     // ==============================
     // GET COMMAND LINE ARGUMENTS:
@@ -176,8 +168,6 @@ int main(int argc, char **argv)
                              QApplication::applicationFilePath())
                          .toLatin1().constData()
                       << std::endl;
-            std::cout << "Qt WebKit version: "
-                      << QTWEBKIT_VERSION_STR << std::endl;
             std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Usage:" << std::endl;
@@ -246,7 +236,6 @@ int main(int argc, char **argv)
                   << std::endl;
         std::cout << "Command line: "
                   << allArguments.toLatin1().constData() << std::endl;
-        std::cout << "Qt WebKit version: " << QTWEBKIT_VERSION_STR << std::endl;
         std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
         std::cout << "License: " << QLibraryInfo::licensedProducts()
                      .toLatin1().constData() << std::endl;
@@ -380,31 +369,19 @@ int main(int argc, char **argv)
     QDir applicationTempDirectory(applicationTempDirectoryName);
     applicationTempDirectory.mkpath(".");
 
-    // Create the output directory:
-//    QString applicationOutputDirectoryName = QDir::tempPath()
-//            + QDir::separator()
-//            + applicationBinaryName + "--" + applicationStartDateAndTime
-//            + QDir::separator() + "output";
-//    application
-//            .setProperty("applicationOutputDirectory",
-//                         applicationOutputDirectoryName);
-//    QDir applicationOutputDirectory(applicationOutputDirectoryName);
-//    applicationOutputDirectory.mkpath(".");
-
     // ==============================
     // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
     // ==============================
     QStringList extractedFiles;
 #if ZIP_SUPPORT == 1
     QString defaultZipPackageName = QApplication::applicationDirPath()
-            + QDir::separator() + applicationBinaryName + ".peb";
+            + QDir::separator() + applicationBinaryName + ".zip";
     QFile defaultZipPackage(defaultZipPackageName);
 
     if (defaultZipPackage.exists()) {
         // Extracting root folder from a separate zip file:
         extractedFiles = JlCompress::extractDir (
-                    QApplication::applicationDirPath()
-                    + QDir::separator() + applicationBinaryName + ".peb",
+                    defaultZipPackageName,
                     applicationTempDirectoryName);
 
         // Extracting root folder from a zip file,
@@ -726,11 +703,11 @@ int main(int argc, char **argv)
     application.setProperty("systrayIcon", systrayIcon);
 
     // System tray icon file:
-    // This setting was created to circumvent Qt bug QTBUG-35832 -
+    // This setting was created to circumvent QTBUG-35832 -
     // inability to display transparent background of
     // system tray icons in Qt5 on Linux.
     // An icon without a transparent background should be used as
-    // a systray icon when the binary is compiled using Qt5 for Linux.
+    // a systray icon when the binary is compiled for Linux.
     QString systrayIconPathNameSetting =
             settings.value("gui/systray_icon_file").toString();
     QString systrayIconPathName;
@@ -838,13 +815,7 @@ int main(int argc, char **argv)
 
     // Install message handler for redirecting all debug messages to a log file:
     if ((qApp->property("logging").toString()) == "enable") {
-#if QT_VERSION >= 0x050000
-        // Qt5 code:
         qInstallMessageHandler(customMessageHandler);
-#else
-        // Qt4 code:
-        qInstallMsgHandler(customMessageHandler);
-#endif
     }
 
     // Logging mode - 'per_session_file' or 'single_file'.
@@ -905,7 +876,6 @@ int main(int argc, char **argv)
              << QDir::toNativeSeparators(QApplication::applicationFilePath())
                 .toLatin1().constData();
     qDebug() << "Command line:" << allArguments.toLatin1().constData();
-    qDebug() << "Qt WebKit version:" << QTWEBKIT_VERSION_STR;
     qDebug() << "Qt version:" << QT_VERSION_STR;
     qDebug() << "License:"
              << QLibraryInfo::licensedProducts().toLatin1().constData();
@@ -1648,14 +1618,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Invoke 'Open file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("openfile")) {
+            request.url().fileName() == "open-file.function") {
 
-        QString target = request.url().toString(QUrl::RemoveScheme
-                                                | QUrl::RemoveAuthority
-                                                | QUrl::RemovePath)
-                .replace("?", "")
-                .replace("//", "")
-                .replace("target=", "");
+        QString target = request.url().query().replace("target=", "");
 
         QFileDialog openFileDialog (qApp->activeWindow());
         openFileDialog.setFileMode(QFileDialog::AnyFile);
@@ -1687,14 +1652,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Invoke 'New file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("newfile")) {
+            request.url().fileName() == "new-file.function") {
 
-        QString target = request.url().toString(QUrl::RemoveScheme
-                                                | QUrl::RemoveAuthority
-                                                | QUrl::RemovePath)
-                .replace("?", "")
-                .replace("//", "")
-                .replace("target=", "");
+        QString target = request.url().query().replace("target=", "");
 
         QFileDialog newFileDialog (qApp->activeWindow());
         newFileDialog.setFileMode(QFileDialog::AnyFile);
@@ -1728,14 +1688,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // Invoke 'Open folder' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().scheme().contains("openfolder")) {
+            request.url().fileName() == "open-folder.function") {
 
-        QString target = request.url().toString(QUrl::RemoveScheme
-                                                | QUrl::RemoveAuthority
-                                                | QUrl::RemovePath)
-                .replace("?", "")
-                .replace("//", "")
-                .replace("target=", "");
+        QString target = request.url().query().replace("target=", "");
 
         QFileDialog openFolderDialog (qApp->activeWindow());
         openFolderDialog.setFileMode(QFileDialog::AnyFile);
@@ -1849,16 +1804,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                                    | QUrl::RemovePath)
                             .replace("?", "")
                             .replace("command=", "");
-#if QT_VERSION >= 0x050000
+
                     QUrlQuery debuggerQuery;
                     debuggerQuery.addQueryItem(QString("command"),
                                                QString(debuggerQueryString));
                     scriptToDebugUrl.setQuery(debuggerQuery);
-#else
-                    scriptToDebugUrl
-                            .addQueryItem(QString("command"),
-                                          QString(debuggerQueryString));
-#endif
+
                     qDebug() << "Perl Debugger URL:"
                              << scriptToDebugUrl.toString();
                     qDebug() << "===============";
