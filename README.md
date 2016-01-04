@@ -135,7 +135,7 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
   
 ## History
   
-PEB was started as a simple GUI for personal databases. This small project is still in its very beginning and the current version 0.1, code name "Camel Calf", should be considered alpha pre-release. Exhaustive documentation is still missing and current examples are basic.  
+PEB was started as a simple GUI for personal databases and this small project is still in early development. The current version is 0.1, code-named "Camel Calf". Exhaustive documentation is still missing and included examples are basic.  
   
 ## License
   
