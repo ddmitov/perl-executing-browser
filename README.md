@@ -13,7 +13,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
     put together your Perl5 scripts and modules and even your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from every folder, even from USB sticks;  
 
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl5, Qt and QtWebKit are available;  
+    use it on every platform, where Perl5, Qt5 and QtWebKit are available;  
 
 * **4. Secure user-space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program;  
@@ -25,7 +25,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
   
 **No feature or implementation should be considered final at this early stage of development!**
   
-**Scripting:**  
+**Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
 * Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
@@ -34,22 +34,15 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
 * Scripts and their HTML-based interfaces can be extracted and run from standard ZIP packages.  
   
+**Local filesystem:**  
+* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
+  
 **Networking:**  
 * PEB will open only pages from a predefined list of allowed domain names.  
 * User agent name can be changed easily from configuration file.  
   
-**Local filesystem:**  
-* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
-  
-**Development goodies:**  
-* PEB can interact with the built-in Perl5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* WebKit Web Inspector can be invoked from context menu.  
-* Local scripts and pages can be edited in external editor using context menu entry.  
-* Every Perl5 script can be displayed as syntax highlighted source code.  
-* Extensive optional logging of all browser activities, including the execution of local scripts.  
-  
-**Configuration:**  
-* All settings are stored in a single settings file with comments included.  
+**Configurability:**  
+* All settings are stored in a single file with comments included.  
 * Browser root folder can be any folder.  
 * Program functions are accessible from special URLs or from a right-click context menu.  
 * Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
@@ -57,9 +50,17 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * 100% of the browser screen area are dedicated to your HTML interface.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
+**Development goodies:**  
+* PEB can interact with the built-in Perl5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* WebKit Web Inspector can be invoked from context menu.  
+* Local scripts and pages can be edited in external editor using context menu entry.  
+* Every Perl5 script can be displayed as syntax highlighted source code.  
+* Extensive optional logging of all browser activities, including the execution of local scripts.  
+
 ## Compile-time Requirements
   
 GCC compiler and Qt5 headers from any standard Qt5 development bundle are the only compile-time requirements.  
+  
 Compiled and tested successfully using:  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
