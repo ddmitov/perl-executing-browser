@@ -7,10 +7,10 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 ## Design Objectives
   
 * **1. Fast and easy GUI for desktop scripts:**  
-    use HTML, CSS and JavaScript to craft and deploy rapidly beautiful Perl5 desktop applications;  
+    use Perl5, JavaScript, HTML and CSS to craft and deploy rapidly beautiful desktop applications;  
 
 * **2. Zero installation when needed:**  
-    put together your Perl5 scripts and modules and even your version of Perl5 with a copy of PEB and its Qt libraries and run your applications from every folder, even from USB sticks;  
+    put together your Perl5 scripts and modules and even your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from every folder, even from USB sticks;  
 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl5, Qt and QtWebKit are available;  
@@ -57,20 +57,9 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * 100% of the browser screen area are dedicated to your HTML interface.  
 * Multi-window application with resizable, fixed size or fullscreen mode windows.  
   
-## Applications
-  
-* Perl5 & JavaScript desktop applications with HTML4/5 & CSS2/3 GUI.  
-* GUI for the Perl debugger.  
-  
-## Target Audience
-  
-* Advanced users and Perl - JavaScript enthusiasts willing to create rapidly custom desktop GUI applications.  
-* Perl developers willing to use the built-in Perl debugger in graphical mode.  
-
 ## Compile-time Requirements
   
 GCC compiler and Qt5 headers from any standard Qt5 development bundle are the only compile-time requirements.  
-  
 Compiled and tested successfully using:  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
 * Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
@@ -86,12 +75,22 @@ Compiled and tested successfully using:
 * Qt5 libraries,  
 * Perl5 distribution - any standard Linux, Mac or Windows Perl distribution.  
   
-## Limitations
+## Target Audience
   
-* No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No means of communication between the browser and a script that is already started. Once you have started a script, you can only wait for it to finish or kill it.  
+* Advanced users and Perl - JavaScript enthusiasts willing to create rapidly custom desktop GUI applications.  
+* Perl developers willing to use the built-in Perl debugger in graphical mode.  
+  
+## What Perl Executing Browser Is Most Usable For
+  
+* Perl5 & JavaScript desktop applications with HTML4/5 & CSS2/3 GUI.  
+* GUI for the Perl debugger.  
+  
+## Applications using Perl Executing Browser
+  
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser as a desktop GUI framework, HTML5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl5 for file-writing backend.  
   
 ## What Perl Executing Browser Is Not
+
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
 * PEB has no sandbox for local Perl scripts. A work-in-progress security system is implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
@@ -133,9 +132,14 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
 * Ctrl+R - reload current page  
 * F11 - toggle fullscreen  
   
+## Limitations
+  
+* No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
+* No means of communication between the browser and a script that is already started. Once you have started a script, you can only wait for it to finish or kill it.  
+  
 ## History
   
-PEB was started as a simple GUI for personal databases and this small project is still in early development. The current version is 0.1, code-named "Camel Calf". Exhaustive documentation is still missing and included examples are basic.  
+PEB was started as a simple GUI for personal databases and this small project is still in early development, the current version being 0.1, code-named "Camel Calf". Exhaustive documentation is still missing and included examples are basic.  
   
 ## License
   
