@@ -1,18 +1,13 @@
+archive/
+logs/
+testing/
+tmp/
 
-build-peb-*-Debug/
-
+db/test.db
 src/peb.pro.user
-
-html/current.css
+ui/current.css
 
 peb
 peb.exe
-
-peb.log
-peb*.log
-
 upcopy
 upgit
-
-db/test.db
-tmp/

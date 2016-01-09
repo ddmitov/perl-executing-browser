@@ -1,17 +1,17 @@
-<html>
+﻿<html>
 
 	<head>
 
-		<title>Perl Executing Browser - send POST request to local script</title>
+		<title>Perl Executing Browser - send GET request to local script</title>
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/jquery-1.11.1.min.js"></script>
+		<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
 
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/bootstrap.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/current.css" media="all" />
+		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/current-theme.css" media="all" />
 
-		<script type='text/javascript' src='http://perl-executing-browser-pseudodomain/js/peb-check-user-input-before-quit.js'></script>
+		<script type='text/javascript' src='peb-check-user-input-before-quit.js'></script>
 
 		<script>
 			function goBack() {
@@ -24,13 +24,13 @@
 
 	<body>
 
-		<form action="http://perl-executing-browser-pseudodomain/scripts/get-post-test.pl" method="post">
+		<form action="http://perl-executing-browser-pseudodomain/perl/scripts/get-post-test.pl" method="get">
 
 			<div class="col-lg-10 col-lg-offset-1">
 
 				<fieldset>
 
-					<legend>Send POST request to local script</legend>
+					<legend>Send GET request to local script</legend>
 
 					<!-- Inputs 1 and 2 -->
 					<div class="form-group">

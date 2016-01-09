@@ -625,7 +625,7 @@ public slots:
         cssLinkedHtml = "";
 
         if ((htmlInput.contains("</title>")) and
-                (!htmlInput.contains("current.css"))) {
+                (!htmlInput.contains("current-theme.css"))) {
             QString cssLink;
             cssLink.append("</title>\n");
             cssLink.append("<link rel=\"stylesheet\" type=\"text/css\"");
@@ -634,7 +634,7 @@ public slots:
             cssLink.append("/");
             cssLink.append(qApp->property("defaultThemeDirectoryName")
                            .toString());
-            cssLink.append("/current.css\" media=\"all\" />");
+            cssLink.append("/current-theme.css\" media=\"all\" />");
 
             htmlInput.replace("</title>", cssLink);
 
@@ -672,18 +672,18 @@ public slots:
                         QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectoryFullPath")
                              .toString())
-                            + QDir::separator() + "current.css"))) {
+                            + QDir::separator() + "current-theme.css"))) {
                 QFile::remove(
                             QDir::toNativeSeparators(
                                 (qApp->property("defaultThemeDirectoryFullPath")
                                  .toString())
-                                + QDir::separator() + "current.css"));
+                                + QDir::separator() + "current-theme.css"));
             }
             QFile::copy(theme,
                         QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectoryFullPath")
                              .toString())
-                            + QDir::separator() + "current.css"));
+                            + QDir::separator() + "current-theme.css"));
 
             emit reloadSignal();
 
@@ -714,18 +714,18 @@ public slots:
                         QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectoryFullPath")
                              .toString())
-                            + QDir::separator() + "current.css"))) {
+                            + QDir::separator() + "current-theme.css"))) {
                 QFile::remove(
                             QDir::toNativeSeparators(
                                 (qApp->property("defaultThemeDirectoryFullPath")
                                  .toString())
-                                + QDir::separator() + "current.css"));
+                                + QDir::separator() + "current-theme.css"));
             }
             QFile::copy(newTheme,
                         QDir::toNativeSeparators(
                             (qApp->property("defaultThemeDirectoryFullPath")
                              .toString())
-                            + QDir::separator() + "current.css"));
+                            + QDir::separator() + "current-theme.css"));
 
             emit reloadSignal();
 

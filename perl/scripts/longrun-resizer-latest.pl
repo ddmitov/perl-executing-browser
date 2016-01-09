@@ -9,8 +9,8 @@ print <<HEADER
 <html>
 
 	<head>
-	<title>Perl Executing Browser - Image Resizer with Only Latest Results</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<title>Perl Executing Browser - Image Resizer with Only Latest Results</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 	</head>
 
 	<body>
