@@ -17,21 +17,22 @@
 #define PEB_H
 
 #include <QApplication>
-#include <QtWebKit>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QtWebKit>
 #include <QUrl>
 #include <QWebPage>
 #include <QWebView>
 #include <QWebFrame>
 #include <QProcess>
 #include <QFileDialog>
+#include <QInputDialog>
 #include <QMessageBox>
 #include <QSpacerItem>
 #include <QGridLayout>
 #include <QMenu>
 #include <QDesktopWidget>
 #include <QSystemTrayIcon>
-#include <QNetworkReply>
 
 // ==============================
 // PRINT SUPPORT:
@@ -171,7 +172,6 @@ public slots:
 public:
     QTrayIcon();
 
-    QAction *quitAction;
     QAction *aboutAction;
     QAction *aboutQtAction;
 
@@ -336,13 +336,6 @@ protected:
                                    | QProcess::ReadWrite);
                 }
 
-                QStringList runningScriptsGlobalCurrentList =
-                        qApp->property("runningScriptsGlobalList")
-                        .toStringList();
-                runningScriptsGlobalCurrentList.append(scriptFullFilePath);
-                qApp->setProperty("runningScriptsGlobalList",
-                                  runningScriptsGlobalCurrentList);
-
                 if (postData.length() > 0) {
                     scriptHandler.write(postDataArray);
                 }
@@ -410,12 +403,6 @@ protected:
             if (postData.length() > 0) {
                 scriptEnvironment.remove("CONTENT_LENGTH");
             }
-
-            QStringList runningScriptsGlobalCurrentList
-                    = qApp->property("runningScriptsGlobalList").toStringList();
-            runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
-            qApp->setProperty("runningScriptsGlobalList",
-                              runningScriptsGlobalCurrentList);
 
             QCustomNetworkReply *reply =
                     new QCustomNetworkReply (request.url(), scriptResultString);
@@ -630,7 +617,6 @@ signals:
     void printSignal();
     void saveAsPdfSignal();
     void reloadSignal();
-    void quitFromURLSignal();
 
 public slots:
 
@@ -912,12 +898,6 @@ public slots:
 
                     runningScriptsInCurrentWindowList.append(sourceFilepath);
 
-                    QStringList runningScriptsGlobalCurrentList =
-                            qApp->property("runningScriptsGlobalList")
-                            .toStringList();
-                    runningScriptsGlobalCurrentList.append(sourceFilepath);
-                    qApp->setProperty("runningScriptsGlobalList",
-                                      runningScriptsGlobalCurrentList);
                 } else {
                     if (SCRIPT_CENSORING == 0) {
                         scriptHandler.start((qApp->property("perlInterpreter")
@@ -955,13 +935,6 @@ public slots:
 
                     runningScriptsInCurrentWindowList
                             .append(scriptFullFilePath);
-
-                    QStringList runningScriptsGlobalCurrentList =
-                            qApp->property("runningScriptsGlobalList")
-                            .toStringList();
-                    runningScriptsGlobalCurrentList.append(scriptFullFilePath);
-                    qApp->setProperty("runningScriptsGlobalList",
-                                      runningScriptsGlobalCurrentList);
 
                     if (postData.length() > 0) {
                         scriptHandler.write(postDataArray);
@@ -1128,12 +1101,6 @@ public slots:
 
         runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
 
-        QStringList runningScriptsGlobalCurrentList
-                = qApp->property("runningScriptsGlobalList").toStringList();
-        runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
-        qApp->setProperty("runningScriptsGlobalList",
-                          runningScriptsGlobalCurrentList);
-
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
     }
@@ -1147,12 +1114,6 @@ public slots:
             scriptHandler.close();
 
             runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
-
-            QStringList runningScriptsGlobalCurrentList =
-                    qApp->property("runningScriptsGlobalList").toStringList();
-            runningScriptsGlobalCurrentList.removeOne(scriptFullFilePath);
-            qApp->setProperty("runningScriptsGlobalList",
-                              runningScriptsGlobalCurrentList);
 
             qDebug() << "Script timed out:" << scriptFullFilePath;
             qDebug() << "===============";
@@ -1204,10 +1165,7 @@ public slots:
                 debuggerScriptToDebugFilePath = filePath;
             }
 
-            debuggerLastCommand = debuggerUrl.toString(QUrl::RemoveScheme
-                                                       | QUrl::RemoveAuthority
-                                                       | QUrl::RemovePath)
-                    .replace("?", "")
+            debuggerLastCommand = debuggerUrl.query()
                     .replace("command", "")
                     .replace("=", "")
                     .replace("+", " ")
@@ -1395,11 +1353,65 @@ public:
     QString scriptFullFilePath;
     QProcess scriptHandler;
     QStringList runningScriptsInCurrentWindowList;
+    QString checkUserInputBeforeQuitJavaScript;
 
 protected:
     bool acceptNavigationRequest(QWebFrame *frame,
                                  const QNetworkRequest &request,
                                  QWebPage::NavigationType type);
+
+    virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
+    {
+        Q_UNUSED(frame);
+
+        QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
+        javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
+        javaScriptAlertMessageBox.setWindowTitle(tr("Alert"));
+        javaScriptAlertMessageBox
+                .setIconPixmap((qApp->property("icon").toString()));
+        javaScriptAlertMessageBox.setText(msg);
+        javaScriptAlertMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+        javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Yes);
+        javaScriptAlertMessageBox.exec();
+    }
+
+    virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
+    {
+        Q_UNUSED(frame);
+
+        QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
+        javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
+        javaScriptConfirmMessageBox.setWindowTitle(tr("Confirm"));
+        javaScriptConfirmMessageBox
+                .setIconPixmap((qApp->property("icon").toString()));
+        javaScriptConfirmMessageBox.setText(msg);
+        javaScriptConfirmMessageBox
+                .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        javaScriptConfirmMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+        javaScriptConfirmMessageBox.setButtonText(QMessageBox::No, tr("No"));
+        javaScriptConfirmMessageBox.setDefaultButton(QMessageBox::No);
+        return QMessageBox::Yes == javaScriptConfirmMessageBox.exec();
+    }
+
+    virtual bool javaScriptPrompt(QWebFrame *frame,
+                                  const QString &msg,
+                                  const QString &defaultValue,
+                                  QString *result)
+    {
+        Q_UNUSED(frame);
+
+        bool ok = false;
+        QString x = QInputDialog::getText(qApp->activeWindow(),
+                                          tr("Prompt"),
+                                          msg,
+                                          QLineEdit::Normal,
+                                          defaultValue,
+                                          &ok);
+        if (ok && result) {
+            *result = x;
+        }
+        return ok;
+    }
 
 private:
     QString userAgentForUrl(const QUrl &url) const
@@ -1414,18 +1426,15 @@ private:
     QString cssLinkedHtml;
     QString httpHeadersCleanedHtml;
 
-    QString jQuery;
-
     QProcessEnvironment scriptEnvironment;
-
-    QStringList sourceViewerMandatoryCommandLine;
-
     bool scriptTimedOut;
     bool scriptKilled;
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
     bool scriptOutputThemeEnabled;
     QString scriptOutputType;
+
+    QStringList sourceViewerMandatoryCommandLine;
 
     QWebView *debuggerNewWindow;
     bool debuggerJustStarted;
@@ -1755,14 +1764,6 @@ public slots:
                 }
             }
 
-            QAction *closeWindowAct = menu->addAction(tr("&Close window"));
-            QObject::connect(closeWindowAct, SIGNAL(triggered()),
-                             this, SLOT(close()));
-
-            QAction *quitAct = menu->addAction(tr("&Quit"));
-            QObject::connect(quitAct, SIGNAL(triggered()),
-                             this, SLOT(qExitApplicationSlot()));
-
             menu->addSeparator();
 
             QAction *aboutAction = menu->addAction(tr("&About"));
@@ -1800,27 +1801,31 @@ public slots:
     void qAboutSlot()
     {
         QString qtVersion = QT_VERSION_STR;
-        QString text =
-                (qApp->applicationName()
-                 + tr(" version ")
+        QByteArray license;
+        license.append("This program is free software;<br>");
+        license.append("you can redistribute it and/or modify it<br>");
+        license.append("under the terms of ");
+        license.append("the GNU General Public License,<br>");
+        license.append("as published by the Free Software Foundation;<br>");
+        license.append("either version 3 of the License,<br>");
+        license.append("or (at your option) any later version.");
+        license.append("<br><br>");
+        license.append("This program is distributed ");
+        license.append("in the hope that it will be useful,<br>");
+        license.append("but WITHOUT ANY WARRANTY;<br>");
+        license.append("without even the implied warranty of<br>");
+        license.append("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.");
+        QByteArray authors;
+        authors.append("Dimitar D. Mitov, 2013 - 2016,<br>");
+        authors.append("Valcho Nedelchev, 2014 - 2016.");
+        QString aboutText =
+                (qApp->applicationName()+ tr(" version ")
                  + qApp->applicationVersion() + "<br>"
-                 + "Qt" + tr(" version ") + qtVersion + "<br><br>"
-                 + tr("This program is free software;") + "<br>"
-                 + tr("you can redistribute it and/or modify it") + "<br>"
-                 + tr("under the terms of")
-                 + tr("the GNU General Public License,") + "<br>"
-                 + tr("as published by the Free Software Foundation;") + "<br>"
-                 + tr("either version 3 of the License,") + "<br>"
-                 + tr("or (at your option) any later version.")
+                 + "Qt" + tr(" version ") + qtVersion
                  + "<br><br>"
-                 + tr("This program is distributed")
-                 + tr("in the hope that it will be useful,") + "<br>"
-                 + tr("but WITHOUT ANY WARRANTY;") + "<br>"
-                 + tr("without even the implied warranty of") + "<br>"
-                 + tr("MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.")
+                 + tr(license)
                  + "<br><br>"
-                 + tr("Dimitar D. Mitov, 2013 - 2016,") + "<br>"
-                 + tr("Valcho Nedelchev, 2014 - 2016.")
+                 + tr(authors)
                  + "<br><br>"
                  + "<a href="
                  + "'https://github.com/ddmitov/perl-executing-browser'>"
@@ -1832,7 +1837,7 @@ public slots:
                                 QSizePolicy::Minimum, QSizePolicy::Expanding);
         aboutMessageBox.setWindowTitle("About " + qApp->applicationName());
         aboutMessageBox.setIconPixmap(qApp->property("icon").toString());
-        aboutMessageBox.setText(text);
+        aboutMessageBox.setText(aboutText);
         QGridLayout *layout = (QGridLayout*)aboutMessageBox.layout();
         layout->addItem(horizontalSpacer,
                         layout->rowCount(), 0, 1,
@@ -1869,7 +1874,42 @@ public slots:
                 event->ignore();
             }
         } else {
-            if (qApp->property("warnOnExit").toString() == "enable") {
+            if (qApp->property("warnOnExit").toString() ==
+                    "if-text-is-entered") {
+                QVariant jsQuitDecision =
+                        mainPage->currentFrame()->evaluateJavaScript(
+                            "checkUserInputBeforeQuit()");
+                QString qtQuitDecision = jsQuitDecision.toString();
+
+                if (qtQuitDecision.length() > 0) {
+                    if (qtQuitDecision == "yes") {
+                        event->accept();
+                        windowClosingStarted = true;
+                    }
+                    if (qtQuitDecision == "no") {
+                        event->ignore();
+                    }
+                }
+
+                if (qtQuitDecision.length() == 0) {
+                    mainPage->currentFrame()->evaluateJavaScript(
+                                mainPage->checkUserInputBeforeQuitJavaScript);
+                    QVariant jsQuitDecision =
+                            mainPage->currentFrame()->evaluateJavaScript(
+                                "checkUserInputBeforeQuit()");
+                    QString qtQuitDecision = jsQuitDecision.toString();
+
+                    if (qtQuitDecision == "yes") {
+                        event->accept();
+                        windowClosingStarted = true;
+                    }
+                    if (qtQuitDecision == "no") {
+                        event->ignore();
+                    }
+                }
+            }
+
+            if (qApp->property("warnOnExit").toString() == "always") {
                 QMessageBox confirmExitMessageBox (qApp->activeWindow());
                 confirmExitMessageBox.setWindowModality(Qt::WindowModal);
                 confirmExitMessageBox.setWindowTitle(tr("Close window"));
@@ -1877,9 +1917,7 @@ public slots:
                         .setIconPixmap((qApp->property("icon").toString()));
                 confirmExitMessageBox
                         .setText(
-                            tr("You are going to close this window and")
-                            + "<br>"
-                            + tr("any unsaved data will be lost!")
+                            tr("You are going to close this window.")
                             + "<br>"
                             + tr("Are you sure?"));
                 confirmExitMessageBox
@@ -1890,72 +1928,16 @@ public slots:
                         .setButtonText(QMessageBox::No, tr("No"));
                 confirmExitMessageBox.setDefaultButton(QMessageBox::No);
                 if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                    mainPage->scriptHandler.close();
                     event->accept();
                     windowClosingStarted = true;
                 } else {
                     event->ignore();
                 }
-            } else {
-                event->accept();
             }
         }
     }
 
     void qExitApplicationSlot()
-    {
-        if (qApp->property("runningScriptsGlobalList")
-                .toStringList().length() > 0) {
-            QMessageBox confirmExitMessageBox (qApp->activeWindow());
-            confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-            confirmExitMessageBox.setWindowTitle(tr("Quit"));
-            confirmExitMessageBox
-                    .setIconPixmap((qApp->property("icon").toString()));
-            confirmExitMessageBox
-                    .setText(tr("You are going to quit the program,")
-                             + "<br>"
-                             + tr("but a script is still running.")
-                             + "<br>"
-                             + tr("Are you sure?"));
-            confirmExitMessageBox.setStandardButtons(QMessageBox::Yes
-                                                     | QMessageBox::No);
-            confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
-            confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
-            confirmExitMessageBox.setDefaultButton(QMessageBox::No);
-            if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                qExitApplicationSequence();
-            }
-        } else {
-            if (qApp->property("warnOnExit").toString() == "enable" and
-                    windowClosingStarted == false) {
-                QMessageBox confirmExitMessageBox (qApp->activeWindow());
-                confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-                confirmExitMessageBox.setWindowTitle(tr("Quit"));
-                confirmExitMessageBox
-                        .setIconPixmap((qApp->property("icon").toString()));
-                confirmExitMessageBox
-                        .setText(
-                            tr("You are going to quit the program and")
-                            + "<br>"
-                            + tr("any unsaved data will be lost!")
-                            + "<br>"
-                            + tr("Are you sure?"));
-                confirmExitMessageBox.setStandardButtons(QMessageBox::Yes
-                                                         | QMessageBox::No);
-                confirmExitMessageBox
-                        .setButtonText(QMessageBox::Yes, tr("Yes"));
-                confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
-                confirmExitMessageBox.setDefaultButton(QMessageBox::No);
-                if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                    qExitApplicationSequence();
-                }
-            } else {
-                qExitApplicationSequence();
-            }
-        }
-    }
-
-    void qExitApplicationSequence()
     {
         // Temporary folder removal:
         QDir tempDir(qApp->property("applicationTempDirectory").toString());

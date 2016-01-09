@@ -1021,9 +1021,6 @@ int main(int argc, char **argv)
         QObject::connect(trayIcon.aboutAction, SIGNAL(triggered()),
                          &toplevel, SLOT(qAboutSlot()));
 
-        QObject::connect(trayIcon.quitAction, SIGNAL(triggered()),
-                         &toplevel, SLOT(qExitApplicationSlot()));
-
         QObject::connect(&toplevel, SIGNAL(trayIconHideSignal()),
                          &trayIcon, SLOT(qTrayIconHideSlot()));
     }
@@ -1308,16 +1305,12 @@ QPage::QPage()
     // ICON FOR DIALOGS:
     icon.load(qApp->property("iconPathName").toString());
 
-    // INTERNALLY COMPILED JQUERY NECESSARY FOR JAVASCRIPT BRIDGES:
+    // READ INTERNALLY COMPILED JS SCRIPT:
     QFile file;
-    file.setFileName(":/scripts/jquery-1-11-1-min.js");
+    file.setFileName(":/scripts/peb-check-user-input-before-quit.js");
     file.open(QIODevice::ReadOnly);
-    jQuery = file.readAll();
+    checkUserInputBeforeQuitJavaScript = file.readAll();
     file.close();
-
-    jQuery.append("\n");
-    jQuery.append("var qt = {'jQuery': jQuery.noConflict(true)};");
-    jQuery.append("null");
 
     // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
     debuggerJustStarted = false;
@@ -1396,9 +1389,6 @@ QTopLevel::QTopLevel()
 
     QObject::connect(mainPage, SIGNAL(reloadSignal()),
                      this, SLOT(qReloadSlot()));
-
-    QObject::connect(mainPage, SIGNAL(quitFromURLSignal()),
-                     this, SLOT(qExitApplicationSlot()));
 
     if ((qApp->property("browserTitle").toString()) == "dynamic") {
         QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
@@ -1488,14 +1478,10 @@ QTrayIcon::QTrayIcon()
         QObject::connect(aboutQtAction, SIGNAL(triggered()),
                          qApp, SLOT(aboutQt()));
 
-        quitAction = new QAction(tr("&Quit"), this);
-
         trayIconMenu = new QMenu();
         trayIcon->setContextMenu(trayIconMenu);
         trayIconMenu->addAction(aboutAction);
         trayIconMenu->addAction(aboutQtAction);
-        trayIconMenu->addSeparator();
-        trayIconMenu->addAction(quitAction);
         trayIcon->show();
     }
 }
@@ -1642,10 +1628,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             scriptEnvironment.insert("FILE_TO_OPEN", fileName);
 
             // JavaScript bridge back to the HTML page where request originated:
-            currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
-                    + fileNameToOpenString + "\");";
-            currentFrame()->evaluateJavaScript(javaScript + "; null");
+            QString javaScript = "document.getElementById(\"" +
+                    target + "\").innerHTML = \"" +
+                    fileNameToOpenString + "\"; null";
+            currentFrame()->evaluateJavaScript(javaScript);
 
             qDebug() << "File to open:" << QDir::toNativeSeparators(fileName);
             qDebug() << "===============";
@@ -1678,10 +1664,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             scriptEnvironment.insert("FILE_TO_CREATE", fileName);
 
             // JavaScript bridge back to the HTML page where request originated:
-            currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
-                    + fileName + "\");";
-            currentFrame()->evaluateJavaScript(javaScript + "; null");
+            QString javaScript = "document.getElementById(\"" +
+                    target + "\").innerHTML = \"" +
+                    fileNameToCreateString + "\"; null";
+            currentFrame()->evaluateJavaScript(javaScript);
 
             qDebug() << "New file:" << QDir::toNativeSeparators(fileName);
             qDebug() << "===============";
@@ -1713,10 +1699,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             scriptEnvironment.insert("FOLDER_TO_OPEN", folderName);
 
             // JavaScript bridge back to the HTML page where request originated:
-            currentFrame()->evaluateJavaScript(jQuery);
-            QString javaScript = "qt.jQuery(\"#" + target + "\").html(\""
-                    + folderName + "\");";
-            currentFrame()->evaluateJavaScript(javaScript + "; null");
+            QString javaScript = "document.getElementById(\"" +
+                    target + "\").innerHTML = \"" +
+                    folderNameToOpenString + "\"; null";
+            currentFrame()->evaluateJavaScript(javaScript);
 
             qDebug() << "Folder to open:"
                      << QDir::toNativeSeparators(folderName);
@@ -1758,29 +1744,19 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     }
 #endif
 
-    // Quit application from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "quit.function") {
-
-        qDebug() << "Application termination requested from URL.";
-        emit quitFromURLSignal();
-
-        return false;
-    }
-
     // Perl debugger interaction.
     // Implementation of an idea proposed by Valcho Nedelchev.
     if (PERL_DEBUGGER_INTERACTION == 1) {
 
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().scheme().contains("perl-debugger")) {
+                request.url().fileName() == "perl-debugger.function") {
 
             if (QPage::mainFrame()->childFrames().contains(frame)) {
                 targetFrame = frame;
             }
 
             // Select a Perl script for debugging:
-            if (request.url().toString().contains("select-file")) {
+            if (request.url().query().contains("action=select-file")) {
 
                 QFileDialog selectScriptToDebugDialog (qApp->activeWindow());
                 selectScriptToDebugDialog
@@ -1803,10 +1779,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 if (scriptToDebug.length() > 1) {
                     QUrl scriptToDebugUrl(QUrl::fromLocalFile(scriptToDebug));
                     QString debuggerQueryString =
-                            request.url().toString(QUrl::RemoveScheme
-                                                   | QUrl::RemoveAuthority
-                                                   | QUrl::RemovePath)
-                            .replace("?", "")
+                            request.url().query()
+                            .replace("action=select-file", "")
+                            .replace("&", "")
                             .replace("command=", "");
 
                     QUrlQuery debuggerQuery;
@@ -1853,7 +1828,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         // Transmit requests to Perl debugger (within the same page):
         if (navigationType == QWebPage::NavigationTypeFormSubmitted and
-                request.url().scheme().contains("perl-debugger")) {
+                request.url().fileName() == "perl-debugger.function") {
 
             targetFrame = frame;
             qStartPerlDebuggerSlot(request.url());
@@ -1862,6 +1837,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
     }
 
+    // OPEN LOCAL CONTENT:
     QFileDetector fileDetector;
 
     // Open local content in the same window:
@@ -1944,6 +1920,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
     }
 
+    // OPEN NETWORK CONTENT:
     // Open allowed network content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (QPage::mainFrame()->childFrames().contains(frame)) and

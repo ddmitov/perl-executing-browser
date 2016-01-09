@@ -5,9 +5,10 @@
 		<title>Perl Executing Browser</title>
 		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/jquery-1.11.1.min.js"></script>
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/html/bootstrap.css" media="all"/>
+		<script type='text/javascript' src='http://perl-executing-browser-pseudodomain/js/jquery-1.11.1.min.js'></script>
+
+		<script type='text/javascript' src='http://perl-executing-browser-pseudodomain/js/bootstrap.min.js'></script>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/html/bootstrap.css' media='all'/>
 		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/html/current.css' media='all' />
 
 		<script>
@@ -172,7 +173,10 @@
 			</p>
 
 			<div id='ajax-results'>
-				<button id='ajax-button' class='btn btn-primary'>AJAX Document Root File Lister</button>
+				<button id='ajax-button' class='btn btn-primary'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/scripts/ajax.pl'
+						data-placement='right'>
+				AJAX Document Root File Lister</button>
 			</div>
 
 			<hr width='95%'>
@@ -185,7 +189,7 @@
 
 			<p align='center'>
 				<font size='5'>
-					<a href='perl-debugger://select-file?command=M'
+					<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M'
 						data-toggle='tooltip' title='perl-debugger://select-file?command=M'
 						data-placement='right'>
 					List All Modules</a>
@@ -194,7 +198,7 @@
 
 			<p align='center'>
 				<font size='5'>
-					<a href='perl-debugger://select-file?command=S'
+					<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=S'
 						data-toggle='tooltip' title='perl-debugger://select-file?command=S'
 						data-placement='right'>
 					List All Subroutine Names</a>
@@ -203,7 +207,7 @@
 
 			<p align='center'>
 				<font size='5'>
-					<a href='perl-debugger://select-file?command=V'
+					<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=V'
 						data-toggle='tooltip' title='perl-debugger://select-file?command=V'
 						data-placement='right'>
 					List All Variables</a>
@@ -212,8 +216,8 @@
 
 			<p align='center'>
 				<font size='5'>
-					<a href='perl-debugger://select-file'
-						data-toggle='tooltip' title='perl-debugger://select-file'
+					<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file'
 						data-placement='right'>
 					Step-by-Step Debugging</a>
 				</font>
@@ -221,8 +225,8 @@
 
 			<p align='center'>
 				<font size='5'>
-					<a href='perl-debugger://select-file' target='_blank'
-						data-toggle='tooltip' title='perl-debugger://select-file'
+					<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file' target='_blank'
+						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file'
 						data-placement='right'>
 					Step-by-Step Debugging in a New Window</a>
 				</font>
@@ -283,14 +287,18 @@
 
 			<p align='center'>
 				<font size='5'>
-					<button onclick='allowedContent()' class='btn btn-primary'>
+					<button onclick='allowedContent()' class='btn btn-primary'
+						data-toggle='tooltip' title='https://www.google.bg'
+						data-placement='right'>
 					Open Allowed Content in a New Window from JavaScript</button>
 				</font>
 			</p>
 
 			<p align='center'>
 				<font size='5'>
-					<button onclick='notAllowedContent()' class='btn btn-primary'>
+					<button onclick='notAllowedContent()' class='btn btn-primary'
+						data-toggle='tooltip' title='http://www.yahoo.com'
+						data-placement='right'>
 					Not Allowed Content in a New Window from JavaScript - Blocked</button>
 				</font>
 			</p>
@@ -350,15 +358,6 @@
 				</font>
 			</p>
 
-			<p align='center'>
-				<font size='5'>
-					<a href='http://perl-executing-browser-pseudodomain/quit.function'
-						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/quit.function'
-						data-placement='right'>
-					Quit Application</a>
-				</font>
-			</p>
-
 		</div>
 
 		<script>
@@ -370,10 +369,10 @@
 						method: 'GET',
 						dataType: 'text',
 						success: function(data) {
-							var dataItems = data.split(",");
+							var dataItems = data.split(',');
 							var text = '';
 							for (index = 0; index < dataItems.length; index++) {
-								text += dataItems[index] + "<br>";
+								text += dataItems[index] + '<br>';
 							}
 							$('#ajax-results').html(text);
 						}

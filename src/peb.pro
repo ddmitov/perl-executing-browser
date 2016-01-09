@@ -1,94 +1,3 @@
-message ("")
-message ("Starting Perl Executing Browser (PEB) build procedure...")
-message ("")
-message ("Qt version: $$[QT_VERSION]")
-message ("Qt is installed in: $$[QT_INSTALL_PREFIX]")
-message ("Qt resources can be found in the following locations:")
-message ("Qt Documentation: $$[QT_INSTALL_DOCS]")
-message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
-message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
-message ("Qt Binary files (executables): $$[QT_INSTALL_BINS]")
-message ("Qt Plugins: $$[QT_INSTALL_PLUGINS]")
-message ("Qt Data files: $$[QT_INSTALL_DATA]")
-message ("Qt Translation files: $$[QT_INSTALL_TRANSLATIONS]")
-message ("")
-
-TEMPLATE = app
-TARGET = peb
-DEPENDPATH += .
-VERSION = 0.1
-TRANSLATIONS = $${TARGET}_bg_BG.ts
-
-CONFIG (debug, debug|release) { 
-    DESTDIR = ../
-}
-CONFIG (release, debug|release) { 
-    DESTDIR = ../
-}
-
-# Network support:
-QT += network
-CONFIG += openssl-linked # necessary for handling https adresses
-
-
-# Macintosh specific settings:
-macx {
-  ##########################################################
-  # To make a bundle-less application: (recommended)
-  # BUNDLE = 0
-  # CONFIG -= app_bundle
-  ##########################################################
-  # To make a bundle (peb.app):
-  # BUNDLE = 1
-  # CONFIG += app_bundle
-  ##########################################################
-  BUNDLE = 0
-  CONFIG -= app_bundle
-
-  DEFINES += "BUNDLE=$$BUNDLE"
-
-  equals (BUNDLE, 0) {
-      message ("Going to build without Mac OSX bundle support...")
-  }
-  equals (BUNDLE, 1) {
-      message ("Going to build with Mac OSX bundle support...")
-  }
-
-  ICON = icons/camel.icns
-}
-
-
-# Windows specific settings:
-win32 {
-  # Resource and icon files:
-  OTHER_FILES += peb.rc icons/camel.ico
-  RC_FILE = peb.rc
-}
-
-
-# Qt4 specific settings:
-lessThan (QT_MAJOR_VERSION, 5) {
-  QT += webkit
-}
-
-
-# Qt5 specific settings:
-greaterThan (QT_MAJOR_VERSION, 4) {
-  QT += widgets webkitwidgets printsupport
-  DEFINES += HAVE_QT5
-}
-
-
-# Source files:
-HEADERS += peb.h
-SOURCES += peb.cpp
-
-# Temporary folder:
-MOC_DIR = ../tmp
-OBJECTS_DIR = ../tmp
-RCC_DIR = ../tmp
-
-
 ##########################################################
 # Application name:
 # ATTENTION - replace spaces with underscore like that:
@@ -203,3 +112,91 @@ equals (PERL_DEBUGGER_INTERACTION, 1) {
 }
 
 message ("")
+
+
+##########################################################
+# Macintosh specific settings:
+##########################################################
+macx {
+  ##########################################################
+  # To make a bundle-less application: (recommended)
+  # BUNDLE = 0
+  # CONFIG -= app_bundle
+  ##########################################################
+  # To make a bundle (peb.app):
+  # BUNDLE = 1
+  # CONFIG += app_bundle
+  ##########################################################
+  BUNDLE = 0
+  CONFIG -= app_bundle
+
+  DEFINES += "BUNDLE=$$BUNDLE"
+
+  equals (BUNDLE, 0) {
+      message ("Going to build without Mac OSX bundle support...")
+  }
+  equals (BUNDLE, 1) {
+      message ("Going to build with Mac OSX bundle support...")
+  }
+
+  ICON = icons/camel.icns
+}
+
+##########################################################
+# NO CONFIGURATION OPTIONS BELOW THIS POINT.
+##########################################################
+
+message ("")
+message ("Starting Perl Executing Browser (PEB) build procedure...")
+message ("")
+message ("Qt version: $$[QT_VERSION]")
+message ("Qt is installed in: $$[QT_INSTALL_PREFIX]")
+message ("Qt resources can be found in the following locations:")
+message ("Qt Documentation: $$[QT_INSTALL_DOCS]")
+message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
+message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
+message ("Qt Binary files (executables): $$[QT_INSTALL_BINS]")
+message ("Qt Plugins: $$[QT_INSTALL_PLUGINS]")
+message ("Qt Data files: $$[QT_INSTALL_DATA]")
+message ("Qt Translation files: $$[QT_INSTALL_TRANSLATIONS]")
+message ("")
+
+TEMPLATE = app
+TARGET = peb
+DEFINES += HAVE_QT5
+DEPENDPATH += .
+VERSION = 0.1
+TRANSLATIONS = $${TARGET}_bg_BG.ts
+
+CONFIG (debug, debug|release) { 
+    DESTDIR = ../
+}
+CONFIG (release, debug|release) { 
+    DESTDIR = ../
+}
+
+# Network support:
+QT += network
+CONFIG += openssl-linked # necessary for handling https adresses
+
+# Webkit support:
+QT += widgets webkitwidgets
+
+# Printing support:
+QT += printsupport
+
+# Source files:
+HEADERS += peb.h
+SOURCES += peb.cpp
+
+# Temporary folder:
+MOC_DIR = ../tmp
+OBJECTS_DIR = ../tmp
+RCC_DIR = ../tmp
+
+# Windows specific settings:
+win32 {
+  # Resource and icon files:
+  OTHER_FILES += peb.rc icons/camel.ico
+  RC_FILE = peb.rc
+}

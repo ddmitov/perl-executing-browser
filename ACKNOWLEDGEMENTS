@@ -134,6 +134,7 @@ http://www.qtcentre.org/threads/10210-how-to-use-tr()-for-QMessageBox
 http://www.qtcentre.org/threads/52787-QWebPage-createWindow
 http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width
 http://www.qtcentre.org/threads/29104-QMake-DEFINES
+http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit
 
 http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
 http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
@@ -202,6 +203,9 @@ http://stackoverflow.com/questions/6275363/what-is-the-correct-terminology-for-a
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
 
+http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
+http://comments.gmane.org/gmane.comp.lib.qt.general/35521 (webkit - how to prevent alert popups)
+
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm
 http://webkit.sed.hu/content/disabling-cache
 http://www.stringreplace.com/c-plus-plus/qt-string-replace-method/
@@ -212,10 +216,10 @@ http://mvclogic.com/qt/qt-code-example-new-file-open-file-save-file-save-as-file
 http://ubuntuforums.org/showthread.php?t=174362 (checking for root privileges in C++)
 http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
 http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
-http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
 http://habrahabr.ru/post/150329/ (Qt Coding Style)
 http://okolovich.info/tag/code-snippets-c/
 http://www.antonioborondo.com/2014/10/22/zipping-and-unzipping-files-with-qt/
+http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp
 
 CGI
 ===
@@ -255,16 +259,20 @@ http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
 http://stackoverflow.com/questions/3163615/how-to-scroll-html-page-to-given-anchor-using-jquery-or-javascript
 http://stackoverflow.com/questions/9436534/ajax-tutorial-for-post-and-get
 http://stackoverflow.com/questions/6395720/get-data-from-php-array-ajax-jquery
+http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj
 
 http://www.w3schools.com/html/html_lists.asp
 http://www.w3schools.com/jsref/event_onclick.asp
 http://www.w3schools.com/jquery/html_html.asp
 http://www.w3schools.com/jquery/ajax_get.asp
 http://www.w3schools.com/js/js_loop_for.asp
+http://www.w3schools.com/js/js_popup.asp
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp
+http://www.w3schools.com/jsref/prop_html_innerhtml.asp
 
 http://getbootstrap.com/components/#dropdowns
 http://getbootstrap.com/javascript/#tooltips-methods
+
 http://bootswatch.com/
 
 http://www.javascriptkit.com/script/cut19.shtml

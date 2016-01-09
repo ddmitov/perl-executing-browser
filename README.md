@@ -34,7 +34,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
 * Scripts and their HTML-based interfaces can be extracted and run from standard ZIP packages.  
   
-**Local filesystem:**  
+**Local Filesystem:**  
 * PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
   
 **Networking:**  
