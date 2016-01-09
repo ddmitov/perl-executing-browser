@@ -5,9 +5,10 @@ tmp/
 
 db/test.db
 src/peb.pro.user
-ui/current.css
+ui/bootstrap/current-theme.css
 
 peb
 peb.exe
-upcopy
+copy
+copy-win32
 upgit
