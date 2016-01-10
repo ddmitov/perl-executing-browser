@@ -1,7 +1,6 @@
-archive/
 logs/
-testing/
 tmp/
+working/
 
 db/test.db
 src/peb.pro.user
