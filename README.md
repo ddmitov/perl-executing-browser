@@ -154,7 +154,7 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ## Name
   
 'Perl Executing Browser' is a descriptive, probably a little boring, technical name.  
-Possible new names: **QtCamel Browser**, **QtCamelKit**, **QtCamel**.  
+Possible new names: **QtCamelKit**, **QtCamel**.  
   
 ## Authors
   

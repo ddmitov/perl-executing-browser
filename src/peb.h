@@ -231,9 +231,7 @@ protected:
             QUrl url = request.url();
             qDebug() << "AJAX Script URL:" << url.toString();
 
-            QString relativeFilePath = url.toString(QUrl::RemoveScheme
-                                                    | QUrl::RemoveAuthority
-                                                    | QUrl::RemoveQuery);
+            QString relativeFilePath = url.path();
 
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
@@ -243,11 +241,7 @@ protected:
             // root directory setting already has a trailing slash.
             scriptFullFilePath = scriptFullFilePath.replace("//", "/");
 
-            QString queryString = url.toString(QUrl::RemoveScheme
-                                               | QUrl::RemoveAuthority
-                                               | QUrl::RemovePath)
-                    .replace("?", "")
-                    .replace("//", "");
+            QString queryString = url.query();
 
             QByteArray postDataArray;
             if (outgoingData) {
@@ -473,11 +467,7 @@ protected:
             }
 
             // Get the full file path and file extension:
-            QString filepath = request.url()
-                    .toString(QUrl::RemoveScheme
-                              | QUrl::RemoveAuthority
-                              | QUrl::RemoveQuery
-                              | QUrl::RemoveFragment);
+            QString filepath = request.url().path();
 
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
@@ -508,9 +498,7 @@ protected:
                         (QUrl::fromLocalFile
                          (QDir::toNativeSeparators(
                               (qApp->property("rootDirName").toString())
-                              + request.url().toString(
-                                  QUrl::RemoveScheme
-                                  | QUrl::RemoveAuthority))));
+                              + request.url().path())));
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
@@ -741,9 +729,7 @@ public slots:
     {
         qDebug() << "Script URL:" << url.toString();
 
-        QString relativeFilePath = url.toString(QUrl::RemoveScheme
-                                                | QUrl::RemoveAuthority
-                                                | QUrl::RemoveQuery);
+        QString relativeFilePath = url.path();
 
         scriptFullFilePath = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString()) + relativeFilePath);
@@ -751,11 +737,7 @@ public slots:
         // root directory setting already has a trailing slash.
         scriptFullFilePath.replace("//", "/");
 
-        QString queryString = url.toString(QUrl::RemoveScheme
-                                           | QUrl::RemoveAuthority
-                                           | QUrl::RemovePath)
-                .replace("?", "")
-                .replace("//", "");
+        QString queryString = url.query();
 
         scriptKilled = false;
 
@@ -1152,9 +1134,7 @@ public slots:
             debuggerOutputFormatterFile.close();
 
             // Read Perl debugger interaction special URL:
-            QString filePath = debuggerUrl.toString(QUrl::RemoveQuery)
-                    .replace("file://", "")
-                    .replace("?", "");
+            QString filePath = debuggerUrl.path();
 
 #ifdef Q_OS_WIN
             filePath.replace(QRegExp("^\\/"), "");
@@ -1592,13 +1572,9 @@ public slots:
 
     void qEditSlot()
     {
-        QString fileToEdit = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString())
-                 + qWebHitTestURL.toString
-                 (QUrl::RemoveScheme
-                  | QUrl::RemoveAuthority
-                  | QUrl::RemoveQuery)
-                 .replace("?", ""));
+        QString fileToEdit = QDir::toNativeSeparators(
+                    (qApp->property("rootDirName").toString())
+                    + qWebHitTestURL.path());
 
         qDebug() << "File to edit:" << fileToEdit;
         qDebug() << "===============";
@@ -1644,8 +1620,7 @@ public slots:
 
         QString fileToOpen = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString())
-                 + qWebHitTestURL.toString
-                 (QUrl::RemoveScheme | QUrl::RemoveAuthority));
+                 + qWebHitTestURL.path());
 
         QFileDetector fileDetector;
         fileDetector.qDefineInterpreter(fileToOpen);
@@ -1687,11 +1662,7 @@ public slots:
 
                 QString fileToOpen = QDir::toNativeSeparators
                         ((qApp->property("rootDirName").toString())
-                         + qWebHitTestURL.toString(
-                             QUrl::RemoveScheme
-                             | QUrl::RemoveAuthority
-                             | QUrl::RemoveQuery)
-                         .replace("?", ""));
+                         + qWebHitTestURL.path());
 
                 QFileDetector fileDetector;
                 fileDetector.qDefineInterpreter(fileToOpen);

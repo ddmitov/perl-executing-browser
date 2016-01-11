@@ -1861,20 +1861,15 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (request.url().path()
                 .contains(fileDetector.htmlExtensions)) {
 
-            QString relativeFilePath = request.url()
-                    .toString(QUrl::RemoveScheme
-                              | QUrl::RemoveAuthority
-                              | QUrl::RemoveFragment);
-            QString fullFilePath = (qApp->property("rootDirName").toString())
-                    + relativeFilePath;
+            QString relativeFilePath = request.url().path();
+            QString fullFilePath =
+                    QDir::toNativeSeparators(
+                        (qApp->property("rootDirName").toString())
+                        + relativeFilePath);
             QFileDetector fileDetector;
             fileDetector.qCheckFileExistence(fullFilePath);
 
-            frame->load(QUrl::fromLocalFile
-                        (QDir::toNativeSeparators
-                         ((qApp->property("rootDirName").toString())
-                          + request.url().toString(
-                              QUrl::RemoveScheme | QUrl::RemoveAuthority))));
+            frame->load(QUrl::fromLocalFile(fullFilePath));
 
             return false;
         }
@@ -1892,12 +1887,11 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                      << request.url().toString();
             qDebug() << "===============";
 
-            QString relativeFilePath = request.url()
-                    .toString(QUrl::RemoveScheme
-                              | QUrl::RemoveAuthority
-                              | QUrl::RemoveFragment);
-            QString fullFilePath = (qApp->property("rootDirName").toString())
-                    + relativeFilePath;
+            QString relativeFilePath = request.url().path();
+            QString fullFilePath =
+                    QDir::toNativeSeparators(
+                        (qApp->property("rootDirName").toString())
+                        + relativeFilePath);
             QFileDetector fileDetector;
             fileDetector.qCheckFileExistence(fullFilePath);
 
@@ -1908,12 +1902,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             newWindow->setWindowIcon(icon);
             newWindow->setAttribute(Qt::WA_DeleteOnClose, true);
 
-            newWindow->load(QUrl::fromLocalFile
-                            (QDir::toNativeSeparators
-                             ((qApp->property("rootDirName").toString())
-                              + request.url().toString(
-                                  QUrl::RemoveScheme
-                                  | QUrl::RemoveAuthority))));
+            newWindow->load(QUrl::fromLocalFile(fullFilePath));
 
             newWindow->show();
             return false;
