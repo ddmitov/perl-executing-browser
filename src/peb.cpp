@@ -765,9 +765,11 @@ int main(int argc, char **argv)
     // Check if default theme file exists, if not - copy it from themes folder:
     if (!QFile::exists(defaultThemeDirectory
                        + QDir::separator()
-                       + "current.css")) {
+                       + "current-theme.css")) {
         QFile::copy(allThemesDirectory + QDir::separator() + defaultTheme,
-                    defaultThemeDirectory + QDir::separator() + "current.css");
+                    defaultThemeDirectory
+                    + QDir::separator()
+                    + "current-theme.css");
     }
 
     // Default translation:
