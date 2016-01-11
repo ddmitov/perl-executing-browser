@@ -64,6 +64,7 @@ public slots:
             QString firstLine;
 
             QFile file(filepath);
+
             if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
                 firstLine = file.readLine();
             }
@@ -472,6 +473,7 @@ protected:
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
                      + filepath);
+            fullFilePath.replace("//", "/");
 
             QFileDetector fileDetector;
             fileDetector.qDefineInterpreter(fullFilePath);
@@ -508,6 +510,7 @@ protected:
             // Local files without recognized file type:
             if (interpreter.contains("undefined")) {
 
+                qDebug() << "File:" << fullFilePath;
                 qDebug() << "File type not recognized!";
                 qDebug() << "===============";
 
@@ -1575,6 +1578,7 @@ public slots:
         QString fileToEdit = QDir::toNativeSeparators(
                     (qApp->property("rootDirName").toString())
                     + qWebHitTestURL.path());
+        fileToEdit.replace("//", "/");
 
         qDebug() << "File to edit:" << fileToEdit;
         qDebug() << "===============";
@@ -1652,7 +1656,8 @@ public slots:
         if (!qWebHitTestResult.linkUrl().isEmpty()) {
             qWebHitTestURL = qWebHitTestResult.linkUrl();
 
-            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN) {
+            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN and
+                    (!qWebHitTestURL.fileName().contains(".function"))) {
 
                 menu->addSeparator();
 
@@ -1663,6 +1668,7 @@ public slots:
                 QString fileToOpen = QDir::toNativeSeparators
                         ((qApp->property("rootDirName").toString())
                          + qWebHitTestURL.path());
+                fileToOpen.replace("//", "/");
 
                 QFileDetector fileDetector;
                 fileDetector.qDefineInterpreter(fileToOpen);
@@ -1678,7 +1684,8 @@ public slots:
                 }
             }
 
-            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN) {
+            if (qWebHitTestURL.authority() == PSEUDO_DOMAIN and
+                    (!qWebHitTestURL.fileName().contains(".function"))) {
 
                 QAction *openInNewWindowAct =
                         menu->addAction(tr("&Open in new window"));
