@@ -481,6 +481,27 @@ int main(int argc, char **argv)
 
     // Perl interpreter:
     QString perlInterpreterSetting = settings.value("perl/perl").toString();
+
+    if (perlInterpreterSetting.length() == 0) {
+        QString title =
+                QApplication::tr("Missing Perl");
+        QString text =
+                QApplication::tr(
+                    "No Perl interpreter is set for<br>") +
+                application.applicationDisplayName() +
+                QApplication::tr(" version ") +
+                application.applicationVersion();
+        QMessageBox missingPerlInterpreterMessageBox;
+        missingPerlInterpreterMessageBox
+                .setWindowModality(Qt::WindowModal);
+        missingPerlInterpreterMessageBox.setIcon(QMessageBox::Warning);
+        missingPerlInterpreterMessageBox.setWindowTitle(title);
+        missingPerlInterpreterMessageBox.setText(text);
+        missingPerlInterpreterMessageBox
+                .setDefaultButton(QMessageBox::Ok);
+        missingPerlInterpreterMessageBox.exec();
+    }
+
     QString perlInterpreter;
 
     if (perlInterpreterSetting == "system") {
@@ -494,6 +515,27 @@ int main(int argc, char **argv)
                     systemPerlTester.readAllStandardOutput();
             perlInterpreter =
                     QString::fromLatin1(testingScriptResultArray);
+
+            if (perlInterpreter.length() == 0) {
+                QString title =
+                        QApplication::tr("Missing Perl");
+                QString text =
+                        QApplication::tr(
+                            "No Perl interpreter is "
+                            "available on PATH for<br>") +
+                        application.applicationDisplayName() +
+                        QApplication::tr(" version ") +
+                        application.applicationVersion();
+                QMessageBox missingPerlInterpreterMessageBox;
+                missingPerlInterpreterMessageBox
+                        .setWindowModality(Qt::WindowModal);
+                missingPerlInterpreterMessageBox.setIcon(QMessageBox::Warning);
+                missingPerlInterpreterMessageBox.setWindowTitle(title);
+                missingPerlInterpreterMessageBox.setText(text);
+                missingPerlInterpreterMessageBox
+                        .setDefaultButton(QMessageBox::Ok);
+                missingPerlInterpreterMessageBox.exec();
+            }
         }
     } else {
         QDir interpreterFile(perlInterpreterSetting);
@@ -505,7 +547,30 @@ int main(int argc, char **argv)
         if (interpreterFile.isAbsolute()) {
             perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
         }
+
+        QFile perlInterpreterBinary(perlInterpreterSetting);
+
+        if (perlInterpreterSetting.length() > 0 and
+                !perlInterpreterBinary.exists()) {
+            QString title =
+                    QApplication::tr("Missing Perl");
+            QString text =
+                    QApplication::tr("Perl interpreter is missing for<br>") +
+                    application.applicationDisplayName() +
+                    QApplication::tr(" version ") +
+                    application.applicationVersion();
+            QMessageBox missingPerlInterpreterMessageBox;
+            missingPerlInterpreterMessageBox
+                    .setWindowModality(Qt::WindowModal);
+            missingPerlInterpreterMessageBox.setIcon(QMessageBox::Warning);
+            missingPerlInterpreterMessageBox.setWindowTitle(title);
+            missingPerlInterpreterMessageBox.setText(text);
+            missingPerlInterpreterMessageBox
+                    .setDefaultButton(QMessageBox::Ok);
+            missingPerlInterpreterMessageBox.exec();
+        }
     }
+
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // PERLLIB environment variable:

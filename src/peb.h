@@ -1111,8 +1111,7 @@ public slots:
             scriptTimeoutMessageBox
                     .setText(
                         tr("Your script timed out:<br>")
-                        + scriptFullFilePath + "<br>"
-                        + tr("Consider starting it as a long-running script."));
+                        + scriptFullFilePath);
             scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
             scriptTimeoutMessageBox.exec();
         }
