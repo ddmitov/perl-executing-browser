@@ -5,7 +5,8 @@
 		<title>Perl Executing Browser Settings</title>
 		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 
-		<script type="text/javascript" src="jquery-1.11.1.min.js"></script>
+		<!-- <script type="text/javascript" src="jquery-1.11.1.min.js"></script> -->
+		<script type="text/javascript" src="qrc:/scripts/js/jquery.min.js"></script>
 
 		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
@@ -17,50 +18,95 @@
 
 		<div class='container'>
 
-			<p align='center'>
-				<font size='5'>
-					<a href='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
-						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
-						data-placement='right'>
-					Select Perl Interpreter</a>
-				</font>
-			<br>
-				<font size='3'>
-					(will take effect immediately)
-				</font>
-			</p>
+			<div>
+				Root directory:<div id='setting-root'></div>
+			</div>
 
-			<p align='center'>
-				<font size='5'>
-					<a href='http://perl-executing-browser-pseudodomain/path.setting?action=add'
-						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/path.setting?action=add'
-						data-placement='right'>
-					Select Folder to Add to PATH of Local Scripts</a>
-				</font>
 			<br>
-				<font size='3'>
-					(will take effect immediately)
-				</font>
-			</p>
 
-			<p align='center'>
-				<font size='5'>
-					<a href='http://perl-executing-browser-pseudodomain/theme.function?action=select'
-						data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/theme.function?action=select'
-						data-placement='right'>
-					Select Browser Theme</a>
-				</font>
+			<div>
+				Current folders on PATH:<div id='setting-path'></div>
+				<a href='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+					data-placement='right'>
+				Add Folder to PATH</a>
+			</div>
+
 			<br>
-				<font size='3'>
-					(current page will be reloaded and the new theme will be used immediately)
-				</font>
-			</p>
+
+			<div>
+				Current Perl interpreter:<div id='setting-perl'></div>
+				<a href='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+					data-placement='right'>
+				Select Perl Interpreter</a>
+			</div>
+
+			<br>
+
+			<div>
+				PERLLIB folder:<div id='setting-perllib'></div>
+			</div>
+
+			<br>
+
+			<div>
+				Perl debugger output formatter:<div id='setting-perl-debugger-output-formatter'></div>
+			</div>
+
+			<br>
+
+			<div>
+				Display STDERR:<div id='setting-display-stderr'></div>
+			</div>
+
+			<br>
+
+			<div>Current browser theme:<div id='setting-theme'></div>
+				<a href='http://perl-executing-browser-pseudodomain/theme.function?action=select'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/theme.function?action=select'
+					data-placement='right'>
+				Select Browser Theme</a>
+			</div>
 
 		</div>
 
 		<script>
 			$(document).ready(function() {
 				$('[data-toggle="tooltip"]').tooltip();
+
+				$('#setting-root').load('http://perl-executing-browser-pseudodomain/root.setting?action=get');
+
+				$.ajax({
+					url: 'http://perl-executing-browser-pseudodomain/path.setting?action=get',
+					method: 'GET',
+					dataType: 'text',
+					success: function(data) {
+						var text = '';
+						if (data) {
+							var dataItems = data.split(',');
+							for (index = 0; index < dataItems.length; index++) {
+								text += dataItems[index] + '<br>';
+							}
+						} else {
+							text = 'none';
+						}
+						$('#setting-path').html(text);
+					}
+				});
+
+				$('#setting-perl').load('http://perl-executing-browser-pseudodomain/perl.setting?action=get');
+
+				$('#setting-perllib').load('http://perl-executing-browser-pseudodomain/perllib.setting?action=get');
+
+				$('#setting-perl-debugger-output-formatter').load('http://perl-executing-browser-pseudodomain/perl-debugger-output-formatter.setting?action=get');
+
+				$('#setting-display-stderr').load('http://perl-executing-browser-pseudodomain/display-stderr.setting?action=get');
+
+				$('#setting-theme').load('http://perl-executing-browser-pseudodomain/theme.setting?action=get');
 			});
 		</script>
 

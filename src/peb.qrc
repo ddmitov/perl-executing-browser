@@ -1,6 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>scripts/censor.pl</file>
-        <file>scripts/peb-check-user-input-before-quit.js</file>
+        <file>scripts/perl/censor.pl</file>
+        <file>scripts/js/peb-check-user-input-before-quit.js</file>
+        <file>scripts/js/jquery.min.js</file>
     </qresource>
 </RCC>

@@ -150,7 +150,7 @@ CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can't restore STDERR
 if ($@) {
 	if ($@ =~ m/trapped/) {
 		print STDERR $header;
-		print STDERR "<p align='center'><font size='5' face='SansSerif'>insecure code was blocked:</font></p>\n";
+		print STDERR "<p align='center'><font size='5' face='SansSerif'>Insecure code was blocked:</font></p>\n";
 		print STDERR "<pre>$@</pre>";
 		print STDERR $footer;
 		exit;

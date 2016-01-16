@@ -217,11 +217,122 @@ signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
     void startPerlDebuggerSignal(QUrl debuggerUrl);
 
+    void qInjectSettingsSignal();
+
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+
+        // GET BROWSER SETTINGS:
+        // Get root directory:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "root.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString rootSetting = qApp->property("rootDirName").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), rootSetting);
+            return reply;
+        }
+
+        // Get folders on PATH for all local scripts:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "path.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString path;
+            foreach (QString pathEntry,
+                     qApp->property("pathToAddList").toStringList()) {
+
+                QDir pathDir(pathEntry);
+                if (pathDir.exists()) {
+                    if (pathDir.isRelative()) {
+                        pathEntry = QDir::toNativeSeparators(
+                                    qApp->property("rootDirName").toString()
+                                    + pathEntry);
+                    }
+                    if (pathDir.isAbsolute()) {
+                        pathEntry = QDir::toNativeSeparators(pathEntry);
+                    }
+                    path.append(pathEntry);
+                    path.append(",");
+                }
+                path.replace(QRegExp(",$"), "");
+            }
+
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), path);
+            return reply;
+        }
+
+        // Get Perl interpreter:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "perl.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString perlSetting = qApp->property("perlInterpreter").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), perlSetting);
+            return reply;
+        }
+
+        // Get PERLLIB folder:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "perllib.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString perlLibSetting = qApp->property("perlLib").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), perlLibSetting);
+            return reply;
+        }
+
+        // Get Perl debugger output formatter:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() ==
+                "perl-debugger-output-formatter.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString perlDbgFormatterSetting =
+                    qApp->property("debuggerOutputFormatter").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(),
+                                             perlDbgFormatterSetting);
+            return reply;
+        }
+
+        // Get setting for displaying STDERR:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "display-stderr.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString displayStderrSetting =
+                    qApp->property("displayStderr").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(),
+                                             displayStderrSetting);
+            return reply;
+        }
+
+        // Get browser theme:
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "theme.setting" and
+                request.url().query() == ("action=get")) {
+
+            QString themeSetting = qApp->property("defaultTheme").toString();
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(), themeSetting);
+            return reply;
+        }
 
         // Local AJAX GET and POST requests.
         if ((operation == GetOperation or
@@ -232,11 +343,9 @@ protected:
             QUrl url = request.url();
             qDebug() << "AJAX Script URL:" << url.toString();
 
-            QString relativeFilePath = url.path();
-
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
-                     + relativeFilePath);
+                     + url.path());
 
             // Replace initial slash at the beginning of the relative path;
             // root directory setting already has a trailing slash.
@@ -310,7 +419,7 @@ protected:
                 if (SCRIPT_CENSORING == 1) {
                     // 'censor.pl' is compiled into the resources of
                     // the binary file and called from there.
-                    QString censorScriptFileName(":/scripts/censor.pl");
+                    QString censorScriptFileName(":/scripts/perl/censor.pl");
                     QFile censorScriptFile(censorScriptFileName);
                     censorScriptFile.open(QIODevice::ReadOnly
                                           | QIODevice::Text);
@@ -409,70 +518,10 @@ protected:
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
 
-            // SET NEW BROWSER SETTINGS:
-            // Set the Perl interpreter:
-            if (request.url().fileName() == "perl.setting" and
-                    request.url().query() == ("action=set")) {
-
-                QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
-                selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
-                selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
-                selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
-                QString perlInterpreter = selectPerlInterpreterDialog
-                        .getOpenFileName
-                        (qApp->activeWindow(), tr("Select Perl Interpreter"),
-                         QDir::currentPath(), tr("All files (*)"));
-                selectPerlInterpreterDialog.close();
-                selectPerlInterpreterDialog.deleteLater();
-
-                if (perlInterpreter.length() > 0) {
-                    QSettings perlInterpreterSetting(
-                                (qApp->property("settingsFileName").toString()),
-                                QSettings::IniFormat);
-                    perlInterpreterSetting.setValue("perl/perl",
-                                                    perlInterpreter);
-                    perlInterpreterSetting.sync();
-
-                    qApp->setProperty("perlInterpreter", perlInterpreter);
-
-                    qDebug() << "Selected Perl interpreter:" << perlInterpreter;
-
-                    QFileDialog selectPerlLibDialog (qApp->activeWindow());
-                    selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
-                    selectPerlLibDialog.setViewMode(QFileDialog::Detail);
-                    selectPerlLibDialog.setWindowModality(Qt::WindowModal);
-                    QString perlLibFolderName = selectPerlLibDialog
-                            .getExistingDirectory(
-                                qApp->activeWindow(),
-                                tr("Select PERLLIB"),
-                                QDir::currentPath());
-                    selectPerlLibDialog.close();
-                    selectPerlLibDialog.deleteLater();
-
-                    QSettings perlLibSetting((qApp->property("settingsFileName")
-                                              .toString()),
-                                             QSettings::IniFormat);
-                    perlLibSetting.setValue("perl/perllib", perlLibFolderName);
-                    perlLibSetting.sync();
-
-                    qApp->setProperty("perlLib", perlLibFolderName);
-
-                    qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-                    qDebug() << "===============";
-                }
-
-                QNetworkRequest emptyNetworkRequest;
-                return QNetworkAccessManager::createRequest
-                        (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest(emptyNetworkRequest));
-            }
-
             // Get the full file path and file extension:
-            QString filepath = request.url().path();
-
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
-                     + filepath);
+                     + request.url().path());
             fullFilePath.replace("//", "/");
 
             QFileDetector fileDetector;
@@ -562,8 +611,9 @@ protected:
         if ((operation == GetOperation or
              operation == PostOperation or
              operation == PutOperation) and
-                ((request.url().scheme().contains("file")) or
-                 (request.url().toString().contains("data:image")) or
+                ((request.url().scheme() =="file") or
+                 (request.url().scheme() == "qrc") or
+                 (request.url().scheme().contains("data:image")) or
                  (request.url().authority() == PSEUDO_DOMAIN) or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
@@ -897,7 +947,7 @@ public slots:
                     if (SCRIPT_CENSORING == 1) {
                         // 'censor.pl' is compiled into the resources of
                         // the binary file and called from there.
-                        QString censorScriptFileName(":/scripts/censor.pl");
+                        QString censorScriptFileName(":/scripts/perl/censor.pl");
                         QFile censorScriptFile(censorScriptFileName);
                         censorScriptFile.open(QIODevice::ReadOnly
                                               | QIODevice::Text);

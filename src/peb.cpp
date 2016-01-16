@@ -669,9 +669,11 @@ int main(int argc, char **argv)
     // Check if start page exists:
     QFile startPageFile(startPage);
     if (!startPageFile.exists()) {
-        QString title = (QApplication::tr("Missing start page"));
-        QString text = (QApplication::tr("Start page is missing.<br>")
-                        + QApplication::tr("Please select a start page."));
+        QString title = QApplication::tr("Missing start page");
+        QString text = QApplication::tr("Start page is missing for<br>") +
+                application.applicationDisplayName() +
+                QApplication::tr(" version ") +
+                application.applicationVersion();
         QMessageBox missingStartPageMessageBox;
         missingStartPageMessageBox.setWindowModality(Qt::WindowModal);
         missingStartPageMessageBox.setIcon(QMessageBox::Critical);
@@ -1228,8 +1230,8 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url, QString &data)
 
     setUrl(url);
 
-    setHeader(QNetworkRequest::ContentTypeHeader,
-              QVariant("text/html; charset=UTF-8"));
+//    setHeader(QNetworkRequest::ContentTypeHeader,
+//              QVariant("text/html; charset=UTF-8"));
     setHeader(QNetworkRequest::ContentLengthHeader,
               QVariant(reply->data.size()));
     setHeader(QNetworkRequest::LastModifiedHeader,
@@ -1374,7 +1376,7 @@ QPage::QPage()
 
     // READ INTERNALLY COMPILED JS SCRIPT:
     QFile file;
-    file.setFileName(":/scripts/peb-check-user-input-before-quit.js");
+    file.setFileName(":/scripts/js/peb-check-user-input-before-quit.js");
     file.open(QIODevice::ReadOnly);
     checkUserInputBeforeQuitJavaScript = file.readAll();
     file.close();
@@ -1560,6 +1562,60 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
+    // SET BROWSER SETTINGS:
+    // Set Perl interpreter:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "perl.setting" and
+            request.url().query() == ("action=set")) {
+
+        QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
+        selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
+        selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
+        selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
+        QString perlInterpreter = selectPerlInterpreterDialog
+                .getOpenFileName
+                (qApp->activeWindow(), tr("Select Perl Interpreter"),
+                 QDir::currentPath(), tr("All files (*)"));
+        selectPerlInterpreterDialog.close();
+        selectPerlInterpreterDialog.deleteLater();
+
+        if (perlInterpreter.length() > 0) {
+            QSettings perlInterpreterSetting(
+                        (qApp->property("settingsFileName").toString()),
+                        QSettings::IniFormat);
+            perlInterpreterSetting.setValue("perl/perl", perlInterpreter);
+            perlInterpreterSetting.sync();
+
+            qApp->setProperty("perlInterpreter", perlInterpreter);
+
+            qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+
+            QFileDialog selectPerlLibDialog (qApp->activeWindow());
+            selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
+            selectPerlLibDialog.setViewMode(QFileDialog::Detail);
+            selectPerlLibDialog.setWindowModality(Qt::WindowModal);
+            QString perlLibFolderName = selectPerlLibDialog
+                    .getExistingDirectory(
+                        qApp->activeWindow(),
+                        tr("Select PERLLIB"),
+                        QDir::currentPath());
+            selectPerlLibDialog.close();
+            selectPerlLibDialog.deleteLater();
+
+            QSettings perlLibSetting((qApp->property("settingsFileName")
+                                      .toString()),
+                                     QSettings::IniFormat);
+            perlLibSetting.setValue("perl/perllib", perlLibFolderName);
+            perlLibSetting.sync();
+
+            qApp->setProperty("perlLib", perlLibFolderName);
+
+            qDebug() << "Selected PERLLIB:" << perlLibFolderName;
+            qDebug() << "===============";
+        }
+
+        return false;
+    }
 
     // Select folder to add to the PATH environment variable:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -1673,6 +1729,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         return false;
     }
 
+    // OPEN FILES AND FOLDERS:
     // Invoke 'Open file' dialog from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().fileName() == "open-file.function") {
@@ -1779,6 +1836,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         return false;
     }
 
+    // PRINTING:
 #ifndef QT_NO_PRINTER
     // Print preview from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -1811,7 +1869,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     }
 #endif
 
-    // Perl debugger interaction.
+    // PERL DEBUGGER INTERACTION:
     // Implementation of an idea proposed by Valcho Nedelchev.
     if (PERL_DEBUGGER_INTERACTION == 1) {
 

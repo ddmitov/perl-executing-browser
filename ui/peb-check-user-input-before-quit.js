@@ -29,9 +29,9 @@ function checkUserInputBeforeQuit() {
 	}
 
 	if (textEntered == true) {
-		if (confirm("На тази страница е попълнен текст и той ще бъде загубен!\n" +
-			"Въведената информация не може да бъде възстановена!\n" +
-			"Сигурни ли сте, че искате да изключите програмата?")) {
+		if (confirm("This page contains text entered by user and it is going to be lost!\n" +
+			"This information can not be recovered!\n" +
+			"Are you sure that you want to quit the program?")) {
 				quitDecision = "yes";
 		}
 	}
