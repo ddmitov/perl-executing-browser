@@ -1580,35 +1580,56 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         selectPerlInterpreterDialog.deleteLater();
 
         if (perlInterpreter.length() > 0) {
+            // Save Perl interpreter setting in the settings file:
             QSettings perlInterpreterSetting(
                         (qApp->property("settingsFileName").toString()),
                         QSettings::IniFormat);
             perlInterpreterSetting.setValue("perl/perl", perlInterpreter);
             perlInterpreterSetting.sync();
 
+            // Set global Perl interpreter setting:
             qApp->setProperty("perlInterpreter", perlInterpreter);
 
+            // JavaScript bridge back to the settings page:
+            currentFrame()->evaluateJavaScript("getPerlSetting();");
+
             qDebug() << "Selected Perl interpreter:" << perlInterpreter;
+            qDebug() << "===============";
+        }
 
-            QFileDialog selectPerlLibDialog (qApp->activeWindow());
-            selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
-            selectPerlLibDialog.setViewMode(QFileDialog::Detail);
-            selectPerlLibDialog.setWindowModality(Qt::WindowModal);
-            QString perlLibFolderName = selectPerlLibDialog
-                    .getExistingDirectory(
-                        qApp->activeWindow(),
-                        tr("Select PERLLIB"),
-                        QDir::currentPath());
-            selectPerlLibDialog.close();
-            selectPerlLibDialog.deleteLater();
+        return false;
+    }
 
+    // Set PERLLIB:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "perllib.setting" and
+            request.url().query() == ("action=set")) {
+
+        QFileDialog selectPerlLibDialog (qApp->activeWindow());
+        selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
+        selectPerlLibDialog.setViewMode(QFileDialog::Detail);
+        selectPerlLibDialog.setWindowModality(Qt::WindowModal);
+        QString perlLibFolderName = selectPerlLibDialog
+                .getExistingDirectory(
+                    qApp->activeWindow(),
+                    tr("Select PERLLIB"),
+                    QDir::currentPath());
+        selectPerlLibDialog.close();
+        selectPerlLibDialog.deleteLater();
+
+        if (perlLibFolderName.length() > 0) {
+            // Save PERLLIB setting in the settings file:
             QSettings perlLibSetting((qApp->property("settingsFileName")
                                       .toString()),
                                      QSettings::IniFormat);
             perlLibSetting.setValue("perl/perllib", perlLibFolderName);
             perlLibSetting.sync();
 
+            // Set global PERLIB setting:
             qApp->setProperty("perlLib", perlLibFolderName);
+
+            // JavaScript bridge back to the settings page:
+            currentFrame()->evaluateJavaScript("getPerlLibSetting();");
 
             qDebug() << "Selected PERLLIB:" << perlLibFolderName;
             qDebug() << "===============";
@@ -1642,19 +1663,19 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                      QSettings::IniFormat);
 
         // Get list of all folders on the current PATH:
-        QStringList currentPathList;
+        QStringList pathList;
         int pathArraySize = pathFoldersSetting
-                .beginReadArray("environment/path");
+                .beginReadArray("perl/path");
         for (int index = 0; index < pathArraySize; ++index) {
             pathFoldersSetting.setArrayIndex(index);
             QString pathSetting = pathFoldersSetting.value("name").toString();
-            currentPathList.append(pathSetting);
+            pathList.append(pathSetting);
         }
         pathFoldersSetting.endArray();
 
         // Append the new folder name to
         // the list of all folders on the current PATH:
-        currentPathList.append(pathFolderString);
+        pathList.append(pathFolderString);
 
         // Append the new folder name in the
         // appropriate section of the settings file:
@@ -1676,7 +1697,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // Add all browser-specific folders to PATH,
         // but first check if these directories exist,
         // then resolve all relative paths, if any:
-        foreach (QString pathEntry, currentPathList) {
+        foreach (QString pathEntry, pathList) {
             QDir pathDir(pathEntry);
             if (pathDir.exists()) {
                 if (pathDir.isRelative()) {
@@ -1700,6 +1721,11 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 #else // Windows
         scriptEnvironment.insert("Path", path);
 #endif
+
+        qApp->setProperty("pathToAddList", pathList);
+
+        // JavaScript bridge back to the settings page:
+        currentFrame()->evaluateJavaScript("getPathSetting();");
 
         return false;
     }

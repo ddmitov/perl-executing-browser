@@ -261,7 +261,6 @@ protected:
                     path.append(pathEntry);
                     path.append(",");
                 }
-                path.replace(QRegExp(",$"), "");
             }
 
             QCustomNetworkReply *reply =

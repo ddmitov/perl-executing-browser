@@ -48,6 +48,11 @@
 
 			<div>
 				PERLLIB folder:<div id='setting-perllib'></div>
+				<a href='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
+					data-placement='right'>
+				Select PERLLIB folder</a>
 			</div>
 
 			<br>
@@ -64,12 +69,12 @@
 
 			<br>
 
-			<div>Current browser theme:<div id='setting-theme'></div>
+			<div>Default browser theme:<div id='setting-theme'></div>
 				<a href='http://perl-executing-browser-pseudodomain/theme.function?action=select'
 					class="btn btn-info btn-sm"
 					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/theme.function?action=select'
 					data-placement='right'>
-				Select Browser Theme</a>
+				Change Default Theme</a>
 			</div>
 
 		</div>
@@ -80,6 +85,28 @@
 
 				$('#setting-root').load('http://perl-executing-browser-pseudodomain/root.setting?action=get');
 
+				getPathSetting();
+
+				getPerlSetting();
+
+				getPerlLibSetting();
+
+				$('#setting-perl-debugger-output-formatter').load('http://perl-executing-browser-pseudodomain/perl-debugger-output-formatter.setting?action=get');
+
+				$('#setting-display-stderr').load('http://perl-executing-browser-pseudodomain/display-stderr.setting?action=get');
+
+				$('#setting-theme').load('http://perl-executing-browser-pseudodomain/theme.setting?action=get');
+			});
+
+			function getPerlSetting() {
+				$('#setting-perl').load('http://perl-executing-browser-pseudodomain/perl.setting?action=get');
+			}
+
+			function getPerlLibSetting() {
+				$('#setting-perllib').load('http://perl-executing-browser-pseudodomain/perllib.setting?action=get');
+			}
+
+			function getPathSetting() {
 				$.ajax({
 					url: 'http://perl-executing-browser-pseudodomain/path.setting?action=get',
 					method: 'GET',
@@ -87,6 +114,7 @@
 					success: function(data) {
 						var text = '';
 						if (data) {
+							data = data.replace(/,$/, "");
 							var dataItems = data.split(',');
 							for (index = 0; index < dataItems.length; index++) {
 								text += dataItems[index] + '<br>';
@@ -97,17 +125,7 @@
 						$('#setting-path').html(text);
 					}
 				});
-
-				$('#setting-perl').load('http://perl-executing-browser-pseudodomain/perl.setting?action=get');
-
-				$('#setting-perllib').load('http://perl-executing-browser-pseudodomain/perllib.setting?action=get');
-
-				$('#setting-perl-debugger-output-formatter').load('http://perl-executing-browser-pseudodomain/perl-debugger-output-formatter.setting?action=get');
-
-				$('#setting-display-stderr').load('http://perl-executing-browser-pseudodomain/display-stderr.setting?action=get');
-
-				$('#setting-theme').load('http://perl-executing-browser-pseudodomain/theme.setting?action=get');
-			});
+			}
 		</script>
 
 	</body>
