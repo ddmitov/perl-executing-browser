@@ -67,16 +67,6 @@
 				Display STDERR:<div id='setting-display-stderr'></div>
 			</div>
 
-			<br>
-
-			<div>Default browser theme:<div id='setting-theme'></div>
-				<a href='http://perl-executing-browser-pseudodomain/theme.function?action=select'
-					class="btn btn-info btn-sm"
-					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/theme.function?action=select'
-					data-placement='right'>
-				Change Default Theme</a>
-			</div>
-
 		</div>
 
 		<script>
@@ -95,7 +85,7 @@
 
 				$('#setting-display-stderr').load('http://perl-executing-browser-pseudodomain/display-stderr.setting?action=get');
 
-				$('#setting-theme').load('http://perl-executing-browser-pseudodomain/theme.setting?action=get');
+				getDefaultThemeSetting();
 			});
 
 			function getPerlSetting() {

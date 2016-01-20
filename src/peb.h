@@ -321,17 +321,17 @@ protected:
             return reply;
         }
 
-        // Get browser theme:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "theme.setting" and
-                request.url().query() == ("action=get")) {
+//        // Get browser theme:
+//        if (operation == GetOperation and
+//                request.url().authority() == PSEUDO_DOMAIN and
+//                request.url().fileName() == "theme.setting" and
+//                request.url().query() == ("action=get")) {
 
-            QString themeSetting = qApp->property("defaultTheme").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(), themeSetting);
-            return reply;
-        }
+//            QString themeSetting = qApp->property("defaultTheme").toString();
+//            QCustomNetworkReply *reply =
+//                    new QCustomNetworkReply (request.url(), themeSetting);
+//            return reply;
+//        }
 
         // Local AJAX GET and POST requests.
         if ((operation == GetOperation or
@@ -728,48 +728,6 @@ public slots:
             emit reloadSignal();
 
             qDebug() << "Selected new theme:" << theme;
-            qDebug() << "===============";
-        } else {
-            qDebug() << "No new theme selected.";
-            qDebug() << "===============";
-        }
-    }
-
-    void qThemeSelectorSlot()
-    {
-        QFileDialog selectThemeDialog (qApp->activeWindow());
-        selectThemeDialog.setFileMode(QFileDialog::AnyFile);
-        selectThemeDialog.setViewMode(QFileDialog::Detail);
-        selectThemeDialog.setWindowModality(Qt::WindowModal);
-        QString newTheme = selectThemeDialog.getOpenFileName(
-                    qApp->activeWindow(),
-                    tr("Select Browser Theme"),
-                    (qApp->property("allThemesDirectory").toString()),
-                    tr("Browser theme (*.theme)"));
-        selectThemeDialog.close();
-        selectThemeDialog.deleteLater();
-
-        if (!newTheme.isEmpty()) {
-            if (QFile::exists(
-                        QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectoryFullPath")
-                             .toString())
-                            + QDir::separator() + "current-theme.css"))) {
-                QFile::remove(
-                            QDir::toNativeSeparators(
-                                (qApp->property("defaultThemeDirectoryFullPath")
-                                 .toString())
-                                + QDir::separator() + "current-theme.css"));
-            }
-            QFile::copy(newTheme,
-                        QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectoryFullPath")
-                             .toString())
-                            + QDir::separator() + "current-theme.css"));
-
-            emit reloadSignal();
-
-            qDebug() << "Selected new theme:" << newTheme;
             qDebug() << "===============";
         } else {
             qDebug() << "No new theme selected.";
@@ -1488,7 +1446,6 @@ class QTopLevel : public QWebView
     Q_OBJECT
 
 signals:
-    void selectThemeSignal();
     void trayIconHideSignal();
 
 public slots:
@@ -1778,18 +1735,6 @@ public slots:
             QObject::connect(saveAsPdfAct, SIGNAL(triggered()),
                              this, SLOT(qSaveAsPdfSlot()));
 
-            if ((qApp->property("reloadCapability").toString()) == "enable") {
-                if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                        QTopLevel::url().toString().length() > 0) {
-                    QAction *selectThemeAct =
-                            menu->addAction(tr("&Select theme"));
-                    QObject::connect(selectThemeAct,
-                                     SIGNAL(triggered()),
-                                     this,
-                                     SLOT(qSelectThemeFromContextMenuSlot()));
-                }
-            }
-
             menu->addSeparator();
 
             QAction *aboutAction = menu->addAction(tr("&About"));
@@ -1817,11 +1762,6 @@ public slots:
         } else {
             showFullScreen();
         }
-    }
-
-    void qSelectThemeFromContextMenuSlot()
-    {
-        emit selectThemeSignal();
     }
 
     void qAboutSlot()

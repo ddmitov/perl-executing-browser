@@ -799,10 +799,6 @@ int main(int argc, char **argv)
         application.setProperty("systrayIconPathName", systrayIconPathName);
     }
 
-    // Name of the default GUI theme:
-    QString defaultTheme = settings.value("gui/theme_default").toString();
-    application.setProperty("defaultTheme", defaultTheme);
-
     // Directory of the default GUI theme:
     QString defaultThemeDirectorySetting =
             settings.value("gui/theme_default_directory").toString();
@@ -828,16 +824,6 @@ int main(int argc, char **argv)
                 QDir::toNativeSeparators(allThemesDirectorySetting);
     }
     application.setProperty("allThemesDirectory", allThemesDirectory);
-
-    // Check if default theme file exists, if not - copy it from themes folder:
-    if (!QFile::exists(defaultThemeDirectory
-                       + QDir::separator()
-                       + "current-theme.css")) {
-        QFile::copy(allThemesDirectory + QDir::separator() + defaultTheme,
-                    defaultThemeDirectory
-                    + QDir::separator()
-                    + "current-theme.css");
-    }
 
     // Default translation:
     QString defaultTranslation =
@@ -1042,7 +1028,6 @@ int main(int argc, char **argv)
     if (qtStyle.length() > 0) {
         qDebug() << "Global Qt style:" << qtStyle;
     }
-    qDebug() << "Default theme:" << defaultTheme;
     qDebug() << "Default theme directory:" << defaultThemeDirectory;
     qDebug() << "All themes directory:" << allThemesDirectory;
     qDebug() << "Default translation:" << defaultTranslation;
@@ -1446,9 +1431,6 @@ QTopLevel::QTopLevel()
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
                      this, SLOT(qDisplayErrorsSlot(QString)));
 
-    QObject::connect(this, SIGNAL(selectThemeSignal()),
-                     mainPage, SLOT(qThemeSelectorSlot()));
-
     QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
                      this, SLOT(qStartPrintPreviewSlot()));
     QObject::connect(mainPage, SIGNAL(printSignal()),
@@ -1730,27 +1712,14 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         return false;
     }
 
-    // Set predefined theme:
+    // SET DEFAULT THEME:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "theme.function" and
-            request.url().query().contains("action=set")) {
+            request.url().fileName() == "theme.function") {
 
         QString theme = request.url().query()
-                .replace("action=set", "")
-                .replace("&", "")
                 .replace("theme=", "");
 
         qThemeSetterSlot(theme);
-
-        return false;
-    }
-
-    // Select another theme:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "theme.function" and
-            request.url().query() == ("action=select")) {
-
-        qThemeSelectorSlot();
 
         return false;
     }
