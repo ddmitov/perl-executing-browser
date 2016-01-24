@@ -1,3 +1,9 @@
+
+message ("")
+message ("Starting Perl Executing Browser (PEB) build procedure...")
+message ("")
+
+
 ##########################################################
 # Application name:
 # ATTENTION - replace spaces with underscore like that:
@@ -24,6 +30,15 @@ PSEUDO_DOMAIN = "perl-executing-browser-pseudodomain"
 
 DEFINES += PSEUDO_DOMAIN=\\\"$$PSEUDO_DOMAIN\\\"
 message ("Local pseudo-domain: $$PSEUDO_DOMAIN")
+
+
+##########################################################
+# Default user agent:
+##########################################################
+USER_AGENT = "WebKit-PerlExecutingBrowser"
+
+DEFINES += USER_AGENT=\\\"$$USER_AGENT\\\"
+message ("Default user agent: $$USER_AGENT")
 
 
 ##########################################################
@@ -111,8 +126,6 @@ equals (PERL_DEBUGGER_INTERACTION, 1) {
     message ("Going to build with Perl debugger interaction capability.")
 }
 
-message ("")
-
 
 ##########################################################
 # Macintosh specific settings:
@@ -142,12 +155,10 @@ macx {
   ICON = icons/camel.icns
 }
 
+
 ##########################################################
 # NO CONFIGURATION OPTIONS BELOW THIS POINT.
 ##########################################################
-
-message ("")
-message ("Starting Perl Executing Browser (PEB) build procedure...")
 message ("")
 message ("Qt version: $$[QT_VERSION]")
 message ("Qt is installed in: $$[QT_INSTALL_PREFIX]")

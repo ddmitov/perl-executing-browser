@@ -641,6 +641,9 @@ int main(int argc, char **argv)
     // NETWORKING:
     // User agent:
     QString userAgent = settings.value("networking/user_agent").toString();
+    if (userAgent.length() == 0) {
+        userAgent = USER_AGENT;
+    }
     application.setProperty("userAgent", userAgent);
 
     // Allowed domains:
