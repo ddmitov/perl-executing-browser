@@ -1,6 +1,5 @@
 
 Permanent TO-DO priorities:
-- more and better examples,
 - documentation,
 - commented code,
 - up-to-date translations,
@@ -13,6 +12,12 @@ v. 0.2
 ====================================
 - nice HTML interface for settings
 - settings in JSON format
+- capture STDERR from local AJAX scripts
+- censor.pl behaviour governed by compile-time settings and command line arguments
+- better documentation for censor.pl
+- security tests in separate files
+- cross-platform capability for all example scripts
+- selective loading of settings from ZIP packages
 
 v. 0.3
 ====================================

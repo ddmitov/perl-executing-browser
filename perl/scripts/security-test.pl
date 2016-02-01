@@ -3,27 +3,34 @@
 use strict;
 use warnings;
 
-#~ unlink "/tmp/test.pl";
-
-#~ chdir "/home/dimitar/";
-
-#~ my $filehandle;
-#~ open $filehandle, "<", "/home/dimitar/foo.txt";
-
-
 #~ print STDERR "STDERR printing test is successfull.\n";
 
-print <<HTML
-<html>
+#~ my $test = `uname -r`;
+#~ unlink "/tmp/test.txt";
 
-	<head>
-		<title>Perl Executing Browser - Security Test</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-	</head>
+#~ opendir (my $directory_handle, "/tmp/test") or die $!;
+#~ chdir "/tmp/test/";
+#~ chdir ("/tmp/test/");
+#~ open my $filehandle, "<", "/tmp/test/foo.txt";
+#~ open my $filehandle, "</tmp/test/foo.txt";
 
-	<body>
-		<p align='center'><font size='5'>Security Test</font></p>
-	</body>
-</html>
-HTML
-;
+#~ CORE::opendir (my $directory_handle, "/tmp/test") or die $!;
+#~ CORE::chdir "/tmp/test/";
+#~ CORE::open my $filehandle, "<", "/tmp/test/foo.txt";
+
+#~ use lib "/tmp/test";
+
+#~ BEGIN {
+	#~ unshift @INC,
+		#~ qw(/tmp/test1
+			#~ /tmp/test2
+		#~ );
+#~ }
+
+#~ BEGIN {
+	#~ push @INC, '/tmp/test';
+#~ }
+
+#~ BEGIN {
+	#~ push (@INC, "/tmp/test");
+#~ }

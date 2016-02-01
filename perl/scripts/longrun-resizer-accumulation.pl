@@ -2,9 +2,8 @@
 
 use strict;
 use warnings;
+use Image::Magick;
 use Env qw (FOLDER_TO_OPEN);
-
-opendir (DIR, $FOLDER_TO_OPEN) or die $!;
 
 print <<HEADER
 <html>
@@ -13,10 +12,9 @@ print <<HEADER
 		<title>Perl Executing Browser - Image Resizer with Accumulation of Results</title>
 		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
 		<script type="text/javascript">
-		function scrollDown()
-		{
-			window.scrollTo(0, document.body.scrollHeight);
-		}
+			function scrollDown() {
+				window.scrollTo(0, document.body.scrollHeight);
+			}
 		</script>
 	</head>
 
@@ -26,26 +24,31 @@ print <<HEADER
 HEADER
 ;
 
+opendir (my $directory_handle, $FOLDER_TO_OPEN) or die $!;
+
 my $output_directory_name = "peb-converted-images";
 my $output_directory_full_path = $FOLDER_TO_OPEN."/".$output_directory_name;
 unless (-e $output_directory_full_path or mkdir $output_directory_full_path) {
 	die "Unable to create $output_directory_full_path <br>\n";
 }
 
-while (my $file = readdir (DIR)) {
+while (my $file = readdir ($directory_handle)) {
 	# Only files are selected:
 	next unless (-f "$FOLDER_TO_OPEN/$file");
 	# Regular expression is used to find files ending in .jpg:
-	next unless ($file =~ m/\.jpg$/);
+	next unless ($file =~ m/\.jpg$/i);
 
 	my $filepath_to_read = $FOLDER_TO_OPEN."/".$file;
 	my $filepath_to_write = $output_directory_full_path."/".$file;
 
+	my $image=Image::Magick->new();
 	print "Resizing $file ...<br>\n";
-	my $result = `/usr/bin/convert $filepath_to_read -resize 20% $filepath_to_write`;
+	$image->Read($filepath_to_read);
+	$image->AdaptiveResize('20%');
+	$image->Write($filepath_to_write);
 }
 
-closedir (DIR);
+closedir ($directory_handle);
 
 print <<FOOTER
 				Resizing successfully completed!

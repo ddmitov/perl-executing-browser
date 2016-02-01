@@ -110,7 +110,9 @@ public slots:
         missingFileMessageBox.setWindowTitle(tr("Missing file"));
         missingFileMessageBox
                 .setText(QDir::toNativeSeparators(fullFilePath)
-                         + tr("<br>is missing.<br>")
+                         + "<br>"
+                         + tr("is missing.")
+                         + "<br>"
                          + tr("Please restore the missing file."));
         missingFileMessageBox.setDefaultButton(QMessageBox::Ok);
         missingFileMessageBox.exec();
@@ -224,115 +226,6 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
-
-        // GET BROWSER SETTINGS:
-        // Get root directory:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "root.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString rootSetting = qApp->property("rootDirName").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(), rootSetting);
-            return reply;
-        }
-
-        // Get folders on PATH for all local scripts:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "path.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString path;
-            foreach (QString pathEntry,
-                     qApp->property("pathToAddList").toStringList()) {
-
-                QDir pathDir(pathEntry);
-                if (pathDir.exists()) {
-                    if (pathDir.isRelative()) {
-                        pathEntry = QDir::toNativeSeparators(
-                                    qApp->property("rootDirName").toString()
-                                    + pathEntry);
-                    }
-                    if (pathDir.isAbsolute()) {
-                        pathEntry = QDir::toNativeSeparators(pathEntry);
-                    }
-                    path.append(pathEntry);
-                    path.append(",");
-                }
-            }
-
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(), path);
-            return reply;
-        }
-
-        // Get Perl interpreter:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "perl.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString perlSetting = qApp->property("perlInterpreter").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(), perlSetting);
-            return reply;
-        }
-
-        // Get PERLLIB folder:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "perllib.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString perlLibSetting = qApp->property("perlLib").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(), perlLibSetting);
-            return reply;
-        }
-
-        // Get Perl debugger output formatter:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() ==
-                "perl-debugger-output-formatter.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString perlDbgFormatterSetting =
-                    qApp->property("debuggerOutputFormatter").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(),
-                                             perlDbgFormatterSetting);
-            return reply;
-        }
-
-        // Get setting for displaying STDERR:
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "display-stderr.setting" and
-                request.url().query() == ("action=get")) {
-
-            QString displayStderrSetting =
-                    qApp->property("displayStderr").toString();
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(),
-                                             displayStderrSetting);
-            return reply;
-        }
-
-//        // Get browser theme:
-//        if (operation == GetOperation and
-//                request.url().authority() == PSEUDO_DOMAIN and
-//                request.url().fileName() == "theme.setting" and
-//                request.url().query() == ("action=get")) {
-
-//            QString themeSetting = qApp->property("defaultTheme").toString();
-//            QCustomNetworkReply *reply =
-//                    new QCustomNetworkReply (request.url(), themeSetting);
-//            return reply;
-//        }
-
         // Local AJAX GET and POST requests.
         if ((operation == GetOperation or
              operation == PostOperation) and
@@ -468,7 +361,8 @@ protected:
                             .setIconPixmap((qApp->property("icon").toString()));
                     scriptTimeoutMessageBox
                             .setText(
-                                tr("Your AJAX script timed out:<br>")
+                                tr("Your AJAX script timed out:")
+                                + "<br>"
                                 + scriptFullFilePath);
                     scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
                     scriptTimeoutMessageBox.exec();
@@ -485,8 +379,9 @@ protected:
                 scriptStartedMessageBox
                         .setIconPixmap((qApp->property("icon").toString()));
                 scriptStartedMessageBox
-                        .setText(tr("This AJAX script is already started ")
-                                 + tr("and still running:<br>")
+                        .setText(tr("This AJAX script is already started "
+                                    "and still running:")
+                                 + "<br>"
                                  + scriptFullFilePath);
                 scriptStartedMessageBox.setDefaultButton(QMessageBox::Ok);
                 scriptStartedMessageBox.exec();
@@ -563,11 +458,7 @@ protected:
                 qDebug() << "===============";
 
                 QNetworkRequest networkRequest;
-                networkRequest.setUrl
-                        (QUrl::fromLocalFile
-                         ((qApp->property("helpDirectory").toString())
-                          + QDir::separator()
-                          + "notrecognized.htm"));
+                networkRequest.setUrl(QString("qrc:/html/notrecognized.htm"));
 
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
@@ -631,11 +522,7 @@ protected:
             qDebug() << "===============";
 
             QNetworkRequest networkRequest;
-            networkRequest.setUrl
-                    (QUrl::fromLocalFile
-                     ((qApp->property("helpDirectory").toString())
-                      + QDir::separator()
-                      + "forbidden.htm"));
+            networkRequest.setUrl(QString("qrc:/html/forbidden.htm"));
 
             return QNetworkAccessManager::createRequest
                     (QNetworkAccessManager::GetOperation,
@@ -784,9 +671,10 @@ public slots:
                 scriptAlreadyFinishedMessageBox
                         .setIconPixmap((qApp->property("icon").toString()));
                 scriptAlreadyFinishedMessageBox
-                        .setText(tr("This script did not start or finished")
+                        .setText(tr("This script did not start or")
                                  + "<br>"
-                                 + tr("before script termination was requested")
+                                 + tr("finished before "
+                                      "script termination was requested:")
                                  + "<br>"
                                  + scriptFullFilePath);
                 scriptAlreadyFinishedMessageBox
@@ -944,8 +832,9 @@ public slots:
                 scriptStartedMessageBox
                         .setIconPixmap((qApp->property("icon").toString()));
                 scriptStartedMessageBox
-                        .setText(tr("This script is already started ")
-                                 + tr("and still running:<br>")
+                        .setText(tr("This script is already started "
+                                    "and still running:")
+                                 + "<br>"
                                  + scriptFullFilePath);
                 scriptStartedMessageBox.setDefaultButton(QMessageBox::Ok);
                 scriptStartedMessageBox.exec();
@@ -1066,8 +955,9 @@ public slots:
                                 .setIconPixmap((qApp->property("icon")
                                                .toString()));
                         showErrorsMessageBox
-                                .setText(tr("Errors were found")
-                                         + tr("during script execution.<br>")
+                                .setText(tr("Errors were found "
+                                            "during script execution.")
+                                         + "<br>"
                                          + tr("Do you want to see them?"));
                         showErrorsMessageBox
                                 .setStandardButtons(QMessageBox::Yes
@@ -1117,7 +1007,8 @@ public slots:
                     .setIconPixmap((qApp->property("icon").toString()));
             scriptTimeoutMessageBox
                     .setText(
-                        tr("Your script timed out:<br>")
+                        tr("Your script timed out:")
+                        + "<br>"
                         + scriptFullFilePath);
             scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
             scriptTimeoutMessageBox.exec();

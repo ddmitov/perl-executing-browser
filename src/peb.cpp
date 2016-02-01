@@ -297,8 +297,10 @@ int main(int argc, char **argv)
     // Prevent starting as root in graphical mode:
     if (userEuid == 0) {
         QString title = (QApplication::tr("Started as root"));
-        QString text = (QApplication::tr("Browser was started as root.<br>")
-                        + QApplication::tr("This is not a good idea!<br>")
+        QString text = (QApplication::tr("Browser was started as root.")
+                        + "<br>"
+                        + QApplication::tr("This is not a good idea!")
+                        + "<br>"
                         + QApplication::tr("Going to quit now."));
         QMessageBox startedAsRootMessageBox;
         startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
@@ -412,7 +414,7 @@ int main(int argc, char **argv)
     // ==============================
     // MANAGE APPLICATION SETTINGS:
     // ==============================
-    // Settings file from the directory of the binary file
+    // Settings file is loaded from the directory of the binary file
     // if no settings file from a ZIP package is found:
     if (settingsDirName.length() == 0 and settingsFileName.length() == 0) {
         QDir settingsDir =
@@ -434,11 +436,14 @@ int main(int argc, char **argv)
 
     // Check if settings file exists:
     if (!settingsFile.exists()) {
-        QString title = (QApplication::tr("Missing configuration file"));
-        QString text = (QApplication::tr("Configuration file<br>")
-                        + settingsFileName
-                        + QMessageBox::tr("<br>is missing.<br>")
-                        + QMessageBox::tr("Please restore it."));
+        QString title = QApplication::tr("Missing configuration file");
+        QString text = QApplication::tr("Configuration file") +
+                "<br>" +
+                settingsFileName +
+                "<br>" +
+                QApplication::tr("is missing.") +
+                "<br>" +
+                QApplication::tr("Please restore it.");
         QMessageBox missingConfigurationFileMessageBox;
         missingConfigurationFileMessageBox.setWindowModality(Qt::WindowModal);
         missingConfigurationFileMessageBox.setIcon(QMessageBox::Critical);
@@ -485,9 +490,8 @@ int main(int argc, char **argv)
     if (perlInterpreterSetting.length() == 0) {
         QString title =
                 QApplication::tr("Missing Perl");
-        QString text =
-                QApplication::tr(
-                    "No Perl interpreter is set for<br>") +
+        QString text = QApplication::tr("No Perl interpreter is set for") +
+                "<br>" +
                 application.applicationDisplayName() +
                 QApplication::tr(" version ") +
                 application.applicationVersion();
@@ -522,7 +526,8 @@ int main(int argc, char **argv)
                 QString text =
                         QApplication::tr(
                             "No Perl interpreter is "
-                            "available on PATH for<br>") +
+                            "available on PATH for") +
+                        "<br>" +
                         application.applicationDisplayName() +
                         QApplication::tr(" version ") +
                         application.applicationVersion();
@@ -555,7 +560,8 @@ int main(int argc, char **argv)
             QString title =
                     QApplication::tr("Missing Perl");
             QString text =
-                    QApplication::tr("Perl interpreter is missing for<br>") +
+                    QApplication::tr("Perl interpreter is missing for") +
+                    "<br>" +
                     application.applicationDisplayName() +
                     QApplication::tr(" version ") +
                     application.applicationVersion();
@@ -608,7 +614,7 @@ int main(int argc, char **argv)
             settings.value("perl/perl_display_stderr").toString();
     application.setProperty("displayStderr", displayStderr);
 
-    // Timeout for CGI-like scripts (not long-running ones):
+    // Timeout for CGI-like and AJAX scripts (not long-running ones):
     QString scriptTimeout =
             settings.value("perl/perl_script_timeout").toString();
     application.setProperty("scriptTimeout", scriptTimeout);
@@ -673,7 +679,8 @@ int main(int argc, char **argv)
     QFile startPageFile(startPage);
     if (!startPageFile.exists()) {
         QString title = QApplication::tr("Missing start page");
-        QString text = QApplication::tr("Start page is missing for<br>") +
+        QString text = QApplication::tr("Start page is missing for") +
+                "<br>" +
                 application.applicationDisplayName() +
                 QApplication::tr(" version ") +
                 application.applicationVersion();
@@ -856,20 +863,6 @@ int main(int argc, char **argv)
     }
     application.installTranslator(&translator);
 
-    // Help directory:
-    QString helpDirectorySetting =
-            settings.value("gui/help_directory").toString();
-    QDir helpDir(helpDirectorySetting);
-    QString helpDirectory;
-    if (helpDir.isRelative()) {
-        helpDirectory =
-                QDir::toNativeSeparators(rootDirName + helpDirectorySetting);
-    }
-    if (helpDir.isAbsolute()) {
-        helpDirectory = QDir::toNativeSeparators(helpDirectorySetting);
-    }
-    application.setProperty("helpDirectory", helpDirectory);
-
     // LOGGING:
     // Logging enable/disable switch:
     QString logging = settings.value("logging/logging").toString();
@@ -1035,7 +1028,6 @@ int main(int argc, char **argv)
     qDebug() << "All themes directory:" << allThemesDirectory;
     qDebug() << "Default translation:" << defaultTranslation;
     qDebug() << "Translations directory:" << allTranslationsDirectory;
-    qDebug() << "Help and error messages directory:" << helpDirectory;
     qDebug() << "System tray icon switch:" << systrayIcon;
     qDebug() << "System tray icon file:" << systrayIconPathName;
     qDebug() << "Web Inspector from context menu:" << webInspector;
@@ -1364,7 +1356,7 @@ QPage::QPage()
 
     // READ INTERNALLY COMPILED JS SCRIPT:
     QFile file;
-    file.setFileName(":/scripts/js/peb-check-user-input-before-quit.js");
+    file.setFileName(":/scripts/js/check-user-input-before-quit.js");
     file.open(QIODevice::ReadOnly);
     checkUserInputBeforeQuitJavaScript = file.readAll();
     file.close();
@@ -1547,6 +1539,67 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
+    // DISPLAY BROWSER SETTINGS:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().toString() == "about:config") {
+
+        QString settingsUiFileName(":/html/settings.htm");
+        QFile settingsUiFile(settingsUiFileName);
+        settingsUiFile.open(QIODevice::ReadOnly
+                              | QIODevice::Text);
+        QTextStream settingsUistream(&settingsUiFile);
+        QString settingsUiContents = settingsUistream.readAll();
+        settingsUiFile.close();
+
+        settingsUiContents.replace("[% Root %]",
+                                   qApp->property("rootDirName").toString());
+
+        QString path;
+        foreach (QString pathEntry,
+                 qApp->property("pathToAddList").toStringList()) {
+            QDir pathDir(pathEntry);
+            if (pathDir.exists()) {
+                if (pathDir.isRelative()) {
+                    pathEntry = QDir::toNativeSeparators(
+                                qApp->property("rootDirName").toString()
+                                + pathEntry);
+                }
+                if (pathDir.isAbsolute()) {
+                    pathEntry = QDir::toNativeSeparators(pathEntry);
+                }
+                path.append(pathEntry);
+                path.append("<br>");
+            }
+        }
+        path.replace(QRegExp("<br>$"), "");
+        if (path.length() > 0) {
+            settingsUiContents.replace("[% PATH %]", path);
+        } else {
+            settingsUiContents.replace("[% PATH %]", "none");
+        }
+
+        settingsUiContents.replace("[% Perl interpreter %]",
+                                   qApp->property("perlInterpreter")
+                                   .toString());
+
+        settingsUiContents.replace("[% PERLLIB folder %]",
+                                   qApp->property("perlLib").toString());
+
+        settingsUiContents.replace("[% Perl debugger output formatter %]",
+                                   qApp->property("debuggerOutputFormatter")
+                                   .toString());
+
+        settingsUiContents.replace("[% Display STDERR %]",
+                                   qApp->property("displayStderr").toString());
+
+        frame->setHtml(settingsUiContents);
+
+        qDebug() << "Settings page requested";
+        qDebug() << "===============";
+
+        return false;
+    }
+
     // SET BROWSER SETTINGS:
     // Set Perl interpreter:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
@@ -1576,7 +1629,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             qApp->setProperty("perlInterpreter", perlInterpreter);
 
             // JavaScript bridge back to the settings page:
-            currentFrame()->evaluateJavaScript("getPerlSetting();");
+            QString javaScript =
+                    "document.getElementById(\"setting-perl\")"
+                    ".innerHTML = \"" + perlInterpreter + "\";";
+            currentFrame()->evaluateJavaScript(javaScript);
 
             qDebug() << "Selected Perl interpreter:" << perlInterpreter;
             qDebug() << "===============";
@@ -1614,7 +1670,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             qApp->setProperty("perlLib", perlLibFolderName);
 
             // JavaScript bridge back to the settings page:
-            currentFrame()->evaluateJavaScript("getPerlLibSetting();");
+            QString javaScript =
+                    "document.getElementById(\"setting-perllib\")"
+                    ".innerHTML = \"" + perlLibFolderName + "\";";
+            currentFrame()->evaluateJavaScript(javaScript);
 
             qDebug() << "Selected PERLLIB:" << perlLibFolderName;
             qDebug() << "===============";
@@ -1709,8 +1768,34 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         qApp->setProperty("pathToAddList", pathList);
 
-        // JavaScript bridge back to the settings page:
-        currentFrame()->evaluateJavaScript("getPathSetting();");
+        QString pathToDisplay;
+        foreach (QString pathEntry, pathList) {
+            QDir pathDir(pathEntry);
+            if (pathDir.exists()) {
+                if (pathDir.isRelative()) {
+                    pathEntry = QDir::toNativeSeparators(
+                                qApp->property("rootDirName").toString()
+                                + pathEntry);
+                }
+                if (pathDir.isAbsolute()) {
+                    pathEntry = QDir::toNativeSeparators(pathEntry);
+                }
+                pathToDisplay.append(pathEntry);
+                pathToDisplay.append("<br>");
+            }
+        }
+        pathToDisplay.replace(QRegExp("<br>$"), "");
+        if (pathToDisplay.length() > 0) {
+            QString javaScript =
+                    "document.getElementById(\"setting-path\")"
+                    ".innerHTML = \"" + pathToDisplay + "\";";
+            currentFrame()->evaluateJavaScript(javaScript);
+        } else {
+            QString javaScript =
+                    "document.getElementById(\"setting-path\")"
+                    ".innerHTML = \"none\";";
+            currentFrame()->evaluateJavaScript(javaScript);
+        }
 
         return false;
     }
@@ -1894,7 +1979,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                          QDir::currentPath(),
                          tr("Perl scripts (*.pl);;")
                          + tr("Perl modules (*.pm);;")
-                         + tr("CGI scripts (*.cgi);;")
                          + tr("All files (*)"));
                 selectScriptToDebugDialog.close();
                 selectScriptToDebugDialog.deleteLater();

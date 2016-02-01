@@ -2,11 +2,9 @@
 
 use strict;
 use warnings;
-use Cwd;
 
-
-use File::HomeDir;
-
+#~ use FindBin;
+#~ use File::HomeDir;
 
 print "Content-Type: text/html\r\n\r\n";
 
@@ -29,19 +27,21 @@ foreach my $key (sort keys %ENV) {
 
 print "\n";
 
+#~ print "Home:\n";
+#~ my $home = File::HomeDir->my_home;
+#~ print $home;
+#~ print "\n";
 
-print "Home:\n";
-my $home = File::HomeDir->my_home;
-print $home;
-print "\n";
-
+#~ print "Script directory:\n";
+#~ my $script_directory = $FindBin::Bin;
+#~ print $script_directory;
+#~ print "\n";
 
 print "\@INC:\n";
 print join "\n", @INC;
 
 print "\n";
 
-print 'CURRENT_DIR='.getcwd()."\n";
 print "</pre>\n";
 
 print "</body>\n";

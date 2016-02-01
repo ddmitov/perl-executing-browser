@@ -28,7 +28,7 @@ FOOTER
 ;
 }
 
-opendir (DIR, $FOLDER_TO_OPEN) or die $!;
+opendir (my $directory_handle, $FOLDER_TO_OPEN) or die $!;
 
 my $output_directory_name = "peb-converted-images";
 my $output_directory_full_path = $FOLDER_TO_OPEN."/".$output_directory_name;
@@ -36,7 +36,7 @@ unless (-e $output_directory_full_path or mkdir $output_directory_full_path) {
 	die "Unable to create $output_directory_full_path <br>\n";
 }
 
-while (my $file = readdir (DIR)) {
+while (my $file = readdir ($directory_handle)) {
 	# Only files are selected:
 	next unless (-f "$FOLDER_TO_OPEN/$file");
 	# Regular expression is used to find files ending in .jpg:
@@ -51,7 +51,7 @@ while (my $file = readdir (DIR)) {
 	html_footer();
 }
 
-closedir (DIR);
+closedir ($directory_handle);
 
 html_header();
 print "Resizing successfully completed!\n";

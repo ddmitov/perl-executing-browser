@@ -61,7 +61,6 @@ equals (SCRIPT_CENSORING, 0) {
     message ("Going to build without script censoring support.")
 }
 equals (SCRIPT_CENSORING, 1) {
-    RESOURCES += peb.qrc
     message ("Going to build with script censoring support.")
 }
 
@@ -177,7 +176,7 @@ TARGET = peb
 DEFINES += HAVE_QT5
 DEPENDPATH += .
 VERSION = 0.1
-TRANSLATIONS = $${TARGET}_bg_BG.ts
+TRANSLATIONS = resources/$${TARGET}_bg_BG.ts
 
 CONFIG (debug, debug|release) { 
     DESTDIR = ../
@@ -205,9 +204,12 @@ MOC_DIR = ../tmp
 OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
+# Resources:
+RESOURCES += resources/peb.qrc
+
 # Windows specific settings:
 win32 {
   # Resource and icon files:
-  OTHER_FILES += peb.rc icons/camel.ico
-  RC_FILE = peb.rc
+  OTHER_FILES += resources/peb.rc resources/icons/camel.ico
+  RC_FILE = resources/peb.rc
 }

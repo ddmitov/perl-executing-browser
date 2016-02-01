@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>scripts/perl/censor.pl</file>
+        <file>scripts/js/check-user-input-before-quit.js</file>
+        <file>html/forbidden.htm</file>
+        <file>html/notrecognized.htm</file>
+        <file>html/settings.htm</file>
+    </qresource>
+</RCC>

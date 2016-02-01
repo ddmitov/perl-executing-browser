@@ -140,7 +140,7 @@ Tests showed, that the operation of the built-in Perl debugger within PEB on Win
   
 ## History
   
-PEB was started as a simple GUI for personal databases and this small project is still in early development, the current version being 0.1, code-named "Camel Calf". Exhaustive documentation is still missing and included examples are basic.  
+PEB was started as a simple GUI for personal databases and this small project is still in early development. Exhaustive documentation is still missing.  
   
 ## License
   
@@ -154,7 +154,7 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ## Name
   
 'Perl Executing Browser' is a descriptive, probably a little boring, technical name.  
-Possible new names: **QtCamelKit**, **QtCamel**.  
+Possible new name: **QtCamel**.  
   
 ## Authors
   
