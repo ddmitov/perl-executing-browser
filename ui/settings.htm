@@ -1,0 +1,123 @@
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser Settings</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+
+		<!-- <script type="text/javascript" src="jquery-1.11.1.min.js"></script> -->
+		<script type="text/javascript" src="qrc:/scripts/js/jquery.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/current-theme.css" media="all" />
+
+	</head>
+
+	<body>
+
+		<div class='container'>
+
+			<div>
+				Root directory:<div id='setting-root'></div>
+			</div>
+
+			<br>
+
+			<div>
+				Current folders on PATH:<div id='setting-path'></div>
+				<a href='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/path.setting?action=add'
+					data-placement='right'>
+				Add Folder to PATH</a>
+			</div>
+
+			<br>
+
+			<div>
+				Current Perl interpreter:<div id='setting-perl'></div>
+				<a href='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
+					data-placement='right'>
+				Select Perl Interpreter</a>
+			</div>
+
+			<br>
+
+			<div>
+				PERLLIB folder:<div id='setting-perllib'></div>
+				<a href='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
+					class="btn btn-info btn-sm"
+					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
+					data-placement='right'>
+				Select PERLLIB folder</a>
+			</div>
+
+			<br>
+
+			<div>
+				Perl debugger output formatter:<div id='setting-perl-debugger-output-formatter'></div>
+			</div>
+
+			<br>
+
+			<div>
+				Display STDERR:<div id='setting-display-stderr'></div>
+			</div>
+
+		</div>
+
+		<script>
+			$(document).ready(function() {
+				$('[data-toggle="tooltip"]').tooltip();
+
+				$('#setting-root').load('http://perl-executing-browser-pseudodomain/root.setting?action=get');
+
+				getPathSetting();
+
+				getPerlSetting();
+
+				getPerlLibSetting();
+
+				$('#setting-perl-debugger-output-formatter').load('http://perl-executing-browser-pseudodomain/perl-debugger-output-formatter.setting?action=get');
+
+				$('#setting-display-stderr').load('http://perl-executing-browser-pseudodomain/display-stderr.setting?action=get');
+
+				getDefaultThemeSetting();
+			});
+
+			function getPerlSetting() {
+				$('#setting-perl').load('http://perl-executing-browser-pseudodomain/perl.setting?action=get');
+			}
+
+			function getPerlLibSetting() {
+				$('#setting-perllib').load('http://perl-executing-browser-pseudodomain/perllib.setting?action=get');
+			}
+
+			function getPathSetting() {
+				$.ajax({
+					url: 'http://perl-executing-browser-pseudodomain/path.setting?action=get',
+					method: 'GET',
+					dataType: 'text',
+					success: function(data) {
+						var text = '';
+						if (data) {
+							data = data.replace(/,$/, "");
+							var dataItems = data.split(',');
+							for (index = 0; index < dataItems.length; index++) {
+								text += dataItems[index] + '<br>';
+							}
+						} else {
+							text = 'none';
+						}
+						$('#setting-path').html(text);
+					}
+				});
+			}
+		</script>
+
+	</body>
+
+</html>
