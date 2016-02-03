@@ -150,6 +150,9 @@ foreach my $line (@user_code) {
 	if ($line =~ m/unshift\s*\@INC/ or $line =~ m/push\s*\(\s*\@INC/ or $line =~ m/push\s*\@INC/) {
 		if ($line =~ m/#.*unshift\s*\@INC/ or $line =~ m/#.*push\s*\(\s*\@INC/ or $line =~ m/#.*push\s*\@INC/) {
 			next;
+		# Necessary exception for fatpacked scripts:
+		} elsif ($line =~ m/unshift \@INC\, bless \\\%fatpacked\, \$class\;/) {
+			next;
 		} else {
 			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden \@INC array manipulation detected!";
 		}

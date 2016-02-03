@@ -386,6 +386,22 @@ int main(int argc, char **argv)
                     defaultZipPackageName,
                     applicationTempDirectoryName);
 
+
+          // http://stackoverflow.com/questions/10290083/qt-simple-example-for-quazip
+//        QuaZip zip(defaultZipPackageName);
+//        zip.open(QuaZip::mdUnzip);
+//        QuaZipFile file(&zip);
+
+//        for (bool f=zip.goToFirstFile(); f; f=zip.goToNextFile()) {
+//            file.open(QIODevice::ReadOnly);
+//            QByteArray data = file.readAll();
+//            qDebug() << "File contents:" << data;
+//            file.close();
+//        }
+
+//        zip.close();
+
+
         // Extracting root folder from a zip file,
         // that was appended to the binary (!) using
         // 'cat peb-bin-only peb.zip > peb-with-data'

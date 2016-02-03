@@ -241,6 +241,7 @@ http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOU
 http://www.perlmonks.org/?node_id=722050 "CORE::GLOBAL::* for auditing which files are read and written?"
 
 http://perlmaven.com/simple-timestamp-generation-using-posix-strftime
+http://perlmaven.com/recursive-subroutines
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
 http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner

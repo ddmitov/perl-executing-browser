@@ -13,7 +13,8 @@ v. 0.2
 - nice HTML interface for settings
 - settings in JSON format
 - capture STDERR from local AJAX scripts
-- censor.pl behaviour governed by compile-time settings and command line arguments
+- censor.pl behaviour governed by compile-time settings;
+  they will correspond to hard-coded command line arguments given by the browser
 - better documentation for censor.pl
 - security tests in separate files
 - cross-platform capability for all example scripts
@@ -21,5 +22,4 @@ v. 0.2
 
 v. 0.3
 ====================================
-- dependency scanner & script packer
 - user-defined environment variables in script environment

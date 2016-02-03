@@ -5,7 +5,6 @@ use warnings;
 
 my @files;
 
-#~ traverse ("/tmp");
 traverse ($ENV{DOCUMENT_ROOT});
 
 print "<html>";
@@ -17,7 +16,6 @@ foreach my $file (@files) {
 
 print "</html>";
 
-# http://perlmaven.com/recursive-subroutines
 sub traverse {
 	my ($entry) = @_;
 
