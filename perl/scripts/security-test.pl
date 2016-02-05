@@ -1,11 +1,15 @@
 #!/usr/bin/perl -w
 
-use strict;
-use warnings;
-
-#~ print STDERR "STDERR printing test is successfull.\n";
+#~ use Win32::Registry;
+#~ use Win32API::Registry
+#~ use Win32::TieRegistry;
+#~ use Win32::Registry::File;
+#~ use Tree::Navigator::Node::Win32::Registry;
+#~ use Parse::Win32Registry;
+#~ use lib "/tmp/test";
 
 #~ my $test = `uname -r`;
+
 #~ unlink "/tmp/test.txt";
 
 #~ opendir (my $directory_handle, "/tmp/test") or die $!;
@@ -17,8 +21,6 @@ use warnings;
 #~ CORE::opendir (my $directory_handle, "/tmp/test") or die $!;
 #~ CORE::chdir "/tmp/test/";
 #~ CORE::open my $filehandle, "<", "/tmp/test/foo.txt";
-
-#~ use lib "/tmp/test";
 
 #~ BEGIN {
 	#~ unshift @INC,
@@ -34,3 +36,5 @@ use warnings;
 #~ BEGIN {
 	#~ push (@INC, "/tmp/test");
 #~ }
+
+#~ print STDERR "STDERR printing test is successfull.\n";

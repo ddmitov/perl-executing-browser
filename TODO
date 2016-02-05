@@ -12,14 +12,20 @@ v. 0.2
 ====================================
 - nice HTML interface for settings
 - settings in JSON format
+- separate global settings and package settings
+
 - capture STDERR from local AJAX scripts
+
 - censor.pl behaviour governed by compile-time settings;
   they will correspond to hard-coded command line arguments given by the browser
 - better documentation for censor.pl
 - security tests in separate files
+
 - cross-platform capability for all example scripts
-- selective loading of settings from ZIP packages
+
+- separate DB_ROOT environment variable and folder
 
 v. 0.3
 ====================================
-- user-defined environment variables in script environment
+- internal JavaScript-based code editor - ACE
+- support for encrypted packages - encrypted SQLite or 7z

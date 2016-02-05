@@ -40,6 +40,17 @@ BEGIN {
 	# OVERRIDE POTENTIALY DANGEROUS
 	# CORE FUNCTIONS:
 	##############################
+
+	*CORE::GLOBAL::require = sub (*;$@) {
+		(my $package, my $filename, my $line) = caller();
+		my $module = $_[0];
+		if ($module =~ "Registry" and $module =~ "Win32") {
+			die "Use of an insecure module detected at package '$package', line: $line.<br>The use of module '$module' is prohibited!\n";
+		} else {
+			return CORE::require $_[0];
+		}
+	};
+
 	*CORE::GLOBAL::opendir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[1];
@@ -213,7 +224,7 @@ if (scalar (keys %problematic_lines) == 0) {
 # PRINT SAVED STDERR, IF ANY:
 ##############################
 if ($@) {
-	if ($@ =~ m/trapped/ or $@ =~ m/insecure/) {
+	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
 		print STDERR $header;
 		print STDERR "<p align='center'><font size='5' face='SansSerif'>Insecure code was blocked:</font></p>\n";
 		print STDERR "<pre>$@</pre>";

@@ -155,7 +155,6 @@ class QScriptEnvironment : public QObject
 public:
     QScriptEnvironment();
 
-    QStringList allowedEnvironmentVariables;
     QProcessEnvironment scriptEnvironment;
 };
 
@@ -503,7 +502,7 @@ protected:
              operation == PutOperation) and
                 ((request.url().scheme() =="file") or
                  (request.url().scheme() == "qrc") or
-                 (request.url().scheme().contains("data:image")) or
+                 (request.url().toString().contains("data:image")) or
                  (request.url().authority() == PSEUDO_DOMAIN) or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
@@ -909,11 +908,12 @@ public slots:
         }
 
         if (scriptOutputType == "latest") {
-            targetFrame->setHtml(output);
+            targetFrame->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
 
         if (scriptOutputType == "accumulation") {
-            targetFrame->setHtml(scriptAccumulatedOutput);
+            targetFrame->setHtml(scriptAccumulatedOutput,
+                                 QUrl(PSEUDO_DOMAIN));
         }
     }
 
@@ -935,7 +935,8 @@ public slots:
 
         if (scriptTimedOut == false) {
             if (scriptOutputType == "final") {
-                targetFrame->setHtml(scriptAccumulatedOutput);
+                targetFrame->setHtml(scriptAccumulatedOutput,
+                                      QUrl(PSEUDO_DOMAIN));
             }
 
             if ((qApp->property("displayStderr").toString()) == "enable") {
@@ -946,7 +947,8 @@ public slots:
                     scriptAccumulatedErrors = cssLinkedHtml;
 
                     if (scriptAccumulatedOutput.length() == 0) {
-                        targetFrame->setHtml(scriptAccumulatedErrors);
+                        targetFrame->setHtml(scriptAccumulatedErrors,
+                                              QUrl(PSEUDO_DOMAIN));
                     } else {
                         QMessageBox showErrorsMessageBox (qApp->activeWindow());
                         showErrorsMessageBox.setWindowModality(Qt::WindowModal);
@@ -1217,7 +1219,8 @@ public slots:
 
     void qDebuggerHtmlFormatterFinishedSlot()
     {
-        targetFrame->setHtml(debuggerAccumulatedHtmlOutput);
+        targetFrame->setHtml(debuggerAccumulatedHtmlOutput,
+                              QUrl(PSEUDO_DOMAIN));
 
         debuggerOutputHandler.close();
         debuggerAccumulatedHtmlOutput = "";
@@ -1536,7 +1539,7 @@ public slots:
     void qDisplayErrorsSlot(QString errors)
     {
         errorsWindow = new QTopLevel();
-        errorsWindow->setHtml(errors);
+        errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
         errorsWindow->setFocus();
         errorsWindow->show();
 

@@ -174,12 +174,15 @@ int main(int argc, char **argv)
             std::cout << "  peb --option=value -o=value" << std::endl;
             std::cout << " " << std::endl;
             std::cout << "Command line options:" << std::endl;
+
             std::cout << "  --fullscreen    -F    "
                       << "start browser in fullscreen mode"
                       << std::endl;
+#ifndef Q_OS_MAC
             std::cout << "  --maximized     -M    "
                       << "start browser in a maximized window"
                       << std::endl;
+#endif
             std::cout << "  --help          -H    this help"
                       << std::endl;
             std::cout << " " << std::endl;
@@ -386,22 +389,6 @@ int main(int argc, char **argv)
                     defaultZipPackageName,
                     applicationTempDirectoryName);
 
-
-          // http://stackoverflow.com/questions/10290083/qt-simple-example-for-quazip
-//        QuaZip zip(defaultZipPackageName);
-//        zip.open(QuaZip::mdUnzip);
-//        QuaZipFile file(&zip);
-
-//        for (bool f=zip.goToFirstFile(); f; f=zip.goToNextFile()) {
-//            file.open(QIODevice::ReadOnly);
-//            QByteArray data = file.readAll();
-//            qDebug() << "File contents:" << data;
-//            file.close();
-//        }
-
-//        zip.close();
-
-
         // Extracting root folder from a zip file,
         // that was appended to the binary (!) using
         // 'cat peb-bin-only peb.zip > peb-with-data'
@@ -412,7 +399,7 @@ int main(int argc, char **argv)
 
 #if ZIP_SUPPORT == 2
         QProcess unzipper;
-        unzipper.start("/usr/bin/unzip",
+        unzipper.start("unzip",
                        QStringList() << defaultZipPackageName
                        << "-d"
                        << applicationTempDirectoryName);
@@ -926,12 +913,14 @@ int main(int argc, char **argv)
             windowSize = "fullscreen";
             application.setProperty("windowSize", windowSize);
         }
+#ifndef Q_OS_MAC
         if (argument.contains("--maximized") or argument.contains("-M")) {
             fixedWidth = 1;
             fixedHeight = 1;
             windowSize = "maximized";
             application.setProperty("windowSize", windowSize);
         }
+#endif
     }
 
     // ==============================
@@ -1142,22 +1131,6 @@ QFileDetector::QFileDetector()
 QScriptEnvironment::QScriptEnvironment()
     : QObject(0)
 {
-    // SAFE ENVIRONMENT FOR ALL LOCAL SCRIPTS:
-    QStringList systemEnvironment =
-            QProcessEnvironment::systemEnvironment().toStringList();
-
-    foreach (QString environmentVariable, systemEnvironment) {
-        QStringList environmentVariableList = environmentVariable.split("=");
-        QString environmentVariableName = environmentVariableList.first();
-        if (!allowedEnvironmentVariables.contains(environmentVariableName)) {
-            scriptEnvironment.remove(environmentVariable);
-        } else {
-            scriptEnvironment.insert(
-                        environmentVariableList.first(),
-                        environmentVariableList[1]);
-        }
-    }
-
     // DOCUMENT_ROOT:
     scriptEnvironment.remove("DOCUMENT_ROOT");
     scriptEnvironment.insert("DOCUMENT_ROOT",
@@ -1608,7 +1581,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         settingsUiContents.replace("[% Display STDERR %]",
                                    qApp->property("displayStderr").toString());
 
-        frame->setHtml(settingsUiContents);
+        frame->setHtml(settingsUiContents, QUrl(PSEUDO_DOMAIN));
 
         qDebug() << "Settings page requested";
         qDebug() << "===============";
