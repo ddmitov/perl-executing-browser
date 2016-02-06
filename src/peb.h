@@ -766,7 +766,8 @@ public slots:
                             QDir::toNativeSeparators(scriptFullFilePath);
 
                     QStringList sourceViewerCommandLine;
-                    sourceViewerCommandLine = sourceViewerMandatoryCommandLine;
+                    sourceViewerCommandLine.append(
+                                (qApp->property("sourceViewer").toString()));
                     sourceViewerCommandLine.append(sourceFilepath);
 
                     scriptHandler.start((qApp->property("perlInterpreter")
@@ -1317,8 +1318,6 @@ private:
     bool scriptOutputThemeEnabled;
     QString scriptOutputType;
 
-    QStringList sourceViewerMandatoryCommandLine;
-
     QWebView *debuggerNewWindow;
     bool debuggerJustStarted;
     QString debuggerScriptToDebugFilePath;
@@ -1483,8 +1482,7 @@ public slots:
         qDebug() << "===============";
 
         QProcess externalEditor;
-        externalEditor
-                .startDetached("/usr/bin/scite",
+        externalEditor.startDetached("scite",
                                QStringList() << fileToEdit);
     }
 
@@ -1679,13 +1677,13 @@ public slots:
         authors.append("Dimitar D. Mitov, 2013 - 2016,<br>");
         authors.append("Valcho Nedelchev, 2014 - 2016.");
         QString aboutText =
-                (qApp->applicationName()+ tr(" version ")
+                (qApp->applicationName() + " version "
                  + qApp->applicationVersion() + "<br>"
-                 + "Qt" + tr(" version ") + qtVersion
+                 + "Qt version " + qtVersion
                  + "<br><br>"
-                 + tr(license)
+                 + license
                  + "<br><br>"
-                 + tr(authors)
+                 + authors
                  + "<br><br>"
                  + "<a href="
                  + "'https://github.com/ddmitov/perl-executing-browser'>"

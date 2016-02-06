@@ -1,13 +1,12 @@
 logs/
 tmp/
-ui/translations/
 working/
 
 db/test.db
 src/peb.pro.user
-src/peb_bg_BG.qm
 ui/bootstrap/current-theme.css
 
+*.qm
 peb
 peb.exe
 gdrive

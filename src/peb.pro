@@ -175,15 +175,7 @@ TEMPLATE = app
 TARGET = peb
 DEFINES += HAVE_QT5
 DEPENDPATH += .
-VERSION = 0.1
-TRANSLATIONS = resources/$${TARGET}_bg_BG.ts
-
-CONFIG (debug, debug|release) { 
-    DESTDIR = ../
-}
-CONFIG (release, debug|release) { 
-    DESTDIR = ../
-}
+VERSION = APPLICATION_VERSION
 
 # Network support:
 QT += network
@@ -199,17 +191,40 @@ QT += printsupport
 HEADERS += peb.h
 SOURCES += peb.cpp
 
+# Translation(s):
+TRANSLATIONS = resources/translations/$${TARGET}_bg_BG.ts \
+
+isEmpty (QMAKE_LRELEASE) {
+  win32: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\lrelease.exe
+  else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+}
+
+win32 {
+  system ($$QMAKE_LRELEASE $$PWD\peb.pro)
+} else {
+  system ($$QMAKE_LRELEASE $$PWD/peb.pro)
+}
+
+# Resources:
+RESOURCES += resources/peb.qrc
+
+# Windows specific resources:
+win32 {
+  # Resource and icon files:
+  OTHER_FILES += resources/peb.rc resources/icons/camel.ico
+  RC_FILE = resources/peb.rc
+}
+
 # Temporary folder:
 MOC_DIR = ../tmp
 OBJECTS_DIR = ../tmp
 RCC_DIR = ../tmp
 
-# Resources:
-RESOURCES += resources/peb.qrc
+# Destination directory for the compiled binary:
+CONFIG (debug, debug|release) {
+  DESTDIR = ../
+}
 
-# Windows specific settings:
-win32 {
-  # Resource and icon files:
-  OTHER_FILES += resources/peb.rc resources/icons/camel.ico
-  RC_FILE = resources/peb.rc
+CONFIG (release, debug|release) {
+  DESTDIR = ../
 }

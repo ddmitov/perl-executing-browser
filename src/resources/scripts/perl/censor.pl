@@ -44,7 +44,8 @@ BEGIN {
 	*CORE::GLOBAL::require = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $module = $_[0];
-		if ($module =~ "Registry" and $module =~ "Win32") {
+		if (($module =~ "Registry" and $module =~ "Win32") or
+			$module =~ "lib") {
 			die "Use of an insecure module detected at package '$package', line: $line.<br>The use of module '$module' is prohibited!\n";
 		} else {
 			return CORE::require $_[0];
@@ -150,13 +151,13 @@ foreach my $line (@user_code) {
 		}
 	}
 
-	if ($line =~ m/use lib/) {
-		if ($line =~ m/#.*use lib/) {
-			next;
-		} else {
-			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden 'use lib' detected!";
-		}
-	}
+	#~ if ($line =~ m/use lib/) {
+		#~ if ($line =~ m/#.*use lib/) {
+			#~ next;
+		#~ } else {
+			#~ $problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden 'use lib' detected!";
+		#~ }
+	#~ }
 
 	if ($line =~ m/unshift\s*\@INC/ or $line =~ m/push\s*\(\s*\@INC/ or $line =~ m/push\s*\@INC/) {
 		if ($line =~ m/#.*unshift\s*\@INC/ or $line =~ m/#.*push\s*\(\s*\@INC/ or $line =~ m/#.*push\s*\@INC/) {

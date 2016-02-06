@@ -636,17 +636,6 @@ int main(int argc, char **argv)
     }
     application.setProperty("sourceViewer", sourceViewer);
 
-    // Optional source viewer command line arguments.
-    // They will be given to the source viewer
-    // whenever it is started by the browser.
-    QString sourceViewerArgumentsSetting =
-            settings.value("perl/perl_source_viewer_arguments").toString();
-    sourceViewerArgumentsSetting.replace("\n", "");
-    QStringList sourceViewerArguments;
-    sourceViewerArguments = sourceViewerArgumentsSetting.split(" ");
-    application.setProperty("sourceViewerArgumentsSetting",
-                            sourceViewerArguments);
-
     // NETWORKING:
     // User agent:
     QString userAgent = settings.value("networking/user_agent").toString();
@@ -838,31 +827,15 @@ int main(int argc, char **argv)
     }
     application.setProperty("allThemesDirectory", allThemesDirectory);
 
-    // Default translation:
+    // Translation:
     QString defaultTranslation =
             settings.value("gui/translation_default").toString();
     application.setProperty("defaultTranslation", defaultTranslation);
 
-    // Directory for all translations:
-    QString allTranslationsDirectorySetting =
-            settings.value("gui/translations_directory").toString();
-    QDir translationsDir(allTranslationsDirectorySetting);
-    QString allTranslationsDirectory;
-    if (translationsDir.isRelative()) {
-        allTranslationsDirectory = QDir::toNativeSeparators(
-                    rootDirName + allTranslationsDirectorySetting);
-    }
-    if (translationsDir.isAbsolute()) {
-        allTranslationsDirectory =
-                QDir::toNativeSeparators(allTranslationsDirectorySetting);
-    }
-    application.setProperty("allTranslationsDirectory",
-                            allTranslationsDirectory);
-
     // Install default translation, if any:
     QTranslator translator;
     if (defaultTranslation != "none") {
-        translator.load(defaultTranslation, allTranslationsDirectory);
+        translator.load(defaultTranslation, ":/translations");
     }
     application.installTranslator(&translator);
 
@@ -992,7 +965,6 @@ int main(int argc, char **argv)
     qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Script Timeout:" << scriptTimeout;
     qDebug() << "Source viewer:" << sourceViewer;
-    qDebug() << "Source viewer arguments:" << sourceViewerArguments;
 
     qDebug() << "===============";
     qDebug() << "NETWORKING RUNTIME SETTINGS:";
@@ -1032,7 +1004,6 @@ int main(int argc, char **argv)
     qDebug() << "Default theme directory:" << defaultThemeDirectory;
     qDebug() << "All themes directory:" << allThemesDirectory;
     qDebug() << "Default translation:" << defaultTranslation;
-    qDebug() << "Translations directory:" << allTranslationsDirectory;
     qDebug() << "System tray icon switch:" << systrayIcon;
     qDebug() << "System tray icon file:" << systrayIconPathName;
     qDebug() << "Web Inspector from context menu:" << webInspector;
@@ -1326,16 +1297,6 @@ QPage::QPage()
     // SCRIPT ENVIRONMENT:
     QScriptEnvironment initialScriptEnvironment;
     scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
-
-    // SOURCE VIEWER MANDATORY COMMAND LINE:
-    sourceViewerMandatoryCommandLine.append(
-                (qApp->property("sourceViewer").toString()));
-    if ((qApp->property("sourceViewerArguments").toStringList()).length() > 1) {
-        foreach (QString argument,
-                 (qApp->property("sourceViewerArguments").toStringList())) {
-            sourceViewerMandatoryCommandLine.append(argument);
-        }
-    }
 
     // DEFAULT FRAME FOR LOCAL CONTENT:
     targetFrame = QPage::mainFrame();
