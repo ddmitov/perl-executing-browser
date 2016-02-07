@@ -5,6 +5,7 @@
         <file>html/settings.htm</file>
         <file>scripts/js/check-user-input-before-quit.js</file>
         <file>scripts/perl/censor.pl</file>
+        <file>scripts/perl/kate.pl</file>
         <file>translations/peb_bg_BG.qm</file>
     </qresource>
 </RCC>

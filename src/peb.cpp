@@ -594,24 +594,6 @@ int main(int argc, char **argv)
     }
     application.setProperty("perlLib", perlLib);
 
-    // Perl debugger output formatter:
-    QString debuggerOutputFormatter;
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        QString debuggerOutputFormatterSetting = settings.value(
-                    "perl/perl_debugger_output_formatter").toString();
-        QFileInfo debuggerOutputFormatterFile(debuggerOutputFormatterSetting);
-        if (debuggerOutputFormatterFile.isRelative()) {
-            debuggerOutputFormatter = QDir::toNativeSeparators(
-                        rootDirName + debuggerOutputFormatterSetting);
-        }
-        if (debuggerOutputFormatterFile.isAbsolute()) {
-            debuggerOutputFormatter =
-                    QDir::toNativeSeparators(debuggerOutputFormatterSetting);
-        }
-        application.setProperty("debuggerOutputFormatter",
-                                debuggerOutputFormatter);
-    }
-
     // Display or hide STDERR from scripts:
     QString displayStderr =
             settings.value("perl/perl_display_stderr").toString();
@@ -621,20 +603,6 @@ int main(int argc, char **argv)
     QString scriptTimeout =
             settings.value("perl/perl_script_timeout").toString();
     application.setProperty("scriptTimeout", scriptTimeout);
-
-    // Source viewer script path:
-    QString sourceViewerSetting =
-            settings.value("perl/perl_source_viewer").toString();
-    QFileInfo sourceViewerFile(sourceViewerSetting);
-    QString sourceViewer;
-    if (sourceViewerFile.isRelative()) {
-        sourceViewer = QDir::toNativeSeparators(
-                    rootDirName + sourceViewerSetting);
-    }
-    if (sourceViewerFile.isAbsolute()) {
-        sourceViewer = QDir::toNativeSeparators(sourceViewerSetting);
-    }
-    application.setProperty("sourceViewer", sourceViewer);
 
     // NETWORKING:
     // User agent:
@@ -959,12 +927,8 @@ int main(int argc, char **argv)
     }
     qDebug() << "Perl interpreter" << perlInterpreter;
     qDebug() << "PERLLIB folder:" << perlLib;
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        qDebug() << "Debugger output formatter:" << debuggerOutputFormatter;
-    }
     qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Script Timeout:" << scriptTimeout;
-    qDebug() << "Source viewer:" << sourceViewer;
 
     qDebug() << "===============";
     qDebug() << "NETWORKING RUNTIME SETTINGS:";

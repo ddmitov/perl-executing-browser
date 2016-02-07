@@ -64,15 +64,6 @@ my $html = "<html>
             }
         </style>
 
-        <script type='text/javascript'>
-        function sendCommand (cmd) {
-            document.getElementById ('command').value = cmd;
-        }
-        function scrollTo (hash) {
-            location.hash = '#' + hash;
-        }
-        </script>
-
     </head>
 
     <body onload='scrollTo(SCROLL_TO_LINE)'>
@@ -118,6 +109,15 @@ HIGHLIGHTED_SOURCE
         <div class='debugger'>
 DEBUGGER_OUTPUT
         </div>
+
+        <script type='text/javascript'>
+        function sendCommand (cmd) {
+            document.getElementById ('command').value = cmd;
+        }
+        function scrollTo (hash) {
+            location.hash = '#' + hash;
+        }
+        </script>
 
     </body>
 

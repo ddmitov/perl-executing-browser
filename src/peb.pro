@@ -130,28 +130,28 @@ equals (PERL_DEBUGGER_INTERACTION, 1) {
 # Macintosh specific settings:
 ##########################################################
 macx {
-  ##########################################################
-  # To make a bundle-less application: (recommended)
-  # BUNDLE = 0
-  # CONFIG -= app_bundle
-  ##########################################################
-  # To make a bundle (peb.app):
-  # BUNDLE = 1
-  # CONFIG += app_bundle
-  ##########################################################
-  BUNDLE = 0
-  CONFIG -= app_bundle
+    ##########################################################
+    # To make a bundle-less application: (recommended)
+    # BUNDLE = 0
+    # CONFIG -= app_bundle
+    ##########################################################
+    # To make a bundle (peb.app):
+    # BUNDLE = 1
+    # CONFIG += app_bundle
+    ##########################################################
+    BUNDLE = 0
+    CONFIG -= app_bundle
 
-  DEFINES += "BUNDLE=$$BUNDLE"
+    DEFINES += "BUNDLE=$$BUNDLE"
 
-  equals (BUNDLE, 0) {
-      message ("Going to build without Mac OSX bundle support...")
-  }
-  equals (BUNDLE, 1) {
-      message ("Going to build with Mac OSX bundle support...")
-  }
+    equals (BUNDLE, 0) {
+        message ("Going to build without Mac OSX bundle support...")
+    }
+    equals (BUNDLE, 1) {
+        message ("Going to build with Mac OSX bundle support...")
+    }
 
-  ICON = icons/camel.icns
+    ICON = icons/camel.icns
 }
 
 
@@ -194,25 +194,39 @@ SOURCES += peb.cpp
 # Translation(s):
 TRANSLATIONS = resources/translations/$${TARGET}_bg_BG.ts \
 
+isEmpty (QMAKE_LUPDATE) {
+    win32: QMAKE_LUPDATE = $$[QT_INSTALL_BINS]\lupdate.exe
+    else: QMAKE_LUPDATE = $$[QT_INSTALL_BINS]/lupdate
+}
+
 isEmpty (QMAKE_LRELEASE) {
-  win32: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\lrelease.exe
-  else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
+    win32: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\lrelease.exe
+    else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
 }
 
 win32 {
-  system ($$QMAKE_LRELEASE $$PWD\peb.pro)
+    system ($$QMAKE_LUPDATE $$PWD\peb.pro)
+    system ($$QMAKE_LRELEASE $$PWD\peb.pro)
 } else {
-  system ($$QMAKE_LRELEASE $$PWD/peb.pro)
+    system ($$QMAKE_LUPDATE $$PWD/peb.pro)
+    system ($$QMAKE_LRELEASE $$PWD/peb.pro)
 }
 
 # Resources:
-RESOURCES += resources/peb.qrc
+equals (PERL_DEBUGGER_INTERACTION, 0) {
+    RESOURCES += resources/peb.qrc
+}
+
+equals (PERL_DEBUGGER_INTERACTION, 1) {
+    RESOURCES += resources/peb.qrc \
+    resources/peb-perl-debugger.qrc
+}
 
 # Windows specific resources:
 win32 {
-  # Resource and icon files:
-  OTHER_FILES += resources/peb.rc resources/icons/camel.ico
-  RC_FILE = resources/peb.rc
+    # Resource and icon files:
+    OTHER_FILES += resources/peb.rc resources/icons/camel.ico
+    RC_FILE = resources/peb.rc
 }
 
 # Temporary folder:
@@ -222,9 +236,9 @@ RCC_DIR = ../tmp
 
 # Destination directory for the compiled binary:
 CONFIG (debug, debug|release) {
-  DESTDIR = ../
+    DESTDIR = ../
 }
 
 CONFIG (release, debug|release) {
-  DESTDIR = ../
+    DESTDIR = ../
 }

@@ -135,6 +135,7 @@ http://www.qtcentre.org/threads/52787-QWebPage-createWindow
 http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width
 http://www.qtcentre.org/threads/29104-QMake-DEFINES
 http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit
+http://www.qtcentre.org/threads/45001-using-two-qrc-files-in-one-application
 
 http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
 http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
@@ -199,6 +200,7 @@ http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-q
 http://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console
 http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
 http://stackoverflow.com/questions/6275363/what-is-the-correct-terminology-for-a-non-ajax-request
+http://stackoverflow.com/questions/15864689/qmake-pre-build-step-before-any-compilation
 
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
@@ -220,6 +222,7 @@ http://habrahabr.ru/post/150329/ (Qt Coding Style)
 http://okolovich.info/tag/code-snippets-c/
 http://www.antonioborondo.com/2014/10/22/zipping-and-unzipping-files-with-qt/
 http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp
+http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/
 
 CGI
 ===

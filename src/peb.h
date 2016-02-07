@@ -762,22 +762,30 @@ public slots:
 
             if (!scriptHandler.isOpen()) {
                 if (sourceEnabled == true) {
-                    QString sourceFilepath =
-                            QDir::toNativeSeparators(scriptFullFilePath);
+                    // 'kate.pl' is compiled into the resources of
+                    // the binary file and called from there.
+                    QString sourceViewerFileName(":/scripts/perl/kate.pl");
+                    QFile sourceViewerFile(sourceViewerFileName);
+                    sourceViewerFile.open(QIODevice::ReadOnly
+                                          | QIODevice::Text);
+                    QTextStream stream(&sourceViewerFile);
+                    QString sourceViewerContents = stream.readAll();
+                    sourceViewerFile.close();
 
-                    QStringList sourceViewerCommandLine;
-                    sourceViewerCommandLine.append(
-                                (qApp->property("sourceViewer").toString()));
-                    sourceViewerCommandLine.append(sourceFilepath);
+                    scriptHandler
+                            .start((qApp->property("perlInterpreter")
+                                    .toString()),
+                                   QStringList()
+                                   << "-e"
+                                   << sourceViewerContents
+                                   << "--"
+                                   << QDir::toNativeSeparators(
+                                       scriptFullFilePath),
+                                   QProcess::Unbuffered
+                                   | QProcess::ReadWrite);
 
-                    scriptHandler.start((qApp->property("perlInterpreter")
-                                         .toString()),
-                                        sourceViewerCommandLine,
-                                        QProcess::Unbuffered
-                                        | QProcess::ReadWrite);
-
-                    runningScriptsInCurrentWindowList.append(sourceFilepath);
-
+                    runningScriptsInCurrentWindowList
+                            .append(scriptFullFilePath);
                 } else {
                     if (SCRIPT_CENSORING == 0) {
                         scriptHandler.start((qApp->property("perlInterpreter")
@@ -792,7 +800,8 @@ public slots:
                     if (SCRIPT_CENSORING == 1) {
                         // 'censor.pl' is compiled into the resources of
                         // the binary file and called from there.
-                        QString censorScriptFileName(":/scripts/perl/censor.pl");
+                        QString censorScriptFileName(
+                                    ":/scripts/perl/censor.pl");
                         QFile censorScriptFile(censorScriptFileName);
                         censorScriptFile.open(QIODevice::ReadOnly
                                               | QIODevice::Text);
@@ -1027,10 +1036,7 @@ public slots:
         if (PERL_DEBUGGER_INTERACTION == 1) {
             // Read and store in memory
             // the Perl debugger output formatter script:
-            QFile debuggerOutputFormatterFile(
-                        QDir::toNativeSeparators(
-                            (qApp->property("debuggerOutputFormatter")
-                             .toString())));
+            QFile debuggerOutputFormatterFile(":/scripts/perl/dbgformatter.pl");
             debuggerOutputFormatterFile.open(QFile::ReadOnly | QFile::Text);
             debuggerOutputFormatterScript =
                     QString(debuggerOutputFormatterFile.readAll());
