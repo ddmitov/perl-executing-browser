@@ -67,17 +67,17 @@
         <translation>не бе намерен.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="496"/>
+        <location filename="../../peb.cpp" line="497"/>
         <source>No Perl interpreter is set for</source>
         <translation>Не е настроен Perl интерпретатор за</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="530"/>
+        <location filename="../../peb.cpp" line="531"/>
         <source>No Perl interpreter is available on PATH for</source>
         <translation>Няма достъпен Perl интерпретатор на PATH за</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="566"/>
+        <location filename="../../peb.cpp" line="567"/>
         <source>Perl interpreter is missing for</source>
         <translation>Не бе намерен Perl интерпретатор за</translation>
     </message>
@@ -114,27 +114,27 @@
         <translation>Моля, възстановете го.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="495"/>
-        <location filename="../../peb.cpp" line="528"/>
-        <location filename="../../peb.cpp" line="564"/>
+        <location filename="../../peb.cpp" line="496"/>
+        <location filename="../../peb.cpp" line="529"/>
+        <location filename="../../peb.cpp" line="565"/>
         <source>Missing Perl</source>
         <translation>Липсващ Perl интерпретатор</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="499"/>
-        <location filename="../../peb.cpp" line="535"/>
-        <location filename="../../peb.cpp" line="569"/>
-        <location filename="../../peb.cpp" line="645"/>
+        <location filename="../../peb.cpp" line="500"/>
+        <location filename="../../peb.cpp" line="536"/>
+        <location filename="../../peb.cpp" line="570"/>
+        <location filename="../../peb.cpp" line="648"/>
         <source> version </source>
         <translation> версия </translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="641"/>
+        <location filename="../../peb.cpp" line="644"/>
         <source>Missing start page</source>
         <translation>Липсваща главна страница</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="642"/>
+        <location filename="../../peb.cpp" line="645"/>
         <source>Start page is missing for</source>
         <translation>Не бе намерена главната страница на</translation>
     </message>
@@ -160,55 +160,55 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="1529"/>
+        <location filename="../../peb.cpp" line="1533"/>
         <source>Select Perl Interpreter</source>
         <translation>Избор на Perl интерпретатор</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1530"/>
-        <location filename="../../peb.cpp" line="1742"/>
-        <location filename="../../peb.cpp" line="1778"/>
-        <location filename="../../peb.cpp" line="1896"/>
+        <location filename="../../peb.cpp" line="1534"/>
+        <location filename="../../peb.cpp" line="1746"/>
+        <location filename="../../peb.cpp" line="1782"/>
+        <location filename="../../peb.cpp" line="1900"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1570"/>
+        <location filename="../../peb.cpp" line="1574"/>
         <source>Select PERLLIB</source>
         <translation>Избор на PERLLIB</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1610"/>
+        <location filename="../../peb.cpp" line="1614"/>
         <source>Select folder to add to PATH</source>
         <translation>Избери директория за добавяне в PATH</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1741"/>
+        <location filename="../../peb.cpp" line="1745"/>
         <source>Select File</source>
         <translation>Избор на файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1776"/>
+        <location filename="../../peb.cpp" line="1780"/>
         <source>Create New File</source>
         <translation>Създай нов файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1812"/>
+        <location filename="../../peb.cpp" line="1816"/>
         <source>Select Folder</source>
         <translation>Избери директория</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1892"/>
+        <location filename="../../peb.cpp" line="1896"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1894"/>
+        <location filename="../../peb.cpp" line="1898"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1895"/>
+        <location filename="../../peb.cpp" line="1899"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>
@@ -406,12 +406,12 @@
 <context>
     <name>QTrayIcon</name>
     <message>
-        <location filename="../../peb.cpp" line="1435"/>
+        <location filename="../../peb.cpp" line="1439"/>
         <source>&amp;About</source>
         <translation>З&amp;а програмата</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1437"/>
+        <location filename="../../peb.cpp" line="1441"/>
         <source>About Q&amp;t</source>
         <translation>За &amp;Qt</translation>
     </message>

@@ -435,6 +435,8 @@ int main(int argc, char **argv)
     }
 
     application.setProperty("settingsFileName", settingsFileName);
+    application.setProperty("settingsDirName", settingsDirName);
+
     QFile settingsFile(settingsFileName);
 
     // Check if settings file exists:
@@ -462,23 +464,49 @@ int main(int argc, char **argv)
     // Define INI file format for storing settings:
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
-    // ROOT DIRECTORY SETTING:
-    QString rootDirName;
-    QString rootDirNameSetting = settings.value("root/root").toString();
-    if (rootDirNameSetting == "current") {
-        rootDirName = settingsDirName;
-    } else {
-        rootDirName = QDir::toNativeSeparators(rootDirNameSetting);
-    }
-    if (!rootDirName.endsWith(QDir::separator())) {
-        rootDirName.append(QDir::separator());
-    }
-    application.setProperty("rootDirName", rootDirName);
+    // BROWSER LOGGING SETTINGS:
+    // Logging enable/disable switch:
+    QString logging = settings.value("browser_logging/logging").toString();
+    application.setProperty("logging", logging);
 
-    // PERL SCRIPT SETTINGS:
+    // Install message handler for redirecting all debug messages to a log file:
+    if ((qApp->property("logging").toString()) == "enable") {
+        qInstallMessageHandler(customMessageHandler);
+    }
+
+    // Logging mode - 'per_session_file' or 'single_file'.
+    // 'single_file' means that only one single log file is created.
+    // 'per_session' means that a separate log file is
+    // created for every browser session. Application start date and time are
+    // appended to the file name in this scenario.
+    QString logMode = settings.value("browser_logging/logging_mode").toString();
+    application.setProperty("logMode", logMode);
+
+    // Log files directory:
+    QString logDirName = settings
+            .value("browser_logging/logging_directory").toString();
+    QDir logDir(logDirName);
+    QString logDirFullPath;
+    if (!logDir.exists()) {
+        logDir.mkpath(".");
+    }
+    if (logDir.isRelative()) {
+        logDirFullPath = QDir::toNativeSeparators(settingsDirName + logDirName);
+    }
+    if (logDir.isAbsolute()) {
+        logDirFullPath = QDir::toNativeSeparators(logDirName);
+    }
+    application.setProperty("logDirFullPath", logDirFullPath);
+
+    // Log filename prefix:
+    QString logPrefix = settings
+            .value("browser_logging/logging_prefix").toString();
+    application.setProperty("logPrefix", logPrefix);
+
+    // BROWSER PERL SETTINGS:
     // Folders to add to PATH:
     QStringList pathToAddList;
-    int pathSize = settings.beginReadArray("perl/path");
+    int pathSize = settings.beginReadArray("browser_perl/path");
     for (int index = 0; index < pathSize; ++index) {
         settings.setArrayIndex(index);
         QString pathSetting = settings.value("name").toString();
@@ -488,7 +516,8 @@ int main(int argc, char **argv)
     application.setProperty("pathToAddList", pathToAddList);
 
     // Perl interpreter:
-    QString perlInterpreterSetting = settings.value("perl/perl").toString();
+    QString perlInterpreterSetting = settings
+            .value("browser_perl/perl").toString();
 
     if (perlInterpreterSetting.length() == 0) {
         QString title =
@@ -549,7 +578,7 @@ int main(int argc, char **argv)
         QDir interpreterFile(perlInterpreterSetting);
         if (interpreterFile.isRelative()) {
             perlInterpreter =
-                    QDir::toNativeSeparators(rootDirName
+                    QDir::toNativeSeparators(settingsDirName
                                              + perlInterpreterSetting);
         }
         if (interpreterFile.isAbsolute()) {
@@ -583,11 +612,11 @@ int main(int argc, char **argv)
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // PERLLIB environment variable:
-    QString perlLibSetting = settings.value("perl/perllib").toString();
+    QString perlLibSetting = settings.value("browser_perl/perllib").toString();
     QDir perlLibDir(perlLibSetting);
     QString perlLib;
     if (perlLibDir.isRelative()) {
-        perlLib = QDir::toNativeSeparators(rootDirName + perlLibSetting);
+        perlLib = QDir::toNativeSeparators(settingsDirName + perlLibSetting);
     }
     if (perlLibDir.isAbsolute()) {
         perlLib = QDir::toNativeSeparators(perlLibSetting);
@@ -596,37 +625,31 @@ int main(int argc, char **argv)
 
     // Display or hide STDERR from scripts:
     QString displayStderr =
-            settings.value("perl/perl_display_stderr").toString();
+            settings.value("browser_perl/perl_display_stderr").toString();
     application.setProperty("displayStderr", displayStderr);
 
     // Timeout for CGI-like and AJAX scripts (not long-running ones):
     QString scriptTimeout =
-            settings.value("perl/perl_script_timeout").toString();
+            settings.value("browser_perl/perl_script_timeout").toString();
     application.setProperty("scriptTimeout", scriptTimeout);
 
-    // NETWORKING:
-    // User agent:
-    QString userAgent = settings.value("networking/user_agent").toString();
-    if (userAgent.length() == 0) {
-        userAgent = USER_AGENT;
+    // PACKAGE GUI SETTINGS:
+    // Package root directory:
+    QString rootDirName;
+    QString rootDirNameSetting = settings.value("package_gui/root").toString();
+    if (rootDirNameSetting == "current") {
+        rootDirName = settingsDirName;
+    } else {
+        rootDirName = QDir::toNativeSeparators(rootDirNameSetting);
     }
-    application.setProperty("userAgent", userAgent);
-
-    // Allowed domains:
-    QStringList allowedDomainsList;
-    int domainsSize = settings.beginReadArray("networking/allowed_domains");
-    for (int index = 0; index < domainsSize; ++index) {
-        settings.setArrayIndex(index);
-        QString pathSetting = settings.value("name").toString();
-        allowedDomainsList.append(pathSetting);
+    if (!rootDirName.endsWith(QDir::separator())) {
+        rootDirName.append(QDir::separator());
     }
-    settings.endArray();
-    application.setProperty("allowedDomainsList", allowedDomainsList);
+    application.setProperty("rootDirName", rootDirName);
 
-    // GUI:
     // Start page - path must be relative to the PEB root directory:
     // HTML file or script are equally usable as a start page:
-    QString startPagePath = settings.value("gui/start_page").toString();
+    QString startPagePath = settings.value("package_gui/start_page").toString();
     QString startPage;
 
     if (startPagePath.length() > 0) {
@@ -657,13 +680,13 @@ int main(int argc, char **argv)
     }
 
     // Warn on exit:
-    QString warnOnExit = settings.value("gui/warn_on_exit") .toString();
+    QString warnOnExit = settings.value("package_gui/warn_on_exit") .toString();
     application.setProperty("warnOnExit", warnOnExit);
 
 #ifndef Q_OS_MAC
     // Window size - 'maximized', 'fullscreen' or numeric value like
     // '800x600' or '1024x756' etc.:
-    QString windowSize = settings.value("gui/window_size").toString();
+    QString windowSize = settings.value("package_gui/window_size").toString();
     int fixedWidth;
     int fixedHeight;
     if (windowSize != "maximized" or windowSize != "fullscreen") {
@@ -677,29 +700,31 @@ int main(int argc, char **argv)
 
     // Browser title -'dynamic' or 'My Favorite Title'
     // 'dynamic' title is taken from every HTML <title> tag.
-    QString browserTitle = settings.value("gui/browser_title").toString();
+    QString browserTitle = settings
+            .value("package_gui/browser_title").toString();
     application.setProperty("browserTitle", browserTitle);
 
     // Right click context menu enable/disable switch:
-    QString contextMenu = settings.value("gui/context_menu").toString();
+    QString contextMenu = settings.value("package_gui/context_menu").toString();
     application.setProperty("contextMenu", contextMenu);
 
     // Going to start page enable/disable switch:
     QString goHomeCapability =
-            settings.value("gui/go_home_capability").toString();
+            settings.value("package_gui/go_home_capability").toString();
     application.setProperty("goHomeCapability", goHomeCapability);
 
     // Page reload enable/disable switch:
     QString reloadCapability =
-            settings.value("gui/reload_capability").toString();
+            settings.value("package_gui/reload_capability").toString();
     application.setProperty("reloadCapability", reloadCapability);
 
     // Web Inspector from context menu enable/disable switch:
-    QString webInspector = settings.value("gui/web_inspector").toString();
+    QString webInspector = settings
+            .value("package_gui/web_inspector").toString();
     application.setProperty("webInspector", webInspector);
 
     // Icon for windows and message boxes:
-    QString iconPathNameSetting = settings.value("gui/icon").toString();
+    QString iconPathNameSetting = settings.value("package_gui/icon").toString();
     QString iconPathName;
 
     if (iconPathNameSetting.length() > 0) {
@@ -729,7 +754,7 @@ int main(int argc, char **argv)
     // Global Qt style for the whole application:
     // Disabling default Qt style and explicitly setting another Qt style
     // may be usefull to avoid minor graphical issues and warnings.
-    QString qtStyleSetting = settings.value("gui/qt_style").toString();
+    QString qtStyleSetting = settings.value("package_gui/qt_style").toString();
     QString qtStyle;
     QStringList availableStyles = QStyleFactory::keys();
     foreach (QString availableStyle, availableStyles) {
@@ -740,7 +765,7 @@ int main(int argc, char **argv)
     }
 
     // System tray icon enable/disable switch:
-    QString systrayIcon = settings.value("gui/systray_icon").toString();
+    QString systrayIcon = settings.value("package_gui/systray_icon").toString();
     application.setProperty("systrayIcon", systrayIcon);
 
     // System tray icon file:
@@ -750,7 +775,7 @@ int main(int argc, char **argv)
     // An icon without a transparent background should be used as
     // a systray icon when the binary is compiled for Linux.
     QString systrayIconPathNameSetting =
-            settings.value("gui/systray_icon_file").toString();
+            settings.value("package_gui/systray_icon_file").toString();
     QString systrayIconPathName;
     // If 'icon_systray' setting is empty,
     // the window icon will be used as a systray icon.
@@ -771,7 +796,7 @@ int main(int argc, char **argv)
 
     // Directory of the default GUI theme:
     QString defaultThemeDirectorySetting =
-            settings.value("gui/theme_default_directory").toString();
+            settings.value("package_gui/theme_default_directory").toString();
     application.setProperty("defaultThemeDirectoryName",
                             defaultThemeDirectorySetting);
     QString defaultThemeDirectory = QDir::toNativeSeparators(
@@ -781,68 +806,41 @@ int main(int argc, char **argv)
 
     // Directory for all GUI themes:
     QString allThemesDirectorySetting =
-            settings.value("gui/themes_directory").toString();
-    QString allThemesDirectory;
-    QDir allThemesDir(allThemesDirectorySetting);
-    if (allThemesDir.isRelative()) {
-        allThemesDirectory =
+            settings.value("package_gui/themes_directory").toString();
+    QString allThemesDirectory =
                 QDir::toNativeSeparators(rootDirName
                                          + allThemesDirectorySetting);
-    }
-    if (allThemesDir.isAbsolute()) {
-        allThemesDirectory =
-                QDir::toNativeSeparators(allThemesDirectorySetting);
-    }
     application.setProperty("allThemesDirectory", allThemesDirectory);
 
     // Translation:
-    QString defaultTranslation =
-            settings.value("gui/translation_default").toString();
-    application.setProperty("defaultTranslation", defaultTranslation);
-
-    // Install default translation, if any:
+    QString translation =
+            settings.value("package_gui/translation").toString();
     QTranslator translator;
-    if (defaultTranslation != "none") {
-        translator.load(defaultTranslation, ":/translations");
+    if (translation != "none") {
+        translator.load("peb_" + translation, ":/translations");
     }
     application.installTranslator(&translator);
 
-    // LOGGING:
-    // Logging enable/disable switch:
-    QString logging = settings.value("logging/logging").toString();
-    application.setProperty("logging", logging);
-
-    // Install message handler for redirecting all debug messages to a log file:
-    if ((qApp->property("logging").toString()) == "enable") {
-        qInstallMessageHandler(customMessageHandler);
+    // PACKAGE NETWORKING SETTINGS:
+    // User agent:
+    QString userAgent = settings
+            .value("package_networking/user_agent").toString();
+    if (userAgent.length() == 0) {
+        userAgent = USER_AGENT;
     }
+    application.setProperty("userAgent", userAgent);
 
-    // Logging mode - 'per_session_file' or 'single_file'.
-    // 'single_file' means that only one single log file is created.
-    // 'per_session' means that a separate log file is
-    // created for every browser session. Application start date and time are
-    // appended to the file name in this scenario.
-    QString logMode = settings.value("logging/logging_mode").toString();
-    application.setProperty("logMode", logMode);
-
-    // Log files directory:
-    QString logDirName = settings.value("logging/logging_directory").toString();
-    QDir logDir(logDirName);
-    QString logDirFullPath;
-    if (!logDir.exists()) {
-        logDir.mkpath(".");
+    // Allowed domains:
+    QStringList allowedDomainsList;
+    int domainsSize = settings
+            .beginReadArray("package_networking/allowed_domains");
+    for (int index = 0; index < domainsSize; ++index) {
+        settings.setArrayIndex(index);
+        QString pathSetting = settings.value("name").toString();
+        allowedDomainsList.append(pathSetting);
     }
-    if (logDir.isRelative()) {
-        logDirFullPath = QDir::toNativeSeparators(rootDirName + logDirName);
-    }
-    if (logDir.isAbsolute()) {
-        logDirFullPath = QDir::toNativeSeparators(logDirName);
-    }
-    application.setProperty("logDirFullPath", logDirFullPath);
-
-    // Log filename prefix:
-    QString logPrefix = settings.value("logging/logging_prefix").toString();
-    application.setProperty("logPrefix", logPrefix);
+    settings.endArray();
+    application.setProperty("allowedDomainsList", allowedDomainsList);
 
     // ==============================
     // COMMAND LINE SETTING OVERRIDES:
@@ -967,7 +965,7 @@ int main(int argc, char **argv)
     }
     qDebug() << "Default theme directory:" << defaultThemeDirectory;
     qDebug() << "All themes directory:" << allThemesDirectory;
-    qDebug() << "Default translation:" << defaultTranslation;
+    qDebug() << "Default translation:" << translation;
     qDebug() << "System tray icon switch:" << systrayIcon;
     qDebug() << "System tray icon file:" << systrayIconPathName;
     qDebug() << "Web Inspector from context menu:" << webInspector;
@@ -1093,7 +1091,7 @@ QScriptEnvironment::QScriptEnvironment()
         if (pathDir.exists()) {
             if (pathDir.isRelative()) {
                 pathEntry = QDir::toNativeSeparators(
-                            qApp->property("rootDirName").toString()
+                            qApp->property("settingsDirName").toString()
                             + pathEntry);
             }
             if (pathDir.isAbsolute()) {
@@ -1475,7 +1473,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             if (pathDir.exists()) {
                 if (pathDir.isRelative()) {
                     pathEntry = QDir::toNativeSeparators(
-                                qApp->property("rootDirName").toString()
+                                qApp->property("settingsDirName").toString()
                                 + pathEntry);
                 }
                 if (pathDir.isAbsolute()) {
@@ -1536,7 +1534,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             QSettings perlInterpreterSetting(
                         (qApp->property("settingsFileName").toString()),
                         QSettings::IniFormat);
-            perlInterpreterSetting.setValue("perl/perl", perlInterpreter);
+            perlInterpreterSetting.setValue("browser_perl/perl", perlInterpreter);
             perlInterpreterSetting.sync();
 
             // Set global Perl interpreter setting:
@@ -1577,7 +1575,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             QSettings perlLibSetting((qApp->property("settingsFileName")
                                       .toString()),
                                      QSettings::IniFormat);
-            perlLibSetting.setValue("perl/perllib", perlLibFolderName);
+            perlLibSetting.setValue("browser_perl/perllib", perlLibFolderName);
             perlLibSetting.sync();
 
             // Set global PERLIB setting:
@@ -1623,7 +1621,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // Get list of all folders on the current PATH:
         QStringList pathList;
         int pathArraySize = pathFoldersSetting
-                .beginReadArray("perl/path");
+                .beginReadArray("browser_perl/path");
         for (int index = 0; index < pathArraySize; ++index) {
             pathFoldersSetting.setArrayIndex(index);
             QString pathSetting = pathFoldersSetting.value("name").toString();
@@ -1637,7 +1635,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         // Append the new folder name in the
         // appropriate section of the settings file:
-        pathFoldersSetting.beginWriteArray("perl/path");
+        pathFoldersSetting.beginWriteArray("browser_perl/path");
         pathFoldersSetting.setArrayIndex(pathArraySize);
         pathFoldersSetting.setValue("name", pathFolderString);
         pathFoldersSetting.endArray();
@@ -1688,7 +1686,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             if (pathDir.exists()) {
                 if (pathDir.isRelative()) {
                     pathEntry = QDir::toNativeSeparators(
-                                qApp->property("rootDirName").toString()
+                                qApp->property("settingsDirName").toString()
                                 + pathEntry);
                 }
                 if (pathDir.isAbsolute()) {

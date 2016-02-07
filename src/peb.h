@@ -1739,7 +1739,7 @@ public slots:
             }
         } else {
             if (qApp->property("warnOnExit").toString() ==
-                    "if-text-is-entered") {
+                    "if_text_is_entered") {
                 QVariant jsQuitDecision =
                         mainPage->currentFrame()->evaluateJavaScript(
                             "checkUserInputBeforeQuit()");
