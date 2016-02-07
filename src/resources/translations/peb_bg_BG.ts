@@ -27,114 +27,114 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../peb.cpp" line="197"/>
+        <location filename="../../peb.cpp" line="196"/>
         <source>Command-Line Options</source>
         <translation>Флагове от командната линия</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="200"/>
+        <location filename="../../peb.cpp" line="199"/>
         <source>start browser in fullscreen mode</source>
         <translation>стартирай браузъра в режим на цял екран</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="204"/>
+        <location filename="../../peb.cpp" line="203"/>
         <source>start browser in a maximized window</source>
         <translation>стартирай браузъра с максимизиран прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="208"/>
+        <location filename="../../peb.cpp" line="207"/>
         <source>this help</source>
         <translation>този помощен прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="302"/>
+        <location filename="../../peb.cpp" line="301"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="303"/>
+        <location filename="../../peb.cpp" line="302"/>
         <source>Browser was started as root.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="443"/>
+        <location filename="../../peb.cpp" line="444"/>
         <source>Configuration file</source>
         <translation>Файлът с настройки</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="447"/>
+        <location filename="../../peb.cpp" line="448"/>
         <source>is missing.</source>
         <translation>не бе намерен.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="497"/>
+        <location filename="../../peb.cpp" line="524"/>
         <source>No Perl interpreter is set for</source>
         <translation>Не е настроен Perl интерпретатор за</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="531"/>
+        <location filename="../../peb.cpp" line="558"/>
         <source>No Perl interpreter is available on PATH for</source>
         <translation>Няма достъпен Perl интерпретатор на PATH за</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="567"/>
+        <location filename="../../peb.cpp" line="594"/>
         <source>Perl interpreter is missing for</source>
         <translation>Не бе намерен Perl интерпретатор за</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="307"/>
-        <location filename="../../peb.cpp" line="336"/>
+        <location filename="../../peb.cpp" line="306"/>
+        <location filename="../../peb.cpp" line="335"/>
         <source>Going to quit now.</source>
         <translation>Ще последва изключване на програмата.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="328"/>
+        <location filename="../../peb.cpp" line="327"/>
         <source>Started by administrator</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="331"/>
+        <location filename="../../peb.cpp" line="330"/>
         <source>Browser was started with administrative privileges.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="305"/>
-        <location filename="../../peb.cpp" line="334"/>
+        <location filename="../../peb.cpp" line="304"/>
+        <location filename="../../peb.cpp" line="333"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="442"/>
+        <location filename="../../peb.cpp" line="443"/>
         <source>Missing configuration file</source>
         <translation>Липсващ файл с настройки</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="449"/>
+        <location filename="../../peb.cpp" line="450"/>
         <source>Please restore it.</source>
         <translation>Моля, възстановете го.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="496"/>
-        <location filename="../../peb.cpp" line="529"/>
-        <location filename="../../peb.cpp" line="565"/>
+        <location filename="../../peb.cpp" line="523"/>
+        <location filename="../../peb.cpp" line="556"/>
+        <location filename="../../peb.cpp" line="592"/>
         <source>Missing Perl</source>
         <translation>Липсващ Perl интерпретатор</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="500"/>
-        <location filename="../../peb.cpp" line="536"/>
-        <location filename="../../peb.cpp" line="570"/>
-        <location filename="../../peb.cpp" line="648"/>
+        <location filename="../../peb.cpp" line="527"/>
+        <location filename="../../peb.cpp" line="563"/>
+        <location filename="../../peb.cpp" line="597"/>
+        <location filename="../../peb.cpp" line="667"/>
         <source> version </source>
         <translation> версия </translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="644"/>
+        <location filename="../../peb.cpp" line="663"/>
         <source>Missing start page</source>
         <translation>Липсваща главна страница</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="645"/>
+        <location filename="../../peb.cpp" line="664"/>
         <source>Start page is missing for</source>
         <translation>Не бе намерена главната страница на</translation>
     </message>
@@ -160,55 +160,55 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="1533"/>
+        <location filename="../../peb.cpp" line="1526"/>
         <source>Select Perl Interpreter</source>
         <translation>Избор на Perl интерпретатор</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1534"/>
-        <location filename="../../peb.cpp" line="1746"/>
-        <location filename="../../peb.cpp" line="1782"/>
-        <location filename="../../peb.cpp" line="1900"/>
+        <location filename="../../peb.cpp" line="1527"/>
+        <location filename="../../peb.cpp" line="1739"/>
+        <location filename="../../peb.cpp" line="1775"/>
+        <location filename="../../peb.cpp" line="1893"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1574"/>
+        <location filename="../../peb.cpp" line="1567"/>
         <source>Select PERLLIB</source>
         <translation>Избор на PERLLIB</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1614"/>
+        <location filename="../../peb.cpp" line="1607"/>
         <source>Select folder to add to PATH</source>
         <translation>Избери директория за добавяне в PATH</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1745"/>
+        <location filename="../../peb.cpp" line="1738"/>
         <source>Select File</source>
         <translation>Избор на файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1780"/>
+        <location filename="../../peb.cpp" line="1773"/>
         <source>Create New File</source>
         <translation>Създай нов файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1816"/>
+        <location filename="../../peb.cpp" line="1809"/>
         <source>Select Folder</source>
         <translation>Избери директория</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1896"/>
+        <location filename="../../peb.cpp" line="1889"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1898"/>
+        <location filename="../../peb.cpp" line="1891"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1899"/>
+        <location filename="../../peb.cpp" line="1892"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>
@@ -406,12 +406,12 @@
 <context>
     <name>QTrayIcon</name>
     <message>
-        <location filename="../../peb.cpp" line="1439"/>
+        <location filename="../../peb.cpp" line="1432"/>
         <source>&amp;About</source>
         <translation>З&amp;а програмата</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1441"/>
+        <location filename="../../peb.cpp" line="1434"/>
         <source>About Q&amp;t</source>
         <translation>За &amp;Qt</translation>
     </message>

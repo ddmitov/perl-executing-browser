@@ -222,9 +222,7 @@ equals (PERL_DEBUGGER_INTERACTION, 1) {
     resources/peb-perl-debugger.qrc
 }
 
-# Windows specific resources:
 win32 {
-    # Resource and icon files:
     OTHER_FILES += resources/peb.rc resources/icons/camel.ico
     RC_FILE = resources/peb.rc
 }

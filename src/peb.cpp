@@ -158,24 +158,23 @@ int main(int argc, char **argv)
         if (argument.contains("--help") or argument.contains("-H")) {
 #ifndef Q_OS_WIN
             // Linux & Mac:
-            std::cout << " " << std::endl;
-            std::cout << application.applicationName().toLatin1().constData()
+            std::cout << " " << std::endl
+                      << application.applicationName().toLatin1().constData()
                       << " v." << application.applicationVersion()
                          .toLatin1().constData()
-                      << std::endl;
-            std::cout << "Application file path: "
+                      << std::endl
+                      << "Application file path: "
                       << QDir::toNativeSeparators(
                              QApplication::applicationFilePath())
                          .toLatin1().constData()
-                      << std::endl;
-            std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-            std::cout << " " << std::endl;
-            std::cout << "Usage:" << std::endl;
-            std::cout << "  peb --option=value -o=value" << std::endl;
-            std::cout << " " << std::endl;
-            std::cout << "Command line options:" << std::endl;
-
-            std::cout << "  --fullscreen    -F    "
+                      << std::endl
+                      << "Qt version: " << QT_VERSION_STR << std::endl
+                      << " " << std::endl
+                      << "Usage:" << std::endl
+                      << "  peb --option=value -o=value" << std::endl
+                      << " " << std::endl
+                      << "Command line options:" << std::endl
+                      << "  --fullscreen    -F    "
                       << "start browser in fullscreen mode"
                       << std::endl;
 #ifndef Q_OS_MAC
@@ -184,8 +183,8 @@ int main(int argc, char **argv)
                       << std::endl;
 #endif
             std::cout << "  --help          -H    this help"
-                      << std::endl;
-            std::cout << " " << std::endl;
+                      << std::endl
+                      << " " << std::endl;
 #endif
 
 #ifdef Q_OS_WIN
@@ -227,30 +226,30 @@ int main(int argc, char **argv)
     // it will start another copy of itself and close the first one.
     // This is necessary for a working interaction with the Perl debugger.
     if (isatty(fileno(stdin))) {
-        std::cout << " " << std::endl;
-        std::cout << application.applicationName().toLatin1().constData()
+        std::cout << " " << std::endl
+                  << application.applicationName().toLatin1().constData()
                   << " v." << application.applicationVersion()
                      .toLatin1().constData()
-                  << std::endl;
-        std::cout << "Application file path: "
+                  << std::endl
+                  << "Application file path: "
                   << QDir::toNativeSeparators(
-                          QApplication::applicationFilePath())
-                      .toLatin1().constData()
-                  << std::endl;
-        std::cout << "Command line: "
-                  << allArguments.toLatin1().constData() << std::endl;
-        std::cout << "Qt version: " << QT_VERSION_STR << std::endl;
-        std::cout << "License: " << QLibraryInfo::licensedProducts()
-                     .toLatin1().constData() << std::endl;
-        std::cout << "Libraries Path: "
+                         QApplication::applicationFilePath())
+                     .toLatin1().constData()
+                  << std::endl
+                  << "Command line: "
+                  << allArguments.toLatin1().constData() << std::endl
+                  << "Qt version: " << QT_VERSION_STR << std::endl
+                  << "License: " << QLibraryInfo::licensedProducts()
+                     .toLatin1().constData() << std::endl
+                  << "Libraries Path: "
                   << QLibraryInfo::location(QLibraryInfo::LibrariesPath)
                      .toLatin1().constData() << std::endl;
 
         // Prevent starting as root from command line:
         if (userEuid == 0) {
             std::cout << "Started from terminal with root privileges. Aborting!"
-                      << std::endl;
-            std::cout << " " << std::endl;
+                      << std::endl
+                      << " " << std::endl;
             return 1;
             QApplication::exit();
         } else {
@@ -866,27 +865,27 @@ int main(int argc, char **argv)
     // LOG ALL SETTINGS:
     // ==============================
     // Log basic program information:
-    qDebug() << "";
-    qDebug() << application.applicationName().toLatin1().constData()
+    qDebug() << "" << endl
+             << application.applicationName().toLatin1().constData()
              << "version"
              << application.applicationVersion().toLatin1().constData()
-             << "started.";
-    qDebug() << "Application file path:"
+             << "started." << endl
+             << "Application file path:"
              << QDir::toNativeSeparators(QApplication::applicationFilePath())
-                .toLatin1().constData();
-    qDebug() << "Command line:" << allArguments.toLatin1().constData();
-    qDebug() << "Qt version:" << QT_VERSION_STR;
-    qDebug() << "License:"
-             << QLibraryInfo::licensedProducts().toLatin1().constData();
-    qDebug() << "Libraries Path:"
+                .toLatin1().constData() << endl
+             << "Command line:" << allArguments.toLatin1().constData() << endl
+             << "Qt version:" << QT_VERSION_STR << endl
+             << "License:"
+             << QLibraryInfo::licensedProducts().toLatin1().constData() << endl
+             << "Libraries Path:"
              << QLibraryInfo::location(QLibraryInfo::LibrariesPath)
-                .toLatin1().constData();
-    qDebug() << "";
+                .toLatin1().constData() << endl
+             << "";
 
-    qDebug() << "===============";
-    qDebug() << "COMPILE-TIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Local pseudo-domain:" << PSEUDO_DOMAIN;
+    qDebug() << "===============" << endl
+             << "BROWSER COMPILE-TIME SETTINGS:" << endl
+             << "===============" << endl
+             << "Local pseudo-domain:" << PSEUDO_DOMAIN;
     if (SCRIPT_CENSORING == 0) {
         qDebug() << "Script censoring disabled.";
     }
@@ -909,79 +908,66 @@ int main(int argc, char **argv)
         qDebug() << "Perl debugger interaction enabled.";
     }
 
-    qDebug() << "===============";
-    qDebug() << "BASIC RUNTIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Root folder:" << QDir::toNativeSeparators(rootDirName);
-    qDebug() << "Temporary folder:" << applicationTempDirectoryName;
-    qDebug() << "Settings file name:" << settingsFileName;
-
-    qDebug() << "===============";
-    qDebug() << "PERL RUNTIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Folders to add to PATH:";
+    qDebug() << "===============" << endl
+             << "BROWSER RUNTIME SETTINGS:" << endl
+             << "===============" << endl
+             << "Temporary folder:" << applicationTempDirectoryName << endl
+             << "Settings file name:" << settingsFileName << endl
+             << "Folders to add to PATH:";
     foreach (QString pathEntry, pathToAddList) {
         qDebug() << pathEntry;
     }
-    qDebug() << "Perl interpreter" << perlInterpreter;
-    qDebug() << "PERLLIB folder:" << perlLib;
-    qDebug() << "Display STDERR from scripts:" << displayStderr;
-    qDebug() << "Script Timeout:" << scriptTimeout;
+    qDebug() << "Perl interpreter" << perlInterpreter << endl
+             << "PERLLIB folder:" << perlLib << endl
+             << "Display STDERR from scripts:" << displayStderr << endl
+             << "Script Timeout:" << scriptTimeout << endl
+             << "Logging:" << logging << endl
+             << "Logging mode:" << logMode << endl
+             << "Logfiles directory:" << logDirFullPath << endl
+             << "Logfiles prefix:" << logPrefix;
 
-    qDebug() << "===============";
-    qDebug() << "NETWORKING RUNTIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "User Agent:" << userAgent;
-    qDebug() << "Allowed domain names:";
-    foreach (QString allowedDomainsListEntry, allowedDomainsList) {
-        qDebug() << allowedDomainsListEntry;
-    }
-
-    qDebug() << "===============";
-    qDebug() << "GUI RUNTIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Start page:" << startPagePath;
-    qDebug() << "Warn on exit:" << warnOnExit;
-    // Get screen resolution:
-    int screenWidth = QDesktopWidget().screen()->rect().width();
-    int screenHeight = QDesktopWidget().screen()->rect().height();
-    qDebug() << "Screen resolution:" << screenWidth << "x" << screenHeight;
+    qDebug() << "===============" << endl
+             << "PACKAGE GUI SETTINGS:" << endl
+             << "===============" << endl
+             << "Root folder:" << QDir::toNativeSeparators(rootDirName) << endl
+             << "Start page:" << startPagePath << endl
+             << "Warn on exit:" << warnOnExit;
 #ifndef Q_OS_MAC
     qDebug() << "Window size:" << windowSize;
 #endif
-    qDebug() << "Browser title:" << browserTitle;
-    qDebug() << "Context menu:" << contextMenu;
-    qDebug() << "Go to start page capability:"
-             << goHomeCapability;
-    qDebug() << "Page reload capability:" << reloadCapability;
-    qDebug() << "Windows and dialogs icon file:" << iconPathName;
-    qDebug() << "Available Qt styles:";
-    QStringList allAvailableStyles = QStyleFactory::keys();
-    foreach (QString availableStyle, allAvailableStyles) {
-        qDebug() << availableStyle;
-    }
+    qDebug() << "Browser title:" << browserTitle << endl
+             << "Context menu:" << contextMenu << endl
+             << "Go to start page capability:" << goHomeCapability << endl
+             << "Page reload capability:" << reloadCapability << endl
+             << "Windows and dialogs icon file:" << iconPathName;
     if (qtStyle.length() > 0) {
+        qDebug() << "Available Qt styles:";
+        QStringList allAvailableStyles = QStyleFactory::keys();
+        foreach (QString availableStyle, allAvailableStyles) {
+            qDebug() << availableStyle;
+        }
         qDebug() << "Global Qt style:" << qtStyle;
     }
-    qDebug() << "Default theme directory:" << defaultThemeDirectory;
-    qDebug() << "All themes directory:" << allThemesDirectory;
-    qDebug() << "Default translation:" << translation;
-    qDebug() << "System tray icon switch:" << systrayIcon;
-    qDebug() << "System tray icon file:" << systrayIconPathName;
-    qDebug() << "Web Inspector from context menu:" << webInspector;
+    qDebug() << "Default theme directory:" << defaultThemeDirectory << endl
+             << "All themes directory:" << allThemesDirectory << endl
+             << "Default translation:" << translation << endl
+             << "System tray icon switch:" << systrayIcon << endl
+             << "System tray icon file:" << systrayIconPathName << endl
+             << "Web Inspector from context menu:" << webInspector;
 
-    qDebug() << "===============";
-    qDebug() << "LOGGING RUNTIME SETTINGS:";
-    qDebug() << "===============";
-    qDebug() << "Logging:" << logging;
-    qDebug() << "Logging mode:" << logMode;
-    qDebug() << "Logfiles directory:" << logDirFullPath;
-    qDebug() << "Logfiles prefix:" << logPrefix;
+    qDebug() << "===============" << endl
+             << "PACKAGE NETWORKING SETTINGS:" << endl
+             << "===============" << endl
+             << "User Agent:" << userAgent << endl
+             << "Allowed domain names:";
+    foreach (QString allowedDomainsListEntry, allowedDomainsList) {
+        qDebug() << allowedDomainsListEntry;
+    }
     qDebug() << "===============";
 
     if (extractedFiles.length() > 0) {
-        qDebug() << "ZIP package found.";
-        qDebug() << "Extracted directories and files:";
+        qDebug() << "ZIP package found." << endl
+                 << "Extracted directories and files:";
         foreach (QString extractedFile, extractedFiles) {
             qDebug() << extractedFile;
         }
