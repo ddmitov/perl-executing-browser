@@ -218,8 +218,6 @@ signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
     void startPerlDebuggerSignal(QUrl debuggerUrl);
 
-    void qInjectSettingsSignal();
-
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
                                          const QNetworkRequest &request,
@@ -227,7 +225,7 @@ protected:
     {
         // Local AJAX GET and POST requests.
         if ((operation == GetOperation or
-             operation == PostOperation) and
+                 operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains("ajax")) {
 
@@ -406,7 +404,8 @@ protected:
             return reply;
         }
 
-        // GET requests to the browser pseudodomain:
+        // GET requests to the browser pseudodomain -
+        // local files, CGI-like and long-running scripts:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
@@ -465,8 +464,8 @@ protected:
             }
         }
 
-        // Take data from a local form using CGI POST method and
-        // execute associated local script:
+        // POST requests to the browser pseudodomain -
+        // CGI-like and long-running scripts:
         if (operation == PostOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
@@ -1127,9 +1126,9 @@ public slots:
 
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch: output from Perl debugger received.";
-//            qDebug() << "Debugger raw output:\n"
-//                     << debuggerOutput;
-//            qDebug() << "===============";
+//            qDebug() << "Debugger raw output:" << endl
+//                     << debuggerOutput << endl
+//                     << "===============";
 
             // Formatting of Perl debugger output is started only after
             // the final command prompt comes out of the debugger:
@@ -1537,6 +1536,7 @@ public slots:
         } else {
             newWindow->setUrl(qWebHitTestURL);
         }
+
         newWindow->show();
     }
 

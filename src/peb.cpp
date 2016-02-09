@@ -434,6 +434,10 @@ int main(int argc, char **argv)
     }
 
     application.setProperty("settingsFileName", settingsFileName);
+
+    if (!settingsDirName.endsWith(QDir::separator())) {
+        settingsDirName.append(QDir::separator());
+    }
     application.setProperty("settingsDirName", settingsDirName);
 
     QFile settingsFile(settingsFileName);
@@ -1051,12 +1055,10 @@ QScriptEnvironment::QScriptEnvironment()
     : QObject(0)
 {
     // DOCUMENT_ROOT:
-    scriptEnvironment.remove("DOCUMENT_ROOT");
     scriptEnvironment.insert("DOCUMENT_ROOT",
                              qApp->property("rootDirName").toString());
 
     // PERLLIB:
-    scriptEnvironment.remove("PERLLIB");
     scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());
 
     // PATH:
@@ -1089,11 +1091,9 @@ QScriptEnvironment::QScriptEnvironment()
     }
 
 #ifndef Q_OS_WIN // Linux and Mac
-    scriptEnvironment.remove("PATH");
     scriptEnvironment.insert("PATH", path);
 #endif
 #ifdef Q_OS_WIN // Windows
-    scriptEnvironment.remove("Path");
     scriptEnvironment.insert("Path", path);
 #endif
 }
@@ -1449,8 +1449,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         QString settingsUiContents = settingsUistream.readAll();
         settingsUiFile.close();
 
-        settingsUiContents.replace("[% Root %]",
-                                   qApp->property("rootDirName").toString());
+//        settingsUiContents.replace("[% Root %]",
+//                                   qApp->property("rootDirName").toString());
 
         QString path;
         foreach (QString pathEntry,
@@ -2015,29 +2015,25 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     }
 
     // OPEN NETWORK CONTENT:
-    // Open allowed network content in the same window:
+    // Open network content in the same window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            (QPage::mainFrame()->childFrames().contains(frame)) and
-            ((qApp->property("allowedDomainsList").toStringList())
-             .contains(request.url().authority()))) {
+            QPage::mainFrame()->childFrames().contains(frame) and
+            (request.url().authority() != PSEUDO_DOMAIN)) {
 
-        qDebug() << "Allowed network link in the same window:"
-                 << request.url().toString();
+        qDebug() << "Network link:" << request.url().toString();
         qDebug() << "===============";
 
-        frame->load(request.url());
+        QPage::mainFrame()->load(request.url());
 
         return false;
     }
 
-    // Open allowed network content in a new window:
+    // Open network content in a new window:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             (!QPage::mainFrame()->childFrames().contains(frame)) and
-            ((qApp->property("allowedDomainsList").toStringList())
-             .contains(request.url().authority()))) {
+            (request.url().authority() != PSEUDO_DOMAIN)) {
 
-        qDebug() << "Allowed network link in a new window:"
-                 << request.url().toString();
+        qDebug() << "Network link in a new window:" << request.url().toString();
         qDebug() << "===============";
 
         newWindow = new QTopLevel();
