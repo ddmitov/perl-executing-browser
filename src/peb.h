@@ -211,7 +211,7 @@ private:
 // NETWORK ACCESS MANAGER
 // CLASS DEFINITION:
 // ==============================
-class QModifiedNetworkAccessManager : public QNetworkAccessManager
+class QAccessManager : public QNetworkAccessManager
 {
     Q_OBJECT
 
@@ -359,6 +359,23 @@ protected:
                     scriptTimeoutMessageBox
                             .setText(
                                 tr("Your AJAX script timed out:")
+                                + "<br>"
+                                + scriptFullFilePath);
+                    scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);
+                    scriptTimeoutMessageBox.exec();
+                }
+
+                if (scriptErrorString.length() > 0) {
+                    QMessageBox scriptTimeoutMessageBox (qApp->activeWindow());
+                    scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
+                    scriptTimeoutMessageBox
+                            .setWindowTitle(tr("AJAX Script Errors"));
+                    scriptTimeoutMessageBox
+                            .setIconPixmap((qApp->property("icon").toString()));
+                    scriptTimeoutMessageBox
+                            .setText(
+                                tr("Errors were found "
+                                   "during AJAX script execution:")
                                 + "<br>"
                                 + scriptFullFilePath);
                     scriptTimeoutMessageBox.setDefaultButton(QMessageBox::Ok);

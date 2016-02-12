@@ -13,8 +13,6 @@ v. 0.2
 - nice HTML interface for settings
 - separate global settings and package settings
 
-- capture STDERR from local AJAX scripts
-
 - censor.pl behaviour governed by compile-time settings;
   they will correspond to hard-coded command line arguments given by the browser
 - better documentation for censor.pl

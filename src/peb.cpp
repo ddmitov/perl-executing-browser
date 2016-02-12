@@ -1337,8 +1337,8 @@ QWebViewWindow::QWebViewWindow()
     setPage(mainPage);
 
     // Use modified Network Access Manager with every window of the program:
-    QModifiedNetworkAccessManager *networkAccessManager =
-            new QModifiedNetworkAccessManager();
+    QAccessManager *networkAccessManager =
+            new QAccessManager();
     mainPage->setNetworkAccessManager(networkAccessManager);
 
     QObject::connect(networkAccessManager,

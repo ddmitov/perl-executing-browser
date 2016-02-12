@@ -3,9 +3,6 @@
 use strict;
 use warnings;
 
-#~ use FindBin;
-#~ use File::HomeDir;
-
 print "Content-Type: text/html\r\n\r\n";
 
 print "<html>\n";
@@ -26,16 +23,6 @@ foreach my $key (sort keys %ENV) {
 }
 
 print "\n";
-
-#~ print "Home:\n";
-#~ my $home = File::HomeDir->my_home;
-#~ print $home;
-#~ print "\n";
-
-#~ print "Script directory:\n";
-#~ my $script_directory = $FindBin::Bin;
-#~ print $script_directory;
-#~ print "\n";
 
 print "\@INC:\n";
 print join "\n", @INC;
