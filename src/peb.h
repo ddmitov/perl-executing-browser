@@ -208,24 +208,24 @@ private:
 };
 
 // ==============================
-// NETWORK ACCESS MANAGER CLASS DEFINITION:
+// NETWORK ACCESS MANAGER
+// CLASS DEFINITION:
 // ==============================
-class ModifiedNetworkAccessManager : public QNetworkAccessManager
+class QModifiedNetworkAccessManager : public QNetworkAccessManager
 {
     Q_OBJECT
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
-    void startPerlDebuggerSignal(QUrl debuggerUrl);
 
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
-        // Local AJAX GET and POST requests.
+        // Local AJAX GET and POST requests:
         if ((operation == GetOperation or
-                 operation == PostOperation) and
+             operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains("ajax")) {
 
@@ -481,28 +481,15 @@ protected:
                      QNetworkRequest(emptyNetworkRequest));
         }
 
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            // Perl debugger interaction.
-            // Implementation of an idea proposed by Valcho Nedelchev.
-            // Transmit requests to Perl debugger
-            // in case debugger is started in a new window:
-            if (operation == GetOperation and
-                    request.url().scheme().contains("file") and
-                    request.url().hasQuery()) {
-
-                emit startPerlDebuggerSignal(request.url());
-            }
-        }
-
         // GET, POST and PUT requests to allowed resources.
         // Domain filtering happens here:
         if ((operation == GetOperation or
              operation == PostOperation or
              operation == PutOperation) and
-                ((request.url().scheme() =="file") or
-                 (request.url().scheme() == "qrc") or
-                 (request.url().toString().contains("data:image")) or
-                 (request.url().authority() == PSEUDO_DOMAIN) or
+                (request.url().scheme() == "file" or
+                 request.url().scheme() == "qrc" or
+                 request.url().toString().contains("data:image") or
+                 request.url().authority() == PSEUDO_DOMAIN or
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
 
@@ -1030,7 +1017,7 @@ public slots:
     // PERL DEBUGGER INTERACTION.
     // Implementation of an idea proposed by Valcho Nedelchev.
     // ==============================
-    void qStartPerlDebuggerSlot(QUrl debuggerUrl)
+    void qStartPerlDebuggerSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
             // Read and store in memory
@@ -1041,26 +1028,8 @@ public slots:
                     QString(debuggerOutputFormatterFile.readAll());
             debuggerOutputFormatterFile.close();
 
-            // Read Perl debugger interaction special URL:
-            QString filePath = debuggerUrl.path();
-
-#ifdef Q_OS_WIN
-            filePath.replace(QRegExp("^\\/"), "");
-#endif
-
-            if ((!filePath.contains("select-file")) and
-                    (!filePath.contains("execute"))) {
-                debuggerScriptToDebugFilePath = filePath;
-            }
-
-            debuggerLastCommand = debuggerUrl.query()
-                    .replace("command", "")
-                    .replace("=", "")
-                    .replace("+", " ")
-                    .replace("/", "");
-
             qDebug() << "File passed to Perl debugger:"
-                     << QDir::toNativeSeparators(debuggerScriptToDebugFilePath);
+                     << QDir::toNativeSeparators(debuggerScriptToDebug);
 
             // Perl interpreter to be used for debugging:
             QString debuggerInterpreter =
@@ -1069,11 +1038,6 @@ public slots:
 
             // Clean accumulated debugger output from previous debugger session:
             debuggerAccumulatedOutput = "";
-
-            // Start a new debugger session with a new file to debug:
-            if (debuggerUrl.path().contains("select-file")) {
-                debuggerHandler.close();
-            }
 
             if (debuggerHandler.isOpen()) {
                 QByteArray debuggerCommand;
@@ -1086,7 +1050,7 @@ public slots:
                 scriptEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
                 debuggerHandler.setProcessEnvironment(scriptEnvironment);
 
-                QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebugFilePath);
+                QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 debuggerHandler.setWorkingDirectory(scriptDirectory);
                 qDebug() << "Working directory:"
@@ -1097,7 +1061,7 @@ public slots:
                 debuggerHandler.start(debuggerInterpreter, QStringList()
                                       << "-d" <<
                                       QDir::toNativeSeparators(
-                                          debuggerScriptToDebugFilePath),
+                                          debuggerScriptToDebug),
                                       QProcess::Unbuffered
                                       | QProcess::ReadWrite);
 
@@ -1169,7 +1133,7 @@ public slots:
             debuggerOutputHandler.setProcessEnvironment(scriptEnvironment);
 
             debuggerOutputFormatterScript
-                    .replace("SCRIPT", debuggerScriptToDebugFilePath);
+                    .replace("SCRIPT", debuggerScriptToDebug);
             debuggerOutputFormatterScript
                     .replace("DEBUGGER_COMMAND", debuggerLastCommand);
 
@@ -1323,9 +1287,8 @@ private:
     bool scriptOutputThemeEnabled;
     QString scriptOutputType;
 
-    QWebView *debuggerNewWindow;
     bool debuggerJustStarted;
-    QString debuggerScriptToDebugFilePath;
+    QString debuggerScriptToDebug;
     QString debuggerLastCommand;
     QProcess debuggerHandler;
     QString debuggerOutputFormatterScript;
@@ -1339,7 +1302,7 @@ private:
 // ==============================
 // WEB VIEW CLASS DEFINITION:
 // ==============================
-class QTopLevel : public QWebView
+class QWebViewWindow : public QWebView
 {
     Q_OBJECT
 
@@ -1366,7 +1329,7 @@ public slots:
     void qPageLoadedDynamicTitleSlot(bool ok)
     {
         if (ok) {
-            setWindowTitle(QTopLevel::title());
+            setWindowTitle(QWebViewWindow::title());
         }
     }
 
@@ -1391,7 +1354,7 @@ public slots:
 #ifdef QT_NO_PRINTER
         Q_UNUSED(printer);
 #else
-        QTopLevel::print(printer);
+        QWebViewWindow::print(printer);
 #endif
     }
 
@@ -1420,7 +1383,7 @@ public slots:
                                  (screenRect.height() / 2)
                                  - (dialogSize.height() / 2)));
         if (printDialog->exec() == QDialog::Accepted) {
-            QTopLevel::print(&printer);
+            QWebViewWindow::print(&printer);
         }
         printDialog->close();
         printDialog->deleteLater();
@@ -1462,7 +1425,7 @@ public slots:
             pdfPrinter.setNumCopies(1);
             pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
             pdfPrinter.setOutputFileName(fileName);
-            QTopLevel::print(&pdfPrinter);
+            QWebViewWindow::print(&pdfPrinter);
         }
 
         qDebug() << "===============";
@@ -1493,7 +1456,7 @@ public slots:
 
     void qViewSourceFromContextMenuSlot()
     {
-        newWindow = new QTopLevel();
+        newWindow = new QWebViewWindow();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);
@@ -1514,7 +1477,7 @@ public slots:
 
     void qOpenInNewWindowSlot()
     {
-        newWindow = new QTopLevel();
+        newWindow = new QWebViewWindow();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);
@@ -1542,7 +1505,7 @@ public slots:
 
     void qDisplayErrorsSlot(QString errors)
     {
-        errorsWindow = new QTopLevel();
+        errorsWindow = new QWebViewWindow();
         errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
         errorsWindow->setFocus();
         errorsWindow->show();
@@ -1614,7 +1577,7 @@ public slots:
 
             if ((qApp->property("reloadCapability").toString()) == "enable") {
                 if (mainPage->runningScriptsInCurrentWindowList.length() == 0 or
-                        QTopLevel::url().toString().length() > 0) {
+                        QWebViewWindow::url().toString().length() > 0) {
                     QAction *reloadAct = menu->addAction(tr("&Reload"));
                     QObject::connect(reloadAct, SIGNAL(triggered()),
                                      this, SLOT(qReloadSlot()));
@@ -1740,34 +1703,45 @@ public slots:
         } else {
             if (qApp->property("warnOnExit").toString() ==
                     "if_text_is_entered") {
+
+                mainPage->currentFrame()->evaluateJavaScript(
+                            mainPage->checkUserInputBeforeQuitJavaScript);
                 QVariant jsQuitDecision =
                         mainPage->currentFrame()->evaluateJavaScript(
                             "checkUserInputBeforeQuit()");
-                QString qtQuitDecision = jsQuitDecision.toString();
+                QString textIsEntered = jsQuitDecision.toString();
 
-                if (qtQuitDecision.length() > 0) {
-                    if (qtQuitDecision == "yes") {
-                        event->accept();
-                        windowClosingStarted = true;
-                    }
-                    if (qtQuitDecision == "no") {
-                        event->ignore();
-                    }
+                if (textIsEntered == "no") {
+                    event->accept();
+                    windowClosingStarted = true;
                 }
-
-                if (qtQuitDecision.length() == 0) {
-                    mainPage->currentFrame()->evaluateJavaScript(
-                                mainPage->checkUserInputBeforeQuitJavaScript);
-                    QVariant jsQuitDecision =
-                            mainPage->currentFrame()->evaluateJavaScript(
-                                "checkUserInputBeforeQuit()");
-                    QString qtQuitDecision = jsQuitDecision.toString();
-
-                    if (qtQuitDecision == "yes") {
+                if (textIsEntered == "yes") {
+                    QMessageBox confirmExitMessageBox (qApp->activeWindow());
+                    confirmExitMessageBox.setWindowModality(Qt::WindowModal);
+                    confirmExitMessageBox.setWindowTitle(tr("Close window"));
+                    confirmExitMessageBox
+                            .setIconPixmap((qApp->property("icon").toString()));
+                    confirmExitMessageBox
+                            .setText(
+                                tr("Text was entered on this page and "
+                                   "it is going to be lost!")
+                                + "<br>"
+                                + tr("This information can not be recovered!")
+                                + "<br>"
+                                + tr("Are you sure you want to "
+                                     "close the window?"));
+                    confirmExitMessageBox
+                            .setStandardButtons(
+                                QMessageBox::Yes | QMessageBox::No);
+                    confirmExitMessageBox
+                            .setButtonText(QMessageBox::Yes, tr("Yes"));
+                    confirmExitMessageBox
+                            .setButtonText(QMessageBox::No, tr("No"));
+                    confirmExitMessageBox.setDefaultButton(QMessageBox::No);
+                    if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                         event->accept();
                         windowClosingStarted = true;
-                    }
-                    if (qtQuitDecision == "no") {
+                    } else {
                         event->ignore();
                     }
                 }
@@ -1832,14 +1806,14 @@ public slots:
     }
 
 public:
-    QTopLevel();
+    QWebViewWindow();
 
     QWebView *createWindow(QWebPage::WebWindowType type)
     {
         qDebug() << "New window requested.";
 
         Q_UNUSED(type);
-        QWebView *window = new QTopLevel();
+        QWebView *window = new QWebViewWindow();
         window->setWindowIcon(icon);
         window->setAttribute(Qt::WA_DeleteOnClose, true);
         window->show();

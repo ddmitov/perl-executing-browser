@@ -1,4 +1,4 @@
-/*
+﻿/*
  Perl Executing Browser, v. 0.1
 
  This program is free software;
@@ -229,11 +229,6 @@ int main(int argc, char **argv)
         std::cout << " " << std::endl
                   << application.applicationName().toLatin1().constData()
                   << " v." << application.applicationVersion()
-                     .toLatin1().constData()
-                  << std::endl
-                  << "Application file path: "
-                  << QDir::toNativeSeparators(
-                         QApplication::applicationFilePath())
                      .toLatin1().constData()
                   << std::endl
                   << "Command line: "
@@ -506,6 +501,27 @@ int main(int argc, char **argv)
             .value("browser_logging/logging_prefix").toString();
     application.setProperty("logPrefix", logPrefix);
 
+    // BROWSER NETWORKING SETTINGS:
+    // Allowed domains:
+    QStringList allowedDomainsList;
+    int domainsSize = settings
+            .beginReadArray("browser_networking/allowed_domains");
+    for (int index = 0; index < domainsSize; ++index) {
+        settings.setArrayIndex(index);
+        QString pathSetting = settings.value("name").toString();
+        allowedDomainsList.append(pathSetting);
+    }
+    settings.endArray();
+    application.setProperty("allowedDomainsList", allowedDomainsList);
+
+    // User agent:
+    QString userAgent = settings
+            .value("browser_networking/user_agent").toString();
+    if (userAgent.length() == 0) {
+        userAgent = USER_AGENT;
+    }
+    application.setProperty("userAgent", userAgent);
+
     // BROWSER PERL SETTINGS:
     // Folders to add to PATH:
     QStringList pathToAddList;
@@ -513,8 +529,25 @@ int main(int argc, char **argv)
     for (int index = 0; index < pathSize; ++index) {
         settings.setArrayIndex(index);
         QString pathSetting = settings.value("name").toString();
-        pathToAddList.append(pathSetting);
+
+        // Get all directory names to be added on PATH of all local scripts,
+        // but first check if these directories exist,
+        // then resolve all relative paths, if any:
+        QDir pathDir(pathSetting);
+        if (pathDir.exists()) {
+            if (pathDir.isRelative()) {
+                pathSetting = QDir::toNativeSeparators(
+                            (qApp->property("settingsDirName").toString())
+                            + pathSetting);
+                pathToAddList.append(pathSetting);
+            }
+            if (pathDir.isAbsolute()) {
+                pathSetting = QDir::toNativeSeparators(pathSetting);
+                pathToAddList.append(pathSetting);
+            }
+        }
     }
+
     settings.endArray();
     application.setProperty("pathToAddList", pathToAddList);
 
@@ -824,27 +857,6 @@ int main(int argc, char **argv)
     }
     application.installTranslator(&translator);
 
-    // PACKAGE NETWORKING SETTINGS:
-    // User agent:
-    QString userAgent = settings
-            .value("package_networking/user_agent").toString();
-    if (userAgent.length() == 0) {
-        userAgent = USER_AGENT;
-    }
-    application.setProperty("userAgent", userAgent);
-
-    // Allowed domains:
-    QStringList allowedDomainsList;
-    int domainsSize = settings
-            .beginReadArray("package_networking/allowed_domains");
-    for (int index = 0; index < domainsSize; ++index) {
-        settings.setArrayIndex(index);
-        QString pathSetting = settings.value("name").toString();
-        allowedDomainsList.append(pathSetting);
-    }
-    settings.endArray();
-    application.setProperty("allowedDomainsList", allowedDomainsList);
-
     // ==============================
     // COMMAND LINE SETTING OVERRIDES:
     // ==============================
@@ -874,9 +886,6 @@ int main(int argc, char **argv)
              << "version"
              << application.applicationVersion().toLatin1().constData()
              << "started." << endl
-             << "Application file path:"
-             << QDir::toNativeSeparators(QApplication::applicationFilePath())
-                .toLatin1().constData() << endl
              << "Command line:" << allArguments.toLatin1().constData() << endl
              << "Qt version:" << QT_VERSION_STR << endl
              << "License:"
@@ -891,25 +900,25 @@ int main(int argc, char **argv)
              << "===============" << endl
              << "Local pseudo-domain:" << PSEUDO_DOMAIN;
     if (SCRIPT_CENSORING == 0) {
-        qDebug() << "Script censoring disabled.";
+        qDebug() << "Script censoring is disabled.";
     }
     if (SCRIPT_CENSORING == 1) {
-        qDebug() << "Script censoring enabled.";
+        qDebug() << "Script censoring is enabled.";
     }
     if (ZIP_SUPPORT == 0) {
-        qDebug() << "ZIP packages support disabled.";
+        qDebug() << "ZIP packages support is disabled.";
     }
     if (ZIP_SUPPORT == 1) {
-        qDebug() << "ZIP packages support enabled using internal code.";
+        qDebug() << "ZIP packages support is enabled using internal code.";
     }
     if (ZIP_SUPPORT == 2) {
-        qDebug() << "ZIP packages support enabled using external unpacker.";
+        qDebug() << "ZIP packages support is enabled using external unpacker.";
     }
     if (PERL_DEBUGGER_INTERACTION == 0) {
-        qDebug() << "Perl debugger interaction disabled.";
+        qDebug() << "Perl debugger interaction is disabled.";
     }
     if (PERL_DEBUGGER_INTERACTION == 1) {
-        qDebug() << "Perl debugger interaction enabled.";
+        qDebug() << "Perl debugger interaction is enabled.";
     }
 
     qDebug() << "===============" << endl
@@ -928,10 +937,15 @@ int main(int argc, char **argv)
              << "Logging:" << logging << endl
              << "Logging mode:" << logMode << endl
              << "Logfiles directory:" << logDirFullPath << endl
-             << "Logfiles prefix:" << logPrefix;
+             << "Logfiles prefix:" << logPrefix << endl
+             << "Allowed domains:";
+    foreach (QString allowedDomainsListEntry, allowedDomainsList) {
+        qDebug() << allowedDomainsListEntry;
+    }
+    qDebug() << "User Agent:" << userAgent;
 
     qDebug() << "===============" << endl
-             << "PACKAGE GUI SETTINGS:" << endl
+             << "PACKAGE SETTINGS:" << endl
              << "===============" << endl
              << "Root folder:" << QDir::toNativeSeparators(rootDirName) << endl
              << "Start page:" << startPagePath << endl
@@ -957,17 +971,8 @@ int main(int argc, char **argv)
              << "Default translation:" << translation << endl
              << "System tray icon switch:" << systrayIcon << endl
              << "System tray icon file:" << systrayIconPathName << endl
-             << "Web Inspector from context menu:" << webInspector;
-
-    qDebug() << "===============" << endl
-             << "PACKAGE NETWORKING SETTINGS:" << endl
-             << "===============" << endl
-             << "User Agent:" << userAgent << endl
-             << "Allowed domain names:";
-    foreach (QString allowedDomainsListEntry, allowedDomainsList) {
-        qDebug() << allowedDomainsListEntry;
-    }
-    qDebug() << "===============";
+             << "Web Inspector from context menu:" << webInspector << endl
+             << "===============";
 
     if (extractedFiles.length() > 0) {
         qDebug() << "ZIP package found." << endl
@@ -981,7 +986,7 @@ int main(int argc, char **argv)
     // ==============================
     // MAIN GUI CLASS INITIALIZATION:
     // ==============================
-    QTopLevel toplevel;
+    QWebViewWindow toplevel;
 
     QObject::connect(qApp, SIGNAL(lastWindowClosed()),
                      &toplevel, SLOT(qExitApplicationSlot()));
@@ -1075,19 +1080,8 @@ QScriptEnvironment::QScriptEnvironment()
     // but first check if these directories exist,
     // then resolve all relative paths, if any:
     foreach (QString pathEntry, qApp->property("pathToAddList").toString()) {
-        QDir pathDir(pathEntry);
-        if (pathDir.exists()) {
-            if (pathDir.isRelative()) {
-                pathEntry = QDir::toNativeSeparators(
-                            qApp->property("settingsDirName").toString()
-                            + pathEntry);
-            }
-            if (pathDir.isAbsolute()) {
-                pathEntry = QDir::toNativeSeparators(pathEntry);
-            }
-            path.append(pathEntry);
-            path.append(pathSeparator);
-        }
+        path.append(pathEntry);
+        path.append(pathSeparator);
     }
 
 #ifndef Q_OS_WIN // Linux and Mac
@@ -1210,6 +1204,7 @@ QPage::QPage()
             setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+    //QWebPage::setForwardUnsupportedContent(true);
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
@@ -1230,6 +1225,9 @@ QPage::QPage()
                          SIGNAL(finished(int, QProcess::ExitStatus)),
                          this,
                          SLOT(qDebuggerHtmlFormatterFinishedSlot()));
+
+        // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
+        debuggerJustStarted = false;
     }
 
     // SIGNALS AND SLOTS FOR ALL LOCAL PERL SCRIPTS:
@@ -1258,15 +1256,12 @@ QPage::QPage()
     file.open(QIODevice::ReadOnly);
     checkUserInputBeforeQuitJavaScript = file.readAll();
     file.close();
-
-    // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
-    debuggerJustStarted = false;
 }
 
 // ==============================
 // WEB VIEW CLASS CONSTRUCTOR:
 // ==============================
-QTopLevel::QTopLevel()
+QWebViewWindow::QWebViewWindow()
     : QWebView(0)
 {
     // Configure keyboard shortcuts:
@@ -1342,21 +1337,14 @@ QTopLevel::QTopLevel()
     setPage(mainPage);
 
     // Use modified Network Access Manager with every window of the program:
-    ModifiedNetworkAccessManager *networkAccessManager =
-            new ModifiedNetworkAccessManager();
+    QModifiedNetworkAccessManager *networkAccessManager =
+            new QModifiedNetworkAccessManager();
     mainPage->setNetworkAccessManager(networkAccessManager);
 
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      mainPage,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
-
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        QObject::connect(networkAccessManager,
-                         SIGNAL(startPerlDebuggerSignal(QUrl)),
-                         mainPage,
-                         SLOT(qStartPerlDebuggerSlot(QUrl)));
-    }
 
     // Disable history:
     QWebHistory *history = mainPage->history();
@@ -1449,25 +1437,11 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         QString settingsUiContents = settingsUistream.readAll();
         settingsUiFile.close();
 
-//        settingsUiContents.replace("[% Root %]",
-//                                   qApp->property("rootDirName").toString());
-
         QString path;
         foreach (QString pathEntry,
                  qApp->property("pathToAddList").toStringList()) {
-            QDir pathDir(pathEntry);
-            if (pathDir.exists()) {
-                if (pathDir.isRelative()) {
-                    pathEntry = QDir::toNativeSeparators(
-                                qApp->property("settingsDirName").toString()
-                                + pathEntry);
-                }
-                if (pathDir.isAbsolute()) {
-                    pathEntry = QDir::toNativeSeparators(pathEntry);
-                }
-                path.append(pathEntry);
-                path.append("<br>");
-            }
+            path.append(pathEntry);
+            path.append("<br>");
         }
         path.replace(QRegExp("<br>$"), "");
         if (path.length() > 0) {
@@ -1520,7 +1494,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             QSettings perlInterpreterSetting(
                         (qApp->property("settingsFileName").toString()),
                         QSettings::IniFormat);
-            perlInterpreterSetting.setValue("browser_perl/perl", perlInterpreter);
+            perlInterpreterSetting
+                    .setValue("browser_perl/perl", perlInterpreter);
             perlInterpreterSetting.sync();
 
             // Set global Perl interpreter setting:
@@ -1599,25 +1574,30 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         qDebug() << "Folder to add to PATH:" << pathFolderString;
         qDebug() << "===============";
 
+        // Get the list of all folders on the current PATH:
+        QStringList oldPathList =
+                qApp->property("pathToAddList").toStringList();
+
+        QStringList pathList;
+        foreach (QString pathEntry, oldPathList) {
+            pathList.append(pathEntry);
+        }
+
+        // Append the new folder name to the list of current PATH folders:
+        pathList.append(pathFolderString);
+
+        // Save the new PATH folders list in the global settings:
+        qApp->setProperty("pathToAddList", pathList);
+
         // Open the settings file:
         QSettings pathFoldersSetting((qApp->property("settingsFileName")
                                       .toString()),
                                      QSettings::IniFormat);
 
-        // Get list of all folders on the current PATH:
-        QStringList pathList;
+        // Get the size of the PATH array in the settings file:
         int pathArraySize = pathFoldersSetting
                 .beginReadArray("browser_perl/path");
-        for (int index = 0; index < pathArraySize; ++index) {
-            pathFoldersSetting.setArrayIndex(index);
-            QString pathSetting = pathFoldersSetting.value("name").toString();
-            pathList.append(pathSetting);
-        }
-        pathFoldersSetting.endArray();
-
-        // Append the new folder name to
-        // the list of all folders on the current PATH:
-        pathList.append(pathFolderString);
+         pathFoldersSetting.endArray();
 
         // Append the new folder name in the
         // appropriate section of the settings file:
@@ -1627,7 +1607,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         pathFoldersSetting.endArray();
 
         // Define separator between PATH folders:
-        QByteArray path;
         QString pathSeparator;
 #if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
         pathSeparator = ":";
@@ -1636,51 +1615,26 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         pathSeparator = ";";
 #endif
 
-        // Add all browser-specific folders to PATH,
-        // but first check if these directories exist,
-        // then resolve all relative paths, if any:
+        // Put the new folder name on PATH:
+        QByteArray path;
         foreach (QString pathEntry, pathList) {
-            QDir pathDir(pathEntry);
-            if (pathDir.exists()) {
-                if (pathDir.isRelative()) {
-                    pathEntry = QDir::toNativeSeparators(
-                                (qApp->property("rootDirName").toString())
-                                + pathEntry);
-                }
-                if (pathDir.isAbsolute()) {
-                    pathEntry = QDir::toNativeSeparators(pathEntry);
-                }
-                path.append(pathEntry);
-                path.append(pathSeparator);
-            }
+            path.append(pathEntry);
+            path.append(pathSeparator);
         }
 
-        // Insert the new browser-specific PATH variable into
-        // the environment of the browser and
-        // all local scripts executed by the browser:
+        // Insert the new PATH variable into
+        // the script environment of the current page:
 #ifndef Q_OS_WIN // Unix-based or similar operating systems
         scriptEnvironment.insert("PATH", path);
 #else // Windows
         scriptEnvironment.insert("Path", path);
 #endif
 
-        qApp->setProperty("pathToAddList", pathList);
-
+        // Display the newly created PATH list on the settings page:
         QString pathToDisplay;
         foreach (QString pathEntry, pathList) {
-            QDir pathDir(pathEntry);
-            if (pathDir.exists()) {
-                if (pathDir.isRelative()) {
-                    pathEntry = QDir::toNativeSeparators(
-                                qApp->property("settingsDirName").toString()
-                                + pathEntry);
-                }
-                if (pathDir.isAbsolute()) {
-                    pathEntry = QDir::toNativeSeparators(pathEntry);
-                }
-                pathToDisplay.append(pathEntry);
-                pathToDisplay.append("<br>");
-            }
+            pathToDisplay.append(pathEntry);
+            pathToDisplay.append("<br>");
         }
         pathToDisplay.replace(QRegExp("<br>$"), "");
         if (pathToDisplay.length() > 0) {
@@ -1853,13 +1807,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     // PERL DEBUGGER INTERACTION:
     // Implementation of an idea proposed by Valcho Nedelchev.
     if (PERL_DEBUGGER_INTERACTION == 1) {
-
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
+        if ((navigationType == QWebPage::NavigationTypeLinkClicked or
+             navigationType == QWebPage::NavigationTypeFormSubmitted) and
                 request.url().fileName() == "perl-debugger.function") {
-
-            if (QPage::mainFrame()->childFrames().contains(frame)) {
                 targetFrame = frame;
-            }
 
             // Select a Perl script for debugging:
             if (request.url().query().contains("action=select-file")) {
@@ -1870,7 +1821,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
                 selectScriptToDebugDialog.setWindowModality(Qt::WindowModal);
                 selectScriptToDebugDialog.setWindowIcon(icon);
-                QString scriptToDebug = selectScriptToDebugDialog
+                debuggerScriptToDebug = selectScriptToDebugDialog
                         .getOpenFileName
                         (qApp->activeWindow(),
                          tr("Select Perl File"),
@@ -1881,63 +1832,41 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 selectScriptToDebugDialog.close();
                 selectScriptToDebugDialog.deleteLater();
 
-                if (scriptToDebug.length() > 1) {
-                    QUrl scriptToDebugUrl(QUrl::fromLocalFile(scriptToDebug));
-                    QString debuggerQueryString =
-                            request.url().query()
-                            .replace("action=select-file", "")
-                            .replace("&", "")
-                            .replace("command=", "");
-
-                    QUrlQuery debuggerQuery;
-                    debuggerQuery.addQueryItem(QString("command"),
-                                               QString(debuggerQueryString));
-                    scriptToDebugUrl.setQuery(debuggerQuery);
-
-                    qDebug() << "Perl Debugger URL:"
-                             << scriptToDebugUrl.toString();
+                if (debuggerScriptToDebug.length() > 1) {
+                    qDebug() << "File to load in the Perl Debugger:"
+                             << debuggerScriptToDebug;
                     qDebug() << "===============";
 
-                    // Create new window, if requested, but only after
-                    // a Perl script for debugging has been selected:
-                    if ((!QPage::mainFrame()->childFrames().contains(frame) and
-                         (!request.url().toString().contains("restart")))) {
-                        debuggerNewWindow = new QTopLevel();
-                        QString iconPathName =
-                                qApp->property("iconPathName").toString();
-                        QPixmap icon;
-                        icon.load(iconPathName);
-                        debuggerNewWindow->setWindowIcon(icon);
-                        debuggerNewWindow->setAttribute(
-                                    Qt::WA_DeleteOnClose, true);
-                        debuggerNewWindow->setUrl(scriptToDebugUrl);
-                        debuggerNewWindow->show();
-                        debuggerNewWindow->raise();
-                    }
+                    // Get Perl debugger command (if any):
+                    debuggerLastCommand = request.url().query().toLatin1()
+                            .replace("action=select-file", "")
+                            .replace("&command=", "")
+                            .replace("+", " ");
 
-                    if (QPage::mainFrame()->childFrames().contains(frame) or
-                            (request.url().toString().contains("restart"))) {
+                    qDebug() << "Debugger command:"
+                             << debuggerLastCommand;
+                    qDebug() << "===============";
 
-                        // Close open handler from a previous debugger session:
-                        debuggerHandler.close();
+                    // Close any still open Perl debugger session:
+                    debuggerHandler.close();
 
-                        qStartPerlDebuggerSlot(scriptToDebugUrl);
-                    }
-
+                    // Start the Perl debugger:
+                    qStartPerlDebuggerSlot();
                     return false;
                 } else {
                     return false;
                 }
             }
-        }
+            // Get Perl debugger command:
+            debuggerLastCommand = request.url().query().toLatin1()
+                    .replace("command=", "")
+                    .replace("+", " ");
 
-        // Transmit requests to Perl debugger (within the same page):
-        if (navigationType == QWebPage::NavigationTypeFormSubmitted and
-                request.url().fileName() == "perl-debugger.function") {
+            qDebug() << "Debugger command:"
+                     << debuggerLastCommand;
+            qDebug() << "===============";
 
-            targetFrame = frame;
-            qStartPerlDebuggerSlot(request.url());
-
+            qStartPerlDebuggerSlot();
             return false;
         }
     }
@@ -2000,7 +1929,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             QFileDetector fileDetector;
             fileDetector.qCheckFileExistence(fullFilePath);
 
-            newWindow = new QTopLevel();
+            newWindow = new QWebViewWindow();
             QString iconPathName = qApp->property("iconPathName").toString();
             QPixmap icon;
             icon.load(iconPathName);
@@ -2023,7 +1952,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         qDebug() << "Network link:" << request.url().toString();
         qDebug() << "===============";
 
-        QPage::mainFrame()->load(request.url());
+        QPage::currentFrame()->load(request.url());
 
         return false;
     }
@@ -2036,7 +1965,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         qDebug() << "Network link in a new window:" << request.url().toString();
         qDebug() << "===============";
 
-        newWindow = new QTopLevel();
+        newWindow = new QWebViewWindow();
         QString iconPathName = qApp->property("iconPathName").toString();
         QPixmap icon;
         icon.load(iconPathName);

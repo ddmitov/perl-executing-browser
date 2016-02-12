@@ -6,7 +6,7 @@ message ("")
 
 ##########################################################
 # Application name:
-# ATTENTION - replace spaces with underscore like that:
+# ATTENTION - replace spaces and commas with underscore like that:
 # "Perl_Executing_Browser" but not "Perl Executing Browser"!
 ##########################################################
 APPLICATION_NAME = "Perl_Executing_Browser"

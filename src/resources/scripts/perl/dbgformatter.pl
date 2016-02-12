@@ -66,7 +66,7 @@ my $html = "<html>
 
     </head>
 
-    <body onload='scrollTo(SCROLL_TO_LINE)'>
+    <body>
 
     <div class='centered'>
             <b>Debugging SCRIPT</b>
@@ -78,7 +78,7 @@ HIGHLIGHTED_SOURCE
         </ol>
     </div>
 
-        <form action='file://SCRIPT' method='get'>
+        <form action='http://perl-executing-browser-pseudodomain/perl-debugger.function' method='get'>
             <div class='form-group'>
                 <div class='centered'>
                 <b>FILE_TO_HIGHLIGHT</b>
@@ -93,15 +93,15 @@ HIGHLIGHTED_SOURCE
             <div class='form-group'>
                 <input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;' />
                 Commands: 
-                <button onClick=\"sendCommand('n')\" class='btn btn-info btn-xs' title='Next line'>n</button>
-                <button onClick=\"sendCommand('r')\" class='btn btn-info btn-xs' title='Return from subroutine'>r</button>
-                <button onClick=\"sendCommand('c')\" class='btn btn-info btn-xs' title='Continue'>c</button>
-                <button onClick=\"sendCommand('M')\" class='btn btn-info btn-xs' title='List All Modules'>M</button>
-                <button onClick=\"sendCommand('S')\" class='btn btn-info btn-xs' title='List All Subroutine Names'>S</button>
-                <button onClick=\"sendCommand('V')\" class='btn btn-info btn-xs' title='List All Variables'>V</button>
-                <button onClick=\"sendCommand('X')\" class='btn btn-info btn-xs' title='List Variables in Current Package'>X</button>
-                <button onClick=\"sendCommand('s')\" class='btn btn-info btn-xs' title='Step Into...'>s</button>
-                <button onClick=\"sendCommand('R')\" class='btn btn-info btn-xs' title='Restart debugger for SCRIPT'>R</button>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=n' class='btn btn-info btn-xs' title='Next line'>n</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=r' class='btn btn-info btn-xs' title='Return from subroutine'>r</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=c' class='btn btn-info btn-xs' title='Continue'>c</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M' class='btn btn-info btn-xs' title='List All Modules'>M</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=S' class='btn btn-info btn-xs' title='List All Subroutine Names'>S</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=V' class='btn btn-info btn-xs' title='List All Variables'>V</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=X' class='btn btn-info btn-xs' title='List Variables in Current Package'>X</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=s' class='btn btn-info btn-xs' title='Step Into...'>s</a>
+                <a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=R' class='btn btn-info btn-xs' title='Restart debugger for SCRIPT'>R</a>
                 &nbsp;DEBUGGER_COMMAND_MESSAGE
             </div>
         </form>
@@ -111,12 +111,8 @@ DEBUGGER_OUTPUT
         </div>
 
         <script type='text/javascript'>
-        function sendCommand (cmd) {
-            document.getElementById ('command').value = cmd;
-        }
-        function scrollTo (hash) {
-            location.hash = '#' + hash;
-        }
+        var scrollToLine = document.getElementById('SCROLL_TO_LINE');
+        scrollToLine.scrollIntoView();
         </script>
 
     </body>
@@ -215,7 +211,7 @@ if (defined $lineinfo) {
                 $formatted_perl_source_code = $formatted_perl_source_code.$formatted_perl_source_line;
             } elsif ($line_number eq $scroll_to_line) {
                 $formatted_perl_source_line =
-                    "<li value='${line_number}'><a name='${line_number}'></a><div class='line'>${highlighted_line}</div></li>\n";
+                    "<li value='${line_number}'><div id='${line_number}' class='line'>${highlighted_line}</div></li>\n";
                 $formatted_perl_source_code = $formatted_perl_source_code.$formatted_perl_source_line;
             } else {
                 $formatted_perl_source_line =
