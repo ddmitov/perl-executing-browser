@@ -2,11 +2,11 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable of executing local CGI-like, AJAX or long-running Perl5 scripts without a web server. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests and their execution is separated from the traditional browser access to local or remote servers. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a small C++ Qt5 WebKit graphical framework for local CGI-like, AJAX or long-running Perl5 scripts executed without a web server as desktop applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. Access to web servers is restricted only to a predefined list of allowed domains. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
-* **1. Fast and easy GUI for desktop scripts:**  
+* **1. Fast and easy graphical framework for desktop scripts:**  
     use Perl5, JavaScript, HTML and CSS to craft and deploy rapidly beautiful desktop applications;  
 
 * **2. Zero installation when needed:**  
@@ -32,7 +32,7 @@ Perl Executing Browser (PEB) is a limited C++ Qt5 WebKit desktop browser capable
 * Perl modules can be loaded from a custom directory without system-wide installation using PATH and/or PERLLIB environment variables.  
 * Any version of Perl5 can be selected from configuration file or by clicking a special URL.  
 * Multiple directories can be added to the PATH environment variable of every locally executed script.  
-* Scripts and their HTML-based interfaces can be extracted and run from standard ZIP packages.  
+* Scripts and their HTML-based interfaces can be extracted and run from ZIP packages.  
   
 **Local Filesystem:**  
 * PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  

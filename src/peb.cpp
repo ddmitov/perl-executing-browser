@@ -792,11 +792,14 @@ int main(int argc, char **argv)
     // may be usefull to avoid minor graphical issues and warnings.
     QString qtStyleSetting = settings.value("package_gui/qt_style").toString();
     QString qtStyle;
-    QStringList availableStyles = QStyleFactory::keys();
-    foreach (QString availableStyle, availableStyles) {
-        if (availableStyle == qtStyleSetting) {
-            qtStyle = availableStyle;
-            application.setStyle(QStyleFactory::create(qtStyle));
+    QStringList availableStyles;
+    if (qtStyleSetting.length() > 0) {
+        availableStyles = QStyleFactory::keys();
+        foreach (QString availableStyle, availableStyles) {
+            if (availableStyle == qtStyleSetting) {
+                qtStyle = availableStyle;
+                application.setStyle(QStyleFactory::create(qtStyle));
+            }
         }
     }
 
@@ -809,7 +812,7 @@ int main(int argc, char **argv)
     // inability to display transparent background of
     // system tray icons in Qt5 on Linux.
     // An icon without a transparent background should be used as
-    // a systray icon when the binary is compiled for Linux.
+    // a systray icon if transparency is displayed as black color on Linux.
     QString systrayIconPathNameSetting =
             settings.value("package_gui/systray_icon_file").toString();
     QString systrayIconPathName;
@@ -818,15 +821,8 @@ int main(int argc, char **argv)
     if (systrayIconPathNameSetting.length() == 0) {
         application.setProperty("systrayIconPathName", iconPathName);
     } else {
-        QFileInfo systrayIconFileInfo(systrayIconPathNameSetting);
-        if (systrayIconFileInfo.isRelative()) {
-            systrayIconPathName = QDir::toNativeSeparators(
-                        rootDirName + systrayIconPathNameSetting);
-        }
-        if (systrayIconFileInfo.isAbsolute()) {
-            systrayIconPathName =
-                    QDir::toNativeSeparators(systrayIconPathNameSetting);
-        }
+        systrayIconPathName = QDir::toNativeSeparators(
+                    rootDirName + systrayIconPathNameSetting);
         application.setProperty("systrayIconPathName", systrayIconPathName);
     }
 
@@ -878,11 +874,34 @@ int main(int argc, char **argv)
     }
 
     // ==============================
+    // MAIN GUI CLASS INITIALIZATION:
+    // ==============================
+    QWebViewWindow window;
+
+    QObject::connect(qApp, SIGNAL(lastWindowClosed()),
+                     &window, SLOT(qExitApplicationSlot()));
+
+    window.setWindowIcon(icon);
+    window.qLoadStartPageSlot();
+    window.show();
+
+    // ==============================
+    // SYSTEM TRAY ICON CLASS INITIALIZATION:
+    // ==============================
+    QTrayIcon trayIcon;
+    if (systrayIcon == "enable") {
+        QObject::connect(trayIcon.aboutAction, SIGNAL(triggered()),
+                         &window, SLOT(qAboutSlot()));
+
+        QObject::connect(&window, SIGNAL(trayIconHideSignal()),
+                         &trayIcon, SLOT(qTrayIconHideSlot()));
+    }
+
+    // ==============================
     // LOG ALL SETTINGS:
     // ==============================
     // Log basic program information:
-    qDebug() << "" << endl
-             << application.applicationName().toLatin1().constData()
+    qDebug() << application.applicationName().toLatin1().constData()
              << "version"
              << application.applicationVersion().toLatin1().constData()
              << "started." << endl
@@ -892,12 +911,10 @@ int main(int argc, char **argv)
              << QLibraryInfo::licensedProducts().toLatin1().constData() << endl
              << "Libraries Path:"
              << QLibraryInfo::location(QLibraryInfo::LibrariesPath)
-                .toLatin1().constData() << endl
-             << "";
+                .toLatin1().constData();
 
     qDebug() << "===============" << endl
              << "BROWSER COMPILE-TIME SETTINGS:" << endl
-             << "===============" << endl
              << "Local pseudo-domain:" << PSEUDO_DOMAIN;
     if (SCRIPT_CENSORING == 0) {
         qDebug() << "Script censoring is disabled.";
@@ -923,7 +940,6 @@ int main(int argc, char **argv)
 
     qDebug() << "===============" << endl
              << "BROWSER RUNTIME SETTINGS:" << endl
-             << "===============" << endl
              << "Temporary folder:" << applicationTempDirectoryName << endl
              << "Settings file name:" << settingsFileName << endl
              << "Folders to add to PATH:";
@@ -946,7 +962,6 @@ int main(int argc, char **argv)
 
     qDebug() << "===============" << endl
              << "PACKAGE SETTINGS:" << endl
-             << "===============" << endl
              << "Root folder:" << QDir::toNativeSeparators(rootDirName) << endl
              << "Start page:" << startPagePath << endl
              << "Warn on exit:" << warnOnExit;
@@ -960,8 +975,7 @@ int main(int argc, char **argv)
              << "Windows and dialogs icon file:" << iconPathName;
     if (qtStyle.length() > 0) {
         qDebug() << "Available Qt styles:";
-        QStringList allAvailableStyles = QStyleFactory::keys();
-        foreach (QString availableStyle, allAvailableStyles) {
+        foreach (QString availableStyle, availableStyles) {
             qDebug() << availableStyle;
         }
         qDebug() << "Global Qt style:" << qtStyle;
@@ -981,30 +995,6 @@ int main(int argc, char **argv)
             qDebug() << extractedFile;
         }
         qDebug() << "===============";
-    }
-
-    // ==============================
-    // MAIN GUI CLASS INITIALIZATION:
-    // ==============================
-    QWebViewWindow toplevel;
-
-    QObject::connect(qApp, SIGNAL(lastWindowClosed()),
-                     &toplevel, SLOT(qExitApplicationSlot()));
-
-    toplevel.setWindowIcon(icon);
-    toplevel.qLoadStartPageSlot();
-    toplevel.show();
-
-    // ==============================
-    // SYSTEM TRAY ICON CLASS INITIALIZATION:
-    // ==============================
-    QTrayIcon trayIcon;
-    if (systrayIcon == "enable") {
-        QObject::connect(trayIcon.aboutAction, SIGNAL(triggered()),
-                         &toplevel, SLOT(qAboutSlot()));
-
-        QObject::connect(&toplevel, SIGNAL(trayIconHideSignal()),
-                         &trayIcon, SLOT(qTrayIconHideSlot()));
     }
 
     return application.exec();

@@ -510,8 +510,17 @@ protected:
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
 
-            qDebug() << "Allowed link:" << request.url().toString();
-            qDebug() << "===============";
+            if (request.url().toString().endsWith(
+                        qApp->property("startPagePath").toString())) {
+                qDebug() << endl
+                         <<"Start page requested:"
+                         << request.url().toString() << endl
+                         << "===============";
+            } else {
+                qDebug() << "Allowed link requested:"
+                         << request.url().toString() << endl
+                         << "===============";
+            }
 
             QNetworkRequest networkRequest;
             networkRequest.setUrl(request.url());
