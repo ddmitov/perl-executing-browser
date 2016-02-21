@@ -442,19 +442,23 @@ protected:
             // Handle local HTML, CSS, JS, web fonts or supported image files:
             if (interpreter.contains ("browser")) {
 
-                QNetworkRequest networkRequest;
-                networkRequest.setUrl
-                        (QUrl::fromLocalFile
-                         (QDir::toNativeSeparators(
-                              (qApp->property("rootDirName").toString())
-                              + request.url().path())));
-
                 qDebug() << "Allowed link requested:"
                          << request.url().toString();
 
-                return QNetworkAccessManager::createRequest
-                        (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest(networkRequest));
+                QString localFileName(QDir::toNativeSeparators(
+                                          (qApp->property("rootDirName")
+                                           .toString())
+                                          + request.url().path()));
+                QFile localFile(localFileName);
+                localFile.open(QIODevice::ReadOnly);
+                QTextStream stream(&localFile);
+                QString localFileContents = stream.readAll();
+                localFile.close();
+
+                QCustomNetworkReply *reply =
+                        new QCustomNetworkReply (request.url(),
+                                                 localFileContents);
+                return reply;
             }
 
             // Local files without recognized file type:
@@ -462,12 +466,18 @@ protected:
 
                 qDebug() << "File type not recognized:" << fullFilePath;
 
-                QNetworkRequest networkRequest;
-                networkRequest.setUrl(QString("qrc:/html/notrecognized.htm"));
+                QString errorMessageFileName(":/html/notrecognized.htm");
+                QFile errorMessageFile(errorMessageFileName);
+                errorMessageFile.open(QIODevice::ReadOnly
+                                      | QIODevice::Text);
+                QTextStream stream(&errorMessageFile);
+                QString errorMessageContents = stream.readAll();
+                errorMessageFile.close();
 
-                return QNetworkAccessManager::createRequest
-                        (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest(networkRequest));
+                QCustomNetworkReply *reply =
+                        new QCustomNetworkReply (request.url(),
+                                                 errorMessageContents);
+                return reply;
             }
         }
 
@@ -493,8 +503,7 @@ protected:
         if ((operation == GetOperation or
              operation == PostOperation or
              operation == PutOperation) and
-                (request.url().scheme() == "file" or
-                 request.url().scheme() == "qrc" or
+                (request.url().scheme() == "qrc" or
                  request.url().toString().contains("data:image") or
                  request.url().authority() == PSEUDO_DOMAIN or
                  ((qApp->property("allowedDomainsList").toStringList())
@@ -512,12 +521,18 @@ protected:
         } else {
             qDebug() << "Not allowed link:" << request.url().toString();
 
-            QNetworkRequest networkRequest;
-            networkRequest.setUrl(QString("qrc:/html/forbidden.htm"));
+            QString errorMessageFileName(":/html/forbidden.htm");
+            QFile errorMessageFile(errorMessageFileName);
+            errorMessageFile.open(QIODevice::ReadOnly
+                                  | QIODevice::Text);
+            QTextStream stream(&errorMessageFile);
+            QString errorMessageContents = stream.readAll();
+            errorMessageFile.close();
 
-            return QNetworkAccessManager::createRequest
-                    (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest(networkRequest));
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (request.url(),
+                                             errorMessageContents);
+            return reply;
         }
     }
 };
@@ -1451,19 +1466,7 @@ public slots:
         qDebug() << "Link to open in a new window:"
                  << qWebHitTestURL.toString();
 
-        QString fileToOpen = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString())
-                 + qWebHitTestURL.path());
-
-        QFileDetector fileDetector;
-        fileDetector.qDefineInterpreter(fileToOpen);
-
-        if (fileDetector.interpreter.contains("browser-html")) {
-            newWindow->setUrl(QUrl::fromLocalFile(fileToOpen));
-        } else {
-            newWindow->setUrl(qWebHitTestURL);
-        }
-
+        newWindow->setUrl(qWebHitTestURL);
         newWindow->show();
     }
 
