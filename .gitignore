@@ -4,9 +4,9 @@ working/
 
 db/test.db
 src/peb.pro.user
-ui/bootstrap/current-theme.css
 
 *.qm
+current-theme.css
 peb
 peb.exe
 gdrive
