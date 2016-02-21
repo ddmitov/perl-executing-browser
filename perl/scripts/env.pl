@@ -5,32 +5,29 @@ use warnings;
 
 print "Content-Type: text/html\r\n\r\n";
 
-print "<html>\n";
+print "<html>
 
-print "<head>\n";
+	<head>
+		<title>Environment and \@INC array</title>
+		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<style type='text/css'>body {text-align: left}</style>
+	</head>
 
-print "<title>Environment and \@INC array</title>\n";
-print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
-print "<style type='text/css'>body {text-align: left}</style>\n";
-print "</head>\n";
+	<body>
+		<p align='center'><font size='5'>Environment and \@INC array</font></p>
 
-print "<body>";
-print "<p align='center'><font size='5' face='SansSerif'>Environment and \@INC array</font></p>";
+<pre>\n";
 
-print "<pre>\n";
 foreach my $key (sort keys %ENV) {
 	print "$key=$ENV{$key}\n";
 }
 
-print "\n";
+print "\n\@INC:\n";
 
-print "\@INC:\n";
 print join "\n", @INC;
 
-print "\n";
+print "\n</pre>
 
-print "</pre>\n";
+	</body>
 
-print "</body>\n";
-
-print "</html>\n";
+</html>\n";

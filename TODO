@@ -25,4 +25,9 @@ v. 0.2
 v. 0.3
 ====================================
 - internal JavaScript-based code editor - ACE
+
+v.0.4
+====================================
+- support for loading HTML interface and fatpacked Perl scripts from a ZIP package
+  without extracting them to a temporary folder
 - support for encrypted packages - encrypted SQLite or 7z

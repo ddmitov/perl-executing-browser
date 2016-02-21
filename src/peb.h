@@ -118,8 +118,6 @@ public slots:
         missingFileMessageBox.exec();
         qDebug() << QDir::toNativeSeparators(fullFilePath) <<
                     "is missing.";
-        qDebug() << "Please restore the missing file.";
-        qDebug() << "===============";
     }
 
 public:
@@ -229,18 +227,15 @@ protected:
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains("ajax")) {
 
-            QUrl url = request.url();
-            qDebug() << "AJAX Script URL:" << url.toString();
-
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
-                     + url.path());
+                     + request.url().path());
 
             // Replace initial slash at the beginning of the relative path;
             // root directory setting already has a trailing slash.
             scriptFullFilePath = scriptFullFilePath.replace("//", "/");
 
-            QString queryString = url.query();
+            QString queryString = request.url().query();
 
             QByteArray postDataArray;
             if (outgoingData) {
@@ -252,8 +247,7 @@ protected:
             fileDetector.qCheckFileExistence(scriptFullFilePath);
             fileDetector.qDefineInterpreter(scriptFullFilePath);
 
-            qDebug() << "File path:" << scriptFullFilePath;
-            qDebug() << "Interpreter:" << fileDetector.interpreter;
+            qDebug() << "AJAX script started:" << scriptFullFilePath;
 
             QScriptEnvironment initialScriptEnvironment;
             QProcessEnvironment scriptEnvironment;
@@ -279,9 +273,6 @@ protected:
                         QDir::toNativeSeparators(scriptFullFilePath));
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             scriptHandler.setWorkingDirectory(scriptDirectory);
-            qDebug() << "Working directory:"
-                     << QDir::toNativeSeparators(scriptDirectory);
-            qDebug() << "===============";
 
             QEventLoop scriptHandlerWaitingLoop;
 
@@ -348,7 +339,6 @@ protected:
                 if (scriptResultString.length() == 0 and
                         scriptErrorString == 0) {
                     qDebug() << "AJAX Script timed out:" << scriptFullFilePath;
-                    qDebug() << "===============";
 
                     QMessageBox scriptTimeoutMessageBox (qApp->activeWindow());
                     scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
@@ -383,7 +373,6 @@ protected:
                 }
             } else {
                 qDebug() << "Script already started:" << scriptFullFilePath;
-                qDebug() << "===============";
 
                 QMessageBox scriptStartedMessageBox (qApp->activeWindow());
                 scriptStartedMessageBox
@@ -460,6 +449,9 @@ protected:
                               (qApp->property("rootDirName").toString())
                               + request.url().path())));
 
+                qDebug() << "Allowed link requested:"
+                         << request.url().toString();
+
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
                          QNetworkRequest(networkRequest));
@@ -468,9 +460,7 @@ protected:
             // Local files without recognized file type:
             if (interpreter.contains("undefined")) {
 
-                qDebug() << "File:" << fullFilePath;
-                qDebug() << "File type not recognized!";
-                qDebug() << "===============";
+                qDebug() << "File type not recognized:" << fullFilePath;
 
                 QNetworkRequest networkRequest;
                 networkRequest.setUrl(QString("qrc:/html/notrecognized.htm"));
@@ -510,17 +500,8 @@ protected:
                  ((qApp->property("allowedDomainsList").toStringList())
                   .contains(request.url().authority())))) {
 
-            if (request.url().toString().endsWith(
-                        qApp->property("startPagePath").toString())) {
-                qDebug() << endl
-                         <<"Start page requested:"
-                         << request.url().toString() << endl
-                         << "===============";
-            } else {
-                qDebug() << "Allowed link requested:"
-                         << request.url().toString() << endl
-                         << "===============";
-            }
+            qDebug() << "Allowed link requested:"
+                     << request.url().toString();
 
             QNetworkRequest networkRequest;
             networkRequest.setUrl(request.url());
@@ -530,7 +511,6 @@ protected:
                      QNetworkRequest(networkRequest));
         } else {
             qDebug() << "Not allowed link:" << request.url().toString();
-            qDebug() << "===============";
 
             QNetworkRequest networkRequest;
             networkRequest.setUrl(QString("qrc:/html/forbidden.htm"));
@@ -570,7 +550,7 @@ public slots:
             cssLink.append("href=\"http://");
             cssLink.append(PSEUDO_DOMAIN);
             cssLink.append("/");
-            cssLink.append(qApp->property("defaultThemeDirectoryName")
+            cssLink.append(qApp->property("themesSetting")
                            .toString());
             cssLink.append("/current-theme.css\" media=\"all\" />");
 
@@ -601,46 +581,38 @@ public slots:
 
     void qThemeSetterSlot(QString theme)
     {
-        theme.prepend((qApp->property("allThemesDirectory").toString())
+        theme.prepend((qApp->property("themesDirectory").toString())
                       + QDir::separator());
         theme.append(".theme");
 
         if (theme.length() > 0) {
             if (QFile::exists(
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectoryFullPath")
+                            (qApp->property("themesDirectory")
                              .toString())
                             + QDir::separator() + "current-theme.css"))) {
                 QFile::remove(
                             QDir::toNativeSeparators(
-                                (qApp->property("defaultThemeDirectoryFullPath")
+                                (qApp->property("themesDirectory")
                                  .toString())
                                 + QDir::separator() + "current-theme.css"));
             }
             QFile::copy(theme,
                         QDir::toNativeSeparators(
-                            (qApp->property("defaultThemeDirectoryFullPath")
+                            (qApp->property("themesDirectory")
                              .toString())
                             + QDir::separator() + "current-theme.css"));
 
             emit reloadSignal();
 
             qDebug() << "Selected new theme:" << theme;
-            qDebug() << "===============";
-        } else {
-            qDebug() << "No new theme selected.";
-            qDebug() << "===============";
         }
     }
 
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
-        qDebug() << "Script URL:" << url.toString();
-
-        QString relativeFilePath = url.path();
-
         scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString()) + relativeFilePath);
+                ((qApp->property("rootDirName").toString()) + url.path());
         // Replace initial slash at the beginning of the relative path;
         // root directory setting already has a trailing slash.
         scriptFullFilePath.replace("//", "/");
@@ -746,8 +718,7 @@ public slots:
             fileDetector.qCheckFileExistence(scriptFullFilePath);
             fileDetector.qDefineInterpreter(scriptFullFilePath);
 
-            qDebug() << "File path:" << scriptFullFilePath;
-            qDebug() << "Interpreter:" << fileDetector.interpreter;
+            qDebug() << "Script started:" << scriptFullFilePath;
 
             if (queryString.length() > 0) {
                 scriptEnvironment.insert("REQUEST_METHOD", "GET");
@@ -768,9 +739,6 @@ public slots:
                         QDir::toNativeSeparators(scriptFullFilePath));
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             scriptHandler.setWorkingDirectory(scriptDirectory);
-            qDebug() << "Working directory:"
-                     << QDir::toNativeSeparators(scriptDirectory);
-            qDebug() << "===============";
 
             if (!scriptHandler.isOpen()) {
                 if (sourceEnabled == true) {
@@ -843,7 +811,6 @@ public slots:
                 }
             } else {
                 qDebug() << "Script already started:" << scriptFullFilePath;
-                qDebug() << "===============";
 
                 QMessageBox scriptStartedMessageBox (qApp->activeWindow());
                 scriptStartedMessageBox
@@ -895,7 +862,6 @@ public slots:
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: output from" << scriptFullFilePath;
 //        qDebug() << "Script output:" << output;
-        qDebug() << "===============";
 
         if (scriptOutputType == "accumulation" or scriptOutputType == "final") {
             scriptAccumulatedOutput.append(output);
@@ -946,7 +912,6 @@ public slots:
         scriptAccumulatedErrors.append("\n");
 
 //        qDebug() << "Script error:" << error;
-//        qDebug() << "===============";
     }
 
     void qScriptFinishedSlot()
@@ -1002,7 +967,6 @@ public slots:
             scriptHandler.close();
 
             qDebug() << "Script finished:" << scriptFullFilePath;
-            qDebug() << "===============";
         }
 
         runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
@@ -1022,7 +986,6 @@ public slots:
             runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
 
             qDebug() << "Script timed out:" << scriptFullFilePath;
-            qDebug() << "===============";
 
             QMessageBox scriptTimeoutMessageBox (qApp->activeWindow());
             scriptTimeoutMessageBox.setWindowModality(Qt::WindowModal);
@@ -1060,7 +1023,6 @@ public slots:
             // Perl interpreter to be used for debugging:
             QString debuggerInterpreter =
                     (qApp->property("perlInterpreter").toString());
-            qDebug() << "Interpreter:" << debuggerInterpreter;
 
             // Clean accumulated debugger output from previous debugger session:
             debuggerAccumulatedOutput = "";
@@ -1079,9 +1041,6 @@ public slots:
                 QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 debuggerHandler.setWorkingDirectory(scriptDirectory);
-                qDebug() << "Working directory:"
-                         << QDir::toNativeSeparators(scriptDirectory);
-                qDebug() << "===============";
 
                 debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
                 debuggerHandler.start(debuggerInterpreter, QStringList()
@@ -1099,7 +1058,6 @@ public slots:
                 qDebug() << QDateTime::currentMSecsSinceEpoch()
                          << "msecs from epoch: command sent to Perl debugger:"
                          << debuggerLastCommand;
-                qDebug() << "===============";
             }
         }
     }
@@ -1184,7 +1142,6 @@ public slots:
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch:"
                      << "Perl debugger output formatter script started.";
-            qDebug() << "===============";
         }
     }
 
@@ -1200,7 +1157,6 @@ public slots:
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch:"
                  << "output from Perl debugger formatter received.";
-        qDebug() << "===============";
     }
 
     void qDebuggerHtmlFormatterErrorsSlot()
@@ -1210,7 +1166,6 @@ public slots:
 
         qDebug() << "Perl debugger formatter script error:"
                  << debuggerOutputFormatterErrors;
-        qDebug() << "===============";
     }
 
     void qDebuggerHtmlFormatterFinishedSlot()
@@ -1224,7 +1179,6 @@ public slots:
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch:"
                  << "output from Perl debugger formatter displayed.";
-        qDebug() << "===============";
     }
 
 public:
@@ -1338,18 +1292,8 @@ signals:
 public slots:
     void qLoadStartPageSlot()
     {
-        QFileDetector fileDetector;
-        fileDetector
-                .qDefineInterpreter((qApp->property("startPage").toString()));
-
-        if (fileDetector.interpreter.contains("browser-html")) {
-            setUrl(QUrl::fromLocalFile
-                   (QDir::toNativeSeparators
-                    ((qApp->property("startPage").toString()))));
-        } else {
-            setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN) + "/"
-                        + (qApp->property("startPagePath").toString())));
-        }
+        setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN) + "/"
+                    + qApp->property("startPagePath").toString()));
     }
 
     void qPageLoadedDynamicTitleSlot(bool ok)
@@ -1389,7 +1333,6 @@ public slots:
 #ifndef QT_NO_PRINTER
 
         qDebug() << "Printing requested.";
-        qDebug() << "===============";
 
         QPrinter printer;
         printer.setOrientation(QPrinter::Portrait);
@@ -1453,8 +1396,6 @@ public slots:
             pdfPrinter.setOutputFileName(fileName);
             QWebViewWindow::print(&pdfPrinter);
         }
-
-        qDebug() << "===============";
 #endif
     }
 
@@ -1473,7 +1414,6 @@ public slots:
         fileToEdit.replace("//", "/");
 
         qDebug() << "File to edit:" << fileToEdit;
-        qDebug() << "===============";
 
         QProcess externalEditor;
         externalEditor.startDetached("scite",
@@ -1495,7 +1435,6 @@ public slots:
 
         qDebug() << "Local script to view as source code:"
                  << qWebHitTestURL.toString();
-        qDebug() << "===============";
 
         newWindow->setUrl(viewSourceUrl);
         newWindow->show();
@@ -1511,7 +1450,6 @@ public slots:
 
         qDebug() << "Link to open in a new window:"
                  << qWebHitTestURL.toString();
-        qDebug() << "===============";
 
         QString fileToOpen = QDir::toNativeSeparators
                 ((qApp->property("rootDirName").toString())
@@ -1811,13 +1749,9 @@ public slots:
             emit trayIconHideSignal();
         }
 
-        QString dateTimeString =
-                QDateTime::currentDateTime()
-                .toString("dd.MM.yyyy hh:mm:ss");
         qDebug() << qApp->applicationName().toLatin1().constData()
                  << qApp->applicationVersion().toLatin1().constData()
-                 << "terminated normally on:" << dateTimeString;
-        qDebug() << "===============";
+                 << "terminated normally.";
 
         QApplication::exit();
     }
