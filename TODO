@@ -14,13 +14,13 @@ v. 0.2
 - separate global settings and package settings
 
 - censor.pl behaviour governed by compile-time settings;
-  they will correspond to hard-coded command line arguments given by the browser
+    they will correspond to hard-coded command line arguments given by the browser
 - better documentation for censor.pl
 - security tests in separate files
 
-- cross-platform capability for all example scripts
-
 - separate DB_ROOT environment variable and folder
+
+- cross-platform capability for all example scripts
 
 v. 0.3
 ====================================

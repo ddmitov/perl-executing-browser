@@ -222,90 +222,90 @@
         <translation>Perl модули (*.pm);;</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="638"/>
+        <location filename="../../peb.h" line="651"/>
         <source>Script Killed</source>
         <translation>Изключен скрипт</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="642"/>
+        <location filename="../../peb.h" line="655"/>
         <source>This script is terminated as requested:</source>
         <translation>Скриптът е изключен както бе поискано:</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="655"/>
+        <location filename="../../peb.h" line="668"/>
         <source>Script Finished</source>
         <translation>Приключил скрипт</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="659"/>
+        <location filename="../../peb.h" line="672"/>
         <source>This script did not start or</source>
         <translation>Този скрипт не е стартирал или</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="661"/>
+        <location filename="../../peb.h" line="674"/>
         <source>finished before script termination was requested:</source>
         <translation>е приключил преди да бъде поискано прекратяването му:</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="821"/>
+        <location filename="../../peb.h" line="834"/>
         <source>Script Already Started</source>
         <translation>Стартиран скрипт</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="825"/>
+        <location filename="../../peb.h" line="838"/>
         <source>This script is already started and still running:</source>
         <translation>Този скрипт вече е стартиран и все още работи:</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="944"/>
+        <location filename="../../peb.h" line="957"/>
         <source>Errors</source>
         <translation>Грешки</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="949"/>
+        <location filename="../../peb.h" line="962"/>
         <source>Errors were found during script execution.</source>
         <translation>Бяха открити грешки при изпълнението на този скрипт.</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="952"/>
+        <location filename="../../peb.h" line="965"/>
         <source>Do you want to see them?</source>
         <translation>Желаете ли да ги видите?</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="957"/>
-        <location filename="../../peb.h" line="1208"/>
-        <location filename="../../peb.h" line="1225"/>
+        <location filename="../../peb.h" line="970"/>
+        <location filename="../../peb.h" line="1221"/>
+        <location filename="../../peb.h" line="1238"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="959"/>
-        <location filename="../../peb.h" line="1226"/>
+        <location filename="../../peb.h" line="972"/>
+        <location filename="../../peb.h" line="1239"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="994"/>
+        <location filename="../../peb.h" line="1007"/>
         <source>Script Timeout</source>
         <translation>Просрочено време</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="999"/>
+        <location filename="../../peb.h" line="1012"/>
         <source>Your script timed out:</source>
         <translation>Скриптът просрочи максималното време за изпълнение:</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1204"/>
+        <location filename="../../peb.h" line="1217"/>
         <source>Alert</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1219"/>
+        <location filename="../../peb.h" line="1232"/>
         <source>Confirm</source>
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1240"/>
+        <location filename="../../peb.h" line="1253"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -326,119 +326,119 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="1376"/>
+        <location filename="../../peb.h" line="1389"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1378"/>
+        <location filename="../../peb.h" line="1391"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1496"/>
+        <location filename="../../peb.h" line="1497"/>
         <source>&amp;Edit</source>
         <translation>&amp;Редактирай</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1511"/>
+        <location filename="../../peb.h" line="1512"/>
         <source>&amp;View Source</source>
         <translation>Разгледай &amp;изходния код</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1523"/>
+        <location filename="../../peb.h" line="1524"/>
         <source>&amp;Open in new window</source>
         <translation>Отвори в &amp;нов прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1538"/>
+        <location filename="../../peb.h" line="1539"/>
         <source>&amp;Home</source>
         <translation>&amp;Главна страница</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1547"/>
+        <location filename="../../peb.h" line="1548"/>
         <source>&amp;Reload</source>
         <translation>Презаре&amp;ди</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1553"/>
+        <location filename="../../peb.h" line="1554"/>
         <source>Print pre&amp;view</source>
         <translation>Пр&amp;еглед за печат</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1557"/>
+        <location filename="../../peb.h" line="1558"/>
         <source>&amp;Print</source>
         <translation>&amp;Печат</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1561"/>
+        <location filename="../../peb.h" line="1562"/>
         <source>Save as P&amp;DF</source>
         <translation>Запиши като P&amp;DF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1567"/>
+        <location filename="../../peb.h" line="1568"/>
         <source>&amp;About</source>
         <translation>З&amp;а програмата</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1571"/>
+        <location filename="../../peb.h" line="1572"/>
         <source>About Q&amp;t</source>
         <translation>За &amp;Qt</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1647"/>
-        <location filename="../../peb.h" line="1687"/>
-        <location filename="../../peb.h" line="1719"/>
+        <location filename="../../peb.h" line="1648"/>
+        <location filename="../../peb.h" line="1688"/>
+        <location filename="../../peb.h" line="1720"/>
         <source>Close window</source>
         <translation>Затваряне на прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1652"/>
+        <location filename="../../peb.h" line="1653"/>
         <source>You are going to close this window,</source>
         <translation>На път сте да затворите този прозорец,</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1654"/>
+        <location filename="../../peb.h" line="1655"/>
         <source>but a script is still running.</source>
         <translation>но все още има работещ скрипт.</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1656"/>
-        <location filename="../../peb.h" line="1726"/>
+        <location filename="../../peb.h" line="1657"/>
+        <location filename="../../peb.h" line="1727"/>
         <source>Are you sure?</source>
         <translation>Сигурни ли сте?</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1659"/>
-        <location filename="../../peb.h" line="1703"/>
-        <location filename="../../peb.h" line="1730"/>
+        <location filename="../../peb.h" line="1660"/>
+        <location filename="../../peb.h" line="1704"/>
+        <location filename="../../peb.h" line="1731"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1660"/>
-        <location filename="../../peb.h" line="1705"/>
-        <location filename="../../peb.h" line="1732"/>
+        <location filename="../../peb.h" line="1661"/>
+        <location filename="../../peb.h" line="1706"/>
+        <location filename="../../peb.h" line="1733"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1692"/>
+        <location filename="../../peb.h" line="1693"/>
         <source>Text was entered on this page and it is going to be lost!</source>
         <translation>На тази страница е попълнен текст и той ще бъде загубен!</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1695"/>
+        <location filename="../../peb.h" line="1696"/>
         <source>This information can not be recovered!</source>
         <translation>Въведената информация не може да бъде възстановена!</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1697"/>
+        <location filename="../../peb.h" line="1698"/>
         <source>Are you sure you want to close the window?</source>
         <translation>Сигурни ли сте, че искате да изключите програмата?</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1724"/>
+        <location filename="../../peb.h" line="1725"/>
         <source>You are going to close this window.</source>
         <translation>На път сте да затворите този прозорец.</translation>
     </message>

@@ -7,14 +7,27 @@ my @files;
 
 traverse ($ENV{DOCUMENT_ROOT});
 
-print "<html>";
+print "<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Environment and \@INC array</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+		<style type='text/css'>body {text-align: left}</style>
+	</head>
+
+	<body>
+		<p align='center'><font size='5'>DOCUMENT_ROOT Recursive File Lister</font></p>\n";
 
 foreach my $file (@files) {
 	print "$file<br>";
 	open (my $filehandle, "<", $file);
 }
 
-print "</html>";
+print "\n</body>
+
+</html>\n";
 
 sub traverse {
 	my ($entry) = @_;

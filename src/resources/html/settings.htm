@@ -1,16 +1,11 @@
+<!DOCTYPE html>
 <html>
 
 	<head>
-
 		<title>Perl Executing Browser Settings</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/ui/jquery/jquery-1.11.1.min.js"></script>
-
-		<script type="text/javascript" src="http://perl-executing-browser-pseudodomain/ui/bootstrap/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/ui/bootstrap/bootstrap.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/ui/bootstrap/current-theme.css" media="all" />
-
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+		<link rel="stylesheet" type="text/css" href="http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/current-theme.css" media="all" />
 	</head>
 
 	<body>
@@ -21,9 +16,7 @@
 				Current folders on PATH:
 				<div id='setting-path'>[% PATH %]</div>
 				<a href='http://perl-executing-browser-pseudodomain/path.setting?action=add'
-					class="btn btn-info btn-sm"
-					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/path.setting?action=add'
-					data-placement='right'>
+					class="btn btn-info btn-sm">
 				Add Folder to PATH</a>
 			</div>
 
@@ -33,9 +26,7 @@
 				Current Perl interpreter:
 				<div id='setting-perl'>[% Perl interpreter %]</div>
 				<a href='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
-					class="btn btn-info btn-sm"
-					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perl.setting?action=set'
-					data-placement='right'>
+					class="btn btn-info btn-sm">
 				Select Perl Interpreter</a>
 			</div>
 
@@ -45,9 +36,7 @@
 				PERLLIB folder:
 				<div id='setting-perllib'>[% PERLLIB folder %]</div>
 				<a href='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
-					class="btn btn-info btn-sm"
-					data-toggle='tooltip' title='http://perl-executing-browser-pseudodomain/perllib.setting?action=set'
-					data-placement='right'>
+					class="btn btn-info btn-sm">
 				Select PERLLIB folder</a>
 			</div>
 

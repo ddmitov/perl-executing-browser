@@ -757,7 +757,7 @@ int main(int argc, char **argv)
     // Themes directory:
     QString themesDirectorySetting =
             settings.value("package/themes_directory").toString();
-    application.setProperty("themesSetting", themesDirectorySetting);
+    application.setProperty("themesDirectorySetting", themesDirectorySetting);
 
     QString themesDirectory =
                 QDir::toNativeSeparators(rootDirName

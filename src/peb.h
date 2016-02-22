@@ -565,9 +565,9 @@ public slots:
             cssLink.append("href=\"http://");
             cssLink.append(PSEUDO_DOMAIN);
             cssLink.append("/");
-            cssLink.append(qApp->property("themesSetting")
+            cssLink.append(qApp->property("themesDirectorySetting")
                            .toString());
-            cssLink.append("/current-theme.css\" media=\"all\" />");
+            cssLink.append("/current-theme.css\" media=\"all\"/>");
 
             htmlInput.replace("</title>", cssLink);
 

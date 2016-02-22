@@ -5,25 +5,25 @@ use warnings;
 
 print "Content-type: text/html; charset=utf-8\n\n";
 
-print "<html>\n";
+print "<!DOCTYPE html>
+<html>
 
-print "<head>\n";
+	<head>
+		<title>Perl Executing Browser - Test Results</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+	</head>
 
-print "<title>Perl Executing Browser - Test Results</title>\n";
-print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
+	<body>
 
-print "</head>\n";
+		<p align='center'><font size='5'>
+		Test Results
+		</font></p>
 
-print "<body>\n";
-
-print "<p align='center'><font size='5' face='SansSerif'>\n";
-print "Test Results\n";
-print "</font></p>\n";
-
-print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "FORM DATA:\n";
-print "</font></p>\n";
-print "<p align='left'><font size='3' face='SansSerif'>\n";
+		<p align='left'><font size='4'>
+		FORM DATA:
+		</font></p>
+		<p align='left'><font size='3'>\n";
 
 # Read input:
 my ($buffer, @pairs, $pair, $name, $value, %FORM);
@@ -44,18 +44,20 @@ foreach $pair (@pairs) {
 	print "$name = $value<br>\n";
 }
 
-print "</font></p>\n";
+print "</font></p>
 
-print "<p align='left'><font size='4' face='SansSerif'>\n";
-print "ENVIRONMENT VARIABLES:\n";
-print "</font></p>\n";
-print "<p align='left'><font size='3' face='SansSerif'>\n";
+		<p align='left'><font size='4'>
+			ENVIRONMENT VARIABLES:
+		</font></p>
+
+		<p align='left'><font size='3'>\n";
 
 foreach my $key (sort(keys(%ENV))) {
 	print "$key = $ENV{$key}<br>\n";
 }
 
-print "</font></p>\n";
+print "</font></p>
 
-print "</body>\n";
-print "</html>\n";
+	</body>
+
+</html>\n";

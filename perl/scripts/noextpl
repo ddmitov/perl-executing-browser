@@ -5,20 +5,20 @@
 use strict;
 use warnings;
 
-print "Content-type: text/html; charset=utf-8\n\n";
-
 print <<HTML
+<!DOCTYPE html>
 <html>
 
-<head>
-	<title>Perl Extensionless Script</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-</head>
+	<head>
+		<title>Perl Extensionless Script</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+	</head>
 
-<body>
-	<p align='center'><font size='5'>Perl Extensionless Script</font></p>
-	<p align='center'><font size='3'>Hello from a Perl script without extension!</font></p>
-</body>
+	<body>
+		<p align='center'><font size='5'>Perl Extensionless Script</font></p>
+		<p align='center'><font size='3'>Hello from a Perl script without extension!</font></p>
+	</body>
 
 </html>
 HTML

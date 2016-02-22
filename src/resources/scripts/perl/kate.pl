@@ -1,9 +1,5 @@
 #!/usr/bin/perl -w
 
-# Copyright (c) 2005 Hans Jeuken. All rights reserved.
-# This program is free software; you can redistribute it and/or
-# modify it under the same terms as Perl itself.
-
 use strict;
 use warnings;
 use Term::ANSIColor;
@@ -76,12 +72,16 @@ format_table => {
 );
 
 # Highlight the syntax of the input file:
-print "<html>\n";
-print "<head>\n";
-print "<title>$input_filename</title>\n";
+print "<!DOCTYPE html>
+<html>
 
-# Output CSS styling:
-print "<style type='text/css'>
+	<head>
+
+		<title>$input_filename</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+
+		<style type='text/css'>
 			body {
 				text-align: left;
 				font-family: monospace;
@@ -97,28 +97,26 @@ print "<style type='text/css'>
 				text-indent: 1.5%;
 				border: green solid 3px;
 				}
-	</style>\n";
+		</style>
 
-print "<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>\n";
-print "</head>\n";
+	</head>
 
-print "<body>\n";
+	<body>
 
-print "<p align='center' style='-webkit-user-select: auto;'><font size='3'>Highlighting $input_filename</font></p>\n";
+		<p align='center' style='-webkit-user-select: auto;'><font size='3'>Highlighting $input_filename</font></p>
 
-print "<ol>\n";
+		<ol>\n";
 
 my $line_number;
 
 foreach my $line (@lines){
 	$line_number++;
 	my $highlighted_line = $highlighter->highlightText ($line);
-	print "<li style='background-color: #FFFFFF;' value='$line_number'><a name='$line_number'></a><div style='-webkit-user-select: auto;'>".$highlighted_line."</div>";
-	print "</li>\n";
+	print "<li style='background-color: #FFFFFF;' value='$line_number'><a name='$line_number'></a><div style='-webkit-user-select: auto;'>".$highlighted_line."</div></li>\n";
 }
 
-print "</ol>\n";
+print "</ol>
 
-print "</body>\n";
+	</body>
 
-print "</html>\n";
+</html>\n";

@@ -174,11 +174,13 @@ foreach my $line (@user_code) {
 ##############################
 # HTML HEADER AND FOOTER:
 ##############################
-my $header = "<html>
+my $header = "<!DOCTYPE html>
+<html>
 
 	<head>
 		<title>Perl Executing Browser - Errors</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
 		<style type='text/css'>body {text-align: left}</style>\n
 	</head>
 

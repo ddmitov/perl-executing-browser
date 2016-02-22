@@ -1,12 +1,12 @@
 #!/usr/bin/perl -w
 
+# UTF-8 encoded file
+
 use strict;
 use warnings;
 use 5.010;
-
 use utf8;
 use open ':std', ':encoding(UTF-8)';
-
 use DBI;
 
 my $database_relative_pathname = "/db/test.db";
@@ -21,16 +21,18 @@ $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Ричард', 'Столм�
 
 my $all = $db->selectall_arrayref ("SELECT * FROM USER");
 
-print "<html>
+print "<!DOCTYPE html>
+<html>
 
-<head>
-<title>Perl Executing Browser - SQLite Example</title>
-<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
-</head>
+	<head>
+		<title>Perl Executing Browser - SQLite Example</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+	</head>
 
-<body>
+	<body>
 
-<p align='left'><font size='3' face='SansSerif'>\n";
+		<p align='left'><font size='3'>\n";
 
 foreach my $row (@$all) {
 	my ($id, $name, $surname) = @$row;
@@ -38,9 +40,9 @@ foreach my $row (@$all) {
 }
 
 print "\n
-</font></p>
+		</font></p>
 
-</body>
+	</body>
 
 </html>\n";
 

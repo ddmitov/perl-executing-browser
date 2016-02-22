@@ -7,11 +7,13 @@ $|=1; # Disable in-built Perl buffering
 
 sub html_header() {
 print <<HEADER
+<!DOCTYPE html>
 <html>
 
 	<head>
-	<title>Perl Executing Browser - Simple Perl 35 Seconds Counter</title>
-	<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<title>Perl Executing Browser - Simple Perl 35 Seconds Counter</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
 	</head>
 
 	<body>
@@ -29,6 +31,7 @@ print <<FOOTER
 		<a href='http://perl-executing-browser-pseudodomain/perl/scripts/longrun-counter.pl?action=kill' class="btn btn-danger btn-sm">Kill Script</a>
 		</font></p>
 	</body>
+
 </html>
 FOOTER
 ;
@@ -49,7 +52,7 @@ for (my $counter=1; $counter <= 35; $counter++){
 	}
 	if ($counter == 35) {
 		print "35 seconds elapsed.<br>\n";
-		print "Script is now finished.\n";
+		print "Script has finished.\n";
 	}
 	html_footer();
 }

@@ -3,13 +3,13 @@
 use strict;
 use warnings;
 
-print "Content-Type: text/html\r\n\r\n";
-
-print "<html>
+print "<!DOCTYPE html>
+<html>
 
 	<head>
 		<title>Environment and \@INC array</title>
-		<meta http-equiv='Content-Type' content='text/html; charset=utf-8'>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
 		<style type='text/css'>body {text-align: left}</style>
 	</head>
 
