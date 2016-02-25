@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+
+		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/themes/current-theme.css" media="all" />
+
+		<script>
+			function allowedContent() {
+				window.open ('https://www.google.bg');
+			}
+			function notAllowedContent() {
+				window.open ('http://www.yahoo.com');
+			}
+		</script>
+
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<p align="center">
+				<font size="5">
+					Local CGI-like Scripts
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/sqlite.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/sqlite.pl"
+						data-placement="right">
+					Perl SQLite Example</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/sqlite.pl?source=enabled" target="_blank"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/sqlite.pl?source=enabled"
+						data-placement="right">
+					Perl SQLite Example as source code</a>
+				</font>
+				<br>
+				<font size="3">
+					(will open in a new window)<br>
+					Based on <a href="https://metacpan.org/pod/Syntax::Highlight::Engine::Kate">
+					Syntax::Highlight::Engine::Kate</a> by Hans Jeuken and Gábor Szabó,<br>
+					non-core module loaded from directory, without system-wide installation.
+				</font>
+			</p>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Local Long-Running Scripts
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/longrun-counter.pl?output=latest"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/longrun-counter.pl?output=latest"
+						data-placement="right">
+					Simple Perl 35 Seconds Counter</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/longrun-counter.pl?output=latest" target="_blank"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/longrun-counter.pl?output=accumulation"
+						data-placement="right">
+					Simple Perl 35 Seconds Counter in a New Window</a>
+				</font>
+			</p>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Local Scripting Tests
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/env.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/env.pl"
+						data-placement="right">
+					Environment and @INC array</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/ui/get.htm"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/ui/get.htm"
+						data-placement="right">
+					Form of a Locally Executed Perl Script - GET method</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/ui/post.htm"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/ui/post.htm"
+						data-placement="right">
+					Form of a Locally Executed Perl Script - POST method</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/noextpl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/noextpl"
+						data-placement="right">
+					Perl Extensionless Script</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/dummy"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/dummy"
+						data-placement="right">
+					Unrecognizable File Type Test</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/timeout-test.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/timeout-test.pl"
+						data-placement="right">
+					Script Timeout Test</a>
+				</font>
+			</p>
+
+<!-- 			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/security-test.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/security-test.pl"
+						data-placement="right">
+					Security Test</a>
+				</font>
+			</p> -->
+
+			<div id="ajax-results">
+				<button id="ajax-button" class="btn btn-primary"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/ajax.pl"
+						data-placement="right">
+				AJAX DOCUMENT_ROOT File Lister</button>
+			</div>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Perl Debugger Interaction
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M"
+						data-placement="right">
+					List All Modules</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=S"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=S"
+						data-placement="right">
+					List All Subroutine Names</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=V"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=V"
+						data-placement="right">
+					List All Variables</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file"
+						data-placement="right">
+					Step-by-Step Debugging</a>
+				</font>
+			</p>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Web Interaction
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://www.perl.org/"
+						data-toggle="tooltip" title="http://www.perl.org/"
+						data-placement="right">
+					Allowed External Link</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://www.perl.org/" target="_blank"
+						data-toggle="tooltip" title="http://www.perl.org/"
+						data-placement="right">
+					Allowed External Link in a New Window</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="https://html5test.com/"
+						data-toggle="tooltip" title="https://html5test.com/"
+						data-placement="right">
+					Online HTML 5 Test</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<button onclick="allowedContent()" class="btn btn-primary"
+						data-toggle="tooltip" title="https://www.google.bg"
+						data-placement="right">
+					Open Allowed Content in a New Window from JavaScript</button>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<button onclick="notAllowedContent()" class="btn btn-primary"
+						data-toggle="tooltip" title="http://www.yahoo.com"
+						data-placement="right">
+					Not Allowed Content in a New Window from JavaScript - Blocked</button>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="https://www.yahoo.com/"
+						data-toggle="tooltip" title="https://www.yahoo.com/"
+						data-placement="right">
+					Not Allowed External Link</a>
+				</font>
+			</p>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Printing & PDF Creation
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/print.function?action=preview"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/print.function?action=preview"
+						data-placement="right">
+					Print Preview</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/print.function?action=print"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/print.function?action=print"
+						data-placement="right">
+					Print</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/print.function?action=pdf"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/print.function?action=pdf"
+						data-placement="right">
+					Save as PDF</a>
+				</font>
+			</p>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/ui/index.htm" target="_blank"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/ui/index.htm"
+						data-placement="right">
+					Start Page in a New Window</a>
+				</font>
+			</p>
+
+		</div>
+
+		<script>
+			$(document).ready(function() {
+				$('[data-toggle="tooltip"]').tooltip();
+				$('#ajax-button').click(function() {
+					$.ajax({
+						url: 'http://perl-executing-browser-pseudodomain/perl/ajax.pl',
+						method: 'GET',
+						dataType: 'text',
+						success: function(data) {
+							var dataItems = data.split(',');
+							var text = '';
+							for (index = 0; index < dataItems.length; index++) {
+								text += dataItems[index] + '<br>';
+							}
+							$('#ajax-results').html(text);
+						}
+					});
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

@@ -653,18 +653,24 @@ int main(int argc, char **argv)
             settings.value("browser/perl_script_timeout").toString();
     application.setProperty("scriptTimeout", scriptTimeout);
 
-    // PACKAGE GUI SETTINGS:
+    // PACKAGE SETTINGS:
     // Package root directory:
     QString rootDirName;
     QString rootDirNameSetting = settings.value("package/root").toString();
-    if (rootDirNameSetting == "current") {
-        rootDirName = settingsDirName;
-    } else {
+
+    QDir rootDir(rootDirNameSetting);
+    if (rootDir.isRelative()) {
+        rootDirName = QDir::toNativeSeparators(
+                    settingsDirName + rootDirNameSetting);
+    }
+    if (rootDir.isAbsolute()) {
         rootDirName = QDir::toNativeSeparators(rootDirNameSetting);
     }
+
     if (!rootDirName.endsWith(QDir::separator())) {
         rootDirName.append(QDir::separator());
     }
+
     application.setProperty("rootDirName", rootDirName);
 
     // Start page -
@@ -931,6 +937,8 @@ QFileDetector::QFileDetector()
 
     gifExtension.setPattern("gif");
     gifExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
+    fileExists = true;
 }
 
 // ==============================
