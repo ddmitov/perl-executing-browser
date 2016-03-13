@@ -519,6 +519,7 @@ protected:
         // POST requests to the browser pseudodomain -
         // CGI-like and long-running scripts:
         if (operation == PostOperation and
+                request.url().scheme() == "peb" and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
 
@@ -1342,7 +1343,7 @@ public slots:
                     + qApp->property("startPagePath").toString()));
     }
 
-    void qPageLoadedDynamicTitleSlot(bool ok)
+    void qPageLoadedSlot(bool ok)
     {
         if (ok) {
             setWindowTitle(QWebViewWindow::title());
@@ -1775,9 +1776,11 @@ public slots:
 
     void qExitApplicationSlot()
     {
+#if ZIP_SUPPORT == 1
         // Temporary folder removal:
         QDir tempDir(qApp->property("applicationTempDirectory").toString());
         tempDir.removeRecursively();
+#endif
 
         if ((qApp->property("systrayIcon").toString()) == "enable") {
             emit trayIconHideSignal();

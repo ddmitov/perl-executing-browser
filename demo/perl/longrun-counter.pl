@@ -28,7 +28,7 @@ sub html_footer() {
 print <<FOOTER
 		</font></p>
 		<p align='center'><font size='5'>
-		<a href='http://perl-executing-browser-pseudodomain/perl/longrun-counter.pl?action=kill' class="btn btn-danger btn-sm">Kill Script</a>
+		<a href='peb://pseudodomain/perl/longrun-counter.pl?action=kill' class="btn btn-danger btn-sm">Kill Script</a>
 		</font></p>
 	</body>
 

@@ -66,14 +66,11 @@ equals (SCRIPT_CENSORING, 1) {
 
 
 ##########################################################
-# To compile without support for unpacking root folder from a ZIP file:
+# To compile without support for ZIP packages:
 # ZIP_SUPPORT = 0
 ##########################################################
-# To enable internal support for unpacking root folder from a ZIP file:
+# To enable support for ZIP packages:
 # ZIP_SUPPORT = 1
-##########################################################
-# To enable external support for unpacking root folder from a ZIP file:
-# ZIP_SUPPORT = 2
 ##########################################################
 ZIP_SUPPORT = 1
 
@@ -97,9 +94,6 @@ equals (ZIP_SUPPORT, 1) {
     quazip/quacrc32.cpp quazip/quagzipfile.cpp quazip/quaziodevice.cpp \
     quazip/quazip.cpp quazip/quazipdir.cpp quazip/quazipfile.cpp \
     quazip/quazipfileinfo.cpp quazip/quazipnewinfo.cpp
-}
-equals (ZIP_SUPPORT, 2) {
-    message ("Going to build with external support for ZIP packages.")
 }
 
 

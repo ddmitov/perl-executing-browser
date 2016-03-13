@@ -41,6 +41,27 @@ BEGIN {
 	# CORE FUNCTIONS:
 	##############################
 
+	#~ my @allowed_domains = qw (www.perl.org www.perl.com);
+
+	#~ *CORE::GLOBAL::gethostbyname = sub (*;$@) {
+		#~ (my $package, my $filename, my $line) = caller();
+		#~ my $hostname = $_[0];
+
+		#~ my $domain_matched = 0;
+		#~ foreach my $allowed_domain (@allowed_domains) {
+			#~ if (($hostname =~ $allowed_domain)) {
+				#~ $domain_matched = 1;
+				#~ return CORE::gethostbyname $_[0];
+			#~ } else {
+				#~ next;
+			#~ }
+		#~ }
+
+		#~ if ($domain_matched == 0) {
+			#~ die "Attempted connection to a prohibited domain '$hostname' detected at package '$package', line: $line.\n";
+		#~ }
+	#~ };
+
 	*CORE::GLOBAL::require = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $module = $_[0];

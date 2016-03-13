@@ -2,7 +2,6 @@
     <qresource prefix="/">
         <file>html/forbidden.htm</file>
         <file>html/notrecognized.htm</file>
-        <file>html/settings.htm</file>
         <file>icons/camel-icon-32.png</file>
         <file>scripts/js/check-user-input-before-quit.js</file>
         <file>scripts/perl/censor.pl</file>

@@ -347,6 +347,7 @@ int main(int argc, char **argv)
     QString applicationBinaryName =
             QFileInfo(QApplication::applicationFilePath()).baseName();
 
+#if ZIP_SUPPORT == 1
     // ==============================
     // CREATE TEMPORARY FOLDER:
     // ==============================
@@ -369,28 +370,9 @@ int main(int argc, char **argv)
 
     // Extracting root folder from a ZIP package:
     if (defaultZipPackage.exists()) {
-#if ZIP_SUPPORT == 1
         extractedFiles = JlCompress::extractDir(
                     defaultZipPackageName,
                     applicationTempDirectoryName);
-
-        // Extracting root folder from a zip file,
-        // that was appended to the binary (!) using
-        // 'cat peb-bin-only peb.zip > peb-with-data'
-//        extractedFiles = JlCompress::extractDir (
-//                    QApplication::applicationFilePath(),
-//                    applicationTempDirectoryName);
-#endif
-
-#if ZIP_SUPPORT == 2
-        QProcess unzipper;
-        unzipper.start("unzip",
-                       QStringList() << defaultZipPackageName
-                       << "-d"
-                       << applicationTempDirectoryName);
-        if (!unzipper.waitForFinished())
-                return false;
-#endif
 
         // Settings file from the extracted ZIP package:
         settingsDirName = applicationTempDirectoryName
@@ -398,6 +380,7 @@ int main(int argc, char **argv)
         settingsFileName = settingsDirName + QDir::separator()
                 + applicationBinaryName + ".ini";
     }
+#endif
 
     // ==============================
     // MANAGE APPLICATION SETTINGS:
@@ -816,10 +799,7 @@ int main(int argc, char **argv)
         qDebug() << "ZIP packages support is disabled.";
     }
     if (ZIP_SUPPORT == 1) {
-        qDebug() << "ZIP packages support is enabled using internal code.";
-    }
-    if (ZIP_SUPPORT == 2) {
-        qDebug() << "ZIP packages support is enabled using external unpacker.";
+        qDebug() << "ZIP packages support is enabled.";
     }
     if (PERL_DEBUGGER_INTERACTION == 0) {
         qDebug() << "Perl debugger interaction is disabled.";
@@ -828,7 +808,9 @@ int main(int argc, char **argv)
         qDebug() << "Perl debugger interaction is enabled.";
     }
     qDebug() << "";
+#if ZIP_SUPPORT == 1
     qDebug() << "Temporary folder:" << applicationTempDirectoryName;
+#endif
     qDebug() << "Settings file name:" << settingsFileName;
     qDebug() << "";
 
@@ -889,9 +871,11 @@ int main(int argc, char **argv)
     qDebug() << "Web Inspector from context menu:" << webInspector;
     qDebug() << "";
 
+#if ZIP_SUPPORT == 1
     foreach (QString extractedFile, extractedFiles) {
         qDebug() << "Extracted ZIP entry:" << extractedFile;
     }
+#endif
 
     return application.exec();
 }
@@ -1206,7 +1190,7 @@ QWebViewWindow::QWebViewWindow()
 
     if ((qApp->property("browserTitle").toString()) == "dynamic") {
         QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
-                         this, SLOT(qPageLoadedDynamicTitleSlot(bool)));
+                         this, SLOT(qPageLoadedSlot(bool)));
     }
 
     setPage(mainPage);
@@ -1299,228 +1283,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
-    // DISPLAY BROWSER SETTINGS:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().toString() == "about:config") {
-
-        QString settingsUiFileName(":/html/settings.htm");
-        QFile settingsUiFile(settingsUiFileName);
-        settingsUiFile.open(QIODevice::ReadOnly
-                              | QIODevice::Text);
-        QTextStream settingsUistream(&settingsUiFile);
-        QString settingsUiContents = settingsUistream.readAll();
-        settingsUiFile.close();
-
-        QString path;
-        foreach (QString pathEntry,
-                 qApp->property("pathToAddList").toStringList()) {
-            path.append(pathEntry);
-            path.append("<br>");
-        }
-        path.replace(QRegExp("<br>$"), "");
-        if (path.length() > 0) {
-            settingsUiContents.replace("[% PATH %]", path);
-        } else {
-            settingsUiContents.replace("[% PATH %]", "none");
-        }
-
-        settingsUiContents.replace("[% Perl interpreter %]",
-                                   qApp->property("perlInterpreter")
-                                   .toString());
-
-        settingsUiContents.replace("[% PERLLIB folder %]",
-                                   qApp->property("perlLib").toString());
-
-        settingsUiContents.replace("[% Perl debugger output formatter %]",
-                                   qApp->property("debuggerOutputFormatter")
-                                   .toString());
-
-        settingsUiContents.replace("[% Display STDERR %]",
-                                   qApp->property("displayStderr").toString());
-
-        frame->setHtml(settingsUiContents, QUrl(PSEUDO_DOMAIN));
-
-        qDebug() << "Settings page requested";
-
-        return false;
-    }
-
-    // SET BROWSER SETTINGS:
-    // Set Perl interpreter:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "perl.setting" and
-            request.url().query() == ("action=set")) {
-
-        QFileDialog selectPerlInterpreterDialog (qApp->activeWindow());
-        selectPerlInterpreterDialog.setFileMode(QFileDialog::AnyFile);
-        selectPerlInterpreterDialog.setViewMode(QFileDialog::Detail);
-        selectPerlInterpreterDialog.setWindowModality(Qt::WindowModal);
-        QString perlInterpreter = selectPerlInterpreterDialog
-                .getOpenFileName
-                (qApp->activeWindow(), tr("Select Perl Interpreter"),
-                 QDir::currentPath(), tr("All files (*)"));
-        selectPerlInterpreterDialog.close();
-        selectPerlInterpreterDialog.deleteLater();
-
-        if (perlInterpreter.length() > 0) {
-            // Save Perl interpreter setting in the settings file:
-            QSettings perlInterpreterSetting(
-                        (qApp->property("settingsFileName").toString()),
-                        QSettings::IniFormat);
-            perlInterpreterSetting
-                    .setValue("browser/perl", perlInterpreter);
-            perlInterpreterSetting.sync();
-
-            // Set global Perl interpreter setting:
-            qApp->setProperty("perlInterpreter", perlInterpreter);
-
-            // JavaScript bridge back to the settings page:
-            QString javaScript =
-                    "document.getElementById(\"setting-perl\")"
-                    ".innerHTML = \"" + perlInterpreter + "\";";
-            currentFrame()->evaluateJavaScript(javaScript);
-
-            qDebug() << "Selected Perl interpreter:" << perlInterpreter;
-        }
-
-        return false;
-    }
-
-    // Set PERLLIB:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "perllib.setting" and
-            request.url().query() == ("action=set")) {
-
-        QFileDialog selectPerlLibDialog (qApp->activeWindow());
-        selectPerlLibDialog.setFileMode(QFileDialog::AnyFile);
-        selectPerlLibDialog.setViewMode(QFileDialog::Detail);
-        selectPerlLibDialog.setWindowModality(Qt::WindowModal);
-        QString perlLibFolderName = selectPerlLibDialog
-                .getExistingDirectory(
-                    qApp->activeWindow(),
-                    tr("Select PERLLIB"),
-                    QDir::currentPath());
-        selectPerlLibDialog.close();
-        selectPerlLibDialog.deleteLater();
-
-        if (perlLibFolderName.length() > 0) {
-            // Save PERLLIB setting in the settings file:
-            QSettings perlLibSetting((qApp->property("settingsFileName")
-                                      .toString()),
-                                     QSettings::IniFormat);
-            perlLibSetting.setValue("browser/perllib", perlLibFolderName);
-            perlLibSetting.sync();
-
-            // Set global PERLIB setting:
-            qApp->setProperty("perlLib", perlLibFolderName);
-
-            // JavaScript bridge back to the settings page:
-            QString javaScript =
-                    "document.getElementById(\"setting-perllib\")"
-                    ".innerHTML = \"" + perlLibFolderName + "\";";
-            currentFrame()->evaluateJavaScript(javaScript);
-
-            qDebug() << "Selected PERLLIB:" << perlLibFolderName;
-        }
-
-        return false;
-    }
-
-    // Select folder to add to the PATH environment variable:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "path.setting" and
-            request.url().query() == ("action=add")) {
-
-        QFileDialog addToPathDialog (qApp->activeWindow());
-        addToPathDialog.setFileMode(QFileDialog::AnyFile);
-        addToPathDialog.setViewMode(QFileDialog::Detail);
-        addToPathDialog.setWindowModality(Qt::WindowModal);
-        QString pathFolderString = addToPathDialog.getExistingDirectory(
-                    qApp->activeWindow(),
-                    tr("Select folder to add to PATH"),
-                    QDir::currentPath());
-        addToPathDialog.close();
-        addToPathDialog.deleteLater();
-
-        qDebug() << "Folder to add to PATH:" << pathFolderString;
-
-        // Get the list of all folders on the current PATH:
-        QStringList oldPathList =
-                qApp->property("pathToAddList").toStringList();
-
-        QStringList pathList;
-        foreach (QString pathEntry, oldPathList) {
-            pathList.append(pathEntry);
-        }
-
-        // Append the new folder name to the list of current PATH folders:
-        pathList.append(pathFolderString);
-
-        // Save the new PATH folders list in the global settings:
-        qApp->setProperty("pathToAddList", pathList);
-
-        // Open the settings file:
-        QSettings pathFoldersSetting((qApp->property("settingsFileName")
-                                      .toString()),
-                                     QSettings::IniFormat);
-
-        // Get the size of the PATH array in the settings file:
-        int pathArraySize = pathFoldersSetting
-                .beginReadArray("browser/path");
-         pathFoldersSetting.endArray();
-
-        // Append the new folder name in the
-        // appropriate section of the settings file:
-        pathFoldersSetting.beginWriteArray("browser/path");
-        pathFoldersSetting.setArrayIndex(pathArraySize);
-        pathFoldersSetting.setValue("name", pathFolderString);
-        pathFoldersSetting.endArray();
-
-        // Define separator between PATH folders:
-        QString pathSeparator;
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-        pathSeparator = ":";
-#endif
-#ifdef Q_OS_WIN // Windows
-        pathSeparator = ";";
-#endif
-
-        // Put the new folder name on PATH:
-        QByteArray path;
-        foreach (QString pathEntry, pathList) {
-            path.append(pathEntry);
-            path.append(pathSeparator);
-        }
-
-        // Insert the new PATH variable into
-        // the script environment of the current page:
-#ifndef Q_OS_WIN // Unix-based or similar operating systems
-        scriptEnvironment.insert("PATH", path);
-#else // Windows
-        scriptEnvironment.insert("Path", path);
-#endif
-
-        // Display the newly created PATH list on the settings page:
-        QString pathToDisplay;
-        foreach (QString pathEntry, pathList) {
-            pathToDisplay.append(pathEntry);
-            pathToDisplay.append("<br>");
-        }
-        pathToDisplay.replace(QRegExp("<br>$"), "");
-        if (pathToDisplay.length() > 0) {
-            QString javaScript =
-                    "document.getElementById(\"setting-path\")"
-                    ".innerHTML = \"" + pathToDisplay + "\";";
-            currentFrame()->evaluateJavaScript(javaScript);
-        } else {
-            QString javaScript =
-                    "document.getElementById(\"setting-path\")"
-                    ".innerHTML = \"none\";";
-            currentFrame()->evaluateJavaScript(javaScript);
-        }
-
-        return false;
-    }
 
     // SET DEFAULT THEME:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and

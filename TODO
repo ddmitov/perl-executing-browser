@@ -1,6 +1,6 @@
 
 Permanent TO-DO priorities:
-- documentation,
+- up-to-date README,
 - commented code,
 - up-to-date translations,
 - GitHub Wiki page,
@@ -10,24 +10,37 @@ Permanent TO-DO priorities:
 
 v. 0.2
 ====================================
-- nice HTML interface for settings
-- separate global settings and package settings
+- settings in a custom INI-like key-value format loadable from inside of a ZIP package
+    QSettings can not be used with a zipped INI file without
+    first extracting the INI file from the ZIP archive
+- separate browser settings and package settings in two files
+- built-in default values for browser and package settings
+- loading of a ZIP package with a command line argument
 
 - censor.pl behaviour governed by compile-time settings;
     they will correspond to hard-coded command line arguments given by the browser
+- filtered network access implemented in censor.pl
 - better documentation for censor.pl
 - security tests in separate files
 
-- separate DB_ROOT environment variable and folder
+- separate DB_ROOT environment variable for the database folder
+
+- default theme without copying the theme file in another file
+
+- allowed network page as a start page
+
+- single template for all HTML error messages
+- translations for all HTML error messages
 
 - cross-platform capability for all example scripts
 
 v. 0.3
 ====================================
-- internal JavaScript-based code editor - ACE
+- support for loading HTML interface and fatpacked Perl scripts from a ZIP package
+    without extracting them to a temporary folder
+- internal JavaScript-based code editor - ACE;
+    code editor will edit settings files too.
 
 v.0.4
 ====================================
-- support for loading HTML interface and fatpacked Perl scripts from a ZIP package
-    without extracting them to a temporary folder
 - support for encrypted packages - encrypted SQLite or 7z

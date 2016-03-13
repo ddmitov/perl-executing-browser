@@ -37,4 +37,8 @@
 	#~ push (@INC, "/tmp/test");
 #~ }
 
+# http://docstore.mik.ua/orelly/perl/cookbook/ch18_02.htm
+#~ my $name = "www.google.com";
+#~ my @addresses = gethostbyname ($name) or die "Can't resolve $name: $!\n";
+
 #~ print STDERR "STDERR printing test is successfull.\n";
