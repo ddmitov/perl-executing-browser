@@ -1,46 +1,41 @@
 
-Permanent TO-DO priorities:
+Permanent TO-DO:
 - up-to-date README,
 - commented code,
 - up-to-date translations,
-- GitHub Wiki page,
+- GitHub Wiki pages,
 - GitHub webpage.
-
-====================================
 
 v. 0.2
 ====================================
-- settings in a custom INI-like key-value format loadable from inside of a ZIP package
-    QSettings can not be used with a zipped INI file without
-    first extracting the INI file from the ZIP archive
-- separate browser settings and package settings in two files
+- separate browser settings and package settings in two INI files
 - built-in default values for browser and package settings
-- loading of a ZIP package with a command line argument
+- loading of a ZIP package or a package settings file with a command line argument
 
-- censor.pl behaviour governed by compile-time settings;
-    they will correspond to hard-coded command line arguments given by the browser
-- filtered network access implemented in censor.pl
+- filter network domains and IP addresses using censor.pl
 - better documentation for censor.pl
 - security tests in separate files
+- separate resource file for censor.pl
 
-- separate DB_ROOT environment variable for the database folder
+- start Perl debugger in script environment when script is inside the current package
+    and in system environment when script is outside the current package
+- dbgformatter.pl fatpacked together with Syntax::Highlight::Engine::Kate
+- separate resource file for dbgformatter.pl
 
-- default theme without copying the theme file in another file
+- DOCUMENT_ROOT becomes only application property without trailing slash
+- DATA_ROOT setting and environment variable for data files only
+- package data folder inside user's data directory derived from the name of the package settings file
+- package 'about.htm' special URL
+- PERL5LIB to native separators
 
-- allowed network page as a start page
+- allowed domain can be start page
 
 - single template for all HTML error messages
 - translations for all HTML error messages
-
-- cross-platform capability for all example scripts
+- HTML error pages for missing browser settings file and missing start page
+- user-supplied JS prompt when check-user-input-before-quit finds user input
 
 v. 0.3
 ====================================
-- support for loading HTML interface and fatpacked Perl scripts from a ZIP package
-    without extracting them to a temporary folder
 - internal JavaScript-based code editor - ACE;
-    code editor will edit settings files too.
-
-v.0.4
-====================================
-- support for encrypted packages - encrypted SQLite or 7z
+    code editor will edit settings files too

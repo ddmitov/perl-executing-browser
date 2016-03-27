@@ -383,7 +383,7 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // MANAGE APPLICATION SETTINGS:
+    // SETTINGS FILES:
     // ==============================
     // Settings file is loaded from the directory of the binary file
     // if no settings file from a ZIP package is found:
@@ -437,6 +437,69 @@ int main(int argc, char **argv)
     // Define INI file format for storing settings:
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
+    // ==============================
+    // MANAGE BROWSER SETTINGS:
+    // ==============================
+    // Perl interpreter:
+    QString perlInterpreterSetting = settings
+            .value("browser/perl").toString();
+
+    if (perlInterpreterSetting.length() == 0) {
+        qDebug()  <<"No Perl interpreter is set in browser settings file.";
+    }
+
+    QString perlInterpreter;
+
+    if (perlInterpreterSetting == "system") {
+        QProcess systemPerlTester;
+        systemPerlTester.start("perl",
+                               QStringList()
+                               << "-e"
+                               << "print $^X;");
+        if (systemPerlTester.waitForFinished()) {
+            QByteArray testingScriptResultArray =
+                    systemPerlTester.readAllStandardOutput();
+            perlInterpreter =
+                    QString::fromLatin1(testingScriptResultArray);
+
+            if (perlInterpreter.length() == 0) {
+                qDebug()  <<"No Perl interpreter is available on PATH";
+            }
+        }
+    } else {
+        QDir interpreterFile(perlInterpreterSetting);
+        if (interpreterFile.isRelative()) {
+            perlInterpreter =
+                    QDir::toNativeSeparators(settingsDirName
+                                             + perlInterpreterSetting);
+        }
+        if (interpreterFile.isAbsolute()) {
+            perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
+        }
+
+        QFile perlInterpreterBinary(perlInterpreterSetting);
+
+        if (perlInterpreterSetting.length() > 0 and
+                !perlInterpreterBinary.exists()) {
+            qDebug()  << "Perl interpreter from browser settings file"
+                      << "is missing";
+        }
+    }
+
+    application.setProperty("perlInterpreter", perlInterpreter);
+
+    // PERLLIB environment variable:
+    QString perlLibSetting = settings.value("browser/perllib").toString();
+    QDir perlLibDir(perlLibSetting);
+    QString perlLib;
+    if (perlLibDir.isRelative()) {
+        perlLib = QDir::toNativeSeparators(settingsDirName + perlLibSetting);
+    }
+    if (perlLibDir.isAbsolute()) {
+        perlLib = QDir::toNativeSeparators(perlLibSetting);
+    }
+    application.setProperty("perlLib", perlLib);
+
     // Logging enable/disable switch:
     QString logging = settings.value("browser/logging").toString();
     // Install message handler for redirecting all debug messages to a log file:
@@ -480,163 +543,9 @@ int main(int argc, char **argv)
     settings.endArray();
     application.setProperty("allowedDomainsList", allowedDomainsList);
 
-    // User agent:
-    QString userAgent = settings
-            .value("browser/user_agent").toString();
-    if (userAgent.length() == 0) {
-        userAgent = USER_AGENT;
-    }
-    application.setProperty("userAgent", userAgent);
-
-    // Folders to add to PATH:
-    QStringList pathToAddList;
-    int pathSize = settings.beginReadArray("browser/path");
-    for (int index = 0; index < pathSize; ++index) {
-        settings.setArrayIndex(index);
-        QString pathSetting = settings.value("name").toString();
-
-        // Get all directory names to be added on PATH of all local scripts,
-        // but first check if these directories exist,
-        // then resolve all relative paths, if any:
-        QDir pathDir(pathSetting);
-        if (pathDir.exists()) {
-            if (pathDir.isRelative()) {
-                pathSetting = QDir::toNativeSeparators(
-                            (qApp->property("settingsDirName").toString())
-                            + pathSetting);
-                pathToAddList.append(pathSetting);
-            }
-            if (pathDir.isAbsolute()) {
-                pathSetting = QDir::toNativeSeparators(pathSetting);
-                pathToAddList.append(pathSetting);
-            }
-        }
-    }
-
-    settings.endArray();
-    application.setProperty("pathToAddList", pathToAddList);
-
-    // Perl interpreter:
-    QString perlInterpreterSetting = settings
-            .value("browser/perl").toString();
-
-    if (perlInterpreterSetting.length() == 0) {
-        QString title =
-                QApplication::tr("Missing Perl");
-        QString text = QApplication::tr("No Perl interpreter is set for") +
-                "<br>" +
-                application.applicationDisplayName() +
-                QApplication::tr(" version ") +
-                application.applicationVersion();
-        QMessageBox missingPerlInterpreterMessageBox;
-        missingPerlInterpreterMessageBox
-                .setWindowModality(Qt::WindowModal);
-       missingPerlInterpreterMessageBox
-                .setIconPixmap(QString(":/icons/camel-icon-32.png"));
-        missingPerlInterpreterMessageBox.setWindowTitle(title);
-        missingPerlInterpreterMessageBox.setText(text);
-        missingPerlInterpreterMessageBox
-                .setDefaultButton(QMessageBox::Ok);
-        missingPerlInterpreterMessageBox.exec();
-    }
-
-    QString perlInterpreter;
-
-    if (perlInterpreterSetting == "system") {
-        QProcess systemPerlTester;
-        systemPerlTester.start("perl",
-                               QStringList()
-                               << "-e"
-                               << "print $^X;");
-        if (systemPerlTester.waitForFinished()) {
-            QByteArray testingScriptResultArray =
-                    systemPerlTester.readAllStandardOutput();
-            perlInterpreter =
-                    QString::fromLatin1(testingScriptResultArray);
-
-            if (perlInterpreter.length() == 0) {
-                QString title =
-                        QApplication::tr("Missing Perl");
-                QString text =
-                        QApplication::tr(
-                            "No Perl interpreter is "
-                            "available on PATH for") +
-                        "<br>" +
-                        application.applicationDisplayName() +
-                        QApplication::tr(" version ") +
-                        application.applicationVersion();
-                QMessageBox missingPerlInterpreterMessageBox;
-                missingPerlInterpreterMessageBox
-                         .setIconPixmap(QString(":/icons/camel-icon-32.png"));
-                missingPerlInterpreterMessageBox.setIcon(QMessageBox::Warning);
-                missingPerlInterpreterMessageBox.setWindowTitle(title);
-                missingPerlInterpreterMessageBox.setText(text);
-                missingPerlInterpreterMessageBox
-                        .setDefaultButton(QMessageBox::Ok);
-                missingPerlInterpreterMessageBox.exec();
-            }
-        }
-    } else {
-        QDir interpreterFile(perlInterpreterSetting);
-        if (interpreterFile.isRelative()) {
-            perlInterpreter =
-                    QDir::toNativeSeparators(settingsDirName
-                                             + perlInterpreterSetting);
-        }
-        if (interpreterFile.isAbsolute()) {
-            perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
-        }
-
-        QFile perlInterpreterBinary(perlInterpreterSetting);
-
-        if (perlInterpreterSetting.length() > 0 and
-                !perlInterpreterBinary.exists()) {
-            QString title =
-                    QApplication::tr("Missing Perl");
-            QString text =
-                    QApplication::tr("Perl interpreter is missing for") +
-                    "<br>" +
-                    application.applicationDisplayName() +
-                    QApplication::tr(" version ") +
-                    application.applicationVersion();
-            QMessageBox missingPerlInterpreterMessageBox;
-            missingPerlInterpreterMessageBox
-                    .setWindowModality(Qt::WindowModal);
-            missingPerlInterpreterMessageBox
-                     .setIconPixmap(QString(":/icons/camel-icon-32.png"));
-            missingPerlInterpreterMessageBox.setWindowTitle(title);
-            missingPerlInterpreterMessageBox.setText(text);
-            missingPerlInterpreterMessageBox
-                    .setDefaultButton(QMessageBox::Ok);
-            missingPerlInterpreterMessageBox.exec();
-        }
-    }
-
-    application.setProperty("perlInterpreter", perlInterpreter);
-
-    // PERLLIB environment variable:
-    QString perlLibSetting = settings.value("browser/perllib").toString();
-    QDir perlLibDir(perlLibSetting);
-    QString perlLib;
-    if (perlLibDir.isRelative()) {
-        perlLib = QDir::toNativeSeparators(settingsDirName + perlLibSetting);
-    }
-    if (perlLibDir.isAbsolute()) {
-        perlLib = QDir::toNativeSeparators(perlLibSetting);
-    }
-    application.setProperty("perlLib", perlLib);
-
-    // Display or hide STDERR from scripts:
-    QString displayStderr =
-            settings.value("browser/perl_display_stderr").toString();
-    application.setProperty("displayStderr", displayStderr);
-
-    // Timeout for CGI-like and AJAX scripts (not long-running ones):
-    QString scriptTimeout =
-            settings.value("browser/perl_script_timeout").toString();
-    application.setProperty("scriptTimeout", scriptTimeout);
-
-    // PACKAGE SETTINGS:
+    // ==============================
+    // MANAGE PACKAGE SETTINGS:
+    // ==============================
     // Package root directory:
     QString rootDirName;
     QString rootDirNameSetting = settings.value("package/root").toString();
@@ -683,38 +592,14 @@ int main(int argc, char **argv)
         QApplication::exit();
     }
 
-    // Warn on exit:
-    QString warnOnExit = settings.value("package/warn_on_exit") .toString();
-    application.setProperty("warnOnExit", warnOnExit);
+    // Display or hide STDERR from scripts:
+    QString displayStderr =
+            settings.value("package/perl_display_stderr").toString();
+    application.setProperty("displayStderr", displayStderr);
 
     // Fullscreen:
     QString fullscreen = settings.value("package/fullscreen").toString();
     application.setProperty("fullscreen", fullscreen);
-
-    // Browser title -'dynamic' or 'My Favorite Title'
-    // 'dynamic' title is taken from every HTML <title> tag.
-    QString browserTitle = settings
-            .value("package/browser_title").toString();
-    application.setProperty("browserTitle", browserTitle);
-
-    // Right click context menu enable/disable switch:
-    QString contextMenu = settings.value("package/context_menu").toString();
-    application.setProperty("contextMenu", contextMenu);
-
-    // Going to start page enable/disable switch:
-    QString goHomeCapability =
-            settings.value("package/go_home_capability").toString();
-    application.setProperty("goHomeCapability", goHomeCapability);
-
-    // Page reload enable/disable switch:
-    QString reloadCapability =
-            settings.value("package/reload_capability").toString();
-    application.setProperty("reloadCapability", reloadCapability);
-
-    // Web Inspector from context menu enable/disable switch:
-    QString webInspector = settings
-            .value("package/web_inspector").toString();
-    application.setProperty("webInspector", webInspector);
 
     // Icon:
     QString iconPathNameSetting = settings.value("package/icon").toString();
@@ -739,20 +624,6 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
-    // System tray icon enable/disable switch:
-    QString systrayIcon = settings.value("package/systray_icon").toString();
-    application.setProperty("systrayIcon", systrayIcon);
-
-    // Themes directory:
-    QString themesDirectorySetting =
-            settings.value("package/themes_directory").toString();
-    application.setProperty("themesDirectorySetting", themesDirectorySetting);
-
-    QString themesDirectory =
-                QDir::toNativeSeparators(rootDirName
-                                         + themesDirectorySetting);
-    application.setProperty("themesDirectory", themesDirectory);
-
     // Translation:
     QString translation =
             settings.value("package/translation").toString();
@@ -761,6 +632,18 @@ int main(int argc, char **argv)
         translator.load("peb_" + translation, ":/translations");
     }
     application.installTranslator(&translator);
+
+    // Warn on exit:
+    QString warnOnExit = settings
+            .value("package/warn_on_exit_if_text_is_entered")
+            .toString();
+    application
+            .setProperty("warnOnExitIfTextIsEntered", warnOnExit);
+
+    // Web Inspector enable/disable switch:
+    QString webInspector = settings
+            .value("package/web_inspector").toString();
+    application.setProperty("webInspector", webInspector);
 
     // ==============================
     // COMMAND LINE SETTING OVERRIDES:
@@ -827,48 +710,26 @@ int main(int argc, char **argv)
     window.show();
 
     // ==============================
-    // SYSTEM TRAY ICON CLASS INITIALIZATION:
-    // ==============================
-    QTrayIcon trayIcon;
-    if (systrayIcon == "enable") {
-        QObject::connect(trayIcon.aboutAction, SIGNAL(triggered()),
-                         &window, SLOT(qAboutSlot()));
-
-        QObject::connect(&window, SIGNAL(trayIconHideSignal()),
-                         &trayIcon, SLOT(qTrayIconHideSlot()));
-    }
-
-    // ==============================
     // LOG ALL SETTINGS:
     // ==============================
     qDebug() << "";
-    foreach (QString pathEntry, pathToAddList) {
-        qDebug() << "Folder on PATH:" << pathEntry;
-    }
     qDebug() << "Perl interpreter" << perlInterpreter;
     qDebug() << "PERLLIB folder:" << perlLib;
-    qDebug() << "Display STDERR from scripts:" << displayStderr;
-    qDebug() << "Script Timeout:" << scriptTimeout;
     qDebug() << "Logging:" << logging;
     qDebug() << "Logging mode:" << logMode;
     qDebug() << "Logfiles directory:" << logDirFullPath;
     foreach (QString allowedDomainsListEntry, allowedDomainsList) {
         qDebug() << "Allowed domain:" << allowedDomainsListEntry;
     }
-    qDebug() << "User Agent:" << userAgent;
     qDebug() << "";
     qDebug() << "Package root folder:" << rootDirName;
     qDebug() << "Package start page:" << startPagePath;
-    qDebug() << "Warn on exit:" << warnOnExit;
+    qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Fullscreen:" << fullscreen;
-    qDebug() << "Browser title:" << browserTitle;
-    qDebug() << "Context menu:" << contextMenu;
-    qDebug() << "Go to start page capability:" << goHomeCapability;
-    qDebug() << "Page reload capability:" << reloadCapability;
     qDebug() << "Icon:" << iconPathName;
-    qDebug() << "Themes directory:" << themesDirectory;
     qDebug() << "Translation:" << translation;
-    qDebug() << "Web Inspector from context menu:" << webInspector;
+    qDebug() << "Warn on exit:" << warnOnExit;
+    qDebug() << "Web Inspector from keyboard shortcut:" << webInspector;
     qDebug() << "";
 
 #if ZIP_SUPPORT == 1
@@ -937,31 +798,6 @@ QScriptEnvironment::QScriptEnvironment()
 
     // PERLLIB:
     scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());
-
-    // PATH:
-    QString path;
-    QString pathSeparator;
-#if defined (Q_OS_LINUX) or defined (Q_OS_MAC) // Linux and Mac
-    pathSeparator = ":";
-#endif
-#ifdef Q_OS_WIN // Windows
-    pathSeparator = ";";
-#endif
-
-    // Add all browser-specific folders to the PATH of all local scripts,
-    // but first check if these directories exist,
-    // then resolve all relative paths, if any:
-    foreach (QString pathEntry, qApp->property("pathToAddList").toString()) {
-        path.append(pathEntry);
-        path.append(pathSeparator);
-    }
-
-#ifndef Q_OS_WIN // Linux and Mac
-    scriptEnvironment.insert("PATH", path);
-#endif
-#ifdef Q_OS_WIN // Windows
-    scriptEnvironment.insert("Path", path);
-#endif
 }
 
 // ==============================
@@ -1137,23 +973,18 @@ QWebViewWindow::QWebViewWindow()
     : QWebView(0)
 {
     // Configure keyboard shortcuts:
-    if ((qApp->property("goHomeCapability").toString()) == "enable") {
-        QShortcut *homeShortcut = new QShortcut(QKeySequence("Ctrl+H"), this);
-        QObject::connect(homeShortcut, SIGNAL(activated()),
-                         this, SLOT(qLoadStartPageSlot()));
-    }
-
-    if ((qApp->property("reloadCapability").toString()) == "enable") {
-        QShortcut *reloadShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
-        QObject::connect(reloadShortcut, SIGNAL(activated()),
-                         this, SLOT(qReloadSlot()));
-    }
-
 #ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
                      this, SLOT(qPrintSlot()));
 #endif
+
+    if ((qApp->property("webInspector").toString()) == "enable") {
+        QShortcut *qWebInspestorShortcut =
+                new QShortcut(QKeySequence("Ctrl+I"), this);
+        QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
+                         this, SLOT(qStartQWebInspector()));
+    }
 
     // Configure screen dimensions:
     if ((qApp->property("fullscreen").toString()) == "enable") {
@@ -1162,19 +993,12 @@ QWebViewWindow::QWebViewWindow()
         showMaximized();
     }
 
-    // Configure browser title:
-    if ((qApp->property("browserTitle").toString()) != "dynamic") {
-        setWindowTitle((qApp->property("browserTitle").toString()));
-    }
-
-    // Configure context menu:
-    if ((qApp->property("contextMenu").toString()) == "disable") {
-        setContextMenuPolicy(Qt::NoContextMenu);
-    }
+    // No context menu:
+    setContextMenuPolicy(Qt::NoContextMenu);
 
     mainPage = new QPage();
 
-    // Connect signals and slots - main window:
+    // Connect signals and slots:
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
                      this, SLOT(qDisplayErrorsSlot(QString)));
 
@@ -1185,13 +1009,8 @@ QWebViewWindow::QWebViewWindow()
     QObject::connect(mainPage, SIGNAL(saveAsPdfSignal()),
                      this, SLOT(qSaveAsPdfSlot()));
 
-    QObject::connect(mainPage, SIGNAL(reloadSignal()),
-                     this, SLOT(qReloadSlot()));
-
-    if ((qApp->property("browserTitle").toString()) == "dynamic") {
-        QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
-                         this, SLOT(qPageLoadedSlot(bool)));
-    }
+    QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
+                     this, SLOT(qPageLoadedSlot(bool)));
 
     setPage(mainPage);
 
@@ -1205,9 +1024,9 @@ QWebViewWindow::QWebViewWindow()
                      mainPage,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Disable history:
-    QWebHistory *history = mainPage->history();
-    history->setMaximumItemCount(0);
+    // To disable history:
+    // QWebHistory *history = mainPage->history();
+    // history->setMaximumItemCount(0);
 
     // Cookies and HTTPS support:
     QNetworkCookieJar *cookieJar = new QNetworkCookieJar;
@@ -1223,57 +1042,10 @@ QWebViewWindow::QWebViewWindow()
     mainPage->mainFrame()->setScrollBarPolicy(Qt::Vertical,
                                               Qt::ScrollBarAsNeeded);
 
-    // Context menu settings:
-    mainPage->action(QWebPage::SetTextDirectionLeftToRight)->setVisible(false);
-    mainPage->action(QWebPage::SetTextDirectionRightToLeft)->setVisible(false);
-
-    mainPage->action(QWebPage::Back)->setVisible(false);
-    mainPage->action(QWebPage::Forward)->setVisible(false);
-    mainPage->action(QWebPage::Reload)->setVisible(false);
-    mainPage->action(QWebPage::Stop)->setVisible(false);
-
-    mainPage->action(QWebPage::OpenLink)->setVisible(false);
-    mainPage->action(QWebPage::CopyLinkToClipboard)->setVisible(false);
-    mainPage->action(QWebPage::OpenLinkInNewWindow)->setVisible(false);
-    mainPage->action(QWebPage::DownloadLinkToDisk)->setVisible(false);
-    mainPage->action(QWebPage::OpenFrameInNewWindow)->setVisible(false);
-
-    mainPage->action(QWebPage::CopyImageUrlToClipboard)->setVisible(false);
-    mainPage->action(QWebPage::CopyImageToClipboard)->setVisible(false);
-    mainPage->action(QWebPage::OpenImageInNewWindow)->setVisible(true);
-    mainPage->action(QWebPage::DownloadImageToDisk)->setVisible(false);
-
     // Icon for windows:
     icon.load(qApp->property("iconPathName").toString());
 
     windowClosingStarted = false;
-}
-
-// ==============================
-// SYSTEM TRAY ICON CLASS CONSTRUCTOR:
-// ==============================
-QTrayIcon::QTrayIcon()
-    : QSystemTrayIcon(0)
-{
-    if ((qApp->property("systrayIcon").toString()) == "enable") {
-        trayIcon = new QSystemTrayIcon();
-        QPixmap icon;
-        icon.load(qApp->property("iconPathName").toString());
-        trayIcon->setIcon(icon);
-        trayIcon->setToolTip(qApp->applicationName());
-
-        aboutAction = new QAction(tr("&About"), this);
-
-        aboutQtAction = new QAction(tr("About Q&t"), this);
-        QObject::connect(aboutQtAction, SIGNAL(triggered()),
-                         qApp, SLOT(aboutQt()));
-
-        trayIconMenu = new QMenu();
-        trayIcon->setContextMenu(trayIconMenu);
-        trayIconMenu->addAction(aboutAction);
-        trayIconMenu->addAction(aboutQtAction);
-        trayIcon->show();
-    }
 }
 
 // ==============================
@@ -1283,123 +1055,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
-
-    // SET DEFAULT THEME:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "theme.function") {
-
-        QString theme = request.url().query()
-                .replace("theme=", "");
-
-        qThemeSetterSlot(theme);
-
-        return false;
-    }
-
-    // OPEN FILES AND FOLDERS:
-    // Invoke 'Open file' dialog from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "open-file.function") {
-
-        QString target = request.url().query().replace("target=", "");
-
-        QFileDialog openFileDialog (qApp->activeWindow());
-        openFileDialog.setFileMode(QFileDialog::AnyFile);
-        openFileDialog.setViewMode(QFileDialog::Detail);
-        openFileDialog.setWindowModality(Qt::WindowModal);
-        QString fileNameToOpenString = openFileDialog.getOpenFileName(
-                    qApp->activeWindow(), tr("Select File"),
-                    QDir::currentPath(), tr("All files (*)"));
-        openFileDialog.close();
-        openFileDialog.deleteLater();
-
-        if (!fileNameToOpenString.isEmpty()) {
-            QByteArray fileName;
-            fileName.append(fileNameToOpenString);
-            scriptEnvironment.insert("FILE_TO_OPEN", fileName);
-
-            // JavaScript bridge back to the HTML page where request originated:
-            QString javaScript = "document.getElementById(\"" +
-                    target + "\").innerHTML = \"" +
-                    fileNameToOpenString + "\"; null";
-            currentFrame()->evaluateJavaScript(javaScript);
-
-            qDebug() << "File to open:" << QDir::toNativeSeparators(fileName);
-        }
-
-        return false;
-    }
-
-    // Invoke 'New file' dialog from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "new-file.function") {
-
-        QString target = request.url().query().replace("target=", "");
-
-        QFileDialog newFileDialog (qApp->activeWindow());
-        newFileDialog.setFileMode(QFileDialog::AnyFile);
-        newFileDialog.setViewMode(QFileDialog::Detail);
-        newFileDialog.setWindowModality(Qt::WindowModal);
-        QString fileNameToCreateString = newFileDialog.getSaveFileName(
-                    qApp->activeWindow(),
-                    tr("Create New File"),
-                    QDir::currentPath(),
-                    tr("All files (*)"));
-        newFileDialog.close();
-        newFileDialog.deleteLater();
-
-        if (!fileNameToCreateString.isEmpty()) {
-            QByteArray fileName;
-            fileName.append(fileNameToCreateString);
-            scriptEnvironment.insert("FILE_TO_CREATE", fileName);
-
-            // JavaScript bridge back to the HTML page where request originated:
-            QString javaScript = "document.getElementById(\"" +
-                    target + "\").innerHTML = \"" +
-                    fileNameToCreateString + "\"; null";
-            currentFrame()->evaluateJavaScript(javaScript);
-
-            qDebug() << "New file:" << QDir::toNativeSeparators(fileName);
-        }
-
-        return false;
-    }
-
-    // Invoke 'Open folder' dialog from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "open-folder.function") {
-
-        QString target = request.url().query().replace("target=", "");
-
-        QFileDialog openFolderDialog (qApp->activeWindow());
-        openFolderDialog.setFileMode(QFileDialog::AnyFile);
-        openFolderDialog.setViewMode(QFileDialog::Detail);
-        openFolderDialog.setWindowModality(Qt::WindowModal);
-        QString folderNameToOpenString = openFolderDialog.getExistingDirectory(
-                    qApp->activeWindow(),
-                    tr("Select Folder"),
-                    QDir::currentPath());
-        openFolderDialog.close();
-        openFolderDialog.deleteLater();
-
-        if (!folderNameToOpenString.isEmpty()) {
-            QByteArray folderName;
-            folderName.append(folderNameToOpenString);
-            scriptEnvironment.insert("FOLDER_TO_OPEN", folderName);
-
-            // JavaScript bridge back to the HTML page where request originated:
-            QString javaScript = "document.getElementById(\"" +
-                    target + "\").innerHTML = \"" +
-                    folderNameToOpenString + "\"; null";
-            currentFrame()->evaluateJavaScript(javaScript);
-
-            qDebug() << "Folder to open:"
-                     << QDir::toNativeSeparators(folderName);
-        }
-
-        return false;
-    }
-
     // PRINTING:
 #ifndef QT_NO_PRINTER
     // Print preview from URL:
@@ -1432,6 +1087,26 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         return false;
     }
 #endif
+
+    // About Qt dialog box:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "about.function" and
+            request.url().query() == ("type=qt")) {
+
+        QApplication::aboutQt();
+
+        return false;
+    }
+
+    // About browser dialog box:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "about.function" and
+            request.url().query() == ("type=browser")) {
+
+        frame->load(QUrl("qrc:/html/about.htm"));
+
+        return false;
+    }
 
     // PERL DEBUGGER INTERACTION:
     // Implementation of an idea proposed by Valcho Nedelchev.

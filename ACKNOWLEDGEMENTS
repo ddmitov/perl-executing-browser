@@ -32,13 +32,8 @@ for beeing welcoming host of the first public presentation of Perl Executing Bro
 on the 2nd of March 2014 and for their helpfull proposals.
 http://hackafe.org/
 
-Thanks to Peter Palfrader, author of Code2HTML script, the first syntax highlighter of Perl Executing Browser.
-Although replaced by Syntax::Highlight::Engine::Kate, it was quite helpfull to develop and test syntax highlight capability.
-http://www.palfrader.org/code/code2html/
-http://sourceforge.net/projects/code2html/
-
 Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.
-This is the current syntax highlighter of Perl Executing Browser.
+This is the syntax highlighter of the Perl Debugger GUI inside Perl Executing Browser.
 https://metacpan.org/release/Syntax-Highlight-Engine-Kate
 
 QT
@@ -54,8 +49,6 @@ http://qt-project.org/doc/qt-4.8/qwebhistory.html
 http://qt-project.org/doc/qt-4.8/qdir.html
 http://qt-project.org/doc/qt-4.8/qfileinfo.html
 http://qt-project.org/doc/qt-4.8/qdir.html
-http://qt-project.org/doc/qt-4.8/desktop-systray.html
-http://qt-project.org/doc/qt-4.8/qtimer.html
 http://qt-project.org/doc/qt-4.8/qregexp.html
 http://qt-project.org/doc/qt-4.8/qfile.html
 http://qt-project.org/doc/qt-4.8/qtextstream.html
@@ -65,7 +58,6 @@ http://qt-project.org/doc/qt-4.8/linguist-hellotr-main-cpp.html
 http://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets
 http://qt-project.org/doc/qt-4.8/qlist.html#removeOne
 http://qt-project.org/doc/qt-4.8/qstring.html#fromRawData
-
 http://qt-project.org/doc/qt-5.0/qtwebkit/qwebsettings.html
 http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html
 http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html
@@ -83,15 +75,11 @@ http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
 http://qt-project.org/wiki/Open_Web_Page_in_QWebView_Bulgarian
 http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
 
-http://qt-project.org/forums/viewthread/23835 (Qt 5 - How to create a frameless window?)
-http://qt-project.org/forums/viewthread/5318 (Set fixed size of QMainWindow created in Designer)
 http://qt-project.org/forums/viewthread/8270 (Find length of QString text)
-http://qt-project.org/forums/viewthread/18292 (how to show/hide application with shortcut?)
 http://qt-project.org/forums/viewthread/6102 (WebView Clear history)
 http://qt-project.org/forums/viewthread/17635 (how to actually use QWebView::createWindow())
 http://qt-project.org/forums/viewthread/10672 (How to set windows system path using Qt api)
 http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)
-http://qt-project.org/forums/viewthread/11729 (How set user-agent in QWebView?)
 http://qt-project.org/forums/viewthread/25533 (#ifdef condition)
 http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)
 http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())
@@ -101,9 +89,9 @@ http://doc.qt.digia.com/4.6/internationalization.html
 
 http://doc.qt.io/qt-4.8/qmake-advanced-usage.html
 http://doc.qt.io/qt-4.8/qwebframe.html
-http://doc.qt.io/qt-4.8/qstylefactory.html
 http://doc.qt.io/qt-4.8/signalsandslots.html
 http://doc.qt.io/qt-4.8/qfileinfo.html
+http://doc.qt.io/qt-4.8/qwebinspector.html
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html
 
 https://wiki.qt.io/Qt_Coding_Style
@@ -115,19 +103,15 @@ https://forum.qt.io/topic/45982/solved-is-there-a-problem-with-the-following-non
 
 http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
 http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only
-http://www.qtcentre.org/threads/39673-QWebView-and-right-click-reload
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen
 http://www.qtcentre.org/threads/4322-How-to-delete-File
-http://www.qtcentre.org/threads/53731-compiling-under-qt4-AND-qt5
 http://www.qtcentre.org/threads/30060-QtWebkit-problems-with-custom-QNetworkAccessManager-QNetworkReply
 http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character
 http://www.qtcentre.org/threads/14401-QString-how-to-delete-new-lines
 http://www.qtcentre.org/threads/31264-How-to-use-QProcess-to-write-multiple-commands-to-external-console-based-program
 http://www.qtcentre.org/threads/14691-QProcess-finished()
-http://www.qtcentre.org/threads/15425-Transparency-in-Icons
 http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout
 http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()
-http://www.qtcentre.org/threads/19676-qgetenv-and-special-chars
 http://www.qtcentre.org/threads/10661-QByteArray-to-QString
 http://www.qtcentre.org/threads/28302-Passing-Command-line-arguments-to-a-Qt-application-in-linux
 http://www.qtcentre.org/threads/10210-how-to-use-tr()-for-QMessageBox
@@ -138,14 +122,11 @@ http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-Qt
 http://www.qtcentre.org/threads/45001-using-two-qrc-files-in-one-application
 
 http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html
-http://www.qtforum.org/article/26983/qwebview-selected-text-context-menu.html
 http://www.qtforum.org/article/18224/get-directory-path.html
 http://www.qtforum.org/article/15030/passing-parameters-to-the-constructor.html
 http://www.qtforum.org/article/27658/how-to-prevent-closing-of-a-window-by-alt-f4-solved.html
-http://www.qtforum.org/article/10001/is-there-a-qt-command-to-lunch-the-default-web-browser-win-maclinux.html
 
 (developer.nokia.com is already unavailable)
-http://developer.nokia.com/Community/Discussion/showthread.php/212357-How-to-disable-the-scrollbar-of-QWebView
 http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt
 http://developer.nokia.com/Community/Wiki/Fullscreen_applications_on_Qt
 http://developer.nokia.com/Community/Wiki/Get_current_Date_and_Time_in_Qt
@@ -169,7 +150,6 @@ http://stackoverflow.com/questions/12571895/save-open-dialog-localization-in-qt
 http://stackoverflow.com/questions/3518090/how-to-get-the-query-string-from-a-qurl
 http://stackoverflow.com/questions/6955281/how-to-stop-qhttp-qtwebkit-from-caching-pages
 http://stackoverflow.com/questions/3211771/how-to-convert-int-to-qstring
-http://stackoverflow.com/questions/18707113/qsystemtrayicon-and-windows8
 http://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt
 http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button
 http://stackoverflow.com/questions/11749262/qt-close-a-running-window-through-code
@@ -183,8 +163,6 @@ http://stackoverflow.com/questions/8362506/qwebview-qt-webkit-wont-open-some-ssl
 http://stackoverflow.com/questions/12301484/how-to-treat-a-qstring-as-a-file-location-and-get-its-directory
 http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
 http://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c
-http://stackoverflow.com/questions/14935919/copy-file-even-when-destination-exists-in-qt
-http://stackoverflow.com/questions/21795919/qsystemtrayicon-mouse-hover
 http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
 http://stackoverflow.com/questions/17998811/window-modal-qfiledialog-pushing-parent-to-background-after-exec
 http://stackoverflow.com/questions/3214297/how-can-my-c-c-application-determine-if-the-root-user-is-executing-the-command
@@ -195,15 +173,12 @@ http://stackoverflow.com/questions/7228826/how-can-i-convert-qvariant-to-qstring
 http://stackoverflow.com/questions/2580934/how-to-specify-different-debug-release-output-directories-in-qmake-pro-file
 http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
 http://stackoverflow.com/questions/4515602/how-to-get-executable-name-in-qt
-http://stackoverflow.com/questions/18667291/disable-wall-compiler-warnings-in-a-qt-project
-http://stackoverflow.com/questions/6740333/can-i-run-a-qt-application-with-a-specific-theme-on-linux
 http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
 http://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console
 http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
 http://stackoverflow.com/questions/6275363/what-is-the-correct-terminology-for-a-non-ajax-request
 http://stackoverflow.com/questions/15864689/qmake-pre-build-step-before-any-compilation
 
-http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
 
 http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
@@ -244,9 +219,6 @@ http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (no
 http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"
 http://www.perlmonks.org/?node_id=722050 "CORE::GLOBAL::* for auditing which files are read and written?"
 
-http://perlmaven.com/simple-timestamp-generation-using-posix-strftime
-http://perlmaven.com/recursive-subroutines
-
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
 http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web
@@ -256,8 +228,6 @@ http://stackoverflow.com/questions/2526804/how-is-perls-inc-constructed-aka-what
 http://stackoverflow.com/questions/841785/how-do-i-include-a-perl-module-thats-in-a-different-directory
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
-http://perlmeme.org/faqs/file_io/directory_listing.html
-http://www.caveofprogramming.com/frontpage/articles/perl/perl-mkdir-how-to-create-directories-in-perl/
 http://www.perl.com/pub/2002/05/14/mod_perl.html
 http://www.tizag.com/perlT/perlhashes.php
 http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input
@@ -270,7 +240,7 @@ http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
 http://iconverticons.com/online/
 
-HTML & JAVASCRIPT
+HTML, CSS & JAVASCRIPT
 =================
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
 http://stackoverflow.com/questions/3163615/how-to-scroll-html-page-to-given-anchor-using-jquery-or-javascript
@@ -280,6 +250,7 @@ http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-j
 http://stackoverflow.com/questions/13362/scrolling-overflowed-divs-with-javascript
 http://stackoverflow.com/questions/24134084/how-to-set-iframe-heightauto-in-html5
 http://stackoverflow.com/questions/24299990/can-percentage-be-provided-in-iframe-tag-of-html5-tag-for-height-and-width
+http://stackoverflow.com/questions/4622086/widthauto-for-input-fields
 
 http://www.w3schools.com/html/html_lists.asp
 http://www.w3schools.com/jsref/event_onclick.asp
@@ -306,3 +277,5 @@ http://www.techrepublic.com/blog/how-do-i/how-do-i-control-the-format-of-html-li
 http://www.sourcetricks.com/2010/07/javascript-scroll-to-bottom-of-page.html
 https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 http://www.bymichaellancaster.com/blog/fluid-iframe-and-images-without-javascript-plugins/
+http://css3buttongenerator.com/
+http://callmenick.com/post/various-css-input-text-styles

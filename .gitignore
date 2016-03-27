@@ -1,14 +1,12 @@
+archive/
 logs/
 tmp/
-working/
-
-src/peb.pro.user
 
 test.db
 *.qm
-current-theme.css
 peb
 peb.exe
+peb.pro.user
 gdrive
 winpack
 upgit

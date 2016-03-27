@@ -3,8 +3,6 @@
 use strict;
 use warnings;
 
-print "Content-type: text/html; charset=utf-8\n\n";
-
 print "<!DOCTYPE html>
 <html>
 
@@ -12,6 +10,7 @@ print "<!DOCTYPE html>
 		<title>Perl Executing Browser - Test Results</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/darkly-theme.css' media='all' />
 	</head>
 
 	<body>

@@ -11,14 +11,7 @@
 
 		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
 		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="bootstrap/themes/current-theme.css" media="all"/>
-
-		<script>
-			function goBack() {
-				window.history.back();
-			return false;
-			}
-		</script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/themes/darkly-theme.css" media="all"/>
 
 	</head>
 
@@ -42,36 +35,20 @@
 						</div>
 					</div>
 
-					<!-- Select File, Folder or New File  -->
-					<div class="form-group">
-						<div class="row">
-							<a href='http://perl-executing-browser-pseudodomain/open-file.function?target=ExistingFileSelection' class="btn btn-info btn-sm">
-							Select existing file</a>
-							<div id="ExistingFileSelection">No file selected</div>
-						</div>
-						<div class="row">
-							<a href='http://perl-executing-browser-pseudodomain/new-file.function?target=NewFileSelection' class="btn btn-info btn-sm">
-							Select new filename</a>
-							<div id="NewFileSelection">No filename selected</div>
-						</div>
-						<div class="row">
-							<a href='http://perl-executing-browser-pseudodomain/open-folder.function?target=FolderSelection' class="btn btn-info btn-sm">
-							Select folder</a>
-							<div id="FolderSelection">No folder selected</div>
-						</div>
-					</div>
-
 					<div class="form-group">
 						<input type="reset" value="Reset" class="btn btn-default" />
 						<input type="submit" value="Submit" class="btn btn-primary" />
 					</div>
 
-				</fieldset>
+					<div>
+						<button type="button" onclick="window.history.back()" class="btn btn-default">
+							Go Back</button>
+						<button type="button" onclick="location.reload();" class="btn btn-default">
+							Reload
+						</button>
+					</div>
 
-				<button type="button" onclick="goBack()" class="btn btn-danger btn-sm">
-					Go Back from JavaScript <br/>
-					Intentionally Disabled
-				</button>
+				</fieldset>
 
 			</div>
 

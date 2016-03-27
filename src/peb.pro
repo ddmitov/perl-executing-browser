@@ -72,7 +72,7 @@ equals (SCRIPT_CENSORING, 1) {
 # To enable support for ZIP packages:
 # ZIP_SUPPORT = 1
 ##########################################################
-ZIP_SUPPORT = 1
+ZIP_SUPPORT = 0
 
 DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
 
@@ -104,19 +104,23 @@ equals (ZIP_SUPPORT, 1) {
 # interaction with the biult-in Perl debugger is
 # not needed or not wanted for security reasons,
 # this functionality can be turned off.
+# Interaction with the Perl debugger is
+# not available on the Windows platform.
 ##########################################################
 # To compile with Perl debugger interaction:
 # PERL_DEBUGGER_INTERACTION = 1
 ##########################################################
-PERL_DEBUGGER_INTERACTION = 1
+!win32 {
+    PERL_DEBUGGER_INTERACTION = 1
 
-DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+    DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
 
-equals (PERL_DEBUGGER_INTERACTION, 0) {
-    message ("Going to build without Perl debugger interaction capability.")
-}
-equals (PERL_DEBUGGER_INTERACTION, 1) {
-    message ("Going to build with Perl debugger interaction capability.")
+    equals (PERL_DEBUGGER_INTERACTION, 0) {
+        message ("Going to build without Perl debugger interaction capability.")
+    }
+    equals (PERL_DEBUGGER_INTERACTION, 1) {
+        message ("Going to build with Perl debugger interaction capability.")
+    }
 }
 
 

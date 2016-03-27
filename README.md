@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a small C++ Qt5 WebKit graphical framework for local CGI-like, AJAX or long-running Perl5 scripts executed without a web server as desktop applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. Access to web servers is restricted only to a predefined list of allowed domains. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framework for local CGI-like or AJAX Perl5 scripts executed without a web server as desktop applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. Access to web is restricted to a predefined list of allowed domains. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -10,13 +10,13 @@ Perl Executing Browser (PEB) is a small C++ Qt5 WebKit graphical framework for l
     use Perl5, JavaScript, HTML5 and CSS to craft and deploy rapidly beautiful desktop applications;  
 
 * **2. Zero installation when needed:**  
-    put together your Perl5 scripts and modules and even your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
+    put together your Perl5 scripts, modules and your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl5, Qt5 and QtWebKit are available;  
 
 * **4. Secure user-space solution:**  
-    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications should be triggered and no need for administrative privileges to run the program;  
+    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered and no need for administrative privileges to run the program;  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
     use as much as possible from existing web technologies, standards and their documentation to build desktop applications.  
@@ -28,38 +28,29 @@ Perl Executing Browser (PEB) is a small C++ Qt5 WebKit graphical framework for l
 **Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
-* Long-running scripts, or scripts running for arbitrary long time, can also be executed locally in a serverless mode.  
-* Perl modules can be loaded from a custom directory without system-wide installation using PATH and/or PERLLIB environment variables.  
-* Any version of Perl5 can be selected from configuration file or by clicking a special URL.  
-* Multiple directories can be added to the PATH environment variable of every locally executed script.  
+* Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
+* Any version of Perl5 can be selected from configuration file.  
 * Scripts and their HTML-based interfaces can be extracted and run from ZIP packages.  
-  
-**Local Filesystem:**  
-* PEB can open or create a single file or folder on the local file system by clicking special URLs. Any locally executed script has access to the custom environment variables FILE_TO_OPEN, FILE_TO_CREATE and FOLDER_TO_OPEN.  
   
 **Networking:**  
 * PEB will open only pages from a predefined list of allowed domain names.  
-* User agent name can be changed easily from configuration file.  
   
 **Configurability:**  
 * All settings are stored in a single file with comments included.  
 * Browser root folder can be any folder.  
-* Program functions are accessible from special URLs or from a right-click context menu.  
-* Themable - a common CSS theme for both static and dynamic pages can be configured from configuration file or selected using a special URL.  
+* All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to your HTML interface.  
-* Multi-window application with resizable, fixed size or fullscreen mode windows.  
+* Single-page or multiple-pages application with an option to start in fullscreen mode.  
   
 **Development goodies:**  
 * PEB can interact with the built-in Perl5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* WebKit Web Inspector can be invoked from context menu.  
-* Local scripts and pages can be edited in external editor using context menu entry.  
-* Every Perl5 script can be displayed as syntax highlighted source code.  
+* WebKit Web Inspector can be invoked using keyboard shortcut.  
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
 
 ## Compile-time Requirements
   
-GCC compiler and Qt5 headers from any standard Qt5 development bundle are the only compile-time requirements.  
+GCC compiler and Qt5.1 - Qt5.5 headers (including QtWebKit headers).  
   
 Compiled and tested successfully using:  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
@@ -83,7 +74,7 @@ Compiled and tested successfully using:
   
 ## What Perl Executing Browser Is Most Usable For
   
-* Perl5 & JavaScript desktop applications with HTML4/5 & CSS2/3 GUI.  
+* Perl5 & JavaScript data-driven desktop applications with HTML4/5 & CSS2/3 GUI.  
 * GUI for the Perl debugger.  
   
 ## Applications using Perl Executing Browser
@@ -95,7 +86,7 @@ Compiled and tested successfully using:
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
 * PEB has no sandbox for local Perl scripts. A work-in-progress security system is implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
-* PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without opening any ports or any other means of communication with the outside world.  
+* PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM.  
   
 ## Security Features & Considerations
@@ -104,9 +95,6 @@ Compiled and tested successfully using:
 1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
 2) environment variables borrowed from the CGI protocol and used for finding local files and communication between HTML forms and local Perl scripts:  
 ```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```;  
-3) custom environment variables used for passing names of selected files and folders to local Perl scripts:  
-```FILE_TO_OPEN```, ```FILE_TO_CREATE``` and ```FOLDER_TO_OPEN```.  
-All other environment variables are removed, including user's ```PATH```, but a custom ```PATH``` can be inserted in the environment of the local Perl scripts.  
 * Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. By default ```censor.pl``` is compiled in the resources of the browser binary and is executed from memory whenever a local Perl script is started. ```censor.pl``` can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message. 
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
@@ -121,26 +109,22 @@ Note however, that a copy of PEB running from a flash drive or external harddisk
 * Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from a debugged Perl script does exist and if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
 * It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
-## Windows Patch for the built-in Perl Debugger
-  
-Tests showed, that the operation of the built-in Perl debugger within PEB on Windows(TM) is impossible without a small, one-line modification of the ```perl5db.pl``` file, which makes ```$console``` variable ```undef``` on Windows platforms. Modifying the debugger itself was not wanted initially due to the conviction that changes in the debugger have to be avoided to prevent introducing bugs in an instrument created to hunt them down. However, tests showed that undef-ing the ```$console``` variable is a minor change, which does not affect the normal operation and output of the built-in debugger. This alteration is necessary because QProcess class doesn't use the default console of the underlying operating system to start processes, including the Perl debugger, and without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of perl5db.pl file using ```{perl-executing-browser-root}/perl/debugger/perl5db-win32.patch```.  
-  
 ## Keyboard Shortcuts
-  
-* Alt+F4 - close current window  
-* Ctrl+H - go to start page  
-* Ctrl+P - print current page  
-* Ctrl+R - reload current page  
+* Ctrl+A - select all  
+* Ctrl+C - copy  
+* Ctrl+V - paste  
 * F11 - toggle fullscreen  
+* Alt+F4 - close current window  
+* Ctrl+P - print current page  
+* Ctrl+I - debug current page using QWebInspector  
   
-## Limitations
+## Limitation
   
-* No history, no cache and no 'Previous Page' or 'Next Page' from JavaScript or from context menu. Only latest output from every script is displayed! User navigation has to be based on working hyperlinks.  
-* No means of communication between the browser and a script that is already started. Once you have started a script, you can only wait for it to finish or kill it.  
+* No reloading from JavaScript of a page that was produced by a local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
   
 ## History
   
-PEB was started as a simple GUI for personal databases and this small project is still in early development. Exhaustive documentation is still missing.  
+PEB was started as a simple GUI for personal databases. Exhaustive documentation is still missing.  
   
 ## License
   
@@ -150,11 +134,6 @@ as published by the Free Software Foundation; either version 3 of the License,
 or (at your option) any later version.  
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
-  
-## Name
-  
-'Perl Executing Browser' is a descriptive, probably a little boring, technical name.  
-Possible new name: **QtCamel**.  
   
 ## Authors
   

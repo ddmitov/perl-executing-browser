@@ -1,6 +1,6 @@
 
 Compile-time Requirements:
-GCC compiler and Qt5 headers from any standard Qt5 development bundle are the only compile-time requirements of the project.
+GCC compiler and Qt5.1 - Qt5.5 headers (including QtWebKit headers).
 
 Compiled and tested successfully using:
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,

@@ -2,7 +2,6 @@
 
 use strict;
 use warnings;
-use POSIX qw (strftime);
 use 5.010;
 no lib ".";
 
@@ -13,28 +12,9 @@ BEGIN {
 	no ops qw(:dangerous sysopen :subprocess :sys_db unlink);
 
 	##############################
-	# HANDLE ENVIRONMENT VARIABLES:
+	# ENVIRONMENT VARIABLES:
 	##############################
 	my $DOCUMENT_ROOT = $ENV{'DOCUMENT_ROOT'};
-
-	# Generate random values in case
-	# FOLDER_TO_OPEN and FILE_TO_OPEN
-	# environment variables are not set.
-	# This is necessary for the overriden core functions
-	# 'opendir', 'chdir' and 'open'.
-	my $FOLDER_TO_OPEN;
-	if (defined($ENV{'FOLDER_TO_OPEN'})) {
-		$FOLDER_TO_OPEN = $ENV{'FOLDER_TO_OPEN'};
-	} else {
-		$FOLDER_TO_OPEN = rand().strftime '%d-%m-%Y--%H-%M-%S', gmtime();
-	}
-
-	my $FILE_TO_OPEN;
-	if (defined($ENV{'FILE_TO_OPEN'})) {
-		$FILE_TO_OPEN = $ENV{'FILE_TO_OPEN'};
-	} else {
-		$FILE_TO_OPEN = rand().strftime '%d-%m-%Y--%H-%M-%S', gmtime();
-	}
 
 	##############################
 	# OVERRIDE POTENTIALY DANGEROUS
@@ -76,7 +56,7 @@ BEGIN {
 	*CORE::GLOBAL::opendir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[1];
-		if ($dir =~ $DOCUMENT_ROOT or $dir =~ $FOLDER_TO_OPEN) {
+		if ($dir =~ $DOCUMENT_ROOT) {
 			return CORE::opendir $_[0], $_[1];
 		} else {
 			die "Intercepted insecure 'opendir' call from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
@@ -86,7 +66,7 @@ BEGIN {
 	*CORE::GLOBAL::chdir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[0];
-		if ($dir =~ $DOCUMENT_ROOT or $dir =~ $FOLDER_TO_OPEN) {
+		if ($dir =~ $DOCUMENT_ROOT) {
 			CORE::chdir $_[0];
 		} else {
 			die "Intercepted insecure 'chdir' call from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
@@ -98,7 +78,7 @@ BEGIN {
 		my $handle = shift;
 		if (@_ == 1) {
 			my $filepath = $_[0];
-			if ($_[0] =~ $DOCUMENT_ROOT or $_[0] =~ $FOLDER_TO_OPEN or $_[0] =~ $FILE_TO_OPEN) {
+			if ($_[0] =~ $DOCUMENT_ROOT) {
 				return CORE::open ($handle, $_[0]);
 			} else {
 				$filepath =~ s/(\<|\>)//;
@@ -106,7 +86,7 @@ BEGIN {
 			}
 		} elsif (@_ == 2) {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN) {
+			if ($_[1] =~ $DOCUMENT_ROOT) {
 				return CORE::open ($handle, $_[1]);
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -114,14 +94,14 @@ BEGIN {
 		} elsif (@_ == 3) {
 			if (defined $_[2]) {
 				my $filepath = $_[2];
-				if ($_[2] =~ $DOCUMENT_ROOT or $_[2] =~ $FOLDER_TO_OPEN or $_[2] =~ $FILE_TO_OPEN) {
+				if ($_[2] =~ $DOCUMENT_ROOT) {
 					CORE::open $handle, $_[1], $_[2];
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 				}
 			} else {
 				my $filepath = $_[1];
-				if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN) {
+				if ($_[1] =~ $DOCUMENT_ROOT) {
 					CORE::open $handle, $_[1], undef; # special case
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -129,8 +109,7 @@ BEGIN {
 			}
 		} else {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DOCUMENT_ROOT or $_[1] =~ $FOLDER_TO_OPEN or $_[1] =~ $FILE_TO_OPEN or
-				$_[2] =~ $DOCUMENT_ROOT or $_[2] =~ $FOLDER_TO_OPEN or $_[2] =~ $FILE_TO_OPEN) {
+			if ($_[1] =~ $DOCUMENT_ROOT or $_[2] =~ $DOCUMENT_ROOT) {
 				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -165,20 +144,12 @@ foreach my $line (@user_code) {
 	$line_number++;
 
 	if ($line =~ m/CORE::/) {
-		if ($line =~ m/#.*CORE::(opendir|chdir|open)/) {
+		if ($line =~ m/#.*CORE::(opendir|chdir|open|require|gethostbyname)/) {
 			next;
 		} else {
 			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden invocation of non-overriden core function detected!";
 		}
 	}
-
-	#~ if ($line =~ m/use lib/) {
-		#~ if ($line =~ m/#.*use lib/) {
-			#~ next;
-		#~ } else {
-			#~ $problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden 'use lib' detected!";
-		#~ }
-	#~ }
 
 	if ($line =~ m/unshift\s*\@INC/ or $line =~ m/push\s*\(\s*\@INC/ or $line =~ m/push\s*\@INC/) {
 		if ($line =~ m/#.*unshift\s*\@INC/ or $line =~ m/#.*push\s*\(\s*\@INC/ or $line =~ m/#.*push\s*\@INC/) {

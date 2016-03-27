@@ -10,7 +10,8 @@ my $debugger_command = "DEBUGGER_COMMAND";
 ##############################
 # EMBEDDED HTML TEMPLATE:
 ##############################
-my $html = "<!DOCTYPE html>
+my $html = "
+<!DOCTYPE html>
 <html>
 
 	<head>
@@ -18,52 +19,93 @@ my $html = "<!DOCTYPE html>
 		<title>Perl Debugger GUI</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
-		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/current-theme.css' media='all'/>
 
 		<style type='text/css'>
 			body {
-				text-align: left;
+				text-align: center;
+				font-family: sans-serif;
+				font-size: 14px;
+				color: #ffffff;
+				background-color: #222222;
+				-webkit-text-size-adjust: 100%;
+				}
+			div.source {
+				width: 100%;
+				SOURCE_BOX_HEIGHT
+				overflow: auto;
 			}
 			ol {
+				text-align: left;
 				font-family: monospace;
-				font-size: 12px;
+				font-size: 14px;
 				background-color: #FFFFFF;
 				color: #000000;
 				-webkit-user-select: none;
 				list-style-type: decimal;
 				background-color: #C0C0C0;
 				padding-left: 6%;
-				text-indent: 1.5%;
+				text-indent: 1%;
+				margin: 4px 4px 4px 4px;
 				border: transparent 3px;
 			}
 			li {
 				background-color: #FFFFFF;
 			}
-			div.centered {
-				text-align: center;
-			}
-			div.source {
-				width: 100%;
-				SOURCE_BOX_HEIGHT
-				overflow: auto;
-			}
 			div.line {
 				-webkit-user-select: auto;
 			}
+			input[type=text] {
+				font-family: sans-serif;
+				font-size: 14px;
+				appearance: none;
+				box-shadow: none;
+				display: block;
+				margin: 2px 2px 2px 2px;
+				border: 1px solid white;
+				width: 99%;
+				border-radius: 3px;
+				padding: 3px 3px 3px 3px;
+			}
+			input[type=text]:focus {
+				outline: none;
+			}
+			div.btn-area {
+				text-align: left;
+				padding: 10px 0px 10px 0px;
+			}
+			.btn {
+				background: #3498db;
+				background-image: -webkit-linear-gradient(top, #3498db, #2980b9);
+				background-image: -o-linear-gradient(top, #3498db, #2980b9);
+				background-image: linear-gradient(to bottom, #3498db, #2980b9);
+				color: #ffffff;
+				font-family: sans-serif;
+				font-size: 14px;
+				text-decoration: none;
+				-webkit-border-radius: 3;
+				border-radius: 3px;
+				padding: 3px 5px 3px 5px;
+			}
+			.btn:hover {
+				background: #3cb0fd;
+				background-image: -webkit-linear-gradient(top, #3cb0fd, #3498db);
+				background-image: -o-linear-gradient(top, #3cb0fd, #3498db);
+				background-image: linear-gradient(to bottom, #3cb0fd, #3498db);
+				text-decoration: none;
+			}
 			div.debugger {
-				background-color: #000000;
-				color: #00FF00;
+				text-align: left;
 				font-family: monospace;
 				font-size: 14px;
+				color: #00FF00;
+				background-color: #000000;
 				padding: 16px;
-				width: 100%;
+				width: 99%;
 				DEBUGGER_OUTPUT_BOX_HEIGHT
 				overflow: auto;
-			}
-			div.html {
-				width: 100%;
-				HTML_BOX_HEIGHT
-				overflow: auto;
+				-webkit-border-radius: 3;
+				border-radius: 3px;
+				padding: 3px 5px 3px 5px;
 			}
 		</style>
 
@@ -71,41 +113,31 @@ my $html = "<!DOCTYPE html>
 
 	<body>
 
-		<div class='centered'>
-				<b>Debugging SCRIPT</b>
-		</div>
-
 		<div class='source'>
+			<b>Debugging SCRIPT</b>
 			<ol>
 HIGHLIGHTED_SOURCE
 			</ol>
 		</div>
 
 		<form action='http://perl-executing-browser-pseudodomain/perl-debugger.function' method='get'>
-			<div class='form-group'>
-				<div class='centered'>
-				<b>FILE_TO_HIGHLIGHT</b>
-				</div>
-				<div class='input-prepend'>
-					<input type='text' id='command'
-						name='command' class='form-control'
-						placeholder='Type Perl debugger command and press Enter' title='Debugger Command'/>
-				</div>
-			</div>
 
-			<div class='form-group'>
-				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;' />
+			<b>FILE_TO_HIGHLIGHT</b>
+			<input type='text' name='command' placeholder='Type Perl debugger command and press Enter' title='Debugger Command'/>
+
+			<div class='btn-area'>
+				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;'/>
 				Commands: 
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=n' class='btn btn-info btn-xs' title='Next line'>n</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=r' class='btn btn-info btn-xs' title='Return from subroutine'>r</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=c' class='btn btn-info btn-xs' title='Continue'>c</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M' class='btn btn-info btn-xs' title='List All Modules'>M</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=S' class='btn btn-info btn-xs' title='List All Subroutine Names'>S</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=V' class='btn btn-info btn-xs' title='List All Variables'>V</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=X' class='btn btn-info btn-xs' title='List Variables in Current Package'>X</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=s' class='btn btn-info btn-xs' title='Step Into...'>s</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=R' class='btn btn-info btn-xs' title='Restart debugger for SCRIPT'>R</a>
-				&nbsp;DEBUGGER_COMMAND_MESSAGE
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=n' class='btn' title='Next line'>n</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=r' class='btn' title='Return from subroutine'>r</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=c' class='btn' title='Continue'>c</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M' class='btn' title='List All Modules'>M</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=S' class='btn' title='List All Subroutine Names'>S</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=V' class='btn' title='List All Variables'>V</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=X' class='btn' title='List Variables in Current Package'>X</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=s' class='btn' title='Step Into...'>s</a>
+				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=R' class='btn' title='Restart debugger'>R</a>
+				&nbsp; DEBUGGER_COMMAND_MESSAGE
 			</div>
 		</form>
 
@@ -264,17 +296,17 @@ print $html;
 # SYNTAX HIGHLIGHTING SETTINGS SUBROUTINE:
 ##############################
 sub source_code_highlighter {
-		# Syntax::Highlight::Engine::Kate settings:
-		my ($source_code_language) = @_;
-		my $source_code_highlighter = new Syntax::Highlight::Engine::Kate(
-		language =>  $source_code_language,
-			substitutions => {
-			"<" => "&lt;",
-			">" => "&gt;",
-			"&" => "&amp;",
-			" " => "&nbsp;",
-			"\t" => "&nbsp;&nbsp;&nbsp;",
-			"\n" => "",
+	# Syntax::Highlight::Engine::Kate settings:
+	my ($source_code_language) = @_;
+	my $source_code_highlighter = new Syntax::Highlight::Engine::Kate(
+	language =>  $source_code_language,
+		substitutions => {
+		"<" => "&lt;",
+		">" => "&gt;",
+		"&" => "&amp;",
+		" " => "&nbsp;",
+		"\t" => "&nbsp;&nbsp;&nbsp;",
+		"\n" => "",
 	},
 	format_table => {
 		Alert => ["<font color=\"#0000ff\">", "</font>"],

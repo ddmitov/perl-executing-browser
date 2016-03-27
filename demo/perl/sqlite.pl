@@ -4,7 +4,6 @@
 
 use strict;
 use warnings;
-use 5.010;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 use DBI;
@@ -28,6 +27,7 @@ print "<!DOCTYPE html>
 		<title>Perl Executing Browser - SQLite Example</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/darkly-theme.css' media='all' />
 	</head>
 
 	<body>

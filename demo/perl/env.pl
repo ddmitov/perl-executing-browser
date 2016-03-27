@@ -10,6 +10,7 @@ print "<!DOCTYPE html>
 		<title>Environment and \@INC array</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/darkly-theme.css' media='all' />
 		<style type='text/css'>body {text-align: left}</style>
 	</head>
 
