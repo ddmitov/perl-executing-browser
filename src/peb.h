@@ -372,7 +372,7 @@ protected:
                 // Handle local HTML, CSS, JS, fonts or supported image files:
                 if (interpreter.contains ("browser")) {
 
-                    qDebug() << "Allowed link requested:"
+                    qDebug() << "Link requested:"
                              << request.url().toString();
 
                     QString localFileName(QDir::toNativeSeparators(
@@ -417,7 +417,6 @@ protected:
 
         // POST requests to the browser pseudodomain - CGI-like scripts:
         if (operation == PostOperation and
-                request.url().scheme() == "http" and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
 
@@ -432,42 +431,12 @@ protected:
                      QNetworkRequest(emptyNetworkRequest));
         }
 
-        // GET, POST and PUT requests to allowed resources.
-        // Domain filtering happens here:
-        if ((operation == GetOperation or
-             operation == PostOperation or
-             operation == PutOperation) and
-                (request.url().scheme() == "qrc" or
-                 request.url().toString().contains("data:image") or
-                 request.url().authority() == PSEUDO_DOMAIN or
-                 ((qApp->property("allowedDomainsList").toStringList())
-                  .contains(request.url().authority())))) {
+        qDebug() << "Link requested:"
+                 << request.url().toString();
 
-            qDebug() << "Allowed link requested:"
-                     << request.url().toString();
-
-            QNetworkRequest networkRequest;
-            networkRequest.setUrl(request.url());
-
-            return QNetworkAccessManager::createRequest
-                    (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest(networkRequest));
-        } else {
-            qDebug() << "Not allowed link:" << request.url().toString();
-
-            QString errorMessageFileName(":/html/forbidden.htm");
-            QFile errorMessageFile(errorMessageFileName);
-            errorMessageFile.open(QIODevice::ReadOnly
-                                  | QIODevice::Text);
-            QTextStream stream(&errorMessageFile);
-            QString errorMessageContents = stream.readAll();
-            errorMessageFile.close();
-
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (request.url(),
-                                             errorMessageContents);
-            return reply;
-        }
+        return QNetworkAccessManager::createRequest
+                (QNetworkAccessManager::GetOperation,
+                 QNetworkRequest(request));
     }
 };
 
@@ -1182,7 +1151,7 @@ public slots:
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
         foreach (QSslError error, errors) {
-            qDebug() << "SSL error: " << error;
+            qDebug() << "SSL error:" << error;
         }
 
         reply->ignoreSslErrors();

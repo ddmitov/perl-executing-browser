@@ -531,18 +531,6 @@ int main(int argc, char **argv)
     }
     application.setProperty("logDirFullPath", logDirFullPath);
 
-    // Allowed domains:
-    QStringList allowedDomainsList;
-    int domainsSize = settings
-            .beginReadArray("browser/allowed_domains");
-    for (int index = 0; index < domainsSize; ++index) {
-        settings.setArrayIndex(index);
-        QString pathSetting = settings.value("name").toString();
-        allowedDomainsList.append(pathSetting);
-    }
-    settings.endArray();
-    application.setProperty("allowedDomainsList", allowedDomainsList);
-
     // ==============================
     // MANAGE PACKAGE SETTINGS:
     // ==============================
@@ -718,9 +706,7 @@ int main(int argc, char **argv)
     qDebug() << "Logging:" << logging;
     qDebug() << "Logging mode:" << logMode;
     qDebug() << "Logfiles directory:" << logDirFullPath;
-    foreach (QString allowedDomainsListEntry, allowedDomainsList) {
-        qDebug() << "Allowed domain:" << allowedDomainsListEntry;
-    }
+
     qDebug() << "";
     qDebug() << "Package root folder:" << rootDirName;
     qDebug() << "Package start page:" << startPagePath;
@@ -820,8 +806,6 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url, QString &data)
 
     setUrl(url);
 
-//    setHeader(QNetworkRequest::ContentTypeHeader,
-//              QVariant("text/html; charset=UTF-8"));
     setHeader(QNetworkRequest::ContentLengthHeader,
               QVariant(reply->data.size()));
     setHeader(QNetworkRequest::LastModifiedHeader,
@@ -909,9 +893,12 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessFileUrls, true);
+            setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::XSSAuditingEnabled, true);
+
     //QWebPage::setForwardUnsupportedContent(true);
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);

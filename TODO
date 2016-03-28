@@ -9,11 +9,12 @@ Permanent TO-DO:
 v. 0.2
 ====================================
 - separate browser settings and package settings in two INI files
+- browser settings file can be in the browser binary folder or in the default user settings folder
+- package settings file can be in the browser binary folder or supplied from command line option
 - built-in default values for browser and package settings
-- loading of a ZIP package or a package settings file with a command line argument
 
-- filter network domains and IP addresses using censor.pl
 - better documentation for censor.pl
+- independent styling of censor.pl
 - security tests in separate files
 - separate resource file for censor.pl
 
@@ -24,16 +25,16 @@ v. 0.2
 
 - DOCUMENT_ROOT becomes only application property without trailing slash
 - DATA_ROOT setting and environment variable for data files only
-- package data folder inside user's data directory derived from the name of the package settings file
+- package data folder inside user's data directory derived from the name of the package name
 - package 'about.htm' special URL
 - PERL5LIB to native separators
-
-- allowed domain can be start page
 
 - single template for all HTML error messages
 - translations for all HTML error messages
 - HTML error pages for missing browser settings file and missing start page
 - user-supplied JS prompt when check-user-input-before-quit finds user input
+
+- better SQLite test
 
 v. 0.3
 ====================================

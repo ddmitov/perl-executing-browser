@@ -9,7 +9,7 @@ BEGIN {
 	##############################
 	# BAN ALL PROHIBITED CORE FUNCTIONS:
 	##############################
-	no ops qw(:dangerous sysopen :subprocess :sys_db unlink);
+	no ops qw(:dangerous :subprocess :sys_db sysopen unlink);
 
 	##############################
 	# ENVIRONMENT VARIABLES:
@@ -20,28 +20,6 @@ BEGIN {
 	# OVERRIDE POTENTIALY DANGEROUS
 	# CORE FUNCTIONS:
 	##############################
-
-	#~ my @allowed_domains = qw (www.perl.org www.perl.com);
-
-	#~ *CORE::GLOBAL::gethostbyname = sub (*;$@) {
-		#~ (my $package, my $filename, my $line) = caller();
-		#~ my $hostname = $_[0];
-
-		#~ my $domain_matched = 0;
-		#~ foreach my $allowed_domain (@allowed_domains) {
-			#~ if (($hostname =~ $allowed_domain)) {
-				#~ $domain_matched = 1;
-				#~ return CORE::gethostbyname $_[0];
-			#~ } else {
-				#~ next;
-			#~ }
-		#~ }
-
-		#~ if ($domain_matched == 0) {
-			#~ die "Attempted connection to a prohibited domain '$hostname' detected at package '$package', line: $line.\n";
-		#~ }
-	#~ };
-
 	*CORE::GLOBAL::require = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $module = $_[0];
@@ -144,10 +122,10 @@ foreach my $line (@user_code) {
 	$line_number++;
 
 	if ($line =~ m/CORE::/) {
-		if ($line =~ m/#.*CORE::(opendir|chdir|open|require|gethostbyname)/) {
+		if ($line =~ m/#.*CORE::(opendir|chdir|open|require)/) {
 			next;
 		} else {
-			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden invocation of non-overriden core function detected!";
+			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden invocation of core function detected!";
 		}
 	}
 
@@ -166,19 +144,26 @@ foreach my $line (@user_code) {
 ##############################
 # HTML HEADER AND FOOTER:
 ##############################
-my $header = "<!DOCTYPE html>
+my $header = "
+<!DOCTYPE html>
 <html>
 
 	<head>
 		<title>Perl Executing Browser - Errors</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
-		<style type='text/css'>body {text-align: left}</style>\n
+
+		<style type='text/css'>
+			body {
+				text-align: left
+			}
+		</style>\n
 	</head>
 
 	<body>";
 
-my $footer = "</body>
+my $footer = "
+	</body>
 
 </html>";
 
