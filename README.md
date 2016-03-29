@@ -32,7 +32,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
 * Any version of Perl5 can be selected from configuration file.  
 * Scripts and their HTML-based interfaces can be extracted and run from ZIP packages.  
   
-**Networking:**  
+**Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
   
 **Configurability:**  
@@ -69,13 +69,8 @@ Compiled and tested successfully using:
   
 ## Target Audience
   
-* Advanced users and Perl - JavaScript enthusiasts willing to create rapidly custom desktop GUI applications.  
+* Perl and JavaScript enthusiasts willing to create rapidly data-driven desktop applications with HTML4/5 & CSS2/3 GUI.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
-  
-## What Perl Executing Browser Is Most Usable For
-  
-* Perl5 & JavaScript data-driven desktop applications with HTML4/5 & CSS2/3 GUI.  
-* GUI for the Perl debugger.  
   
 ## Applications using Perl Executing Browser
   
@@ -83,7 +78,7 @@ Compiled and tested successfully using:
   
 ## What Perl Executing Browser Is Not
 
-* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers. It can be configured as a site specific browser to open only a predefined list of domain names if this is necessary for interaction with a specific web service.  
+* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
 * PEB has no sandbox for local Perl scripts. A work-in-progress security system is implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
 * PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
@@ -120,7 +115,7 @@ Note however, that a copy of PEB running from a flash drive or external harddisk
   
 ## Limitation
   
-* No reloading from JavaScript of a page that was produced by a local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
+* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
   
 ## History
   

@@ -10,7 +10,7 @@
 
 #~ my $test = `uname -r`;
 
-#~ unlink "/tmp/test.txt";
+unlink "/tmp/test.txt";
 
 #~ opendir (my $directory_handle, "/tmp/test") or die $!;
 #~ chdir "/tmp/test/";

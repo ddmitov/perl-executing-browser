@@ -14,7 +14,6 @@ v. 0.2
 - built-in default values for browser and package settings
 
 - better documentation for censor.pl
-- independent styling of censor.pl
 - security tests in separate files
 - separate resource file for censor.pl
 

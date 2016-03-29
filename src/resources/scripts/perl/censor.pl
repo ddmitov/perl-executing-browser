@@ -155,7 +155,30 @@ my $header = "
 
 		<style type='text/css'>
 			body {
-				text-align: left
+				text-align: left;
+				font-family: sans-serif;
+				font-size: 22px;
+				color: #ffffff;
+				background-color: #222222;
+				-webkit-text-size-adjust: 100%;
+			}
+
+			pre {
+				display: block;
+				padding: 10px;
+				margin: 0 0 10.5px;
+				font-size: 14px;
+				word-break: break-all;
+				word-wrap: break-word;
+				color: #333333;
+				background-color: #f5f5f5;
+				border: 1px solid #cccccc;
+				border-radius: 3px;
+			}
+
+			div.title {
+				text-align: center;
+				padding: 10px 0px 10px 0px;
 			}
 		</style>\n
 	</head>
@@ -181,12 +204,12 @@ if (scalar (keys %problematic_lines) == 0) {
 	CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can not restore STDERR: $!";
 
 	print STDERR $header;
-	print STDERR "<p align='center'><font size='5' face='SansSerif'>";
+	print STDERR "<div class='title'>";
 	print STDERR "Script execution was not attempted due to security violation";
 	if (scalar (keys %problematic_lines) == 1) {
-		print STDERR ":</font></p>\n";
+		print STDERR ":</div>\n";
 	} elsif (scalar (keys %problematic_lines) > 1) {
-		print STDERR "s:</font></p>\n";
+		print STDERR "s:</div>\n";
 	}
 
 	while ((my $line, my $explanation) = each (%problematic_lines)){
@@ -206,13 +229,13 @@ if (scalar (keys %problematic_lines) == 0) {
 if ($@) {
 	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
 		print STDERR $header;
-		print STDERR "<p align='center'><font size='5' face='SansSerif'>Insecure code was blocked:</font></p>\n";
+		print STDERR "<div class='title'>Insecure code was blocked:</div>\n";
 		print STDERR "<pre>$@</pre>";
 		print STDERR $footer;
 		exit;
 	} else {
 		print STDERR $header;
-		print STDERR "<p align='center'><font size='5' face='SansSerif'>Errors were found during script execution:</font></p>\n";
+		print STDERR "<div class='title'>Errors were found during script execution:</div>\n";
 		print STDERR "<pre>$@</pre>";
 		print STDERR $footer;
 		exit;
@@ -221,7 +244,7 @@ if ($@) {
 
 if (defined($stderr)) {
 	print STDERR $header;
-	print STDERR "<p align='center'><font size='5' face='SansSerif'>Errors were found during script execution:</font></p>\n";
+	print STDERR "<div class='title'>Errors were found during script execution:</div>\n";
 	print STDERR "<pre>$stderr</pre>";
 	print STDERR $footer;
 }
