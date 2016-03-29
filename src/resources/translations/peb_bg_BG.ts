@@ -223,41 +223,4 @@
         <translation>Сигурни ли сте, че искате да изключите програмата?</translation>
     </message>
 </context>
-<context>
-    <name>QuaGzipFile</name>
-    <message>
-        <source>QIODevice::Append is not supported for GZIP</source>
-        <translation type="vanished">QIODevice::Append is not supported for GZIP</translation>
-    </message>
-    <message>
-        <source>Opening gzip for both reading and writing is not supported</source>
-        <translation type="vanished">Opening gzip for both reading and writing is not supported</translation>
-    </message>
-    <message>
-        <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation type="vanished">You can open a gzip either for reading or for writing. Which is it?</translation>
-    </message>
-    <message>
-        <source>Could not gzopen() file</source>
-        <translation type="vanished">Could not gzopen() file</translation>
-    </message>
-</context>
-<context>
-    <name>QuaZIODevice</name>
-    <message>
-        <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation type="vanished">QIODevice::Append is not supported for QuaZIODevice</translation>
-    </message>
-    <message>
-        <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation type="vanished">QIODevice::ReadWrite is not supported for QuaZIODevice</translation>
-    </message>
-</context>
-<context>
-    <name>QuaZipFile</name>
-    <message>
-        <source>ZIP/UNZIP API error %1</source>
-        <translation type="vanished">ZIP/UNZIP API error %1</translation>
-    </message>
-</context>
 </TS>

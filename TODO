@@ -10,7 +10,12 @@ v. 0.2
 ====================================
 - separate browser settings and package settings in two INI files
 - browser settings file can be in the browser binary folder or in the default user settings folder
-- package settings file can be in the browser binary folder or supplied from command line option
+- package settings file can be supplied from command line option or in the browser binary folder
+- package settings file can be in the package root folder
+- DOCUMENT_ROOT becomes only application property without trailing slash
+- DATA_ROOT setting and environment variable for package data files only
+- DATA_ROOT can be in user's data directory
+- PERL5LIB to native separators
 - built-in default values for browser and package settings
 
 - better documentation for censor.pl
@@ -20,13 +25,6 @@ v. 0.2
 - start Perl debugger in script environment when script is inside the current package
     and in system environment when script is outside the current package
 - dbgformatter.pl fatpacked together with Syntax::Highlight::Engine::Kate
-- separate resource file for dbgformatter.pl
-
-- DOCUMENT_ROOT becomes only application property without trailing slash
-- DATA_ROOT setting and environment variable for data files only
-- package data folder inside user's data directory derived from the name of the package name
-- package 'about.htm' special URL
-- PERL5LIB to native separators
 
 - single template for all HTML error messages
 - translations for all HTML error messages
