@@ -4,84 +4,84 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../peb.cpp" line="191"/>
+        <location filename="../../peb.cpp" line="187"/>
         <source>Command-Line Options</source>
         <translation>Флагове от командната линия</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="194"/>
+        <location filename="../../peb.cpp" line="190"/>
         <source>start browser in fullscreen mode</source>
         <translation>стартирай браузъра в режим на цял екран</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="198"/>
+        <location filename="../../peb.cpp" line="194"/>
         <source>this help</source>
         <translation>този помощен прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="287"/>
+        <location filename="../../peb.cpp" line="283"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="288"/>
+        <location filename="../../peb.cpp" line="284"/>
         <source>Browser was started as root.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="417"/>
+        <location filename="../../peb.cpp" line="377"/>
         <source>Configuration file</source>
         <translation>Файлът с настройки</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="421"/>
+        <location filename="../../peb.cpp" line="381"/>
         <source>is missing.</source>
         <translation>не бе намерен.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="292"/>
-        <location filename="../../peb.cpp" line="321"/>
+        <location filename="../../peb.cpp" line="288"/>
+        <location filename="../../peb.cpp" line="317"/>
         <source>Going to quit now.</source>
         <translation>Ще последва изключване на програмата.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="313"/>
+        <location filename="../../peb.cpp" line="309"/>
         <source>Started by administrator</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="316"/>
+        <location filename="../../peb.cpp" line="312"/>
         <source>Browser was started with administrative privileges.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="290"/>
-        <location filename="../../peb.cpp" line="319"/>
+        <location filename="../../peb.cpp" line="286"/>
+        <location filename="../../peb.cpp" line="315"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="416"/>
+        <location filename="../../peb.cpp" line="376"/>
         <source>Missing configuration file</source>
         <translation>Липсващ файл с настройки</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="423"/>
+        <location filename="../../peb.cpp" line="383"/>
         <source>Please restore it.</source>
         <translation>Моля, възстановете го.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="569"/>
+        <location filename="../../peb.cpp" line="529"/>
         <source> version </source>
         <translation> версия </translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="565"/>
+        <location filename="../../peb.cpp" line="525"/>
         <source>Missing start page</source>
         <translation>Липсваща главна страница</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="566"/>
+        <location filename="../../peb.cpp" line="526"/>
         <source>Start page is missing for</source>
         <translation>Не бе намерена главната страница на</translation>
     </message>
@@ -89,22 +89,22 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="1122"/>
+        <location filename="../../peb.cpp" line="1067"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1118"/>
+        <location filename="../../peb.cpp" line="1063"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1120"/>
+        <location filename="../../peb.cpp" line="1065"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1121"/>
+        <location filename="../../peb.cpp" line="1066"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>
@@ -226,45 +226,38 @@
 <context>
     <name>QuaGzipFile</name>
     <message>
-        <location filename="../../quazip/quagzipfile.cpp" line="60"/>
         <source>QIODevice::Append is not supported for GZIP</source>
-        <translation>QIODevice::Append is not supported for GZIP</translation>
+        <translation type="vanished">QIODevice::Append is not supported for GZIP</translation>
     </message>
     <message>
-        <location filename="../../quazip/quagzipfile.cpp" line="66"/>
         <source>Opening gzip for both reading and writing is not supported</source>
-        <translation>Opening gzip for both reading and writing is not supported</translation>
+        <translation type="vanished">Opening gzip for both reading and writing is not supported</translation>
     </message>
     <message>
-        <location filename="../../quazip/quagzipfile.cpp" line="74"/>
         <source>You can open a gzip either for reading or for writing. Which is it?</source>
-        <translation>You can open a gzip either for reading or for writing. Which is it?</translation>
+        <translation type="vanished">You can open a gzip either for reading or for writing. Which is it?</translation>
     </message>
     <message>
-        <location filename="../../quazip/quagzipfile.cpp" line="80"/>
         <source>Could not gzopen() file</source>
-        <translation>Could not gzopen() file</translation>
+        <translation type="vanished">Could not gzopen() file</translation>
     </message>
 </context>
 <context>
     <name>QuaZIODevice</name>
     <message>
-        <location filename="../../quazip/quaziodevice.cpp" line="145"/>
         <source>QIODevice::Append is not supported for QuaZIODevice</source>
-        <translation>QIODevice::Append is not supported for QuaZIODevice</translation>
+        <translation type="vanished">QIODevice::Append is not supported for QuaZIODevice</translation>
     </message>
     <message>
-        <location filename="../../quazip/quaziodevice.cpp" line="150"/>
         <source>QIODevice::ReadWrite is not supported for QuaZIODevice</source>
-        <translation>QIODevice::ReadWrite is not supported for QuaZIODevice</translation>
+        <translation type="vanished">QIODevice::ReadWrite is not supported for QuaZIODevice</translation>
     </message>
 </context>
 <context>
     <name>QuaZipFile</name>
     <message>
-        <location filename="../../quazip/quazipfile.cpp" line="218"/>
         <source>ZIP/UNZIP API error %1</source>
-        <translation>ZIP/UNZIP API error %1</translation>
+        <translation type="vanished">ZIP/UNZIP API error %1</translation>
     </message>
 </context>
 </TS>

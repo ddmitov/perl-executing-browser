@@ -33,16 +33,8 @@ message ("Local pseudo-domain: $$PSEUDO_DOMAIN")
 
 
 ##########################################################
-# Default user agent:
-##########################################################
-USER_AGENT = "WebKit-PerlExecutingBrowser"
-
-DEFINES += USER_AGENT=\\\"$$USER_AGENT\\\"
-message ("Default user agent: $$USER_AGENT")
-
-
-##########################################################
-# To guard against some security issues with user-supplied Perl scripts:
+# To guard against some security issue
+# with user-supplied Perl scripts:
 # SCRIPT_CENSORING = 1
 # If this option is enabled,
 # every Perl script going to be executed by the browser
@@ -66,51 +58,21 @@ equals (SCRIPT_CENSORING, 1) {
 
 
 ##########################################################
-# To compile without support for ZIP packages:
-# ZIP_SUPPORT = 0
-##########################################################
-# To enable support for ZIP packages:
-# ZIP_SUPPORT = 1
-##########################################################
-ZIP_SUPPORT = 0
-
-DEFINES += "ZIP_SUPPORT=$$ZIP_SUPPORT"
-
-equals (ZIP_SUPPORT, 0) {
-    message ("Going to build without support for ZIP packages.")
-}
-equals (ZIP_SUPPORT, 1) {
-    message ("Going to build with internal support for ZIP packages.")
-    DEFINES += "QUAZIP_STATIC=1"
-    INCLUDEPATH += $QT_INSTALL_PREFIX/src/3rdparty/zlib
-    LIBS += -L$QT_INSTALL_PREFIX/src/3rdparty/zlib -lz
-    HEADERS += quazip/crypt.h quazip/ioapi.h quazip/JlCompress.h \
-    quazip/quaadler32.h quazip/quachecksum32.h quazip/quacrc32.h \
-    quazip/quagzipfile.h quazip/quaziodevice.h quazip/quazipdir.h \
-    quazip/quazipfile.h quazip/quazipfileinfo.h quazip/quazip_global.h \
-    quazip/quazip.h quazip/zip.h quazip/quazipnewinfo.h quazip/unzip.h
-    SOURCES += quazip/unzip.c quazip/zip.c \
-    quazip/JlCompress.cpp quazip/qioapi.cpp quazip/quaadler32.cpp \
-    quazip/quacrc32.cpp quazip/quagzipfile.cpp quazip/quaziodevice.cpp \
-    quazip/quazip.cpp quazip/quazipdir.cpp quazip/quazipfile.cpp \
-    quazip/quazipfileinfo.cpp quazip/quazipnewinfo.cpp
-}
-
-
-##########################################################
-# To switch off Perl debugger interaction:
-# PERL_DEBUGGER_INTERACTION = 0
-# If PEB is going to be compiled for end users and
-# interaction with the biult-in Perl debugger is
-# not needed or not wanted for security reasons,
-# this functionality can be turned off.
-# Interaction with the Perl debugger is
-# not available on the Windows platform.
-##########################################################
-# To compile with Perl debugger interaction:
-# PERL_DEBUGGER_INTERACTION = 1
+# Interaction with the Perl debugger -
+# not available on Windows:
 ##########################################################
 !win32 {
+    ##########################################################
+    # To switch off Perl debugger interaction:
+    # PERL_DEBUGGER_INTERACTION = 0
+    # If PEB is going to be compiled for end users and
+    # interaction with the biult-in Perl debugger is
+    # not needed or not wanted for security reasons,
+    # this functionality can be turned off.
+    ##########################################################
+    # To compile with Perl debugger interaction:
+    # PERL_DEBUGGER_INTERACTION = 1
+    ##########################################################
     PERL_DEBUGGER_INTERACTION = 1
 
     DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"

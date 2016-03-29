@@ -21,10 +21,6 @@
 #include <qglobal.h>
 #include "peb.h"
 
-#if ZIP_SUPPORT == 1
-#include <quazip/JlCompress.h> // for unpacking root folder from a ZIP file
-#endif
-
 #ifndef Q_OS_WIN
 #include <iostream> // for std::cout
 #include <unistd.h> // for isatty()
@@ -347,46 +343,10 @@ int main(int argc, char **argv)
     QString applicationBinaryName =
             QFileInfo(QApplication::applicationFilePath()).baseName();
 
-#if ZIP_SUPPORT == 1
-    // ==============================
-    // CREATE TEMPORARY FOLDER:
-    // ==============================
-    // Create the main temporary folder for the current browser session:
-    QString applicationTempDirectoryName = QDir::tempPath() + QDir::separator()
-            + applicationBinaryName + "--" + applicationStartDateAndTime;
-    application
-            .setProperty("applicationTempDirectory",
-                         applicationTempDirectoryName);
-    QDir applicationTempDirectory(applicationTempDirectoryName);
-    applicationTempDirectory.mkpath(".");
-
-    // ==============================
-    // EXTRACT ROOT FOLDER FROM A ZIP PACKAGE:
-    // ==============================
-    QStringList extractedFiles;
-    QString defaultZipPackageName = QApplication::applicationDirPath()
-            + QDir::separator() + applicationBinaryName + ".zip";
-    QFile defaultZipPackage(defaultZipPackageName);
-
-    // Extracting root folder from a ZIP package:
-    if (defaultZipPackage.exists()) {
-        extractedFiles = JlCompress::extractDir(
-                    defaultZipPackageName,
-                    applicationTempDirectoryName);
-
-        // Settings file from the extracted ZIP package:
-        settingsDirName = applicationTempDirectoryName
-                + QDir::separator() + "root";
-        settingsFileName = settingsDirName + QDir::separator()
-                + applicationBinaryName + ".ini";
-    }
-#endif
-
     // ==============================
     // SETTINGS FILES:
     // ==============================
-    // Settings file is loaded from the directory of the binary file
-    // if no settings file from a ZIP package is found:
+    // Settings file is loaded from the directory of the binary file:
     if (settingsDirName.length() == 0 and settingsFileName.length() == 0) {
         QDir settingsDir =
                 QDir::toNativeSeparators(application.applicationDirPath());
@@ -438,7 +398,7 @@ int main(int argc, char **argv)
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
     // ==============================
-    // MANAGE BROWSER SETTINGS:
+    // BROWSER SETTINGS:
     // ==============================
     // Perl interpreter:
     QString perlInterpreterSetting = settings
@@ -532,7 +492,7 @@ int main(int argc, char **argv)
     application.setProperty("logDirFullPath", logDirFullPath);
 
     // ==============================
-    // MANAGE PACKAGE SETTINGS:
+    // PACKAGE SETTINGS:
     // ==============================
     // Package root directory:
     QString rootDirName;
@@ -666,12 +626,6 @@ int main(int argc, char **argv)
     if (SCRIPT_CENSORING == 1) {
         qDebug() << "Script censoring is enabled.";
     }
-    if (ZIP_SUPPORT == 0) {
-        qDebug() << "ZIP packages support is disabled.";
-    }
-    if (ZIP_SUPPORT == 1) {
-        qDebug() << "ZIP packages support is enabled.";
-    }
     if (PERL_DEBUGGER_INTERACTION == 0) {
         qDebug() << "Perl debugger interaction is disabled.";
     }
@@ -679,9 +633,6 @@ int main(int argc, char **argv)
         qDebug() << "Perl debugger interaction is enabled.";
     }
     qDebug() << "";
-#if ZIP_SUPPORT == 1
-    qDebug() << "Temporary folder:" << applicationTempDirectoryName;
-#endif
     qDebug() << "Settings file name:" << settingsFileName;
     qDebug() << "";
 
@@ -717,12 +668,6 @@ int main(int argc, char **argv)
     qDebug() << "Warn on exit:" << warnOnExit;
     qDebug() << "Web Inspector from keyboard shortcut:" << webInspector;
     qDebug() << "";
-
-#if ZIP_SUPPORT == 1
-    foreach (QString extractedFile, extractedFiles) {
-        qDebug() << "Extracted ZIP entry:" << extractedFile;
-    }
-#endif
 
     return application.exec();
 }

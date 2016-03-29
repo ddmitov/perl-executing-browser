@@ -300,6 +300,9 @@ protected:
                             scriptErrorString == 0) {
                         qDebug() << "AJAX script timed out or gave no output:"
                                  << scriptFullFilePath;
+                    } else {
+                        qDebug() << "AJAX script finished:"
+                                 << scriptFullFilePath;
                     }
 
                     if (scriptErrorString.length() > 0) {
@@ -1135,12 +1138,6 @@ public slots:
 
     void qExitApplicationSlot()
     {
-#if ZIP_SUPPORT == 1
-        // Temporary folder removal:
-        QDir tempDir(qApp->property("applicationTempDirectory").toString());
-        tempDir.removeRecursively();
-#endif
-
         qDebug() << qApp->applicationName().toLatin1().constData()
                  << qApp->applicationVersion().toLatin1().constData()
                  << "terminated normally.";

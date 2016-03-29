@@ -30,7 +30,6 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
 * Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
 * Any version of Perl5 can be selected from configuration file.  
-* Scripts and their HTML-based interfaces can be extracted and run from ZIP packages.  
   
 **Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
