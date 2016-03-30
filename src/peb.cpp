@@ -450,13 +450,13 @@ int main(int argc, char **argv)
 
     // PERLLIB environment variable:
     QString perlLibSetting = settings.value("browser/perllib").toString();
-    QDir perlLibDir(perlLibSetting);
+    QDir perlLibDir(QDir::toNativeSeparators(perlLibSetting));
     QString perlLib;
     if (perlLibDir.isRelative()) {
-        perlLib = QDir::toNativeSeparators(settingsDirName + perlLibSetting);
+        perlLib = settingsDirName + perlLibSetting;
     }
     if (perlLibDir.isAbsolute()) {
-        perlLib = QDir::toNativeSeparators(perlLibSetting);
+        perlLib = perlLibSetting;
     }
     application.setProperty("perlLib", perlLib);
 
@@ -507,10 +507,6 @@ int main(int argc, char **argv)
         rootDirName = QDir::toNativeSeparators(rootDirNameSetting);
     }
 
-    if (!rootDirName.endsWith(QDir::separator())) {
-        rootDirName.append(QDir::separator());
-    }
-
     application.setProperty("rootDirName", rootDirName);
 
     // Start page -
@@ -520,7 +516,7 @@ int main(int argc, char **argv)
     application.setProperty("startPagePath", startPagePath);
 
     // Check if start page exists:
-    QFile startPageFile(rootDirName + startPagePath);
+    QFile startPageFile(rootDirName + QDir::separator() + startPagePath);
     if (!startPageFile.exists()) {
         QString title = QApplication::tr("Missing start page");
         QString text = QApplication::tr("Start page is missing for") +
@@ -555,7 +551,7 @@ int main(int argc, char **argv)
 
     if (iconPathNameSetting.length() > 0) {
         iconPathName = QDir::toNativeSeparators(
-                    rootDirName + iconPathNameSetting);
+                    rootDirName + QDir::separator() + iconPathNameSetting);
     }
 
     QFile iconFile(iconPathName);

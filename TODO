@@ -12,10 +12,9 @@ v. 0.2
 - browser settings file can be in the browser binary folder or in the default user settings folder
 - package settings file can be supplied from command line option or in the browser binary folder
 - package settings file can be in the package root folder
-- DOCUMENT_ROOT becomes only application property without trailing slash
+- DOCUMENT_ROOT becomes only application property
 - DATA_ROOT setting and environment variable for package data files only
 - DATA_ROOT can be in user's data directory
-- PERL5LIB to native separators
 - built-in default values for browser and package settings
 
 - better documentation for censor.pl

@@ -187,11 +187,8 @@ protected:
 
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
+                     + QDir::separator()
                      + request.url().path());
-
-            // Replace initial slash at the beginning of the relative path;
-            // root directory setting already has a trailing slash.
-            scriptFullFilePath = scriptFullFilePath.replace("//", "/");
 
             QFileDetector fileDetector;
             fileDetector.qCheckFileExistence(scriptFullFilePath);
@@ -349,6 +346,7 @@ protected:
             // Get the full file path and file extension:
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("rootDirName").toString())
+                     + QDir::separator()
                      + request.url().path());
             fullFilePath.replace("//", "/");
 
@@ -381,6 +379,7 @@ protected:
                     QString localFileName(QDir::toNativeSeparators(
                                               (qApp->property("rootDirName")
                                                .toString())
+                                              + QDir::separator()
                                               + request.url().path()));
                     QFile localFile(localFileName);
                     localFile.open(QIODevice::ReadOnly);
@@ -460,10 +459,9 @@ public slots:
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
         scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString()) + url.path());
-        // Replace initial slash at the beginning of the relative path;
-        // root directory setting already has a trailing slash.
-        scriptFullFilePath.replace("//", "/");
+                ((qApp->property("rootDirName").toString())
+                 + QDir::separator()
+                 + url.path());
 
         QString queryString = url.query();
         QString postData(postDataArray);
