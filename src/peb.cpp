@@ -1,5 +1,5 @@
 ﻿/*
- Perl Executing Browser, v. 0.1
+ Perl Executing Browser
 
  This program is free software;
  you can redistribute it and/or modify it under the terms of the
@@ -478,16 +478,16 @@ int main(int argc, char **argv)
     // Log files directory:
     QString logDirName = settings
             .value("browser/logging_directory").toString();
-    QDir logDir(logDirName);
+    QDir logDir(QDir::toNativeSeparators(logDirName));
     QString logDirFullPath;
     if (!logDir.exists()) {
         logDir.mkpath(".");
     }
     if (logDir.isRelative()) {
-        logDirFullPath = QDir::toNativeSeparators(settingsDirName + logDirName);
+        logDirFullPath = settingsDirName + logDirName;
     }
     if (logDir.isAbsolute()) {
-        logDirFullPath = QDir::toNativeSeparators(logDirName);
+        logDirFullPath = logDirName;
     }
     application.setProperty("logDirFullPath", logDirFullPath);
 
@@ -507,7 +507,23 @@ int main(int argc, char **argv)
         rootDirName = QDir::toNativeSeparators(rootDirNameSetting);
     }
 
-    application.setProperty("rootDirName", rootDirName);
+    application.setProperty("root", rootDirName);
+
+    // Package data root directory:
+    QString dataRootDirName;
+    QString dataRootDirNameSetting =
+            settings.value("package/data_root").toString();
+
+    QDir dataRootDir(dataRootDirNameSetting);
+    if (dataRootDir.isRelative()) {
+        dataRootDirName = QDir::toNativeSeparators(
+                    settingsDirName + dataRootDirNameSetting);
+    }
+    if (dataRootDir.isAbsolute()) {
+        dataRootDirName = QDir::toNativeSeparators(dataRootDirNameSetting);
+    }
+
+    application.setProperty("dataRoot", dataRootDirName);
 
     // Start page -
     // path must be relative to the root directory of the current package.
@@ -538,7 +554,7 @@ int main(int argc, char **argv)
 
     // Display or hide STDERR from scripts:
     QString displayStderr =
-            settings.value("package/perl_display_stderr").toString();
+            settings.value("package/display_stderr").toString();
     application.setProperty("displayStderr", displayStderr);
 
     // Fullscreen:
@@ -656,6 +672,7 @@ int main(int argc, char **argv)
 
     qDebug() << "";
     qDebug() << "Package root folder:" << rootDirName;
+    qDebug() << "Package data root folder:" << dataRootDirName;
     qDebug() << "Package start page:" << startPagePath;
     qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Fullscreen:" << fullscreen;
@@ -719,9 +736,9 @@ QFileDetector::QFileDetector()
 QScriptEnvironment::QScriptEnvironment()
     : QObject(0)
 {
-    // DOCUMENT_ROOT:
-    scriptEnvironment.insert("DOCUMENT_ROOT",
-                             qApp->property("rootDirName").toString());
+    // DATA_ROOT:
+    scriptEnvironment.insert("DATA_ROOT",
+                             qApp->property("dataRoot").toString());
 
     // PERLLIB:
     scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());

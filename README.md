@@ -87,8 +87,9 @@ Compiled and tested successfully using:
   
 * Local scripts are executed with the minimum of necessary environment variables. These are:  
 1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
-2) environment variables borrowed from the CGI protocol and used for finding local files and communication between HTML forms and local Perl scripts:  
-```DOCUMENT_ROOT```, ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```;  
+2) environment variables borrowed from the CGI protocol and used for communication between HTML forms and local Perl scripts:  
+```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```;  
+3) ```DATA_ROOT``` - custom environment variable used to locate data files from local Perl scripts.  
 * Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. By default ```censor.pl``` is compiled in the resources of the browser binary and is executed from memory whenever a local Perl script is started. ```censor.pl``` can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
 * Starting the browser as root on Linux is not allowed - it exits with a warning message. 
 * PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  

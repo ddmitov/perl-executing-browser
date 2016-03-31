@@ -1,5 +1,5 @@
 ﻿/*
- Perl Executing Browser, v. 0.1
+ Perl Executing Browser
 
  This program is free software;
  you can redistribute it and/or modify it under the terms of the
@@ -186,7 +186,7 @@ protected:
                 request.url().path().contains("ajax")) {
 
             QString scriptFullFilePath = QDir::toNativeSeparators
-                    ((qApp->property("rootDirName").toString())
+                    ((qApp->property("root").toString())
                      + QDir::separator()
                      + request.url().path());
 
@@ -345,10 +345,9 @@ protected:
 
             // Get the full file path and file extension:
             QString fullFilePath = QDir::toNativeSeparators
-                    ((qApp->property("rootDirName").toString())
+                    ((qApp->property("root").toString())
                      + QDir::separator()
                      + request.url().path());
-            fullFilePath.replace("//", "/");
 
             QFileDetector fileDetector;
             fileDetector.qCheckFileExistence(fullFilePath);
@@ -377,7 +376,7 @@ protected:
                              << request.url().toString();
 
                     QString localFileName(QDir::toNativeSeparators(
-                                              (qApp->property("rootDirName")
+                                              (qApp->property("root")
                                                .toString())
                                               + QDir::separator()
                                               + request.url().path()));
@@ -459,7 +458,7 @@ public slots:
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
         scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("rootDirName").toString())
+                ((qApp->property("root").toString())
                  + QDir::separator()
                  + url.path());
 
