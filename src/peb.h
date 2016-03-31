@@ -229,6 +229,8 @@ protected:
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 scriptHandler.setWorkingDirectory(scriptDirectory);
 
+//                scriptHandler.setWorkingDirectory("");
+
                 QEventLoop scriptHandlerWaitingLoop;
 
                 QObject::connect(&scriptHandler,
@@ -486,6 +488,8 @@ public slots:
                     QDir::toNativeSeparators(scriptFullFilePath));
         QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
         scriptHandler.setWorkingDirectory(scriptDirectory);
+
+//        scriptHandler.setWorkingDirectory("");
 
         if (!scriptHandler.isOpen()) {
             if (SCRIPT_CENSORING == 0) {

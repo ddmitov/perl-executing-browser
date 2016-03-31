@@ -14,7 +14,7 @@ BEGIN {
 	##############################
 	# ENVIRONMENT VARIABLES:
 	##############################
-	my $DOCUMENT_ROOT = $ENV{'DOCUMENT_ROOT'};
+	my $DATA_ROOT = $ENV{'DATA_ROOT'};
 
 	##############################
 	# OVERRIDE POTENTIALY DANGEROUS
@@ -34,7 +34,7 @@ BEGIN {
 	*CORE::GLOBAL::opendir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[1];
-		if ($dir =~ $DOCUMENT_ROOT) {
+		if ($dir =~ $DATA_ROOT) {
 			return CORE::opendir $_[0], $_[1];
 		} else {
 			die "Intercepted insecure 'opendir' call from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
@@ -44,7 +44,7 @@ BEGIN {
 	*CORE::GLOBAL::chdir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[0];
-		if ($dir =~ $DOCUMENT_ROOT) {
+		if ($dir =~ $DATA_ROOT) {
 			CORE::chdir $_[0];
 		} else {
 			die "Intercepted insecure 'chdir' call from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
@@ -56,7 +56,7 @@ BEGIN {
 		my $handle = shift;
 		if (@_ == 1) {
 			my $filepath = $_[0];
-			if ($_[0] =~ $DOCUMENT_ROOT) {
+			if ($_[0] =~ $DATA_ROOT) {
 				return CORE::open ($handle, $_[0]);
 			} else {
 				$filepath =~ s/(\<|\>)//;
@@ -64,7 +64,7 @@ BEGIN {
 			}
 		} elsif (@_ == 2) {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DOCUMENT_ROOT) {
+			if ($_[1] =~ $DATA_ROOT) {
 				return CORE::open ($handle, $_[1]);
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -72,14 +72,14 @@ BEGIN {
 		} elsif (@_ == 3) {
 			if (defined $_[2]) {
 				my $filepath = $_[2];
-				if ($_[2] =~ $DOCUMENT_ROOT) {
+				if ($_[2] =~ $DATA_ROOT) {
 					CORE::open $handle, $_[1], $_[2];
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 				}
 			} else {
 				my $filepath = $_[1];
-				if ($_[1] =~ $DOCUMENT_ROOT) {
+				if ($_[1] =~ $DATA_ROOT) {
 					CORE::open $handle, $_[1], undef; # special case
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -87,7 +87,7 @@ BEGIN {
 			}
 		} else {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DOCUMENT_ROOT or $_[2] =~ $DOCUMENT_ROOT) {
+			if ($_[1] =~ $DATA_ROOT or $_[2] =~ $DATA_ROOT) {
 				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
