@@ -8,19 +8,30 @@ Permanent TO-DO:
 
 v. 0.2
 ====================================
-- separate browser settings and package settings in two INI files
-- browser settings file can be in the browser binary folder or in the default user settings folder
-- package settings file can be supplied from command line option or in the browser binary folder
-- package settings file can be in the package root folder
-- DATA_ROOT can be in user's data directory
+- browser settings file can be in:
+    1.) the browser binary folder,
+    2.) the current user settings folder,
+    3.) the default system settings folder
+- support for separate package settings INI files
+    package settings can be:
+    1.) inside the browser settings file,
+    2.) supplied from command line option
+- {user_settings_folder} alias inside settings files
+    {user_settings_folder} applicable for:
+        browser/perl
+        browser/perllib
+        browser/logging_directory
+        package/root
+        package/data_root
 - built-in default values for browser and package settings
 
 - better documentation for censor.pl
 - security tests in separate files
 - separate resource file for censor.pl
 
-- start Perl debugger in script environment when script is inside the current package
-    and in system environment when script is outside the current package
+- start Perl debugger in script environment if script is in the current package
+    and if script is outside the current package
+    ask for command line arguments and environment variables
 - dbgformatter.pl fatpacked together with Syntax::Highlight::Engine::Kate
 
 - single template for all HTML error messages
