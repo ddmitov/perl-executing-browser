@@ -8,6 +8,21 @@ use utf8;
 use open ':std', ':encoding(UTF-8)';
 use DBI;
 
+print "
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Perl Executing Browser - SQLite Test</title>
+		<meta name='viewport' content='width=device-width, initial-scale=1'>
+		<meta charset='utf-8'>
+		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/bootstrap/themes/darkly-theme.css' media='all'/>
+	</head>
+
+	<body>
+
+		<div>\n";
+
 my $database_relative_pathname = "/test.db";
 my $db = DBI->connect ("dbi:SQLite:$ENV{'DATA_ROOT'}$database_relative_pathname","","", {sqlite_unicode => 1}) or
 	die "Could not connect to database";
@@ -25,24 +40,12 @@ if (scalar @$all_records < 4) {
 
 $all_records = $db->selectall_arrayref ("SELECT * FROM USER");
 
-print "<!DOCTYPE html>
-<html>
-
-	<head>
-		<title>Perl Executing Browser - SQLite Test</title>
-		<meta name='viewport' content='width=device-width, initial-scale=1'>
-		<meta charset='utf-8'>
-		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/ui/bootstrap/themes/darkly-theme.css' media='all' />
-	</head>
-
-	<body>
-
-		<div>\n";
-
 foreach my $row (@$all_records) {
 	my ($id, $name, $surname) = @$row;
 	print "$id $name $surname <br>\n";
 }
+
+$db->disconnect;
 
 print "\n
 		</div>
@@ -50,5 +53,3 @@ print "\n
 	</body>
 
 </html>\n";
-
-$db->disconnect;

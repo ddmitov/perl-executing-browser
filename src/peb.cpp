@@ -472,24 +472,32 @@ int main(int argc, char **argv)
     // 'per_session' means that a separate log file is
     // created for every browser session. Application start date and time are
     // appended to the file name in this scenario.
-    QString logMode = settings.value("browser/logging_mode").toString();
-    application.setProperty("logMode", logMode);
+    // This option will be honoured only if logging is enabled.
+    QString logMode;
+    if (logging == "enable") {
+        logMode = settings.value("browser/logging_mode").toString();
+        application.setProperty("logMode", logMode);
+    }
 
     // Log files directory:
-    QString logDirName = settings
-            .value("browser/logging_directory").toString();
-    QDir logDir(QDir::toNativeSeparators(logDirName));
+    // This option will be honoured only if logging is enabled.
+    QString logDirName;
     QString logDirFullPath;
-    if (!logDir.exists()) {
-        logDir.mkpath(".");
+    if (logging == "enable") {
+        logDirName = settings
+                .value("browser/logging_directory").toString();
+        QDir logDir(QDir::toNativeSeparators(logDirName));
+        if (!logDir.exists()) {
+            logDir.mkpath(".");
+        }
+        if (logDir.isRelative()) {
+            logDirFullPath = settingsDirName + logDirName;
+        }
+        if (logDir.isAbsolute()) {
+            logDirFullPath = logDirName;
+        }
+        application.setProperty("logDirFullPath", logDirFullPath);
     }
-    if (logDir.isRelative()) {
-        logDirFullPath = settingsDirName + logDirName;
-    }
-    if (logDir.isAbsolute()) {
-        logDirFullPath = logDirName;
-    }
-    application.setProperty("logDirFullPath", logDirFullPath);
 
     // ==============================
     // PACKAGE SETTINGS:
@@ -552,15 +560,6 @@ int main(int argc, char **argv)
         QApplication::exit();
     }
 
-    // Display or hide STDERR from scripts:
-    QString displayStderr =
-            settings.value("package/display_stderr").toString();
-    application.setProperty("displayStderr", displayStderr);
-
-    // Fullscreen:
-    QString fullscreen = settings.value("package/fullscreen").toString();
-    application.setProperty("fullscreen", fullscreen);
-
     // Icon:
     QString iconPathNameSetting = settings.value("package/icon").toString();
     QString iconPathName;
@@ -584,6 +583,10 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
+    // Fullscreen:
+    QString fullscreen = settings.value("package/fullscreen").toString();
+    application.setProperty("fullscreen", fullscreen);
+
     // Translation:
     QString translation =
             settings.value("package/translation").toString();
@@ -599,11 +602,6 @@ int main(int argc, char **argv)
             .toString();
     application
             .setProperty("warnOnExitIfTextIsEntered", warnOnExit);
-
-    // Web Inspector enable/disable switch:
-    QString webInspector = settings
-            .value("package/web_inspector").toString();
-    application.setProperty("webInspector", webInspector);
 
     // ==============================
     // COMMAND LINE SETTING OVERRIDES:
@@ -674,12 +672,10 @@ int main(int argc, char **argv)
     qDebug() << "Package root folder:" << rootDirName;
     qDebug() << "Package data root folder:" << dataRootDirName;
     qDebug() << "Package start page:" << startPagePath;
-    qDebug() << "Display STDERR from scripts:" << displayStderr;
     qDebug() << "Fullscreen:" << fullscreen;
     qDebug() << "Icon:" << iconPathName;
     qDebug() << "Translation:" << translation;
     qDebug() << "Warn on exit:" << warnOnExit;
-    qDebug() << "Web Inspector from keyboard shortcut:" << webInspector;
     qDebug() << "";
 
     return application.exec();
@@ -844,10 +840,8 @@ QPage::QPage()
             setAttribute(QWebSettings::AutoLoadImages, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
-    if ((qApp->property("webInspector").toString()) == "enable") {
-        QWebSettings::globalSettings()->
-                setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    }
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
     QWebSettings::globalSettings()->
@@ -924,12 +918,10 @@ QWebViewWindow::QWebViewWindow()
                      this, SLOT(qPrintSlot()));
 #endif
 
-    if ((qApp->property("webInspector").toString()) == "enable") {
-        QShortcut *qWebInspestorShortcut =
-                new QShortcut(QKeySequence("Ctrl+I"), this);
-        QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
-                         this, SLOT(qStartQWebInspector()));
-    }
+    QShortcut *qWebInspestorShortcut =
+            new QShortcut(QKeySequence("Ctrl+I"), this);
+    QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
+                     this, SLOT(qStartQWebInspector()));
 
     // Configure screen dimensions:
     if ((qApp->property("fullscreen").toString()) == "enable") {

@@ -108,7 +108,7 @@ CORE::open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
 # READ USER SCRIPT FROM
 # THE FIRST COMMAND LINE ARGUMENT:
 ##############################
-my $file = $ARGV[0];
+my $file = shift @ARGV;
 CORE::open my $filehandle, '<', $file or die;
 my @user_code = <$filehandle>;
 close $filehandle;

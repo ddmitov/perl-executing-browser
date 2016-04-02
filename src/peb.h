@@ -30,16 +30,15 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QDesktopWidget>
+#include <qglobal.h>
 
 // ==============================
 // PRINT SUPPORT:
 // ==============================
 #ifndef QT_NO_PRINTER
 #include <QPrintPreviewDialog>
-#include <qglobal.h>
 #include <QtPrintSupport/QPrinter>
 #include <QtPrintSupport/QPrintDialog>
-#include <QUrlQuery>
 #endif
 
 // ==============================
@@ -187,7 +186,6 @@ protected:
 
             QString scriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("root").toString())
-                     + QDir::separator()
                      + request.url().path());
 
             QFileDetector fileDetector;
@@ -223,13 +221,7 @@ protected:
 
                 QProcess scriptHandler;
                 scriptHandler.setProcessEnvironment(scriptEnvironment);
-
-                QFileInfo scriptAbsoluteFilePath(
-                            QDir::toNativeSeparators(scriptFullFilePath));
-                QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-                scriptHandler.setWorkingDirectory(scriptDirectory);
-
-//                scriptHandler.setWorkingDirectory("");
+                scriptHandler.setWorkingDirectory("");
 
                 QEventLoop scriptHandlerWaitingLoop;
 
@@ -348,7 +340,6 @@ protected:
             // Get the full file path and file extension:
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("root").toString())
-                     + QDir::separator()
                      + request.url().path());
 
             QFileDetector fileDetector;
@@ -380,7 +371,6 @@ protected:
                     QString localFileName(QDir::toNativeSeparators(
                                               (qApp->property("root")
                                                .toString())
-                                              + QDir::separator()
                                               + request.url().path()));
                     QFile localFile(localFileName);
                     localFile.open(QIODevice::ReadOnly);
@@ -461,7 +451,6 @@ public slots:
     {
         scriptFullFilePath = QDir::toNativeSeparators
                 ((qApp->property("root").toString())
-                 + QDir::separator()
                  + url.path());
 
         QString queryString = url.query();
@@ -483,13 +472,7 @@ public slots:
         }
 
         scriptHandler.setProcessEnvironment(scriptEnvironment);
-
-        QFileInfo scriptAbsoluteFilePath(
-                    QDir::toNativeSeparators(scriptFullFilePath));
-        QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-        scriptHandler.setWorkingDirectory(scriptDirectory);
-
-//        scriptHandler.setWorkingDirectory("");
+        scriptHandler.setWorkingDirectory("");
 
         if (!scriptHandler.isOpen()) {
             if (SCRIPT_CENSORING == 0) {
@@ -601,36 +584,34 @@ public slots:
         targetFrame->setHtml(scriptAccumulatedOutput,
                              QUrl(PSEUDO_DOMAIN));
 
-        if ((qApp->property("displayStderr").toString()) == "enable") {
-            if (scriptAccumulatedErrors.length() > 0) {
+        if (scriptAccumulatedErrors.length() > 0) {
 
-                if (scriptAccumulatedOutput.length() == 0) {
-                    targetFrame->setHtml(scriptAccumulatedErrors,
-                                         QUrl(PSEUDO_DOMAIN));
-                } else {
-                    QMessageBox showErrorsMessageBox (qApp->activeWindow());
-                    showErrorsMessageBox.setWindowModality(Qt::WindowModal);
-                    showErrorsMessageBox.setWindowTitle(tr("Errors"));
-                    showErrorsMessageBox
-                            .setIconPixmap((qApp->property("icon")
-                                            .toString()));
-                    showErrorsMessageBox
-                            .setText(tr("Errors were found "
-                                        "during script execution.")
-                                     + "<br>"
-                                     + tr("Do you want to see them?"));
-                    showErrorsMessageBox
-                            .setStandardButtons(QMessageBox::Yes
-                                                | QMessageBox::No);
-                    showErrorsMessageBox
-                            .setButtonText(QMessageBox::Yes, tr("Yes"));
-                    showErrorsMessageBox
-                            .setButtonText(QMessageBox::No, tr("No"));
-                    showErrorsMessageBox.setDefaultButton(QMessageBox::Yes);
+            if (scriptAccumulatedOutput.length() == 0) {
+                targetFrame->setHtml(scriptAccumulatedErrors,
+                                     QUrl(PSEUDO_DOMAIN));
+            } else {
+                QMessageBox showErrorsMessageBox (qApp->activeWindow());
+                showErrorsMessageBox.setWindowModality(Qt::WindowModal);
+                showErrorsMessageBox.setWindowTitle(tr("Errors"));
+                showErrorsMessageBox
+                        .setIconPixmap((qApp->property("icon")
+                                        .toString()));
+                showErrorsMessageBox
+                        .setText(tr("Errors were found "
+                                    "during script execution.")
+                                 + "<br>"
+                                 + tr("Do you want to see them?"));
+                showErrorsMessageBox
+                        .setStandardButtons(QMessageBox::Yes
+                                            | QMessageBox::No);
+                showErrorsMessageBox
+                        .setButtonText(QMessageBox::Yes, tr("Yes"));
+                showErrorsMessageBox
+                        .setButtonText(QMessageBox::No, tr("No"));
+                showErrorsMessageBox.setDefaultButton(QMessageBox::Yes);
 
-                    if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
-                        emit displayErrorsSignal(scriptAccumulatedErrors);
-                    }
+                if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
+                    emit displayErrorsSignal(scriptAccumulatedErrors);
                 }
             }
         }
