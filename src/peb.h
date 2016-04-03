@@ -9,8 +9,9 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2016, ddmitov (at) yahoo (dot) com
+ Dimitar D. Mitov, 2013 - 2016
  Valcho Nedelchev, 2014 - 2016
+ https://github.com/ddmitov/perl-executing-browser
 */
 
 #ifndef PEB_H
