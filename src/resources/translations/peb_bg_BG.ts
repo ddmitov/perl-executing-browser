@@ -4,18 +4,6 @@
 <context>
     <name>QApplication</name>
     <message>
-        <source>Command-Line Options</source>
-        <translation type="vanished">Флагове от командната линия</translation>
-    </message>
-    <message>
-        <source>start browser in fullscreen mode</source>
-        <translation type="vanished">стартирай браузъра в режим на цял екран</translation>
-    </message>
-    <message>
-        <source>this help</source>
-        <translation type="vanished">този помощен прозорец</translation>
-    </message>
-    <message>
         <location filename="../../peb.cpp" line="199"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
@@ -46,14 +34,6 @@
         <location filename="../../peb.cpp" line="231"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
-    </message>
-    <message>
-        <source>Missing configuration file</source>
-        <translation type="vanished">Липсващ файл с настройки</translation>
-    </message>
-    <message>
-        <source>Configuration file is missing:</source>
-        <translation type="vanished">Не бе намерен конфигурационният файл:</translation>
     </message>
 </context>
 <context>

@@ -21,6 +21,12 @@ print "
 
 	<body>
 
+		<p>
+			<font size='5'>
+				SQLite Test
+			</font>
+		</p>
+
 		<div>\n";
 
 my $database_relative_pathname = "/test.db";

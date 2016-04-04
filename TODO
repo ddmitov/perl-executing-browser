@@ -22,8 +22,6 @@ v. 0.2
 - translation for error.htm
 - user-supplied JS prompt when check-user-input-before-quit finds user input
 
-- better looking SQLite test
-
 v. 0.3
 ====================================
 - internal JavaScript-based code editor - ACE;
