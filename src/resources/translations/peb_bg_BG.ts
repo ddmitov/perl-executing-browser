@@ -4,107 +4,77 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../peb.cpp" line="188"/>
         <source>Command-Line Options</source>
-        <translation>Флагове от командната линия</translation>
+        <translation type="vanished">Флагове от командната линия</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="191"/>
         <source>start browser in fullscreen mode</source>
-        <translation>стартирай браузъра в режим на цял екран</translation>
+        <translation type="vanished">стартирай браузъра в режим на цял екран</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="195"/>
         <source>this help</source>
-        <translation>този помощен прозорец</translation>
+        <translation type="vanished">този помощен прозорец</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="284"/>
+        <location filename="../../peb.cpp" line="199"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="285"/>
+        <location filename="../../peb.cpp" line="200"/>
         <source>Browser was started as root.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="378"/>
-        <source>Configuration file</source>
-        <translation>Файлът с настройки</translation>
-    </message>
-    <message>
-        <location filename="../../peb.cpp" line="382"/>
-        <source>is missing.</source>
-        <translation>не бе намерен.</translation>
-    </message>
-    <message>
-        <location filename="../../peb.cpp" line="289"/>
-        <location filename="../../peb.cpp" line="318"/>
+        <location filename="../../peb.cpp" line="204"/>
+        <location filename="../../peb.cpp" line="233"/>
         <source>Going to quit now.</source>
         <translation>Ще последва изключване на програмата.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="310"/>
+        <location filename="../../peb.cpp" line="225"/>
         <source>Started by administrator</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="313"/>
+        <location filename="../../peb.cpp" line="228"/>
         <source>Browser was started with administrative privileges.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="287"/>
-        <location filename="../../peb.cpp" line="316"/>
+        <location filename="../../peb.cpp" line="202"/>
+        <location filename="../../peb.cpp" line="231"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="377"/>
         <source>Missing configuration file</source>
-        <translation>Липсващ файл с настройки</translation>
+        <translation type="vanished">Липсващ файл с настройки</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="384"/>
-        <source>Please restore it.</source>
-        <translation>Моля, възстановете го.</translation>
-    </message>
-    <message>
-        <location filename="../../peb.cpp" line="550"/>
-        <source> version </source>
-        <translation> версия </translation>
-    </message>
-    <message>
-        <location filename="../../peb.cpp" line="546"/>
-        <source>Missing start page</source>
-        <translation>Липсваща главна страница</translation>
-    </message>
-    <message>
-        <location filename="../../peb.cpp" line="547"/>
-        <source>Start page is missing for</source>
-        <translation>Не бе намерена главната страница на</translation>
+        <source>Configuration file is missing:</source>
+        <translation type="vanished">Не бе намерен конфигурационният файл:</translation>
     </message>
 </context>
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="1073"/>
+        <location filename="../../peb.cpp" line="994"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1069"/>
+        <location filename="../../peb.cpp" line="990"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1071"/>
+        <location filename="../../peb.cpp" line="992"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="1072"/>
+        <location filename="../../peb.cpp" line="993"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>

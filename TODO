@@ -8,10 +8,6 @@ Permanent TO-DO:
 
 v. 0.2
 ====================================
-- support for separate package settings INI files
-    package settings can be:
-    1.) inside the browser settings file,
-    2.) supplied from command line option
 - built-in default values for browser and package settings
 
 - better documentation for censor.pl
@@ -23,12 +19,10 @@ v. 0.2
     ask for command line arguments and start in system environment
 - dbgformatter.pl fatpacked together with Syntax::Highlight::Engine::Kate
 
-- single template for all HTML error messages
-- translations for all HTML error messages
-- HTML error pages for missing browser settings file and missing start page
+- translation for error.htm
 - user-supplied JS prompt when check-user-input-before-quit finds user input
 
-- better SQLite test
+- better looking SQLite test
 
 v. 0.3
 ====================================

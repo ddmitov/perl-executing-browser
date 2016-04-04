@@ -1,0 +1,29 @@
+
+# Package settings file for Perl Executing Browser
+
+[package]
+root_directory=root
+# The root directory of a package contains locally executed scripts, local HTML pages and related content.
+# All relative paths within the package are resolved using this folder.
+# Possible values - an absolute path or a path relative to the folder of this settings file.
+
+data_directory=data
+# The data directory of the package containing all writeable data files like database files.
+# Possible values - an absolute path or a path relative to the folder of this settings file.
+
+start_page=index.htm
+# Start page - path must be relative to the package root directory.
+# HTML file or script are equally usable as a start page.
+
+start_fullscreen=disable
+# Start browser in fullscreen mode - 'enable' or 'disable'.
+
+icon=
+# Path must be relative to the package root directory.
+
+translation=bg_BG
+# No value means that no translation will be loaded, default English interface will be used.
+# 'bg_BG' - Bulgarian translation.
+
+warn_on_exit=enable
+# Warn user before quitting the application if text is entered in a form - 'enable' or 'disable'.
