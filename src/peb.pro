@@ -172,19 +172,25 @@ win32 {
     system ($$QMAKE_LRELEASE $$PWD/peb.pro)
 }
 
-# Resources:
-equals (PERL_DEBUGGER_INTERACTION, 0) {
-    RESOURCES += resources/peb.qrc
-}
-
-equals (PERL_DEBUGGER_INTERACTION, 1) {
-    RESOURCES += resources/peb.qrc \
-    resources/peb-perl-debugger.qrc
-}
-
+# No Perl debugger support for Windows:
 win32 {
+    PERL_DEBUGGER_INTERACTION = 0
+    DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+    RESOURCES += resources/peb.qrc
     OTHER_FILES += resources/peb.rc resources/icons/camel.ico
     RC_FILE = resources/peb.rc
+}
+
+!win32 {
+    # Resources:
+    equals (PERL_DEBUGGER_INTERACTION, 0) {
+        RESOURCES += resources/peb.qrc
+    }
+
+    equals (PERL_DEBUGGER_INTERACTION, 1) {
+        RESOURCES += resources/peb.qrc \
+        resources/peb-perl-debugger.qrc
+    }
 }
 
 # Temporary folder:

@@ -1071,8 +1071,7 @@ public slots:
                 event->ignore();
             }
         } else {
-            if (qApp->property("warnOnExitIfTextIsEntered").toString() ==
-                    "enable") {
+            if (qApp->property("warnOnExit").toString() == "enable") {
 
                 mainPage->currentFrame()->evaluateJavaScript(
                             mainPage->checkUserInputBeforeQuitJavaScript);

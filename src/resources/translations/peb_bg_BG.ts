@@ -4,34 +4,34 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../peb.cpp" line="199"/>
+        <location filename="../../peb.cpp" line="198"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="200"/>
+        <location filename="../../peb.cpp" line="199"/>
         <source>Browser was started as root.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="204"/>
-        <location filename="../../peb.cpp" line="233"/>
+        <location filename="../../peb.cpp" line="203"/>
+        <location filename="../../peb.cpp" line="232"/>
         <source>Going to quit now.</source>
         <translation>Ще последва изключване на програмата.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="225"/>
+        <location filename="../../peb.cpp" line="224"/>
         <source>Started by administrator</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="228"/>
+        <location filename="../../peb.cpp" line="227"/>
         <source>Browser was started with administrative privileges.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="202"/>
-        <location filename="../../peb.cpp" line="231"/>
+        <location filename="../../peb.cpp" line="201"/>
+        <location filename="../../peb.cpp" line="230"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
     </message>
@@ -39,22 +39,22 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="994"/>
+        <location filename="../../peb.cpp" line="913"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="990"/>
+        <location filename="../../peb.cpp" line="909"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="992"/>
+        <location filename="../../peb.cpp" line="911"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="993"/>
+        <location filename="../../peb.cpp" line="912"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>
@@ -126,7 +126,7 @@
     </message>
     <message>
         <location filename="../../peb.h" line="1051"/>
-        <location filename="../../peb.h" line="1091"/>
+        <location filename="../../peb.h" line="1090"/>
         <source>Close window</source>
         <translation>Затваряне на прозорец</translation>
     </message>
@@ -147,28 +147,28 @@
     </message>
     <message>
         <location filename="../../peb.h" line="1063"/>
-        <location filename="../../peb.h" line="1107"/>
+        <location filename="../../peb.h" line="1106"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location filename="../../peb.h" line="1064"/>
-        <location filename="../../peb.h" line="1109"/>
+        <location filename="../../peb.h" line="1108"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1096"/>
+        <location filename="../../peb.h" line="1095"/>
         <source>Text was entered on this page and it is going to be lost!</source>
         <translation>На тази страница е попълнен текст и той ще бъде загубен!</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1099"/>
+        <location filename="../../peb.h" line="1098"/>
         <source>This information can not be recovered!</source>
         <translation>Въведената информация не може да бъде възстановена!</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1101"/>
+        <location filename="../../peb.h" line="1100"/>
         <source>Are you sure you want to close the window?</source>
         <translation>Сигурни ли сте, че искате да изключите програмата?</translation>
     </message>

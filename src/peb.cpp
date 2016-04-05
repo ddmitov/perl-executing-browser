@@ -29,7 +29,6 @@
 
 #ifdef Q_OS_WIN
 #include <windows.h>
-#include <stdio.h>
 
 // ==============================
 // DETECT WINDOWS USER PRIVILEGES SUBROUTINE:
@@ -250,39 +249,42 @@ int main(int argc, char **argv)
                          applicationStartDateAndTime);
 
     // ==============================
-    // BROWSER SETTINGS:
+    // SETTINGS FILE:
     // ==============================
-    // Browser settings file is loaded from the directory of the binary file:
-    QDir browserSettingsDir =
+    // Settings file is loaded from the directory of the binary file:
+    QDir settingsDir =
             QDir::toNativeSeparators(application.applicationDirPath());
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        browserSettingsDir.cdUp();
-        browserSettingsDir.cdUp();
+        settingsDir.cdUp();
+        settingsDir.cdUp();
     }
 #endif
 
-    // Get the name of the browser settings directory:
-    QString browserSettingsDirName =
-            browserSettingsDir.absolutePath().toLatin1();
-    browserSettingsDirName.append(QDir::separator());
+    // Get the name of the settings file directory:
+    QString settingsDirName =
+            settingsDir.absolutePath().toLatin1();
+    settingsDirName.append(QDir::separator());
 
-    // Get the name of the browser settings file:
-    QString browserSettingsFileName = QDir::toNativeSeparators
-            (browserSettingsDirName + QDir::separator()
+    // Get the name of the settings file.
+    // Settings file takes the name of the binary,
+    // but with an '.ini' file extension:
+    QString settingsFileName =
+            QDir::toNativeSeparators
+            (settingsDirName
              + QFileInfo(QApplication::applicationFilePath()).baseName()
              + ".ini");
 
-    // Define INI file format for browser settings:
-    QFile browserSettingsFile(browserSettingsFileName);
-    QSettings browserSettings(browserSettingsFileName, QSettings::IniFormat);
+    // Define INI file format for settings:
+    QFile settingsFile(settingsFileName);
+    QSettings settings(settingsFileName, QSettings::IniFormat);
 
+    // ==============================
+    // BROWSER SETTINGS:
+    // ==============================
     // Perl interpreter:
     QString perlInterpreterSetting =
-            browserSettings.value("browser/perl").toString();
-    if (perlInterpreterSetting.length() == 0) {
-        qDebug()  <<"No Perl interpreter is set in browser settings file.";
-    }
+            settings.value("browser/perl").toString();
     QString perlInterpreter;
     if (perlInterpreterSetting == "system") {
         QProcess systemPerlTester;
@@ -295,46 +297,38 @@ int main(int argc, char **argv)
                     systemPerlTester.readAllStandardOutput();
             perlInterpreter =
                     QString::fromLatin1(testingScriptResultArray);
-
-            if (perlInterpreter.length() == 0) {
-                qDebug()  <<"No Perl interpreter is available on PATH";
-            }
         }
     } else {
         QDir interpreterFile(perlInterpreterSetting);
         if (interpreterFile.isRelative()) {
             perlInterpreter =
-                    QDir::toNativeSeparators(browserSettingsDirName
+                    QDir::toNativeSeparators(settingsDirName
                                              + perlInterpreterSetting);
         }
         if (interpreterFile.isAbsolute()) {
             perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
-        }
-        QFile perlInterpreterBinary(perlInterpreterSetting);
-        if (perlInterpreterSetting.length() > 0 and
-                !perlInterpreterBinary.exists()) {
-            qDebug()  << "Perl interpreter from browser settings file"
-                      << "is missing";
         }
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // PERLLIB environment variable:
     QString perlLibSetting =
-            browserSettings.value("browser/perllib").toString();
-    QDir perlLibDir(QDir::toNativeSeparators(perlLibSetting));
+            settings.value("browser/perllib").toString();
     QString perlLib;
-    if (perlLibDir.isRelative()) {
-        perlLib = browserSettingsDirName + perlLibSetting;
+    if (perlLibSetting.length() > 0) {
+        QDir perlLibDir(QDir::toNativeSeparators(perlLibSetting));
+        if (perlLibDir.isRelative()) {
+            perlLib = settingsDirName + perlLibSetting;
+        }
+        if (perlLibDir.isAbsolute()) {
+            perlLib = perlLibSetting;
+        }
+        application.setProperty("perlLib", perlLib);
     }
-    if (perlLibDir.isAbsolute()) {
-        perlLib = perlLibSetting;
-    }
-    application.setProperty("perlLib", perlLib);
 
     // Logging enable/disable switch:
     QString loggingSetting =
-            browserSettings.value("browser/logging").toString();
+            settings.value("browser/logging").toString();
     // Install message handler for redirecting all debug messages to a log file:
     if (loggingSetting == "enable") {
         qInstallMessageHandler(customMessageHandler);
@@ -349,7 +343,7 @@ int main(int argc, char **argv)
     QString loggingModeSetting;
     if (loggingSetting == "enable") {
         loggingModeSetting =
-                browserSettings.value("browser/logging_mode").toString();
+                settings.value("browser/logging_mode").toString();
         application.setProperty("logMode", loggingModeSetting);
     }
 
@@ -359,13 +353,13 @@ int main(int argc, char **argv)
     QString logDirFullPath;
     if (loggingSetting == "enable") {
         logDirNameSetting =
-                browserSettings.value("browser/logging_directory").toString();
+                settings.value("browser/logging_directory").toString();
         QDir logDir(QDir::toNativeSeparators(logDirNameSetting));
         if (!logDir.exists()) {
             logDir.mkpath(".");
         }
         if (logDir.isRelative()) {
-            logDirFullPath = browserSettingsDirName + logDirNameSetting;
+            logDirFullPath = settingsDirName + logDirNameSetting;
         }
         if (logDir.isAbsolute()) {
             logDirFullPath = logDirNameSetting;
@@ -376,81 +370,14 @@ int main(int argc, char **argv)
     // ==============================
     // PACKAGE SETTINGS:
     // ==============================
-    QString rootDirSetting;
-    QString dataDirSetting;
-    QString startPageSetting;
-    QString startFullscreenSetting;
-    QString iconSetting;
-    QString translationSetting;
-    QString warnOnExitSetting;
-
-    // Package settings file is the first and only command line argument.
-    // Full file path must be given.
-    QString packageSettingsFilePath;
-    QString packageSettingsDirName;
-
-    // If there is a valid package settings file,
-    // read package settings from this file,
-    // otherwise read package settings from the browser settings file.
-    if (QCoreApplication::arguments().length() > 1) {
-        packageSettingsFilePath = QCoreApplication::arguments().at(2);
-        packageSettingsFilePath.replace("\n", "");
-
-        // Get the directory of the package settings file:
-        QFileInfo packageSettingsDirInfo(packageSettingsFilePath);
-        packageSettingsDirName =
-                packageSettingsDirInfo.absoluteDir().absolutePath();
-        packageSettingsDirName.append(QDir::separator());
-
-        // Check if package settings file exists:
-        QFile packageSettingsFile(packageSettingsFilePath);
-        if (packageSettingsFile.exists()) {
-            // Define INI file format for package settings:
-            QSettings packageSettings(
-                        packageSettingsFilePath, QSettings::IniFormat);
-
-            rootDirSetting =
-                    packageSettings.value("package/root_directory").toString();
-            dataDirSetting =
-                    packageSettings.value("package/data_directory").toString();
-            startPageSetting =
-                    packageSettings.value("package/start_page").toString();
-            startFullscreenSetting =
-                    packageSettings
-                    .value("package/start_fullscreen").toString();
-            iconSetting =
-                    packageSettings.value("package/icon").toString();
-            translationSetting =
-                    packageSettings.value("package/translation").toString();
-            warnOnExitSetting = packageSettings
-                    .value("package/warn_on_exit").toString();
-        }
-    } else {
-        packageSettingsFilePath = browserSettingsFileName;
-        rootDirSetting =
-                browserSettings.value("package/root_directory").toString();
-        dataDirSetting =
-                browserSettings.value("package/data_directory").toString();
-        startPageSetting =
-                browserSettings.value("package/start_page").toString();
-        startFullscreenSetting =
-                browserSettings.value("package/start_fullscreen").toString();
-        iconSetting =
-                browserSettings.value("package/icon").toString();
-        translationSetting = browserSettings.value("package/translation").toString();
-        warnOnExitSetting = browserSettings
-                .value("package/warn_on_exit").toString();
-    }
-
-    // ==============================
-    // SETTINGS ADJUSTMENTS:
-    // ==============================
     // Package root directory:
+    QString rootDirSetting =
+            settings.value("package/root_directory").toString();
     QString rootDirName;
     QDir rootDir(rootDirSetting);
     if (rootDir.isRelative()) {
         rootDirName = QDir::toNativeSeparators(
-                    packageSettingsDirName + rootDirSetting);
+                    settingsDirName + rootDirSetting);
     }
     if (rootDir.isAbsolute()) {
         rootDirName = QDir::toNativeSeparators(rootDirSetting);
@@ -458,11 +385,13 @@ int main(int argc, char **argv)
     application.setProperty("root", rootDirName);
 
     // Package data directory:
+    QString dataDirSetting =
+            settings.value("package/data_directory").toString();
     QString dataDirName;
     QDir dataDir(dataDirSetting);
     if (dataDir.isRelative()) {
         dataDirName = QDir::toNativeSeparators(
-                    packageSettingsDirName + dataDirSetting);
+                    settingsDirName + dataDirSetting);
     }
     if (dataDir.isAbsolute()) {
         dataDirName = QDir::toNativeSeparators(dataDirSetting);
@@ -472,9 +401,17 @@ int main(int argc, char **argv)
     // Start page -
     // path must be relative to the root directory of the current package.
     // HTML file or script are equally usable as a start page:
+    QString startPageSetting =
+            settings.value("package/start_page").toString();
     application.setProperty("startPagePath", startPageSetting);
 
+    // Fullscreen:
+    QString startFullscreenSetting =
+            settings.value("package/start_fullscreen").toString();
+    application.setProperty("fullscreen", startFullscreenSetting);
+
     // Icon:
+    QString iconSetting = settings.value("package/icon").toString();
     QString iconPathName;
     if (iconSetting.length() > 0) {
         iconPathName = QDir::toNativeSeparators(
@@ -494,10 +431,9 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
-    // Fullscreen:
-    application.setProperty("fullscreen", startFullscreenSetting);
-
     // Translation:
+    QString translationSetting =
+            settings.value("package/translation").toString();
     QTranslator translator;
     if (translationSetting.length() > 0) {
         translator.load("peb_" + translationSetting, ":/translations");
@@ -505,7 +441,9 @@ int main(int argc, char **argv)
     application.installTranslator(&translator);
 
     // Warn on exit:
-    application.setProperty("warnOnExitIfTextIsEntered", warnOnExitSetting);
+    QString warnOnExitSetting = settings
+            .value("package/warn_on_exit").toString();
+    application.setProperty("warnOnExit", warnOnExitSetting);
 
     // ==============================
     // LOG BASIC PROGRAM INFORMATION:
@@ -515,9 +453,6 @@ int main(int argc, char **argv)
              << application.applicationVersion().toLatin1().constData()
              << "started.";
     qDebug() << "Executable:" << application.applicationFilePath();
-    qDebug() << "Libraries Path:"
-             << QLibraryInfo::location(QLibraryInfo::LibrariesPath)
-                .toLatin1().constData();
     qDebug() << "Qt version:" << QT_VERSION_STR;
     qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
     if (SCRIPT_CENSORING == 0) {
@@ -542,9 +477,9 @@ int main(int argc, char **argv)
     QObject::connect(qApp, SIGNAL(lastWindowClosed()),
                      &window, SLOT(qExitApplicationSlot()));
 
-    // Check if start page exists:
+    // Check if settings file and start page exist:
     QFile startPageFile(rootDirName + QDir::separator() + startPageSetting);
-    if (browserSettingsFile.exists() and startPageFile.exists()) {
+    if (settingsFile.exists() and startPageFile.exists()) {
         window.qLoadStartPageSlot();
     } else {
         window.setUrl(QUrl("qrc:/html/error.htm"));
@@ -557,17 +492,16 @@ int main(int argc, char **argv)
     // LOG ALL SETTINGS:
     // ==============================
     qDebug() << "";
-    qDebug() << "Browser settings file:" << browserSettingsFileName;
+    qDebug() << "Settings file:" << settingsFileName;
     qDebug() << "Perl interpreter" << perlInterpreter;
-    qDebug() << "PERLLIB folder:" << perlLib;
+    if (perlLibSetting.length() > 0) {
+        qDebug() << "PERLLIB folder:" << perlLib;
+    }
     qDebug() << "Logging:" << loggingSetting;
     if (loggingSetting == "enable") {
         qDebug() << "Logging mode:" << loggingModeSetting;
         qDebug() << "Logfiles directory:" << logDirFullPath;
     }
-
-    qDebug() << "";
-    qDebug() << "Package settings file:" << packageSettingsFilePath;
     qDebug() << "Package root folder:" << rootDirName;
     qDebug() << "Package data folder:" << dataDirName;
     qDebug() << "Package start page:"
@@ -640,7 +574,10 @@ QScriptEnvironment::QScriptEnvironment()
     scriptEnvironment.insert("DATA_ROOT", qApp->property("data").toString());
 
     // PERLLIB:
-    scriptEnvironment.insert("PERLLIB", qApp->property("perlLib").toString());
+    if (qApp->property("perlLib").toString().length() > 0) {
+        scriptEnvironment
+                .insert("PERLLIB", qApp->property("perlLib").toString());
+    }
 }
 
 // ==============================

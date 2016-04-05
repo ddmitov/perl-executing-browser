@@ -12,7 +12,6 @@ v. 0.2
 
 - better documentation for censor.pl
 - security tests in separate files
-- separate resource file for censor.pl
 
 - start Perl debugger in script environment if script is in the current package
     and if script is outside the current package
