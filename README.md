@@ -79,7 +79,7 @@ Compiled and tested successfully using:
 
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.  
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any pages.  
-* PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
+* PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
 * PEB has no sandbox for local Perl scripts. Basic security is implemented in the ```censor.pl``` embedded Perl script (see below). It bans scripts using potentially dangerous core functions, but can not protect every file and every user from every poorly written or malicious script! So it is recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
