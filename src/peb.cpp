@@ -81,36 +81,23 @@ void customMessageHandler(QtMsgType type,
         break;
     }
 
-    if ((qApp->property("logMode").toString()) == "single_file") {
-        QFile logFile(QDir::toNativeSeparators
-                      (qApp->property("logDirFullPath").toString()
-                       + QDir::separator()
-                       + QFileInfo(
-                           QApplication::applicationFilePath()).baseName()
-                       + ".log"));
-        logFile.open(QIODevice::WriteOnly
-                     | QIODevice::Append
-                     | QIODevice::Text);
-        QTextStream textStream(&logFile);
-        textStream << text << endl;
-    }
-
-    if ((qApp->property("logMode").toString()) == "per_session_file") {
-        QFile logFile(QDir::toNativeSeparators
-                      (qApp->property("logDirFullPath").toString()
-                       + QDir::separator()
-                       + QFileInfo(
-                           QApplication::applicationFilePath()).baseName()
-                       + "-started-at-"
-                       + qApp->property(
-                           "applicationStartDateAndTime").toString()
-                       + ".log"));
-        logFile.open(QIODevice::WriteOnly
-                     | QIODevice::Append
-                     | QIODevice::Text);
-        QTextStream textStream(&logFile);
-        textStream << text << endl;
-    }
+    // A separate log file is created for every browser session.
+    // Application start date and time are
+    // appended to the binary file name.
+    QFile logFile(QDir::toNativeSeparators
+                  (qApp->property("logDirFullPath").toString()
+                   + QDir::separator()
+                   + QFileInfo(
+                       QApplication::applicationFilePath()).baseName()
+                   + "-started-at-"
+                   + qApp->property(
+                       "applicationStartDateAndTime").toString()
+                   + ".log"));
+    logFile.open(QIODevice::WriteOnly
+                 | QIODevice::Append
+                 | QIODevice::Text);
+    QTextStream textStream(&logFile);
+    textStream << text << endl;
 }
 
 // ==============================
@@ -241,7 +228,7 @@ int main(int argc, char **argv)
     // ==============================
     // GET APPLICATION START DATE AND TIME:
     // ==============================
-    // Application start date and time for temporary folder name:
+    // Application start date and time for logging:
     QString applicationStartDateAndTime =
             QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
     application
@@ -280,11 +267,11 @@ int main(int argc, char **argv)
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
     // ==============================
-    // BROWSER SETTINGS:
+    // SETTINGS:
     // ==============================
     // Perl interpreter:
     QString perlInterpreterSetting =
-            settings.value("browser/perl").toString();
+            settings.value("perl").toString();
     QString perlInterpreter;
     if (perlInterpreterSetting == "system") {
         QProcess systemPerlTester;
@@ -313,7 +300,7 @@ int main(int argc, char **argv)
 
     // PERLLIB environment variable:
     QString perlLibSetting =
-            settings.value("browser/perllib").toString();
+            settings.value("perllib").toString();
     QString perlLib;
     if (perlLibSetting.length() > 0) {
         QDir perlLibDir(QDir::toNativeSeparators(perlLibSetting));
@@ -328,23 +315,10 @@ int main(int argc, char **argv)
 
     // Logging enable/disable switch:
     QString loggingSetting =
-            settings.value("browser/logging").toString();
+            settings.value("logging").toString();
     // Install message handler for redirecting all debug messages to a log file:
     if (loggingSetting == "enable") {
         qInstallMessageHandler(customMessageHandler);
-    }
-
-    // Logging mode - 'per_session_file' or 'single_file'.
-    // 'single_file' means that only one single log file is created.
-    // 'per_session' means that a separate log file is
-    // created for every browser session. Application start date and time are
-    // appended to the file name in this scenario.
-    // This option will be honoured only if logging is enabled.
-    QString loggingModeSetting;
-    if (loggingSetting == "enable") {
-        loggingModeSetting =
-                settings.value("browser/logging_mode").toString();
-        application.setProperty("logMode", loggingModeSetting);
     }
 
     // Log files directory:
@@ -353,7 +327,11 @@ int main(int argc, char **argv)
     QString logDirFullPath;
     if (loggingSetting == "enable") {
         logDirNameSetting =
-                settings.value("browser/logging_directory").toString();
+                settings.value("logging_directory").toString();
+        // Default value:
+        if (logDirNameSetting.length() == 0) {
+            logDirNameSetting = "logs";
+        }
         QDir logDir(QDir::toNativeSeparators(logDirNameSetting));
         if (!logDir.exists()) {
             logDir.mkpath(".");
@@ -367,12 +345,9 @@ int main(int argc, char **argv)
         application.setProperty("logDirFullPath", logDirFullPath);
     }
 
-    // ==============================
-    // PACKAGE SETTINGS:
-    // ==============================
-    // Package root directory:
+    // Root directory:
     QString rootDirSetting =
-            settings.value("package/root_directory").toString();
+            settings.value("root_directory").toString();
     QString rootDirName;
     QDir rootDir(rootDirSetting);
     if (rootDir.isRelative()) {
@@ -384,9 +359,9 @@ int main(int argc, char **argv)
     }
     application.setProperty("root", rootDirName);
 
-    // Package data directory:
+    // Data directory:
     QString dataDirSetting =
-            settings.value("package/data_directory").toString();
+            settings.value("data_directory").toString();
     QString dataDirName;
     QDir dataDir(dataDirSetting);
     if (dataDir.isRelative()) {
@@ -402,16 +377,16 @@ int main(int argc, char **argv)
     // path must be relative to the root directory of the current package.
     // HTML file or script are equally usable as a start page:
     QString startPageSetting =
-            settings.value("package/start_page").toString();
+            settings.value("start_page").toString();
     application.setProperty("startPagePath", startPageSetting);
 
     // Fullscreen:
     QString startFullscreenSetting =
-            settings.value("package/start_fullscreen").toString();
+            settings.value("start_fullscreen").toString();
     application.setProperty("fullscreen", startFullscreenSetting);
 
     // Icon:
-    QString iconSetting = settings.value("package/icon").toString();
+    QString iconSetting = settings.value("icon").toString();
     QString iconPathName;
     if (iconSetting.length() > 0) {
         iconPathName = QDir::toNativeSeparators(
@@ -433,7 +408,7 @@ int main(int argc, char **argv)
 
     // Translation:
     QString translationSetting =
-            settings.value("package/translation").toString();
+            settings.value("translation").toString();
     QTranslator translator;
     if (translationSetting.length() > 0) {
         translator.load("peb_" + translationSetting, ":/translations");
@@ -442,7 +417,7 @@ int main(int argc, char **argv)
 
     // Warn on exit:
     QString warnOnExitSetting = settings
-            .value("package/warn_on_exit").toString();
+            .value("warn_on_exit").toString();
     application.setProperty("warnOnExit", warnOnExitSetting);
 
     // ==============================
@@ -493,7 +468,6 @@ int main(int argc, char **argv)
     }
     qDebug() << "Logging:" << loggingSetting;
     if (loggingSetting == "enable") {
-        qDebug() << "Logging mode:" << loggingModeSetting;
         qDebug() << "Logfiles directory:" << logDirFullPath;
     }
     qDebug() << "Package root folder:" << rootDirName;

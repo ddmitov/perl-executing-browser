@@ -8,8 +8,6 @@ Permanent TO-DO:
 
 v. 0.2
 ====================================
-- built-in default values for browser and package settings
-
 - security tests in separate files
 
 - start Perl debugger in script environment if script is in the current package
