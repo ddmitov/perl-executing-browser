@@ -33,31 +33,6 @@ message ("Local pseudo-domain: $$PSEUDO_DOMAIN")
 
 
 ##########################################################
-# To guard against some security issue
-# with user-supplied Perl scripts:
-# SCRIPT_CENSORING = 1
-# If this option is enabled,
-# every Perl script going to be executed by the browser
-# is scanned by a special super-script, censor.pl, and
-# if any security issues are found, the offending script
-# is blocked and error message is displayed.
-##########################################################
-# To turn off security checks of user-supplied Perl scripts:
-# SCRIPT_CENSORING = 0
-##########################################################
-SCRIPT_CENSORING = 1
-
-DEFINES += "SCRIPT_CENSORING=$$SCRIPT_CENSORING"
-
-equals (SCRIPT_CENSORING, 0) {
-    message ("Going to build without script censoring support.")
-}
-equals (SCRIPT_CENSORING, 1) {
-    message ("Going to build with script censoring support.")
-}
-
-
-##########################################################
 # Interaction with the Perl debugger -
 # not available on Windows:
 ##########################################################

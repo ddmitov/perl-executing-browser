@@ -10,13 +10,11 @@ v. 0.2
 ====================================
 - built-in default values for browser and package settings
 
-- better documentation for censor.pl
 - security tests in separate files
 
 - start Perl debugger in script environment if script is in the current package
     and if script is outside the current package
     ask for command line arguments and start in system environment
-- dbgformatter.pl fatpacked together with Syntax::Highlight::Engine::Kate
 
 - translation for error.htm
 - user-supplied JS prompt when check-user-input-before-quit finds user input

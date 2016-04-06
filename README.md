@@ -78,31 +78,29 @@ Compiled and tested successfully using:
 ## What Perl Executing Browser Is Not
 
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.  
-* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
-* PEB has no sandbox for local Perl scripts. A work-in-progress security system is implemented in the ```censor.pl``` script (see below), which is created to protect local files from malicious or poorly written Perl scripts, but currently no claims are made for it's effectiveness and stability. It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any pages.  
 * PEB is not an implementation of the CGI protocol. It uses only four environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
-* Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM.  
+* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
+* PEB has no sandbox for local Perl scripts. Basic security is implemented in the ```censor.pl``` embedded Perl script (see below). It bans scripts using potentially dangerous core functions, but can not protect every file and every user from every poorly written or malicious script! So it is recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
-* Local scripts are executed with the minimum of necessary environment variables. These are:  
-1) ```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
-2) environment variables borrowed from the CGI protocol and used for communication between HTML forms and local Perl scripts:  
-```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH```;  
-3) ```DATA_ROOT``` - custom environment variable used to locate data files from local Perl scripts.  
-* Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. By default ```censor.pl``` is compiled in the resources of the browser binary and is executed from memory whenever a local Perl script is started. ```censor.pl``` can be turned off by a compile-time variable. Just change ```SCRIPT_CENSORING = 1``` to ```SCRIPT_CENSORING = 0``` in the project file of the browser (peb.pro) before compiling the binary.  
-* Starting the browser as root on Linux is not allowed - it exits with a warning message. 
-* PEB does not download locally executed scripts from any remote locations and it does not use any Perl interpreter as helper application for online content. This is not going to be implemented due to the huge security risks involved!  
-* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
-* If user is not administrator of his/her machine and configuration file and root folder are owned by root/administrator and read-only for all others, user will be effectively prevented from executing untrusted code. Executing as root on a Linux machine:  
-```chown --recursive root peb-root-folder```  
-```chgrp --recursive root peb-root-folder```  
-```chmod --recursive 755 peb-root-folder```  
-is enough to do the job. The same commands could be applied to the folder of the binary file to prevent it's unauthorized replacing or modification. Locally executed scripts don't have to be made executable because they are always given as an argument to the interpreter, but mode 755 is necessary to avoid ```cannot read directory``` error.  
-Essentially the same protection on a Windows(TM) machine could be achieved by installing PEB from the administrator's account in a location that is read-only for all other users.  
-Note however, that a copy of PEB running from a flash drive or external harddisk and owned by an ordinary user will not have this extra protection.  
+* Security features based on C++ code:
+1) Starting the browser with administrative privileges is not allowed - it exits with a warning message.  
+2) Local scripts are executed in a clean environment with only a minimum of necessary environment variables. These are:  
+```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
+```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between HTML forms and local Perl scripts;  
+```DATA_ROOT``` - custom environment variable used to locate data files from local Perl scripts.  
+3) Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
+4) PEB does not download locally executed scripts from any remote locations.  
+5) Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (currently ```http://perl-executing-browser-pseudodomain/```).  
+* Security features based on Perl code:  
+Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
+1) :dangerous group - ```syscall```, ```dump```, ```chroot```,  
+2) :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
+3) :sys_db group - all 30 functions from this group,
+4) ```sysopen```.
 * Perl scripts, which are selected for debugging, are also executed and, in contrast with all other local scripts, there are no restrictions on which scripts could be debugged. This means that a potential security risk from a debugged Perl script does exist and if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
-* It is not a good idea to make any folders containing locally executed scripts available to web servers or file sharing applications due to the risk of executing locally malicious or unsecure code uploaded from outside. Securing configuration file and root folder as mentioned above should prevent file upload and modification, but will expose local files in read-only mode, which also has to be avoided.  
   
 ## Keyboard Shortcuts
 * Ctrl+A - select all  

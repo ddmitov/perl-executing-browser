@@ -226,8 +226,8 @@ if (defined $lineinfo) {
 	close ($file_to_highlight_filehandle);
 
 	# Syntax-highlight the necessary part of the debugged Perl code:
-	my $start_line = $line_to_underline - 15;
-	my $end_line = $line_to_underline + 15;
+	my $start_line = $line_to_underline - 10;
+	my $end_line = $line_to_underline + 10;
 	$scroll_to_line = $line_to_underline - 5;
 
 	my $line_number;

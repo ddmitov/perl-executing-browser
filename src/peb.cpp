@@ -455,12 +455,6 @@ int main(int argc, char **argv)
     qDebug() << "Executable:" << application.applicationFilePath();
     qDebug() << "Qt version:" << QT_VERSION_STR;
     qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
-    if (SCRIPT_CENSORING == 0) {
-        qDebug() << "Script censoring is disabled.";
-    }
-    if (SCRIPT_CENSORING == 1) {
-        qDebug() << "Script censoring is enabled.";
-    }
     if (PERL_DEBUGGER_INTERACTION == 0) {
         qDebug() << "Perl debugger interaction is disabled.";
     }
