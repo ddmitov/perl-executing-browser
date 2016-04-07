@@ -723,6 +723,12 @@ public slots:
             debuggerOutputHandler.setProcessEnvironment(scriptEnvironment);
 
             debuggerOutputFormatterScript
+                    .replace("PEBLIB_PATH",
+                             QApplication::applicationDirPath()
+                             + QDir::separator()
+                             + "peblib");
+
+            debuggerOutputFormatterScript
                     .replace("SCRIPT", debuggerScriptToDebug);
             debuggerOutputFormatterScript
                     .replace("DEBUGGER_COMMAND", debuggerLastCommand);

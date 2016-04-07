@@ -10,7 +10,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
     use Perl5, JavaScript, HTML5 and CSS to craft and deploy rapidly beautiful desktop applications;  
 
 * **2. Zero installation when needed:**  
-    put together your Perl5 scripts, modules and your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
+    put together your Perl5 scripts and your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl5, Qt5 and QtWebKit are available;  
@@ -23,13 +23,12 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
 
 ## Features
   
-**No feature or implementation should be considered final at this early stage of development!**
+**No feature or implementation should be considered final at this stage of development!**
   
 **Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
-* Perl modules can be loaded from a custom directory without system-wide installation using PERLLIB environment variable.  
-* Any version of Perl5 can be selected from configuration file.  
+* Any version of Perl5 can be selected inside the settings file.  
   
 **Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
@@ -88,18 +87,36 @@ Compiled and tested successfully using:
 * Security features based on C++ code:  
 1) Starting the browser with administrative privileges is not allowed - it exits with a warning message.  
 2) Local scripts are executed in a clean environment with only a minimum of necessary environment variables. These are:  
-```PERL5LIB``` - long-established Perl environment variable used to add Perl modules in non-standard locations;  
-```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between HTML forms and local Perl scripts;  
+```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between local HTML forms and local Perl scripts;  
 ```DATA_ROOT``` - custom environment variable used to locate data files from local Perl scripts.  
 3) Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
 4) PEB does not download locally executed scripts from any remote locations.  
 5) Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
 * Security features based on Perl code:  
-Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
-1) :dangerous group - ```syscall```, ```dump```, ```chroot```,  
-2) :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
-3) :sys_db group - all 30 functions from this group,  
-4) ```sysopen```.  
+1) Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
+1.1) :dangerous group - ```syscall```, ```dump```, ```chroot```,  
+1.2) :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
+1.3) :sys_db group - all 30 functions from this group,  
+1.4) ```sysopen```.  
+2) Some important core functions for directory traversal and file manipulation are overriden. These are:
+2.1) ```opendir```,  
+2.2) ```chdir```,  
+2.3) ```open```.  
+Only files and directories inside the ```DATA_ROOT```folder can be opened and read, every attempt to traverse other directories and open other files, will throw an error and the script will be aborted.  
+3) Default module loading using ```require``` and ```use``` is also overriden.  
+3.1) ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
+3.2) The following Windows registry manipulation modules are also banned:  
+3.2.1) ```Win32::Registry```,  
+3.2.2) ```Win32API::Registry```,  
+3.2.3) ```Win32::TieRegistry```,  
+3.2.4) ```Win32::Registry::File```,  
+3.2.5) ```Tree::Navigator::Node::Win32::Registry```,  
+3.2.6) ```Parse::Win32Registry```  
+and probably others containing the keywords 'Win32' and 'Registry'.  
+4) In order for the overriden core functions to act like a security barrier for unsafe operations, a statical code analysis is performed before the execution of every script.  
+4.1) Even a single occurence of a call to one of the original, not-overriden function like ```CORE::opendir```, ```CORE::chdir```, ```CORE::open``` or ```CORE::require``` will prevent the script from being executed.  
+4.2) Direct adding of directories to the ```@INC``` array is also prohibited an leads to aborting the script execution - see bellow.  
+However, statical code analysis is not performed on modules to avoid performance degradation. So to balance performance, security and usability  ```use lib``` and ```PERLLIB``` environment variables are not allowed and not used, as well as manual adding of directories to the ```@INC``` array from user code. You should either use the core modules of your Perl distribution or install your modules in a perlbrew Perl or a portable version of Strawberry Perl on Windows.  
 * Every Perl script can be selected for debugging and debugging means execution, which is a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
   
 ## Keyboard Shortcuts

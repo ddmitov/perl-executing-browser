@@ -1,5 +1,9 @@
 #!/usr/bin/perl -w
 
+BEGIN {
+	push @INC, 'PEBLIB_PATH';
+}
+
 use strict;
 use warnings;
 use Term::ANSIColor;

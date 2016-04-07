@@ -298,21 +298,6 @@ int main(int argc, char **argv)
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 
-    // PERLLIB environment variable:
-    QString perlLibSetting =
-            settings.value("perllib").toString();
-    QString perlLib;
-    if (perlLibSetting.length() > 0) {
-        QDir perlLibDir(QDir::toNativeSeparators(perlLibSetting));
-        if (perlLibDir.isRelative()) {
-            perlLib = settingsDirName + perlLibSetting;
-        }
-        if (perlLibDir.isAbsolute()) {
-            perlLib = perlLibSetting;
-        }
-        application.setProperty("perlLib", perlLib);
-    }
-
     // Logging enable/disable switch:
     QString loggingSetting =
             settings.value("logging").toString();
@@ -463,9 +448,6 @@ int main(int argc, char **argv)
     qDebug() << "";
     qDebug() << "Settings file:" << settingsFileName;
     qDebug() << "Perl interpreter" << perlInterpreter;
-    if (perlLibSetting.length() > 0) {
-        qDebug() << "PERLLIB folder:" << perlLib;
-    }
     qDebug() << "Logging:" << loggingSetting;
     if (loggingSetting == "enable") {
         qDebug() << "Logfiles directory:" << logDirFullPath;
@@ -540,12 +522,6 @@ QScriptEnvironment::QScriptEnvironment()
 {
     // DATA_ROOT:
     scriptEnvironment.insert("DATA_ROOT", qApp->property("data").toString());
-
-    // PERLLIB:
-    if (qApp->property("perlLib").toString().length() > 0) {
-        scriptEnvironment
-                .insert("PERLLIB", qApp->property("perlLib").toString());
-    }
 }
 
 // ==============================
