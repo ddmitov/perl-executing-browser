@@ -95,29 +95,29 @@ Compiled and tested successfully using:
   5. Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
 * Security features based on Perl code:  
   1. Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
-    1.1. :dangerous group - ```syscall```, ```dump```, ```chroot```,  
-    1.2. :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
-    1.3. :sys_db group - all 30 functions from this group,  
-    1.4. ```sysopen```.  
+    1. :dangerous group - ```syscall```, ```dump```, ```chroot```,  
+    2. :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
+    3. :sys_db group - all 30 functions from this group,  
+    4. ```sysopen```.  
   2. Some important core functions for directory traversal and file manipulation are overriden. These are:  
-    2.1. ```opendir```,  
-    2.2. ```chdir```,  
-    2.3. ```open```,  
-    2.4. ```unlink```.  
+    1. ```opendir```,  
+    2. ```chdir```,  
+    3. ```open```,  
+    4. ```unlink```.  
   Only files and directories inside the ```DATA_ROOT```folder can be opened, read or deleted, every attempt to manipulate other directories and files will throw an error and the script will be aborted.  
   3. Default module loading using ```require``` and ```use``` is also overriden.  
-    3.1. ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
-    3.2. The following Windows registry manipulation modules are also banned:  
-      3.2.1. ```Win32::Registry```,  
-      3.2.2. ```Win32API::Registry```,  
-      3.2.3. ```Win32::TieRegistry```,  
-      3.2.4. ```Win32::Registry::File```,  
-      3.2.5. ```Tree::Navigator::Node::Win32::Registry```,  
-      3.2.6. ```Parse::Win32Registry```  
+    1. ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
+    2. The following Windows registry manipulation modules are also banned:  
+      1. ```Win32::Registry```,  
+      2. ```Win32API::Registry```,  
+      3. ```Win32::TieRegistry```,  
+      4. ```Win32::Registry::File```,  
+      5. ```Tree::Navigator::Node::Win32::Registry```,  
+      6. ```Parse::Win32Registry```  
       and probably others containing the keywords 'Win32' and 'Registry'.  
   4. In order for the overriden core functions to act like a security barrier for unsafe operations, a statical code analysis is performed before the execution of a script.  
-    4.1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
-    4.2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is also detected and results in aborting the script execution.  
+    1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
+    2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is also detected and results in aborting the script execution.  
     However, statical code analysis is not performed on modules to avoid performance degradation. It is considered, that core modules are safe, CPAN modules can not be installed without user intervention and without the ```use lib``` statement, the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block, there is no practical way to execute an unsafe code without user's permission.  
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
   
