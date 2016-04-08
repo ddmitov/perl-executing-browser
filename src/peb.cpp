@@ -56,6 +56,7 @@ BOOL IsUserAdmin(void)
 // MESSAGE HANDLER FOR REDIRECTING
 // ALL DEBUG MESSAGES TO A LOG FILE:
 // ==============================
+// Implementation of an idea proposed by Valcho Nedelchev.
 void customMessageHandler(QtMsgType type,
                           const QMessageLogContext &context,
                           const QString &message)

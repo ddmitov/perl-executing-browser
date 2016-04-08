@@ -45,7 +45,7 @@ BEGIN {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[0];
 		if ($dir =~ $DATA_ROOT) {
-			CORE::chdir $_[0];
+			return CORE::chdir $_[0];
 		} else {
 			die "Intercepted insecure 'chdir' call from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
 		}
@@ -94,6 +94,16 @@ BEGIN {
 			}
 		}
 	};
+
+	*CORE::GLOBAL::unlink = sub (*;$@) {
+		(my $package, my $filename, my $line) = caller();
+		my $entry = $_[0];
+		if ($entry =~ $DATA_ROOT) {
+			return CORE::unlink $_[0];
+		} else {
+			die "Intercepted insecure 'unlink' call from package '$package', line: $line.<br>Deleting '$entry' is not allowed!\n";
+		}
+	};
 }
 
 ##############################
@@ -122,17 +132,17 @@ foreach my $line (@user_code) {
 	$line_number++;
 
 	if ($line =~ m/CORE::/) {
-		if ($line =~ m/#.*CORE::(opendir|chdir|open|require)/) {
+		if ($line =~ m/#.*CORE::/) {
 			next;
 		} else {
 			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden invocation of core function detected!";
 		}
 	}
 
-	if ($line =~ m/unshift\s*\@INC/ or $line =~ m/push\s*\(\s*\@INC/ or $line =~ m/push\s*\@INC/) {
-		if ($line =~ m/#.*unshift\s*\@INC/ or $line =~ m/#.*push\s*\(\s*\@INC/ or $line =~ m/#.*push\s*\@INC/) {
+	if ($line =~ m/\@INC/) {
+		if ($line =~ m/#.*unshift/ or $line =~ m/#.*push/) {
 			next;
-		} else {
+		} elsif ($line =~ m/unshift/ or $line =~ m/push/) {
 			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden \@INC array manipulation detected!";
 		}
 	}

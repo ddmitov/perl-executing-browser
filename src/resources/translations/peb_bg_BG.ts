@@ -4,34 +4,34 @@
 <context>
     <name>QApplication</name>
     <message>
-        <location filename="../../peb.cpp" line="185"/>
+        <location filename="../../peb.cpp" line="186"/>
         <source>Started as root</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="186"/>
+        <location filename="../../peb.cpp" line="187"/>
         <source>Browser was started as root.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="190"/>
-        <location filename="../../peb.cpp" line="219"/>
+        <location filename="../../peb.cpp" line="191"/>
+        <location filename="../../peb.cpp" line="220"/>
         <source>Going to quit now.</source>
         <translation>Ще последва изключване на програмата.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="211"/>
+        <location filename="../../peb.cpp" line="212"/>
         <source>Started by administrator</source>
         <translation>Стартиране с административни права</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="214"/>
+        <location filename="../../peb.cpp" line="215"/>
         <source>Browser was started with administrative privileges.</source>
         <translation>Браузърът е стартиран с административни права.</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="188"/>
-        <location filename="../../peb.cpp" line="217"/>
+        <location filename="../../peb.cpp" line="189"/>
+        <location filename="../../peb.cpp" line="218"/>
         <source>This is not a good idea!</source>
         <translation>Това не е добра идея!</translation>
     </message>
@@ -39,22 +39,22 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="856"/>
+        <location filename="../../peb.cpp" line="857"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="852"/>
+        <location filename="../../peb.cpp" line="853"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="854"/>
+        <location filename="../../peb.cpp" line="855"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="855"/>
+        <location filename="../../peb.cpp" line="856"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>

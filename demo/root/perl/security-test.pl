@@ -8,7 +8,9 @@
 #~ use Parse::Win32Registry;
 #~ use lib "/tmp/test";
 
-my $test = `uname -r`;
+#~ my $test = `uname -r`;
+
+#~ unlink "/tmp/test";
 
 #~ opendir (my $directory_handle, "/tmp/test") or die $!;
 #~ chdir "/tmp/test/";
@@ -20,17 +22,8 @@ my $test = `uname -r`;
 #~ CORE::chdir "/tmp/test/";
 #~ CORE::open my $filehandle, "<", "/tmp/test/foo.txt";
 
-#~ BEGIN {
-	#~ unshift @INC,
-		#~ qw(/tmp/test1
-			#~ /tmp/test2
-		#~ );
-#~ }
+#~ BEGIN {unshift @INC, qw(/tmp/test);}
 
-#~ BEGIN {
-	#~ push @INC, '/tmp/test';
-#~ }
+#~ BEGIN {push @INC, '/tmp/test';}
 
-#~ BEGIN {
-	#~ push (@INC, "/tmp/test");
-#~ }
+BEGIN {push (@INC, "/tmp/test");}
