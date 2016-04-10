@@ -397,7 +397,13 @@ int main(int argc, char **argv)
             settings.value("translation").toString();
     QTranslator translator;
     if (translationSetting.length() > 0) {
-        translator.load("peb_" + translationSetting, ":/translations");
+        // Check for a valid translation.
+        // Future valid translations have to be added here.
+        if (translationSetting == "bg_BG") {
+            translator.load("peb_" + translationSetting, ":/translations");
+        } else {
+            translationSetting = "";
+        }
     }
     application.installTranslator(&translator);
 
@@ -432,7 +438,14 @@ int main(int argc, char **argv)
     if (settingsFile.exists() and startPageFile.exists()) {
         window.qLoadStartPageSlot();
     } else {
-        window.setUrl(QUrl("qrc:/html/error.htm"));
+        if (translationSetting.length() > 0) {
+            window.setUrl(QUrl("qrc:/html/error_"
+                               + translationSetting
+                               +".htm"));
+        } else {
+            window.setUrl(QUrl("qrc:/html/error.htm"));
+            qDebug()  <<"Settings file is missing or start page is not found.";
+        }
     }
 
     window.setWindowIcon(icon);
