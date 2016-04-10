@@ -801,7 +801,7 @@ public:
     QString scriptFullFilePath;
     QProcess scriptHandler;
     QStringList runningScriptsInCurrentWindowList;
-    QString checkUserInputBeforeQuitJavaScript;
+    QString checkUserInputBeforeCloseJavaScript;
 
 protected:
     bool acceptNavigationRequest(QWebFrame *frame,
@@ -1048,51 +1048,36 @@ public slots:
             if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
                 mainPage->scriptHandler.close();
                 event->accept();
-                windowClosingStarted = true;
             } else {
                 event->ignore();
             }
         } else {
-            if (qApp->property("warnOnExit").toString() == "enable") {
+            mainPage->currentFrame()->evaluateJavaScript(
+                        mainPage->checkUserInputBeforeCloseJavaScript);
+            QVariant jsResult =
+                    mainPage->currentFrame()->evaluateJavaScript(
+                        "checkUserInputBeforeClose()");
+            QString textIsEntered = jsResult.toString();
 
-                mainPage->currentFrame()->evaluateJavaScript(
-                            mainPage->checkUserInputBeforeQuitJavaScript);
-                QVariant jsQuitDecision =
+            if (textIsEntered == "no") {
+                event->accept();
+            }
+
+            if (textIsEntered == "yes") {
+                QVariant jsResult =
                         mainPage->currentFrame()->evaluateJavaScript(
-                            "checkUserInputBeforeQuit()");
-                QString textIsEntered = jsQuitDecision.toString();
+                            "pebCloseConfirmation()");
+                QString jsQuitDecision = jsResult.toString();
 
-                if (textIsEntered == "no") {
+                if (jsQuitDecision.length() == 0) {
                     event->accept();
-                    windowClosingStarted = true;
                 }
-                if (textIsEntered == "yes") {
-                    QMessageBox confirmExitMessageBox (qApp->activeWindow());
-                    confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-                    confirmExitMessageBox.setWindowTitle(tr("Close window"));
-                    confirmExitMessageBox
-                            .setIconPixmap((qApp->property("icon").toString()));
-                    confirmExitMessageBox
-                            .setText(
-                                tr("Text was entered on this page and "
-                                   "it is going to be lost!")
-                                + "<br>"
-                                + tr("This information can not be recovered!")
-                                + "<br>"
-                                + tr("Are you sure you want to "
-                                     "close the window?"));
-                    confirmExitMessageBox
-                            .setStandardButtons(
-                                QMessageBox::Yes | QMessageBox::No);
-                    confirmExitMessageBox
-                            .setButtonText(QMessageBox::Yes, tr("Yes"));
-                    confirmExitMessageBox
-                            .setButtonText(QMessageBox::No, tr("No"));
-                    confirmExitMessageBox.setDefaultButton(QMessageBox::No);
-                    if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
+
+                if (jsQuitDecision.length() > 0) {
+                    if (jsQuitDecision == "yes") {
                         event->accept();
-                        windowClosingStarted = true;
-                    } else {
+                    }
+                    if (jsQuitDecision == "no") {
                         event->ignore();
                     }
                 }
@@ -1140,7 +1125,6 @@ private:
     QWebView *errorsWindow;
 
     QPixmap icon;
-    bool windowClosingStarted;
 };
 
 #endif // PEB_H

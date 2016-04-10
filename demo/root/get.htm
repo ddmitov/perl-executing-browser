@@ -13,6 +13,21 @@
 		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
 		<link rel="stylesheet" type="text/css" href="bootstrap/themes/darkly-theme.css" media="all"/>
 
+		<script type="text/javascript">
+			// Exit confirmation:
+			function pebCloseConfirmation() {
+				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +
+										"Are you sure you want to close the window?");
+				var result;
+				if (confirmation == true) {
+					result = "yes";
+				} else {
+					result = "no";
+				}
+				return result;
+			}
+		</script>
+
 	</head>
 
 	<body>

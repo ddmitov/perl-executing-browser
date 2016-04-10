@@ -1,5 +1,5 @@
 
-function checkUserInputBeforeQuit() {
+function checkUserInputBeforeClose() {
 	var textEntered = "";
 
 	var textFields = new Array();

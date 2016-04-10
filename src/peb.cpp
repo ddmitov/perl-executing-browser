@@ -401,11 +401,6 @@ int main(int argc, char **argv)
     }
     application.installTranslator(&translator);
 
-    // Warn on exit:
-    QString warnOnExitSetting = settings
-            .value("warn_on_exit").toString();
-    application.setProperty("warnOnExit", warnOnExitSetting);
-
     // ==============================
     // LOG BASIC PROGRAM INFORMATION:
     // ==============================
@@ -464,8 +459,6 @@ int main(int argc, char **argv)
     if (translationSetting.length() > 0) {
         qDebug() << "Translation:" << translationSetting;
     }
-    qDebug() << "Warn on exit:" << warnOnExitSetting;
-    qDebug() << "";
 
     return application.exec();
 }
@@ -684,9 +677,9 @@ QPage::QPage()
 
     // READ INTERNALLY COMPILED JS SCRIPT:
     QFile file;
-    file.setFileName(":/scripts/js/check-user-input-before-quit.js");
+    file.setFileName(":/scripts/js/check-user-input-before-close.js");
     file.open(QIODevice::ReadOnly);
-    checkUserInputBeforeQuitJavaScript = file.readAll();
+    checkUserInputBeforeCloseJavaScript = file.readAll();
     file.close();
 }
 
@@ -766,8 +759,6 @@ QWebViewWindow::QWebViewWindow()
 
     // Icon for windows:
     icon.load(qApp->property("iconPathName").toString());
-
-    windowClosingStarted = false;
 }
 
 // ==============================

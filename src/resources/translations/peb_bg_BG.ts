@@ -39,22 +39,22 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="857"/>
+        <location filename="../../peb.cpp" line="848"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="853"/>
+        <location filename="../../peb.cpp" line="844"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="855"/>
+        <location filename="../../peb.cpp" line="846"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="856"/>
+        <location filename="../../peb.cpp" line="847"/>
         <source>Perl modules (*.pm);;</source>
         <translation>Perl модули (*.pm);;</translation>
     </message>
@@ -126,7 +126,6 @@
     </message>
     <message>
         <location filename="../../peb.h" line="1033"/>
-        <location filename="../../peb.h" line="1072"/>
         <source>Close window</source>
         <translation>Затваряне на прозорец</translation>
     </message>
@@ -147,30 +146,13 @@
     </message>
     <message>
         <location filename="../../peb.h" line="1045"/>
-        <location filename="../../peb.h" line="1088"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location filename="../../peb.h" line="1046"/>
-        <location filename="../../peb.h" line="1090"/>
         <source>No</source>
         <translation>Не</translation>
-    </message>
-    <message>
-        <location filename="../../peb.h" line="1077"/>
-        <source>Text was entered on this page and it is going to be lost!</source>
-        <translation>На тази страница е попълнен текст и той ще бъде загубен!</translation>
-    </message>
-    <message>
-        <location filename="../../peb.h" line="1080"/>
-        <source>This information can not be recovered!</source>
-        <translation>Въведената информация не може да бъде възстановена!</translation>
-    </message>
-    <message>
-        <location filename="../../peb.h" line="1082"/>
-        <source>Are you sure you want to close the window?</source>
-        <translation>Сигурни ли сте, че искате да изключите програмата?</translation>
     </message>
 </context>
 </TS>

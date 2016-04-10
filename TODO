@@ -15,7 +15,6 @@ v. 0.2
     ask for command line arguments and start in system environment
 
 - translation for error.htm
-- user-supplied JS prompt when check-user-input-before-quit finds user input
 
 v. 0.3
 ====================================
