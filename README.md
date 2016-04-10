@@ -10,13 +10,13 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
     use Perl5, JavaScript, HTML5 and CSS to create beautiful desktop data-driven applications;  
 
 * **2. Zero installation when needed:**  
-    put together your Perl5 scripts and your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
+    run your applications from any folder;  
 
 * **3. Cross-platform availability:**  
     use it on every platform, where Perl5, Qt5 and QtWebKit are available;  
 
 * **4. Secure user-space solution:**  
-    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered and no need for administrative privileges to run the program;  
+    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered;  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
     use as much as possible from existing web technologies, standards and their documentation.  
