@@ -67,6 +67,11 @@ void customMessageHandler(QtMsgType type,
     QString text = QString("[%1] ").arg(dateAndTime);
 
     switch (type) {
+#if QT_VERSION >= 0x050500
+    case QtInfoMsg:
+        text += QString("{Info} %1").arg(message);
+        break;
+#endif
     case QtDebugMsg:
         text += QString("{Log} %1").arg(message);
         break;

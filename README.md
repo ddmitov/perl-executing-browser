@@ -58,6 +58,7 @@ Compiled and tested successfully using:
 (main development and testing platform - Valcho Nedelchev).  
 * Qt Creator 3.1.1 and Qt 5.3.0 on 64-bit Lubuntu 14.10 Linux,
 * Qt Creator 3.1.1 and Qt 5.4.1 on 64-bit Lubuntu 15.04 Linux  
+* Qt Creator 3.5.1 and Qt 5.5.1 on 64-bit Lubuntu 15.04 Linux  
 (main development and testing platform - Dimitar D. Mitov).  
   
 ## Runtime Requirements
