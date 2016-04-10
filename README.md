@@ -2,12 +2,12 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framework for local CGI-like or AJAX Perl5 scripts executed without a web server as desktop applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framework for local CGI-like or AJAX Perl5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
-* **1. Fast and easy graphical framework for desktop scripts:**  
-    use Perl5, JavaScript, HTML5 and CSS to craft and deploy rapidly beautiful desktop applications;  
+* **1. Fast and easy graphical framework for Perl5 desktop applications:**  
+    use Perl5, JavaScript, HTML5 and CSS to create beautiful desktop data-driven applications;  
 
 * **2. Zero installation when needed:**  
     put together your Perl5 scripts and your version of Perl5 with a copy of PEB and its Qt5 libraries and run your applications from any folder;  
@@ -19,7 +19,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered and no need for administrative privileges to run the program;  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
-    use as much as possible from existing web technologies, standards and their documentation to build desktop applications.  
+    use as much as possible from existing web technologies, standards and their documentation.  
 
 ## Features
   
@@ -35,11 +35,11 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
   
 **Configurability:**
 * All settings are stored in a single INI file.  
-* Browser root folder can be any folder.  
+* Start from any folder.  
 * All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to your HTML interface.  
-* Single-page or multiple-pages application with an option to start in fullscreen mode.  
+* Usefull for both single-page or multiple-page applications with an option to start in fullscreen mode.  
   
 **Development goodies:**  
 * PEB can interact with the built-in Perl5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
@@ -67,7 +67,7 @@ Compiled and tested successfully using:
   
 ## Target Audience
   
-* Perl and JavaScript enthusiasts willing to create rapidly data-driven desktop applications with HTML4/5 & CSS2/3 GUI.  
+* Perl and JavaScript enthusiasts creating custom data-driven desktop applications.  
 * Perl developers willing to use the built-in Perl debugger in graphical mode.  
   
 ## Applications using Perl Executing Browser
@@ -119,7 +119,8 @@ Compiled and tested successfully using:
 * In order for the overriden core functions to act like a security barrier for unsafe operations, a statical code analysis is performed before the execution of a script.  
     1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
     2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is also detected and results in aborting the script execution.  
-    However, statical code analysis is not performed on modules to avoid performance degradation. It is considered that core modules are safe, CPAN modules can not be installed without user intervention and without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block, there is no practical way to execute an unsafe code without user's permission.  
+    However, statical code analysis is not performed on modules to avoid performance degradation.  
+    It is considered that core modules are safe and CPAN modules can not be installed without user intervention. There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
   
 **Perl Debugger Interaction:**
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
