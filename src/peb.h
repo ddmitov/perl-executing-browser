@@ -236,61 +236,55 @@ protected:
                 QString scriptResultString;
                 QString scriptErrorString;
 
-                if (!scriptHandler.isOpen()) {
-                    // 'censor.pl' is compiled into the resources of
-                    // the binary file and called from there.
-                    QString censorScriptFileName(
-                                ":/scripts/perl/censor.pl");
-                    QFile censorScriptFile(censorScriptFileName);
-                    censorScriptFile.open(QIODevice::ReadOnly
-                                          | QIODevice::Text);
-                    QTextStream stream(&censorScriptFile);
-                    QString censorScriptContents = stream.readAll();
-                    censorScriptFile.close();
+                // 'censor.pl' is compiled into the resources of
+                // the binary file and called from there.
+                QString censorScriptFileName(
+                            ":/scripts/perl/censor.pl");
+                QFile censorScriptFile(censorScriptFileName);
+                censorScriptFile.open(QIODevice::ReadOnly
+                                      | QIODevice::Text);
+                QTextStream stream(&censorScriptFile);
+                QString censorScriptContents = stream.readAll();
+                censorScriptFile.close();
 
-                    scriptHandler
-                            .start((qApp->property("perlInterpreter")
-                                    .toString()),
-                                   QStringList()
-                                   << "-e"
-                                   << censorScriptContents
-                                   << "--"
-                                   << QDir::toNativeSeparators(
-                                       scriptFullFilePath),
-                                   QProcess::Unbuffered
-                                   | QProcess::ReadWrite);
+                scriptHandler.start((qApp->property("perlInterpreter")
+                                     .toString()),
+                                    QStringList()
+                                    << "-e"
+                                    << censorScriptContents
+                                    << "--"
+                                    << QDir::toNativeSeparators(
+                                        scriptFullFilePath),
+                                    QProcess::Unbuffered
+                                    | QProcess::ReadWrite);
 
-                    if (postData.length() > 0) {
-                        scriptHandler.write(postDataArray);
-                    }
+                if (postData.length() > 0) {
+                    scriptHandler.write(postDataArray);
+                }
 
-                    scriptHandlerWaitingLoop.exec();
+                scriptHandlerWaitingLoop.exec();
 
-                    QByteArray scriptResultArray =
-                            scriptHandler.readAllStandardOutput();
-                    scriptResultString =
-                            QString::fromLatin1(scriptResultArray);
+                QByteArray scriptResultArray =
+                        scriptHandler.readAllStandardOutput();
+                scriptResultString =
+                        QString::fromLatin1(scriptResultArray);
 
-                    QByteArray scriptErrorArray =
-                            scriptHandler.readAllStandardError();
-                    scriptErrorString =
-                            QString::fromLatin1(scriptErrorArray);
+                QByteArray scriptErrorArray =
+                        scriptHandler.readAllStandardError();
+                scriptErrorString =
+                        QString::fromLatin1(scriptErrorArray);
 
-                    if (scriptResultString.length() == 0 and
-                            scriptErrorString == 0) {
-                        qDebug() << "AJAX script timed out or gave no output:"
-                                 << scriptFullFilePath;
-                    } else {
-                        qDebug() << "AJAX script finished:"
-                                 << scriptFullFilePath;
-                    }
-
-                    if (scriptErrorString.length() > 0) {
-                        qDebug() << "AJAX script gave errors:"
-                                 << scriptFullFilePath;
-                    }
+                if (scriptResultString.length() == 0 and
+                        scriptErrorString == 0) {
+                    qDebug() << "AJAX script timed out or gave no output:"
+                             << scriptFullFilePath;
                 } else {
-                    qDebug() << "AJAX script already started:"
+                    qDebug() << "AJAX script finished:"
+                             << scriptFullFilePath;
+                }
+
+                if (scriptErrorString.length() > 0) {
+                    qDebug() << "AJAX script gave errors:"
                              << scriptFullFilePath;
                 }
 
@@ -442,6 +436,12 @@ public slots:
                 ((qApp->property("root").toString())
                  + url.path());
 
+        if (scriptHandler.isOpen()) {
+            scriptHandler.close();
+            qDebug() << "Script is going to be restarted:"
+                     << scriptFullFilePath;
+        }
+
         QString queryString = url.query();
         QString postData(postDataArray);
 
@@ -463,38 +463,33 @@ public slots:
         scriptHandler.setProcessEnvironment(scriptEnvironment);
         scriptHandler.setWorkingDirectory("");
 
-        if (!scriptHandler.isOpen()) {
-            // 'censor.pl' is compiled into the resources of
-            // the binary file and called from there.
-            QString censorScriptFileName(
-                        ":/scripts/perl/censor.pl");
-            QFile censorScriptFile(censorScriptFileName);
-            censorScriptFile.open(QIODevice::ReadOnly
-                                  | QIODevice::Text);
-            QTextStream censorStream(&censorScriptFile);
-            QString censorScriptContents = censorStream.readAll();
-            censorScriptFile.close();
+        // 'censor.pl' is compiled into the resources of
+        // the binary file and called from there.
+        QString censorScriptFileName(
+                    ":/scripts/perl/censor.pl");
+        QFile censorScriptFile(censorScriptFileName);
+        censorScriptFile.open(QIODevice::ReadOnly
+                              | QIODevice::Text);
+        QTextStream censorStream(&censorScriptFile);
+        QString censorScriptContents = censorStream.readAll();
+        censorScriptFile.close();
 
-            scriptHandler
-                    .start((qApp->property("perlInterpreter")
-                            .toString()),
-                           QStringList()
-                           << "-e"
-                           << censorScriptContents
-                           << "--"
-                           << QDir::toNativeSeparators(
-                               scriptFullFilePath),
-                           QProcess::Unbuffered
-                           | QProcess::ReadWrite);
+        scriptHandler.start((qApp->property("perlInterpreter")
+                             .toString()),
+                            QStringList()
+                            << "-e"
+                            << censorScriptContents
+                            << "--"
+                            << QDir::toNativeSeparators(
+                                scriptFullFilePath),
+                            QProcess::Unbuffered
+                            | QProcess::ReadWrite);
 
-            runningScriptsInCurrentWindowList
-                    .append(scriptFullFilePath);
+        runningScriptsInCurrentWindowList
+                .append(scriptFullFilePath);
 
-            if (postData.length() > 0) {
-                scriptHandler.write(postDataArray);
-            }
-        } else {
-            qDebug() << "Script already started:" << scriptFullFilePath;
+        if (postData.length() > 0) {
+            scriptHandler.write(postDataArray);
         }
 
         QWebSettings::clearMemoryCaches();
@@ -1012,59 +1007,33 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (mainPage->scriptHandler.isOpen()) {
-            QMessageBox confirmExitMessageBox (qApp->activeWindow());
-            confirmExitMessageBox.setWindowModality(Qt::WindowModal);
-            confirmExitMessageBox.setWindowTitle(tr("Close window"));
-            confirmExitMessageBox
-                    .setIconPixmap((qApp->property("icon").toString()));
-            confirmExitMessageBox
-                    .setText(
-                        tr("You are going to close this window,")
-                        + "<br>"
-                        + tr("but a script is still running.")
-                        + "<br>"
-                        + tr("Are you sure?"));
-            confirmExitMessageBox
-                    .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-            confirmExitMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
-            confirmExitMessageBox.setButtonText(QMessageBox::No, tr("No"));
-            confirmExitMessageBox.setDefaultButton(QMessageBox::No);
-            if (confirmExitMessageBox.exec() == QMessageBox::Yes) {
-                mainPage->scriptHandler.close();
-                event->accept();
-            } else {
-                event->ignore();
-            }
-        } else {
-            mainPage->currentFrame()->evaluateJavaScript(
-                        mainPage->checkUserInputBeforeCloseJavaScript);
+        mainPage->currentFrame()->evaluateJavaScript(
+                    mainPage->checkUserInputBeforeCloseJavaScript);
+        QVariant jsResult =
+                mainPage->currentFrame()->evaluateJavaScript(
+                    "checkUserInputBeforeClose()");
+        QString textIsEntered = jsResult.toString();
+
+        if (textIsEntered == "no") {
+            event->accept();
+        }
+
+        if (textIsEntered == "yes") {
             QVariant jsResult =
                     mainPage->currentFrame()->evaluateJavaScript(
-                        "checkUserInputBeforeClose()");
-            QString textIsEntered = jsResult.toString();
+                        "pebCloseConfirmation()");
+            QString jsQuitDecision = jsResult.toString();
 
-            if (textIsEntered == "no") {
+            if (jsQuitDecision.length() == 0) {
                 event->accept();
             }
 
-            if (textIsEntered == "yes") {
-                QVariant jsResult =
-                        mainPage->currentFrame()->evaluateJavaScript(
-                            "pebCloseConfirmation()");
-                QString jsQuitDecision = jsResult.toString();
-
-                if (jsQuitDecision.length() == 0) {
+            if (jsQuitDecision.length() > 0) {
+                if (jsQuitDecision == "yes") {
                     event->accept();
                 }
-
-                if (jsQuitDecision.length() > 0) {
-                    if (jsQuitDecision == "yes") {
-                        event->accept();
-                    }
-                    if (jsQuitDecision == "no") {
-                        event->ignore();
-                    }
+                if (jsQuitDecision == "no") {
+                    event->ignore();
                 }
             }
         }

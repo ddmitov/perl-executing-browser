@@ -448,9 +448,9 @@ int main(int argc, char **argv)
     if (loggingSetting == "enable") {
         qDebug() << "Logfiles directory:" << logDirFullPath;
     }
-    qDebug() << "Package root folder:" << rootDirName;
-    qDebug() << "Package data folder:" << dataDirName;
-    qDebug() << "Package start page:"
+    qDebug() << "Root folder:" << rootDirName;
+    qDebug() << "Data folder:" << dataDirName;
+    qDebug() << "Start page:"
              << rootDirName + QDir::separator() + startPageSetting;
     qDebug() << "Start fullscreen:" << startFullscreenSetting;
     if (iconPathName.length() > 0) {
@@ -459,6 +459,7 @@ int main(int argc, char **argv)
     if (translationSetting.length() > 0) {
         qDebug() << "Translation:" << translationSetting;
     }
+    qDebug() << "";
 
     return application.exec();
 }

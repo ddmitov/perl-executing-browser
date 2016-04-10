@@ -10,13 +10,8 @@ v. 0.2
 ====================================
 - security tests in separate files
 
-- start Perl debugger in script environment if script is in the current package
+- start Perl debugger in script environment if script is in the current root
     and if script is outside the current package
     ask for command line arguments and start in system environment
 
 - translation for error.htm
-
-v. 0.3
-====================================
-- internal JavaScript-based code editor - ACE;
-    code editor will edit settings files too
