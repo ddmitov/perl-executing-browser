@@ -25,12 +25,14 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
   
 **No feature or implementation should be considered final at this stage of development!**
   
-**Local Scripting:**
+**Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
 * Any version of Perl5 can be selected inside the settings file.  
-**Web Access:**
+  
+**Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
+  
 **Configurability:**
 * All settings are stored in a single INI file.  
 * Browser root folder can be any folder.  
@@ -91,6 +93,7 @@ Compiled and tested successfully using:
 * Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
 * PEB does not download locally executed scripts from any remote locations.  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
+  
 **Security features based on Perl code:**
 * Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
   1. :dangerous group - ```syscall```, ```dump```, ```chroot```,  
@@ -117,6 +120,7 @@ Compiled and tested successfully using:
     1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
     2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is also detected and results in aborting the script execution.  
     However, statical code analysis is not performed on modules to avoid performance degradation. It is considered that core modules are safe, CPAN modules can not be installed without user intervention and without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block, there is no practical way to execute an unsafe code without user's permission.  
+  
 **Perl Debugger Interaction:**
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
   
