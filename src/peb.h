@@ -495,21 +495,6 @@ public slots:
             }
         } else {
             qDebug() << "Script already started:" << scriptFullFilePath;
-
-            QMessageBox scriptStartedMessageBox (qApp->activeWindow());
-            scriptStartedMessageBox
-                    .setWindowModality(Qt::WindowModal);
-            scriptStartedMessageBox
-                    .setWindowTitle(tr("Script Already Started"));
-            scriptStartedMessageBox
-                    .setIconPixmap((qApp->property("icon").toString()));
-            scriptStartedMessageBox
-                    .setText(tr("This script is already started "
-                                "and still running:")
-                             + "<br>"
-                             + scriptFullFilePath);
-            scriptStartedMessageBox.setDefaultButton(QMessageBox::Ok);
-            scriptStartedMessageBox.exec();
         }
 
         QWebSettings::clearMemoryCaches();

@@ -844,7 +844,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                          tr("Select Perl File"),
                          QDir::currentPath(),
                          tr("Perl scripts (*.pl);;")
-                         + tr("Perl modules (*.pm);;")
                          + tr("All files (*)"));
                 selectScriptToDebugDialog.close();
                 selectScriptToDebugDialog.deleteLater();
