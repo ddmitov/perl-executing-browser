@@ -80,11 +80,11 @@ Compiled and tested successfully using:
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any pages.  
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
-* PEB has no sandbox for local Perl scripts. Basic security is implemented in the ```censor.pl``` embedded Perl script (see below). It bans scripts using potentially dangerous core functions, but can not protect every file and every user from every poorly written or malicious script! So it is recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
+* PEB has no full-fledged sandbox for local Perl scripts. Basic security is implemented in the ```censor.pl``` embedded Perl script (see below). It is still recommended to inspect your scripts before use for possible security vulnerabilities and best programming practices!  
   
 ## Security Features & Considerations
   
-* Security features based on C++ code:  
+**Security features based on C++ code:**
   1. Starting the browser with administrative privileges is not allowed - it exits with a warning message.  
   2. Local scripts are executed in a clean environment with only a minimum of necessary environment variables.  
   These are:  
@@ -93,7 +93,7 @@ Compiled and tested successfully using:
   3. Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
   4. PEB does not download locally executed scripts from any remote locations.  
   5. Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
-* Security features based on Perl code:  
+**Security features based on Perl code:**
   1. Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
     1. :dangerous group - ```syscall```, ```dump```, ```chroot```,  
     2. :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
