@@ -1,4 +1,3 @@
-
 lessThan (QT_MAJOR_VERSION, 5) {
     error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
 }
@@ -12,28 +11,10 @@ equals (QT_MAJOR_VERSION, 5) {
         error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
     }
 
-    message ("")
-    message ("Starting Perl Executing Browser (PEB) build procedure...")
-    message ("")
-
-
-    ##########################################################
-    # Application name:
-    # ATTENTION - replace spaces and commas with underscore like that:
-    # "Perl_Executing_Browser" but not "Perl Executing Browser"!
-    ##########################################################
-    APPLICATION_NAME = "Perl_Executing_Browser"
-
-    DEFINES += APPLICATION_NAME=\\\"$$APPLICATION_NAME\\\"
-
-
-    ##########################################################
-    # Application version:
-    ##########################################################
-    APPLICATION_VERSION = "0.1"
-
-    DEFINES += APPLICATION_VERSION=\\\"$$APPLICATION_VERSION\\\"
-    message ("Application version: $$APPLICATION_VERSION")
+    message ("Starting Perl Executing Browser configuration.")
+    message ("Qt version: $$[QT_VERSION]")
+    message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
+    message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
 
     ##########################################################
@@ -66,10 +47,10 @@ equals (QT_MAJOR_VERSION, 5) {
         DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
 
         equals (PERL_DEBUGGER_INTERACTION, 0) {
-            message ("Going to build without Perl debugger interaction capability.")
+            message ("Building without Perl debugger interaction capability.")
         }
         equals (PERL_DEBUGGER_INTERACTION, 1) {
-            message ("Going to build with Perl debugger interaction capability.")
+            message ("Building with Perl debugger interaction capability.")
         }
     }
 
@@ -93,10 +74,10 @@ equals (QT_MAJOR_VERSION, 5) {
         DEFINES += "BUNDLE=$$BUNDLE"
 
         equals (BUNDLE, 0) {
-            message ("Going to build without Mac OSX bundle support...")
+            message ("Building without Mac OSX bundle support.")
         }
         equals (BUNDLE, 1) {
-            message ("Going to build with Mac OSX bundle support...")
+            message ("Building with Mac OSX bundle support.")
         }
 
         ICON = icons/camel.icns
@@ -106,14 +87,6 @@ equals (QT_MAJOR_VERSION, 5) {
     ##########################################################
     # NO CONFIGURATION OPTIONS BELOW THIS POINT.
     ##########################################################
-    message ("")
-    message ("Qt version: $$[QT_VERSION]")
-    message ("Qt is installed in: $$[QT_INSTALL_PREFIX]")
-    message ("Qt Documentation: $$[QT_INSTALL_DOCS]")
-    message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
-    message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
-    message ("")
-
     TEMPLATE = app
     TARGET = peb
     DEFINES += HAVE_QT5
@@ -183,10 +156,10 @@ equals (QT_MAJOR_VERSION, 5) {
         RCC_DIR = ../tmp
 
         # Destination directory for the compiled binary:
-        CONFIG (debug) {
+        CONFIG (debug, debug|release) {
             DESTDIR = ../
         }
-        CONFIG (release) {
+        CONFIG (release, debug|release) {
             DESTDIR = ../
         }
     }
@@ -198,10 +171,10 @@ equals (QT_MAJOR_VERSION, 5) {
         RCC_DIR = PWD/../tmp
 
         # Destination directory for the compiled binary:
-        CONFIG (debug) {
+        CONFIG (debug, debug|release) {
             DESTDIR = PWD/../
         }
-        CONFIG (release) {
+        CONFIG (release, debug|release) {
             DESTDIR = PWD/../
         }
     }

@@ -29,7 +29,9 @@
 
 #ifdef Q_OS_WIN
 #include <windows.h>
+#endif
 
+#ifdef Q_OS_WIN
 // ==============================
 // DETECT WINDOWS USER PRIVILEGES SUBROUTINE:
 // ==============================
@@ -88,8 +90,7 @@ void customMessageHandler(QtMsgType type,
     }
 
     // A separate log file is created for every browser session.
-    // Application start date and time are
-    // appended to the binary file name.
+    // Application start date and time are appended to the binary file name.
     QFile logFile(QDir::toNativeSeparators
                   (qApp->property("logDirFullPath").toString()
                    + QDir::separator()
@@ -116,12 +117,8 @@ int main(int argc, char **argv)
     // ==============================
     // SET BASIC APPLICATION VARIABLES:
     // ==============================
-    QString applicationName = APPLICATION_NAME;
-    if (applicationName.contains("_")) {
-        applicationName.replace("_", " ");
-    }
-    application.setApplicationName(applicationName);
-    application.setApplicationVersion(APPLICATION_VERSION);
+    application.setApplicationName("Perl_Executing_Browser");
+    application.setApplicationVersion("0.1");
 
     // ==============================
     // SET UTF-8 ENCODING APPLICATION-WIDE:
