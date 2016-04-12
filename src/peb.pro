@@ -176,33 +176,32 @@ equals (QT_MAJOR_VERSION, 5) {
         }
     }
 
-    # Temporary folder:
     lessThan (QT_MINOR_VERSION, 5) {
+        # Temporary folder:
         MOC_DIR = ../tmp
         OBJECTS_DIR = ../tmp
         RCC_DIR = ../tmp
 
         # Destination directory for the compiled binary:
-        CONFIG (debug, debug|release) {
+        CONFIG (debug) {
             DESTDIR = ../
         }
-
-        CONFIG (release, debug|release) {
+        CONFIG (release) {
             DESTDIR = ../
         }
     }
 
     equals (QT_MINOR_VERSION, 5) {
+        # Temporary folder:
         MOC_DIR = PWD/../tmp
         OBJECTS_DIR = PWD/../tmp
         RCC_DIR = PWD/../tmp
 
         # Destination directory for the compiled binary:
-        CONFIG (debug, debug|release) {
+        CONFIG (debug) {
             DESTDIR = PWD/../
         }
-
-        CONFIG (release, debug|release) {
+        CONFIG (release) {
             DESTDIR = PWD/../
         }
     }

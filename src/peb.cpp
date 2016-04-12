@@ -324,19 +324,18 @@ int main(int argc, char **argv)
     // Logging:
     QString loggingSetting =
             settings.value("logging").toString();
-    // Install message handler for redirecting all debug messages to a log file:
+    QString logDirFullPath = settingsDirName + "logs";
     if (loggingSetting == "enable") {
+        // Install message handler for
+        // redirecting all debug messages to a log file:
         qInstallMessageHandler(customMessageHandler);
+        // Log files directory:
+        QDir logDir(logDirFullPath);
+        if (!logDir.exists()) {
+            logDir.mkpath(".");
+        }
+        application.setProperty("logDirFullPath", logDirFullPath);
     }
-    // Log files directory:
-    QString logDirNameSetting = "logs";;
-    QString logDirFullPath = settingsDirName + logDirNameSetting;;
-
-    QDir logDir(logDirFullPath);
-    if (!logDir.exists()) {
-        logDir.mkpath(".");
-    }
-    application.setProperty("logDirFullPath", logDirFullPath);
 
     // Root directory:
     QString rootDirSetting =

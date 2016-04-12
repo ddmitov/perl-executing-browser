@@ -18,6 +18,7 @@
 			function pebCloseConfirmation() {
 				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +
 										"Are you sure you want to close the window?");
+
 				var result;
 				if (confirmation == true) {
 					result = "yes";
@@ -26,16 +27,39 @@
 				}
 				return result;
 			}
-			
-			// Navigate away:
-			function unloadFunction() {
-				alert("Are you sure you want to go away?");
-			}
+
+			// Navigate away confirmation:
+			$(window).on("beforeunload", function() {
+				var textEntered = "";
+
+				var textFields = new Array();
+				textFields = document.getElementsByTagName("textarea");
+
+				for (i = 0; i < textFields.length; i++) { 
+					if (textFields[i].value.length > 0) {
+						textEntered = "yes";
+					}
+				}
+
+				var inputBoxes = new Array();
+				inputBoxes = document.querySelectorAll("input[type=text]");
+
+				for (i = 0; i < inputBoxes.length; i++) { 
+					if (inputBoxes[i].value.length > 0) {
+						textEntered = "yes";
+					}
+				}
+
+				if (textEntered == "yes") {
+					return "Text was entered on this page and it is going to be lost!\n" +
+										"Are you sure you want to go to another page?";
+				}
+			});
 		</script>
 
 	</head>
 
-	<body onunload="unloadFunction()">
+	<body>
 
 		<form action="perl/get-post-test.pl" method="get">
 
