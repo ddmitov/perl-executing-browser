@@ -112,8 +112,6 @@ equals (QT_MAJOR_VERSION, 5) {
     message ("Qt Documentation: $$[QT_INSTALL_DOCS]")
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
-    message ("Qt Plugins: $$[QT_INSTALL_PLUGINS]")
-    message ("Qt Translation files: $$[QT_INSTALL_TRANSLATIONS]")
     message ("")
 
     TEMPLATE = app
@@ -179,16 +177,33 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     # Temporary folder:
-    MOC_DIR = PWD/../tmp
-    OBJECTS_DIR = PWD/../tmp
-    RCC_DIR = PWD/../tmp
+    lessThan (QT_MINOR_VERSION, 5) {
+        MOC_DIR = ../tmp
+        OBJECTS_DIR = ../tmp
+        RCC_DIR = ../tmp
 
-    # Destination directory for the compiled binary:
-    CONFIG (debug, debug|release) {
-        DESTDIR = PWD/../
+        # Destination directory for the compiled binary:
+        CONFIG (debug, debug|release) {
+            DESTDIR = ../
+        }
+
+        CONFIG (release, debug|release) {
+            DESTDIR = ../
+        }
     }
 
-    CONFIG (release, debug|release) {
-        DESTDIR = PWD/../
+    equals (QT_MINOR_VERSION, 5) {
+        MOC_DIR = PWD/../tmp
+        OBJECTS_DIR = PWD/../tmp
+        RCC_DIR = PWD/../tmp
+
+        # Destination directory for the compiled binary:
+        CONFIG (debug, debug|release) {
+            DESTDIR = PWD/../
+        }
+
+        CONFIG (release, debug|release) {
+            DESTDIR = PWD/../
+        }
     }
 }

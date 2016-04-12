@@ -279,62 +279,64 @@ int main(int argc, char **argv)
     QString perlInterpreterSetting =
             settings.value("perl").toString();
     QString perlInterpreter;
-    if (perlInterpreterSetting == "system") {
-        QProcess systemPerlTester;
-        systemPerlTester.start("perl",
-                               QStringList()
-                               << "-e"
-                               << "print $^X;");
-        if (systemPerlTester.waitForFinished()) {
-            QByteArray testingScriptResultArray =
-                    systemPerlTester.readAllStandardOutput();
-            perlInterpreter =
-                    QString::fromLatin1(testingScriptResultArray);
-        }
-    } else {
-        QDir interpreterFile(perlInterpreterSetting);
-        if (interpreterFile.isRelative()) {
-            perlInterpreter =
-                    QDir::toNativeSeparators(settingsDirName
-                                             + perlInterpreterSetting);
-        }
-        if (interpreterFile.isAbsolute()) {
-            perlInterpreter = QDir::toNativeSeparators(perlInterpreterSetting);
+    if (perlInterpreterSetting.length() > 0) {
+        if (perlInterpreterSetting == "system") {
+            // Find the full path to the Perl interpreter on PATH:
+            QProcess systemPerlTester;
+            systemPerlTester.start("perl",
+                                   QStringList()
+                                   << "-e"
+                                   << "print $^X;");
+
+            if (systemPerlTester.waitForFinished()) {
+                QByteArray testingScriptResultArray =
+                        systemPerlTester.readAllStandardOutput();
+                perlInterpreter =
+                        QString::fromLatin1(testingScriptResultArray);
+            }
+        } else {
+            QDir interpreterFile(perlInterpreterSetting);
+            // Local Perl interpreter given as a relative filepath:
+            if (interpreterFile.isRelative()) {
+                perlInterpreter =
+                        QDir::toNativeSeparators(
+                            settingsDirName + perlInterpreterSetting);
+
+                QFile perlInterpreterFile(perlInterpreter);
+                if (!perlInterpreterFile.exists()) {
+                    perlInterpreter = "";
+                }
+            }
+            // Perl interpreter given as a full filepath:
+            if (interpreterFile.isAbsolute()) {
+                perlInterpreter =
+                        QDir::toNativeSeparators(perlInterpreterSetting);
+
+                QFile perlInterpreterFile(perlInterpreter);
+                if (!perlInterpreterFile.exists()) {
+                    perlInterpreter = "";
+                }
+            }
         }
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 
-    // Logging enable/disable switch:
+    // Logging:
     QString loggingSetting =
             settings.value("logging").toString();
     // Install message handler for redirecting all debug messages to a log file:
     if (loggingSetting == "enable") {
         qInstallMessageHandler(customMessageHandler);
     }
-
     // Log files directory:
-    // This option will be honoured only if logging is enabled.
-    QString logDirNameSetting;
-    QString logDirFullPath;
-    if (loggingSetting == "enable") {
-        logDirNameSetting =
-                settings.value("logging_directory").toString();
-        // Default value:
-        if (logDirNameSetting.length() == 0) {
-            logDirNameSetting = "logs";
-        }
-        QDir logDir(QDir::toNativeSeparators(logDirNameSetting));
-        if (!logDir.exists()) {
-            logDir.mkpath(".");
-        }
-        if (logDir.isRelative()) {
-            logDirFullPath = settingsDirName + logDirNameSetting;
-        }
-        if (logDir.isAbsolute()) {
-            logDirFullPath = logDirNameSetting;
-        }
-        application.setProperty("logDirFullPath", logDirFullPath);
+    QString logDirNameSetting = "logs";;
+    QString logDirFullPath = settingsDirName + logDirNameSetting;;
+
+    QDir logDir(logDirFullPath);
+    if (!logDir.exists()) {
+        logDir.mkpath(".");
     }
+    application.setProperty("logDirFullPath", logDirFullPath);
 
     // Root directory:
     QString rootDirSetting =
@@ -355,6 +357,9 @@ int main(int argc, char **argv)
             settings.value("data_directory").toString();
     QString dataDirName;
     QDir dataDir(dataDirSetting);
+    if (!dataDir.exists()) {
+        dataDir.mkpath(".");
+    }
     if (dataDir.isRelative()) {
         dataDirName = QDir::toNativeSeparators(
                     settingsDirName + dataDirSetting);
@@ -461,13 +466,13 @@ int main(int argc, char **argv)
     // ==============================
     qDebug() << "";
     qDebug() << "Settings file:" << settingsFileName;
-    qDebug() << "Perl interpreter" << perlInterpreter;
+    qDebug() << "Perl interpreter:" << perlInterpreter;
     qDebug() << "Logging:" << loggingSetting;
     if (loggingSetting == "enable") {
         qDebug() << "Logfiles directory:" << logDirFullPath;
     }
-    qDebug() << "Root folder:" << rootDirName;
-    qDebug() << "Data folder:" << dataDirName;
+    qDebug() << "Root directory:" << rootDirName;
+    qDebug() << "Data directory:" << dataDirName;
     qDebug() << "Start page:"
              << rootDirName + QDir::separator() + startPageSetting;
     qDebug() << "Start fullscreen:" << startFullscreenSetting;

@@ -26,4 +26,9 @@
 
 #~ BEGIN {push @INC, '/tmp/test';}
 
-BEGIN {push (@INC, "/tmp/test");}
+BEGIN {
+	push
+		(@INC, "/tmp/test");
+	}
+
+print "Test!";

@@ -193,117 +193,132 @@ protected:
             fileDetector.qCheckFileExistence(scriptFullFilePath);
 
             if (fileDetector.fileExists == true) {
-                QString queryString = request.url().query();
+                if (qApp->property("perlInterpreter").toString().length() > 0) {
+                    QString queryString = request.url().query();
 
-                QByteArray postDataArray;
-                if (outgoingData) {
-                    postDataArray = outgoingData->readAll();
-                }
-                QString postData(postDataArray);
+                    QByteArray postDataArray;
+                    if (outgoingData) {
+                        postDataArray = outgoingData->readAll();
+                    }
+                    QString postData(postDataArray);
 
-                qDebug() << "AJAX script started:" << scriptFullFilePath;
+                    qDebug() << "AJAX script started:" << scriptFullFilePath;
 
-                QScriptEnvironment initialScriptEnvironment;
-                QProcessEnvironment scriptEnvironment;
-                scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
+                    QScriptEnvironment initialScriptEnvironment;
+                    QProcessEnvironment scriptEnvironment;
+                    scriptEnvironment =
+                            initialScriptEnvironment.scriptEnvironment;
 
-                if (queryString.length() > 0) {
-                    scriptEnvironment.insert("REQUEST_METHOD", "GET");
-                    scriptEnvironment.insert("QUERY_STRING", queryString);
-                    qDebug() << "Query string:" << queryString;
-                }
+                    if (queryString.length() > 0) {
+                        scriptEnvironment.insert("REQUEST_METHOD", "GET");
+                        scriptEnvironment.insert("QUERY_STRING", queryString);
+                        qDebug() << "Query string:" << queryString;
+                    }
 
-                if (postData.length() > 0) {
-                    scriptEnvironment.insert("REQUEST_METHOD", "POST");
-                    QString postDataSize = QString::number(postData.size());
-                    scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
-                    qDebug() << "POST data:" << postData;
-                }
+                    if (postData.length() > 0) {
+                        scriptEnvironment
+                                .insert("REQUEST_METHOD", "POST");
+                        QString postDataSize = QString::number(postData.size());
+                        scriptEnvironment
+                                .insert("CONTENT_LENGTH", postDataSize);
+                        qDebug() << "POST data:" << postData;
+                    }
 
-                QProcess scriptHandler;
-                scriptHandler.setProcessEnvironment(scriptEnvironment);
-                scriptHandler.setWorkingDirectory("");
+                    QProcess scriptHandler;
+                    scriptHandler.setProcessEnvironment(scriptEnvironment);
+                    scriptHandler.setWorkingDirectory("");
 
-                QEventLoop scriptHandlerWaitingLoop;
+                    QEventLoop scriptHandlerWaitingLoop;
 
-                QObject::connect(&scriptHandler,
-                                 SIGNAL(finished(int, QProcess::ExitStatus)),
-                                 &scriptHandlerWaitingLoop,
-                                 SLOT(quit()));
-                QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
-                                   SLOT(quit()));
+                    QObject::connect(&scriptHandler,
+                                     SIGNAL(finished(
+                                                int, QProcess::ExitStatus)),
+                                     &scriptHandlerWaitingLoop,
+                                     SLOT(quit()));
+                    QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
+                                       SLOT(quit()));
 
-                QString scriptResultString;
-                QString scriptErrorString;
+                    QString scriptResultString;
+                    QString scriptErrorString;
 
-                // 'censor.pl' is compiled into the resources of
-                // the binary file and called from there.
-                QString censorScriptFileName(
-                            ":/scripts/perl/censor.pl");
-                QFile censorScriptFile(censorScriptFileName);
-                censorScriptFile.open(QIODevice::ReadOnly
-                                      | QIODevice::Text);
-                QTextStream stream(&censorScriptFile);
-                QString censorScriptContents = stream.readAll();
-                censorScriptFile.close();
+                    // 'censor.pl' is compiled into the resources of
+                    // the binary file and called from there.
+                    QString censorScriptFileName(
+                                ":/scripts/perl/censor.pl");
+                    QFile censorScriptFile(censorScriptFileName);
+                    censorScriptFile.open(QIODevice::ReadOnly
+                                          | QIODevice::Text);
+                    QTextStream stream(&censorScriptFile);
+                    QString censorScriptContents = stream.readAll();
+                    censorScriptFile.close();
 
-                scriptHandler.start((qApp->property("perlInterpreter")
-                                     .toString()),
-                                    QStringList()
-                                    << "-e"
-                                    << censorScriptContents
-                                    << "--"
-                                    << QDir::toNativeSeparators(
-                                        scriptFullFilePath),
-                                    QProcess::Unbuffered
-                                    | QProcess::ReadWrite);
+                    scriptHandler.start((qApp->property("perlInterpreter")
+                                         .toString()),
+                                        QStringList()
+                                        << "-e"
+                                        << censorScriptContents
+                                        << "--"
+                                        << QDir::toNativeSeparators(
+                                            scriptFullFilePath),
+                                        QProcess::Unbuffered
+                                        | QProcess::ReadWrite);
 
-                if (postData.length() > 0) {
-                    scriptHandler.write(postDataArray);
-                }
+                    if (postData.length() > 0) {
+                        scriptHandler.write(postDataArray);
+                    }
 
-                scriptHandlerWaitingLoop.exec();
+                    scriptHandlerWaitingLoop.exec();
 
-                QByteArray scriptResultArray =
-                        scriptHandler.readAllStandardOutput();
-                scriptResultString =
-                        QString::fromLatin1(scriptResultArray);
+                    QByteArray scriptResultArray =
+                            scriptHandler.readAllStandardOutput();
+                    scriptResultString =
+                            QString::fromLatin1(scriptResultArray);
 
-                QByteArray scriptErrorArray =
-                        scriptHandler.readAllStandardError();
-                scriptErrorString =
-                        QString::fromLatin1(scriptErrorArray);
+                    QByteArray scriptErrorArray =
+                            scriptHandler.readAllStandardError();
+                    scriptErrorString =
+                            QString::fromLatin1(scriptErrorArray);
 
-                if (scriptResultString.length() == 0 and
-                        scriptErrorString == 0) {
-                    qDebug() << "AJAX script timed out or gave no output:"
-                             << scriptFullFilePath;
+                    if (scriptResultString.length() == 0 and
+                            scriptErrorString == 0) {
+                        qDebug() << "AJAX script timed out or gave no output:"
+                                 << scriptFullFilePath;
+                    } else {
+                        qDebug() << "AJAX script finished:"
+                                 << scriptFullFilePath;
+                    }
+
+                    if (scriptErrorString.length() > 0) {
+                        qDebug() << "AJAX script gave errors:"
+                                 << scriptFullFilePath;
+                    }
+
+                    QWebSettings::clearMemoryCaches();
+
+                    scriptEnvironment.remove("REQUEST_METHOD");
+
+                    if (queryString.length() > 0) {
+                        scriptEnvironment.remove("QUERY_STRING");
+                    }
+
+                    if (postData.length() > 0) {
+                        scriptEnvironment.remove("CONTENT_LENGTH");
+                    }
+
+                    QCustomNetworkReply *reply =
+                            new QCustomNetworkReply (request.url(),
+                                                     scriptResultString);
+                    return reply;
                 } else {
-                    qDebug() << "AJAX script finished:"
+                    qDebug() << "AJAX script not started:"
                              << scriptFullFilePath;
+                    qDebug() << "Perl interpreter was not set.";
+
+                    QNetworkRequest emptyNetworkRequest;
+                    return QNetworkAccessManager::createRequest
+                            (QNetworkAccessManager::GetOperation,
+                             QNetworkRequest(emptyNetworkRequest));
                 }
-
-                if (scriptErrorString.length() > 0) {
-                    qDebug() << "AJAX script gave errors:"
-                             << scriptFullFilePath;
-                }
-
-                QWebSettings::clearMemoryCaches();
-
-                scriptEnvironment.remove("REQUEST_METHOD");
-
-                if (queryString.length() > 0) {
-                    scriptEnvironment.remove("QUERY_STRING");
-                }
-
-                if (postData.length() > 0) {
-                    scriptEnvironment.remove("CONTENT_LENGTH");
-                }
-
-                QCustomNetworkReply *reply =
-                        new QCustomNetworkReply (request.url(),
-                                                 scriptResultString);
-                return reply;
             }
 
             if (fileDetector.fileExists == false) {
@@ -436,72 +451,77 @@ public slots:
                 ((qApp->property("root").toString())
                  + url.path());
 
-        if (scriptHandler.isOpen()) {
-            scriptHandler.close();
-            qDebug() << "Script is going to be restarted:"
-                     << scriptFullFilePath;
-        }
+        if (qApp->property("perlInterpreter").toString().length() > 0) {
+            if (scriptHandler.isOpen()) {
+                scriptHandler.close();
+                qDebug() << "Script is going to be restarted:"
+                         << scriptFullFilePath;
+            }
 
-        QString queryString = url.query();
-        QString postData(postDataArray);
+            QString queryString = url.query();
+            QString postData(postDataArray);
 
-        qDebug() << "Script started:" << scriptFullFilePath;
+            qDebug() << "Script started:" << scriptFullFilePath;
 
-        if (queryString.length() > 0) {
-            scriptEnvironment.insert("REQUEST_METHOD", "GET");
-            scriptEnvironment.insert("QUERY_STRING", queryString);
-            qDebug() << "Query string:" << queryString;
-        }
+            if (queryString.length() > 0) {
+                scriptEnvironment.insert("REQUEST_METHOD", "GET");
+                scriptEnvironment.insert("QUERY_STRING", queryString);
+                qDebug() << "Query string:" << queryString;
+            }
 
-        if (postData.length() > 0) {
-            scriptEnvironment.insert("REQUEST_METHOD", "POST");
-            QString postDataSize = QString::number(postData.size());
-            scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
-            qDebug() << "POST data:" << postData;
-        }
+            if (postData.length() > 0) {
+                scriptEnvironment.insert("REQUEST_METHOD", "POST");
+                QString postDataSize = QString::number(postData.size());
+                scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
+                qDebug() << "POST data:" << postData;
+            }
 
-        scriptHandler.setProcessEnvironment(scriptEnvironment);
-        scriptHandler.setWorkingDirectory("");
+            scriptHandler.setProcessEnvironment(scriptEnvironment);
+            scriptHandler.setWorkingDirectory("");
 
-        // 'censor.pl' is compiled into the resources of
-        // the binary file and called from there.
-        QString censorScriptFileName(
-                    ":/scripts/perl/censor.pl");
-        QFile censorScriptFile(censorScriptFileName);
-        censorScriptFile.open(QIODevice::ReadOnly
-                              | QIODevice::Text);
-        QTextStream censorStream(&censorScriptFile);
-        QString censorScriptContents = censorStream.readAll();
-        censorScriptFile.close();
+            // 'censor.pl' is compiled into the resources of
+            // the binary file and called from there.
+            QString censorScriptFileName(
+                        ":/scripts/perl/censor.pl");
+            QFile censorScriptFile(censorScriptFileName);
+            censorScriptFile.open(QIODevice::ReadOnly
+                                  | QIODevice::Text);
+            QTextStream censorStream(&censorScriptFile);
+            QString censorScriptContents = censorStream.readAll();
+            censorScriptFile.close();
 
-        scriptHandler.start((qApp->property("perlInterpreter")
-                             .toString()),
-                            QStringList()
-                            << "-e"
-                            << censorScriptContents
-                            << "--"
-                            << QDir::toNativeSeparators(
-                                scriptFullFilePath),
-                            QProcess::Unbuffered
-                            | QProcess::ReadWrite);
+            scriptHandler.start((qApp->property("perlInterpreter")
+                                 .toString()),
+                                QStringList()
+                                << "-e"
+                                << censorScriptContents
+                                << "--"
+                                << QDir::toNativeSeparators(
+                                    scriptFullFilePath),
+                                QProcess::Unbuffered
+                                | QProcess::ReadWrite);
 
-        runningScriptsInCurrentWindowList
-                .append(scriptFullFilePath);
+            runningScriptsInCurrentWindowList
+                    .append(scriptFullFilePath);
 
-        if (postData.length() > 0) {
-            scriptHandler.write(postDataArray);
-        }
+            if (postData.length() > 0) {
+                scriptHandler.write(postDataArray);
+            }
 
-        QWebSettings::clearMemoryCaches();
+            QWebSettings::clearMemoryCaches();
 
-        scriptEnvironment.remove("REQUEST_METHOD");
+            scriptEnvironment.remove("REQUEST_METHOD");
 
-        if (queryString.length() > 0) {
-            scriptEnvironment.remove("QUERY_STRING");
-        }
+            if (queryString.length() > 0) {
+                scriptEnvironment.remove("QUERY_STRING");
+            }
 
-        if (postData.length() > 0) {
-            scriptEnvironment.remove("CONTENT_LENGTH");
+            if (postData.length() > 0) {
+                scriptEnvironment.remove("CONTENT_LENGTH");
+            }
+        } else {
+            qDebug() << "Script not started:" << scriptFullFilePath;
+            qDebug() << "Perl interpreter was not set.";
         }
     }
 
@@ -1022,17 +1042,17 @@ public slots:
             QVariant jsResult =
                     mainPage->currentFrame()->evaluateJavaScript(
                         "pebCloseConfirmation()");
-            QString jsQuitDecision = jsResult.toString();
+            QString jsCloseDecision = jsResult.toString();
 
-            if (jsQuitDecision.length() == 0) {
+            if (jsCloseDecision.length() == 0) {
                 event->accept();
             }
 
-            if (jsQuitDecision.length() > 0) {
-                if (jsQuitDecision == "yes") {
+            if (jsCloseDecision.length() > 0) {
+                if (jsCloseDecision == "yes") {
                     event->accept();
                 }
-                if (jsQuitDecision == "no") {
+                if (jsCloseDecision == "no") {
                     event->ignore();
                 }
             }

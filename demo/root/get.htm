@@ -26,11 +26,16 @@
 				}
 				return result;
 			}
+			
+			// Navigate away:
+			function unloadFunction() {
+				alert("Are you sure you want to go away?");
+			}
 		</script>
 
 	</head>
 
-	<body>
+	<body onunload="unloadFunction()">
 
 		<form action="perl/get-post-test.pl" method="get">
 
