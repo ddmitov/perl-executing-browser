@@ -16,16 +16,6 @@ equals (QT_MAJOR_VERSION, 5) {
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
-
-    ##########################################################
-    # The pseudo-domain of the browser:
-    ##########################################################
-    PSEUDO_DOMAIN = "perl-executing-browser-pseudodomain"
-
-    DEFINES += PSEUDO_DOMAIN=\\\"$$PSEUDO_DOMAIN\\\"
-    message ("Local pseudo-domain: $$PSEUDO_DOMAIN")
-
-
     ##########################################################
     # Interaction with the Perl debugger -
     # not available on Windows:
@@ -53,7 +43,6 @@ equals (QT_MAJOR_VERSION, 5) {
             message ("Building with Perl debugger interaction capability.")
         }
     }
-
 
     ##########################################################
     # Macintosh specific settings:
@@ -83,7 +72,6 @@ equals (QT_MAJOR_VERSION, 5) {
         ICON = icons/camel.icns
     }
 
-
     ##########################################################
     # NO CONFIGURATION OPTIONS BELOW THIS POINT.
     ##########################################################
@@ -91,7 +79,6 @@ equals (QT_MAJOR_VERSION, 5) {
     TARGET = peb
     DEFINES += HAVE_QT5
     DEPENDPATH += .
-    VERSION = APPLICATION_VERSION
 
     # Network support:
     QT += network
@@ -149,33 +136,11 @@ equals (QT_MAJOR_VERSION, 5) {
         }
     }
 
-    lessThan (QT_MINOR_VERSION, 5) {
-        # Temporary folder:
-        MOC_DIR = ../tmp
-        OBJECTS_DIR = ../tmp
-        RCC_DIR = ../tmp
+    # Destination directory for the compiled binary:
+    DESTDIR = $$PWD/../
 
-        # Destination directory for the compiled binary:
-        CONFIG (debug, debug|release) {
-            DESTDIR = ../
-        }
-        CONFIG (release, debug|release) {
-            DESTDIR = ../
-        }
-    }
-
-    equals (QT_MINOR_VERSION, 5) {
-        # Temporary folder:
-        MOC_DIR = PWD/../tmp
-        OBJECTS_DIR = PWD/../tmp
-        RCC_DIR = PWD/../tmp
-
-        # Destination directory for the compiled binary:
-        CONFIG (debug, debug|release) {
-            DESTDIR = PWD/../
-        }
-        CONFIG (release, debug|release) {
-            DESTDIR = PWD/../
-        }
-    }
+    # Temporary folder:
+    MOC_DIR = tmp
+    OBJECTS_DIR = tmp
+    RCC_DIR = tmp
 }

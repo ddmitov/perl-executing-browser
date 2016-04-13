@@ -43,6 +43,13 @@
 #endif
 
 // ==============================
+// PSEUDO-DOMAIN:
+// ==============================
+#ifndef PSEUDO_DOMAIN
+#define PSEUDO_DOMAIN "perl-executing-browser-pseudodomain"
+#endif
+
+// ==============================
 // FILE DETECTOR CLASS DEFINITION:
 // ==============================
 class QFileDetector : public QObject
