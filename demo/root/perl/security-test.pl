@@ -22,13 +22,11 @@
 #~ CORE::chdir "/tmp/test/";
 #~ CORE::open my $filehandle, "<", "/tmp/test/foo.txt";
 
-#~ BEGIN {unshift @INC, qw(/tmp/test);}
+BEGIN {unshift @INC, qw(/tmp/test);}
 
-#~ BEGIN {push @INC, '/tmp/test';}
+BEGIN {push @INC, '/tmp/test';}
 
 BEGIN {
 	push
 		(@INC, "/tmp/test");
 	}
-
-print "Test!";

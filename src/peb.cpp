@@ -463,15 +463,16 @@ int main(int argc, char **argv)
     qDebug() << "";
     qDebug() << "Settings file:" << settingsFileName;
     qDebug() << "Perl interpreter:" << perlInterpreter;
-    qDebug() << "Logging:" << loggingSetting;
     if (loggingSetting == "enable") {
-        qDebug() << "Logfiles directory:" << logDirFullPath;
+        qDebug() << "Logging is enabled.";
     }
     qDebug() << "Root directory:" << rootDirName;
     qDebug() << "Data directory:" << dataDirName;
     qDebug() << "Start page:"
              << rootDirName + QDir::separator() + startPageSetting;
-    qDebug() << "Start fullscreen:" << startFullscreenSetting;
+    if (startFullscreenSetting == "enable") {
+        qDebug() << "Start in fullscreen is enabled.";
+    }
     if (iconPathName.length() > 0) {
         qDebug() << "Icon:" << iconPathName;
     }

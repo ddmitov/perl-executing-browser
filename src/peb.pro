@@ -11,8 +11,7 @@ equals (QT_MAJOR_VERSION, 5) {
         error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
     }
 
-    message ("Starting Perl Executing Browser configuration.")
-    message ("Qt version: $$[QT_VERSION]")
+    message ("Perl Executing Browser using Qt $$[QT_VERSION]")
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
@@ -37,10 +36,10 @@ equals (QT_MAJOR_VERSION, 5) {
         DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
 
         equals (PERL_DEBUGGER_INTERACTION, 0) {
-            message ("Building without Perl debugger interaction capability.")
+            message ("Configured without Perl debugger interaction capability.")
         }
         equals (PERL_DEBUGGER_INTERACTION, 1) {
-            message ("Building with Perl debugger interaction capability.")
+            message ("Configured with Perl debugger interaction capability.")
         }
     }
 
@@ -63,10 +62,10 @@ equals (QT_MAJOR_VERSION, 5) {
         DEFINES += "BUNDLE=$$BUNDLE"
 
         equals (BUNDLE, 0) {
-            message ("Building without Mac OSX bundle support.")
+            message ("Configured without Mac OSX bundle support.")
         }
         equals (BUNDLE, 1) {
-            message ("Building with Mac OSX bundle support.")
+            message ("Configured with Mac OSX bundle support.")
         }
 
         ICON = icons/camel.icns

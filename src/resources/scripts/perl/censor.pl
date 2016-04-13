@@ -139,10 +139,10 @@ foreach my $line (@user_code) {
 		}
 	}
 
-	if ($line =~ m/\@INC/) {
-		if ($line =~ m/#.*unshift/ or $line =~ m/#.*push/) {
+	if ($line =~ m/\@INC\s{0,},/) {
+		if ($line =~ m/#.*\@INC\s{0,},/) {
 			next;
-		} elsif ($line =~ m/unshift/ or $line =~ m/push/) {
+		} else {
 			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden \@INC array manipulation detected!";
 		}
 	}

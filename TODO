@@ -7,7 +7,6 @@ Permanent TO-DO:
 
 v. 0.2
 ====================================
-- censor.pl: handle multi-line @INC manipulation in BEGIN block
 - censor-ajax.pl for local AJAX Perl scripts
 - security tests in separate files
 
