@@ -39,17 +39,17 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="868"/>
+        <location filename="../../peb.cpp" line="874"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="865"/>
+        <location filename="../../peb.cpp" line="871"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="867"/>
+        <location filename="../../peb.cpp" line="873"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>

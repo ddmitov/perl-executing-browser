@@ -117,7 +117,7 @@ int main(int argc, char **argv)
     // ==============================
     // SET BASIC APPLICATION VARIABLES:
     // ==============================
-    application.setApplicationName("Perl_Executing_Browser");
+    application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.1");
 
     // ==============================
@@ -229,16 +229,6 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // GET APPLICATION START DATE AND TIME:
-    // ==============================
-    // Application start date and time for logging:
-    QString applicationStartDateAndTime =
-            QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
-    application
-            .setProperty("applicationStartDateAndTime",
-                         applicationStartDateAndTime);
-
-    // ==============================
     // SETTINGS FILE:
     // ==============================
     // Settings file is loaded from the directory of the binary file:
@@ -323,6 +313,12 @@ int main(int argc, char **argv)
             settings.value("logging").toString();
     QString logDirFullPath = settingsDirName + "logs";
     if (loggingSetting == "enable") {
+        // Application start date and time for logging:
+        QString applicationStartDateAndTime =
+                QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
+        application
+                .setProperty("applicationStartDateAndTime",
+                             applicationStartDateAndTime);
         // Install message handler for
         // redirecting all debug messages to a log file:
         qInstallMessageHandler(customMessageHandler);
@@ -338,32 +334,36 @@ int main(int argc, char **argv)
     QString rootDirSetting =
             settings.value("root_directory").toString();
     QString rootDirName;
-    QDir rootDir(rootDirSetting);
-    if (rootDir.isRelative()) {
-        rootDirName = QDir::toNativeSeparators(
-                    settingsDirName + rootDirSetting);
+    if (rootDirSetting.length() > 0) {
+        QDir rootDir(rootDirSetting);
+        if (rootDir.isRelative()) {
+            rootDirName = QDir::toNativeSeparators(
+                        settingsDirName + rootDirSetting);
+        }
+        if (rootDir.isAbsolute()) {
+            rootDirName = QDir::toNativeSeparators(rootDirSetting);
+        }
+        application.setProperty("root", rootDirName);
     }
-    if (rootDir.isAbsolute()) {
-        rootDirName = QDir::toNativeSeparators(rootDirSetting);
-    }
-    application.setProperty("root", rootDirName);
 
     // Data directory:
     QString dataDirSetting =
             settings.value("data_directory").toString();
     QString dataDirName;
-    QDir dataDir(dataDirSetting);
-    if (!dataDir.exists()) {
-        dataDir.mkpath(".");
+    if (dataDirSetting.length() > 0) {
+        QDir dataDir(dataDirSetting);
+        if (!dataDir.exists()) {
+            dataDir.mkpath(".");
+        }
+        if (dataDir.isRelative()) {
+            dataDirName = QDir::toNativeSeparators(
+                        settingsDirName + dataDirSetting);
+        }
+        if (dataDir.isAbsolute()) {
+            dataDirName = QDir::toNativeSeparators(dataDirSetting);
+        }
+        application.setProperty("data", dataDirName);
     }
-    if (dataDir.isRelative()) {
-        dataDirName = QDir::toNativeSeparators(
-                    settingsDirName + dataDirSetting);
-    }
-    if (dataDir.isAbsolute()) {
-        dataDirName = QDir::toNativeSeparators(dataDirSetting);
-    }
-    application.setProperty("data", dataDirName);
 
     // Start page -
     // path must be relative to the root directory of the current package.
@@ -441,7 +441,7 @@ int main(int argc, char **argv)
 
     // Check if settings file and start page exist:
     QFile startPageFile(rootDirName + QDir::separator() + startPageSetting);
-    if (settingsFile.exists() and startPageFile.exists()) {
+    if (startPageFile.exists()) {
         window.qLoadStartPageSlot();
     } else {
         if (translationSetting.length() > 0) {
@@ -468,8 +468,12 @@ int main(int argc, char **argv)
     }
     qDebug() << "Root directory:" << rootDirName;
     qDebug() << "Data directory:" << dataDirName;
-    qDebug() << "Start page:"
-             << rootDirName + QDir::separator() + startPageSetting;
+    if (rootDirSetting.length() > 0) {
+        qDebug() << "Start page:"
+                 << rootDirName + QDir::separator() + startPageSetting;
+    } else {
+        qDebug() << "Start page path can not be resolved.";
+    }
     if (startFullscreenSetting == "enable") {
         qDebug() << "Start in fullscreen is enabled.";
     }
