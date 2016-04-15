@@ -39,60 +39,60 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="874"/>
+        <location filename="../../peb.cpp" line="872"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="871"/>
+        <location filename="../../peb.cpp" line="869"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="873"/>
+        <location filename="../../peb.cpp" line="871"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="579"/>
+        <location filename="../../peb.h" line="585"/>
         <source>Errors</source>
         <translation>Грешки</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="584"/>
+        <location filename="../../peb.h" line="590"/>
         <source>Errors were found during script execution.</source>
         <translation>Бяха открити грешки при изпълнението на този скрипт.</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="587"/>
+        <location filename="../../peb.h" line="593"/>
         <source>Do you want to see them?</source>
         <translation>Желаете ли да ги видите?</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="592"/>
-        <location filename="../../peb.h" line="828"/>
-        <location filename="../../peb.h" line="845"/>
+        <location filename="../../peb.h" line="598"/>
+        <location filename="../../peb.h" line="834"/>
+        <location filename="../../peb.h" line="851"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="594"/>
-        <location filename="../../peb.h" line="846"/>
+        <location filename="../../peb.h" line="600"/>
+        <location filename="../../peb.h" line="852"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="824"/>
+        <location filename="../../peb.h" line="830"/>
         <source>Alert</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="839"/>
+        <location filename="../../peb.h" line="845"/>
         <source>Confirm</source>
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="860"/>
+        <location filename="../../peb.h" line="866"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -100,12 +100,12 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="980"/>
+        <location filename="../../peb.h" line="986"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="982"/>
+        <location filename="../../peb.h" line="988"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>

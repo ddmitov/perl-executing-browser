@@ -221,6 +221,7 @@ http://modperlbook.org/html/3-9-2-1-Modifying-INC.html
 http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (not executing program)"
 http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"
 http://www.perlmonks.org/?node_id=722050 "CORE::GLOBAL::* for auditing which files are read and written?"
+http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
 http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner
@@ -231,6 +232,7 @@ http://stackoverflow.com/questions/2526804/how-is-perls-inc-constructed-aka-what
 http://stackoverflow.com/questions/841785/how-do-i-include-a-perl-module-thats-in-a-different-directory
 
 http://perlmaven.com/manipulating-perl-arrays
+http://perlmaven.com/how-to-sort-a-hash-in-perl
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
 http://www.perl.com/pub/2002/05/14/mod_perl.html

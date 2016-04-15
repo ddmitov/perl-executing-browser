@@ -118,16 +118,17 @@ CORE::open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
 # READ USER SCRIPT FROM
 # THE FIRST COMMAND LINE ARGUMENT:
 ##############################
-my $file = shift @ARGV;
-CORE::open my $filehandle, '<', $file or die;
+my $filepath = shift @ARGV;
+CORE::open my $filehandle, '<', $filepath or die;
 my @user_code = <$filehandle>;
 close $filehandle;
 
 ##############################
 # STATIC CODE ANALYSIS:
 ##############################
-my %problematic_lines;
 my $line_number;
+my %problematic_lines;
+my %explanations;
 foreach my $line (@user_code) {
 	$line_number++;
 
@@ -135,7 +136,8 @@ foreach my $line (@user_code) {
 		if ($line =~ m/#.*CORE::/) {
 			next;
 		} else {
-			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden invocation of core function detected!";
+			$problematic_lines{$line_number} = $line;
+			$explanations{$line_number} = "Forbidden invocation of core function detected!";
 		}
 	}
 
@@ -143,7 +145,8 @@ foreach my $line (@user_code) {
 		if ($line =~ m/#.*\@INC\s{0,},/) {
 			next;
 		} else {
-			$problematic_lines{"Line ".$line_number.": ".$line} = "Forbidden \@INC array manipulation detected!";
+			$problematic_lines{$line_number} = $line;
+			$explanations{$line_number} = "Forbidden \@INC array manipulation detected!";
 		}
 	}
 }
@@ -210,23 +213,35 @@ if (scalar (keys %problematic_lines) == 0) {
 	close (STDERR) or die "Can not close STDERR: $!";
 	CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can not restore STDERR: $!";
 
-	print STDERR $header;
-	print STDERR "<div class='title'>";
+	if ($filepath !~ "ajax") {
+		print STDERR $header;
+		print STDERR "<div class='title'>";
+		print STDERR "$filepath<br>\n";
+	}
 	print STDERR "Script execution was not attempted due to security violation";
 	if (scalar (keys %problematic_lines) == 1) {
-		print STDERR ":</div>\n";
+		print STDERR ":\n";
 	} elsif (scalar (keys %problematic_lines) > 1) {
-		print STDERR "s:</div>\n";
+		print STDERR "s:\n";
+	}
+	if ($filepath !~ "ajax") {
+		print STDERR "</div>\n";
 	}
 
-	while ((my $line, my $explanation) = each (%problematic_lines)){
-		print STDERR "<pre>";
-		print STDERR "$line";
-		print STDERR "$explanation";
-		print STDERR "</pre>";
+	foreach my $line_number (sort {$a <=> $b} (keys(%problematic_lines))) {
+		if ($filepath !~ "ajax") {
+			print STDERR "<pre>";
+		}
+		print STDERR "Line $line_number: $problematic_lines{$line_number}";
+		print STDERR "$explanations{$line_number}\n";
+		if ($filepath !~ "ajax") {
+			print STDERR "</pre>";
+		}
 	}
-	
-	print STDERR $footer;
+
+	if ($filepath !~ "ajax") {
+		print STDERR $footer;
+	}
 	exit;
 }
 
@@ -234,24 +249,51 @@ if (scalar (keys %problematic_lines) == 0) {
 # PRINT SAVED STDERR, IF ANY:
 ##############################
 if ($@) {
+	print STDERR $header;
 	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
-		print STDERR $header;
-		print STDERR "<div class='title'>Insecure code was blocked:</div>\n";
-		print STDERR "<pre>$@</pre>";
-		print STDERR $footer;
-		exit;
+		if ($filepath !~ "ajax") {
+			print STDERR "<div class='title'>\n";
+			print STDERR "$filepath<br>\n";
+		}
+		print STDERR "Insecure code was blocked:\n";
+		if ($filepath !~ "ajax") {
+			print STDERR "</div>\n";
+		}
 	} else {
-		print STDERR $header;
-		print STDERR "<div class='title'>Errors were found during script execution:</div>\n";
-		print STDERR "<pre>$@</pre>";
-		print STDERR $footer;
-		exit;
+		if ($filepath !~ "ajax") {
+			print STDERR "<div class='title'>\n";
+			print STDERR "$filepath<br>\n";
+		}
+		print STDERR "Errors were found during script execution:\n";
+		if ($filepath !~ "ajax") {
+			print STDERR "</div>\n";
+		}
 	}
+	if ($filepath !~ "ajax") {
+		print STDERR "<pre>";
+	}
+	print STDERR "$@";
+	if ($filepath !~ "ajax") {
+		print STDERR "</pre>";
+		print STDERR $footer;
+	}
+	exit;
 }
 
 if (defined($stderr)) {
-	print STDERR $header;
-	print STDERR "<div class='title'>Errors were found during script execution:</div>\n";
-	print STDERR "<pre>$stderr</pre>";
-	print STDERR $footer;
+	if ($filepath !~ "ajax") {
+		print STDERR $header;
+		print STDERR "<div class='title'>\n";
+		print STDERR "$filepath<br>\n";
+	}
+	print STDERR "Errors were found during script execution:\n";
+	if ($filepath !~ "ajax") {
+		print STDERR "</div>\n";
+		print STDERR "<pre>";
+	}
+	print STDERR "$stderr";
+	if ($filepath !~ "ajax") {
+		print STDERR "</pre>";
+		print STDERR $footer;
+	}
 }

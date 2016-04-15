@@ -1,16 +1,10 @@
 
-Permanent TO-DO:
-- up-to-date README,
-- commented code,
-- up-to-date translations,
-- GitHub Wiki pages,
-
 v. 0.2
 ====================================
-- censor-ajax.pl for local AJAX Perl scripts
 - security tests in separate files
 
-- start Perl debugger in script environment if script is in the root folder
-    and if script is outside the root folder,
+- start Perl debugger in script environment if script is in the root folder and
+    if script is outside the root folder,
     ask for command line arguments and start in system environment
 
+- GitHub Wiki pages,

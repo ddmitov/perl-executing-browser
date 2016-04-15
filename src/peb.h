@@ -296,8 +296,14 @@ protected:
                     }
 
                     if (scriptErrorString.length() > 0) {
-                        qDebug() << "AJAX script gave errors:"
-                                 << scriptFullFilePath;
+                        qDebug() << "AJAX script errors:";
+                        QStringList scriptErrors =
+                                scriptErrorString.split("\n");
+                        foreach (QString scriptError, scriptErrors) {
+                            if (scriptError.length() > 0) {
+                                qDebug() << scriptError;
+                            }
+                        }
                     }
 
                     QWebSettings::clearMemoryCaches();
