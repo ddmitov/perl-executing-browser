@@ -16,32 +16,9 @@ equals (QT_MAJOR_VERSION, 5) {
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
     ##########################################################
-    # Interaction with the Perl debugger -
-    # not available on Windows:
+    # HTTPS support - comment out to disable:
     ##########################################################
-    !win32 {
-        ##########################################################
-        # To switch off Perl debugger interaction:
-        # PERL_DEBUGGER_INTERACTION = 0
-        # If PEB is going to be compiled for end users and
-        # interaction with the biult-in Perl debugger is
-        # not needed or not wanted for security reasons,
-        # this functionality can be turned off.
-        ##########################################################
-        # To compile with Perl debugger interaction:
-        # PERL_DEBUGGER_INTERACTION = 1
-        ##########################################################
-        PERL_DEBUGGER_INTERACTION = 1
-
-        DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
-
-        equals (PERL_DEBUGGER_INTERACTION, 0) {
-            message ("Configured without Perl debugger interaction capability.")
-        }
-        equals (PERL_DEBUGGER_INTERACTION, 1) {
-            message ("Configured with Perl debugger interaction capability.")
-        }
-    }
+    CONFIG += openssl-linked
 
     ##########################################################
     # Macintosh specific settings:
@@ -72,16 +49,41 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
+    # Interaction with the Perl debugger -
+    # not available on Windows:
+    ##########################################################
+    !win32 {
+        ##########################################################
+        # To switch off Perl debugger interaction:
+        # PERL_DEBUGGER_INTERACTION = 0
+        # If PEB is going to be compiled for end users and
+        # interaction with the biult-in Perl debugger is
+        # not needed or not wanted for security reasons,
+        # this functionality can be turned off.
+        ##########################################################
+        # To compile with Perl debugger interaction:
+        # PERL_DEBUGGER_INTERACTION = 1
+        ##########################################################
+        PERL_DEBUGGER_INTERACTION = 1
+
+        DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+
+        equals (PERL_DEBUGGER_INTERACTION, 0) {
+            message ("Configured without Perl debugger interaction capability.")
+        }
+        equals (PERL_DEBUGGER_INTERACTION, 1) {
+            message ("Configured with Perl debugger interaction capability.")
+        }
+    }
+
+    ##########################################################
     # NO CONFIGURATION OPTIONS BELOW THIS POINT.
     ##########################################################
     TEMPLATE = app
     TARGET = peb
-    DEFINES += HAVE_QT5
-    DEPENDPATH += .
 
     # Network support:
     QT += network
-    CONFIG += openssl-linked # necessary for handling https adresses
 
     # Webkit support:
     QT += widgets webkitwidgets

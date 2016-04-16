@@ -539,8 +539,8 @@ QFileDetector::QFileDetector()
 QScriptEnvironment::QScriptEnvironment()
     : QObject(0)
 {
-    // DATA_ROOT:
-    scriptEnvironment.insert("DATA_ROOT", qApp->property("data").toString());
+    // Set PEB_DATA_DIR environment variable:
+    scriptEnvironment.insert("PEB_DATA_DIR", qApp->property("data").toString());
 }
 
 // ==============================

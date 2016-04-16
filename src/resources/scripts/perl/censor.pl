@@ -12,9 +12,26 @@ BEGIN {
 	no ops qw(:dangerous :subprocess :sys_db sysopen);
 
 	##############################
-	# ENVIRONMENT VARIABLES:
+	# ENVIRONMENT:
 	##############################
-	my $DATA_ROOT = $ENV{'DATA_ROOT'};
+	my $PEB_DATA_DIR = $ENV{'PEB_DATA_DIR'};
+
+	my %CLEAN_ENV;
+	$CLEAN_ENV{'PEB_DATA_DIR'} = $PEB_DATA_DIR;
+
+	if ($ENV{'REQUEST_METHOD'}) {
+		$CLEAN_ENV{'REQUEST_METHOD'} = $ENV{'REQUEST_METHOD'};
+	}
+
+	if ($ENV{'QUERY_STRING'}) {
+		$CLEAN_ENV{'QUERY_STRING'} = $ENV{'QUERY_STRING'};
+	}
+
+	if ($ENV{'CONTENT_LENGTH'}) {
+		$CLEAN_ENV{'CONTENT_LENGTH'} = $ENV{'CONTENT_LENGTH'};
+	}
+
+	%ENV = %CLEAN_ENV;
 
 	##############################
 	# OVERRIDE POTENTIALY DANGEROUS
@@ -34,7 +51,7 @@ BEGIN {
 	*CORE::GLOBAL::opendir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[1];
-		if ($dir =~ $DATA_ROOT) {
+		if ($dir =~ $PEB_DATA_DIR) {
 			return CORE::opendir $_[0], $_[1];
 		} else {
 			die "Intercepted insecure 'opendir' call from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
@@ -44,7 +61,7 @@ BEGIN {
 	*CORE::GLOBAL::chdir = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $dir = $_[0];
-		if ($dir =~ $DATA_ROOT) {
+		if ($dir =~ $PEB_DATA_DIR) {
 			return CORE::chdir $_[0];
 		} else {
 			die "Intercepted insecure 'chdir' call from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
@@ -56,7 +73,7 @@ BEGIN {
 		my $handle = shift;
 		if (@_ == 1) {
 			my $filepath = $_[0];
-			if ($_[0] =~ $DATA_ROOT) {
+			if ($_[0] =~ $PEB_DATA_DIR) {
 				return CORE::open ($handle, $_[0]);
 			} else {
 				$filepath =~ s/(\<|\>)//;
@@ -64,7 +81,7 @@ BEGIN {
 			}
 		} elsif (@_ == 2) {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DATA_ROOT) {
+			if ($_[1] =~ $PEB_DATA_DIR) {
 				return CORE::open ($handle, $_[1]);
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -72,14 +89,14 @@ BEGIN {
 		} elsif (@_ == 3) {
 			if (defined $_[2]) {
 				my $filepath = $_[2];
-				if ($_[2] =~ $DATA_ROOT) {
+				if ($_[2] =~ $PEB_DATA_DIR) {
 					CORE::open $handle, $_[1], $_[2];
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 				}
 			} else {
 				my $filepath = $_[1];
-				if ($_[1] =~ $DATA_ROOT) {
+				if ($_[1] =~ $PEB_DATA_DIR) {
 					CORE::open $handle, $_[1], undef; # special case
 				} else {
 					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -87,7 +104,7 @@ BEGIN {
 			}
 		} else {
 			my $filepath = $_[1];
-			if ($_[1] =~ $DATA_ROOT or $_[2] =~ $DATA_ROOT) {
+			if ($_[1] =~ $PEB_DATA_DIR or $_[2] =~ $PEB_DATA_DIR) {
 				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
 			} else {
 				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
@@ -98,7 +115,7 @@ BEGIN {
 	*CORE::GLOBAL::unlink = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $entry = $_[0];
-		if ($entry =~ $DATA_ROOT) {
+		if ($entry =~ $PEB_DATA_DIR) {
 			return CORE::unlink $_[0];
 		} else {
 			die "Intercepted insecure 'unlink' call from package '$package', line: $line.<br>Deleting '$entry' is not allowed!\n";
@@ -217,6 +234,8 @@ if (scalar (keys %problematic_lines) == 0) {
 		print STDERR $header;
 		print STDERR "<div class='title'>";
 		print STDERR "$filepath<br>\n";
+		print STDERR "</div>\n";
+		print STDERR "<div class='title'>";
 	}
 	print STDERR "Script execution was not attempted due to security violation";
 	if (scalar (keys %problematic_lines) == 1) {

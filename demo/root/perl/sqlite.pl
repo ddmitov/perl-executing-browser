@@ -30,7 +30,7 @@ print "
 		<div>\n";
 
 my $database_relative_pathname = "/test.db";
-my $db = DBI->connect ("dbi:SQLite:$ENV{'DATA_ROOT'}$database_relative_pathname","","", {sqlite_unicode => 1}) or
+my $db = DBI->connect ("dbi:SQLite:$ENV{'PEB_DATA_DIR'}$database_relative_pathname","","", {sqlite_unicode => 1}) or
 	die "Could not connect to database";
 
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");

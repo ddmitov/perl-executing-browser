@@ -90,7 +90,7 @@ Compiled and tested successfully using:
 * Local scripts are executed in a clean environment with only a minimum of necessary environment variables.  
   These are:  
   1. ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between local HTML forms and local Perl scripts;  
-  2. ```DATA_ROOT``` - custom environment variable used to locate data files from local Perl scripts.  
+  2. ```PEB_DATA_DIR``` - custom environment variable used to locate data files from local Perl scripts.  
 * Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
 * PEB does not download locally executed scripts from any remote locations.  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
@@ -101,12 +101,13 @@ Compiled and tested successfully using:
   2. :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
   3. :sys_db group - all 30 functions from this group,  
   4. ```sysopen```.  
+* The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
 * Some important core functions for directory traversal and file manipulation are overriden. These are:  
   1. ```opendir```,  
   2. ```chdir```,  
   3. ```open```,  
   4. ```unlink```.  
-  Only files and directories inside the ```DATA_ROOT```folder can be opened, read or deleted, every attempt to manipulate other directories and files will throw an error and the script will be aborted.  
+  Only files and directories inside the ```PEB_DATA_DIR```folder can be opened, read or deleted, every attempt to manipulate other directories and files will throw an error and the script will be aborted.  
 * Default module loading using ```require``` and ```use``` is also overriden.  
   1. ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
   2. The following Windows registry manipulation modules are also banned:  
@@ -135,13 +136,14 @@ Compiled and tested successfully using:
 * Ctrl+P - print current page  
 * Ctrl+I - debug current page using QWebInspector  
   
-## Limitation
+## Limitations
   
 * No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
+* No context menu.  
   
 ## History
   
-PEB was started as a simple GUI for personal databases. Exhaustive documentation is still missing.  
+PEB was started as a simple GUI for personal databases.  
   
 ## License
   
