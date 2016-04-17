@@ -514,9 +514,6 @@ public slots:
                                 QProcess::Unbuffered
                                 | QProcess::ReadWrite);
 
-            runningScriptsInCurrentWindowList
-                    .append(scriptFullFilePath);
-
             if (postData.length() > 0) {
                 scriptHandler.write(postDataArray);
             }
@@ -608,7 +605,6 @@ public slots:
 
         scriptHandler.close();
         qDebug() << "Script finished:" << scriptFullFilePath;
-        runningScriptsInCurrentWindowList.removeOne(scriptFullFilePath);
 
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
@@ -811,10 +807,6 @@ public slots:
 
 public:
     QPage();
-    QString scriptFullFilePath;
-    QProcess scriptHandler;
-    QStringList runningScriptsInCurrentWindowList;
-    QString checkUserInputBeforeCloseJavaScript;
 
 protected:
     bool acceptNavigationRequest(QWebFrame *frame,
@@ -878,6 +870,8 @@ private:
     QWebView *newWindow;
     QWebFrame *targetFrame;
 
+    QString scriptFullFilePath;
+    QProcess scriptHandler;
     QProcessEnvironment scriptEnvironment;
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
@@ -1041,7 +1035,7 @@ public slots:
     void closeEvent(QCloseEvent *event)
     {
         mainPage->currentFrame()->evaluateJavaScript(
-                    mainPage->checkUserInputBeforeCloseJavaScript);
+                    checkUserInputBeforeCloseJavaScript);
         QVariant jsResult =
                 mainPage->currentFrame()->evaluateJavaScript(
                     "checkUserInputBeforeClose()");
@@ -1110,6 +1104,8 @@ private:
     QPage *mainPage;
     QWebView *newWindow;
     QWebView *errorsWindow;
+
+    QString checkUserInputBeforeCloseJavaScript;
 
     QPixmap icon;
 };

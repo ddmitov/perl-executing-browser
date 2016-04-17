@@ -2,18 +2,18 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framework for local CGI-like or AJAX Perl5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML-based interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
-* **1. Fast and easy graphical framework for Perl5 desktop applications:**  
-    use Perl5, JavaScript, HTML5 and CSS to create beautiful desktop data-driven applications;  
+* **1. Fast and easy graphical framework for Perl 5 desktop applications:**  
+    use Perl 5, JavaScript, HTML5 and CSS to create beautiful desktop data-driven applications;  
 
 * **2. Zero installation:**  
     run your applications from any folder;  
 
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl5, Qt5 and QtWebKit are available;  
+    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available;  
 
 * **4. Secure user-space solution:**  
     no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered;  
@@ -28,7 +28,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
 **Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
-* Any version of Perl5 can be selected inside the settings file.  
+* Any version of Perl 5 can be selected inside the settings file.  
   
 **Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
@@ -42,13 +42,13 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt5 WebKit graphical framewor
 * Usefull for both single-page or multiple-page applications with an option to start in fullscreen mode.  
   
 **Development goodies:**  
-* PEB can interact with the built-in Perl5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
 * WebKit Web Inspector can be invoked using keyboard shortcut: Ctrl+I.  
 * Extensive optional logging of all browser activities, including the execution of local scripts.  
 
 ## Compile-time Requirements
   
-GCC compiler and Qt5.1 - Qt5.5 headers (including QtWebKit headers).  
+GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
   
 Compiled and tested successfully using:  
 * Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
@@ -63,8 +63,8 @@ Compiled and tested successfully using:
   
 ## Runtime Requirements
   
-* Qt5 libraries,  
-* Perl5 distribution - any standard Linux, Mac or Windows Perl distribution.  
+* Qt 5 libraries,  
+* Perl 5 distribution - any standard Linux, Mac or Windows Perl distribution.  
   
 ## Target Audience
   
@@ -73,7 +73,7 @@ Compiled and tested successfully using:
   
 ## Applications using Perl Executing Browser
   
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser as a desktop GUI framework, HTML5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl5 for file-writing backend.  
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser as a desktop GUI framework, HTML5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for file-writing backend.  
   
 ## What Perl Executing Browser Is Not
 

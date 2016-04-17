@@ -699,13 +699,6 @@ QPage::QPage()
 
     // ICON FOR DIALOGS:
     icon.load(qApp->property("iconPathName").toString());
-
-    // READ INTERNALLY COMPILED JS SCRIPT:
-    QFile file;
-    file.setFileName(":/scripts/js/check-user-input-before-close.js");
-    file.open(QIODevice::ReadOnly);
-    checkUserInputBeforeCloseJavaScript = file.readAll();
-    file.close();
 }
 
 // ==============================
@@ -784,6 +777,13 @@ QWebViewWindow::QWebViewWindow()
 
     // Icon for windows:
     icon.load(qApp->property("iconPathName").toString());
+
+    // READ INTERNALLY COMPILED JS SCRIPT:
+    QFile file;
+    file.setFileName(":/scripts/js/check-user-input-before-close.js");
+    file.open(QIODevice::ReadOnly);
+    checkUserInputBeforeCloseJavaScript = file.readAll();
+    file.close();
 }
 
 // ==============================
