@@ -28,7 +28,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
 **Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
-* Any version of Perl 5 can be selected inside the settings file.  
+* Any version of Perl 5 can be selected.  
   
 **Web Access:**  
 * PEB can open web pages with cross-site scripting disabled.  
@@ -64,12 +64,12 @@ Compiled and tested successfully using:
 ## Runtime Requirements
   
 * Qt 5 libraries,  
-* Perl 5 distribution - any standard Linux, Mac or Windows Perl distribution.  
+* Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
   
 ## Target Audience
   
-* Perl and JavaScript enthusiasts creating custom data-driven desktop applications.  
-* Perl developers willing to use the built-in Perl debugger in graphical mode.  
+* Perl and JavaScript enthusiasts creating custom data-driven desktop applications  
+* Perl developers willing to use the built-in Perl debugger in graphical mode  
   
 ## Applications using Perl Executing Browser
   

@@ -70,29 +70,29 @@
     </message>
     <message>
         <location filename="../../peb.h" line="595"/>
-        <location filename="../../peb.h" line="827"/>
-        <location filename="../../peb.h" line="844"/>
+        <location filename="../../peb.h" line="823"/>
+        <location filename="../../peb.h" line="840"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location filename="../../peb.h" line="597"/>
-        <location filename="../../peb.h" line="845"/>
+        <location filename="../../peb.h" line="841"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="823"/>
+        <location filename="../../peb.h" line="819"/>
         <source>Alert</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="838"/>
+        <location filename="../../peb.h" line="834"/>
         <source>Confirm</source>
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="859"/>
+        <location filename="../../peb.h" line="855"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -100,12 +100,12 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="981"/>
+        <location filename="../../peb.h" line="977"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="983"/>
+        <location filename="../../peb.h" line="979"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>

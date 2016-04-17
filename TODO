@@ -3,8 +3,6 @@ v. 0.2
 ====================================
 - security tests in separate files
 
-- start Perl debugger in script environment if script is in the root folder and
-    if script is outside the root folder,
-    ask for command line arguments and start in system environment
+- if debugged script is outside the root folder, ask for command line arguments
 
 - GitHub Wiki pages,

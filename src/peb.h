@@ -628,10 +628,6 @@ public slots:
             qDebug() << "File passed to Perl debugger:"
                      << QDir::toNativeSeparators(debuggerScriptToDebug);
 
-            // Perl interpreter to be used for debugging:
-            QString debuggerInterpreter =
-                    (qApp->property("perlInterpreter").toString());
-
             // Clean accumulated debugger output from previous debugger session:
             debuggerAccumulatedOutput = "";
 
@@ -643,15 +639,22 @@ public slots:
             } else {
                 debuggerJustStarted = true;
 
-                // scriptEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-                debuggerHandler.setProcessEnvironment(scriptEnvironment);
+                if (debuggerScriptToDebug
+                        .contains(qApp->property("root").toString())) {
+                    debuggerHandler.setProcessEnvironment(scriptEnvironment);
+                } else {
+                    debuggerHandler.setProcessEnvironment(
+                                QProcessEnvironment::systemEnvironment());
+                }
 
                 QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
                 QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
                 debuggerHandler.setWorkingDirectory(scriptDirectory);
 
                 debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
-                debuggerHandler.start(debuggerInterpreter, QStringList()
+                debuggerHandler.start(qApp->property("perlInterpreter")
+                                      .toString(),
+                                      QStringList()
                                       << "-d" <<
                                       QDir::toNativeSeparators(
                                           debuggerScriptToDebug),
