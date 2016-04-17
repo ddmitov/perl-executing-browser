@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="bg_BG">
+<TS version="2.0" language="bg_BG">
 <context>
     <name>QApplication</name>
     <message>
@@ -70,29 +70,39 @@
     </message>
     <message>
         <location filename="../../peb.h" line="595"/>
-        <location filename="../../peb.h" line="823"/>
-        <location filename="../../peb.h" line="840"/>
+        <location filename="../../peb.h" line="845"/>
+        <location filename="../../peb.h" line="862"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location filename="../../peb.h" line="597"/>
-        <location filename="../../peb.h" line="841"/>
+        <location filename="../../peb.h" line="863"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="819"/>
+        <location filename="../../peb.h" line="652"/>
+        <source>Command Line</source>
+        <translation>Команден ред</translation>
+    </message>
+    <message>
+        <location filename="../../peb.h" line="653"/>
+        <source>Enter all command line arguments, if any:</source>
+        <translation>Въведете всички аргументи на командния ред, ако има такива:</translation>
+    </message>
+    <message>
+        <location filename="../../peb.h" line="841"/>
         <source>Alert</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="834"/>
+        <location filename="../../peb.h" line="856"/>
         <source>Confirm</source>
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="855"/>
+        <location filename="../../peb.h" line="877"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -100,12 +110,12 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="977"/>
+        <location filename="../../peb.h" line="999"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="979"/>
+        <location filename="../../peb.h" line="1001"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>

@@ -3,6 +3,4 @@ v. 0.2
 ====================================
 - security tests in separate files
 
-- if debugged script is outside the root folder, ask for command line arguments
-
 - GitHub Wiki pages,

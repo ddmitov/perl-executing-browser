@@ -631,6 +631,8 @@ public slots:
             // Clean accumulated debugger output from previous debugger session:
             debuggerAccumulatedOutput = "";
 
+            QString commandLineArguments;
+
             if (debuggerHandler.isOpen()) {
                 QByteArray debuggerCommand;
                 debuggerCommand.append(debuggerLastCommand.toLatin1());
@@ -643,6 +645,19 @@ public slots:
                         .contains(qApp->property("root").toString())) {
                     debuggerHandler.setProcessEnvironment(scriptEnvironment);
                 } else {
+                    bool ok;
+                    QString input =
+                            QInputDialog::getText(
+                                qApp->activeWindow(),
+                                tr("Command Line"),
+                                tr("Enter all command line arguments, if any:"),
+                                QLineEdit::Normal,
+                                "",
+                                &ok);
+                    if (ok && !input.isEmpty()) {
+                        commandLineArguments = input;
+                    }
+
                     debuggerHandler.setProcessEnvironment(
                                 QProcessEnvironment::systemEnvironment());
                 }
@@ -655,9 +670,10 @@ public slots:
                 debuggerHandler.start(qApp->property("perlInterpreter")
                                       .toString(),
                                       QStringList()
-                                      << "-d" <<
-                                      QDir::toNativeSeparators(
-                                          debuggerScriptToDebug),
+                                      << "-d"
+                                      << QDir::toNativeSeparators(
+                                          debuggerScriptToDebug)
+                                      << commandLineArguments,
                                       QProcess::Unbuffered
                                       | QProcess::ReadWrite);
 

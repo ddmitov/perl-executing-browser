@@ -7,7 +7,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
 ## Design Objectives
   
 * **1. Fast and easy graphical framework for Perl 5 desktop applications:**  
-    use Perl 5, JavaScript, HTML5 and CSS to create beautiful desktop data-driven applications;  
+    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop data-driven applications;  
 
 * **2. Zero installation:**  
     run your applications from any folder;  
@@ -73,7 +73,7 @@ Compiled and tested successfully using:
   
 ## Applications using Perl Executing Browser
   
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser as a desktop GUI framework, HTML5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for file-writing backend.  
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser as a desktop GUI framework, HTML 5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for file-writing backend.  
   
 ## What Perl Executing Browser Is Not
 
@@ -86,7 +86,7 @@ Compiled and tested successfully using:
 ## Security Features & Considerations
   
 **Security features based on C++ code:**
-* Starting the browser with administrative privileges is not allowed - it exits with a warning message.  
+* Starting the browser with administrative privileges is not allowed - it exits with a message.  
 * Local scripts are executed in a clean environment with only a minimum of necessary environment variables.  
   These are:  
   1. ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between local HTML forms and local Perl scripts;  
@@ -138,7 +138,7 @@ Compiled and tested successfully using:
   
 ## Limitations
   
-* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
+* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```,  
 * No context menu.  
   
 ## History
