@@ -16,6 +16,12 @@
 		<script type="text/javascript">
 			var formSubmitted = false;
 
+			// Custom title for the Confirm dialog box:
+			function pebConfirmTitle() {
+				var confirmTitle = "!! Confirm !!";
+				return confirmTitle;
+			}
+
 			// Exit confirmation:
 			function pebCloseConfirmation() {
 				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +

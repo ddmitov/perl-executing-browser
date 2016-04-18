@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="bg_BG">
+<TS version="2.1" language="bg_BG">
 <context>
     <name>QApplication</name>
     <message>
@@ -39,17 +39,17 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="872"/>
+        <location filename="../../peb.cpp" line="868"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="869"/>
+        <location filename="../../peb.cpp" line="865"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="871"/>
+        <location filename="../../peb.cpp" line="867"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
@@ -102,7 +102,7 @@
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="877"/>
+        <location filename="../../peb.h" line="879"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -110,12 +110,12 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="999"/>
+        <location filename="../../peb.h" line="1010"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1001"/>
+        <location filename="../../peb.h" line="1012"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>

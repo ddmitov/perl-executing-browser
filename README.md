@@ -42,9 +42,9 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
 * Usefull for both single-page or multiple-page applications with an option to start in fullscreen mode.  
   
 **Development goodies:**  
-* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected and loaded for debugging in an HTML graphical interface. Output from debugger commands is displayed together with the syntax highlighted source code of the debugged script and it's included modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* WebKit Web Inspector can be invoked using keyboard shortcut: Ctrl+I.  
-* Extensive optional logging of all browser activities, including the execution of local scripts.  
+* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML graphical interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
+* WebKit Web Inspector can be invoked using the keyboard shortcut Ctrl+I.  
+* Extensive optional logging of all browser activities.  
 
 ## Compile-time Requirements
   

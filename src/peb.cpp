@@ -757,10 +757,6 @@ QWebViewWindow::QWebViewWindow()
                      mainPage,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // To disable history:
-    // QWebHistory *history = mainPage->history();
-    // history->setMaximumItemCount(0);
-
     // Cookies and HTTPS support:
     QNetworkCookieJar *cookieJar = new QNetworkCookieJar;
     networkAccessManager->setCookieJar(cookieJar);

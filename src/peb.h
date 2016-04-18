@@ -834,11 +834,25 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        Q_UNUSED(frame);
+        // Alert dialog box title can be set from JavaScript.
+        // This could be usefull for a partial translation of
+        // the most commonly used dialogs within the browser.
+        QString alertTitle;
+
+        QVariant jsResult = frame->evaluateJavaScript("pebAlertTitle()");
+        QString jsAlertTitle = jsResult.toString();
+
+        if (jsAlertTitle.length() == 0) {
+            alertTitle = tr("Alert");
+        }
+
+        if (jsAlertTitle.length() > 0) {
+            alertTitle = jsAlertTitle;
+        }
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
         javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptAlertMessageBox.setWindowTitle(tr("Alert"));
+        javaScriptAlertMessageBox.setWindowTitle(alertTitle);
         javaScriptAlertMessageBox
                 .setIconPixmap((qApp->property("icon").toString()));
         javaScriptAlertMessageBox.setText(msg);
@@ -849,11 +863,25 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        Q_UNUSED(frame);
+        // Confirm dialog box title can be set from JavaScript.
+        // This could be usefull for a partial translation of
+        // the most commonly used dialogs within the browser.
+        QString confirmTitle;
+
+        QVariant jsResult = frame->evaluateJavaScript("pebConfirmTitle()");
+        QString jsConfirmTitle = jsResult.toString();
+
+        if (jsConfirmTitle.length() == 0) {
+            confirmTitle = tr("Confirm");
+        }
+
+        if (jsConfirmTitle.length() > 0) {
+            confirmTitle = jsConfirmTitle;
+        }
 
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
         javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptConfirmMessageBox.setWindowTitle(tr("Confirm"));
+        javaScriptConfirmMessageBox.setWindowTitle(confirmTitle);
         javaScriptConfirmMessageBox
                 .setIconPixmap((qApp->property("icon").toString()));
         javaScriptConfirmMessageBox.setText(msg);
@@ -870,11 +898,25 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        Q_UNUSED(frame);
+        // Prompt dialog box title can be set from JavaScript.
+        // This could be usefull for a partial translation of
+        // the most commonly used dialogs within the browser.
+        QString promptTitle;
+
+        QVariant jsResult = frame->evaluateJavaScript("pebPromptTitle()");
+        QString jsPromptTitle = jsResult.toString();
+
+        if (jsPromptTitle.length() == 0) {
+            promptTitle = tr("Prompt");
+        }
+
+        if (jsPromptTitle.length() > 0) {
+            promptTitle = jsPromptTitle;
+        }
 
         bool ok = false;
         QString x = QInputDialog::getText(qApp->activeWindow(),
-                                          tr("Prompt"),
+                                          promptTitle,
                                           msg,
                                           QLineEdit::Normal,
                                           defaultValue,
