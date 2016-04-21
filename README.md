@@ -83,7 +83,7 @@ Compiled and tested successfully using:
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently if needed.  
 * PEB has no full-fledged sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but it is still recommended to inspect your scripts before use for possible security vulnerabilities!  
   
-## Security Features & Considerations
+## Security
   
 **Security features based on C++ code:**
 * Starting the browser with administrative privileges is not allowed - it exits with a message.  
@@ -136,10 +136,11 @@ Compiled and tested successfully using:
 * Ctrl+P - print current page  
 * Ctrl+I - debug current page using QWebInspector  
   
-## Limitations
+## User Interface Limitations
   
 * No context menu.  
-* No history and cache. JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
+* No history and cache.  
+JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
 * No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```,  
   
 ## History
