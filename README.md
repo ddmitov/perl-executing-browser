@@ -138,8 +138,9 @@ Compiled and tested successfully using:
   
 ## Limitations
   
-* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```,  
 * No context menu.  
+* No history and cache. JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
+* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```,  
   
 ## History
   

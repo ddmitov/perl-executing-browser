@@ -39,17 +39,17 @@
 <context>
     <name>QPage</name>
     <message>
-        <location filename="../../peb.cpp" line="868"/>
+        <location filename="../../peb.cpp" line="872"/>
         <source>All files (*)</source>
         <translation>Всички файлове (*)</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="865"/>
+        <location filename="../../peb.cpp" line="869"/>
         <source>Select Perl File</source>
         <translation>Избери Perl файл</translation>
     </message>
     <message>
-        <location filename="../../peb.cpp" line="867"/>
+        <location filename="../../peb.cpp" line="871"/>
         <source>Perl scripts (*.pl);;</source>
         <translation>Perl скриптове (*.pl);;</translation>
     </message>
@@ -70,14 +70,14 @@
     </message>
     <message>
         <location filename="../../peb.h" line="595"/>
-        <location filename="../../peb.h" line="845"/>
-        <location filename="../../peb.h" line="862"/>
+        <location filename="../../peb.h" line="859"/>
+        <location filename="../../peb.h" line="890"/>
         <source>Yes</source>
         <translation>Да</translation>
     </message>
     <message>
         <location filename="../../peb.h" line="597"/>
-        <location filename="../../peb.h" line="863"/>
+        <location filename="../../peb.h" line="891"/>
         <source>No</source>
         <translation>Не</translation>
     </message>
@@ -92,17 +92,17 @@
         <translation>Въведете всички аргументи на командния ред, ако има такива:</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="841"/>
+        <location filename="../../peb.h" line="846"/>
         <source>Alert</source>
         <translation>Внимание</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="856"/>
+        <location filename="../../peb.h" line="875"/>
         <source>Confirm</source>
         <translation>Потвърждение</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="879"/>
+        <location filename="../../peb.h" line="910"/>
         <source>Prompt</source>
         <translation>Запитване</translation>
     </message>
@@ -110,12 +110,12 @@
 <context>
     <name>QWebViewWindow</name>
     <message>
-        <location filename="../../peb.h" line="1010"/>
+        <location filename="../../peb.h" line="1041"/>
         <source>Save as PDF</source>
         <translation>Запиши като PDF</translation>
     </message>
     <message>
-        <location filename="../../peb.h" line="1012"/>
+        <location filename="../../peb.h" line="1043"/>
         <source>PDF files (*.pdf)</source>
         <translation>PDF файлове (*.pdf)</translation>
     </message>

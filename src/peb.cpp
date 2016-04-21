@@ -654,7 +654,7 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::XSSAuditingEnabled, true);
 
-    //QWebPage::setForwardUnsupportedContent(true);
+    // Disable cache:
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
@@ -756,6 +756,10 @@ QWebViewWindow::QWebViewWindow()
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      mainPage,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
+
+    // Disable history:
+    QWebHistory *history = mainPage->history();
+    history->setMaximumItemCount(0);
 
     // Cookies and HTTPS support:
     QNetworkCookieJar *cookieJar = new QNetworkCookieJar;

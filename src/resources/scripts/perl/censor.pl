@@ -54,7 +54,7 @@ BEGIN {
 		if ($dir =~ $PEB_DATA_DIR) {
 			return CORE::opendir $_[0], $_[1];
 		} else {
-			die "Intercepted insecure 'opendir' call from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
+			die "Insecure 'opendir' call intercepted from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
 		}
 	};
 
@@ -64,7 +64,7 @@ BEGIN {
 		if ($dir =~ $PEB_DATA_DIR) {
 			return CORE::chdir $_[0];
 		} else {
-			die "Intercepted insecure 'chdir' call from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
+			die "Insecure 'chdir' call intercepted from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
 		}
 	};
 
@@ -77,14 +77,14 @@ BEGIN {
 				return CORE::open ($handle, $_[0]);
 			} else {
 				$filepath =~ s/(\<|\>)//;
-				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
+				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 			}
 		} elsif (@_ == 2) {
 			my $filepath = $_[1];
 			if ($_[1] =~ $PEB_DATA_DIR) {
 				return CORE::open ($handle, $_[1]);
 			} else {
-				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
+				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 			}
 		} elsif (@_ == 3) {
 			if (defined $_[2]) {
@@ -92,14 +92,14 @@ BEGIN {
 				if ($_[2] =~ $PEB_DATA_DIR) {
 					CORE::open $handle, $_[1], $_[2];
 				} else {
-					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
+					die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 				}
 			} else {
 				my $filepath = $_[1];
 				if ($_[1] =~ $PEB_DATA_DIR) {
 					CORE::open $handle, $_[1], undef; # special case
 				} else {
-					die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
+					die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 				}
 			}
 		} else {
@@ -107,7 +107,7 @@ BEGIN {
 			if ($_[1] =~ $PEB_DATA_DIR or $_[2] =~ $PEB_DATA_DIR) {
 				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
 			} else {
-				die "Intercepted insecure 'open' call from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
+				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
 			}
 		}
 	};
@@ -118,7 +118,7 @@ BEGIN {
 		if ($entry =~ $PEB_DATA_DIR) {
 			return CORE::unlink $_[0];
 		} else {
-			die "Intercepted insecure 'unlink' call from package '$package', line: $line.<br>Deleting '$entry' is not allowed!\n";
+			die "Insecure 'unlink' call intercepted from package '$package', line: $line.<br>Deleting '$entry' is not allowed!\n";
 		}
 	};
 }
@@ -233,7 +233,7 @@ if (scalar (keys %problematic_lines) == 0) {
 	if ($filepath !~ "ajax") {
 		print STDERR $header;
 		print STDERR "<div class='title'>";
-		print STDERR "$filepath<br>\n";
+		print STDERR "$filepath\n";
 		print STDERR "</div>\n";
 		print STDERR "<div class='title'>";
 	}
@@ -272,7 +272,9 @@ if ($@) {
 	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
 		if ($filepath !~ "ajax") {
 			print STDERR "<div class='title'>\n";
-			print STDERR "$filepath<br>\n";
+			print STDERR "$filepath\n";
+			print STDERR "</div>\n";
+			print STDERR "<div class='title'>";
 		}
 		print STDERR "Insecure code was blocked:\n";
 		if ($filepath !~ "ajax") {
@@ -281,7 +283,9 @@ if ($@) {
 	} else {
 		if ($filepath !~ "ajax") {
 			print STDERR "<div class='title'>\n";
-			print STDERR "$filepath<br>\n";
+			print STDERR "$filepath\n";
+			print STDERR "</div>\n";
+			print STDERR "<div class='title'>";
 		}
 		print STDERR "Errors were found during script execution:\n";
 		if ($filepath !~ "ajax") {
@@ -303,7 +307,9 @@ if (defined($stderr)) {
 	if ($filepath !~ "ajax") {
 		print STDERR $header;
 		print STDERR "<div class='title'>\n";
-		print STDERR "$filepath<br>\n";
+		print STDERR "$filepath\n";
+		print STDERR "</div>\n";
+		print STDERR "<div class='title'>";
 	}
 	print STDERR "Errors were found during script execution:\n";
 	if ($filepath !~ "ajax") {
