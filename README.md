@@ -28,6 +28,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
 **Local Scripting:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
+* Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
   
 **Web Access:**  
@@ -39,7 +40,7 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
 * All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to your HTML interface.  
-* Usefull for both single-page or multiple-page applications with an option to start in fullscreen mode.  
+* Usefull for both single-page or multi-page applications with an option to start in fullscreen mode.  
   
 **Development goodies:**  
 * PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML graphical interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
@@ -141,7 +142,7 @@ Compiled and tested successfully using:
 * No context menu.  
 * No history and cache.  
 JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
-* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```,  
+* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
   
 ## History
   
