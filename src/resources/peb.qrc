@@ -3,7 +3,7 @@
         <file>html/about.htm</file>
         <file>html/error.htm</file>
         <file>html/error_bg_BG.htm</file>
-        <file>icons/camel-icon-32.png</file>
+        <file>icons/camel.png</file>
         <file>scripts/js/check-user-input-before-close.js</file>
         <file>scripts/perl/censor.pl</file>
         <file>translations/peb_bg_BG.qm</file>

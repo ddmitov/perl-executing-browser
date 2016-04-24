@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser - Demo</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+
+		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/themes/darkly-theme.css" media="all" />
+
+	</head>
+
+	<body>
+
+		<div class="container">
+
+			<p align="center">
+				<font size="5">
+					Local Scripting Tests
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/sqlite.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/sqlite.pl"
+						data-placement="right">
+					SQLite Test</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/env.pl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/env.pl"
+						data-placement="right">
+					Environment and @INC array</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/get.htm"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/get.htm"
+						data-placement="right">
+					GET Method</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/post.htm"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/post.htm"
+						data-placement="right">
+					POST Method</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/perl/noextpl"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/noextpl"
+						data-placement="right">
+					Extensionless Script</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/dummy.txt"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/dummy.txt"
+						data-placement="right">
+					Unsupported File Type</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://perl-executing-browser-pseudodomain/security-tests.htm"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/security-tests.htm"
+						data-placement="right">
+					Security Tests</a>
+				</font>
+			</p>
+
+			<div id="ajax-results">
+				<button id="ajax-button" class="btn btn-primary"
+						data-toggle="tooltip" title="http://perl-executing-browser-pseudodomain/perl/ajax.pl"
+						data-placement="right">
+				Local AJAX Script</button>
+			</div>
+
+			<hr width="95%">
+
+			<p align="center">
+				<font size="5">
+					Web Interaction
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="http://www.perl.org/"
+						data-toggle="tooltip" title="http://www.perl.org/"
+						data-placement="right">
+					Web Content</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<a href="https://html5test.com/"
+						data-toggle="tooltip" title="https://html5test.com/"
+						data-placement="right">
+					Online HTML 5 Test</a>
+				</font>
+			</p>
+
+			<p align="center">
+				<font size="5">
+					<button onclick="window.open('https://www.google.bg')" class="btn btn-primary"
+						data-toggle="tooltip" title="https://www.google.bg"
+						data-placement="right">
+					Web Content in a New Window from JavaScript</button>
+				</font>
+			</p>
+
+		</div>
+
+		<script>
+			$(document).ready(function() {
+				$('[data-toggle="tooltip"]').tooltip();
+
+				$('#ajax-button').click(function() {
+					$.ajax({
+						url: 'http://perl-executing-browser-pseudodomain/perl/ajax.pl',
+						method: 'GET',
+						dataType: 'text',
+						success: function(data) {
+							$('#ajax-results').html(data);
+						}
+					});
+				});
+
+			});
+		</script>
+
+	</body>
+
+</html>

@@ -256,7 +256,6 @@ int main(int argc, char **argv)
              + ".ini");
 
     // Define INI file format for settings:
-    QFile settingsFile(settingsFileName);
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
     // ==============================
@@ -330,62 +329,45 @@ int main(int argc, char **argv)
         application.setProperty("logDirFullPath", logDirFullPath);
     }
 
-    // Root directory:
-    QString rootDirSetting =
-            settings.value("root_directory").toString();
-    QString rootDirName;
-    if (rootDirSetting.length() > 0) {
-        QDir rootDir(rootDirSetting);
-        if (rootDir.isRelative()) {
-            rootDirName = QDir::toNativeSeparators(
-                        settingsDirName + rootDirSetting);
-        }
-        if (rootDir.isAbsolute()) {
-            rootDirName = QDir::toNativeSeparators(rootDirSetting);
-        }
-        application.setProperty("root", rootDirName);
-    }
+    // Package directory:
+    QString packageDirName = QDir::toNativeSeparators(
+                settingsDirName
+                + "package"
+                + QDir::separator());
 
-    // Data directory:
-    QString dataDirSetting =
-            settings.value("data_directory").toString();
-    QString dataDirName;
-    if (dataDirSetting.length() > 0) {
-        QDir dataDir(dataDirSetting);
-        if (!dataDir.exists()) {
-            dataDir.mkpath(".");
-        }
-        if (dataDir.isRelative()) {
-            dataDirName = QDir::toNativeSeparators(
-                        settingsDirName + dataDirSetting);
-        }
-        if (dataDir.isAbsolute()) {
-            dataDirName = QDir::toNativeSeparators(dataDirSetting);
-        }
-        application.setProperty("data", dataDirName);
-    }
+    // Package application directory:
+    QString applicationDirName = QDir::toNativeSeparators(
+                packageDirName
+                + "application");
+    application.setProperty("application", applicationDirName);
 
-    // Start page -
+    // Package data directory:
+    QString dataDirName = QDir::toNativeSeparators(
+                packageDirName
+                + "data");
+    application.setProperty("data", dataDirName);
+
+    // Package start page -
     // path must be relative to the root directory of the current package.
     // HTML file or script are equally usable as a start page:
     QString startPageSetting =
             settings.value("start_page").toString();
     application.setProperty("startPagePath", startPageSetting);
 
-    // Fullscreen:
+    // Start fullscreen:
     QString startFullscreenSetting =
             settings.value("start_fullscreen").toString();
     application.setProperty("fullscreen", startFullscreenSetting);
 
-    // Icon:
-    QString iconSetting = settings.value("icon").toString();
-    QString iconPathName;
-    if (iconSetting.length() > 0) {
-        iconPathName = QDir::toNativeSeparators(
-                    rootDirName + QDir::separator() + iconSetting);
-    }
-    QFile iconFile(iconPathName);
+    // Package icon:
+    QString iconPathName = QDir::toNativeSeparators(
+                settingsDirName
+                + QDir::separator()
+                + "package"
+                + QDir::separator()
+                + "package.png");
     QPixmap icon(32, 32);
+    QFile iconFile(iconPathName);
     if (iconFile.exists()) {
         application.setProperty("iconPathName", iconPathName);
         icon.load(iconPathName);
@@ -394,7 +376,7 @@ int main(int argc, char **argv)
         // Set the embedded default icon
         // in case no external icon file is found:
         application.setProperty("iconPathName", ":/icons/camel-icon-32.png");
-        icon.load(":/icons/camel-icon-32.png");
+        icon.load(":/icons/camel.png");
         QApplication::setWindowIcon(icon);
     }
 
@@ -439,8 +421,10 @@ int main(int argc, char **argv)
     QObject::connect(qApp, SIGNAL(lastWindowClosed()),
                      &window, SLOT(qExitApplicationSlot()));
 
-    // Check if settings file and start page exist:
-    QFile startPageFile(rootDirName + QDir::separator() + startPageSetting);
+    // Start page existence check and loading:
+    QFile startPageFile(applicationDirName
+                        + QDir::separator()
+                        + startPageSetting);
     if (startPageFile.exists()) {
         window.qLoadStartPageSlot();
     } else {
@@ -450,7 +434,7 @@ int main(int argc, char **argv)
                                +".htm"));
         } else {
             window.setUrl(QUrl("qrc:/html/error.htm"));
-            qDebug()  <<"Settings file is missing or start page is not found.";
+            qDebug()  <<"Start page is not found.";
         }
     }
 
@@ -466,19 +450,12 @@ int main(int argc, char **argv)
     if (loggingSetting == "enable") {
         qDebug() << "Logging is enabled.";
     }
-    qDebug() << "Root directory:" << rootDirName;
-    qDebug() << "Data directory:" << dataDirName;
-    if (rootDirSetting.length() > 0) {
-        qDebug() << "Start page:"
-                 << rootDirName + QDir::separator() + startPageSetting;
-    } else {
-        qDebug() << "Start page path can not be resolved.";
-    }
+    qDebug() << "Package application directory:" << applicationDirName;
+    qDebug() << "Package data directory:" << dataDirName;
+    qDebug() << "Package start page:"
+             << applicationDirName + QDir::separator() + startPageSetting;
     if (startFullscreenSetting == "enable") {
         qDebug() << "Start in fullscreen is enabled.";
-    }
-    if (iconPathName.length() > 0) {
-        qDebug() << "Icon:" << iconPathName;
     }
     if (translationSetting.length() > 0) {
         qDebug() << "Translation:" << translationSetting;

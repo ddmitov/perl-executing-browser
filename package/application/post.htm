@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser - Demo</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+
+		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/themes/darkly-theme.css" media="all"/>
+
+		<script type="text/javascript">
+			var formSubmitted = false;
+
+			// Custom title for the Confirm dialog box:
+			function pebConfirmTitle() {
+				var confirmTitle = "!! Confirm !!";
+				return confirmTitle;
+			}
+
+			// Exit confirmation:
+			function pebCloseConfirmation() {
+				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +
+										"Are you sure you want to close the window?");
+
+				var result;
+				if (confirmation == true) {
+					result = "yes";
+				} else {
+					result = "no";
+				}
+				return result;
+			}
+
+			// This function is necessary to prevent
+			// navigate away confirmation when form is being submitted.
+			function submitFunction() {
+				formSubmitted = true;
+			}
+
+			// Navigate away confirmation -
+			// it will be trigered only if form is not being submitted:
+			$(window).on("beforeunload", function() {
+				if (formSubmitted == false) {
+					var textEntered = "";
+
+					var textFields = new Array();
+					textFields = document.getElementsByTagName("textarea");
+
+					for (i = 0; i < textFields.length; i++) { 
+						if (textFields[i].value.length > 0) {
+							textEntered = "yes";
+						}
+					}
+
+					var inputBoxes = new Array();
+					inputBoxes = document.querySelectorAll("input[type=text]");
+
+					for (i = 0; i < inputBoxes.length; i++) { 
+						if (inputBoxes[i].value.length > 0) {
+							textEntered = "yes";
+						}
+					}
+
+					if (textEntered == "yes") {
+						return "Text was entered on this page and it is going to be lost!\n" +
+											"Are you sure you want to go to another page?";
+					}
+				}
+			});
+		</script>
+
+	</head>
+
+	<body>
+
+		<form action="perl/get-post-test.pl" method="post" onsubmit="submitFunction()">
+
+			<div class="col-lg-10 col-lg-offset-1">
+
+				<fieldset>
+
+					<legend>Send POST request to local script</legend>
+
+					<!-- Inputs 1 and 2 -->
+					<div class="form-group">
+						<div class="input-prepend">
+							<input type="text" id="value1" name="value1" class="form-control" placeholder="Value 1" title="Value 1"/>
+						</div>
+						<div class="input-append">
+							<input type="text" id="value2" name="value2" class="form-control" placeholder="Value 2" title="Value 2"/>
+						</div>
+					</div>
+
+					<div class="form-group">
+						<input type="reset" value="Reset" class="btn btn-default" />
+						<input type="submit" value="Submit" class="btn btn-primary" />
+					</div>
+
+					<div>
+						<button type="button" onclick="window.history.back()" class="btn btn-default">
+							Go Back</button>
+						<button type="button" onclick="location.reload();" class="btn btn-default">
+							Reload
+						</button>
+					</div>
+
+				</fieldset>
+
+			</div>
+
+		</form>
+
+	</body>
+
+</html>

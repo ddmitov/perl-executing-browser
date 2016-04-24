@@ -193,7 +193,7 @@ protected:
                 request.url().path().contains("ajax")) {
 
             QString scriptFullFilePath = QDir::toNativeSeparators
-                    ((qApp->property("root").toString())
+                    ((qApp->property("application").toString())
                      + request.url().path());
 
             QFileDetector fileDetector;
@@ -350,7 +350,7 @@ protected:
 
             // Get the full file path and file extension:
             QString fullFilePath = QDir::toNativeSeparators
-                    ((qApp->property("root").toString())
+                    ((qApp->property("application").toString())
                      + request.url().path());
 
             QFileDetector fileDetector;
@@ -380,7 +380,7 @@ protected:
                              << request.url().toString();
 
                     QString localFileName(QDir::toNativeSeparators(
-                                              (qApp->property("root")
+                                              (qApp->property("application")
                                                .toString())
                                               + request.url().path()));
                     QFile localFile(localFileName);
@@ -461,8 +461,7 @@ public slots:
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
         scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("root").toString())
-                 + url.path());
+                ((qApp->property("application").toString()) + url.path());
 
         if (qApp->property("perlInterpreter").toString().length() > 0) {
             if (scriptHandler.isOpen()) {
@@ -642,7 +641,7 @@ public slots:
                 debuggerJustStarted = true;
 
                 if (debuggerScriptToDebug
-                        .contains(qApp->property("root").toString())) {
+                        .contains(qApp->property("application").toString())) {
                     debuggerHandler.setProcessEnvironment(scriptEnvironment);
                 } else {
                     bool ok;
