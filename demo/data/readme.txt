@@ -1,1 +1,0 @@
-This folder should contain any writable data files.
