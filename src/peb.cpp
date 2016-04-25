@@ -308,25 +308,21 @@ int main(int argc, char **argv)
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // Logging:
-    QString loggingSetting =
-            settings.value("logging").toString();
+    // If 'logs' directory is found in the directory of the browser binary,
+    // all program messages will be redirected to log files,
+    // otherwise no log files will be created and
+    // all program messages will be visible inside Qt Creator.
     QString logDirFullPath = settingsDirName + "logs";
-    if (loggingSetting == "enable") {
+    QDir logDir(logDirFullPath);
+    if (logDir.exists()) {
+        application.setProperty("logDirFullPath", logDirFullPath);
         // Application start date and time for logging:
         QString applicationStartDateAndTime =
                 QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
-        application
-                .setProperty("applicationStartDateAndTime",
-                             applicationStartDateAndTime);
-        // Install message handler for
-        // redirecting all debug messages to a log file:
+        application.setProperty("applicationStartDateAndTime",
+                                applicationStartDateAndTime);
+        // Install message handler for redirecting all messages to a log file:
         qInstallMessageHandler(customMessageHandler);
-        // Log files directory:
-        QDir logDir(logDirFullPath);
-        if (!logDir.exists()) {
-            logDir.mkpath(".");
-        }
-        application.setProperty("logDirFullPath", logDirFullPath);
     }
 
     // Package directory:
@@ -396,7 +392,7 @@ int main(int argc, char **argv)
     application.installTranslator(&translator);
 
     // ==============================
-    // LOG BASIC PROGRAM INFORMATION:
+    // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
     // ==============================
     qDebug() << application.applicationName().toLatin1().constData()
              << "version"
@@ -411,7 +407,16 @@ int main(int argc, char **argv)
     if (PERL_DEBUGGER_INTERACTION == 1) {
         qDebug() << "Perl debugger interaction is enabled.";
     }
-    qDebug() << "";
+    qDebug() << "Settings file:" << settingsFileName;
+    qDebug() << "Perl interpreter:" << perlInterpreter;
+    qDebug() << "Start page:"
+             << applicationDirName + QDir::separator() + startPageSetting;
+    if (startFullscreenSetting == "enable") {
+        qDebug() << "Start in fullscreen is enabled.";
+    }
+    if (translationSetting.length() > 0) {
+        qDebug() << "Translation:" << translationSetting;
+    }
 
     // ==============================
     // MAIN GUI CLASS INITIALIZATION:
@@ -440,27 +445,6 @@ int main(int argc, char **argv)
 
     window.setWindowIcon(icon);
     window.show();
-
-    // ==============================
-    // LOG ALL SETTINGS:
-    // ==============================
-    qDebug() << "";
-    qDebug() << "Settings file:" << settingsFileName;
-    qDebug() << "Perl interpreter:" << perlInterpreter;
-    if (loggingSetting == "enable") {
-        qDebug() << "Logging is enabled.";
-    }
-    qDebug() << "Package application directory:" << applicationDirName;
-    qDebug() << "Package data directory:" << dataDirName;
-    qDebug() << "Package start page:"
-             << applicationDirName + QDir::separator() + startPageSetting;
-    if (startFullscreenSetting == "enable") {
-        qDebug() << "Start in fullscreen is enabled.";
-    }
-    if (translationSetting.length() > 0) {
-        qDebug() << "Translation:" << translationSetting;
-    }
-    qDebug() << "";
 
     return application.exec();
 }
