@@ -55,8 +55,24 @@ BOOL IsUserAdmin(void)
 #endif
 
 // ==============================
+// READ EMBEDDED HTML TEMPLATE
+// FOR ERROR MESSAGES:
+// ==============================
+QString readHtmlErrorTemplate()
+{
+    QString htmlErrorFileName(":/html/error.htm");
+    QFile htmlErrorFile(htmlErrorFileName);
+    htmlErrorFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream htmlErrorStream(&htmlErrorFile);
+    QString htmlErrorContents = htmlErrorStream.readAll();
+    htmlErrorFile.close();
+
+    return htmlErrorContents;
+}
+
+// ==============================
 // MESSAGE HANDLER FOR REDIRECTING
-// ALL DEBUG MESSAGES TO A LOG FILE:
+// PROGRAM MESSAGES TO A LOG FILE:
 // ==============================
 // Implementation of an idea proposed by Valcho Nedelchev.
 void customMessageHandler(QtMsgType type,
@@ -94,15 +110,11 @@ void customMessageHandler(QtMsgType type,
     QFile logFile(QDir::toNativeSeparators
                   (qApp->property("logDirFullPath").toString()
                    + QDir::separator()
-                   + QFileInfo(
-                       QApplication::applicationFilePath()).baseName()
+                   + QFileInfo(QApplication::applicationFilePath()).baseName()
                    + "-started-at-"
-                   + qApp->property(
-                       "applicationStartDateAndTime").toString()
+                   + qApp->property("applicationStartDateAndTime").toString()
                    + ".log"));
-    logFile.open(QIODevice::WriteOnly
-                 | QIODevice::Append
-                 | QIODevice::Text);
+    logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
     QTextStream textStream(&logFile);
     textStream << text << endl;
 }
@@ -119,6 +131,7 @@ int main(int argc, char **argv)
     // ==============================
     application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.1");
+    bool startedAsRoot = false;
 
     // ==============================
     // SET UTF-8 ENCODING APPLICATION-WIDE:
@@ -142,10 +155,9 @@ int main(int argc, char **argv)
         if (isatty(fileno(stdin))) {
             // Prevent starting as root from command line:
             if (userEuid == 0) {
-                std::cout << " " << std::endl
-                          << "Starting with root privileges is not allowed!"
-                          << std::endl
-                          << " " << std::endl;
+                std::cout << "Starting Perl Executing Browser by administrator "
+                          << "is not allowed."
+                          << std::endl;
                 return 1;
                 QApplication::exit();
             }
@@ -185,46 +197,14 @@ int main(int argc, char **argv)
 
     // Prevent starting as root in graphical mode:
     if (userEuid == 0) {
-        QString title = (QApplication::tr("Started as root"));
-        QString text = (QApplication::tr("Browser was started as root.")
-                        + "<br>"
-                        + QApplication::tr("This is not a good idea!")
-                        + "<br>"
-                        + QApplication::tr("Going to quit now."));
-        QMessageBox startedAsRootMessageBox;
-        startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
-        startedAsRootMessageBox.setIcon(QMessageBox::Critical);
-        startedAsRootMessageBox.setWindowTitle(title);
-        startedAsRootMessageBox.setText(text);
-        startedAsRootMessageBox.setDefaultButton(QMessageBox::Ok);
-        startedAsRootMessageBox.exec();
-
-        return 1;
-        QApplication::exit();
+        startedAsRoot = true;
     }
 #endif
 
 #ifdef Q_OS_WIN
     // Detect user privileges - Windows:
     if (IsUserAdmin()) {
-        QMessageBox startedAsRootMessageBox;
-        startedAsRootMessageBox.setWindowModality(Qt::WindowModal);
-        startedAsRootMessageBox.setIcon(QMessageBox::Critical);
-        startedAsRootMessageBox.setWindowTitle(
-                    QApplication::tr(
-                        "Started by administrator"));
-        startedAsRootMessageBox.setText(
-                    QApplication::tr(
-                        "Browser was started with administrative privileges.")
-                    + "<br>"
-                    + QApplication::tr("This is not a good idea!")
-                    + "&nbsp;"
-                    + QApplication::tr("Going to quit now."));
-        startedAsRootMessageBox.setDefaultButton(QMessageBox::Ok);
-        startedAsRootMessageBox.exec();
-
-        return 1;
-        QApplication::exit();
+        startedAsRoot = true;
     }
 #endif
 
@@ -311,7 +291,7 @@ int main(int argc, char **argv)
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
-    // all program messages will be visible inside Qt Creator.
+    // program messages could be seen inside Qt Creator.
     QString logDirFullPath = settingsDirName + "logs";
     QDir logDir(logDirFullPath);
     if (logDir.exists()) {
@@ -357,10 +337,8 @@ int main(int argc, char **argv)
 
     // Package icon:
     QString iconPathName = QDir::toNativeSeparators(
-                settingsDirName
-                + QDir::separator()
-                + "package"
-                + QDir::separator()
+                settingsDirName + QDir::separator()
+                + "package" + QDir::separator()
                 + "package.png");
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
@@ -376,48 +354,6 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
-    // Translation:
-    QString translationSetting =
-            settings.value("translation").toString();
-    QTranslator translator;
-    if (translationSetting.length() > 0) {
-        // Check for a valid translation.
-        // Future valid translations have to be added here.
-        if (translationSetting == "bg_BG") {
-            translator.load("peb_" + translationSetting, ":/translations");
-        } else {
-            translationSetting = "";
-        }
-    }
-    application.installTranslator(&translator);
-
-    // ==============================
-    // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
-    // ==============================
-    qDebug() << application.applicationName().toLatin1().constData()
-             << "version"
-             << application.applicationVersion().toLatin1().constData()
-             << "started.";
-    qDebug() << "Executable:" << application.applicationFilePath();
-    qDebug() << "Qt version:" << QT_VERSION_STR;
-    qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
-    if (PERL_DEBUGGER_INTERACTION == 0) {
-        qDebug() << "Perl debugger interaction is disabled.";
-    }
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        qDebug() << "Perl debugger interaction is enabled.";
-    }
-    qDebug() << "Settings file:" << settingsFileName;
-    qDebug() << "Perl interpreter:" << perlInterpreter;
-    qDebug() << "Start page:"
-             << applicationDirName + QDir::separator() + startPageSetting;
-    if (startFullscreenSetting == "enable") {
-        qDebug() << "Start in fullscreen is enabled.";
-    }
-    if (translationSetting.length() > 0) {
-        qDebug() << "Translation:" << translationSetting;
-    }
-
     // ==============================
     // MAIN GUI CLASS INITIALIZATION:
     // ==============================
@@ -426,20 +362,57 @@ int main(int argc, char **argv)
     QObject::connect(qApp, SIGNAL(lastWindowClosed()),
                      &window, SLOT(qExitApplicationSlot()));
 
-    // Start page existence check and loading:
-    QFile startPageFile(applicationDirName
-                        + QDir::separator()
-                        + startPageSetting);
-    if (startPageFile.exists()) {
-        window.qLoadStartPageSlot();
-    } else {
-        if (translationSetting.length() > 0) {
-            window.setUrl(QUrl("qrc:/html/error_"
-                               + translationSetting
-                               +".htm"));
+    if (startedAsRoot == true) {
+        QString htmlErrorContents = readHtmlErrorTemplate();
+        QString errorMessage =
+                "Running Perl Executing Browser with "
+                "administrative privileges is not allowed.";
+        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+
+        window.setHtml(htmlErrorContents);
+
+        qDebug() << "Running"
+                 << application.applicationName().toLatin1().constData()
+                 << application.applicationVersion().toLatin1().constData()
+                 << "with administrative privileges is not allowed.";
+    }
+
+    if (startedAsRoot == false) {
+        // ==============================
+        // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
+        // ==============================
+        qDebug() << application.applicationName().toLatin1().constData()
+                 << application.applicationVersion().toLatin1().constData()
+                 << "started.";
+        qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "Qt version:" << QT_VERSION_STR;
+        qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+        if (PERL_DEBUGGER_INTERACTION == 0) {
+            qDebug() << "Perl debugger interaction is disabled.";
+        }
+        if (PERL_DEBUGGER_INTERACTION == 1) {
+            qDebug() << "Perl debugger interaction is enabled.";
+        }
+        qDebug() << "Settings file:" << settingsFileName;
+        qDebug() << "Perl interpreter:" << perlInterpreter;
+        if (startFullscreenSetting == "enable") {
+            qDebug() << "Start in fullscreen is enabled.";
+        }
+
+        // Start page existence check and loading:
+        QFile startPageFile(applicationDirName
+                            + QDir::separator()
+                            + startPageSetting);
+        if (startPageFile.exists()) {
+            window.qLoadStartPageSlot();
         } else {
-            window.setUrl(QUrl("qrc:/html/error.htm"));
-            qDebug()  <<"Start page is not found.";
+            QString htmlErrorContents = readHtmlErrorTemplate();
+            QString errorMessage = "Start page was not found.";
+            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+
+            window.setHtml(htmlErrorContents);
+
+            qDebug() << "Start page was not found.";
         }
     }
 
@@ -700,8 +673,6 @@ QWebViewWindow::QWebViewWindow()
                      this, SLOT(qStartPrintPreviewSlot()));
     QObject::connect(mainPage, SIGNAL(printSignal()),
                      this, SLOT(qPrintSlot()));
-    QObject::connect(mainPage, SIGNAL(saveAsPdfSignal()),
-                     this, SLOT(qSaveAsPdfSlot()));
 
     QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
@@ -775,16 +746,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         return false;
     }
-
-    // Save as PDF from URL:
-    if (navigationType == QWebPage::NavigationTypeLinkClicked and
-            request.url().fileName() == "print.function" and
-            request.url().query() == ("action=pdf")) {
-
-        emit saveAsPdfSignal();
-
-        return false;
-    }
 #endif
 
     // About Qt dialog box:
@@ -827,10 +788,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 debuggerScriptToDebug = selectScriptToDebugDialog
                         .getOpenFileName
                         (qApp->activeWindow(),
-                         tr("Select Perl File"),
+                         "Select Perl File",
                          QDir::currentPath(),
-                         tr("Perl scripts (*.pl);;")
-                         + tr("All files (*)"));
+                         "Perl scripts (*.pl);;All files (*)");
                 selectScriptToDebugDialog.close();
                 selectScriptToDebugDialog.deleteLater();
 

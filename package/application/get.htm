@@ -22,7 +22,7 @@
 				return confirmTitle;
 			}
 
-			// Exit confirmation:
+			// Close confirmation:
 			function pebCloseConfirmation() {
 				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +
 										"Are you sure you want to close the window?");
@@ -34,6 +34,18 @@
 					result = "no";
 				}
 				return result;
+			}
+
+			// Custom Yes button label:
+			function pebYesLabel() {
+				var yesLabel = "YES";
+				return yesLabel;
+			}
+
+			// Custom No button label:
+			function pebNoLabel() {
+				var noLabel = "NO";
+				return noLabel;
 			}
 
 			// This function is necessary to prevent
@@ -102,8 +114,6 @@
 					</div>
 
 					<div>
-						<button type="button" onclick="window.history.back()" class="btn btn-default">
-							Go Back</button>
 						<button type="button" onclick="location.reload();" class="btn btn-default">
 							Reload
 						</button>

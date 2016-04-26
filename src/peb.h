@@ -455,7 +455,6 @@ signals:
     void displayErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
-    void saveAsPdfSignal();
 
 public slots:
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
@@ -493,25 +492,20 @@ public slots:
 
             // 'censor.pl' is compiled into the resources of
             // the binary file and called from there.
-            QString censorScriptFileName(
-                        ":/scripts/perl/censor.pl");
+            QString censorScriptFileName(":/scripts/perl/censor.pl");
             QFile censorScriptFile(censorScriptFileName);
-            censorScriptFile.open(QIODevice::ReadOnly
-                                  | QIODevice::Text);
+            censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
             QTextStream censorStream(&censorScriptFile);
             QString censorScriptContents = censorStream.readAll();
             censorScriptFile.close();
 
-            scriptHandler.start((qApp->property("perlInterpreter")
-                                 .toString()),
+            scriptHandler.start((qApp->property("perlInterpreter").toString()),
                                 QStringList()
                                 << "-e"
                                 << censorScriptContents
                                 << "--"
-                                << QDir::toNativeSeparators(
-                                    scriptFullFilePath),
-                                QProcess::Unbuffered
-                                | QProcess::ReadWrite);
+                                << QDir::toNativeSeparators(scriptFullFilePath),
+                                QProcess::Unbuffered | QProcess::ReadWrite);
 
             if (postData.length() > 0) {
                 scriptHandler.write(postDataArray);
@@ -576,29 +570,7 @@ public slots:
                 targetFrame->setHtml(scriptAccumulatedErrors,
                                      QUrl(PSEUDO_DOMAIN));
             } else {
-                QMessageBox showErrorsMessageBox (qApp->activeWindow());
-                showErrorsMessageBox.setWindowModality(Qt::WindowModal);
-                showErrorsMessageBox.setWindowTitle(tr("Errors"));
-                showErrorsMessageBox
-                        .setIconPixmap((qApp->property("icon")
-                                        .toString()));
-                showErrorsMessageBox
-                        .setText(tr("Errors were found "
-                                    "during script execution.")
-                                 + "<br>"
-                                 + tr("Do you want to see them?"));
-                showErrorsMessageBox
-                        .setStandardButtons(QMessageBox::Yes
-                                            | QMessageBox::No);
-                showErrorsMessageBox
-                        .setButtonText(QMessageBox::Yes, tr("Yes"));
-                showErrorsMessageBox
-                        .setButtonText(QMessageBox::No, tr("No"));
-                showErrorsMessageBox.setDefaultButton(QMessageBox::Yes);
-
-                if (showErrorsMessageBox.exec() == QMessageBox::Yes) {
-                    emit displayErrorsSignal(scriptAccumulatedErrors);
-                }
+                emit displayErrorsSignal(scriptAccumulatedErrors);
             }
         }
 
@@ -648,8 +620,8 @@ public slots:
                     QString input =
                             QInputDialog::getText(
                                 qApp->activeWindow(),
-                                tr("Command Line"),
-                                tr("Enter all command line arguments, if any:"),
+                                "Command Line",
+                                "Enter all command line arguments, if any:",
                                 QLineEdit::Normal,
                                 "",
                                 &ok);
@@ -715,7 +687,6 @@ public slots:
                     }
                     qDebuggerStartHtmlFormatter();
                 }
-
 
                 if ((debuggerLastCommand.length() == 0) and
                         (debuggerAccumulatedOutput
@@ -834,19 +805,25 @@ protected:
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
         // Alert dialog box title can be set from JavaScript.
-        // This could be usefull for a partial translation of
-        // the most commonly used dialogs within the browser.
         QString alertTitle;
-
         QVariant jsResult = frame->evaluateJavaScript("pebAlertTitle()");
         QString jsAlertTitle = jsResult.toString();
-
         if (jsAlertTitle.length() == 0) {
-            alertTitle = tr("Alert");
+            alertTitle = "Alert";
         }
-
         if (jsAlertTitle.length() > 0) {
             alertTitle = jsAlertTitle;
+        }
+
+        // Yes button label can be set from JavaScript.
+        QString yesLabel;
+        QVariant yesLabelJsResult = frame->evaluateJavaScript("pebYesLabel()");
+        QString jsYesLabel = yesLabelJsResult.toString();
+        if (jsYesLabel.length() == 0) {
+            yesLabel = "Yes";
+        }
+        if (jsYesLabel.length() > 0) {
+            yesLabel = jsYesLabel;
         }
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
@@ -855,7 +832,7 @@ protected:
         javaScriptAlertMessageBox
                 .setIconPixmap((qApp->property("icon").toString()));
         javaScriptAlertMessageBox.setText(msg);
-        javaScriptAlertMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
+        javaScriptAlertMessageBox.setButtonText(QMessageBox::Yes, yesLabel);
         javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Yes);
         javaScriptAlertMessageBox.exec();
     }
@@ -863,19 +840,37 @@ protected:
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
         // Confirm dialog box title can be set from JavaScript.
-        // This could be usefull for a partial translation of
-        // the most commonly used dialogs within the browser.
         QString confirmTitle;
-
-        QVariant jsResult = frame->evaluateJavaScript("pebConfirmTitle()");
-        QString jsConfirmTitle = jsResult.toString();
-
+        QVariant confirmTitleJsResult =
+                frame->evaluateJavaScript("pebConfirmTitle()");
+        QString jsConfirmTitle = confirmTitleJsResult.toString();
         if (jsConfirmTitle.length() == 0) {
-            confirmTitle = tr("Confirm");
+            confirmTitle = "Confirm";
         }
-
         if (jsConfirmTitle.length() > 0) {
             confirmTitle = jsConfirmTitle;
+        }
+
+        // Yes button label can be set from JavaScript.
+        QString yesLabel;
+        QVariant yesLabelJsResult = frame->evaluateJavaScript("pebYesLabel()");
+        QString jsYesLabel = yesLabelJsResult.toString();
+        if (jsYesLabel.length() == 0) {
+            yesLabel = "Yes";
+        }
+        if (jsYesLabel.length() > 0) {
+            yesLabel = jsYesLabel;
+        }
+
+        // No button label can be set from JavaScript.
+        QString noLabel;
+        QVariant noLabelJsResult = frame->evaluateJavaScript("pebNoLabel()");
+        QString jsNoLabel = noLabelJsResult.toString();
+        if (jsNoLabel.length() == 0) {
+            noLabel = "No";
+        }
+        if (jsNoLabel.length() > 0) {
+            noLabel = jsNoLabel;
         }
 
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
@@ -886,8 +881,8 @@ protected:
         javaScriptConfirmMessageBox.setText(msg);
         javaScriptConfirmMessageBox
                 .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        javaScriptConfirmMessageBox.setButtonText(QMessageBox::Yes, tr("Yes"));
-        javaScriptConfirmMessageBox.setButtonText(QMessageBox::No, tr("No"));
+        javaScriptConfirmMessageBox.setButtonText(QMessageBox::Yes, yesLabel);
+        javaScriptConfirmMessageBox.setButtonText(QMessageBox::No, noLabel);
         javaScriptConfirmMessageBox.setDefaultButton(QMessageBox::No);
         return QMessageBox::Yes == javaScriptConfirmMessageBox.exec();
     }
@@ -898,17 +893,13 @@ protected:
                                   QString *result)
     {
         // Prompt dialog box title can be set from JavaScript.
-        // This could be usefull for a partial translation of
-        // the most commonly used dialogs within the browser.
         QString promptTitle;
-
-        QVariant jsResult = frame->evaluateJavaScript("pebPromptTitle()");
-        QString jsPromptTitle = jsResult.toString();
-
+        QVariant promptTitleJsResult =
+                frame->evaluateJavaScript("pebPromptTitle()");
+        QString jsPromptTitle = promptTitleJsResult.toString();
         if (jsPromptTitle.length() == 0) {
-            promptTitle = tr("Prompt");
+            promptTitle = "Prompt";
         }
-
         if (jsPromptTitle.length() > 0) {
             promptTitle = jsPromptTitle;
         }
@@ -997,7 +988,6 @@ public slots:
     void qPrintSlot()
     {
 #ifndef QT_NO_PRINTER
-
         qDebug() << "Printing requested.";
 
         QPrinter printer;
@@ -1022,46 +1012,6 @@ public slots:
         }
         printDialog->close();
         printDialog->deleteLater();
-#endif
-    }
-
-    void qSaveAsPdfSlot()
-    {
-#ifndef QT_NO_PRINTER
-
-        qDebug() << "Save as PDF requested.";
-
-        QFileDialog saveAsPdfDialog (qApp->activeWindow());
-        saveAsPdfDialog.setFileMode(QFileDialog::AnyFile);
-        saveAsPdfDialog.setViewMode(QFileDialog::Detail);
-        saveAsPdfDialog.setWindowModality(Qt::WindowModal);
-        QString fileName = saveAsPdfDialog.getSaveFileName(
-                    qApp->activeWindow(),
-                    tr("Save as PDF"),
-                    QDir::currentPath(),
-                    tr("PDF files (*.pdf)"));
-        saveAsPdfDialog.close();
-        saveAsPdfDialog.deleteLater();
-
-        if (!fileName.isEmpty()) {
-            if (QFileInfo(fileName).suffix().isEmpty()) {
-                fileName.append(".pdf");
-            }
-
-            qDebug() << "PDF file:" << fileName;
-
-            QPrinter pdfPrinter;
-            pdfPrinter.setOrientation(QPrinter::Portrait);
-            pdfPrinter.setPageSize(QPrinter::A4);
-            pdfPrinter.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
-            pdfPrinter.setResolution(QPrinter::HighResolution);
-            pdfPrinter.setColorMode(QPrinter::Color);
-            pdfPrinter.setPrintRange(QPrinter::AllPages);
-            pdfPrinter.setNumCopies(1);
-            pdfPrinter.setOutputFormat(QPrinter::PdfFormat);
-            pdfPrinter.setOutputFileName(fileName);
-            QWebViewWindow::print(&pdfPrinter);
-        }
 #endif
     }
 

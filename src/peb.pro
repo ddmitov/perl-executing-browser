@@ -95,27 +95,6 @@ equals (QT_MAJOR_VERSION, 5) {
     HEADERS += peb.h
     SOURCES += peb.cpp
 
-    # Translation(s):
-    TRANSLATIONS = resources/translations/$${TARGET}_bg_BG.ts \
-
-    isEmpty (QMAKE_LUPDATE) {
-        win32: QMAKE_LUPDATE = $$[QT_INSTALL_BINS]\lupdate.exe
-        else: QMAKE_LUPDATE = $$[QT_INSTALL_BINS]/lupdate
-    }
-
-    isEmpty (QMAKE_LRELEASE) {
-        win32: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]\lrelease.exe
-        else: QMAKE_LRELEASE = $$[QT_INSTALL_BINS]/lrelease
-    }
-
-    win32 {
-        system ($$QMAKE_LUPDATE $$PWD\peb.pro)
-        system ($$QMAKE_LRELEASE $$PWD\peb.pro)
-    } else {
-        system ($$QMAKE_LUPDATE $$PWD/peb.pro)
-        system ($$QMAKE_LRELEASE $$PWD/peb.pro)
-    }
-
     # No Perl debugger support for Windows:
     win32 {
         PERL_DEBUGGER_INTERACTION = 0
