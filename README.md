@@ -25,18 +25,14 @@ Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framewo
   
 **No feature or implementation should be considered final at this stage of development!**
   
-**Local Scripting:**  
+**Usability:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
 * jQuery AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard jQuery methods.  
 * Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
-  
-**Web Access:**  
+* PEB can be started from any folder.  
 * PEB can open web pages with cross-site scripting disabled.  
-  
-**Configurability:**
 * Settings are stored in a single INI file.  
-* Start from any folder.  
 * All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to your HTML interface.  
@@ -82,7 +78,7 @@ Compiled and tested successfully using:
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any page.  
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
-* PEB has no full-fledged sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but it is still recommended to inspect your scripts before use for possible security vulnerabilities!  
+* PEB has no full-fledged sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
   
 ## Security
   
@@ -119,11 +115,13 @@ Compiled and tested successfully using:
     5. ```Tree::Navigator::Node::Win32::Registry```,  
     6. ```Parse::Win32Registry```  
     and probably others containing the keywords 'Win32' and 'Registry'.  
-* In order for the overriden core functions to act like a security barrier for unsafe operations, a statical code analysis is performed before the execution of a script.  
+* The overriden core functions act as a security barrier against unsafe operations because statical code analysis is performed before the execution of a script with the following restrictions:  
     1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
-    2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is also detected and results in aborting the script execution.  
+    2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is detected and results in aborting the script execution.  
+    3. ```eval``` from user code is not allowed and user scripts can not execute code from data files.  
     However, statical code analysis is not performed on modules to avoid performance degradation.  
-    It is considered that core modules are safe and CPAN modules can not be installed without user intervention. There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
+    It is considered that core modules are safe and CPAN modules can not be installed without user intervention.  
+    There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```eval``` function, without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
   
 **Perl Debugger Interaction:**
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
