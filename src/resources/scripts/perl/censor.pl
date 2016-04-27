@@ -158,12 +158,21 @@ foreach my $line (@user_code) {
 		}
 	}
 
-	if ($line =~ m/\@INC\s{0,},/) {
-		if ($line =~ m/#.*\@INC\s{0,},/) {
+	if ($line =~ m/\@INC\s{0,}(,|=)/) {
+		if ($line =~ m/#.*\@INC\s{0,}(,|=)/) {
 			next;
 		} else {
 			$problematic_lines{$line_number} = $line;
 			$explanations{$line_number} = "Forbidden \@INC array manipulation detected!";
+		}
+	}
+
+	if ($line =~ m/\s{0,}eval/) {
+		if ($line =~ m/#.*\s{0,}eval/) {
+			next;
+		} else {
+			$problematic_lines{$line_number} = $line;
+			$explanations{$line_number} = "Forbidden 'eval' function detected!";
 		}
 	}
 }

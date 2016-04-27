@@ -947,12 +947,6 @@ class QWebViewWindow : public QWebView
     Q_OBJECT
 
 public slots:
-    void qLoadStartPageSlot()
-    {
-        setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN) + "/"
-                    + qApp->property("startPagePath").toString()));
-    }
-
     void qPageLoadedSlot(bool ok)
     {
         if (ok) {

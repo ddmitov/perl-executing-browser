@@ -60,7 +60,7 @@ BOOL IsUserAdmin(void)
 // ==============================
 QString readHtmlErrorTemplate()
 {
-    QString htmlErrorFileName(":/html/error.htm");
+    QString htmlErrorFileName(":/html/error.html");
     QFile htmlErrorFile(htmlErrorFileName);
     htmlErrorFile.open(QIODevice::ReadOnly | QIODevice::Text);
     QTextStream htmlErrorStream(&htmlErrorFile);
@@ -239,7 +239,7 @@ int main(int argc, char **argv)
     QSettings settings(settingsFileName, QSettings::IniFormat);
 
     // ==============================
-    // SETTINGS:
+    // READ SETTINGS FROM SETTINGS FILE:
     // ==============================
     // Perl interpreter:
     QString perlInterpreterSetting =
@@ -287,6 +287,14 @@ int main(int argc, char **argv)
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 
+    // Start fullscreen:
+    QString startFullscreenSetting =
+            settings.value("start_fullscreen").toString();
+    application.setProperty("fullscreen", startFullscreenSetting);
+
+    // ==============================
+    // CHECK PROGRAM FILES AND FOLDERS:
+    // ==============================
     // Logging:
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
@@ -322,18 +330,6 @@ int main(int argc, char **argv)
                 packageDirName
                 + "data");
     application.setProperty("data", dataDirName);
-
-    // Package start page -
-    // path must be relative to the root directory of the current package.
-    // HTML file or script are equally usable as a start page:
-    QString startPageSetting =
-            settings.value("start_page").toString();
-    application.setProperty("startPagePath", startPageSetting);
-
-    // Start fullscreen:
-    QString startFullscreenSetting =
-            settings.value("start_fullscreen").toString();
-    application.setProperty("fullscreen", startFullscreenSetting);
 
     // Package icon:
     QString iconPathName = QDir::toNativeSeparators(
@@ -400,19 +396,26 @@ int main(int argc, char **argv)
         }
 
         // Start page existence check and loading:
-        QFile startPageFile(applicationDirName
-                            + QDir::separator()
-                            + startPageSetting);
-        if (startPageFile.exists()) {
-            window.qLoadStartPageSlot();
+        QFile staticStartPageFile(applicationDirName + QDir::separator()
+                                  + "index.html");
+        if (staticStartPageFile.exists()) {
+            window.setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN)
+                               + "/index.html"));
         } else {
-            QString htmlErrorContents = readHtmlErrorTemplate();
-            QString errorMessage = "Start page was not found.";
-            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+            QFile dynamicStartPageFile(applicationDirName + QDir::separator()
+                                       + "index.pl");
+            if (dynamicStartPageFile.exists()) {
+                window.setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN)
+                                   + "/index.pl"));
+            } else {
+                QString htmlErrorContents = readHtmlErrorTemplate();
+                QString errorMessage = "Start page was not found.";
+                htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
-            window.setHtml(htmlErrorContents);
+                window.setHtml(htmlErrorContents);
 
-            qDebug() << "Start page was not found.";
+                qDebug() << "Start page was not found.";
+            }
         }
     }
 
@@ -763,7 +766,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             request.url().fileName() == "about.function" and
             request.url().query() == ("type=browser")) {
 
-        frame->load(QUrl("qrc:/html/about.htm"));
+        frame->load(QUrl("qrc:/html/about.html"));
 
         return false;
     }
