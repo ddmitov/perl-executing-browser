@@ -2,28 +2,26 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML-based interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a minimalistic C++ Qt 5 WebKit graphical framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using jQuery AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
 * **1. Fast and easy graphical framework for Perl 5 desktop applications:**  
-    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop data-driven applications;  
+    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop data-driven applications,  
 
 * **2. Zero installation:**  
-    run your applications from any folder;  
+    run from any folder,  
 
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available;  
+    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available,  
 
 * **4. Secure user-space solution:**  
-    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered;  
+    no daemons or services are installed or started, no privileged ports are opened, no firewall notifications are triggered,  
 
 * **5. Maximal (re)use of existing web technologies and standards:**  
     use as much as possible from existing web technologies, standards and their documentation.  
 
 ## Features
-  
-**No feature or implementation should be considered final at this stage of development!**
   
 **Usability:**  
 * CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  

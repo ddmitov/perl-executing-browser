@@ -24,11 +24,10 @@
 
 #ifndef Q_OS_WIN
 #include <unistd.h> // for isatty()
-#include <iostream> // for std::cout
 #endif
 
 #ifdef Q_OS_WIN
-#include <windows.h>
+#include <windows.h> // for IsUserAdmin()
 #endif
 
 #ifdef Q_OS_WIN
@@ -140,28 +139,33 @@ int main(int argc, char **argv)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 
     // ==============================
-    // DETECT USER PRIVILEGES AND
-    // APPLICATION START FROM TERMINAL:
+    // DETECT USER PRIVILEGES:
     // ==============================
 #ifndef Q_OS_WIN
-    // Detect user privileges - Linux and Mac:
-    int userEuid;
-    userEuid = geteuid();
+    // Linux and Mac:
+    int userEuid = geteuid();
 
+    if (userEuid == 0) {
+        startedAsRoot = true;
+    }
+#endif
+
+#ifdef Q_OS_WIN
+    // Windows:
+    if (IsUserAdmin()) {
+        startedAsRoot = true;
+    }
+#endif
+
+    // ==============================
+    // DETECT START FROM TERMINAL:
+    // ==============================
+#ifndef Q_OS_WIN
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
     // This is necessary for a working interaction with the Perl debugger.
     if (PERL_DEBUGGER_INTERACTION == 1) {
         if (isatty(fileno(stdin))) {
-            // Prevent starting as root from command line:
-            if (userEuid == 0) {
-                std::cout << "Starting Perl Executing Browser by administrator "
-                          << "is not allowed."
-                          << std::endl;
-                return 1;
-                QApplication::exit();
-            }
-
             if (userEuid > 0) {
                 // Fork another instance of the browser:
                 int pid = fork();
@@ -180,8 +184,7 @@ int main(int argc, char **argv)
                     // New instance is now detached from terminal:
                     QProcess anotherInstance;
                     anotherInstance.startDetached(
-                                QApplication::applicationFilePath(),
-                                QCoreApplication::arguments());
+                                QApplication::applicationFilePath());
                     if (anotherInstance.waitForStarted(-1)) {
                         return 1;
                         QApplication::exit();
@@ -193,18 +196,6 @@ int main(int argc, char **argv)
                 }
             }
         }
-    }
-
-    // Prevent starting as root in graphical mode:
-    if (userEuid == 0) {
-        startedAsRoot = true;
-    }
-#endif
-
-#ifdef Q_OS_WIN
-    // Detect user privileges - Windows:
-    if (IsUserAdmin()) {
-        startedAsRoot = true;
     }
 #endif
 
@@ -241,7 +232,7 @@ int main(int argc, char **argv)
     // ==============================
     // READ SETTINGS FROM SETTINGS FILE:
     // ==============================
-    // Perl interpreter:
+    // PERL INTERPRETER:
     QString perlInterpreterSetting =
             settings.value("perl").toString();
     QString perlInterpreter;
@@ -287,7 +278,7 @@ int main(int argc, char **argv)
     }
     application.setProperty("perlInterpreter", perlInterpreter);
 
-    // Start fullscreen:
+    // START FULLSCREEN:
     QString startFullscreenSetting =
             settings.value("start_fullscreen").toString();
     application.setProperty("fullscreen", startFullscreenSetting);
@@ -361,13 +352,15 @@ int main(int argc, char **argv)
     if (startedAsRoot == true) {
         QString htmlErrorContents = readHtmlErrorTemplate();
         QString errorMessage =
-                "Running Perl Executing Browser with "
-                "administrative privileges is not allowed.";
+                "Using "
+                + application.applicationName().toLatin1() + " "
+                + application.applicationVersion().toLatin1() + " "
+                + "with administrative privileges is not allowed.";
         htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
         window.setHtml(htmlErrorContents);
 
-        qDebug() << "Running"
+        qDebug() << "Using"
                  << application.applicationName().toLatin1().constData()
                  << application.applicationVersion().toLatin1().constData()
                  << "with administrative privileges is not allowed.";
