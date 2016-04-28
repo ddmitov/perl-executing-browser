@@ -192,12 +192,12 @@ protected:
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains("ajax")) {
 
-            QString scriptFullFilePath = QDir::toNativeSeparators
+            QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
                      + request.url().path());
 
             QFileDetector fileDetector;
-            fileDetector.qCheckFileExistence(scriptFullFilePath);
+            fileDetector.qCheckFileExistence(ajaxScriptFullFilePath);
 
             if (fileDetector.fileExists == true) {
                 if (qApp->property("perlInterpreter").toString().length() > 0) {
@@ -209,11 +209,11 @@ protected:
                     }
                     QString postData(postDataArray);
 
-                    qDebug() << "AJAX script started:" << scriptFullFilePath;
+                    qDebug() << "AJAX script started:"
+                             << ajaxScriptFullFilePath;
 
                     QScriptEnvironment initialScriptEnvironment;
-                    QProcessEnvironment scriptEnvironment;
-                    scriptEnvironment =
+                    QProcessEnvironment scriptEnvironment =
                             initialScriptEnvironment.scriptEnvironment;
 
                     if (queryString.length() > 0) {
@@ -231,22 +231,24 @@ protected:
                         qDebug() << "POST data:" << postData;
                     }
 
-                    QProcess scriptHandler;
-                    scriptHandler.setProcessEnvironment(scriptEnvironment);
-                    scriptHandler.setWorkingDirectory("");
+                    QProcess ajaxScriptHandler;
+                    ajaxScriptHandler.setProcessEnvironment(scriptEnvironment);
+                    ajaxScriptHandler.setWorkingDirectory("");
 
-                    QEventLoop scriptHandlerWaitingLoop;
-
-                    QObject::connect(&scriptHandler,
+                    // Non-blocking event loop waiting for AJAX script results:
+                    QEventLoop ajaxScriptHandlerWaitingLoop;
+                    QObject::connect(&ajaxScriptHandler,
                                      SIGNAL(finished(
                                                 int, QProcess::ExitStatus)),
-                                     &scriptHandlerWaitingLoop,
+                                     &ajaxScriptHandlerWaitingLoop,
                                      SLOT(quit()));
-                    QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
-                                       SLOT(quit()));
 
-                    QString scriptResultString;
-                    QString scriptErrorString;
+                    // AJAX scripts timer- 2 seconds:
+                    // QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
+                    //                    SLOT(quit()));
+
+                    QString ajaxScriptResultString;
+                    QString ajaxScriptErrorString;
 
                     // 'censor.pl' is compiled into the resources of
                     // the binary file and called from there.
@@ -259,46 +261,46 @@ protected:
                     QString censorScriptContents = stream.readAll();
                     censorScriptFile.close();
 
-                    scriptHandler.start((qApp->property("perlInterpreter")
-                                         .toString()),
-                                        QStringList()
-                                        << "-e"
-                                        << censorScriptContents
-                                        << "--"
-                                        << QDir::toNativeSeparators(
-                                            scriptFullFilePath),
-                                        QProcess::Unbuffered
-                                        | QProcess::ReadWrite);
+                    ajaxScriptHandler.start((qApp->property("perlInterpreter")
+                                             .toString()),
+                                            QStringList()
+                                            << "-e"
+                                            << censorScriptContents
+                                            << "--"
+                                            << QDir::toNativeSeparators(
+                                                ajaxScriptFullFilePath),
+                                            QProcess::Unbuffered
+                                            | QProcess::ReadWrite);
 
                     if (postData.length() > 0) {
-                        scriptHandler.write(postDataArray);
+                        ajaxScriptHandler.write(postDataArray);
                     }
 
-                    scriptHandlerWaitingLoop.exec();
+                    ajaxScriptHandlerWaitingLoop.exec();
 
                     QByteArray scriptResultArray =
-                            scriptHandler.readAllStandardOutput();
-                    scriptResultString =
+                            ajaxScriptHandler.readAllStandardOutput();
+                    ajaxScriptResultString =
                             QString::fromLatin1(scriptResultArray);
 
                     QByteArray scriptErrorArray =
-                            scriptHandler.readAllStandardError();
-                    scriptErrorString =
+                            ajaxScriptHandler.readAllStandardError();
+                    ajaxScriptErrorString =
                             QString::fromLatin1(scriptErrorArray);
 
-                    if (scriptResultString.length() == 0 and
-                            scriptErrorString == 0) {
+                    if (ajaxScriptResultString.length() == 0 and
+                            ajaxScriptErrorString == 0) {
                         qDebug() << "AJAX script timed out or gave no output:"
-                                 << scriptFullFilePath;
+                                 << ajaxScriptFullFilePath;
                     } else {
                         qDebug() << "AJAX script finished:"
-                                 << scriptFullFilePath;
+                                 << ajaxScriptFullFilePath;
                     }
 
-                    if (scriptErrorString.length() > 0) {
+                    if (ajaxScriptErrorString.length() > 0) {
                         qDebug() << "AJAX script errors:";
                         QStringList scriptErrors =
-                                scriptErrorString.split("\n");
+                                ajaxScriptErrorString.split("\n");
                         foreach (QString scriptError, scriptErrors) {
                             if (scriptError.length() > 0) {
                                 qDebug() << scriptError;
@@ -320,11 +322,11 @@ protected:
 
                     QCustomNetworkReply *reply =
                             new QCustomNetworkReply (request.url(),
-                                                     scriptResultString);
+                                                     ajaxScriptResultString);
                     return reply;
                 } else {
                     qDebug() << "AJAX script not started:"
-                             << scriptFullFilePath;
+                             << ajaxScriptFullFilePath;
                     qDebug() << "Perl interpreter was not set.";
 
                     QNetworkRequest emptyNetworkRequest;
