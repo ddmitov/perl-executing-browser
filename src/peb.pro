@@ -95,17 +95,14 @@ equals (QT_MAJOR_VERSION, 5) {
     HEADERS += peb.h
     SOURCES += peb.cpp
 
-    # No Perl debugger support for Windows:
+    # Resources:
     win32 {
-        PERL_DEBUGGER_INTERACTION = 0
-        DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
         RESOURCES += resources/peb.qrc
         OTHER_FILES += resources/peb.rc resources/icons/camel.ico
         RC_FILE = resources/peb.rc
     }
 
     !win32 {
-        # Resources:
         equals (PERL_DEBUGGER_INTERACTION, 0) {
             RESOURCES += resources/peb.qrc
         }

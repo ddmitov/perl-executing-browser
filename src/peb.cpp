@@ -27,27 +27,27 @@
 #endif
 
 #ifdef Q_OS_WIN
-#include <windows.h> // for IsUserAdmin()
+#include <windows.h> // for isUserAdmin()
 #endif
 
-#ifdef Q_OS_WIN
 // ==============================
 // DETECT WINDOWS USER PRIVILEGES SUBROUTINE:
 // ==============================
-BOOL IsUserAdmin(void)
+#ifdef Q_OS_WIN
+BOOL isUserAdmin()
 {
     BOOL bResult;
-    SID_IDENTIFIER_AUTHORITY NtAuthority = SECURITY_NT_AUTHORITY;
-    PSID AdministratorsGroup;
+    SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
+    PSID administratorsGroup;
     bResult = AllocateAndInitializeSid(
-                &NtAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
+                &ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
                 DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
-                &AdministratorsGroup);
+                &administratorsGroup);
     if (bResult) {
-        if (!CheckTokenMembership(NULL, AdministratorsGroup, &bResult)) {
+        if (!CheckTokenMembership(NULL, administratorsGroup, &bResult)) {
             bResult = FALSE;
         }
-        FreeSid(AdministratorsGroup);
+        FreeSid(administratorsGroup);
     }
     return(bResult);
 }
@@ -152,7 +152,7 @@ int main(int argc, char **argv)
 
 #ifdef Q_OS_WIN
     // Windows:
-    if (IsUserAdmin()) {
+    if (isUserAdmin()) {
         startedAsRoot = true;
     }
 #endif
@@ -160,10 +160,10 @@ int main(int argc, char **argv)
     // ==============================
     // DETECT START FROM TERMINAL:
     // ==============================
-#ifndef Q_OS_WIN
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
     // This is necessary for a working interaction with the Perl debugger.
+#ifndef Q_OS_WIN
     if (PERL_DEBUGGER_INTERACTION == 1) {
         if (isatty(fileno(stdin))) {
             if (userEuid > 0) {
@@ -376,12 +376,14 @@ int main(int argc, char **argv)
         qDebug() << "Executable:" << application.applicationFilePath();
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+#ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
             qDebug() << "Perl debugger interaction is disabled.";
         }
         if (PERL_DEBUGGER_INTERACTION == 1) {
             qDebug() << "Perl debugger interaction is enabled.";
         }
+#endif
         qDebug() << "Settings file:" << settingsFileName;
         qDebug() << "Perl interpreter:" << perlInterpreter;
         if (startFullscreenSetting == "enable") {
@@ -588,7 +590,28 @@ QPage::QPage()
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
+    // SIGNALS AND SLOTS FOR ALL LOCAL CGI-LIKE PERL SCRIPTS:
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
+                     this, SLOT(qScriptOutputSlot()));
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
+                     this, SLOT(qScriptErrorsSlot()));
+    QObject::connect(&scriptHandler,
+                     SIGNAL(finished(int, QProcess::ExitStatus)),
+                     this,
+                     SLOT(qScriptFinishedSlot()));
+
+    // SCRIPT ENVIRONMENT:
+    QScriptEnvironment initialScriptEnvironment;
+    scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
+
+    // DEFAULT FRAME FOR LOCAL CONTENT:
+    targetFrame = QPage::mainFrame();
+
+    // ICON FOR DIALOGS:
+    icon.load(qApp->property("iconPathName").toString());
+
     // SIGNALS AND SLOTS FOR THE PERL DEBUGGER:
+#ifndef Q_OS_WIN
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));
@@ -609,26 +632,7 @@ QPage::QPage()
         // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
         debuggerJustStarted = false;
     }
-
-    // SIGNALS AND SLOTS FOR ALL LOCAL PERL SCRIPTS:
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qScriptOutputSlot()));
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qScriptErrorsSlot()));
-    QObject::connect(&scriptHandler,
-                     SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this,
-                     SLOT(qScriptFinishedSlot()));
-
-    // SCRIPT ENVIRONMENT:
-    QScriptEnvironment initialScriptEnvironment;
-    scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
-
-    // DEFAULT FRAME FOR LOCAL CONTENT:
-    targetFrame = QPage::mainFrame();
-
-    // ICON FOR DIALOGS:
-    icon.load(qApp->property("iconPathName").toString());
+#endif
 }
 
 // ==============================
@@ -766,6 +770,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
     // PERL DEBUGGER INTERACTION:
     // Implementation of an idea proposed by Valcho Nedelchev.
+#ifndef Q_OS_WIN
     if (PERL_DEBUGGER_INTERACTION == 1) {
         if ((navigationType == QWebPage::NavigationTypeLinkClicked or
              navigationType == QWebPage::NavigationTypeFormSubmitted) and
@@ -825,6 +830,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             return false;
         }
     }
+#endif
 
     return QWebPage::acceptNavigationRequest(frame, request, navigationType);
 }

@@ -587,6 +587,7 @@ public slots:
     // PERL DEBUGGER INTERACTION.
     // Implementation of an idea proposed by Valcho Nedelchev.
     // ==============================
+#ifndef Q_OS_WIN
     void qStartPerlDebuggerSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
@@ -759,42 +760,49 @@ public slots:
 
     void qDebuggerHtmlFormatterOutputSlot()
     {
-        QString debuggerHtmlOutput =
-                debuggerOutputHandler.readAllStandardOutput();
+        if (PERL_DEBUGGER_INTERACTION == 1) {
+            QString debuggerHtmlOutput =
+                    debuggerOutputHandler.readAllStandardOutput();
 
-        // Append last output of the debugger formatter to
-        // the accumulated debugger formatter output:
-        debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
+            // Append last output of the debugger formatter to
+            // the accumulated debugger formatter output:
+            debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
 
-        qDebug() << QDateTime::currentMSecsSinceEpoch()
-                 << "msecs from epoch:"
-                 << "output from Perl debugger formatter received.";
+            qDebug() << QDateTime::currentMSecsSinceEpoch()
+                     << "msecs from epoch:"
+                     << "output from Perl debugger formatter received.";
+        }
     }
 
     void qDebuggerHtmlFormatterErrorsSlot()
     {
-        QString debuggerOutputFormatterErrors =
-                debuggerOutputHandler.readAllStandardError();
+        if (PERL_DEBUGGER_INTERACTION == 1) {
+            QString debuggerOutputFormatterErrors =
+                    debuggerOutputHandler.readAllStandardError();
 
-        qDebug() << "Perl debugger formatter error:"
-                 << debuggerOutputFormatterErrors;
+            qDebug() << "Perl debugger formatter error:"
+                     << debuggerOutputFormatterErrors;
+        }
     }
 
     void qDebuggerHtmlFormatterFinishedSlot()
     {
-        targetFrame->setHtml(debuggerAccumulatedHtmlOutput,
-                              QUrl(PSEUDO_DOMAIN));
+        if (PERL_DEBUGGER_INTERACTION == 1) {
+            targetFrame->setHtml(debuggerAccumulatedHtmlOutput,
+                                 QUrl(PSEUDO_DOMAIN));
 
-        qDebug() << QDateTime::currentMSecsSinceEpoch()
-                 << "msecs from epoch:"
-                 << "output from Perl debugger formatter displayed.";
+            qDebug() << QDateTime::currentMSecsSinceEpoch()
+                     << "msecs from epoch:"
+                     << "output from Perl debugger formatter displayed.";
 
-        // qDebug() << "Perl debugger formatter output:" << endl
-        //          << debuggerAccumulatedHtmlOutput;
+            // qDebug() << "Perl debugger formatter output:" << endl
+            //          << debuggerAccumulatedHtmlOutput;
 
-        debuggerOutputHandler.close();
-        debuggerAccumulatedHtmlOutput = "";
+            debuggerOutputHandler.close();
+            debuggerAccumulatedHtmlOutput = "";
+        }
     }
+#endif
 
 public:
     QPage();
@@ -817,15 +825,15 @@ protected:
             alertTitle = jsAlertTitle;
         }
 
-        // Yes button label can be set from JavaScript.
-        QString yesLabel;
-        QVariant yesLabelJsResult = frame->evaluateJavaScript("pebYesLabel()");
-        QString jsYesLabel = yesLabelJsResult.toString();
-        if (jsYesLabel.length() == 0) {
-            yesLabel = "Yes";
+        // OK button label can be set from JavaScript.
+        QString okLabel;
+        QVariant okLabelJsResult = frame->evaluateJavaScript("pebOkLabel()");
+        QString jsOkLabel = okLabelJsResult.toString();
+        if (jsOkLabel.length() == 0) {
+            okLabel = "OK";
         }
-        if (jsYesLabel.length() > 0) {
-            yesLabel = jsYesLabel;
+        if (jsOkLabel.length() > 0) {
+            okLabel = jsOkLabel;
         }
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
@@ -834,8 +842,8 @@ protected:
         javaScriptAlertMessageBox
                 .setIconPixmap((qApp->property("icon").toString()));
         javaScriptAlertMessageBox.setText(msg);
-        javaScriptAlertMessageBox.setButtonText(QMessageBox::Yes, yesLabel);
-        javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Yes);
+        javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
+        javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
         javaScriptAlertMessageBox.exec();
     }
 
@@ -929,6 +937,9 @@ private:
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
 
+    QPixmap icon;
+
+#ifndef Q_OS_WIN
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
     QString debuggerLastCommand;
@@ -937,8 +948,7 @@ private:
     QProcess debuggerOutputHandler;
     QString debuggerAccumulatedOutput;
     QString debuggerAccumulatedHtmlOutput;
-
-    QPixmap icon;
+#endif
 };
 
 // ==============================
