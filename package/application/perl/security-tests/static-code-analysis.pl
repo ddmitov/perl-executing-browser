@@ -1,10 +1,8 @@
 #!/usr/bin/perl -w
 
-# STATIC CODE ANALYSIS TEST:
-CORE::opendir (my $directory_handle, "/tmp/test") or die $!;
-CORE::chdir "/tmp/test/";
-CORE::open my $filehandle, "<", "/tmp/test" or die $!;
 CORE::unlink "/tmp/test/foo.txt";
+
+CORE::require Win32::Registry;
 
 eval ("print 'Test'");
 

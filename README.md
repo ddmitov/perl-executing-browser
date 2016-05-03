@@ -97,12 +97,7 @@ Compiled and tested successfully using:
   3. :sys_db group - all 30 functions from this group,  
   4. ```sysopen```.  
 * The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
-* Some important core functions for directory traversal and file manipulation are overriden. These are:  
-  1. ```opendir```,  
-  2. ```chdir```,  
-  3. ```open```,  
-  4. ```unlink```.  
-  Only files and directories inside the ```PEB_DATA_DIR```folder can be opened, read or deleted, every attempt to manipulate other directories and files will throw an error and the script will be aborted.  
+* ```unlink``` core function is overriden. Only files inside the ```PEB_DATA_DIR```folder can be deleted, any attempt to delete other files will throw an error and the script will be aborted.  
 * Default module loading using ```require``` and ```use``` is also overriden.  
   1. ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
   2. The following Windows registry manipulation modules are also banned:  
@@ -113,13 +108,13 @@ Compiled and tested successfully using:
     5. ```Tree::Navigator::Node::Win32::Registry```,  
     6. ```Parse::Win32Registry```  
     and probably others containing the keywords 'Win32' and 'Registry'.  
-* The overriden core functions act as a security barrier against unsafe operations because statical code analysis is performed before the execution of a script with the following restrictions:  
-    1. Even a single occurence of a call to one of the original core function starting with the ```CORE::``` invocation will prevent the script from being executed.  
+* The overriden core functions act as a barrier against unsafe operations because statical code analysis is performed before script execution with the following restrictions:  
+    1. Any call to one of the original core function - ```CORE::require``` or ```CORE::unlink``` will prevent the script from being executed.  
     2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is detected and results in aborting the script execution.  
     3. ```eval``` from user code is not allowed and user scripts can not execute code from data files.  
-    However, statical code analysis is not performed on modules to avoid performance degradation.  
-    It is considered that core modules are safe and CPAN modules can not be installed without user intervention.  
-    There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```eval``` function, without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
+However, statical code analysis is not performed on modules to avoid performance degradation.  
+It is considered that core modules are safe and CPAN modules can not be installed without user intervention.  
+There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```eval``` function, without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
   
 **Perl Debugger Interaction:**
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  

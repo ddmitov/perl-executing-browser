@@ -384,7 +384,8 @@ int main(int argc, char **argv)
             qDebug() << "Perl debugger interaction is enabled.";
         }
 #endif
-        qDebug() << "Settings file:" << settingsFileName;
+        qDebug() << "Settings file:"
+                 << QDir::toNativeSeparators(settingsFileName);
         qDebug() << "Perl interpreter:" << perlInterpreter;
         if (startFullscreenSetting == "enable") {
             qDebug() << "Start in fullscreen is enabled.";

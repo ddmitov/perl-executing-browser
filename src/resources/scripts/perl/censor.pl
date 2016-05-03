@@ -48,70 +48,6 @@ BEGIN {
 		}
 	};
 
-	*CORE::GLOBAL::opendir = sub (*;$@) {
-		(my $package, my $filename, my $line) = caller();
-		my $dir = $_[1];
-		if ($dir =~ $PEB_DATA_DIR) {
-			return CORE::opendir $_[0], $_[1];
-		} else {
-			die "Insecure 'opendir' call intercepted from package '$package', line: $line.<br>Opening directory '$dir' is not allowed!\n";
-		}
-	};
-
-	*CORE::GLOBAL::chdir = sub (*;$@) {
-		(my $package, my $filename, my $line) = caller();
-		my $dir = $_[0];
-		if ($dir =~ $PEB_DATA_DIR) {
-			return CORE::chdir $_[0];
-		} else {
-			die "Insecure 'chdir' call intercepted from package '$package', line: $line.<br>Changing directory to '$dir' is not allowed!\n";
-		}
-	};
-
-	*CORE::GLOBAL::open = sub (*;$@) {
-		(my $package, my $filename, my $line) = caller();
-		my $handle = shift;
-		if (@_ == 1) {
-			my $filepath = $_[0];
-			if ($_[0] =~ $PEB_DATA_DIR) {
-				return CORE::open ($handle, $_[0]);
-			} else {
-				$filepath =~ s/(\<|\>)//;
-				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
-			}
-		} elsif (@_ == 2) {
-			my $filepath = $_[1];
-			if ($_[1] =~ $PEB_DATA_DIR) {
-				return CORE::open ($handle, $_[1]);
-			} else {
-				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
-			}
-		} elsif (@_ == 3) {
-			if (defined $_[2]) {
-				my $filepath = $_[2];
-				if ($_[2] =~ $PEB_DATA_DIR) {
-					CORE::open $handle, $_[1], $_[2];
-				} else {
-					die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
-				}
-			} else {
-				my $filepath = $_[1];
-				if ($_[1] =~ $PEB_DATA_DIR) {
-					CORE::open $handle, $_[1], undef; # special case
-				} else {
-					die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
-				}
-			}
-		} else {
-			my $filepath = $_[1];
-			if ($_[1] =~ $PEB_DATA_DIR or $_[2] =~ $PEB_DATA_DIR) {
-				CORE::open $handle, $_[1], $_[2], @_[3..$#_];
-			} else {
-				die "Insecure 'open' call intercepted from package '$package', line: $line.<br>Opening '$filepath' is not allowed!\n";
-			}
-		}
-	};
-
 	*CORE::GLOBAL::unlink = sub (*;$@) {
 		(my $package, my $filename, my $line) = caller();
 		my $entry = $_[0];
@@ -149,8 +85,8 @@ my %explanations;
 foreach my $line (@user_code) {
 	$line_number++;
 
-	if ($line =~ m/CORE::/) {
-		if ($line =~ m/#.*CORE::/) {
+	if ($line =~ m/CORE::(require|unlink)/) {
+		if ($line =~ m/#.*CORE::(require|unlink)/) {
 			next;
 		} else {
 			$problematic_lines{$line_number} = $line;
@@ -167,8 +103,8 @@ foreach my $line (@user_code) {
 		}
 	}
 
-	if ($line =~ m/\s{0,}eval/) {
-		if ($line =~ m/#.*\s{0,}eval/) {
+	if ($line =~ m/\s{1,}eval/) {
+		if ($line =~ m/#.*\s{1,}eval/) {
 			next;
 		} else {
 			$problematic_lines{$line_number} = $line;
@@ -277,9 +213,9 @@ if (scalar (keys %problematic_lines) == 0) {
 # PRINT SAVED STDERR, IF ANY:
 ##############################
 if ($@) {
-	print STDERR $header;
 	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
 		if ($filepath !~ "ajax") {
+			print STDERR $header;
 			print STDERR "<div class='title'>\n";
 			print STDERR "$filepath\n";
 			print STDERR "</div>\n";
@@ -291,6 +227,7 @@ if ($@) {
 		}
 	} else {
 		if ($filepath !~ "ajax") {
+			print STDERR $header;
 			print STDERR "<div class='title'>\n";
 			print STDERR "$filepath\n";
 			print STDERR "</div>\n";

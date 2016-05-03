@@ -536,7 +536,6 @@ public slots:
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: output from" << scriptFullFilePath;
-        // qDebug() << "Script output:" << endl << output;
 
         scriptAccumulatedOutput.append(output);
 
@@ -553,8 +552,6 @@ public slots:
         QString error = scriptHandler.readAllStandardError();
         scriptAccumulatedErrors.append(error);
         scriptAccumulatedErrors.append("\n");
-
-        // qDebug() << "Script error:" << endl << error;
     }
 
     void qScriptFinishedSlot()
