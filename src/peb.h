@@ -1041,7 +1041,6 @@ public slots:
 
         QWebInspector *inspector = new QWebInspector;
         inspector->setPage(QWebViewWindow::page());
-        inspector->adjustSize();
         inspector->show();
     }
 

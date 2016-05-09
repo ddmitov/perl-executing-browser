@@ -9,7 +9,8 @@ BEGIN {
 	##############################
 	# BAN ALL PROHIBITED CORE FUNCTIONS:
 	##############################
-	no ops qw(:dangerous :subprocess :sys_db sysopen);
+	#no ops qw(syscall dump chroot fork);
+	no ops qw(:dangerous fork);
 
 	##############################
 	# ENVIRONMENT:
@@ -32,86 +33,25 @@ BEGIN {
 	}
 
 	%ENV = %CLEAN_ENV;
-
-	##############################
-	# OVERRIDE POTENTIALY DANGEROUS
-	# CORE FUNCTIONS:
-	##############################
-	*CORE::GLOBAL::require = sub (*;$@) {
-		(my $package, my $filename, my $line) = caller();
-		my $module = $_[0];
-		if (($module =~ "Registry" and $module =~ "Win32") or
-			$module =~ "lib") {
-			die "Use of an insecure module detected at package '$package', line: $line.<br>The use of module '$module' is prohibited!\n";
-		} else {
-			return CORE::require $_[0];
-		}
-	};
-
-	*CORE::GLOBAL::unlink = sub (*;$@) {
-		(my $package, my $filename, my $line) = caller();
-		my $entry = $_[0];
-		if ($entry =~ $PEB_DATA_DIR) {
-			return CORE::unlink $_[0];
-		} else {
-			die "Insecure 'unlink' call intercepted from package '$package', line: $line.<br>Deleting '$entry' is not allowed!\n";
-		}
-	};
 }
 
 ##############################
 # REDIRECT STDERR TO A VARIABLE:
 ##############################
-CORE::open (my $saved_stderr_filehandle, '>&', \*STDERR)  or die "Can not duplicate STDERR: $!";
+open (my $saved_stderr_filehandle, '>&', \*STDERR)  or die "Can not duplicate STDERR: $!";
 close STDERR;
 my $stderr;
-CORE::open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
+open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
 
 ##############################
 # READ USER SCRIPT FROM
 # THE FIRST COMMAND LINE ARGUMENT:
 ##############################
 my $filepath = shift @ARGV;
-CORE::open my $filehandle, '<', $filepath or die;
-my @user_code = <$filehandle>;
+open my $filehandle, '<', $filepath or die "Unable to open file: $!";;
+$/ = undef;
+my $user_code = <$filehandle>;
 close $filehandle;
-
-##############################
-# STATIC CODE ANALYSIS:
-##############################
-my $line_number;
-my %problematic_lines;
-my %explanations;
-foreach my $line (@user_code) {
-	$line_number++;
-
-	if ($line =~ m/CORE::(require|unlink)/) {
-		if ($line =~ m/#.*CORE::(require|unlink)/) {
-			next;
-		} else {
-			$problematic_lines{$line_number} = $line;
-			$explanations{$line_number} = "Forbidden invocation of core function detected!";
-		}
-	}
-
-	if ($line =~ m/\@INC\s{0,}(,|=)/) {
-		if ($line =~ m/#.*\@INC\s{0,}(,|=)/) {
-			next;
-		} else {
-			$problematic_lines{$line_number} = $line;
-			$explanations{$line_number} = "Forbidden \@INC array manipulation detected!";
-		}
-	}
-
-	if ($line =~ m/\s{1,}eval/) {
-		if ($line =~ m/#.*\s{1,}eval/) {
-			next;
-		} else {
-			$problematic_lines{$line_number} = $line;
-			$explanations{$line_number} = "Forbidden 'eval' function detected!";
-		}
-	}
-}
 
 ##############################
 # HTML HEADER AND FOOTER:
@@ -165,55 +105,16 @@ my $footer = "
 ##############################
 # EXECUTE USER CODE IN 'EVAL' STATEMENT:
 ##############################
-if (scalar (keys %problematic_lines) == 0) {
-	my $user_code = join ('', @user_code);
-	eval ($user_code);
-
-	close (STDERR) or die "Can not close STDERR: $!";
-	CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can not restore STDERR: $!";
-} elsif (scalar (keys %problematic_lines) > 0) {
-	close (STDERR) or die "Can not close STDERR: $!";
-	CORE::open (STDERR, '>&', $saved_stderr_filehandle) or die "Can not restore STDERR: $!";
-
-	if ($filepath !~ "ajax") {
-		print STDERR $header;
-		print STDERR "<div class='title'>";
-		print STDERR "$filepath\n";
-		print STDERR "</div>\n";
-		print STDERR "<div class='title'>";
-	}
-	print STDERR "Script execution was not attempted due to security violation";
-	if (scalar (keys %problematic_lines) == 1) {
-		print STDERR ":\n";
-	} elsif (scalar (keys %problematic_lines) > 1) {
-		print STDERR "s:\n";
-	}
-	if ($filepath !~ "ajax") {
-		print STDERR "</div>\n";
-	}
-
-	foreach my $line_number (sort {$a <=> $b} (keys(%problematic_lines))) {
-		if ($filepath !~ "ajax") {
-			print STDERR "<pre>";
-		}
-		print STDERR "Line $line_number: $problematic_lines{$line_number}";
-		print STDERR "$explanations{$line_number}\n";
-		if ($filepath !~ "ajax") {
-			print STDERR "</pre>";
-		}
-	}
-
-	if ($filepath !~ "ajax") {
-		print STDERR $footer;
-	}
-	exit;
-}
+eval ($user_code);
 
 ##############################
 # PRINT SAVED STDERR, IF ANY:
 ##############################
+close (STDERR) or die "Can not close STDERR: $!";
+open (STDERR, '>&', $saved_stderr_filehandle) or die "Can not restore STDERR: $!";
+
 if ($@) {
-	if ($@ =~ m/trapped/ or $@ =~ m/insecure/i) {
+	if ($@ =~ m/trapped/) {
 		if ($filepath !~ "ajax") {
 			print STDERR $header;
 			print STDERR "<div class='title'>\n";

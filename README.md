@@ -76,7 +76,7 @@ Compiled and tested successfully using:
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any page.  
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
-* PEB has no full-fledged sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
+* PEB has no sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
   
 ## Security
   
@@ -86,35 +86,13 @@ Compiled and tested successfully using:
   These are:  
   1. ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between local HTML forms and local Perl scripts;  
   2. ```PEB_DATA_DIR``` - custom environment variable used to locate data files from local Perl scripts.  
-* Local Perl scripts are executed without a working directory and they can not open files using relative paths.  
+* Perl scripts are executed without a working directory and they can not open files using relative paths.  
 * PEB does not download locally executed scripts from any remote locations.  
-* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the root folder of the browser can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
+* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
   
 **Security features based on Perl code:**
-* Local scripts are executed in an ```eval``` function and only after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```. It is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The following core functions are banned:  
-  1. :dangerous group - ```syscall```, ```dump```, ```chroot```,  
-  2. :subprocess group - ```system```, ```fork```, ```wait```, ```waitpid```, the backtick operator, ```glob```,  
-  3. :sys_db group - all 30 functions from this group,  
-  4. ```sysopen```.  
+* Perl scripts are executed in an ```eval``` function after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The core functions ```syscall```, ```dump```, ```chroot``` (:dangerous group) and ```fork``` are banned.  
 * The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
-* ```unlink``` core function is overriden. Only files inside the ```PEB_DATA_DIR```folder can be deleted, any attempt to delete other files will throw an error and the script will be aborted.  
-* Default module loading using ```require``` and ```use``` is also overriden.  
-  1. ```use lib``` is banned to prevent loading of Perl modules from arbitrary locations.  
-  2. The following Windows registry manipulation modules are also banned:  
-    1. ```Win32::Registry```,  
-    2. ```Win32API::Registry```,  
-    3. ```Win32::TieRegistry```,  
-    4. ```Win32::Registry::File```,  
-    5. ```Tree::Navigator::Node::Win32::Registry```,  
-    6. ```Parse::Win32Registry```  
-    and probably others containing the keywords 'Win32' and 'Registry'.  
-* The overriden core functions act as a barrier against unsafe operations because statical code analysis is performed before script execution with the following restrictions:  
-    1. Any call to one of the original core function - ```CORE::require``` or ```CORE::unlink``` will prevent the script from being executed.  
-    2. Adding directories to the ```@INC``` array from the ```BEGIN``` block is detected and results in aborting the script execution.  
-    3. ```eval``` from user code is not allowed and user scripts can not execute code from data files.  
-However, statical code analysis is not performed on modules to avoid performance degradation.  
-It is considered that core modules are safe and CPAN modules can not be installed without user intervention.  
-There seems to be no practical way to execute unauthorized and unsafe Perl code without the ```eval``` function, without the ```use lib``` statement, without the ```PERLLIB``` environment variable and without adding directories to the ```@INC``` array from the ```BEGIN``` block.  
   
 **Perl Debugger Interaction:**
 * Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  

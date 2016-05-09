@@ -54,7 +54,6 @@ http://qt-project.org/doc/qt-4.8/qfile.html
 http://qt-project.org/doc/qt-4.8/qtextstream.html
 http://qt-project.org/doc/qt-4.8/qiodevice.html
 http://qt-project.org/doc/qt-4.8/qwebframe.html
-http://qt-project.org/doc/qt-4.8/linguist-hellotr-main-cpp.html
 http://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets
 http://qt-project.org/doc/qt-4.8/qlist.html#removeOne
 http://qt-project.org/doc/qt-4.8/qstring.html#fromRawData
@@ -72,13 +71,10 @@ http://qt-project.org/doc/qt-5/qmake-test-function-reference.html
 
 http://qt-project.org/wiki/How_to_Use_QSettings
 http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
-http://qt-project.org/wiki/Open_Web_Page_in_QWebView_Bulgarian
-http://qt-project.org/wiki/Transition_from_Qt_4.x_to_Qt5
 
 http://qt-project.org/forums/viewthread/8270 (Find length of QString text)
 http://qt-project.org/forums/viewthread/6102 (WebView Clear history)
 http://qt-project.org/forums/viewthread/17635 (how to actually use QWebView::createWindow())
-http://qt-project.org/forums/viewthread/10672 (How to set windows system path using Qt api)
 http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)
 http://qt-project.org/forums/viewthread/25533 (#ifdef condition)
 http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)
@@ -168,8 +164,6 @@ http://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creat
 http://stackoverflow.com/questions/13111669/yes-no-message-box-using-qmessagebox
 http://stackoverflow.com/questions/17998811/window-modal-qfiledialog-pushing-parent-to-background-after-exec
 http://stackoverflow.com/questions/3214297/how-can-my-c-c-application-determine-if-the-root-user-is-executing-the-command
-http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
-http://stackoverflow.com/questions/1712500/qt-qsettings-on-windows-with-ini-files-and-comments
 http://stackoverflow.com/questions/16250994/how-to-properly-use-qsettings
 http://stackoverflow.com/questions/7228826/how-can-i-convert-qvariant-to-qstring-and-vice-versa-in-qt
 http://stackoverflow.com/questions/2580934/how-to-specify-different-debug-release-output-directories-in-qmake-pro-file
@@ -177,10 +171,8 @@ http://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value
 http://stackoverflow.com/questions/4515602/how-to-get-executable-name-in-qt
 http://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt
 http://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console
-http://stackoverflow.com/questions/4002757/how-to-add-zlib-to-an-existing-qt-installation
 http://stackoverflow.com/questions/6275363/what-is-the-correct-terminology-for-a-non-ajax-request
 http://stackoverflow.com/questions/15864689/qmake-pre-build-step-before-any-compilation
-http://stackoverflow.com/questions/18280733/retrieving-command-line-arguments-in-a-qt-application
 
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
 
@@ -196,10 +188,8 @@ http://cboard.cprogramming.com/linux-programming/101532-detaching-console.html
 http://mvclogic.com/qt/qt-code-example-new-file-open-file-save-file-save-as-file-file-print-print-preview-file-print-preview-print-preview/
 http://ubuntuforums.org/showthread.php?t=174362 (checking for root privileges in C++)
 http://doc.crossplatform.ru/qt/4.5.0/deployment-mac.html
-http://efxa.org/2013/05/06/how-internationalization-can-be-used-in-qt-apps/
 http://habrahabr.ru/post/150329/ (Qt Coding Style)
 http://okolovich.info/tag/code-snippets-c/
-http://www.antonioborondo.com/2014/10/22/zipping-and-unzipping-files-with-qt/
 http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp
 http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/
@@ -221,7 +211,6 @@ http://modperlbook.org/html/3-9-2-1-Modifying-INC.html
 
 http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (not executing program)"
 http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"
-http://www.perlmonks.org/?node_id=722050 "CORE::GLOBAL::* for auditing which files are read and written?"
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
@@ -240,10 +229,10 @@ http://www.perl.com/pub/2002/05/14/mod_perl.html
 http://www.tizag.com/perlT/perlhashes.php
 http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input
 http://modperlbook.org/html/3-9-2-1-Modifying-INC.html
+http://www.tutorialspoint.com/perl/perl_syscall.htm
 
 MAC
 ===
-http://stackoverflow.com/questions/7501678/set-environment-variables-on-mac-os-x-lion
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
 http://iconverticons.com/online/
@@ -251,7 +240,6 @@ http://iconverticons.com/online/
 HTML, CSS & JAVASCRIPT
 =================
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
-http://stackoverflow.com/questions/3163615/how-to-scroll-html-page-to-given-anchor-using-jquery-or-javascript
 http://stackoverflow.com/questions/9436534/ajax-tutorial-for-post-and-get
 http://stackoverflow.com/questions/6395720/get-data-from-php-array-ajax-jquery
 http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj
@@ -278,11 +266,6 @@ http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.p
 http://www.tutorialspoint.com/bootstrap/bootstrap_dropdown_plugin.htm
 http://twitter-bootstrap.node1.zygote.cc/javascript.html
 
-http://www.javascriptkit.com/script/cut19.shtml
-http://matthewjamestaylor.com/blog/adding-css-to-html-with-link-embed-inline-and-import
-http://www.w3.org/TR/html401/present/graphics.html
-http://highlight.hohli.com/
-http://www.techrepublic.com/blog/how-do-i/how-do-i-control-the-format-of-html-lists-with-css/
 http://www.sourcetricks.com/2010/07/javascript-scroll-to-bottom-of-page.html
 https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView
 http://www.bymichaellancaster.com/blog/fluid-iframe-and-images-without-javascript-plugins/
