@@ -304,23 +304,13 @@ int main(int argc, char **argv)
         qInstallMessageHandler(customMessageHandler);
     }
 
-    // Package directory:
-    QString packageDirName = QDir::toNativeSeparators(
-                settingsDirName
-                + "package"
-                + QDir::separator());
-
     // Package application directory:
     QString applicationDirName = QDir::toNativeSeparators(
-                packageDirName
+                settingsDirName
+                + "package"
+                + QDir::separator()
                 + "application");
     application.setProperty("application", applicationDirName);
-
-    // Package data directory:
-    QString dataDirName = QDir::toNativeSeparators(
-                packageDirName
-                + "data");
-    application.setProperty("data", dataDirName);
 
     // Package icon:
     QString iconPathName = QDir::toNativeSeparators(
@@ -467,16 +457,6 @@ QFileDetector::QFileDetector()
 }
 
 // ==============================
-// SCRIPT ENVIRONMENT CLASS CONSTRUCTOR:
-// ==============================
-QScriptEnvironment::QScriptEnvironment()
-    : QObject(0)
-{
-    // Set PEB_DATA_DIR environment variable:
-    scriptEnvironment.insert("PEB_DATA_DIR", qApp->property("data").toString());
-}
-
-// ==============================
 // CUSTOM NETWORK REPLY CONSTRUCTOR:
 // ==============================
 struct QCustomNetworkReplyPrivate
@@ -601,18 +581,14 @@ QPage::QPage()
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    // SCRIPT ENVIRONMENT:
-    QScriptEnvironment initialScriptEnvironment;
-    scriptEnvironment = initialScriptEnvironment.scriptEnvironment;
-
     // DEFAULT FRAME FOR LOCAL CONTENT:
     targetFrame = QPage::mainFrame();
 
     // ICON FOR DIALOGS:
     icon.load(qApp->property("iconPathName").toString());
 
-    // SIGNALS AND SLOTS FOR THE PERL DEBUGGER:
 #ifndef Q_OS_WIN
+    // SIGNALS AND SLOTS FOR THE PERL DEBUGGER:
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));

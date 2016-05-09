@@ -15,17 +15,14 @@ print "<!DOCTYPE html>
 
 	<body>
 
-		<p align='center'><font size='5'>
-		Test Results
-		</font></p>
+		<p align='center'><font size='5'>Test Results</font></p>
 
-		<p align='left'><font size='4'>
-		FORM DATA:
-		</font></p>
+		<p align='left'><font size='4'>FORM DATA:</font></p>
+
 		<p align='left'><font size='3'>\n";
 
 # Read input:
-my ($buffer, @pairs, $pair, $name, $value, %FORM);
+my ($buffer, @pairs, $pair, $name, $value);
 $ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
 if ($ENV{'REQUEST_METHOD'} eq "POST") {
 	read (STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
@@ -39,15 +36,12 @@ foreach $pair (@pairs) {
 	($name, $value) = split(/=/, $pair);
 	$value =~ tr/+/ /;
 	$value =~ s/%(..)/pack("C", hex($1))/eg;
-	$FORM{$name} = $value;
 	print "$name = $value<br>\n";
 }
 
 print "</font></p>
 
-		<p align='left'><font size='4'>
-			ENVIRONMENT VARIABLES:
-		</font></p>
+		<p align='left'><font size='4'>ENVIRONMENT VARIABLES:</font></p>
 
 		<p align='left'><font size='3'>\n";
 

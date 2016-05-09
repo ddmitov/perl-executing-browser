@@ -212,9 +212,7 @@ protected:
                     qDebug() << "AJAX script started:"
                              << ajaxScriptFullFilePath;
 
-                    QScriptEnvironment initialScriptEnvironment;
-                    QProcessEnvironment scriptEnvironment =
-                            initialScriptEnvironment.scriptEnvironment;
+                    QProcessEnvironment scriptEnvironment;
 
                     if (queryString.length() > 0) {
                         scriptEnvironment.insert("REQUEST_METHOD", "GET");
@@ -233,7 +231,6 @@ protected:
 
                     QProcess ajaxScriptHandler;
                     ajaxScriptHandler.setProcessEnvironment(scriptEnvironment);
-                    ajaxScriptHandler.setWorkingDirectory("");
 
                     // Non-blocking event loop waiting for AJAX script results:
                     QEventLoop ajaxScriptHandlerWaitingLoop;
@@ -476,6 +473,8 @@ public slots:
 
             qDebug() << "Script started:" << scriptFullFilePath;
 
+            QProcessEnvironment scriptEnvironment;
+
             if (queryString.length() > 0) {
                 scriptEnvironment.insert("REQUEST_METHOD", "GET");
                 scriptEnvironment.insert("QUERY_STRING", queryString);
@@ -490,7 +489,6 @@ public slots:
             }
 
             scriptHandler.setProcessEnvironment(scriptEnvironment);
-            scriptHandler.setWorkingDirectory("");
 
             // 'censor.pl' is compiled into the resources of
             // the binary file and called from there.

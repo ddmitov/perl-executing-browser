@@ -82,16 +82,12 @@ Compiled and tested successfully using:
   
 **Security features based on C++ code:**
 * Starting the browser with administrative privileges is not allowed - it exits with a message.  
-* Local scripts are executed in a clean environment with only a minimum of necessary environment variables.  
-  These are:  
-  1. ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` - environment variables borrowed from the CGI protocol and used for communication between local HTML forms and local Perl scripts;  
-  2. ```PEB_DATA_DIR``` - custom environment variable used to locate data files from local Perl scripts.  
-* Perl scripts are executed without a working directory and they can not open files using relative paths.  
+* Local scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.  
 * PEB does not download locally executed scripts from any remote locations.  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
   
 **Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning of potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. The core functions ```syscall```, ```dump```, ```chroot``` (:dangerous group) and ```fork``` are banned.  
+* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
 * The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
   
 **Perl Debugger Interaction:**

@@ -15,10 +15,7 @@ BEGIN {
 	##############################
 	# ENVIRONMENT:
 	##############################
-	my $PEB_DATA_DIR = $ENV{'PEB_DATA_DIR'};
-
 	my %CLEAN_ENV;
-	$CLEAN_ENV{'PEB_DATA_DIR'} = $PEB_DATA_DIR;
 
 	if ($ENV{'REQUEST_METHOD'}) {
 		$CLEAN_ENV{'REQUEST_METHOD'} = $ENV{'REQUEST_METHOD'};

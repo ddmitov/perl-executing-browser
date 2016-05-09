@@ -6,6 +6,7 @@ use strict;
 use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
+use Cwd;
 use DBI;
 
 print "
@@ -29,8 +30,9 @@ print "
 
 		<div>\n";
 
-my $database_relative_pathname = "/test.db";
-my $db = DBI->connect ("dbi:SQLite:$ENV{'PEB_DATA_DIR'}$database_relative_pathname","","", {sqlite_unicode => 1}) or
+my $cwd = cwd();
+my $database_relative_pathname = "/package/data/test.db";
+my $db = DBI->connect ("dbi:SQLite:$cwd$database_relative_pathname","","", {sqlite_unicode => 1}) or
 	die "Could not connect to database";
 
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
