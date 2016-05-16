@@ -13,40 +13,10 @@
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all"/>
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all"/>
 
+		<script type="text/javascript" src="peb/peb.js"></script>
+
 		<script type="text/javascript">
 			var formSubmitted = false;
-
-			// Custom title for the Confirm dialog box:
-			function pebConfirmTitle() {
-				var confirmTitle = "!! Confirm !!";
-				return confirmTitle;
-			}
-
-			// Close confirmation:
-			function pebCloseConfirmation() {
-				var confirmation = confirm("Text was entered on this page and it is going to be lost!\n" +
-										"Are you sure you want to close the window?");
-
-				var result;
-				if (confirmation == true) {
-					result = "yes";
-				} else {
-					result = "no";
-				}
-				return result;
-			}
-
-			// Custom Yes button label:
-			function pebYesLabel() {
-				var yesLabel = "YES";
-				return yesLabel;
-			}
-
-			// Custom No button label:
-			function pebNoLabel() {
-				var noLabel = "NO";
-				return noLabel;
-			}
 
 			// This function is necessary to prevent
 			// navigate away confirmation when form is being submitted.
@@ -98,7 +68,6 @@
 
 					<legend>Send POST request to local script</legend>
 
-					<!-- Inputs 1 and 2 -->
 					<div class="form-group">
 						<div class="input-prepend">
 							<input type="text" id="value1" name="value1" class="form-control" placeholder="Value 1" title="Value 1"/>

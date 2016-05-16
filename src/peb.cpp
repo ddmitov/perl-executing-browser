@@ -281,12 +281,11 @@ int main(int argc, char **argv)
     // START FULLSCREEN:
     QString startFullscreenSetting =
             settings.value("start_fullscreen").toString();
-    application.setProperty("fullscreen", startFullscreenSetting);
 
     // ==============================
-    // CHECK PROGRAM FILES AND FOLDERS:
+    // CHECK BROWSER FILES AND FOLDERS:
     // ==============================
-    // Logging:
+    // LOGGING:
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
@@ -304,7 +303,7 @@ int main(int argc, char **argv)
         qInstallMessageHandler(customMessageHandler);
     }
 
-    // Package application directory:
+    // PACKAGE APPLICATION DIRECTORY:
     QString applicationDirName = QDir::toNativeSeparators(
                 settingsDirName
                 + "package"
@@ -312,7 +311,7 @@ int main(int argc, char **argv)
                 + "application");
     application.setProperty("application", applicationDirName);
 
-    // Package icon:
+    // PACKAGE ICON:
     QString iconPathName = QDir::toNativeSeparators(
                 settingsDirName + QDir::separator()
                 + "package" + QDir::separator()
@@ -332,13 +331,34 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // MAIN GUI CLASS INITIALIZATION:
+    // READ INTERNALLY COMPILED JAVASCRIPT:
     // ==============================
-    QWebViewWindow window;
+    QFile file;
+    file.setFileName(":/scripts/js/check-user-input-before-close.js");
+    file.open(QIODevice::ReadOnly);
+    QString checkUserInputBeforeCloseJS = file.readAll();
+    file.close();
 
-    QObject::connect(qApp, SIGNAL(lastWindowClosed()),
-                     &window, SLOT(qExitApplicationSlot()));
+    application.setProperty("checkUserInputBeforeCloseJS",
+                            checkUserInputBeforeCloseJS);
 
+    // ==============================
+    // MAIN GUI CLASSES INITIALIZATION:
+    // ==============================
+    MainWindow mainWindow;
+    mainWindow.webViewWidget = new QWebViewWidget();
+
+    // Connect signal and slot for setting the main window title:
+    QObject::connect(mainWindow.webViewWidget,
+                     SIGNAL(titleChanged(QString)),
+                     &mainWindow, SLOT(setMainWindowTitleSlot(QString)));
+
+    // Connect signal and slot for actions taken before application exit:
+    QObject::connect(qApp, SIGNAL(aboutToQuit()),
+                     &mainWindow, SLOT(qExitApplicationSlot()));
+
+    // Display embedded HTML error message if application is started by
+    // a user with administrative privileges:
     if (startedAsRoot == true) {
         QString htmlErrorContents = readHtmlErrorTemplate();
         QString errorMessage =
@@ -348,7 +368,7 @@ int main(int argc, char **argv)
                 + "with administrative privileges is not allowed.";
         htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
-        window.setHtml(htmlErrorContents);
+        mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
         qDebug() << "Using"
                  << application.applicationName().toLatin1().constData()
@@ -356,6 +376,7 @@ int main(int argc, char **argv)
                  << "with administrative privileges is not allowed.";
     }
 
+    // Display start page:
     if (startedAsRoot == false) {
         // ==============================
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
@@ -385,30 +406,47 @@ int main(int argc, char **argv)
         QFile staticStartPageFile(applicationDirName + QDir::separator()
                                   + "index.html");
         if (staticStartPageFile.exists()) {
-            window.setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN)
-                               + "/index.html"));
+            mainWindow.webViewWidget->setUrl(
+                        QUrl("http://" + QString(PSEUDO_DOMAIN)
+                             + "/index.html"));
         } else {
             QFile dynamicStartPageFile(applicationDirName + QDir::separator()
                                        + "index.pl");
             if (dynamicStartPageFile.exists()) {
-                window.setUrl(QUrl("http://" + QString(PSEUDO_DOMAIN)
-                                   + "/index.pl"));
+                mainWindow.webViewWidget->setUrl(
+                            QUrl("http://" + QString(PSEUDO_DOMAIN)
+                                 + "/index.pl"));
             } else {
                 QString htmlErrorContents = readHtmlErrorTemplate();
                 QString errorMessage = "Start page was not found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
-                window.setHtml(htmlErrorContents);
+                mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
                 qDebug() << "Start page was not found.";
             }
         }
     }
 
-    window.setWindowIcon(icon);
-    window.show();
+    mainWindow.setCentralWidget(mainWindow.webViewWidget);
+    mainWindow.setWindowIcon(icon);
+
+    if (startFullscreenSetting == "enable") {
+        mainWindow.showFullScreen();
+    } else {
+        mainWindow.showMaximized();
+    }
 
     return application.exec();
+}
+
+// ==============================
+// MAIN WINDOW CLASS CONSTRUCTOR:
+// ==============================
+MainWindow::MainWindow(QWidget *parent)
+    : QMainWindow(parent)
+{
+    // !!! No need to implement code here, but must be declared !!!
 }
 
 // ==============================
@@ -504,7 +542,7 @@ qint64 QCustomNetworkReply::size() const
 
 void QCustomNetworkReply::abort()
 {
-    // !!! no need to implement code here, but must be declared !!!
+    // !!! No need to implement code here, but must be declared !!!
 }
 
 qint64 QCustomNetworkReply::bytesAvailable() const
@@ -555,8 +593,6 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::AcceleratedCompositingEnabled, true);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
@@ -571,7 +607,7 @@ QPage::QPage()
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
-    // SIGNALS AND SLOTS FOR ALL LOCAL CGI-LIKE PERL SCRIPTS:
+    // Connect signals and slots for all local cgi-like perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
@@ -581,14 +617,8 @@ QPage::QPage()
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    // DEFAULT FRAME FOR LOCAL CONTENT:
-    targetFrame = QPage::mainFrame();
-
-    // ICON FOR DIALOGS:
-    icon.load(qApp->property("iconPathName").toString());
-
 #ifndef Q_OS_WIN
-    // SIGNALS AND SLOTS FOR THE PERL DEBUGGER:
+    // Connect signals and slots for the perl debugger:
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));
@@ -606,7 +636,7 @@ QPage::QPage()
                          this,
                          SLOT(qDebuggerHtmlFormatterFinishedSlot()));
 
-        // EXPLICIT INITIALIZATION OF IMPORTANT PERL-DEBUGGER-RELATED VALUE:
+        // Explicit initialization of important perl-debugger-related value:
         debuggerJustStarted = false;
     }
 #endif
@@ -615,7 +645,7 @@ QPage::QPage()
 // ==============================
 // WEB VIEW CLASS CONSTRUCTOR:
 // ==============================
-QWebViewWindow::QWebViewWindow()
+QWebViewWidget::QWebViewWidget()
     : QWebView(0)
 {
     // Configure keyboard shortcuts:
@@ -630,19 +660,14 @@ QWebViewWindow::QWebViewWindow()
     QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
                      this, SLOT(qStartQWebInspector()));
 
-    // Configure screen dimensions:
-    if ((qApp->property("fullscreen").toString()) == "enable") {
-        showFullScreen();
-    } else {
-        showMaximized();
-    }
+    // Start new window maximized:
+    showMaximized();
 
-    // No context menu:
-    setContextMenuPolicy(Qt::NoContextMenu);
-
+    // Start QPage instance:
     mainPage = new QPage();
 
-    // Connect signals and slots:
+    // Connect signals and slots for script errors, printing and
+    // actions taken after page is loaded:
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
                      this, SLOT(qDisplayErrorsSlot(QString)));
 
@@ -654,13 +679,15 @@ QWebViewWindow::QWebViewWindow()
     QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
 
+    // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
 
-    // Use modified Network Access Manager with every window of the program:
+    // Use modified Network Access Manager:
     QAccessManager *networkAccessManager =
             new QAccessManager();
     mainPage->setNetworkAccessManager(networkAccessManager);
 
+    // Connect signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      mainPage,
@@ -683,16 +710,6 @@ QWebViewWindow::QWebViewWindow()
                                               Qt::ScrollBarAsNeeded);
     mainPage->mainFrame()->setScrollBarPolicy(Qt::Vertical,
                                               Qt::ScrollBarAsNeeded);
-
-    // Icon for windows:
-    icon.load(qApp->property("iconPathName").toString());
-
-    // READ INTERNALLY COMPILED JS SCRIPT:
-    QFile file;
-    file.setFileName(":/scripts/js/check-user-input-before-close.js");
-    file.open(QIODevice::ReadOnly);
-    checkUserInputBeforeCloseJavaScript = file.readAll();
-    file.close();
 }
 
 // ==============================
@@ -762,7 +779,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                         .setFileMode(QFileDialog::ExistingFile);
                 selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
                 selectScriptToDebugDialog.setWindowModality(Qt::WindowModal);
-                selectScriptToDebugDialog.setWindowIcon(icon);
                 debuggerScriptToDebug = selectScriptToDebugDialog
                         .getOpenFileName
                         (qApp->activeWindow(),

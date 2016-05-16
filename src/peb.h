@@ -18,6 +18,7 @@
 #define PEB_H
 
 #include <QApplication>
+#include <QMainWindow>
 #include <QtNetwork/QNetworkAccessManager>
 #include <QNetworkReply>
 #include <QtWebKit>
@@ -30,8 +31,11 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QMenu>
 #include <QDesktopWidget>
 #include <qglobal.h>
+
+#include <QMenu>
 
 // ==============================
 // PRINT SUPPORT:
@@ -48,6 +52,68 @@
 #ifndef PSEUDO_DOMAIN
 #define PSEUDO_DOMAIN "perl-executing-browser-pseudodomain"
 #endif
+
+// ==============================
+// MAIN WINDOW CLASS DEFINITION:
+// ==============================
+class MainWindow : public QMainWindow
+{
+    Q_OBJECT
+
+public slots:
+    void setMainWindowTitleSlot(QString title)
+    {
+        setWindowTitle(title);
+    }
+
+    void closeEvent(QCloseEvent *event)
+    {
+        webViewWidget->page()->currentFrame()->evaluateJavaScript(
+                    qApp->property("checkUserInputBeforeCloseJS").toString());
+
+        QVariant jsResult =
+                 webViewWidget->page()->currentFrame()->evaluateJavaScript(
+                    "checkUserInputBeforeClose()");
+        QString textIsEntered = jsResult.toString();
+
+        if (textIsEntered == "no") {
+            event->accept();
+        }
+
+        if (textIsEntered == "yes") {
+            QVariant jsResult =
+                     webViewWidget->page()->currentFrame()->evaluateJavaScript(
+                        "pebCloseConfirmation()");
+            QString jsCloseDecision = jsResult.toString();
+
+            if (jsCloseDecision.length() == 0) {
+                event->accept();
+            }
+
+            if (jsCloseDecision.length() > 0) {
+                if (jsCloseDecision == "yes") {
+                    event->accept();
+                }
+                if (jsCloseDecision == "no") {
+                    event->ignore();
+                }
+            }
+        }
+    }
+
+    void qExitApplicationSlot()
+    {
+        qDebug() << qApp->applicationName().toLatin1().constData()
+                 << qApp->applicationVersion().toLatin1().constData()
+                 << "terminated normally.";
+
+        QApplication::exit();
+    }
+
+public:
+    explicit MainWindow(QWidget *parent = 0);
+    QWebView *webViewWidget;
+};
 
 // ==============================
 // FILE DETECTOR CLASS DEFINITION:
@@ -130,19 +196,6 @@ private:
     QRegExp pngExtension;
     QRegExp jpgExtensions;
     QRegExp gifExtension;
-};
-
-// ==============================
-// SCRIPT ENVIRONMENT CLASS DEFINITION:
-// ==============================
-class QScriptEnvironment : public QObject
-{
-    Q_OBJECT
-
-public:
-    QScriptEnvironment();
-
-    QProcessEnvironment scriptEnvironment;
 };
 
 // ==============================
@@ -531,18 +584,13 @@ public slots:
     void qScriptOutputSlot()
     {
         QString output = scriptHandler.readAllStandardOutput();
+        scriptAccumulatedOutput.append(output);
+
+        QPage::currentFrame()->setHtml(scriptAccumulatedOutput,
+                                       QUrl(PSEUDO_DOMAIN));
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: output from" << scriptFullFilePath;
-
-        scriptAccumulatedOutput.append(output);
-
-        if (!QPage::mainFrame()->childFrames().contains(targetFrame)) {
-            targetFrame = QPage::currentFrame();
-        }
-
-        targetFrame->setHtml(scriptAccumulatedOutput,
-                             QUrl(PSEUDO_DOMAIN));
     }
 
     void qScriptErrorsSlot()
@@ -554,28 +602,23 @@ public slots:
 
     void qScriptFinishedSlot()
     {
-        if (!QPage::mainFrame()->childFrames().contains(targetFrame)) {
-            targetFrame = QPage::currentFrame();
-        }
-
-        targetFrame->setHtml(scriptAccumulatedOutput,
-                             QUrl(PSEUDO_DOMAIN));
+        QPage::currentFrame()->setHtml(scriptAccumulatedOutput,
+                                       QUrl(PSEUDO_DOMAIN));
 
         if (scriptAccumulatedErrors.length() > 0) {
-
             if (scriptAccumulatedOutput.length() == 0) {
-                targetFrame->setHtml(scriptAccumulatedErrors,
-                                     QUrl(PSEUDO_DOMAIN));
+                QPage::currentFrame()->setHtml(scriptAccumulatedErrors,
+                                               QUrl(PSEUDO_DOMAIN));
             } else {
                 emit displayErrorsSignal(scriptAccumulatedErrors);
             }
         }
 
         scriptHandler.close();
-        qDebug() << "Script finished:" << scriptFullFilePath;
-
         scriptAccumulatedOutput = "";
         scriptAccumulatedErrors = "";
+
+        qDebug() << "Script finished:" << scriptFullFilePath;
     }
 
     // ==============================
@@ -820,7 +863,7 @@ protected:
             alertTitle = jsAlertTitle;
         }
 
-        // OK button label can be set from JavaScript.
+        // "OK" button label can be set from JavaScript.
         QString okLabel;
         QVariant okLabelJsResult = frame->evaluateJavaScript("pebOkLabel()");
         QString jsOkLabel = okLabelJsResult.toString();
@@ -834,8 +877,6 @@ protected:
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
         javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
         javaScriptAlertMessageBox.setWindowTitle(alertTitle);
-        javaScriptAlertMessageBox
-                .setIconPixmap((qApp->property("icon").toString()));
         javaScriptAlertMessageBox.setText(msg);
         javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
         javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
@@ -856,7 +897,7 @@ protected:
             confirmTitle = jsConfirmTitle;
         }
 
-        // Yes button label can be set from JavaScript.
+        // "Yes" button label can be set from JavaScript.
         QString yesLabel;
         QVariant yesLabelJsResult = frame->evaluateJavaScript("pebYesLabel()");
         QString jsYesLabel = yesLabelJsResult.toString();
@@ -867,7 +908,7 @@ protected:
             yesLabel = jsYesLabel;
         }
 
-        // No button label can be set from JavaScript.
+        // "No" button label can be set from JavaScript.
         QString noLabel;
         QVariant noLabelJsResult = frame->evaluateJavaScript("pebNoLabel()");
         QString jsNoLabel = noLabelJsResult.toString();
@@ -881,8 +922,6 @@ protected:
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
         javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
         javaScriptConfirmMessageBox.setWindowTitle(confirmTitle);
-        javaScriptConfirmMessageBox
-                .setIconPixmap((qApp->property("icon").toString()));
         javaScriptConfirmMessageBox.setText(msg);
         javaScriptConfirmMessageBox
                 .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
@@ -923,8 +962,7 @@ protected:
     }
 
 private:
-    QWebView *newWindow;
-    QWebFrame *targetFrame;
+    QWebView *webViewWidget;
 
     QString scriptFullFilePath;
     QProcess scriptHandler;
@@ -932,9 +970,8 @@ private:
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
 
-    QPixmap icon;
-
 #ifndef Q_OS_WIN
+    QWebFrame *targetFrame;
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
     QString debuggerLastCommand;
@@ -949,7 +986,7 @@ private:
 // ==============================
 // WEB VIEW CLASS DEFINITION:
 // ==============================
-class QWebViewWindow : public QWebView
+class QWebViewWidget : public QWebView
 {
     Q_OBJECT
 
@@ -957,8 +994,146 @@ public slots:
     void qPageLoadedSlot(bool ok)
     {
         if (ok) {
-            setWindowTitle(QWebViewWindow::title());
+            setWindowTitle(QWebViewWidget::title());
         }
+    }
+
+    void contextMenuEvent(QContextMenuEvent *event)
+    {
+        QWebHitTestResult qWebHitTestResult =
+                mainPage->mainFrame()->hitTestContent(event->pos());
+        QMenu menu;
+
+        if ((qWebHitTestResult.isContentEditable() and
+                qWebHitTestResult.linkUrl().isEmpty() and
+                qWebHitTestResult.imageUrl().isEmpty()) or
+                qWebHitTestResult.isContentSelected()) {
+
+            QString cutLabel;
+            QVariant cutLabelJsResult =
+                    mainPage->
+                    currentFrame()->evaluateJavaScript("pebCutLabel()");
+            QString jsCutLabel = cutLabelJsResult.toString();
+            if (jsCutLabel.length() == 0) {
+                cutLabel = "Cut";
+            }
+            if (jsCutLabel.length() > 0) {
+                cutLabel = jsCutLabel;
+            }
+
+            QAction *cutAct = menu.addAction(cutLabel);
+            QObject::connect(cutAct, SIGNAL(triggered()),
+                             this, SLOT(qCutAction()));
+
+            QString copyLabel;
+            QVariant copyLabelJsResult =
+                    mainPage->
+                    currentFrame()->evaluateJavaScript("pebCopyLabel()");
+            QString jsCopyLabel = copyLabelJsResult.toString();
+            if (jsCopyLabel.length() == 0) {
+                copyLabel = "Copy";
+            }
+            if (jsCopyLabel.length() > 0) {
+                copyLabel = jsCopyLabel;
+            }
+
+            QAction *copyAct = menu.addAction(copyLabel);
+            QObject::connect(copyAct, SIGNAL(triggered()),
+                             this, SLOT(qCopyAction()));
+
+            QString pasteLabel;
+            QVariant pasteLabelJsResult =
+                    mainPage->
+                    currentFrame()->evaluateJavaScript("pebPasteLabel()");
+            QString jsPasteLabel = pasteLabelJsResult.toString();
+            if (jsPasteLabel.length() == 0) {
+                pasteLabel = "Paste";
+            }
+            if (jsPasteLabel.length() > 0) {
+                pasteLabel = jsPasteLabel;
+            }
+
+            QAction *pasteAct = menu.addAction(pasteLabel);
+            QObject::connect(pasteAct, SIGNAL(triggered()),
+                             this, SLOT(qPasteAction()));
+
+            QString selectAllLabel;
+            QVariant selectAllLabelJsResult =
+                    mainPage->
+                    currentFrame()->evaluateJavaScript("pebSelectAllLabel()");
+            QString jsSelectAllLabel = selectAllLabelJsResult.toString();
+            if (jsSelectAllLabel.length() == 0) {
+                selectAllLabel = "Select All";
+            }
+            if (jsSelectAllLabel.length() > 0) {
+                selectAllLabel = jsSelectAllLabel;
+            }
+
+            QAction *selectAllAct = menu.addAction(selectAllLabel);
+            QObject::connect(selectAllAct, SIGNAL(triggered()),
+                             this, SLOT(qSelectAllAction()));
+        }
+
+        if (!qWebHitTestResult.isContentEditable() and
+                qWebHitTestResult.linkUrl().isEmpty() and
+                qWebHitTestResult.imageUrl().isEmpty() and
+                (!qWebHitTestResult.isContentSelected())) {
+
+            QString printPreviewLabel;
+            QVariant printPreviewJsResult =
+                    mainPage->
+                    currentFrame()->
+                    evaluateJavaScript("pebPrintPreviewLabel()");
+            QString jsPrintPreviewLabel = printPreviewJsResult.toString();
+            if (jsPrintPreviewLabel.length() == 0) {
+                printPreviewLabel = "Print Preview";
+            }
+            if (jsPrintPreviewLabel.length() > 0) {
+                printPreviewLabel = jsPrintPreviewLabel;
+            }
+
+            QAction *printPreviewAct = menu.addAction(printPreviewLabel);
+            QObject::connect(printPreviewAct, SIGNAL(triggered()),
+                             this, SLOT(qStartPrintPreviewSlot()));
+
+            QString printLabel;
+            QVariant printJsResult =
+                    mainPage->
+                    currentFrame()->evaluateJavaScript("pebPrintLabel()");
+            QString jsPrintLabel = printJsResult.toString();
+            if (jsPrintLabel.length() == 0) {
+                printLabel = "Print";
+            }
+            if (jsPrintLabel.length() > 0) {
+                printLabel = jsPrintLabel;
+            }
+
+            QAction *printAct = menu.addAction(printLabel);
+            QObject::connect(printAct, SIGNAL(triggered()),
+                             this, SLOT(qPrintSlot()));
+        }
+
+        menu.exec(mapToGlobal(event->pos()));
+    }
+
+    void qCutAction()
+    {
+        QWebViewWidget::triggerPageAction(QWebPage::Cut);
+    }
+
+    void qCopyAction()
+    {
+        QWebViewWidget::triggerPageAction(QWebPage::Copy);
+    }
+
+    void qPasteAction()
+    {
+        QWebViewWidget::triggerPageAction(QWebPage::Paste);
+    }
+
+    void qSelectAllAction()
+    {
+        QWebViewWidget::triggerPageAction(QWebPage::SelectAll);
     }
 
     void qStartPrintPreviewSlot()
@@ -982,7 +1157,7 @@ public slots:
 #ifdef QT_NO_PRINTER
         Q_UNUSED(printer);
 #else
-        QWebViewWindow::print(printer);
+        QWebViewWidget::print(printer);
 #endif
     }
 
@@ -1009,7 +1184,7 @@ public slots:
                                  (screenRect.height() / 2)
                                  - (dialogSize.height() / 2)));
         if (printDialog->exec() == QDialog::Accepted) {
-            QWebViewWindow::print(&printer);
+            QWebViewWidget::print(&printer);
         }
         printDialog->close();
         printDialog->deleteLater();
@@ -1018,19 +1193,11 @@ public slots:
 
     void qDisplayErrorsSlot(QString errors)
     {
-        errorsWindow = new QWebViewWindow();
+        errorsWindow = new QWebViewWidget();
         errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
+        errorsWindow->adjustSize();
         errorsWindow->setFocus();
         errorsWindow->show();
-    }
-
-    void qToggleFullScreenSlot()
-    {
-        if (isFullScreen()) {
-            showMaximized();
-        } else {
-            showFullScreen();
-        }
     }
 
     void qStartQWebInspector()
@@ -1038,14 +1205,14 @@ public slots:
         qDebug() << "QWebInspector started.";
 
         QWebInspector *inspector = new QWebInspector;
-        inspector->setPage(QWebViewWindow::page());
+        inspector->setPage(QWebViewWidget::page());
         inspector->show();
     }
 
     void closeEvent(QCloseEvent *event)
     {
         mainPage->currentFrame()->evaluateJavaScript(
-                    checkUserInputBeforeCloseJavaScript);
+                    qApp->property("checkUserInputBeforeCloseJS").toString());
         QVariant jsResult =
                 mainPage->currentFrame()->evaluateJavaScript(
                     "checkUserInputBeforeClose()");
@@ -1076,36 +1243,27 @@ public slots:
         }
     }
 
-    void qExitApplicationSlot()
-    {
-        qDebug() << qApp->applicationName().toLatin1().constData()
-                 << qApp->applicationVersion().toLatin1().constData()
-                 << "terminated normally.";
-
-        QApplication::exit();
-    }
-
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
+        reply->ignoreSslErrors();
+
         foreach (QSslError error, errors) {
             qDebug() << "SSL error:" << error;
         }
-
-        reply->ignoreSslErrors();
     }
 
 public:
-    QWebViewWindow();
+    QWebViewWidget();
 
     QWebView *createWindow(QWebPage::WebWindowType type)
     {
-        qDebug() << "New window requested.";
-
         Q_UNUSED(type);
-        QWebView *window = new QWebViewWindow();
-        window->setWindowIcon(icon);
-        window->setAttribute(Qt::WA_DeleteOnClose, true);
-        window->showMaximized();
+
+        QWebView *window = new QWebViewWidget();
+        window->adjustSize();
+        window->setFocus();
+
+        qDebug() << "New window requested.";
 
         return window;
     }
@@ -1114,10 +1272,6 @@ private:
     QPage *mainPage;
     QWebView *newWindow;
     QWebView *errorsWindow;
-
-    QString checkUserInputBeforeCloseJavaScript;
-
-    QPixmap icon;
 };
 
 #endif // PEB_H

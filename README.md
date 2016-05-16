@@ -87,7 +87,7 @@ Compiled and tested successfully using:
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
   
 **Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory whenever a local Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
+* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when local Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
 * The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
   
 **Perl Debugger Interaction:**
@@ -102,9 +102,8 @@ Compiled and tested successfully using:
 * Ctrl+P - print current page  
 * Ctrl+I - debug current page using QWebInspector  
   
-## User Interface Limitations
+## Limitations
   
-* No context menu.  
 * No history and cache.  
 JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
 * No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
