@@ -464,6 +464,9 @@ QFileDetector::QFileDetector()
     htmlExtensions.setPattern("htm");
     htmlExtensions.setCaseSensitivity(Qt::CaseInsensitive);
 
+    xmlExtension.setPattern("xml");
+    xmlExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
     cssExtension.setPattern("css");
     cssExtension.setCaseSensitivity(Qt::CaseInsensitive);
 

@@ -134,7 +134,6 @@ public slots:
             QString firstLine;
 
             QFile file(filepath);
-
             if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
                 firstLine = file.readLine();
             }
@@ -146,7 +145,8 @@ public slots:
             if (extension.contains(htmlExtensions)) {
                 interpreter = "browser-html";
             }
-            if (extension.contains(cssExtension) or
+            if (extension.contains(xmlExtension) or
+                    extension.contains(cssExtension) or
                     extension.contains(jsExtension) or
                     extension.contains(ttfExtension) or
                     extension.contains(eotExtension) or
@@ -179,14 +179,14 @@ public:
     bool fileExists;
     QString interpreter;
 
-    QRegExp plExtension;
-    QRegExp htmlExtensions;
-
 private:
     QString extension;
     QRegExp perlShebang;
 
     // Regular expressions for file type detection by extension:
+    QRegExp plExtension;
+    QRegExp htmlExtensions;
+    QRegExp xmlExtension;
     QRegExp cssExtension;
     QRegExp jsExtension;
     QRegExp svgExtension;
