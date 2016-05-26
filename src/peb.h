@@ -142,20 +142,21 @@ public slots:
                 interpreter = (qApp->property("perlInterpreter").toString());
             }
         } else {
-            if (extension.contains(htmlExtensions)) {
-                interpreter = "browser-html";
-            }
-            if (extension.contains(xmlExtension) or
+            if (extension.contains(htmlExtensions) or
+                    extension.contains(xmlExtension) or
+                    extension.contains(jsonExtension) or
                     extension.contains(cssExtension) or
-                    extension.contains(jsExtension) or
-                    extension.contains(ttfExtension) or
+                    extension.contains(jsExtension)) {
+                interpreter = "browser-text";
+            }
+            if (extension.contains(ttfExtension) or
                     extension.contains(eotExtension) or
                     extension.contains(woffExtensions) or
                     extension.contains(svgExtension) or
                     extension.contains(pngExtension) or
                     extension.contains(jpgExtensions) or
                     extension.contains(gifExtension)) {
-                interpreter = "browser";
+                interpreter = "browser-images";
             }
 
             if (extension == "pl") {
@@ -426,26 +427,44 @@ protected:
                              QNetworkRequest(emptyNetworkRequest));
                 }
 
-                // Handle local HTML, CSS, JS, fonts or supported image files:
+                // Handle supported local files:
                 if (interpreter.contains ("browser")) {
+                    if (interpreter.contains ("text")) {
+                        qDebug() << "Local link requested:"
+                                 << request.url().toString();
 
-                    qDebug() << "Link requested:"
-                             << request.url().toString();
+                        QString localFileName(QDir::toNativeSeparators(
+                                                  (qApp->property("application")
+                                                   .toString())
+                                                  + request.url().path()));
+                        QFile localFile(localFileName);
+                        localFile.open(QIODevice::ReadOnly);
+                        QTextStream stream(&localFile);
+                        QString localFileContents = stream.readAll();
+                        localFile.close();
 
-                    QString localFileName(QDir::toNativeSeparators(
-                                              (qApp->property("application")
-                                               .toString())
-                                              + request.url().path()));
-                    QFile localFile(localFileName);
-                    localFile.open(QIODevice::ReadOnly);
-                    QTextStream stream(&localFile);
-                    QString localFileContents = stream.readAll();
-                    localFile.close();
+                        QCustomNetworkReply *reply =
+                                new QCustomNetworkReply (request.url(),
+                                                         localFileContents);
+                        return reply;
+                    }
 
-                    QCustomNetworkReply *reply =
-                            new QCustomNetworkReply (request.url(),
-                                                     localFileContents);
-                    return reply;
+                    if (interpreter.contains ("images")) {
+                        qDebug() << "Local link requested:"
+                                 << request.url().toString();
+
+                        QString localFileName(QDir::toNativeSeparators(
+                                                  (qApp->property("application")
+                                                   .toString())
+                                                  + request.url().path()));
+
+                        QNetworkRequest networkRequest;
+                        networkRequest
+                                .setUrl(QUrl::fromLocalFile(localFileName));
+                        return QNetworkAccessManager::createRequest
+                                (QNetworkAccessManager::GetOperation,
+                                 QNetworkRequest(networkRequest));
+                    }
                 }
 
                 // Unsupported local files:
