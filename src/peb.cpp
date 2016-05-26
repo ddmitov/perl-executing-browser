@@ -467,6 +467,9 @@ QFileDetector::QFileDetector()
     xmlExtension.setPattern("xml");
     xmlExtension.setCaseSensitivity(Qt::CaseInsensitive);
 
+    jsonExtension.setPattern("json");
+    jsonExtension.setCaseSensitivity(Qt::CaseInsensitive);
+
     cssExtension.setPattern("css");
     cssExtension.setCaseSensitivity(Qt::CaseInsensitive);
 

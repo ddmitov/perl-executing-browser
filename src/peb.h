@@ -187,6 +187,7 @@ private:
     QRegExp plExtension;
     QRegExp htmlExtensions;
     QRegExp xmlExtension;
+    QRegExp jsonExtension;
     QRegExp cssExtension;
     QRegExp jsExtension;
     QRegExp svgExtension;
