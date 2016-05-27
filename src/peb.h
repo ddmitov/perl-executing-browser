@@ -68,34 +68,35 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        webViewWidget->page()->currentFrame()->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS").toString());
-
-        QVariant jsResult =
-                 webViewWidget->page()->currentFrame()->evaluateJavaScript(
-                    "checkUserInputBeforeClose()");
-        QString textIsEntered = jsResult.toString();
-
-        if (textIsEntered == "no") {
-            event->accept();
-        }
-
-        if (textIsEntered == "yes") {
+        foreach(QWebFrame *frame,
+                webViewWidget->page()->mainFrame()->childFrames()){
+            frame->evaluateJavaScript(
+                        qApp->property("checkUserInputBeforeCloseJS")
+                        .toString());
             QVariant jsResult =
-                     webViewWidget->page()->currentFrame()->evaluateJavaScript(
-                        "pebCloseConfirmation()");
-            QString jsCloseDecision = jsResult.toString();
+                    frame->evaluateJavaScript("checkUserInputBeforeClose()");
+            QString textIsEntered = jsResult.toString();
 
-            if (jsCloseDecision.length() == 0) {
+            if (textIsEntered == "no") {
                 event->accept();
             }
 
-            if (jsCloseDecision.length() > 0) {
-                if (jsCloseDecision == "yes") {
+            if (textIsEntered == "yes") {
+                QVariant jsResult =
+                        frame->evaluateJavaScript("pebCloseConfirmation()");
+                QString jsCloseDecision = jsResult.toString();
+
+                if (jsCloseDecision.length() == 0) {
                     event->accept();
                 }
-                if (jsCloseDecision == "no") {
-                    event->ignore();
+
+                if (jsCloseDecision.length() > 0) {
+                    if (jsCloseDecision == "yes") {
+                        event->accept();
+                    }
+                    if (jsCloseDecision == "no") {
+                        event->ignore();
+                    }
                 }
             }
         }
@@ -427,7 +428,7 @@ protected:
                              QNetworkRequest(emptyNetworkRequest));
                 }
 
-                // Handle supported local files:
+                // Handle other supported local files:
                 if (interpreter.contains ("browser")) {
                     if (interpreter.contains ("text")) {
                         qDebug() << "Local link requested:"
@@ -524,11 +525,80 @@ class QPage : public QWebPage
     Q_OBJECT
 
 signals:
+    void changeTitleSignal();
     void displayErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
 
 public slots:
+    void qPageLoadedSlot(bool ok)
+    {
+        if (ok) {
+            emit changeTitleSignal();
+
+            QVariant messageBoxElementsJsResult =
+                    currentFrame()->
+                    evaluateJavaScript("pebMessageBoxElements()");
+
+            QJsonDocument messageBoxElementsJsonDocument =
+                    QJsonDocument::fromJson(
+                        messageBoxElementsJsResult.toString().toUtf8());
+
+            QJsonObject messageBoxElementsJsonObject =
+                    messageBoxElementsJsonDocument.object();
+
+            if (messageBoxElementsJsonObject.length() == 0) {
+                alertTitle = "Alert";
+                okLabel = "Ok";
+                confirmTitle = "Confirmation";
+                yesLabel = "Yes";
+                noLabel = "No";
+                promptTitle = "Prompt";
+            }
+
+            if (messageBoxElementsJsonObject.length() > 0) {
+                if (messageBoxElementsJsonObject["alertTitle"]
+                        .toString().length() > 0) {
+                    alertTitle =
+                            messageBoxElementsJsonObject["alertTitle"]
+                            .toString();
+                }
+
+                if (messageBoxElementsJsonObject["okLabel"]
+                        .toString().length() > 0) {
+                    okLabel =
+                            messageBoxElementsJsonObject["okLabel"].toString();
+                }
+
+                if (messageBoxElementsJsonObject["confirmTitle"]
+                        .toString().length() > 0) {
+                    confirmTitle =
+                            messageBoxElementsJsonObject["confirmTitle"]
+                            .toString();
+                }
+
+                if (messageBoxElementsJsonObject["yesLabel"]
+                        .toString().length() > 0) {
+                    yesLabel =
+                            messageBoxElementsJsonObject["yesLabel"].toString();
+                }
+
+                if (messageBoxElementsJsonObject["noLabel"]
+                        .toString().length() > 0) {
+                    noLabel =
+                            messageBoxElementsJsonObject["noLabel"].toString();
+                }
+
+                if (messageBoxElementsJsonObject["promptTitle"]
+                        .toString().length() > 0) {
+                    promptTitle =
+                            messageBoxElementsJsonObject["promptTitle"]
+                            .toString();
+                }
+            }
+        }
+    }
+
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
         scriptFullFilePath = QDir::toNativeSeparators
@@ -872,27 +942,7 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        // Alert dialog box title can be set from JavaScript.
-        QString alertTitle;
-        QVariant jsResult = frame->evaluateJavaScript("pebAlertTitle()");
-        QString jsAlertTitle = jsResult.toString();
-        if (jsAlertTitle.length() == 0) {
-            alertTitle = "Alert";
-        }
-        if (jsAlertTitle.length() > 0) {
-            alertTitle = jsAlertTitle;
-        }
-
-        // "OK" button label can be set from JavaScript.
-        QString okLabel;
-        QVariant okLabelJsResult = frame->evaluateJavaScript("pebOkLabel()");
-        QString jsOkLabel = okLabelJsResult.toString();
-        if (jsOkLabel.length() == 0) {
-            okLabel = "OK";
-        }
-        if (jsOkLabel.length() > 0) {
-            okLabel = jsOkLabel;
-        }
+        Q_UNUSED(frame);
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
         javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
@@ -901,43 +951,12 @@ protected:
         javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
         javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
         javaScriptAlertMessageBox.exec();
+        qApp->activeWindow()->focusWidget();
     }
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        // Confirm dialog box title can be set from JavaScript.
-        QString confirmTitle;
-        QVariant confirmTitleJsResult =
-                frame->evaluateJavaScript("pebConfirmTitle()");
-        QString jsConfirmTitle = confirmTitleJsResult.toString();
-        if (jsConfirmTitle.length() == 0) {
-            confirmTitle = "Confirm";
-        }
-        if (jsConfirmTitle.length() > 0) {
-            confirmTitle = jsConfirmTitle;
-        }
-
-        // "Yes" button label can be set from JavaScript.
-        QString yesLabel;
-        QVariant yesLabelJsResult = frame->evaluateJavaScript("pebYesLabel()");
-        QString jsYesLabel = yesLabelJsResult.toString();
-        if (jsYesLabel.length() == 0) {
-            yesLabel = "Yes";
-        }
-        if (jsYesLabel.length() > 0) {
-            yesLabel = jsYesLabel;
-        }
-
-        // "No" button label can be set from JavaScript.
-        QString noLabel;
-        QVariant noLabelJsResult = frame->evaluateJavaScript("pebNoLabel()");
-        QString jsNoLabel = noLabelJsResult.toString();
-        if (jsNoLabel.length() == 0) {
-            noLabel = "No";
-        }
-        if (jsNoLabel.length() > 0) {
-            noLabel = jsNoLabel;
-        }
+        Q_UNUSED(frame);
 
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
         javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
@@ -956,17 +975,7 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        // Prompt dialog box title can be set from JavaScript.
-        QString promptTitle;
-        QVariant promptTitleJsResult =
-                frame->evaluateJavaScript("pebPromptTitle()");
-        QString jsPromptTitle = promptTitleJsResult.toString();
-        if (jsPromptTitle.length() == 0) {
-            promptTitle = "Prompt";
-        }
-        if (jsPromptTitle.length() > 0) {
-            promptTitle = jsPromptTitle;
-        }
+        Q_UNUSED(frame);
 
         bool ok = false;
         QString x = QInputDialog::getText(qApp->activeWindow(),
@@ -978,11 +987,19 @@ protected:
         if (ok && result) {
             *result = x;
         }
+        qApp->activeWindow()->focusWidget();
         return ok;
     }
 
 private:
     QWebView *webViewWidget;
+
+    QString alertTitle;
+    QString okLabel;
+    QString confirmTitle;
+    QString yesLabel;
+    QString noLabel;
+    QString promptTitle;
 
     QString scriptFullFilePath;
     QProcess scriptHandler;
@@ -1011,11 +1028,9 @@ class QWebViewWidget : public QWebView
     Q_OBJECT
 
 public slots:
-    void qPageLoadedSlot(bool ok)
+    void qChangeTitleSlot()
     {
-        if (ok) {
-            setWindowTitle(QWebViewWidget::title());
-        }
+        setWindowTitle(QWebViewWidget::title());
     }
 
     void contextMenuEvent(QContextMenuEvent *event)
@@ -1024,70 +1039,80 @@ public slots:
                 mainPage->mainFrame()->hitTestContent(event->pos());
         QMenu menu;
 
+        QString printPreviewLabel;
+        QString printLabel;
+
+        QString cutLabel;
+        QString copyLabel;
+        QString pasteLabel;
+        QString selectAllLabel;
+
+        QVariant contextMenuJsResult =
+                mainPage->currentFrame()->
+                evaluateJavaScript("pebContextMenu()");
+
+        QJsonDocument contextMenuJsonDocument =
+                QJsonDocument::fromJson(
+                    contextMenuJsResult.toString().toUtf8());
+
+        QJsonObject contextMenuJsonObject =
+                contextMenuJsonDocument.object();
+
+        if (contextMenuJsonObject.length() == 0) {
+            printPreviewLabel = "Print Preview";
+            printLabel = "Print";
+            cutLabel = "Cut";
+            copyLabel = "Copy";
+            pasteLabel = "Paste";
+            selectAllLabel = "Select All";
+        }
+
+        if (contextMenuJsonObject.length() > 0) {
+            if (contextMenuJsonObject["printPreview"].toString()
+                    .length() > 0) {
+                printPreviewLabel =
+                        contextMenuJsonObject["printPreview"].toString();
+            }
+
+            if (contextMenuJsonObject["print"].toString().length() > 0) {
+                printLabel = contextMenuJsonObject["print"].toString();
+            }
+
+            if (contextMenuJsonObject["cut"].toString().length() > 0) {
+                cutLabel = contextMenuJsonObject["cut"].toString();
+            }
+
+            if (contextMenuJsonObject["copy"].toString().length() > 0) {
+                copyLabel = contextMenuJsonObject["copy"].toString();
+            }
+
+            if (contextMenuJsonObject["paste"].toString().length() > 0) {
+                pasteLabel = contextMenuJsonObject["paste"].toString();
+            }
+
+            if (contextMenuJsonObject["print"].toString().length() > 0) {
+                selectAllLabel = contextMenuJsonObject["selectAll"]
+                        .toString();
+            }
+        }
+
         if ((qWebHitTestResult.isContentEditable() and
                 qWebHitTestResult.linkUrl().isEmpty() and
                 qWebHitTestResult.imageUrl().isEmpty()) or
                 qWebHitTestResult.isContentSelected()) {
 
-            QString cutLabel;
-            QVariant cutLabelJsResult =
-                    mainPage->
-                    currentFrame()->evaluateJavaScript("pebCutLabel()");
-            QString jsCutLabel = cutLabelJsResult.toString();
-            if (jsCutLabel.length() == 0) {
-                cutLabel = "Cut";
-            }
-            if (jsCutLabel.length() > 0) {
-                cutLabel = jsCutLabel;
-            }
-
             QAction *cutAct = menu.addAction(cutLabel);
             QObject::connect(cutAct, SIGNAL(triggered()),
                              this, SLOT(qCutAction()));
 
-            QString copyLabel;
-            QVariant copyLabelJsResult =
-                    mainPage->
-                    currentFrame()->evaluateJavaScript("pebCopyLabel()");
-            QString jsCopyLabel = copyLabelJsResult.toString();
-            if (jsCopyLabel.length() == 0) {
-                copyLabel = "Copy";
-            }
-            if (jsCopyLabel.length() > 0) {
-                copyLabel = jsCopyLabel;
-            }
 
             QAction *copyAct = menu.addAction(copyLabel);
             QObject::connect(copyAct, SIGNAL(triggered()),
                              this, SLOT(qCopyAction()));
 
-            QString pasteLabel;
-            QVariant pasteLabelJsResult =
-                    mainPage->
-                    currentFrame()->evaluateJavaScript("pebPasteLabel()");
-            QString jsPasteLabel = pasteLabelJsResult.toString();
-            if (jsPasteLabel.length() == 0) {
-                pasteLabel = "Paste";
-            }
-            if (jsPasteLabel.length() > 0) {
-                pasteLabel = jsPasteLabel;
-            }
-
             QAction *pasteAct = menu.addAction(pasteLabel);
             QObject::connect(pasteAct, SIGNAL(triggered()),
                              this, SLOT(qPasteAction()));
-
-            QString selectAllLabel;
-            QVariant selectAllLabelJsResult =
-                    mainPage->
-                    currentFrame()->evaluateJavaScript("pebSelectAllLabel()");
-            QString jsSelectAllLabel = selectAllLabelJsResult.toString();
-            if (jsSelectAllLabel.length() == 0) {
-                selectAllLabel = "Select All";
-            }
-            if (jsSelectAllLabel.length() > 0) {
-                selectAllLabel = jsSelectAllLabel;
-            }
 
             QAction *selectAllAct = menu.addAction(selectAllLabel);
             QObject::connect(selectAllAct, SIGNAL(triggered()),
@@ -1099,34 +1124,9 @@ public slots:
                 qWebHitTestResult.imageUrl().isEmpty() and
                 (!qWebHitTestResult.isContentSelected())) {
 
-            QString printPreviewLabel;
-            QVariant printPreviewJsResult =
-                    mainPage->
-                    currentFrame()->
-                    evaluateJavaScript("pebPrintPreviewLabel()");
-            QString jsPrintPreviewLabel = printPreviewJsResult.toString();
-            if (jsPrintPreviewLabel.length() == 0) {
-                printPreviewLabel = "Print Preview";
-            }
-            if (jsPrintPreviewLabel.length() > 0) {
-                printPreviewLabel = jsPrintPreviewLabel;
-            }
-
             QAction *printPreviewAct = menu.addAction(printPreviewLabel);
             QObject::connect(printPreviewAct, SIGNAL(triggered()),
                              this, SLOT(qStartPrintPreviewSlot()));
-
-            QString printLabel;
-            QVariant printJsResult =
-                    mainPage->
-                    currentFrame()->evaluateJavaScript("pebPrintLabel()");
-            QString jsPrintLabel = printJsResult.toString();
-            if (jsPrintLabel.length() == 0) {
-                printLabel = "Print";
-            }
-            if (jsPrintLabel.length() > 0) {
-                printLabel = jsPrintLabel;
-            }
 
             QAction *printAct = menu.addAction(printLabel);
             QObject::connect(printAct, SIGNAL(triggered()),
@@ -1134,6 +1134,7 @@ public slots:
         }
 
         menu.exec(mapToGlobal(event->pos()));
+        this->focusWidget();
     }
 
     void qCutAction()

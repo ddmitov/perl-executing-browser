@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using CGI protocol GET and POST methods or using AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -24,8 +24,8 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 ## Features
   
 **Usability:**  
-* CGI-like scripts can be executed locally in a serverless mode, feeding them from standard HTML forms using CGI protocol GET and POST methods.  
-* AJAX requests to local scripts can also be made and all returned data can be seamlessly inserted into the DOM tree using standard JavaScript methods.  
+* CGI-like local scripts can be fed from standard HTML forms using GET or POST methods.  
+* AJAX requests to local scripts return data that can be seamlessly inserted into the DOM tree using standard JavaScript methods.  
 * Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
 * PEB can be started from any folder.  
@@ -81,7 +81,8 @@ Compiled and tested successfully using:
 ## Security
   
 **Security features based on C++ code:**
-* Starting the browser with administrative privileges is not allowed - it exits with a message.  
+* Starting PEB with administrative privileges is not allowed - it exits with a message.  
+* System Perl can not be used by PEB unless a link is explicitly created by user.  
 * Local scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.  
 * PEB does not download locally executed scripts from any remote locations.  
 * Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
@@ -91,7 +92,7 @@ Compiled and tested successfully using:
 * The environment of all local scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted from the operating system.  
   
 **Perl Debugger Interaction:**
-* Every Perl script can be selected for debugging and debugging means execution, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
+* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
   
 ## Keyboard Shortcuts
 * Ctrl+A - select all  

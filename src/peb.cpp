@@ -235,47 +235,14 @@ int main(int argc, char **argv)
     // PERL INTERPRETER:
     QString perlInterpreterSetting =
             settings.value("perl").toString();
-    QString perlInterpreter;
-    if (perlInterpreterSetting.length() > 0) {
-        if (perlInterpreterSetting == "system") {
-            // Find the full path to the Perl interpreter on PATH:
-            QProcess systemPerlTester;
-            systemPerlTester.start("perl",
-                                   QStringList()
-                                   << "-e"
-                                   << "print $^X;");
+    QString perlInterpreter = QDir::toNativeSeparators(
+                settingsDirName + perlInterpreterSetting);
 
-            if (systemPerlTester.waitForFinished()) {
-                QByteArray testingScriptResultArray =
-                        systemPerlTester.readAllStandardOutput();
-                perlInterpreter =
-                        QString::fromLatin1(testingScriptResultArray);
-            }
-        } else {
-            QDir interpreterFile(perlInterpreterSetting);
-            // Local Perl interpreter given as a relative filepath:
-            if (interpreterFile.isRelative()) {
-                perlInterpreter =
-                        QDir::toNativeSeparators(
-                            settingsDirName + perlInterpreterSetting);
-
-                QFile perlInterpreterFile(perlInterpreter);
-                if (!perlInterpreterFile.exists()) {
-                    perlInterpreter = "";
-                }
-            }
-            // Perl interpreter given as a full filepath:
-            if (interpreterFile.isAbsolute()) {
-                perlInterpreter =
-                        QDir::toNativeSeparators(perlInterpreterSetting);
-
-                QFile perlInterpreterFile(perlInterpreter);
-                if (!perlInterpreterFile.exists()) {
-                    perlInterpreter = "";
-                }
-            }
-        }
+    QFile perlInterpreterFile(perlInterpreter);
+    if (!perlInterpreterFile.exists()) {
+        perlInterpreter = "";
     }
+
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // START FULLSCREEN:
@@ -384,8 +351,10 @@ int main(int argc, char **argv)
         qDebug() << application.applicationName().toLatin1().constData()
                  << application.applicationVersion().toLatin1().constData()
                  << "started.";
-        qDebug() << "Executable:" << application.applicationFilePath();
         qDebug() << "Qt version:" << QT_VERSION_STR;
+        qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "Settings:"
+                 << QDir::toNativeSeparators(settingsFileName);
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
 #ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
@@ -395,8 +364,6 @@ int main(int argc, char **argv)
             qDebug() << "Perl debugger interaction is enabled.";
         }
 #endif
-        qDebug() << "Settings file:"
-                 << QDir::toNativeSeparators(settingsFileName);
         qDebug() << "Perl interpreter:" << perlInterpreter;
         if (startFullscreenSetting == "enable") {
             qDebug() << "Start in fullscreen is enabled.";
@@ -613,6 +580,10 @@ QPage::QPage()
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
+    // Connect signals and slots for actions taken after page is loaded:
+    QObject::connect(this, SIGNAL(loadFinished(bool)),
+                     this, SLOT(qPageLoadedSlot(bool)));
+
     // Connect signals and slots for all local cgi-like perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
@@ -672,8 +643,8 @@ QWebViewWidget::QWebViewWidget()
     // Start QPage instance:
     mainPage = new QPage();
 
-    // Connect signals and slots for script errors, printing and
-    // actions taken after page is loaded:
+    // Connect signals and slots for
+    // displaying script errors, printing and changing window title:
     QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
                      this, SLOT(qDisplayErrorsSlot(QString)));
 
@@ -682,8 +653,8 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(printSignal()),
                      this, SLOT(qPrintSlot()));
 
-    QObject::connect(mainPage, SIGNAL(loadFinished(bool)),
-                     this, SLOT(qPageLoadedSlot(bool)));
+    QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
+                     this, SLOT(qChangeTitleSlot()));
 
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);

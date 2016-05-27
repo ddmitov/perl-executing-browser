@@ -1,6 +1,7 @@
 archive/
 logs/
 tmp/
+perl/bin/perl
 
 test.db
 *.qm
