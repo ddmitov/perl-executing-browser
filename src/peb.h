@@ -951,7 +951,6 @@ protected:
         javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
         javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
         javaScriptAlertMessageBox.exec();
-        qApp->activeWindow()->focusWidget();
     }
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
@@ -987,7 +986,6 @@ protected:
         if (ok && result) {
             *result = x;
         }
-        qApp->activeWindow()->focusWidget();
         return ok;
     }
 
