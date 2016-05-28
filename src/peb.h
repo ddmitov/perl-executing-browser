@@ -68,8 +68,8 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        foreach(QWebFrame *frame,
-                webViewWidget->page()->mainFrame()->childFrames()){
+        foreach (QWebFrame *frame,
+                webViewWidget->page()->mainFrame()->childFrames()) {
             frame->evaluateJavaScript(
                         qApp->property("checkUserInputBeforeCloseJS")
                         .toString());
@@ -1232,33 +1232,35 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        mainPage->currentFrame()->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS").toString());
-        QVariant jsResult =
-                mainPage->currentFrame()->evaluateJavaScript(
-                    "checkUserInputBeforeClose()");
-        QString textIsEntered = jsResult.toString();
-
-        if (textIsEntered == "no") {
-            event->accept();
-        }
-
-        if (textIsEntered == "yes") {
+        foreach (QWebFrame *frame,
+                    mainPage->mainFrame()->childFrames()) {
+            frame->evaluateJavaScript(
+                        qApp->property("checkUserInputBeforeCloseJS")
+                        .toString());
             QVariant jsResult =
-                    mainPage->currentFrame()->evaluateJavaScript(
-                        "pebCloseConfirmation()");
-            QString jsCloseDecision = jsResult.toString();
+                    frame->evaluateJavaScript("checkUserInputBeforeClose()");
+            QString textIsEntered = jsResult.toString();
 
-            if (jsCloseDecision.length() == 0) {
+            if (textIsEntered == "no") {
                 event->accept();
             }
 
-            if (jsCloseDecision.length() > 0) {
-                if (jsCloseDecision == "yes") {
+            if (textIsEntered == "yes") {
+                QVariant jsResult =
+                        frame->evaluateJavaScript("pebCloseConfirmation()");
+                QString jsCloseDecision = jsResult.toString();
+
+                if (jsCloseDecision.length() == 0) {
                     event->accept();
                 }
-                if (jsCloseDecision == "no") {
-                    event->ignore();
+
+                if (jsCloseDecision.length() > 0) {
+                    if (jsCloseDecision == "yes") {
+                        event->accept();
+                    }
+                    if (jsCloseDecision == "no") {
+                        event->ignore();
+                    }
                 }
             }
         }

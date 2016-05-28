@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local CGI-like or AJAX Perl 5 scripts executed without a web server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local CGI-like or AJAX Perl 5 scripts executed without any server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -25,7 +25,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
   
 **Usability:**  
 * CGI-like local scripts can be fed from standard HTML forms using GET or POST methods.  
-* AJAX requests to local scripts return data that can be seamlessly inserted into the DOM tree using standard JavaScript methods.  
+* AJAX requests to local scripts return data that can be seamlessly inserted into the HTML DOM tree of any local page using standard JavaScript methods.  
 * Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
 * PEB can be started from any folder.  
@@ -73,7 +73,7 @@ Compiled and tested successfully using:
 ## What Perl Executing Browser Is Not
 
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.  
-* Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM of any page.  
+* Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM tree of any page.  
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
 * PEB has no sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
