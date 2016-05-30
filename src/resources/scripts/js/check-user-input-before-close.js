@@ -1,13 +1,13 @@
 
 function checkUserInputBeforeClose() {
-	var textEntered = "";
+	var textEntered = false;
 
 	var textFields = new Array();
 	textFields = document.getElementsByTagName("textarea");
 
 	for (i = 0; i < textFields.length; i++) { 
 		if (textFields[i].value.length > 0) {
-			textEntered = "yes";
+			textEntered = true;
 		}
 	}
 
@@ -16,7 +16,7 @@ function checkUserInputBeforeClose() {
 
 	for (i = 0; i < inputBoxes.length; i++) { 
 		if (inputBoxes[i].value.length > 0) {
-			textEntered = "yes";
+			textEntered = true;
 		}
 	}
 

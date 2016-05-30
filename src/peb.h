@@ -68,36 +68,40 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        foreach (QWebFrame *frame,
-                webViewWidget->page()->mainFrame()->childFrames()) {
-            frame->evaluateJavaScript(
-                        qApp->property("checkUserInputBeforeCloseJS")
-                        .toString());
-            QVariant jsResult =
-                    frame->evaluateJavaScript("checkUserInputBeforeClose()");
-            QString textIsEntered = jsResult.toString();
+        if (webViewWidget->page()->mainFrame()->childFrames().length() > 0) {
+            foreach (QWebFrame *frame,
+                     webViewWidget->page()->mainFrame()->childFrames()) {
+                qCheckUserInputBeforeClose(frame, event);
+            }
+        } else {
+            qCheckUserInputBeforeClose(
+                        webViewWidget->page()->mainFrame(), event);
+        }
+    }
 
-            if (textIsEntered == "no") {
+    void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
+    {
+        frame->evaluateJavaScript(
+                    qApp->property("checkUserInputBeforeCloseJS")
+                    .toString());
+        QVariant jsResult =
+                frame->evaluateJavaScript("checkUserInputBeforeClose()");
+        bool textIsEntered = jsResult.toBool();
+
+        if (textIsEntered == false) {
+            event->accept();
+        }
+
+        if (textIsEntered == true) {
+            QVariant jsResult =
+                    frame->evaluateJavaScript("pebCloseConfirmation()");
+            bool jsCloseDecision = jsResult.toBool();
+
+            if (jsCloseDecision == true) {
                 event->accept();
             }
-
-            if (textIsEntered == "yes") {
-                QVariant jsResult =
-                        frame->evaluateJavaScript("pebCloseConfirmation()");
-                QString jsCloseDecision = jsResult.toString();
-
-                if (jsCloseDecision.length() == 0) {
-                    event->accept();
-                }
-
-                if (jsCloseDecision.length() > 0) {
-                    if (jsCloseDecision == "yes") {
-                        event->accept();
-                    }
-                    if (jsCloseDecision == "no") {
-                        event->ignore();
-                    }
-                }
+            if (jsCloseDecision == false) {
+                event->ignore();
             }
         }
     }
@@ -1230,36 +1234,39 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        foreach (QWebFrame *frame,
+        if (mainPage->mainFrame()->childFrames().length() > 0) {
+            foreach (QWebFrame *frame,
                     mainPage->mainFrame()->childFrames()) {
-            frame->evaluateJavaScript(
-                        qApp->property("checkUserInputBeforeCloseJS")
-                        .toString());
-            QVariant jsResult =
-                    frame->evaluateJavaScript("checkUserInputBeforeClose()");
-            QString textIsEntered = jsResult.toString();
+                qCheckUserInputBeforeClose(frame, event);
+            }
+        } else {
+            qCheckUserInputBeforeClose(mainPage->mainFrame(), event);
+        }
+    }
 
-            if (textIsEntered == "no") {
+    void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
+    {
+        frame->evaluateJavaScript(
+                    qApp->property("checkUserInputBeforeCloseJS")
+                    .toString());
+        QVariant jsResult =
+                frame->evaluateJavaScript("checkUserInputBeforeClose()");
+        bool textIsEntered = jsResult.toBool();
+
+        if (textIsEntered == false) {
+            event->accept();
+        }
+
+        if (textIsEntered == true) {
+            QVariant jsResult =
+                    frame->evaluateJavaScript("pebCloseConfirmation()");
+            bool jsCloseDecision = jsResult.toBool();
+
+            if (jsCloseDecision == true) {
                 event->accept();
             }
-
-            if (textIsEntered == "yes") {
-                QVariant jsResult =
-                        frame->evaluateJavaScript("pebCloseConfirmation()");
-                QString jsCloseDecision = jsResult.toString();
-
-                if (jsCloseDecision.length() == 0) {
-                    event->accept();
-                }
-
-                if (jsCloseDecision.length() > 0) {
-                    if (jsCloseDecision == "yes") {
-                        event->accept();
-                    }
-                    if (jsCloseDecision == "no") {
-                        event->ignore();
-                    }
-                }
+            if (jsCloseDecision == false) {
+                event->ignore();
             }
         }
     }
