@@ -1074,27 +1074,39 @@ public slots:
                     .length() > 0) {
                 printPreviewLabel =
                         contextMenuJsonObject["printPreview"].toString();
+            } else {
+                printPreviewLabel = "Print Preview";
             }
 
             if (contextMenuJsonObject["print"].toString().length() > 0) {
                 printLabel = contextMenuJsonObject["print"].toString();
+            } else {
+                printLabel = "Print";
             }
 
             if (contextMenuJsonObject["cut"].toString().length() > 0) {
                 cutLabel = contextMenuJsonObject["cut"].toString();
+            } else {
+                cutLabel = "Cut";
             }
 
             if (contextMenuJsonObject["copy"].toString().length() > 0) {
                 copyLabel = contextMenuJsonObject["copy"].toString();
+            } else {
+                copyLabel = "Copy";
             }
 
             if (contextMenuJsonObject["paste"].toString().length() > 0) {
                 pasteLabel = contextMenuJsonObject["paste"].toString();
+            } else {
+                pasteLabel = "Paste";
             }
 
-            if (contextMenuJsonObject["print"].toString().length() > 0) {
+            if (contextMenuJsonObject["selectAll"].toString().length() > 0) {
                 selectAllLabel = contextMenuJsonObject["selectAll"]
                         .toString();
+            } else {
+                selectAllLabel = "Select All";
             }
         }
 
