@@ -56,7 +56,7 @@
 // ==============================
 // MAIN WINDOW CLASS DEFINITION:
 // ==============================
-class MainWindow : public QMainWindow
+class QMainBrowserWindow : public QMainWindow
 {
     Q_OBJECT
 
@@ -116,7 +116,7 @@ public slots:
     }
 
 public:
-    explicit MainWindow(QWidget *parent = 0);
+    explicit QMainBrowserWindow(QWidget *parent = 0);
     QWebView *webViewWidget;
 };
 
@@ -551,15 +551,6 @@ public slots:
             QJsonObject messageBoxElementsJsonObject =
                     messageBoxElementsJsonDocument.object();
 
-            if (messageBoxElementsJsonObject.length() == 0) {
-                alertTitle = "Alert";
-                okLabel = "Ok";
-                confirmTitle = "Confirmation";
-                yesLabel = "Yes";
-                noLabel = "No";
-                promptTitle = "Prompt";
-            }
-
             if (messageBoxElementsJsonObject.length() > 0) {
                 if (messageBoxElementsJsonObject["alertTitle"]
                         .toString().length() > 0) {
@@ -568,17 +559,24 @@ public slots:
                             .toString();
                 }
 
-                if (messageBoxElementsJsonObject["okLabel"]
-                        .toString().length() > 0) {
-                    okLabel =
-                            messageBoxElementsJsonObject["okLabel"].toString();
-                }
-
                 if (messageBoxElementsJsonObject["confirmTitle"]
                         .toString().length() > 0) {
                     confirmTitle =
                             messageBoxElementsJsonObject["confirmTitle"]
                             .toString();
+                }
+
+                if (messageBoxElementsJsonObject["promptTitle"]
+                        .toString().length() > 0) {
+                    promptTitle =
+                            messageBoxElementsJsonObject["promptTitle"]
+                            .toString();
+                }
+
+                if (messageBoxElementsJsonObject["okLabel"]
+                        .toString().length() > 0) {
+                    okLabel =
+                            messageBoxElementsJsonObject["okLabel"].toString();
                 }
 
                 if (messageBoxElementsJsonObject["yesLabel"]
@@ -591,13 +589,6 @@ public slots:
                         .toString().length() > 0) {
                     noLabel =
                             messageBoxElementsJsonObject["noLabel"].toString();
-                }
-
-                if (messageBoxElementsJsonObject["promptTitle"]
-                        .toString().length() > 0) {
-                    promptTitle =
-                            messageBoxElementsJsonObject["promptTitle"]
-                            .toString();
                 }
             }
         }
@@ -997,11 +988,12 @@ private:
     QWebView *webViewWidget;
 
     QString alertTitle;
-    QString okLabel;
     QString confirmTitle;
+    QString promptTitle;
+
+    QString okLabel;
     QString yesLabel;
     QString noLabel;
-    QString promptTitle;
 
     QString scriptFullFilePath;
     QProcess scriptHandler;
@@ -1041,13 +1033,13 @@ public slots:
                 mainPage->mainFrame()->hitTestContent(event->pos());
         QMenu menu;
 
-        QString printPreviewLabel;
-        QString printLabel;
+        QString printPreviewLabel = "Print Preview";
+        QString printLabel = "Print";
 
-        QString cutLabel;
-        QString copyLabel;
-        QString pasteLabel;
-        QString selectAllLabel;
+        QString cutLabel = "Cut";
+        QString copyLabel = "Copy";
+        QString pasteLabel = "Paste";
+        QString selectAllLabel = "Select All";
 
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
@@ -1060,53 +1052,32 @@ public slots:
         QJsonObject contextMenuJsonObject =
                 contextMenuJsonDocument.object();
 
-        if (contextMenuJsonObject.length() == 0) {
-            printPreviewLabel = "Print Preview";
-            printLabel = "Print";
-            cutLabel = "Cut";
-            copyLabel = "Copy";
-            pasteLabel = "Paste";
-            selectAllLabel = "Select All";
-        }
-
         if (contextMenuJsonObject.length() > 0) {
             if (contextMenuJsonObject["printPreview"].toString()
                     .length() > 0) {
                 printPreviewLabel =
                         contextMenuJsonObject["printPreview"].toString();
-            } else {
-                printPreviewLabel = "Print Preview";
             }
 
             if (contextMenuJsonObject["print"].toString().length() > 0) {
                 printLabel = contextMenuJsonObject["print"].toString();
-            } else {
-                printLabel = "Print";
             }
 
             if (contextMenuJsonObject["cut"].toString().length() > 0) {
                 cutLabel = contextMenuJsonObject["cut"].toString();
-            } else {
-                cutLabel = "Cut";
             }
 
             if (contextMenuJsonObject["copy"].toString().length() > 0) {
                 copyLabel = contextMenuJsonObject["copy"].toString();
-            } else {
-                copyLabel = "Copy";
             }
 
             if (contextMenuJsonObject["paste"].toString().length() > 0) {
                 pasteLabel = contextMenuJsonObject["paste"].toString();
-            } else {
-                pasteLabel = "Paste";
             }
 
             if (contextMenuJsonObject["selectAll"].toString().length() > 0) {
                 selectAllLabel = contextMenuJsonObject["selectAll"]
                         .toString();
-            } else {
-                selectAllLabel = "Select All";
             }
         }
 

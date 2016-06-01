@@ -312,7 +312,7 @@ int main(int argc, char **argv)
     // ==============================
     // MAIN GUI CLASSES INITIALIZATION:
     // ==============================
-    MainWindow mainWindow;
+    QMainBrowserWindow mainWindow;
     mainWindow.webViewWidget = new QWebViewWidget();
 
     // Connect signal and slot for setting the main window title:
@@ -410,7 +410,7 @@ int main(int argc, char **argv)
 // ==============================
 // MAIN WINDOW CLASS CONSTRUCTOR:
 // ==============================
-MainWindow::MainWindow(QWidget *parent)
+QMainBrowserWindow::QMainBrowserWindow(QWidget *parent)
     : QMainWindow(parent)
 {
     // !!! No need to implement code here, but must be declared !!!
@@ -593,6 +593,14 @@ QPage::QPage()
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
                      SLOT(qScriptFinishedSlot()));
+
+    alertTitle = "Alert";
+    confirmTitle = "Confirmation";
+    promptTitle = "Prompt";
+
+    okLabel = "Ok";
+    yesLabel = "Yes";
+    noLabel = "No";
 
 #ifndef Q_OS_WIN
     // Connect signals and slots for the perl debugger:
