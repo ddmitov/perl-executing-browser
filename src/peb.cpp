@@ -554,7 +554,7 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::PluginsEnabled, true);
+            setAttribute(QWebSettings::PluginsEnabled, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->

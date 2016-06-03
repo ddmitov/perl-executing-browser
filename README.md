@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local CGI-like or AJAX Perl 5 scripts executed without any server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local Perl 5 scripts executed without any server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -24,8 +24,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 ## Features
   
 **Usability:**  
-* CGI-like local scripts can be fed from standard HTML forms using GET or POST methods.  
-* AJAX requests to local scripts return data that can be seamlessly inserted into the HTML DOM tree of any local page using standard JavaScript methods.  
+* Local scripts can be fed from HTML forms using GET or POST methods or from AJAX requests.  
 * Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
 * PEB can be started from any folder.  
@@ -34,26 +33,29 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 * All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
 * 100% of the browser screen area are dedicated to your HTML interface.  
-* Usefull for both single-page or multi-page applications with an option to start in fullscreen mode.  
+* Usefull for both single-page or multi-page applications with an optional start in fullscreen mode.  
+* Optional JavaScript translation of context menu and dialog boxes.  
+* Optional JavaScript check for unsaved data in HTML forms before closing a window to prevent accidental data loss.  
   
 **Development goodies:**  
 * PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.  
-* WebKit Web Inspector can be invoked using the keyboard shortcut Ctrl+I.  
+* WebKit Web Inspector can be invoked using Ctrl+I keyboard shortcut.  
 * Extensive optional logging of all browser activities.  
 
 ## Compile-time Requirements
   
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
+Later versions of Qt are unusable due to the deprecation of QtWebKit.  
   
 Compiled and tested successfully using:  
-* Qt Creator 2.8.1 and Qt 5.1.1 on 32-bit Debian Linux,  
-* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Debian Linux,  
-* Qt Creator 3.0.0 and Qt 5.2.0 on 32-bit Windows XP,  
-* Qt Creator 3.0.1 and Qt 5.2.1 on 64-bit OS X 10.9.1, i5  
+* Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,  
+* Qt Creator 3.0.0 and [Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,  
+* Qt Creator 3.0.0 and [Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,  
+* Qt Creator 3.0.1 and [Qt 5.2.1] (http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5  
 (main development and testing platform - Valcho Nedelchev),  
-* Qt Creator 3.1.1 and Qt 5.3.0 on 64-bit Lubuntu 14.10 Linux,
-* Qt Creator 3.1.1 and Qt 5.4.1 on 64-bit Lubuntu 15.04 Linux,  
-* Qt Creator 3.5.1 and Qt 5.5.1 on 64-bit Lubuntu 15.04 Linux  
+* Qt Creator 3.1.1 and [Qt 5.3.0] (http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
+* Qt Creator 3.1.1 and [Qt 5.4.1] (http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,  
+* Qt Creator 3.5.1 and [Qt 5.5.1] (http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
 (main development and testing platform - Dimitar D. Mitov).  
   
 ## Runtime Requirements
@@ -76,7 +78,7 @@ Compiled and tested successfully using:
 * Unlike JavaScript in general purpose web browsers, local Perl scripts executed by PEB have no access to the HTML DOM tree of any page.  
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.  
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
-* PEB has no sandbox for local Perl scripts. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
+* PEB has no sandbox for local Perl scripts - they are treated like and executed as ordinary desktop applications with normal user privileges. Basic security is implemented in C++ and Perl code, but without warranties of any kind!  
   
 ## Security
   
@@ -84,8 +86,8 @@ Compiled and tested successfully using:
 * Starting PEB with administrative privileges is not allowed - it exits with a message.  
 * System Perl can not be used by PEB unless a link is explicitly created by user.  
 * Local scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.  
-* PEB does not download locally executed scripts from any remote locations.  
-* Users have no dialog to select arbitrary local scripts for execution by PEB - only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
+* PEB can not and does not download remote files and can not execute locally Perl scripts from remote locations.  
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
   
 **Security features based on Perl code:**
 * Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when local Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
@@ -108,6 +110,8 @@ Compiled and tested successfully using:
 * No history and cache.  
 JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.  
 * No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.  
+* No file can be downloaded on hard disk.  
+* No plugin support.  
   
 ## History
   
