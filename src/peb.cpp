@@ -270,19 +270,19 @@ int main(int argc, char **argv)
         qInstallMessageHandler(customMessageHandler);
     }
 
-    // PACKAGE APPLICATION DIRECTORY:
+    // APPLICATION DIRECTORY:
     QString applicationDirName = QDir::toNativeSeparators(
                 settingsDirName
-                + "package"
+                + "resources"
                 + QDir::separator()
-                + "application");
+                + "app");
     application.setProperty("application", applicationDirName);
 
-    // PACKAGE ICON:
+    // APPLICATION ICON:
     QString iconPathName = QDir::toNativeSeparators(
                 settingsDirName + QDir::separator()
-                + "package" + QDir::separator()
-                + "package.png");
+                + "resources" + QDir::separator()
+                + "app.png");
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
     if (iconFile.exists()) {
@@ -292,7 +292,7 @@ int main(int argc, char **argv)
     } else {
         // Set the embedded default icon
         // in case no external icon file is found:
-        application.setProperty("iconPathName", ":/icons/camel-icon-32.png");
+        //application.setProperty("iconPathName", ":/icons/camel.png");
         icon.load(":/icons/camel.png");
         QApplication::setWindowIcon(icon);
     }
@@ -353,8 +353,6 @@ int main(int argc, char **argv)
                  << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug() << "Settings:"
-                 << QDir::toNativeSeparators(settingsFileName);
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
 #ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
@@ -364,6 +362,8 @@ int main(int argc, char **argv)
             qDebug() << "Perl debugger interaction is enabled.";
         }
 #endif
+        qDebug() << "Settings:"
+                 << QDir::toNativeSeparators(settingsFileName);
         qDebug() << "Perl interpreter:" << perlInterpreter;
         if (startFullscreenSetting == "enable") {
             qDebug() << "Start in fullscreen is enabled.";

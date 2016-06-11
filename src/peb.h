@@ -82,8 +82,7 @@ public slots:
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
         frame->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS")
-                    .toString());
+                    qApp->property("checkUserInputBeforeCloseJS").toString());
         QVariant jsResult =
                 frame->evaluateJavaScript("checkUserInputBeforeClose()");
         bool textIsEntered = jsResult.toBool();
@@ -95,7 +94,13 @@ public slots:
         if (textIsEntered == true) {
             QVariant jsResult =
                     frame->evaluateJavaScript("pebCloseConfirmation()");
-            bool jsCloseDecision = jsResult.toBool();
+
+            bool jsCloseDecision;
+            if (jsResult.toString().length() > 0) {
+                jsCloseDecision = jsResult.toBool();
+            } else {
+                jsCloseDecision = true;
+            }
 
             if (jsCloseDecision == true) {
                 event->accept();
@@ -1033,13 +1038,13 @@ public slots:
                 mainPage->mainFrame()->hitTestContent(event->pos());
         QMenu menu;
 
-        QString printPreviewLabel = "Print Preview";
-        QString printLabel = "Print";
+        QString printPreviewLabel;
+        QString printLabel;
 
-        QString cutLabel = "Cut";
-        QString copyLabel = "Copy";
-        QString pasteLabel = "Paste";
-        QString selectAllLabel = "Select All";
+        QString cutLabel;
+        QString copyLabel;
+        QString pasteLabel;
+        QString selectAllLabel;
 
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
@@ -1079,6 +1084,14 @@ public slots:
                 selectAllLabel = contextMenuJsonObject["selectAll"]
                         .toString();
             }
+        } else {
+            printPreviewLabel = "Print Preview";
+            printLabel = "Print";
+
+            cutLabel = "Cut";
+            copyLabel = "Copy";
+            pasteLabel = "Paste";
+            selectAllLabel = "Select All";
         }
 
         if ((qWebHitTestResult.isContentEditable() and
@@ -1086,22 +1099,29 @@ public slots:
                 qWebHitTestResult.imageUrl().isEmpty()) or
                 qWebHitTestResult.isContentSelected()) {
 
-            QAction *cutAct = menu.addAction(cutLabel);
-            QObject::connect(cutAct, SIGNAL(triggered()),
-                             this, SLOT(qCutAction()));
+            if (cutLabel.length() > 0) {
+                QAction *cutAct = menu.addAction(cutLabel);
+                QObject::connect(cutAct, SIGNAL(triggered()),
+                                 this, SLOT(qCutAction()));
+            }
 
+            if (copyLabel.length() > 0) {
+                QAction *copyAct = menu.addAction(copyLabel);
+                QObject::connect(copyAct, SIGNAL(triggered()),
+                                 this, SLOT(qCopyAction()));
+            }
 
-            QAction *copyAct = menu.addAction(copyLabel);
-            QObject::connect(copyAct, SIGNAL(triggered()),
-                             this, SLOT(qCopyAction()));
+            if (pasteLabel.length() > 0) {
+                QAction *pasteAct = menu.addAction(pasteLabel);
+                QObject::connect(pasteAct, SIGNAL(triggered()),
+                                 this, SLOT(qPasteAction()));
+            }
 
-            QAction *pasteAct = menu.addAction(pasteLabel);
-            QObject::connect(pasteAct, SIGNAL(triggered()),
-                             this, SLOT(qPasteAction()));
-
-            QAction *selectAllAct = menu.addAction(selectAllLabel);
-            QObject::connect(selectAllAct, SIGNAL(triggered()),
-                             this, SLOT(qSelectAllAction()));
+            if (selectAllLabel.length() > 0) {
+                QAction *selectAllAct = menu.addAction(selectAllLabel);
+                QObject::connect(selectAllAct, SIGNAL(triggered()),
+                                 this, SLOT(qSelectAllAction()));
+            }
         }
 
         if (!qWebHitTestResult.isContentEditable() and
@@ -1109,13 +1129,17 @@ public slots:
                 qWebHitTestResult.imageUrl().isEmpty() and
                 (!qWebHitTestResult.isContentSelected())) {
 
-            QAction *printPreviewAct = menu.addAction(printPreviewLabel);
-            QObject::connect(printPreviewAct, SIGNAL(triggered()),
-                             this, SLOT(qStartPrintPreviewSlot()));
+            if (printPreviewLabel.length() > 0) {
+                QAction *printPreviewAct = menu.addAction(printPreviewLabel);
+                QObject::connect(printPreviewAct, SIGNAL(triggered()),
+                                 this, SLOT(qStartPrintPreviewSlot()));
+            }
 
-            QAction *printAct = menu.addAction(printLabel);
-            QObject::connect(printAct, SIGNAL(triggered()),
-                             this, SLOT(qPrintSlot()));
+            if (printLabel.length() > 0) {
+                QAction *printAct = menu.addAction(printLabel);
+                QObject::connect(printAct, SIGNAL(triggered()),
+                                 this, SLOT(qPrintSlot()));
+            }
         }
 
         menu.exec(mapToGlobal(event->pos()));
@@ -1230,8 +1254,7 @@ public slots:
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
         frame->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS")
-                    .toString());
+                    qApp->property("checkUserInputBeforeCloseJS").toString());
         QVariant jsResult =
                 frame->evaluateJavaScript("checkUserInputBeforeClose()");
         bool textIsEntered = jsResult.toBool();
@@ -1243,7 +1266,13 @@ public slots:
         if (textIsEntered == true) {
             QVariant jsResult =
                     frame->evaluateJavaScript("pebCloseConfirmation()");
-            bool jsCloseDecision = jsResult.toBool();
+
+            bool jsCloseDecision;
+            if (jsResult.toString().length() > 0) {
+                jsCloseDecision = jsResult.toBool();
+            } else {
+                jsCloseDecision = true;
+            }
 
             if (jsCloseDecision == true) {
                 event->accept();

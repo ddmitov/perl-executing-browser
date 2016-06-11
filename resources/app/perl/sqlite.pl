@@ -31,7 +31,7 @@ print "
 		<div>\n";
 
 my $cwd = cwd();
-my $database_relative_pathname = "/package/data/test.db";
+my $database_relative_pathname = "/resources/data/test.db";
 my $db = DBI->connect ("dbi:SQLite:$cwd$database_relative_pathname","","", {sqlite_unicode => 1}) or
 	die "Could not connect to database";
 
