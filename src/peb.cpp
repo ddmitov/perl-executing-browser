@@ -286,13 +286,11 @@ int main(int argc, char **argv)
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
     if (iconFile.exists()) {
-        application.setProperty("iconPathName", iconPathName);
         icon.load(iconPathName);
         QApplication::setWindowIcon(icon);
     } else {
         // Set the embedded default icon
         // in case no external icon file is found:
-        //application.setProperty("iconPathName", ":/icons/camel.png");
         icon.load(":/icons/camel.png");
         QApplication::setWindowIcon(icon);
     }
@@ -301,13 +299,12 @@ int main(int argc, char **argv)
     // READ INTERNALLY COMPILED JAVASCRIPT:
     // ==============================
     QFile file;
-    file.setFileName(":/scripts/js/check-user-input-before-close.js");
+    file.setFileName(":/scripts/js/peb.js");
     file.open(QIODevice::ReadOnly);
-    QString checkUserInputBeforeCloseJS = file.readAll();
+    QString pebJS = file.readAll();
     file.close();
 
-    application.setProperty("checkUserInputBeforeCloseJS",
-                            checkUserInputBeforeCloseJS);
+    application.setProperty("pebJS", pebJS);
 
     // ==============================
     // MAIN GUI CLASSES INITIALIZATION:
@@ -677,6 +674,10 @@ QWebViewWidget::QWebViewWidget()
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      mainPage,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
+
+    // Connect signal and slot for closing window from URL:
+    QObject::connect(networkAccessManager, SIGNAL(closeWindowSignal()),
+                     this, SLOT(qCloseWindowFromURLSlot()));
 
     // Disable history:
     QWebHistory *history = mainPage->history();

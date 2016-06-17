@@ -81,32 +81,42 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        frame->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS").toString());
-        QVariant jsResult =
+        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+
+        QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("checkUserInputBeforeClose()");
-        bool textIsEntered = jsResult.toBool();
+        bool textIsEntered = checkUserInputJsResult.toBool();
+
+        QVariant checkCloseWarningJsResult =
+                frame->evaluateJavaScript("checkCloseWarning()");
+        QString closeWarning = checkCloseWarningJsResult.toString();
 
         if (textIsEntered == false) {
             event->accept();
         }
 
         if (textIsEntered == true) {
-            QVariant jsResult =
-                    frame->evaluateJavaScript("pebCloseConfirmation()");
-
-            bool jsCloseDecision;
-            if (jsResult.toString().length() > 0) {
-                jsCloseDecision = jsResult.toBool();
-            } else {
-                jsCloseDecision = true;
-            }
-
-            if (jsCloseDecision == true) {
-                event->accept();
-            }
-            if (jsCloseDecision == false) {
+            if (closeWarning == "async") {
                 event->ignore();
+                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
+            }
+            if (closeWarning == "sync") {
+                QVariant jsSyncResult =
+                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
+
+                bool jsCloseDecision;
+                if (jsSyncResult.toString().length() > 0) {
+                    jsCloseDecision = jsSyncResult.toBool();
+                } else {
+                    jsCloseDecision = true;
+                }
+
+                if (jsCloseDecision == true) {
+                    event->accept();
+                }
+                if (jsCloseDecision == false) {
+                    event->ignore();
+                }
             }
         }
     }
@@ -245,12 +255,24 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
+    void closeWindowSignal();
 
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+        if (operation == GetOperation and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().fileName() == "close.function") {
+                    emit closeWindowSignal();
+
+            QNetworkRequest emptyNetworkRequest;
+            return QNetworkAccessManager::createRequest
+                    (QNetworkAccessManager::GetOperation,
+                     QNetworkRequest(emptyNetworkRequest));
+        }
+
         // Local AJAX GET and POST requests:
         if ((operation == GetOperation or
              operation == PostOperation) and
@@ -282,7 +304,7 @@ protected:
                     if (queryString.length() > 0) {
                         scriptEnvironment.insert("REQUEST_METHOD", "GET");
                         scriptEnvironment.insert("QUERY_STRING", queryString);
-                        qDebug() << "Query string:" << queryString;
+                        // qDebug() << "Query string:" << queryString;
                     }
 
                     if (postData.length() > 0) {
@@ -291,7 +313,7 @@ protected:
                         QString postDataSize = QString::number(postData.size());
                         scriptEnvironment
                                 .insert("CONTENT_LENGTH", postDataSize);
-                        qDebug() << "POST data:" << postData;
+                        // qDebug() << "POST data:" << postData;
                     }
 
                     QProcess ajaxScriptHandler;
@@ -479,7 +501,6 @@ protected:
 
                 // Unsupported local files:
                 if (interpreter.contains("undefined")) {
-
                     qDebug() << "File type not supported by browser:"
                              << fullFilePath;
 
@@ -621,14 +642,14 @@ public slots:
             if (queryString.length() > 0) {
                 scriptEnvironment.insert("REQUEST_METHOD", "GET");
                 scriptEnvironment.insert("QUERY_STRING", queryString);
-                qDebug() << "Query string:" << queryString;
+                // qDebug() << "Query string:" << queryString;
             }
 
             if (postData.length() > 0) {
                 scriptEnvironment.insert("REQUEST_METHOD", "POST");
                 QString postDataSize = QString::number(postData.size());
                 scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
-                qDebug() << "POST data:" << postData;
+                // qDebug() << "POST data:" << postData;
             }
 
             scriptHandler.setProcessEnvironment(scriptEnvironment);
@@ -1241,44 +1262,72 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (mainPage->mainFrame()->childFrames().length() > 0) {
-            foreach (QWebFrame *frame,
-                    mainPage->mainFrame()->childFrames()) {
-                qCheckUserInputBeforeClose(frame, event);
+        if (!this->parentWidget()) {
+            if (mainPage->mainFrame()->childFrames().length() > 0) {
+                foreach (QWebFrame *frame,
+                         mainPage->mainFrame()->childFrames()) {
+                    qCheckUserInputBeforeClose(frame, event);
+                }
+            } else {
+                qCheckUserInputBeforeClose(mainPage->mainFrame(), event);
             }
-        } else {
-            qCheckUserInputBeforeClose(mainPage->mainFrame(), event);
         }
     }
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        frame->evaluateJavaScript(
-                    qApp->property("checkUserInputBeforeCloseJS").toString());
-        QVariant jsResult =
+        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+
+        QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("checkUserInputBeforeClose()");
-        bool textIsEntered = jsResult.toBool();
+        bool textIsEntered = checkUserInputJsResult.toBool();
+
+        QVariant checkCloseWarningJsResult =
+                frame->evaluateJavaScript("checkCloseWarning()");
+        QString closeWarning = checkCloseWarningJsResult.toString();
 
         if (textIsEntered == false) {
             event->accept();
         }
 
         if (textIsEntered == true) {
-            QVariant jsResult =
-                    frame->evaluateJavaScript("pebCloseConfirmation()");
-
-            bool jsCloseDecision;
-            if (jsResult.toString().length() > 0) {
-                jsCloseDecision = jsResult.toBool();
-            } else {
-                jsCloseDecision = true;
-            }
-
-            if (jsCloseDecision == true) {
-                event->accept();
-            }
-            if (jsCloseDecision == false) {
+            if (closeWarning == "async") {
                 event->ignore();
+                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
+            }
+            if (closeWarning == "sync") {
+                QVariant jsSyncResult =
+                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
+
+                bool jsCloseDecision;
+                if (jsSyncResult.toString().length() > 0) {
+                    jsCloseDecision = jsSyncResult.toBool();
+                } else {
+                    jsCloseDecision = true;
+                }
+
+                if (jsCloseDecision == true) {
+                    event->accept();
+                }
+                if (jsCloseDecision == false) {
+                    event->ignore();
+                }
+            }
+        }
+    }
+
+    void qCloseWindowFromURLSlot()
+    {
+        // Close current window:
+        this->close();
+
+        // Close application when the last window is closed:
+        if (this->parentWidget()) {
+            this->parentWidget()->close();
+            // The number 3 is a bit misleading -
+            // only one visible window is left in this case.
+            if (qApp->allWindows().count() == 3) {
+                qApp->exit();
             }
         }
     }

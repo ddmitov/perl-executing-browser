@@ -28,7 +28,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 * Basic security restrictions are imposed on every locally executed Perl script.  
 * Any version of Perl 5 can be selected.  
 * PEB can be started from any folder.  
-* PEB can open web pages with cross-site scripting disabled.  
+* PEB opens web pages with cross-site scripting disabled.  
 * Settings are stored in a single INI file.  
 * All browser functions are accessible from special URLs.  
 * Use your favorite logo as a custom icon to be displayed on windows and message boxes.  

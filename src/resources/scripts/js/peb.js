@@ -1,4 +1,22 @@
 
+
+function checkCloseWarning() {
+	var closeWarning;
+
+	if (typeof pebCloseConfirmationAsync == 'function') {
+		closeWarning = "async";
+	}else{
+		if (typeof pebCloseConfirmationSync == 'function') {
+			closeWarning = "sync";
+		} else {
+			closeWarning = "none";
+		}
+	}
+
+	return closeWarning;
+}
+
+
 function checkUserInputBeforeClose() {
 	var textEntered = false;
 
