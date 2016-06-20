@@ -1324,9 +1324,7 @@ public slots:
         // Close application when the last window is closed:
         if (this->parentWidget()) {
             this->parentWidget()->close();
-            // The number 3 is a bit misleading -
-            // only one visible window is left in this case.
-            if (qApp->allWindows().count() == 3) {
+            if (qApp->topLevelWindows().count() == 1) {
                 qApp->exit();
             }
         }

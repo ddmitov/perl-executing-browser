@@ -2,7 +2,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local Perl 5 scripts executed without any server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local Perl 5 scripts executed without server as desktop data-driven applications. Local scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
 ## Design Objectives
   
@@ -26,13 +26,12 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 **Usability:**  
 * Local scripts can be fed from HTML forms using GET or POST methods or from AJAX requests.  
 * Basic security restrictions are imposed on every locally executed Perl script.  
-* Any version of Perl 5 can be selected.  
+* Any version of Perl 5 can be used.  
 * PEB can be started from any folder.  
 * PEB opens web pages with cross-site scripting disabled.  
-* Settings are stored in a single INI file.  
-* All browser functions are accessible from special URLs.  
-* Use your favorite logo as a custom icon to be displayed on windows and message boxes.  
-* 100% of the browser screen area are dedicated to your HTML interface.  
+* Browser functions are accessible from special URLs.  
+* Any icon can be displayed on windows and message boxes.  
+* Every aspect of the graphical user interface can be customized using HTML & JavaScript.  
 * Usefull for both single-page or multi-page applications with an optional start in fullscreen mode.  
 * Optional JavaScript translation of context menu and dialog boxes.  
 * Optional JavaScript check for unsaved data in HTML forms before closing a window to prevent accidental data loss.  
