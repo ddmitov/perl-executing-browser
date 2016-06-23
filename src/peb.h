@@ -565,58 +565,6 @@ public slots:
     {
         if (ok) {
             emit changeTitleSignal();
-
-            QVariant messageBoxElementsJsResult =
-                    currentFrame()->
-                    evaluateJavaScript("pebMessageBoxElements()");
-
-            QJsonDocument messageBoxElementsJsonDocument =
-                    QJsonDocument::fromJson(
-                        messageBoxElementsJsResult.toString().toUtf8());
-
-            QJsonObject messageBoxElementsJsonObject =
-                    messageBoxElementsJsonDocument.object();
-
-            if (messageBoxElementsJsonObject.length() > 0) {
-                if (messageBoxElementsJsonObject["alertTitle"]
-                        .toString().length() > 0) {
-                    alertTitle =
-                            messageBoxElementsJsonObject["alertTitle"]
-                            .toString();
-                }
-
-                if (messageBoxElementsJsonObject["confirmTitle"]
-                        .toString().length() > 0) {
-                    confirmTitle =
-                            messageBoxElementsJsonObject["confirmTitle"]
-                            .toString();
-                }
-
-                if (messageBoxElementsJsonObject["promptTitle"]
-                        .toString().length() > 0) {
-                    promptTitle =
-                            messageBoxElementsJsonObject["promptTitle"]
-                            .toString();
-                }
-
-                if (messageBoxElementsJsonObject["okLabel"]
-                        .toString().length() > 0) {
-                    okLabel =
-                            messageBoxElementsJsonObject["okLabel"].toString();
-                }
-
-                if (messageBoxElementsJsonObject["yesLabel"]
-                        .toString().length() > 0) {
-                    yesLabel =
-                            messageBoxElementsJsonObject["yesLabel"].toString();
-                }
-
-                if (messageBoxElementsJsonObject["noLabel"]
-                        .toString().length() > 0) {
-                    noLabel =
-                            messageBoxElementsJsonObject["noLabel"].toString();
-                }
-            }
         }
     }
 
@@ -963,7 +911,30 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        Q_UNUSED(frame);
+        QVariant messageBoxElementsJsResult =
+                frame->evaluateJavaScript("pebMessageBoxElements()");
+
+        QJsonDocument messageBoxElementsJsonDocument =
+                QJsonDocument::fromJson(
+                    messageBoxElementsJsResult.toString().toUtf8());
+
+        QJsonObject messageBoxElementsJsonObject =
+                messageBoxElementsJsonDocument.object();
+
+        if (messageBoxElementsJsonObject.length() > 0) {
+            if (messageBoxElementsJsonObject["alertTitle"]
+                    .toString().length() > 0) {
+                alertTitle =
+                        messageBoxElementsJsonObject["alertTitle"]
+                        .toString();
+            }
+
+            if (messageBoxElementsJsonObject["okLabel"]
+                    .toString().length() > 0) {
+                okLabel =
+                        messageBoxElementsJsonObject["okLabel"].toString();
+            }
+        }
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
         javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
@@ -976,7 +947,36 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        Q_UNUSED(frame);
+        QVariant messageBoxElementsJsResult =
+                frame->evaluateJavaScript("pebMessageBoxElements()");
+
+        QJsonDocument messageBoxElementsJsonDocument =
+                QJsonDocument::fromJson(
+                    messageBoxElementsJsResult.toString().toUtf8());
+
+        QJsonObject messageBoxElementsJsonObject =
+                messageBoxElementsJsonDocument.object();
+
+        if (messageBoxElementsJsonObject.length() > 0) {
+            if (messageBoxElementsJsonObject["confirmTitle"]
+                    .toString().length() > 0) {
+                confirmTitle =
+                        messageBoxElementsJsonObject["confirmTitle"]
+                        .toString();
+            }
+
+            if (messageBoxElementsJsonObject["yesLabel"]
+                    .toString().length() > 0) {
+                yesLabel =
+                        messageBoxElementsJsonObject["yesLabel"].toString();
+            }
+
+            if (messageBoxElementsJsonObject["noLabel"]
+                    .toString().length() > 0) {
+                noLabel =
+                        messageBoxElementsJsonObject["noLabel"].toString();
+            }
+        }
 
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
         javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
@@ -995,18 +995,54 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        Q_UNUSED(frame);
+        QVariant messageBoxElementsJsResult =
+                frame->evaluateJavaScript("pebMessageBoxElements()");
+
+        QJsonDocument messageBoxElementsJsonDocument =
+                QJsonDocument::fromJson(
+                    messageBoxElementsJsResult.toString().toUtf8());
+
+        QJsonObject messageBoxElementsJsonObject =
+                messageBoxElementsJsonDocument.object();
+
+        if (messageBoxElementsJsonObject.length() > 0) {
+            if (messageBoxElementsJsonObject["promptTitle"]
+                    .toString().length() > 0) {
+                promptTitle =
+                        messageBoxElementsJsonObject["promptTitle"]
+                        .toString();
+            }
+
+            if (messageBoxElementsJsonObject["okLabel"]
+                    .toString().length() > 0) {
+                okLabel =
+                        messageBoxElementsJsonObject["okLabel"].toString();
+            }
+
+            if (messageBoxElementsJsonObject["cancelLabel"]
+                    .toString().length() > 0) {
+                cancelLabel =
+                        messageBoxElementsJsonObject["cancelLabel"].toString();
+            }
+        }
 
         bool ok = false;
-        QString x = QInputDialog::getText(qApp->activeWindow(),
-                                          promptTitle,
-                                          msg,
-                                          QLineEdit::Normal,
-                                          defaultValue,
-                                          &ok);
-        if (ok && result) {
-            *result = x;
+
+        QInputDialog dialog;
+        dialog.setModal(true);
+        dialog.setWindowTitle(promptTitle);
+        dialog.setLabelText(msg);
+        dialog.setInputMode(QInputDialog::TextInput);
+        dialog.setTextValue(defaultValue);
+        dialog.setOkButtonText(okLabel);
+        dialog.setCancelButtonText(cancelLabel);
+
+        if (dialog.exec() == QDialog::Accepted) {
+            *result = dialog.textValue();
+            ok = true;
+            return ok;
         }
+
         return ok;
     }
 
@@ -1018,6 +1054,7 @@ private:
     QString promptTitle;
 
     QString okLabel;
+    QString cancelLabel;
     QString yesLabel;
     QString noLabel;
 

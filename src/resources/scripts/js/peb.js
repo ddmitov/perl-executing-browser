@@ -5,7 +5,7 @@ function checkCloseWarning() {
 
 	if (typeof pebCloseConfirmationAsync == 'function') {
 		closeWarning = "async";
-	}else{
+	} else {
 		if (typeof pebCloseConfirmationSync == 'function') {
 			closeWarning = "sync";
 		} else {

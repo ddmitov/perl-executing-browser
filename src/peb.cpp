@@ -596,6 +596,7 @@ QPage::QPage()
     promptTitle = "Prompt";
 
     okLabel = "Ok";
+    cancelLabel = "Cancel";
     yesLabel = "Yes";
     noLabel = "No";
 
