@@ -911,8 +911,10 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
+        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("pebMessageBoxElements()");
+                frame->evaluateJavaScript("findMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -947,8 +949,10 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
+        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("pebMessageBoxElements()");
+                frame->evaluateJavaScript("findMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -995,8 +999,10 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
+        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("pebMessageBoxElements()");
+                frame->evaluateJavaScript("findMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -1104,9 +1110,12 @@ public slots:
         QString pasteLabel;
         QString selectAllLabel;
 
+        mainPage->currentFrame()->
+                evaluateJavaScript(qApp->property("pebJS").toString());
+
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
-                evaluateJavaScript("pebContextMenu()");
+                evaluateJavaScript("findContextMenu()");
 
         QJsonDocument contextMenuJsonDocument =
                 QJsonDocument::fromJson(

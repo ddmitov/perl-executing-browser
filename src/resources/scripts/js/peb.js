@@ -1,19 +1,18 @@
 
 
-function checkCloseWarning() {
-	var closeWarning;
-
-	if (typeof pebCloseConfirmationAsync == 'function') {
-		closeWarning = "async";
-	} else {
-		if (typeof pebCloseConfirmationSync == 'function') {
-			closeWarning = "sync";
-		} else {
-			closeWarning = "none";
-		}
+function findContextMenu() {
+	if (typeof pebContextMenu == 'function') {
+		var returnValue = pebContextMenu();
+		return returnValue;
 	}
+}
 
-	return closeWarning;
+
+function findMessageBoxElements() {
+	if (typeof pebMessageBoxElements == 'function') {
+		var returnValue = pebMessageBoxElements();
+		return returnValue;
+	}
 }
 
 
@@ -39,4 +38,21 @@ function checkUserInputBeforeClose() {
 	}
 
 	return textEntered;
+}
+
+
+function checkCloseWarning() {
+	var closeWarning;
+
+	if (typeof pebCloseConfirmationAsync == 'function') {
+		closeWarning = "async";
+	} else {
+		if (typeof pebCloseConfirmationSync == 'function') {
+			closeWarning = "sync";
+		} else {
+			closeWarning = "none";
+		}
+	}
+
+	return closeWarning;
 }
