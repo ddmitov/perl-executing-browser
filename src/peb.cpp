@@ -312,6 +312,11 @@ int main(int argc, char **argv)
     QMainBrowserWindow mainWindow;
     mainWindow.webViewWidget = new QWebViewWidget();
 
+    // Application property necessary when
+    // closing the main window is requested using
+    // the special window closing URL.
+    qApp->setProperty("mainWindowCloseRequested", false);
+
     // Connect signal and slot for setting the main window title:
     QObject::connect(mainWindow.webViewWidget,
                      SIGNAL(titleChanged(QString)),

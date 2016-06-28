@@ -68,14 +68,24 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (webViewWidget->page()->mainFrame()->childFrames().length() > 0) {
-            foreach (QWebFrame *frame,
-                     webViewWidget->page()->mainFrame()->childFrames()) {
-                qCheckUserInputBeforeClose(frame, event);
+        if (qApp->property("mainWindowCloseRequested").toBool() == false) {
+            if (webViewWidget->
+                    page()->mainFrame()->childFrames().length() > 0) {
+                foreach (QWebFrame *frame,
+                         webViewWidget->page()->mainFrame()->childFrames()) {
+                    qCheckUserInputBeforeClose(frame, event);
+                }
+            } else {
+                qCheckUserInputBeforeClose(
+                            webViewWidget->page()->mainFrame(), event);
             }
-        } else {
-            qCheckUserInputBeforeClose(
-                        webViewWidget->page()->mainFrame(), event);
+        }
+
+        // If closing the main window is requested using
+        // the special window closing URL,
+        // no check for user input is performed.
+        if (qApp->property("mainWindowCloseRequested").toBool() == true) {
+            event->accept();
         }
     }
 
@@ -262,9 +272,10 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+        // Window closing URL:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "close.function") {
+                request.url().fileName() == "close-window.function") {
                     emit closeWindowSignal();
 
             QNetworkRequest emptyNetworkRequest;
@@ -1364,15 +1375,13 @@ public slots:
 
     void qCloseWindowFromURLSlot()
     {
-        // Close current window:
-        this->close();
+        if (!this->parentWidget()) {
+            this->close();
+        }
 
-        // Close application when the last window is closed:
         if (this->parentWidget()) {
+            qApp->setProperty("mainWindowCloseRequested", true);
             this->parentWidget()->close();
-            if (qApp->topLevelWindows().count() == 1) {
-                qApp->exit();
-            }
         }
     }
 
