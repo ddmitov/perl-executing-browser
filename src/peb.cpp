@@ -702,6 +702,11 @@ QWebViewWidget::QWebViewWidget()
                                               Qt::ScrollBarAsNeeded);
     mainPage->mainFrame()->setScrollBarPolicy(Qt::Vertical,
                                               Qt::ScrollBarAsNeeded);
+
+    // Initialize variable necessary for
+    // user input check before closing a new window
+    // (any window opened after the initial one):
+    windowCloseRequested = false;
 }
 
 // ==============================

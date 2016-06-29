@@ -1319,7 +1319,7 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (!this->parentWidget()) {
+        if (!this->parentWidget() and windowCloseRequested == false) {
             if (mainPage->mainFrame()->childFrames().length() > 0) {
                 foreach (QWebFrame *frame,
                          mainPage->mainFrame()->childFrames()) {
@@ -1328,6 +1328,8 @@ public slots:
             } else {
                 qCheckUserInputBeforeClose(mainPage->mainFrame(), event);
             }
+        } else {
+            event->accept();
         }
     }
 
@@ -1350,6 +1352,7 @@ public slots:
         if (textIsEntered == true) {
             if (closeWarning == "async") {
                 event->ignore();
+                windowCloseRequested = true;
                 frame->evaluateJavaScript("pebCloseConfirmationAsync()");
             }
             if (closeWarning == "sync") {
@@ -1414,6 +1417,8 @@ private:
     QPage *mainPage;
     QWebView *newWindow;
     QWebView *errorsWindow;
+
+    bool windowCloseRequested;
 };
 
 #endif // PEB_H
