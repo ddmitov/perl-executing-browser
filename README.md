@@ -86,7 +86,7 @@ Compiled and tested successfully using:
 * System Perl can not be used by PEB unless a link is explicitly created by user.  
 * Local scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.  
 * PEB can not and does not download remote files and can not execute locally Perl scripts from remote locations.  
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```package/application``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```resources/app``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).  
   
 **Security features based on Perl code:**
 * Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when local Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
