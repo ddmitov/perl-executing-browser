@@ -200,87 +200,71 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // SETTINGS FILE:
+    // BINARY FILE DIRECTORY:
     // ==============================
-    // Settings file is loaded from the directory of the binary file:
-    QDir settingsDir =
+    QDir binaryDir =
             QDir::toNativeSeparators(application.applicationDirPath());
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        settingsDir.cdUp();
-        settingsDir.cdUp();
+        binaryDir.cdUp();
+        binaryDir.cdUp();
     }
 #endif
 
-    // Get the name of the settings file directory:
-    QString settingsDirName =
-            settingsDir.absolutePath().toLatin1();
-    settingsDirName.append(QDir::separator());
-
-    // Get the name of the settings file.
-    // Settings file takes the name of the binary,
-    // but with an '.ini' file extension:
-    QString settingsFileName =
-            QDir::toNativeSeparators
-            (settingsDirName
-             + QFileInfo(QApplication::applicationFilePath()).baseName()
-             + ".ini");
-
-    // Define INI file format for settings:
-    QSettings settings(settingsFileName, QSettings::IniFormat);
+    QString binaryDirName =
+            binaryDir.absolutePath().toLatin1();
 
     // ==============================
-    // READ SETTINGS FROM SETTINGS FILE:
+    // CHECK FILES AND FOLDERS:
     // ==============================
     // PERL INTERPRETER:
-    QString perlInterpreterSetting =
-            settings.value("perl").toString();
-    QString perlInterpreter = QDir::toNativeSeparators(
-                settingsDirName + perlInterpreterSetting);
+    QString perlExecutable;
 
-    QFile perlInterpreterFile(perlInterpreter);
-    if (!perlInterpreterFile.exists()) {
-        perlInterpreter = "";
+#ifndef Q_OS_WIN
+    perlExecutable = "perl";
+#endif
+
+#ifdef Q_OS_WIN
+    perlExecutable = "perl.exe";
+#endif
+
+    QString perlInterpreterFullPath;
+    QString privatePerlInterpreterFullPath = QDir::toNativeSeparators(
+                binaryDirName + QDir::separator()
+                + "perl" + QDir::separator()
+                + "bin" + QDir::separator()
+                + perlExecutable);
+
+    QFile privatePerlInterpreterFile(privatePerlInterpreterFullPath);
+    if (!privatePerlInterpreterFile.exists()) {
+        // Find the full path to the Perl interpreter on PATH:
+        QProcess systemPerlTester;
+        systemPerlTester.start("perl",
+                               QStringList()
+                               << "-e"
+                               << "print $^X;");
+
+        QByteArray testingScriptResultArray;
+        if (systemPerlTester.waitForFinished()) {
+            testingScriptResultArray = systemPerlTester.readAllStandardOutput();
+        }
+        perlInterpreterFullPath = QString::fromLatin1(testingScriptResultArray);
+    } else {
+        perlInterpreterFullPath = privatePerlInterpreterFullPath;
     }
 
-    application.setProperty("perlInterpreter", perlInterpreter);
-
-    // START FULLSCREEN:
-    QString startFullscreenSetting =
-            settings.value("start_fullscreen").toString();
-
-    // ==============================
-    // CHECK BROWSER FILES AND FOLDERS:
-    // ==============================
-    // LOGGING:
-    // If 'logs' directory is found in the directory of the browser binary,
-    // all program messages will be redirected to log files,
-    // otherwise no log files will be created and
-    // program messages could be seen inside Qt Creator.
-    QString logDirFullPath = settingsDirName + "logs";
-    QDir logDir(logDirFullPath);
-    if (logDir.exists()) {
-        application.setProperty("logDirFullPath", logDirFullPath);
-        // Application start date and time for logging:
-        QString applicationStartDateAndTime =
-                QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
-        application.setProperty("applicationStartDateAndTime",
-                                applicationStartDateAndTime);
-        // Install message handler for redirecting all messages to a log file:
-        qInstallMessageHandler(customMessageHandler);
-    }
+    application.setProperty("perlInterpreter", perlInterpreterFullPath);
 
     // APPLICATION DIRECTORY:
     QString applicationDirName = QDir::toNativeSeparators(
-                settingsDirName
-                + "resources"
-                + QDir::separator()
+                binaryDirName + QDir::separator()
+                + "resources" + QDir::separator()
                 + "app");
     application.setProperty("application", applicationDirName);
 
     // APPLICATION ICON:
     QString iconPathName = QDir::toNativeSeparators(
-                settingsDirName + QDir::separator()
+                binaryDirName + QDir::separator()
                 + "resources" + QDir::separator()
                 + "app.png");
     QPixmap icon(32, 32);
@@ -293,6 +277,24 @@ int main(int argc, char **argv)
         // in case no external icon file is found:
         icon.load(":/icons/camel.png");
         QApplication::setWindowIcon(icon);
+    }
+
+    // LOGGING:
+    // If 'logs' directory is found in the directory of the browser binary,
+    // all program messages will be redirected to log files,
+    // otherwise no log files will be created and
+    // program messages could be seen inside Qt Creator.
+    QString logDirFullPath = binaryDirName + QDir::separator() + "logs";
+    QDir logDir(logDirFullPath);
+    if (logDir.exists()) {
+        application.setProperty("logDirFullPath", logDirFullPath);
+        // Application start date and time for logging:
+        QString applicationStartDateAndTime =
+                QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
+        application.setProperty("applicationStartDateAndTime",
+                                applicationStartDateAndTime);
+        // Install message handler for redirecting all messages to a log file:
+        qInstallMessageHandler(customMessageHandler);
     }
 
     // ==============================
@@ -345,8 +347,27 @@ int main(int argc, char **argv)
                  << "with administrative privileges is not allowed.";
     }
 
+    // Display embedded HTML error message if
+    // Perl interpreter is not found:
+    if (perlInterpreterFullPath.length() == 0) {
+        QString htmlErrorContents = readHtmlErrorTemplate();
+        QString errorMessage = privatePerlInterpreterFullPath + "<br>"
+                + "was not found and "
+                + "Perl interpreter was not available on PATH.";
+        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+
+        mainWindow.webViewWidget->setHtml(htmlErrorContents);
+
+        qDebug() << application.applicationName().toLatin1().constData()
+                 << application.applicationVersion().toLatin1().constData()
+                 << "started.";
+        qDebug() << "Qt version:" << QT_VERSION_STR;
+        qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "Perl interpreter was not found.";
+    }
+
     // Display start page:
-    if (startedAsRoot == false) {
+    if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
         // ==============================
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
         // ==============================
@@ -355,6 +376,7 @@ int main(int argc, char **argv)
                  << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
 #ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
@@ -364,12 +386,6 @@ int main(int argc, char **argv)
             qDebug() << "Perl debugger interaction is enabled.";
         }
 #endif
-        qDebug() << "Settings:"
-                 << QDir::toNativeSeparators(settingsFileName);
-        qDebug() << "Perl interpreter:" << perlInterpreter;
-        if (startFullscreenSetting == "enable") {
-            qDebug() << "Start in fullscreen is enabled.";
-        }
 
         // Start page existence check and loading:
         QFile staticStartPageFile(applicationDirName + QDir::separator()
@@ -399,12 +415,7 @@ int main(int argc, char **argv)
 
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
     mainWindow.setWindowIcon(icon);
-
-    if (startFullscreenSetting == "enable") {
-        mainWindow.showFullScreen();
-    } else {
-        mainWindow.showMaximized();
-    }
+    mainWindow.showMaximized();
 
     return application.exec();
 }
