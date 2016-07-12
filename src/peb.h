@@ -94,11 +94,11 @@ public slots:
         frame->evaluateJavaScript(qApp->property("pebJS").toString());
 
         QVariant checkUserInputJsResult =
-                frame->evaluateJavaScript("checkUserInputBeforeClose()");
+                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
         bool textIsEntered = checkUserInputJsResult.toBool();
 
         QVariant checkCloseWarningJsResult =
-                frame->evaluateJavaScript("checkCloseWarning()");
+                frame->evaluateJavaScript("pebCheckCloseWarning()");
         QString closeWarning = checkCloseWarningJsResult.toString();
 
         if (textIsEntered == false) {
@@ -570,6 +570,8 @@ signals:
     void displayErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
+    void selectFileSignal(QNetworkRequest request);
+    void closeWindowSignal();
 
 public slots:
     void qPageLoadedSlot(bool ok)
@@ -689,6 +691,20 @@ public slots:
         scriptAccumulatedErrors = "";
 
         qDebug() << "Script finished:" << scriptFullFilePath;
+    }
+
+    void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
+    {
+        reply->ignoreSslErrors();
+
+        foreach (QSslError error, errors) {
+            qDebug() << "SSL error:" << error;
+        }
+    }
+
+    void qCloseWindowTransmitterSlot()
+    {
+        emit closeWindowSignal();
     }
 
     // ==============================
@@ -925,7 +941,7 @@ protected:
         frame->evaluateJavaScript(qApp->property("pebJS").toString());
 
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("findMessageBoxElements()");
+                frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -963,7 +979,7 @@ protected:
         frame->evaluateJavaScript(qApp->property("pebJS").toString());
 
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("findMessageBoxElements()");
+                frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -1013,7 +1029,7 @@ protected:
         frame->evaluateJavaScript(qApp->property("pebJS").toString());
 
         QVariant messageBoxElementsJsResult =
-                frame->evaluateJavaScript("findMessageBoxElements()");
+                frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
         QJsonDocument messageBoxElementsJsonDocument =
                 QJsonDocument::fromJson(
@@ -1081,6 +1097,8 @@ private:
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
 
+    QString userSelectedFileName;
+
 #ifndef Q_OS_WIN
     QWebFrame *targetFrame;
     bool debuggerJustStarted;
@@ -1107,6 +1125,40 @@ public slots:
         setWindowTitle(QWebViewWidget::title());
     }
 
+    void qSelectFileSlot(QNetworkRequest request)
+    {
+        QString target = request.url().query().replace("target=", "");
+
+        QFileDialog openFileDialog (this);
+        openFileDialog.setWindowModality(Qt::WindowModal);
+        openFileDialog.setFileMode(QFileDialog::AnyFile);
+        openFileDialog.setViewMode(QFileDialog::Detail);
+        QString userSelectedFileName =
+                openFileDialog.getOpenFileName(this,
+                                               QString(QWebViewWidget::title()),
+                                               QDir::currentPath());
+        openFileDialog.close();
+        openFileDialog.deleteLater();
+
+        if (!userSelectedFileName.isEmpty()) {
+            // JavaScript bridge back to the HTML page where request originated:
+            mainPage->currentFrame()->
+                    evaluateJavaScript(qApp->property("pebJS").toString());
+
+            QString fileSelectedEventJavaScript =
+                    "pebFileSelected(\"" +
+                    target +
+                    "\" , \"" +
+                    userSelectedFileName +
+                    "\"); null";
+            mainPage->currentFrame()->
+                    evaluateJavaScript(fileSelectedEventJavaScript);
+
+            qDebug() << "User selected file:"
+                     << QDir::toNativeSeparators(userSelectedFileName);
+        }
+    }
+
     void contextMenuEvent(QContextMenuEvent *event)
     {
         QWebHitTestResult qWebHitTestResult =
@@ -1126,7 +1178,7 @@ public slots:
 
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
-                evaluateJavaScript("findContextMenu()");
+                evaluateJavaScript("pebFindContextMenu()");
 
         QJsonDocument contextMenuJsonDocument =
                 QJsonDocument::fromJson(
@@ -1338,11 +1390,11 @@ public slots:
         frame->evaluateJavaScript(qApp->property("pebJS").toString());
 
         QVariant checkUserInputJsResult =
-                frame->evaluateJavaScript("checkUserInputBeforeClose()");
+                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
         bool textIsEntered = checkUserInputJsResult.toBool();
 
         QVariant checkCloseWarningJsResult =
-                frame->evaluateJavaScript("checkCloseWarning()");
+                frame->evaluateJavaScript("pebCheckCloseWarning()");
         QString closeWarning = checkCloseWarningJsResult.toString();
 
         if (textIsEntered == false) {
@@ -1385,15 +1437,6 @@ public slots:
         if (this->parentWidget()) {
             qApp->setProperty("mainWindowCloseRequested", true);
             this->parentWidget()->close();
-        }
-    }
-
-    void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
-    {
-        reply->ignoreSslErrors();
-
-        foreach (QSslError error, errors) {
-            qDebug() << "SSL error:" << error;
         }
     }
 

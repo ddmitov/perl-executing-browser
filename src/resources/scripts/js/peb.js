@@ -1,6 +1,6 @@
 
 
-function findContextMenu() {
+function pebFindContextMenu() {
 	if (typeof pebContextMenu == 'function') {
 		var returnValue = pebContextMenu();
 		return returnValue;
@@ -8,7 +8,7 @@ function findContextMenu() {
 }
 
 
-function findMessageBoxElements() {
+function pebFindMessageBoxElements() {
 	if (typeof pebMessageBoxElements == 'function') {
 		var returnValue = pebMessageBoxElements();
 		return returnValue;
@@ -16,7 +16,7 @@ function findMessageBoxElements() {
 }
 
 
-function checkUserInputBeforeClose() {
+function pebCheckUserInputBeforeClose() {
 	var textEntered = false;
 
 	var textFields = new Array();
@@ -41,7 +41,7 @@ function checkUserInputBeforeClose() {
 }
 
 
-function checkCloseWarning() {
+function pebCheckCloseWarning() {
 	var closeWarning;
 
 	if (typeof pebCloseConfirmationAsync == 'function') {
@@ -55,4 +55,16 @@ function checkCloseWarning() {
 	}
 
 	return closeWarning;
+}
+
+
+function pebFileSelected(elementName, fileName) {
+	var element = document.getElementById(elementName);
+	element.innerHTML = fileName;
+
+	var event;
+	event = document.createEvent("HTMLEvents");
+	event.initEvent("fileselected", true, true);
+	event.eventName = "fileselected"
+	element.dispatchEvent(event);
 }

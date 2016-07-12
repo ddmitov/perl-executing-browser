@@ -573,6 +573,8 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::JavascriptCanAccessClipboard, true);
+    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::SpatialNavigationEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LinksIncludedInFocusChain, true);
@@ -589,15 +591,46 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::XSSAuditingEnabled, true);
 
+    // No download of files:
+    setForwardUnsupportedContent(false);
+
     // Disable cache:
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
-    // Connect signals and slots for actions taken after page is loaded:
-    QObject::connect(this, SIGNAL(loadFinished(bool)),
-                     this, SLOT(qPageLoadedSlot(bool)));
+    // Disable history:
+    QWebHistory *history = this->history();
+    history->setMaximumItemCount(0);
 
-    // Connect signals and slots for all local cgi-like perl scripts:
+    // Initialize modified Network Access Manager:
+    QAccessManager *networkAccessManager = new QAccessManager();
+
+    // Cookies and HTTPS support:
+    QNetworkCookieJar *cookieJar = new QNetworkCookieJar;
+    networkAccessManager->setCookieJar(cookieJar);
+
+    // Use the modified Network Access Manager:
+    setNetworkAccessManager(networkAccessManager);
+
+    // Connect signal and slot for SSL Errors:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
+                     this,
+                     SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
+
+    // Connect signal and slot for closing window from URL:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(closeWindowSignal()),
+                     this,
+                     SLOT(qCloseWindowTransmitterSlot()));
+
+    // Connect signal and slot for starting local scripts:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(startScriptSignal(QUrl, QByteArray)),
+                     this,
+                     SLOT(qStartScriptSlot(QUrl, QByteArray)));
+
+    // Connect signals and slots for all local CGI-like Perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
@@ -606,6 +639,16 @@ QPage::QPage()
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
                      SLOT(qScriptFinishedSlot()));
+
+    // Connect signals and slots for actions taken after page is loaded:
+    QObject::connect(this, SIGNAL(loadFinished(bool)),
+                     this, SLOT(qPageLoadedSlot(bool)));
+
+    // Configure scroll bars:
+    mainFrame()->setScrollBarPolicy(Qt::Horizontal,
+                                              Qt::ScrollBarAsNeeded);
+    mainFrame()->setScrollBarPolicy(Qt::Vertical,
+                                              Qt::ScrollBarAsNeeded);
 
     alertTitle = "Alert";
     confirmTitle = "Confirmation";
@@ -659,9 +702,6 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
                      this, SLOT(qStartQWebInspector()));
 
-    // Start new window maximized:
-    showMaximized();
-
     // Start QPage instance:
     mainPage = new QPage();
 
@@ -678,41 +718,19 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
                      this, SLOT(qChangeTitleSlot()));
 
+    // Connect signal and slot for selecting file from URL:
+    QObject::connect(mainPage, SIGNAL(selectFileSignal(QNetworkRequest)),
+                     this, SLOT(qSelectFileSlot(QNetworkRequest)));
+
+    // Connect signal and slot for closing window from URL:
+    QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
+                     this, SLOT(qCloseWindowFromURLSlot()));
+
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
 
-    // Use modified Network Access Manager:
-    QAccessManager *networkAccessManager =
-            new QAccessManager();
-    mainPage->setNetworkAccessManager(networkAccessManager);
-
-    // Connect signal and slot for starting local scripts:
-    QObject::connect(networkAccessManager,
-                     SIGNAL(startScriptSignal(QUrl, QByteArray)),
-                     mainPage,
-                     SLOT(qStartScriptSlot(QUrl, QByteArray)));
-
-    // Connect signal and slot for closing window from URL:
-    QObject::connect(networkAccessManager, SIGNAL(closeWindowSignal()),
-                     this, SLOT(qCloseWindowFromURLSlot()));
-
-    // Disable history:
-    QWebHistory *history = mainPage->history();
-    history->setMaximumItemCount(0);
-
-    // Cookies and HTTPS support:
-    QNetworkCookieJar *cookieJar = new QNetworkCookieJar;
-    networkAccessManager->setCookieJar(cookieJar);
-    QObject::connect(networkAccessManager,
-                     SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
-                     this,
-                     SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
-
-    // Configure scroll bars:
-    mainPage->mainFrame()->setScrollBarPolicy(Qt::Horizontal,
-                                              Qt::ScrollBarAsNeeded);
-    mainPage->mainFrame()->setScrollBarPolicy(Qt::Vertical,
-                                              Qt::ScrollBarAsNeeded);
+    // Start new window maximized:
+    showMaximized();
 
     // Initialize variable necessary for
     // user input check before closing a new window
@@ -727,7 +745,15 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
-    // PRINTING:
+    // User selected file:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "open-file.function") {
+
+        emit selectFileSignal(request);
+
+        return false;
+    }
+
 #ifndef QT_NO_PRINTER
     // Print preview from URL:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
