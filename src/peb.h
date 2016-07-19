@@ -702,7 +702,7 @@ public slots:
         }
     }
 
-    void qCloseWindowTransmitterSlot()
+    void qCloseWindowFromURLTransmitterSlot()
     {
         emit closeWindowSignal();
     }
@@ -1127,35 +1127,44 @@ public slots:
 
     void qSelectFileSlot(QNetworkRequest request)
     {
-        QString target = request.url().query().replace("target=", "");
+        if (mainPage->currentFrame()->baseUrl()
+                .toString().contains(PSEUDO_DOMAIN)) {
+            QString target = request.url().query().replace("target=", "");
 
-        QFileDialog openFileDialog (this);
-        openFileDialog.setWindowModality(Qt::WindowModal);
-        openFileDialog.setFileMode(QFileDialog::AnyFile);
-        openFileDialog.setViewMode(QFileDialog::Detail);
-        QString userSelectedFileName =
-                openFileDialog.getOpenFileName(this,
-                                               QString(QWebViewWidget::title()),
-                                               QDir::currentPath());
-        openFileDialog.close();
-        openFileDialog.deleteLater();
+            QFileDialog openFileDialog (this);
+            openFileDialog.setWindowModality(Qt::WindowModal);
+            openFileDialog.setFileMode(QFileDialog::AnyFile);
+            openFileDialog.setViewMode(QFileDialog::Detail);
+            QString userSelectedFileName =
+                    openFileDialog
+                    .getOpenFileName(this,
+                                     QString(QWebViewWidget::title()),
+                                     QDir::currentPath());
+            openFileDialog.close();
+            openFileDialog.deleteLater();
 
-        if (!userSelectedFileName.isEmpty()) {
-            // JavaScript bridge back to the HTML page where request originated:
-            mainPage->currentFrame()->
-                    evaluateJavaScript(qApp->property("pebJS").toString());
+            if (!userSelectedFileName.isEmpty()) {
+                // JavaScript bridge back to
+                // the local HTML page where request originated:
+                mainPage->currentFrame()->
+                        evaluateJavaScript(qApp->property("pebJS").toString());
 
-            QString fileSelectedEventJavaScript =
-                    "pebFileSelected(\"" +
-                    target +
-                    "\" , \"" +
-                    userSelectedFileName +
-                    "\"); null";
-            mainPage->currentFrame()->
-                    evaluateJavaScript(fileSelectedEventJavaScript);
+                QString fileSelectedEventJavaScript =
+                        "pebFileSelected(\"" +
+                        target +
+                        "\" , \"" +
+                        userSelectedFileName +
+                        "\"); null";
 
-            qDebug() << "User selected file:"
-                     << QDir::toNativeSeparators(userSelectedFileName);
+                mainPage->currentFrame()->
+                        evaluateJavaScript(fileSelectedEventJavaScript);
+
+                qDebug() << "User selected file:"
+                         << QDir::toNativeSeparators(userSelectedFileName);
+            }
+        } else {
+            qDebug() << "Webpage attempted full path local file selection:"
+                     << mainPage->currentFrame()->baseUrl().toString();
         }
     }
 
@@ -1327,14 +1336,6 @@ public slots:
         qDebug() << "Printing requested.";
 
         QPrinter printer;
-        printer.setOrientation(QPrinter::Portrait);
-        printer.setPageSize(QPrinter::A4);
-        printer.setPageMargins(10, 10, 10, 10, QPrinter::Millimeter);
-        printer.setResolution(QPrinter::HighResolution);
-        printer.setColorMode(QPrinter::Color);
-        printer.setPrintRange(QPrinter::AllPages);
-        printer.setNumCopies(1);
-
         QPrintDialog *printDialog = new QPrintDialog(&printer);
         printDialog->setWindowModality(Qt::WindowModal);
         QSize dialogSize = printDialog->sizeHint();

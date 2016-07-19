@@ -622,7 +622,7 @@ QPage::QPage()
     QObject::connect(networkAccessManager,
                      SIGNAL(closeWindowSignal()),
                      this,
-                     SLOT(qCloseWindowTransmitterSlot()));
+                     SLOT(qCloseWindowFromURLTransmitterSlot()));
 
     // Connect signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
