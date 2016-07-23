@@ -526,6 +526,9 @@ protected:
             }
 
             if (fileDetector.fileExists == false) {
+                qDebug() << "File not found:"
+                         << fullFilePath;
+
                 QNetworkRequest emptyNetworkRequest;
                 return QNetworkAccessManager::createRequest
                         (QNetworkAccessManager::GetOperation,
@@ -570,7 +573,7 @@ signals:
     void displayErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
-    void selectFileSignal(QNetworkRequest request);
+    void selectInodeSignal(QNetworkRequest request);
     void closeWindowSignal();
 
 public slots:
@@ -1125,45 +1128,70 @@ public slots:
         setWindowTitle(QWebViewWidget::title());
     }
 
-    void qSelectFileSlot(QNetworkRequest request)
+    void qSelectInodesSlot(QNetworkRequest request)
     {
         if (mainPage->currentFrame()->baseUrl()
                 .toString().contains(PSEUDO_DOMAIN)) {
             QString target = request.url().query().replace("target=", "");
 
-            QFileDialog openFileDialog (this);
-            openFileDialog.setWindowModality(Qt::WindowModal);
-            openFileDialog.setFileMode(QFileDialog::AnyFile);
-            openFileDialog.setViewMode(QFileDialog::Detail);
-            QString userSelectedFileName =
-                    openFileDialog
-                    .getOpenFileName(this,
-                                     QString(QWebViewWidget::title()),
-                                     QDir::currentPath());
-            openFileDialog.close();
-            openFileDialog.deleteLater();
+            QFileDialog inodesDialog (this);
+            inodesDialog.setWindowModality(Qt::WindowModal);
+            inodesDialog.setViewMode(QFileDialog::Detail);
+            inodesDialog.setWindowTitle(QWebViewWidget::title());
 
-            if (!userSelectedFileName.isEmpty()) {
+            if (request.url().fileName() == "open-file.function") {
+                inodesDialog.setFileMode(QFileDialog::AnyFile);
+            }
+
+            if (request.url().fileName() == "open-files.function") {
+                inodesDialog.setFileMode(QFileDialog::ExistingFiles);
+            }
+
+            if (request.url().fileName() == "save-file.function") {
+                inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
+            }
+
+            if (request.url().fileName() == "open-directory.function") {
+                inodesDialog.setFileMode(QFileDialog::Directory);
+            }
+
+            QStringList userSelectedInodes;
+            if (inodesDialog.exec()) {
+                userSelectedInodes = inodesDialog.selectedFiles();
+            }
+
+            inodesDialog.close();
+            inodesDialog.deleteLater();
+
+            if (!userSelectedInodes.isEmpty()) {
+                QString userSelectedInodesFormatted;
+                foreach (QString userSelectedInode, userSelectedInodes) {
+                    userSelectedInodesFormatted.append(userSelectedInode);
+                    userSelectedInodesFormatted.append(";");
+                }
+                userSelectedInodesFormatted
+                        .replace(QRegularExpression(";$"), "");
+
                 // JavaScript bridge back to
                 // the local HTML page where request originated:
                 mainPage->currentFrame()->
                         evaluateJavaScript(qApp->property("pebJS").toString());
 
-                QString fileSelectedEventJavaScript =
-                        "pebFileSelected(\"" +
+                QString inodeSelectedEventJavaScript =
+                        "pebInodeSelection(\"" +
                         target +
                         "\" , \"" +
-                        userSelectedFileName +
+                        userSelectedInodesFormatted +
                         "\"); null";
 
                 mainPage->currentFrame()->
-                        evaluateJavaScript(fileSelectedEventJavaScript);
+                        evaluateJavaScript(inodeSelectedEventJavaScript);
 
-                qDebug() << "User selected file:"
-                         << QDir::toNativeSeparators(userSelectedFileName);
+                qDebug() << "User selected inode:"
+                         << userSelectedInodesFormatted;
             }
         } else {
-            qDebug() << "Webpage attempted full path local file selection:"
+            qDebug() << "Webpage attempted local full path selection:"
                      << mainPage->currentFrame()->baseUrl().toString();
         }
     }

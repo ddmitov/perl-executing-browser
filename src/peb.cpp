@@ -376,7 +376,6 @@ int main(int argc, char **argv)
                  << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
 #ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
@@ -386,6 +385,7 @@ int main(int argc, char **argv)
             qDebug() << "Perl debugger interaction is enabled.";
         }
 #endif
+        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
 
         // Start page existence check and loading:
         QFile staticStartPageFile(applicationDirName + QDir::separator()
@@ -564,16 +564,20 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 QPage::QPage()
     : QWebPage(0)
 {
+    QNetworkProxyFactory::setUseSystemConfiguration(true);
+
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PluginsEnabled, false);
     QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::JavaEnabled, false);
+    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::JavascriptCanAccessClipboard, true);
+            setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::SpatialNavigationEnabled, true);
     QWebSettings::globalSettings()->
@@ -581,15 +585,15 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
     QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
+    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::XSSAuditingEnabled, true);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
     // No download of files:
     setForwardUnsupportedContent(false);
@@ -719,8 +723,8 @@ QWebViewWidget::QWebViewWidget()
                      this, SLOT(qChangeTitleSlot()));
 
     // Connect signal and slot for selecting file from URL:
-    QObject::connect(mainPage, SIGNAL(selectFileSignal(QNetworkRequest)),
-                     this, SLOT(qSelectFileSlot(QNetworkRequest)));
+    QObject::connect(mainPage, SIGNAL(selectInodeSignal(QNetworkRequest)),
+                     this, SLOT(qSelectInodesSlot(QNetworkRequest)));
 
     // Connect signal and slot for closing window from URL:
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
@@ -745,11 +749,38 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                    const QNetworkRequest &request,
                                    QWebPage::NavigationType navigationType)
 {
-    // User selected file:
+    // User selected single file:
     if (navigationType == QWebPage::NavigationTypeLinkClicked and
             request.url().fileName() == "open-file.function") {
 
-        emit selectFileSignal(request);
+        emit selectInodeSignal(request);
+
+        return false;
+    }
+
+    // User selected multiple files:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "open-files.function") {
+
+        emit selectInodeSignal(request);
+
+        return false;
+    }
+
+    // User selected new file:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "save-file.function") {
+
+        emit selectInodeSignal(request);
+
+        return false;
+    }
+
+    // User selected directory:
+    if (navigationType == QWebPage::NavigationTypeLinkClicked and
+            request.url().fileName() == "open-directory.function") {
+
+        emit selectInodeSignal(request);
 
         return false;
     }

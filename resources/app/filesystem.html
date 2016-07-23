@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+
+		<title>Perl Executing Browser - Filesystem Interactions</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+
+		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all"/>
+
+		<script type="text/javascript" src="peb/peb.js"></script>
+
+	</head>
+
+	<body>
+
+		<a href='http://perl-executing-browser-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
+		Select Single File</a>
+		<div id="file-selection"></div>
+
+		<br>
+
+		<a href='http://perl-executing-browser-pseudodomain/open-files.function?target=files-selection' class="btn btn-info btn-primary">
+		Select Multiple Files</a>
+		<div id="files-selection"></div>
+
+		<br>
+
+		<a href='http://perl-executing-browser-pseudodomain/save-file.function?target=save-file-selection' class="btn btn-info btn-primary">
+		Select New Filename</a>
+		<div id="save-file-selection"></div>
+
+		<br>
+
+		<a href='http://perl-executing-browser-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
+		Select Directory</a>
+		<div id="directory-selection"></div>
+
+		<script>
+			$(document).ready(function() {
+				$('#file-selection').bind("inodeselection", function(){
+					$.ajax({
+						url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
+						data: {filename: $('#file-selection').html()},
+						method: 'POST',
+						dataType: 'text',
+						success: function(data) {
+							document.write(data);
+						}
+					});
+				});
+
+				$('#directory-selection').bind("inodeselection", function(){
+					$.ajax({
+						url: 'http://perl-executing-browser-pseudodomain/perl/open-directory.pl',
+						data: {directoryname: $('#directory-selection').html()},
+						method: 'POST',
+						dataType: 'text',
+						success: function(data) {
+							document.write(data);
+						}
+					});
+				});
+			});
+		</script>
+
+	</body>
+
+</html>

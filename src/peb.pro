@@ -79,6 +79,10 @@ equals (QT_MAJOR_VERSION, 5) {
     ##########################################################
     # NO CONFIGURATION OPTIONS BELOW THIS POINT.
     ##########################################################
+
+    CONFIG+=release
+    # CONFIG+=debug
+
     TEMPLATE = app
     TARGET = peb
 

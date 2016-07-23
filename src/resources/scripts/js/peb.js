@@ -58,13 +58,13 @@ function pebCheckCloseWarning() {
 }
 
 
-function pebFileSelected(elementName, fileName) {
+function pebInodeSelection(elementName, inodes) {
 	var element = document.getElementById(elementName);
-	element.innerHTML = fileName;
+	element.innerHTML = inodes;
 
 	var event;
 	event = document.createEvent("HTMLEvents");
-	event.initEvent("fileselected", true, true);
-	event.eventName = "fileselected"
+	event.initEvent("inodeselection", true, true);
+	event.eventName = "inodeselection"
 	element.dispatchEvent(event);
 }

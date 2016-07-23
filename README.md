@@ -104,11 +104,10 @@ Compiled and tested successfully using:
   
 ## Limitations
   
-* No history and cache.
-JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
-* No reloading from JavaScript of a page that was produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.
+* No history and cache. JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
+* No reloading from JavaScript of a page that is produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.
 * No file can be downloaded on hard disk.
-* No plugin support.
+* No support for plugins and HTML 5 video.
   
 ## History
   
