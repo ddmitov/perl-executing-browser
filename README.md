@@ -24,7 +24,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
   
 **Usability:**
 * Perl 5 scripts can be fed from HTML forms using GET or POST methods or from AJAX requests.
-* Single file or multiple files, new filename, existing or new directory can be selected by user and supplied to local Perl scripts.
+* Single file or multiple files, new filename, existing or new directory can be selected by user and supplied with their full paths to local Perl scripts.
 * Basic security restrictions are imposed on every Perl script.
 * Any version of Perl 5 can be used.
 * PEB can be started from any folder.
