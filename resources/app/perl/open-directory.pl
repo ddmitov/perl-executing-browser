@@ -3,12 +3,20 @@
 use strict;
 use warnings;
 
+my @files;
+my $directory_name;
+my $path_separator;
+
+# Determine the right path separator:
+if ($^O eq "MSWin32") {
+	$path_separator = "\\";
+} else {
+	$path_separator = "/";
+}
+
 # Read input:
 my ($buffer, @pairs, $pair, $name, $value);
 read (STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
-
-my @files;
-my $directory_name;
 
 # Split information into name/value pairs:
 @pairs = split(/&/, $buffer);
@@ -58,11 +66,11 @@ sub traverse {
 	opendir (my $directory_handle, $entry) or die $!;
 	while (my $subentry = readdir $directory_handle) {
 		next if $subentry eq '.' or $subentry eq '..';
-		my $full_path = $entry."/".$subentry;
+		my $full_path = $entry.$path_separator.$subentry;
 		if (-f $full_path) {
 			push @files, $full_path;
 		}
-		traverse ("$entry/$subentry");
+		traverse ("$entry$path_separator$subentry");
 	}
 	close $directory_handle;
 

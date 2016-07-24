@@ -31,9 +31,9 @@
 
 		<br>
 
-		<a href='http://perl-executing-browser-pseudodomain/save-file.function?target=save-file-selection' class="btn btn-info btn-primary">
+		<a href='http://perl-executing-browser-pseudodomain/save-file.function?target=new-file-selection' class="btn btn-info btn-primary">
 		Select New Filename</a>
-		<div id="save-file-selection"></div>
+		<div id="new-file-selection"></div>
 
 		<br>
 
@@ -53,6 +53,11 @@
 							document.write(data);
 						}
 					});
+				});
+
+				$('#files-selection').bind("inodeselection", function(){
+					var selectedFilesElement = document.getElementById("files-selection");
+					selectedFilesElement.innerHTML = selectedFilesElement.innerHTML.replace(/;/g, "<br>");
 				});
 
 				$('#directory-selection').bind("inodeselection", function(){
