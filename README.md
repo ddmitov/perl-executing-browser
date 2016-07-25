@@ -152,10 +152,8 @@ function pebCloseConfirmationSync() {
     return confirmation;
 }
 ```
-  
-    This warning function is implemented using a standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.
-    Here is an example of an asynchronous warning routine using jQuery and Alertify.js:
-  
+  This warning function is implemented using a standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.
+  Here is an example of an asynchronous warning routine using jQuery and Alertify.js:
 ```javascript
 function pebCloseConfirmationAsync() {
     alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
@@ -169,8 +167,7 @@ function pebCloseConfirmationAsync() {
         }
     });
 ```
-  
-    This warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. That's why if the user chooses to close the window, a special window closing URL has to be sent to the browser. Upon receiving this special URL, PEB closes the window in question. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.
+  This warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. That's why if the user chooses to close the window, a special window closing URL has to be sent to the browser. Upon receiving this special URL, PEB closes the window in question. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.
   
 ## Security
   
