@@ -101,7 +101,7 @@ my $data_directory = "$current_working_directory/resources/data";
     PEB can start with a static HTML start page or with a start page, that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayes as a start page. If neither ```index.html``` nor ```index.pl``` are found, an error message will be displayed. No start page is a showstopper for PEB.
 * **Icon:**  
     A PEB-based application can have it's own icon located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
-* Log files:**  
+* **Log files:**  
     If log files are needed for debugging PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes, that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour. Please note, that log files can rapidly grow in size due to the fact that every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
@@ -123,7 +123,7 @@ function pebContextMenu() {
     return JSON.stringify(contextMenuObject);
 }
 ```
-* **Custom or translated labels for messagebox elements:**  
+* **Custom or translated labels for dialog box elements:**  
     Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
 ```javascript
 function pebMessageBoxElements() {
