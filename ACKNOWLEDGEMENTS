@@ -11,7 +11,7 @@ shared usefull knowledge on a variety of forums, blogs and other sites,
 I thank them all! Their expertise, effort and good will are highly appreciated!
 
 Special thanks to the staff of the Library of the New Bulgarian University,
-where much of the coding effort took place!
+where much of the development effort took place!
 
 Special thanks to Stack Overflow user peppe for answering competently and swiftly my question
 "How to read POST data "sent" from my own QtWebKit application?":
@@ -261,6 +261,7 @@ http://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascri
 http://stackoverflow.com/questions/10328102/how-to-detect-content-change-event-on-a-div
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 http://stackoverflow.com/questions/1955265/how-do-i-load-a-page-in-javascript-from-its-source-string
+http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 
 http://www.w3schools.com/html/html_lists.asp
 http://www.w3schools.com/jsref/event_onclick.asp

@@ -79,13 +79,75 @@ Compiled and tested successfully using:
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
 * PEB has no sandbox for Perl scripts - they are treated like and executed as ordinary desktop applications with normal user privileges. Basic security is implemented in C++ and Perl code, but without warranties of any kind!
   
+## Settings
+  
+**Settings based on the existence of certain files and folders:**
+PEB is designed to run from any directory without setting anything beforehand and every file or directory, that is checked during program start-up, is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
+* **Name of the binary file:**
+    The binary file of the browser, ```peb``` or ```peb.exe``` by default, can be renamed at will. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the extension), whatever the name may be.
+* **Application directory:**
+    Application directory is hardcoded for compatibility with [Electron] (http://electron.atom.io/). It must be ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder.
+* **Data directory:**
+    Data directory is not hardcoded in C++ code, but a separation of data files from HTML interface and Perl code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is: ```{PEB_binary_directory}/resources/data```. Perl scripts can access this folder using the following code:
+```perl
+use Cwd;
+  
+my $current_working_directory = cwd();
+my $data_directory = "$current_working_directory/resources/data";
+```
+* **Perl interpreter:**
+    PEB expects to find Perl interpreter in ```{PEB_binary_directory}/perl/bin``` folder. The interpreter must be named ```perl``` on Linux and Mac machines and ```perl.exe``` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error message is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
+* **Main page:**
+    PEB can start with a static HTML start page or with a start page, that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayes as a start page. If neither ```index.html``` nor ```index.pl``` are found, an error message will be displayed. No start page is a showstopper for PEB.
+* **Icon:**
+    A PEB-based application can have it's own icon located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
+* Log files:**
+    If log files are needed for debugging PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes, that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour. Please note, that log files can rapidly grow in size due to the fact that every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
+**Settings based on JavaScript code:**
+JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without recompiling the binary or depending on compiled Qt translation files by using simple JavaScript. Another purpose of JavaScript-based settings is to prevent data loss when user has enetered data in a local HTML form, but is going to close the window.
+* **Custom or translated context menu labels:**
+    Using the following code any local HTML page can have custom labels on the default right-click context menu (if the contextmenu event is not already intercepted for an HTML-based context menu):
+```javascript
+function pebContextMenu() {
+    var contextMenuObject = new Object();
+  
+    contextMenuObject.printPreview = "Custom Print Preview Label";
+    contextMenuObject.print = "Custom Print Label";
+  
+    contextMenuObject.cut = "Custom Cut Label";
+    contextMenuObject.copy = "Custom Copy Label";
+    contextMenuObject.paste = "Custom Paste Label";
+    contextMenuObject.selectAll = "Custom Select All Label";
+  
+    return JSON.stringify(contextMenuObject);
+}
+```
+* **Custom or translated labels for messagebox elements:**
+    Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
+```javascript
+function pebMessageBoxElements() {
+    var messageBoxElementsObject = new Object();
+
+    messageBoxElementsObject.alertTitle = "Custom Alert Label";
+    messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
+    messageBoxElementsObject.promptTitle = "Custom Prompt Label";
+
+    messageBoxElementsObject.okLabel = "Custom Ok Label";
+    messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
+    messageBoxElementsObject.yesLabel = "Custom Yes Label";
+    messageBoxElementsObject.noLabel = "Custom No Label";
+
+    return  JSON.stringify(messageBoxElementsObject);
+}
+```
+  
 ## Security
   
 **Security features based on C++ code:**
 * Starting PEB with administrative privileges is not allowed - it exits with a message.
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
 * PEB can not and does not download remote files and can not execute locally Perl scripts from remote locations.
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```resources/app``` subfolder of the browser directory can be executed if they are invoked from a special URL (```http://perl-executing-browser-pseudodomain/```).
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` subfolder of the browser directory can be executed if they are invoked from a special URL: ```http://perl-executing-browser-pseudodomain/```.
   
 **Security features based on Perl code:**
 * Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.
