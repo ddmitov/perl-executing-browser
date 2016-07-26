@@ -110,39 +110,39 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the contextmenu event is not already intercepted):  
 
 ```javascript
-function pebContextMenu() {
-    var contextMenuObject = new Object();
+  function pebContextMenu() {
+      var contextMenuObject = new Object();
   
-    contextMenuObject.printPreview = "Custom Print Preview Label";
-    contextMenuObject.print = "Custom Print Label";
+      contextMenuObject.printPreview = "Custom Print Preview Label";
+      contextMenuObject.print = "Custom Print Label";
   
-    contextMenuObject.cut = "Custom Cut Label";
-    contextMenuObject.copy = "Custom Copy Label";
-    contextMenuObject.paste = "Custom Paste Label";
-    contextMenuObject.selectAll = "Custom Select All Label";
+      contextMenuObject.cut = "Custom Cut Label";
+      contextMenuObject.copy = "Custom Copy Label";
+      contextMenuObject.paste = "Custom Paste Label";
+      contextMenuObject.selectAll = "Custom Select All Label";
   
-    return JSON.stringify(contextMenuObject);
-}
+      return JSON.stringify(contextMenuObject);
+  }
 ```
 
 * **Custom or translated labels for JavaScript dialog boxes:**  
   Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
 
 ```javascript
-function pebMessageBoxElements() {
-    var messageBoxElementsObject = new Object();
+  function pebMessageBoxElements() {
+      var messageBoxElementsObject = new Object();
 
-    messageBoxElementsObject.alertTitle = "Custom Alert Label";
-    messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
-    messageBoxElementsObject.promptTitle = "Custom Prompt Label";
+      messageBoxElementsObject.alertTitle = "Custom Alert Label";
+      messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
+      messageBoxElementsObject.promptTitle = "Custom Prompt Label";
 
-    messageBoxElementsObject.okLabel = "Custom Ok Label";
-    messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
-    messageBoxElementsObject.yesLabel = "Custom Yes Label";
-    messageBoxElementsObject.noLabel = "Custom No Label";
+      messageBoxElementsObject.okLabel = "Custom Ok Label";
+      messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
+      messageBoxElementsObject.yesLabel = "Custom Yes Label";
+      messageBoxElementsObject.noLabel = "Custom No Label";
 
-    return  JSON.stringify(messageBoxElementsObject);
-}
+      return  JSON.stringify(messageBoxElementsObject);
+  }
 ```
 
 * **Checking user input before window close:**  
@@ -155,23 +155,23 @@ function pebMessageBoxElements() {
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of the two types of warning functions will be choosen in any PEB-based application, if user data is to be protected against accidental loss. If both synchronous and asynchronous functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using jQuery and Alertify.js.  
 
 ```javascript
-    function pebCloseConfirmationSync() {
-        var confirmation = confirm("Are you sure you want to close the window?");
-        return confirmation;
-    }
+  function pebCloseConfirmationSync() {
+      var confirmation = confirm("Are you sure you want to close the window?");
+      return confirmation;
+  }
 
-    function pebCloseConfirmationAsync() {
-        alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
-        alertify.set({buttonFocus: "cancel"});
-        alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
-            if (confirmation) {
-                $jQuery.ajax({
-                    url: 'http://perl-executing-browser-pseudodomain/close-window.function',
-                    method: 'GET'
-                });
-            }
-        });
-    }
+  function pebCloseConfirmationAsync() {
+      alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
+      alertify.set({buttonFocus: "cancel"});
+      alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
+          if (confirmation) {
+              $jQuery.ajax({
+                  url: 'http://perl-executing-browser-pseudodomain/close-window.function',
+                  method: 'GET'
+              });
+          }
+      });
+  }
 ```
 
 ## Security
