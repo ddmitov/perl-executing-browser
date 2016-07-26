@@ -44,7 +44,8 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 ## Compile-time Requirements
   
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
-Later versions of Qt are unusable due to the deprecation of QtWebKit.
+Later versions of Qt are unusable due to the deprecation of QtWebKit.  
+The most important Qt dependency of PEB is actually not QtWebkit itself, but QNetworkAccessManager class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of QWebEngine, the new Blink-based web engine of Qt, means that transition to QWebEngine remains problematic.  
   
 Compiled and tested successfully using:
 * Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -151,8 +152,8 @@ JavaScript-based settings are created to facilitate the development of fully tra
   If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this routine is going to be executed. If the asynchronous warning routine is missing, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
   What are the differences between the two routines?  
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.  
-  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. So if the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
-  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of the two types of warning functions will be choosen in any PEB-based application, if user data is to be protected against accidental loss. If both synchronous and asynchronous functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using jQuery and Alertify.js.  
+  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in any PEB-based application, if user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using ```jQuery``` and ```Alertify.js```.  
 
 ```javascript
   function pebCloseConfirmationSync() {
@@ -177,10 +178,10 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## Security
   
 **Security features based on C++ code:**
-* Starting PEB with administrative privileges is not allowed - it exits with a message.
-* Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
 * PEB can not and does not download remote files and can not execute locally Perl scripts from remote locations.
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` subfolder of the browser directory can be executed if they are invoked from a special URL: ```http://perl-executing-browser-pseudodomain/```.
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
+* Starting PEB with administrative privileges is not allowed - it exits with a warning message.
+* Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
 **Security features based on Perl code:**
 * Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.
