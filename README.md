@@ -34,7 +34,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 * Every aspect of the graphical user interface can be customized using HTML & JavaScript.
 * Usefull for both single-page or multi-page applications.
 * Optional JavaScript translation of context menu and dialog boxes.
-* Optional JavaScript check for unsaved data in HTML forms before closing a window to prevent accidental data loss.
+* Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss.
   
 **Development goodies:**
 * PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.
@@ -46,7 +46,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
 Later versions of Qt are unusable due to the deprecation of QtWebKit.  
   
-The most important Qt dependency of PEB is actually not ```QtWebkit itself```, but ```QNetworkAccessManager``` class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QWebEngine``` remains problematic.  
+The most important Qt dependency of PEB is actually not ```QtWebkit```, but ```QNetworkAccessManager``` class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QWebEngine``` remains problematic.  
   
 Compiled and tested successfully using:
 * Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -141,7 +141,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.  
   
-  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog itself can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in any PEB-based application, if user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using ```jQuery``` and ```Alertify.js```.  
 
