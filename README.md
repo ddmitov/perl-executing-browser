@@ -89,12 +89,12 @@ PEB is designed to run from any directory without setting anything beforehand an
     Application directory is hardcoded for compatibility with [Electron] (http://electron.atom.io/). It must be ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder.
 * **Data directory:**  
     Data directory is not hardcoded in C++ code, but a separation of data files from HTML interface and Perl code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is: ```{PEB_binary_directory}/resources/data```. Perl scripts can access this folder using the following code:
+```perl
+    use Cwd;
 
-        use Cwd;
-
-        my $current_working_directory = cwd();
-        my $data_directory = "$current_working_directory/resources/data";
-
+    my $current_working_directory = cwd();
+    my $data_directory = "$current_working_directory/resources/data";
+```
 * **Perl interpreter:**  
     PEB expects to find Perl interpreter in ```{PEB_binary_directory}/perl/bin``` folder. The interpreter must be named ```perl``` on Linux and Mac machines and ```perl.exe``` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error message is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
 * **Start page:**  
@@ -105,7 +105,7 @@ PEB is designed to run from any directory without setting anything beforehand an
     If log files are needed for debugging PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes, that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour. Please note, that log files can rapidly grow in size due to the fact that every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
-JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without recompiling the binary or depending on compiled Qt translation files by using simple JavaScript. Another purpose of JavaScript-based settings is to prevent data loss when user has enetered data in a local HTML form, but is going to close the window.
+JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a PEB window containing a local HTML form filled with unsaved data.
 * **Custom or translated context menu labels:**  
     Using the following code any local HTML page can have custom labels on the default right-click context menu (if the contextmenu event is not already intercepted):
 ```javascript
@@ -123,7 +123,7 @@ function pebContextMenu() {
     return JSON.stringify(contextMenuObject);
 }
 ```
-* **Custom or translated labels for dialog box elements:**  
+* **Custom or translated labels for JavaScript dialog boxes:**  
     Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
 ```javascript
 function pebMessageBoxElements() {
@@ -141,20 +141,20 @@ function pebMessageBoxElements() {
     return  JSON.stringify(messageBoxElementsObject);
 }
 ```
-* **Checking user input before close:**  
+* **Checking user input before window close:**  
     PEB users can enter a lot of information in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed using internal JavaScript code compiled in the resources of the browser binary.  
-    If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous. If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this asynchronous warning routine is going to be executed. If this routine is missing, then the browser tries to find and execute a JavaScript function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
+    If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
+    If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this routine is going to be executed. If the asynchronous warning routine is missing, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
     What are the differences between the two routines? Here is an example of a synchronous warning routine:
-  
-
+```javascript
         function pebCloseConfirmationSync() {
             var confirmation = confirm("Are you sure you want to close the window?");
             return confirmation;
         }
-
+```
     This warning function is implemented using a standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.
     Here is an example of an asynchronous warning routine using jQuery and Alertify.js:
-
+```javascript
         function pebCloseConfirmationAsync() {
             alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
             alertify.set({buttonFocus: "cancel"});
@@ -166,7 +166,7 @@ function pebMessageBoxElements() {
                     });
                 }
             });
-
+```
     This warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. That's why if the user chooses to close the window, a special window closing URL has to be sent to the browser. Upon receiving this special URL, PEB closes the window in question. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.
   
 ## Security
