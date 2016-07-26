@@ -45,7 +45,8 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
   
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
 Later versions of Qt are unusable due to the deprecation of QtWebKit.  
-The most important Qt dependency of PEB is actually not QtWebkit itself, but QNetworkAccessManager class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of QWebEngine, the new Blink-based web engine of Qt, means that transition to QWebEngine remains problematic.  
+  
+The most important Qt dependency of PEB is actually not ```QtWebkit itself```, but ```QNetworkAccessManager``` class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QWebEngine``` remains problematic.  
   
 Compiled and tested successfully using:
 * Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -63,23 +64,6 @@ Compiled and tested successfully using:
 * Qt 5 libraries,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.
   
-## Target Audience
-  
-* Perl and JavaScript enthusiasts creating custom data-driven desktop applications
-* Perl developers willing to use the built-in Perl debugger in graphical mode
-  
-## Application(s) using Perl Executing Browser
-  
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser, Electron or NW.js as a desktop GUI framework, HTML 5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for a file-writing backend.
-  
-## What Perl Executing Browser Is Not
-  
-* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
-* Unlike JavaScript in general purpose web browsers, Perl scripts executed by PEB have no access to the HTML DOM tree of any page.
-* PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
-* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
-* PEB has no sandbox for Perl scripts - they are treated like and executed as ordinary desktop applications with normal user privileges. Basic security is implemented in C++ and Perl code, but without warranties of any kind!
-  
 ## Settings
   
 **Settings based on the existence of certain files and folders:**  
@@ -92,7 +76,7 @@ PEB is designed to run from any directory without setting anything beforehand an
     Data directory is not hardcoded in C++ code, but a separation of data files from HTML interface and Perl code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is: ```{PEB_binary_directory}/resources/data```. Perl scripts can access this folder using the following code:
 ```perl
     use Cwd;
-
+  
     my $current_working_directory = cwd();
     my $data_directory = "$current_working_directory/resources/data";
 ```
@@ -148,11 +132,17 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
 * **Checking user input before window close:**  
   PEB users can enter a lot of information in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed using internal JavaScript code compiled in the resources of the browser binary.  
+  
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
+  
   If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this routine is going to be executed. If the asynchronous warning routine is missing, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
+  
   What are the differences between the two routines?  
+  
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.  
+  
   The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. Visually the warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in any PEB-based application, if user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using ```jQuery``` and ```Alertify.js```.  
 
 ```javascript
@@ -175,6 +165,15 @@ JavaScript-based settings are created to facilitate the development of fully tra
   }
 ```
 
+## Keyboard Shortcuts
+* Ctrl+A - Select All
+* Ctrl+C - Copy  
+* Ctrl+V - Paste  
+* F11 - toggle Fullscreen
+* Alt+F4 - Close window
+* Ctrl+P - Print
+* Ctrl+I - debug current page using QWebInspector
+  
 ## Security
   
 **Security features based on C++ code:**
@@ -190,15 +189,6 @@ JavaScript-based settings are created to facilitate the development of fully tra
 **Perl Debugger Interaction:**
 * Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
   
-## Keyboard Shortcuts
-* Ctrl+A - Select All
-* Ctrl+C - Copy  
-* Ctrl+V - Paste  
-* F11 - toggle Fullscreen
-* Alt+F4 - Close window
-* Ctrl+P - Print
-* Ctrl+I - debug current page using QWebInspector
-  
 ## Limitations
   
 * No history and cache. JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
@@ -206,9 +196,26 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * No file can be downloaded on hard disk.
 * No support for plugins and HTML 5 video.
   
+## What Perl Executing Browser Is Not
+  
+* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
+* Unlike JavaScript in general purpose web browsers, Perl scripts executed by PEB have no access to the HTML DOM tree of any page.
+* PEB is not an implementation of the CGI protocol. It uses only three environment variables (see below) together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
+* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
+* PEB has no sandbox for Perl scripts - they are treated like and executed as ordinary desktop applications with normal user privileges.
+  
+## Target Audience
+  
+* Perl and JavaScript enthusiasts creating custom data-driven desktop applications
+* Perl developers willing to use the built-in Perl debugger in graphical mode
+  
 ## History
   
 PEB was started as a simple GUI for personal databases.
+  
+## Application(s) using Perl Executing Browser
+  
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser, Electron or NW.js as a desktop GUI framework, HTML 5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for a file-writing backend.
   
 ## License
   
