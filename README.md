@@ -46,7 +46,7 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
 Later versions of Qt are unusable due to the deprecation of QtWebKit.  
   
-The most important Qt dependency of PEB is actually not ```QtWebkit```, but ```QNetworkAccessManager``` class, which is subclassed to implement AJAX requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QWebEngine``` remains problematic.  
+The most important Qt dependency of PEB is actually not ```QtWebkit```, but ```QNetworkAccessManager``` class, which is subclassed to implement CGI-like POST and AJAX GET and POST requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QWebEngine``` remains problematic.  
   
 Compiled and tested successfully using:
 * Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -71,9 +71,9 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Name of the binary file:**  
     The binary file of the browser, ```peb``` or ```peb.exe``` by default, can be renamed at will. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the extension), whatever the name may be.
 * **Application directory:**  
-    Application directory is hardcoded for compatibility with [Electron] (http://electron.atom.io/). It must be ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder.
+    Application directory must be ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder. Application directory is hardcoded in C++ code for compatibility with the [Electron] (http://electron.atom.io/) framework. [Epigraphista] (https://github.com/ddmitov/epigraphista) provides an example of a PEB-based application, that is also compatible with [Electron] (http://electron.atom.io/) and [NW.js] (http://nwjs.io/).
 * **Data directory:**  
-    Data directory is not hardcoded in C++ code, but a separation of data files from HTML interface and Perl code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is: ```{PEB_binary_directory}/resources/data```. Perl scripts can access this folder using the following code:
+    Data directory is not hardcoded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ```{PEB_binary_directory}/resources``` directory. ```data``` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
 ```perl
     use Cwd;
   
@@ -130,7 +130,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   }
 ```
 
-* **Checking user input before window close:**  
+* **Checking user input before closing a window:**
   PEB users can enter a lot of information in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
@@ -165,6 +165,69 @@ JavaScript-based settings are created to facilitate the development of fully tra
   }
 ```
 
+  
+## Special URLs and Interaction with Files and Folders
+  
+* **PEB pseudo-domain:**
+  ```http://perl-executing-browser-pseudodomain/```  
+  The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
+  It is intercepted inside PEB and is not passed to the underlying operating system.
+* **Close current window:**
+  ```http://perl-executing-browser-pseudodomain/close-window.function```  
+  Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
+* **Display dialog to select a single existing file:**
+```http://perl-executing-browser-pseudodomain/open-file.function?target=target_DOM_element_of_the_calling_page```  
+  The full path of the selected file will be inserted in the target DOM element of the calling local page.  
+  Having a target DOM element is mandatory when using this special URL.
+  HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
+  This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
+  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script
+  Please note that for security reasons full paths of local file or folders are inserted only inside local HTML files!  
+  The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
+
+```javascript
+  $(document).ready(function() {
+      $('#file-selection').bind("inodeselection", function(){
+          $.ajax({
+              url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
+              data: {filename: $('#file-selection').html()},
+              method: 'POST',
+              dataType: 'text',
+              success: function(data) {
+                  document.write(data);
+              }
+          });
+      });
+  });
+```
+
+* **Display dialog to select multiple existing files:**
+  ```http://perl-executing-browser-pseudodomain/open-files.function?target=target_DOM_element_of_the_calling_page```  
+  The full paths of the selected files will be inserted in the target DOM element of the calling local page.
+  Having a target DOM element is mandatory when using this special URL.
+  ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
+  Different file names are separated by a semicolon - ```;```  
+* **Display dialog to select a new file name:**
+  ```http://perl-executing-browser-pseudodomain/new-file.function?target=target_DOM_element_of_the_calling_page```  
+  The full path of the selected new file name will be inserted in the target DOM element of the calling local page.
+  Having a target DOM element is mandatory when using this special URL.
+  ```inodeselection``` HTML event is emitted when the path of the selected new file name is inserted into the calling local page.  
+  Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
+* **Display dialog to select existing directory or create a new one:**
+  ```http://perl-executing-browser-pseudodomain/open-directory.function?target=target_DOM_element_of_the_calling_page```  
+  The full path of the selected directory will be inserted in the target DOM element of the calling local page.
+  Having a target DOM element is mandatory when using this special URL.
+  ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
+  Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be transmitted to a local Perl script.  
+* **Print:**
+  ```http://perl-executing-browser-pseudodomain/?action=preview```
+* **Print Preview:**
+  ```http://perl-executing-browser-pseudodomain/?action=print```
+* **About PEB dialog box:**
+  ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About Qt dialog box:**
+  ```http://perl-executing-browser-pseudodomain/?type=browser```
+  
 ## Keyboard Shortcuts
 * Ctrl+A - Select All
 * Ctrl+C - Copy  

@@ -64,11 +64,13 @@
 				</li>
 
 				<li>
-					<a href="http://perl-executing-browser-pseudodomain/about.function?type=browser" target="iframe_a">About</a>
-				</li>
-
-				<li>
-					<a href="http://perl-executing-browser-pseudodomain/about.function?type=qt">About Qt</a>
+					<a id="about" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+					About<span class="caret"></span>
+					</a>
+					<ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+						<li><a href="http://perl-executing-browser-pseudodomain/about.function?type=browser" target="iframe_a">About PEB</a></li>
+						<li><a href="http://perl-executing-browser-pseudodomain/about.function?type=qt" target="iframe_a">About Qt</a></li>
+					</ul>
 				</li>
 
 				<li>
@@ -82,7 +84,7 @@
 		<iframe src="main.html" name="iframe_a"></iframe>
 
 		<footer>
-			Perl Executing Browser is a minimalistic HTML framework for Perl 5 desktop applications executed without any server
+			Perl Executing Browser is a minimalistic HTML framework for Perl 5 desktop applications
 		</footer>
 
 	</body>

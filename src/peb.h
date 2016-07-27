@@ -1147,7 +1147,7 @@ public slots:
                 inodesDialog.setFileMode(QFileDialog::ExistingFiles);
             }
 
-            if (request.url().fileName() == "save-file.function") {
+            if (request.url().fileName() == "new-file-name.function") {
                 inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
             }
 
