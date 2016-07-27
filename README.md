@@ -69,7 +69,7 @@ Compiled and tested successfully using:
 **Settings based on the existence of certain files and folders:**  
 PEB is designed to run from any directory without setting anything beforehand and every file or directory, that is checked during program start-up, is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
 * **Name of the binary file:**  
-    The binary file of the browser, ```peb``` or ```peb.exe``` by default, can be renamed at will. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the extension), whatever the name may be.
+    The binary file of the browser, ```peb``` or ```peb.exe``` by default, can be renamed at will. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without file extension), whatever the name may be.
 * **Application directory:**  
     Application directory must be ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder. Application directory is hardcoded in C++ code for compatibility with the [Electron] (http://electron.atom.io/) framework. [Epigraphista] (https://github.com/ddmitov/epigraphista) provides an example of a PEB-based application, that is also compatible with [Electron] (http://electron.atom.io/) and [NW.js] (http://nwjs.io/).
 * **Data directory:**  
@@ -180,7 +180,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
   This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
-  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script
+  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script. 
   Please note that for security reasons full paths of local file or folders are inserted only inside local HTML files!  
   The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
 
@@ -201,18 +201,18 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ```
   
 * **Select multiple files:** ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
-  The full paths of the selected files will be inserted in the target DOM element of the calling local page.
+  The full paths of the selected files will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
   Different file names are separated by a semicolon - ```;```  
   
 * **Select new file name:** ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
-  The full path of the new file name will be inserted in the target DOM element of the calling local page.
+  The full path of the new file name will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
   Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
   
-* **Select directory or create a new one:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
+* **Select directory:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
