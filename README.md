@@ -222,7 +222,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * **Print Preview:** ```http://perl-executing-browser-pseudodomain/?action=print```
   
-* **About PEB dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About PEB local page:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
