@@ -175,7 +175,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **Close current window:** ```http://perl-executing-browser-pseudodomain/close-window.function```  
   Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
   
-* **Display dialog to select a single existing file:** ```http://perl-executing-browser-pseudodomain/open-file.function?target=DOM_element```  
+* **Select single file:** ```http://perl-executing-browser-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
@@ -200,19 +200,19 @@ JavaScript-based settings are created to facilitate the development of fully tra
   });
 ```
   
-* **Display dialog to select multiple existing files:** ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
+* **Select multiple files:** ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page.
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
   Different file names are separated by a semicolon - ```;```  
   
-* **Display dialog to select a new file name:** ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
+* **Select new file name:** ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
   The full path of the new file name will be inserted in the target DOM element of the calling local page.
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
   Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
   
-* **Display dialog to select existing directory or create a new one:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
+* **Select directory or create a new one:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
