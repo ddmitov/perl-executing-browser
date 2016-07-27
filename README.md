@@ -168,73 +168,63 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Special URLs and Interaction with Files and Folders
   
-* **PEB pseudo-domain:**  
-    ```http://perl-executing-browser-pseudodomain/```  
-    The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
-    It is intercepted inside PEB and is not passed to the underlying operating system.  
+* **PEB pseudo-domain:** ```http://perl-executing-browser-pseudodomain/```  
+  The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
+  It is intercepted inside PEB and is not passed to the underlying operating system.  
   
-* **Close current window:**  
-    ```http://perl-executing-browser-pseudodomain/close-window.function```  
-    Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
+* **Close current window:** ```http://perl-executing-browser-pseudodomain/close-window.function```  
+  Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
   
-* **Display dialog to select a single existing file:**  
-    ```http://perl-executing-browser-pseudodomain/open-file.function?target=DOM_element```  
-    The full path of the selected file will be inserted in the target DOM element of the calling local page.  
-    Having a target DOM element is mandatory when using this special URL.  
-    HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
-    This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
-    Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script
-    Please note that for security reasons full paths of local file or folders are inserted only inside local HTML files!  
-    The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
+* **Display dialog to select a single existing file:** ```http://perl-executing-browser-pseudodomain/open-file.function?target=DOM_element```  
+  The full path of the selected file will be inserted in the target DOM element of the calling local page.  
+  Having a target DOM element is mandatory when using this special URL.  
+  HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
+  This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
+  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script
+  Please note that for security reasons full paths of local file or folders are inserted only inside local HTML files!  
+  The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
 
 ```javascript
-    $(document).ready(function() {
-        $('#file-selection').bind("inodeselection", function(){
-            $.ajax({
-                url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
-                data: {filename: $('#file-selection').html()},
-                method: 'POST',
-                dataType: 'text',
-                success: function(data) {
-                    document.write(data);
-                }
-            });
-        });
-    });
+  $(document).ready(function() {
+      $('#file-selection').bind("inodeselection", function(){
+          $.ajax({
+              url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
+              data: {filename: $('#file-selection').html()},
+              method: 'POST',
+              dataType: 'text',
+              success: function(data) {
+                  document.write(data);
+              }
+          });
+      });
+  });
 ```
   
-* **Display dialog to select multiple existing files:**  
-    ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
-    The full paths of the selected files will be inserted in the target DOM element of the calling local page.
-    Having a target DOM element is mandatory when using this special URL.  
-    ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
-    Different file names are separated by a semicolon - ```;```  
+* **Display dialog to select multiple existing files:** ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
+  The full paths of the selected files will be inserted in the target DOM element of the calling local page.
+  Having a target DOM element is mandatory when using this special URL.  
+  ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
+  Different file names are separated by a semicolon - ```;```  
   
-* **Display dialog to select a new file name:**  
-    ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
-    The full path of the new file name will be inserted in the target DOM element of the calling local page.
-    Having a target DOM element is mandatory when using this special URL.  
-    ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
-    Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
+* **Display dialog to select a new file name:** ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
+  The full path of the new file name will be inserted in the target DOM element of the calling local page.
+  Having a target DOM element is mandatory when using this special URL.  
+  ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
+  Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
   
-* **Display dialog to select existing directory or create a new one:**  
-    ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
-    The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
-    Having a target DOM element is mandatory when using this special URL.  
-    ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
-    Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be transmitted to a local Perl script.  
+* **Display dialog to select existing directory or create a new one:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
+  The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
+  Having a target DOM element is mandatory when using this special URL.  
+  ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
+  Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be transmitted to a local Perl script.  
   
-* **Print:**  
-    ```http://perl-executing-browser-pseudodomain/?action=preview```
+* **Print:** ```http://perl-executing-browser-pseudodomain/?action=preview```
   
-* **Print Preview:**  
-    ```http://perl-executing-browser-pseudodomain/?action=print```
+* **Print Preview:** ```http://perl-executing-browser-pseudodomain/?action=print```
   
-* **About PEB dialog box:**  
-    ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About PEB dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
-* **About Qt dialog box:**  
-    ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
 ## Keyboard Shortcuts
 * Ctrl+A - Select All
