@@ -235,12 +235,24 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## Special URLs for Interaction with the Perl Debugger
   
 * **Select file:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
+  Using the above URL the selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
   
-* **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=debugger_command```  
+* **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M```  
   
   Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
   Example: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
-  Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed.  
+  Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
+  
+## Supported File Extensions for Local Content
+   PEB is case-insensitive for all local file extensions. All local files can have   
+* **Perl scripts:** ```.pl```
+* **HTML pages:** ```.htm```, ```.html```
+* **CSS files:** ```.css```
+* **XML files:** ```.xml```
+* **JSON files:** ```.json```
+* **JavaScript files:** ```.js```
+* **Image files:** ```.gif```, ```.jpeg```, ```.jpg```, ```.png```, ```.svg```
+* **Font files:** ```.eot```, ```.ttf```, ```.woff```, ```.woff2```
   
 ## Keyboard Shortcuts
 * Ctrl+A - Select All
