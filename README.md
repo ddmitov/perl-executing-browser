@@ -92,7 +92,7 @@ PEB is designed to run from any directory without setting anything beforehand an
     Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
-JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a PEB window containing a local HTML form filled with unsaved data.
+JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
 * **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the contextmenu event is not already intercepted):  
 
@@ -186,7 +186,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
   
-  The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
+  The following code is an example of how to select a local file and transmit it's full path to a local Perl script using ```jQuery```:  
 
 ```javascript
   $(document).ready(function() {
@@ -234,11 +234,12 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Special URLs for Interaction with the Perl Debugger
   
-* **Select file to debug:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
+* **Select file:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
   
-* **Send command to the debugger:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=debugger_command```  
+* **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=debugger_command```  
   
-  Selecting file to debug and sending command to the Pel debugger can be combined in a single URL: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
+  Selecting file to debug and sending command to the Pel debugger can be combined in a single URL:  
+  ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed.  
   
 ## Keyboard Shortcuts
@@ -253,7 +254,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## Security
   
 **Security features based on C++ code:**
-* PEB can not and does not download remote files and can not execute locally Perl scripts from remote locations.
+* PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
 * Starting PEB with administrative privileges is not allowed - it exits with a warning message.
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
