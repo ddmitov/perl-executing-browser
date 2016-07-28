@@ -239,18 +239,19 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M```  
   
+* **Combined Perl Debugger URL**  
   Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
   Example: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
 ## Supported File Extensions for Local Content
-   PEB is case-insensitive for all local file extensions. All local files can have   
+   PEB is case-insensitive for all local file extensions. All local files can have multi-dotted names.  
 * **Perl scripts:** ```.pl```
 * **HTML pages:** ```.htm```, ```.html```
-* **CSS files:** ```.css```
 * **XML files:** ```.xml```
-* **JSON files:** ```.json```
+* **CSS files:** ```.css```
 * **JavaScript files:** ```.js```
+* **JSON files:** ```.json```
 * **Image files:** ```.gif```, ```.jpeg```, ```.jpg```, ```.png```, ```.svg```
 * **Font files:** ```.eot```, ```.ttf```, ```.woff```, ```.woff2```
   
