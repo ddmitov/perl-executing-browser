@@ -1,7 +1,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalistic HTML framework for local Perl 5 scripts executed without server as desktop data-driven applications. Perl 5 scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.
+Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of a minimalistic HTML framework for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop data-driven applications. Perl 5 scripts can be fed from HTML forms using GET and POST methods or from AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.
   
 ## Design Objectives
   
@@ -38,25 +38,25 @@ Perl Executing Browser (PEB) is a C++ Qt 5 WebKit implementation of a minimalist
   
 **Development goodies:**
 * PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.
-* WebKit Web Inspector can be invoked using Ctrl+I keyboard shortcut.
+* ```QWebInspector``` window can be invoked using Ctrl+I keyboard shortcut.
 * Extensive optional logging of all browser activities.
   
 ## Compile-time Requirements
   
-GCC compiler and Qt 5.1 - Qt 5.5 headers (including QtWebKit headers).  
-Later versions of Qt are unusable due to the deprecation of QtWebKit.  
+GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebKit``` headers).  
+Later versions of Qt are unusable due to the deprecation of ```QtWebKit```.  
   
 The most important Qt dependency of PEB is actually not ```QtWebkit```, but ```QNetworkAccessManager``` class, which is subclassed to implement CGI-like POST and AJAX GET and POST requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` remains problematic.  
   
 Compiled and tested successfully using:
-* Qt Creator 2.8.1 and [Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
-* Qt Creator 3.0.0 and [Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
-* Qt Creator 3.0.0 and [Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,
-* Qt Creator 3.0.1 and [Qt 5.2.1] (http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5  
+* [Qt Creator 2.8.1 and Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
+* [Qt Creator 3.0.0 and Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
+* [Qt Creator 3.0.0 and Qt 5.2.0] (http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,
+* [Qt Creator 3.0.1 and Qt 5.2.1] (http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5  
 (main development and testing platform - Valcho Nedelchev),
-* Qt Creator 3.1.1 and [Qt 5.3.0] (http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
-* Qt Creator 3.1.1 and [Qt 5.4.1] (http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
-* Qt Creator 3.5.1 and [Qt 5.5.1] (http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
+* [Qt Creator 3.1.1 and Qt 5.3.0] (http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
+* [Qt Creator 3.1.1 and Qt 5.4.1] (http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
+* [Qt Creator 3.5.1 and Qt 5.5.1] (http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
 (main development and testing platform - Dimitar D. Mitov).
   
 ## Runtime Requirements
@@ -145,7 +145,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog itself can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
-  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in any PEB-based application, if user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using ```jQuery``` and ```Alertify.js```.  
+  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery] (https://jquery.com/) and [Alertify.js] (http://alertifyjs.com/).  
 
 ```javascript
   function pebCloseConfirmationSync() {
@@ -232,6 +232,10 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
+## HTML interface for Interaction with the Perl Debugger
+  
+![PEB Perl Debugger HTML Interface](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB Perl Debugger HTML Interface")
+  
 ## Special URLs for Interaction with the Perl Debugger
   
 * **Select file:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
@@ -247,13 +251,13 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## Supported File Extensions for Local Content
    PEB is case-insensitive for all local file extensions. All local files can have multi-dotted names.  
 * **Perl scripts:** ```.pl```
-* **HTML pages:** ```.htm```, ```.html```
+* **HTML pages:** ```.htm``` ```.html```
 * **XML files:** ```.xml```
 * **CSS files:** ```.css```
 * **JavaScript files:** ```.js```
 * **JSON files:** ```.json```
-* **Image files:** ```.gif```, ```.jpeg```, ```.jpg```, ```.png```, ```.svg```
-* **Font files:** ```.eot```, ```.ttf```, ```.woff```, ```.woff2```
+* **Image files:** ```.gif``` ```.jpeg``` ```.jpg``` ```.png``` ```.svg```
+* **Font files:** ```.eot``` ```.ttf``` ```.woff``` ```.woff2```
   
 ## Keyboard Shortcuts
 * Ctrl+A - Select All
@@ -262,7 +266,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * F11 - toggle Fullscreen
 * Alt+F4 - Close window
 * Ctrl+P - Print
-* Ctrl+I - debug current page using QWebInspector
+* Ctrl+I - debug current page using ```QWebInspector```
   
 ## Security
   
@@ -296,7 +300,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Target Audience
   
-* Perl and JavaScript enthusiasts creating custom data-driven desktop applications
+* Perl enthusiasts creating custom data-driven desktop applications
 * Perl developers willing to use the built-in Perl debugger in graphical mode
   
 ## History
@@ -305,7 +309,7 @@ PEB was started as a simple GUI for personal databases.
   
 ## Application(s) using Perl Executing Browser
   
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser, Electron or NW.js as a desktop GUI framework, HTML 5 and Bootstrap for a themable user interface, JavaScript for on-screen text conversion and Perl 5 for a file-writing backend.
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser, [Electron] (http://electron.atom.io/) or [NW.js] (http://nwjs.io/) as a desktop GUI framework, HTML 5 and [Bootstrap] (http://getbootstrap.com/) for a themable user interface, JavaScript for on-screen text conversion and [Perl 5] (https://www.perl.org/) for a file-writing backend.
   
 ## License
   
