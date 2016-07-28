@@ -37,8 +37,8 @@ Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit impleme
 * Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss.
   
 **Development goodies:**
-* PEB can interact with the built-in Perl 5 debugger. Any Perl script can be selected for debugging in an HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev.
-* ```QWebInspector``` window can be invoked using Ctrl+I keyboard shortcut.
+* PEB can interact with the Perl 5 debugger in graphical mode - see section 'HTML Interface for the Perl Debugger'  
+* ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
 * Extensive optional logging of all browser activities.
   
 ## Compile-time Requirements
@@ -62,7 +62,8 @@ Compiled and tested successfully using:
 ## Runtime Requirements
   
 * Qt 5 libraries,
-* Perl 5 distribution - any Linux, Mac or Windows Perl distribution.
+* Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
+  [Strawberry Perl] (http://strawberryperl.com/) PortableZIP edition is successfully used with all Windows builds of PEB.
   
 ## Settings
   
@@ -232,9 +233,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
-## HTML interface for Interaction with the Perl Debugger
-  
-![PEB Perl Debugger HTML Interface](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB Perl Debugger HTML Interface")
+## HTML Interface for the Perl Debugger
+   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using ```Syntax::Highlight::Engine::Kate``` CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the built-in Perl debugger.  
+   ![PEB Perl Debugger HTML Interface](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB Perl Debugger HTML Interface")
   
 ## Special URLs for Interaction with the Perl Debugger
   
@@ -260,13 +261,13 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **Font files:** ```.eot``` ```.ttf``` ```.woff``` ```.woff2```
   
 ## Keyboard Shortcuts
-* Ctrl+A - Select All
-* Ctrl+C - Copy  
-* Ctrl+V - Paste  
-* F11 - toggle Fullscreen
-* Alt+F4 - Close window
-* Ctrl+P - Print
-* Ctrl+I - debug current page using ```QWebInspector```
+* ```Ctrl+A``` - Select All
+* ```Ctrl+C``` - Copy  
+* ```Ctrl+V``` - Paste  
+* ```F11``` - toggle Fullscreen
+* ```Alt+F4``` - Close window
+* ```Ctrl+P``` - Print
+* ```Ctrl+I``` - debug current page using ```QWebInspector```
   
 ## Security
   
