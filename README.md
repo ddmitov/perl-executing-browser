@@ -168,7 +168,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ```
 
   
-## Special URLs and Interaction with Files and Folders
+## Special URLs for Users and Interaction with Files and Folders
   
 * **PEB pseudo-domain:** ```http://perl-executing-browser-pseudodomain/```  
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
@@ -182,9 +182,10 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
   This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
-  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script.  
+  Actual opening of the selected file is performed only after the selected file is transmitted to and opened from a Perl script.  
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
+  
   The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
 
 ```javascript
@@ -221,7 +222,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
   
-  Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be transmitted to a local Perl script.  
+  Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be passed to a local Perl script.  
   
 * **Print:** ```http://perl-executing-browser-pseudodomain/?action=preview```
   
@@ -230,6 +231,15 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **About PEB embedded page:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
+  
+## Special URLs for Interaction with the Perl Debugger
+  
+* **Select file to debug:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
+  
+* **Send command to the debugger:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=debugger_command```  
+  
+  Selecting file to debug and sending command to the Pel debugger can be combined in a single URL: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
+  Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed.  
   
 ## Keyboard Shortcuts
 * Ctrl+A - Select All
