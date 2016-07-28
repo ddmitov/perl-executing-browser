@@ -87,7 +87,9 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**  
     A PEB-based application can have it's own icon located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Log files:**  
-    If log files are needed for debugging PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes, that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour. Please note, that log files can rapidly grow in size due to the fact that every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
+    If log files are needed for debugging PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes, that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour.  
+    
+    Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
 JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a PEB window containing a local HTML form filled with unsaved data.
@@ -180,8 +182,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
   This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
-  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script. 
-  Please note that for security reasons full paths of local file or folders are inserted only inside local HTML files!  
+  Actual opening of the selected file is not performed until the selected file is not transmitted to and opened from a Perl script.  
+  
+  Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
   The following code is an example of how to select a local file and transmit it's full path to a local Perl script using jQuery:  
 
 ```javascript
@@ -210,19 +213,21 @@ JavaScript-based settings are created to facilitate the development of fully tra
   The full path of the new file name will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
+  
   Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
   
 * **Select directory:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
+  
   Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be transmitted to a local Perl script.  
   
 * **Print:** ```http://perl-executing-browser-pseudodomain/?action=preview```
   
 * **Print Preview:** ```http://perl-executing-browser-pseudodomain/?action=print```
   
-* **About PEB local page:** ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About PEB embedded page:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
