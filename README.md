@@ -239,7 +239,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=debugger_command```  
   
   Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
-  Combined URL: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
+  Example: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed.  
   
 ## Keyboard Shortcuts
