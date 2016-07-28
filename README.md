@@ -37,7 +37,7 @@ Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit impleme
 * Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss.
   
 **Development goodies:**
-* PEB can interact with the Perl 5 debugger in graphical mode - see section 'HTML Interface for the Perl Debugger'  
+* PEB can interact with the Perl 5 debugger in graphical mode - see section *HTML Interface for the Perl Debugger*  
 * ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
 * Extensive optional logging of all browser activities.
   
@@ -234,8 +234,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
   
 ## HTML Interface for the Perl Debugger
-   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using ```Syntax::Highlight::Engine::Kate``` CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the built-in Perl debugger.  
-   ![PEB Perl Debugger HTML Interface](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB Perl Debugger HTML Interface")
+   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
+  
+   ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
   
 ## Special URLs for Interaction with the Perl Debugger
   
