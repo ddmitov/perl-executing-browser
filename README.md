@@ -362,7 +362,7 @@ PEB was started as a simple GUI for personal databases.
   
 ## Application(s) using Perl Executing Browser
   
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an EpiDoc XML file creator using Perl Executing Browser, [Electron] (http://electron.atom.io/) or [NW.js] (http://nwjs.io/) as a desktop GUI framework, HTML 5 and [Bootstrap] (http://getbootstrap.com/) for a themable user interface, JavaScript for on-screen text conversion and [Perl 5] (https://www.perl.org/) for a file-writing backend.
+* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an [EpiDoc] (https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator using Perl Executing Browser, [Electron] (http://electron.atom.io/) or [NW.js] (http://nwjs.io/) as a desktop GUI framework, HTML 5 and [Bootstrap] (http://getbootstrap.com/) for a themable user interface, JavaScript for on-screen text conversion and [Perl 5] (https://www.perl.org/) for a file-writing backend.
   
 ## License
   
