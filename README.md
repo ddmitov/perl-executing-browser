@@ -2,6 +2,7 @@ Perl Executing Browser
 ----------------------------------------------------------------------------------------
   
 Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of a minimalistic HTML framework for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop data-driven applications. Perl 5 scripts can be fed directly from HTML forms using GET and POST methods or using AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
+  
 Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications, but with Perl doing the heavy lifting.
   
 ## Design Objectives
@@ -69,9 +70,9 @@ Compiled and tested successfully using:
 ## How to Call Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: non-AJAX scripts and AJAX scripts.
 * **Non-AJAX Perl scripts:**  
-    Non-AJAX Perl scripts are expected to produce a complete HTML page that will replace the calling page when script output becomes available. Note that there could be multiple chunks of script output from non-AJAX scripts - PEB accumulates them and displays everything it has when a new piece of script output comes out.  
+    Non-AJAX Perl scripts are expected to produce a complete HTML page that will replace the calling page when script output becomes available. Note that there could be multiple chunks of script output from a non-AJAX script - PEB accumulates them and displays everything it has when a new piece of script output comes out.  
   
-    There is no timeout for all Perl scripts executed by PEB (non-AJAX and AJAX), but slow scripts should be optimized to avoid degradation of the user experinece.  
+    There is no timeout for all Perl scripts executed by PEB (AJAX and non-AJAX), but slow scripts should be optimized to avoid degradation of the user experinece.  
   
     There is no special naming convention for non-AJAX scripts and they are called from hyperlinks or HTML forms just like any Perl CGI script was called in the olden days of Perl CGI scripting:
 
