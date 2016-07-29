@@ -67,7 +67,7 @@ Compiled and tested successfully using:
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
   [Strawberry Perl] (http://strawberryperl.com/) PortableZIP edition is successfully used with all Windows builds of PEB.  
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
-  Being unable to start with administrative privileges PEB can use, but not abuse, any system Perl on PATH.
+  Being unable to start scripts with administrative privileges PEB can use, but not abuse, any system Perl on PATH.
   
 ## How to Call Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: non-AJAX scripts and AJAX scripts.
@@ -223,7 +223,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
-* Starting PEB with administrative privileges is not allowed - it exits with a warning message.
+* If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
 **Security features based on Perl code:**
