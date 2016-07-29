@@ -72,7 +72,7 @@ Compiled and tested successfully using:
 ## How to Call Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: non-AJAX scripts and AJAX scripts.
 * **Non-AJAX Perl scripts:**  
-    Non-AJAX Perl scripts are expected to produce a complete HTML page that will replace the calling page when script output becomes available. Note that there could be multiple chunks of script output from a non-AJAX script - PEB accumulates them and displays everything it has when a new piece of script output comes out.  
+    Non-AJAX Perl scripts are expected to produce a complete HTML page that will replace the calling page when script output becomes available. Note that there could be multiple chunks of output from a non-AJAX script - PEB accumulates them and displays everything it has when a new piece of script output comes out.  
   
     There is no timeout for all Perl scripts executed by PEB (AJAX and non-AJAX), but slow scripts should be optimized to avoid user experinece degradation.  
   
@@ -182,18 +182,18 @@ JavaScript-based settings are created to facilitate the development of fully tra
   }
 ```
 
-* **Checking user input before closing a window:**
-  PEB users can enter a lot of information in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed using internal JavaScript code compiled in the resources of the browser binary.  
+* **Checking for unsaved user input before closing a window:**
+  PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
   
-  If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this routine is going to be executed. If the asynchronous warning routine is missing, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
+  If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
   
   What are the differences between the two routines?  
   
-  The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until the user finally presses 'Yes' or 'No'. Visually the Confirm dialog looks like a normal native dialog.  
+  The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
   
-  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of other JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog itself can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention - this is actually the great advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to distinct itself and attract attention and this is the advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery] (https://jquery.com/) and [Alertify.js] (http://alertifyjs.com/).  
 
