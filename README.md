@@ -74,7 +74,7 @@ Compiled and tested successfully using:
 * **Non-AJAX Perl scripts:**  
     Non-AJAX Perl scripts are expected to produce a complete HTML page that will replace the calling page when script output becomes available. Note that there could be multiple chunks of script output from a non-AJAX script - PEB accumulates them and displays everything it has when a new piece of script output comes out.  
   
-    There is no timeout for all Perl scripts executed by PEB (AJAX and non-AJAX), but slow scripts should be optimized to avoid degradation of the user experinece.  
+    There is no timeout for all Perl scripts executed by PEB (AJAX and non-AJAX), but slow scripts should be optimized to avoid user experinece degradation.  
   
     There is no special naming convention for non-AJAX scripts. They are called from hyperlinks or HTML forms just like any Perl CGI script was called in the olden days of Perl CGI scripting:
 
@@ -289,7 +289,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be passed to a local Perl script.  
   
-* **Print:** ```http://perl-executing-browser-pseudodomain/print.function?action=print```
+* **Print:** ```http://perl-executing-browser-pseudodomain/print.function?action=print```  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.
   
 * **Print Preview:** ```http://perl-executing-browser-pseudodomain/print.function?action=preview```
