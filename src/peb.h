@@ -440,7 +440,7 @@ protected:
         }
 
         // GET requests to the browser pseudodomain -
-        // local files and CGI-like scripts:
+        // local files and non-AJAX scripts:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {
@@ -536,7 +536,7 @@ protected:
             }
         }
 
-        // POST requests to the browser pseudodomain - CGI-like scripts:
+        // POST requests to the browser pseudodomain - non-AJAX scripts:
         if (operation == PostOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains("ajax"))) {

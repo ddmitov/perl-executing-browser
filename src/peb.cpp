@@ -634,7 +634,7 @@ QPage::QPage()
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Connect signals and slots for all local CGI-like Perl scripts:
+    // Connect signals and slots for all local non-AJAX Perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
