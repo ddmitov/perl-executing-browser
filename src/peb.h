@@ -284,11 +284,15 @@ protected:
                      QNetworkRequest(emptyNetworkRequest));
         }
 
+        QRegExp ajaxMarker;
+        ajaxMarker.setPattern("ajax");
+        ajaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
+
         // Local AJAX GET and POST requests:
         if ((operation == GetOperation or
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
-                request.url().path().contains("ajax")) {
+                request.url().path().contains(ajaxMarker)) {
 
             QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
@@ -443,7 +447,7 @@ protected:
         // local files and non-AJAX scripts:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                (!request.url().path().contains("ajax"))) {
+                (!request.url().path().contains(ajaxMarker))) {
 
             // Get the full file path and file extension:
             QString fullFilePath = QDir::toNativeSeparators
@@ -539,7 +543,7 @@ protected:
         // POST requests to the browser pseudodomain - non-AJAX scripts:
         if (operation == PostOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                (!request.url().path().contains("ajax"))) {
+                (!request.url().path().contains(ajaxMarker))) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();

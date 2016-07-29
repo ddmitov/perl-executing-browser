@@ -3,7 +3,7 @@ Perl Executing Browser
   
 Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of a minimalistic HTML framework for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop data-driven applications. Perl 5 scripts can be fed directly from HTML forms using GET and POST methods or using AJAX requests. HTML interface for interaction with the built-in Perl debugger is also available.  
   
-Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications, but with Perl doing the heavy lifting.
+Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications with Perl doing the heavy lifting.
   
 ## Design Objectives
   
@@ -74,7 +74,7 @@ Compiled and tested successfully using:
   
     There is no timeout for all Perl scripts executed by PEB (AJAX and non-AJAX), but slow scripts should be optimized to avoid degradation of the user experinece.  
   
-    There is no special naming convention for non-AJAX scripts and they are called from hyperlinks or HTML forms just like any Perl CGI script was called in the olden days of Perl CGI scripting:
+    There is no special naming convention for non-AJAX scripts. They are called from hyperlinks or HTML forms just like any Perl CGI script was called in the olden days of Perl CGI scripting:
 
 ```html
   <form action="perl/test.pl" method="post">
@@ -91,7 +91,7 @@ Compiled and tested successfully using:
   
     PEB returns all output from AJAX scripts in one piece after the script has finished with no timeout.
   
-    AJAX scripts must have the keyword ```ajax``` somewhere in their pathname so that PEB is able to distinguish between AJAX and non-AJAX scripts. So an AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
+    AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and non-AJAX scripts. So an AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
   
     The following example illustrates how to call a local AJAX Perl script from a local page:  
 
