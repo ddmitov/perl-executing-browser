@@ -30,7 +30,7 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
 * Basic security restrictions are imposed on every Perl script.
 * PEB can be started from any folder.
 * PEB is usefull for both single-page or multi-page applications.
-* Single file or multiple files, new filename, existing or new directory can be selected by user.
+* Single file or multiple files, new filename, existing or new directory can be selected by user.  
   Their full paths are displayed in the calling local page and they can be supplied to local Perl scripts.
 * Browser functions are accessible from special URLs.
 * Any icon can be displayed on windows and message boxes.
@@ -65,7 +65,9 @@ Compiled and tested successfully using:
   
 * Qt 5 libraries,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
-  [Strawberry Perl] (http://strawberryperl.com/) PortableZIP edition is successfully used with all Windows builds of PEB.
+  [Strawberry Perl] (http://strawberryperl.com/) PortableZIP edition is successfully used with all Windows builds of PEB.  
+  [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
+  Being unable to start with administrative privileges PEB can use, but not abuse, any system Perl on PATH.
   
 ## How to Call Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: non-AJAX scripts and AJAX scripts.
@@ -216,6 +218,21 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ```
 
   
+## Security
+  
+**Security features based on C++ code:**
+* PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
+* Starting PEB with administrative privileges is not allowed - it exits with a warning message.
+* Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
+  
+**Security features based on Perl code:**
+* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned. ```fork``` is banned to avoid any orphan processes, which may be created if this function is carelessly used.
+* The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
+  
+**Perl Debugger Interaction:**
+* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
+  
 ## Special URLs for Users and Interaction with Files and Folders
   
 * **PEB pseudo-domain:** ```http://perl-executing-browser-pseudodomain/```  
@@ -258,7 +275,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
   Different file names are separated by a semicolon - ```;```  
   
-* **Select new file name:** ```http://perl-executing-browser-pseudodomain/new-file.function?target=DOM_element```  
+* **Select new file name:** ```http://perl-executing-browser-pseudodomain/new-file-name.function?target=DOM_element```  
   The full path of the new file name will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
@@ -272,13 +289,14 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be passed to a local Perl script.  
   
-* **Print:** ```http://perl-executing-browser-pseudodomain/?action=preview```
+* **Print:** ```http://perl-executing-browser-pseudodomain/print.function?action=print```
+  Printing is not immediately performed, but a native printer selection dialog is displayed first.
   
-* **Print Preview:** ```http://perl-executing-browser-pseudodomain/?action=print```
+* **Print Preview:** ```http://perl-executing-browser-pseudodomain/print.function?action=preview```
   
-* **About PEB embedded page:** ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About PEB embedded page:** ```http://perl-executing-browser-pseudodomain/about.function?type=browser```
   
-* **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/?type=browser```
+* **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/about.function?type=qt```
   
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
@@ -317,35 +335,21 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * ```Ctrl+P``` - Print
 * ```Ctrl+I``` - debug current page using ```QWebInspector```
   
-## Security
-  
-**Security features based on C++ code:**
-* PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
-* Starting PEB with administrative privileges is not allowed - it exits with a warning message.
-* Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
-  
-**Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. All core functions from the :dangerous group - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.
-* The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
-  
-**Perl Debugger Interaction:**
-* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
-  
-## Limitations
-  
-* No history and cache. JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
-* No reloading from JavaScript of a page that is produced by local script, but local static pages, as well as web pages, can be reloaded from JavaScript using ```location.reload()```.
-* No file can be downloaded on hard disk.
-* No support for plugins and HTML 5 video.
-  
 ## What Perl Executing Browser Is Not
   
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
-* Unlike JavaScript in general purpose web browsers, Perl scripts executed by PEB have no access to the HTML DOM tree of any page.
+* Unlike JavaScript in general purpose web browsers, Perl scripts executed by PEB have no direct access to the HTML DOM tree of any page.
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
 * PEB has no sandbox for Perl scripts - they are treated like and executed as ordinary desktop applications with normal user privileges.
+  
+## Limitations
+  
+* No history and cache.  
+  JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
+* No reloading from JavaScript of a page that is produced by a local Perl script, but local static pages, as well as web pages, can be reloaded using JavaScript ```location.reload()```.
+* No file can be downloaded on hard disk.
+* No support for plugins and HTML 5 video.
   
 ## Target Audience
   
