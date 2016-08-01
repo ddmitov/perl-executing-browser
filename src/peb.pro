@@ -16,11 +16,6 @@ equals (QT_MAJOR_VERSION, 5) {
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
     ##########################################################
-    # HTTPS support - comment out to disable:
-    ##########################################################
-    CONFIG += openssl-linked
-
-    ##########################################################
     # Macintosh specific settings:
     ##########################################################
     macx {
@@ -77,8 +72,6 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # NO CONFIGURATION OPTIONS BELOW THIS POINT.
-    ##########################################################
 
     CONFIG+=release
     # CONFIG+=debug
@@ -88,6 +81,9 @@ equals (QT_MAJOR_VERSION, 5) {
 
     # Network support:
     QT += network
+
+    # HTTPS support:
+    CONFIG += openssl-linked
 
     # Webkit support:
     QT += widgets webkitwidgets
