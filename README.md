@@ -7,7 +7,7 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
   
 ## Design Objectives
   
-* **1. Fast and easy graphical framework for Perl 5 desktop applications:**  
+* **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
     use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop data-driven applications,
   
 * **2. Zero installation:**  
@@ -218,6 +218,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Security
    Being a small GUI framework for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary. All Perl scripts executed by PEB are treated as ordinary desktop applications with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts within PEB. A PEB user can not endanger the opreating system and can not fall victim to remote or arbitrary Perl code, but still has access to all data he or she rightfully owns.  
+  
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
@@ -310,10 +311,10 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M```  
   
-* **Combined Perl Debugger URL**  
+* **Combined Perl Debugger URL:**  
   Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
   Example: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
-  Using the above URL the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
+  Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
 ## Supported File Extensions for Local Content
    PEB is case-insensitive for all local file extensions. All local files can have multi-dotted names.  
