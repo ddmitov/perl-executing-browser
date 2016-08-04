@@ -352,8 +352,8 @@ int main(int argc, char **argv)
     if (perlInterpreterFullPath.length() == 0) {
         QString htmlErrorContents = readHtmlErrorTemplate();
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
-                + "was not found and "
-                + "Perl interpreter was not available on PATH.";
+                + "is not found and "
+                + "Perl interpreter is not available on PATH.";
         htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);

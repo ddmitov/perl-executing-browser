@@ -12,5 +12,8 @@ Compiled and tested successfully using:
 * Qt Creator 3.5.1 and Qt 5.5.1 on 64-bit Lubuntu 15.04 Linux.
 
 Runtime Requirements:
-* Qt5 libraries,
-* Perl5 distribution - any standard Linux, Mac or Windows Perl distribution.
+* Qt 5 libraries - their full Linux list can be found inside the 'start-peb.sh' script,
+* Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
+  Strawberry Perl PortableZIP edition is successfully used with all Windows builds of PEB.
+  Perlbrew Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.
+  Being unable to start scripts with administrative privileges PEB can use, but not abuse, any system Perl on PATH.
