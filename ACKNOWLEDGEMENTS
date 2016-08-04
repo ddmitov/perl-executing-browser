@@ -1,5 +1,5 @@
 
-PERL EXECUTING BROWSER -
+PERL EXECUTING BROWSER (PEB) -
 THANKS, ACKNOWLEDGEMENTS AND REFERENCES
 ================================
 
@@ -19,7 +19,7 @@ Special thanks to Stack Overflow user peppe for answering competently and swiftl
 http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application
 
 I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué
-for their code, which I adopted and modified:
+for their code, which I adopted and modified for an important part of PEB:
 http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources
 http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application
 

@@ -217,7 +217,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
   
 ## Security
-   Being a small GUI framework for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary. All Perl scripts executed by PEB are treated as ordinary desktop applications with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users can not endanger the opreating system or fall victims to remote or arbitrary Perl code, but they still have full access to their own local data.  
+   Being a GUI for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary and they are treated as ordinary desktop programs with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users can not endanger the opreating system or fall victims to remote or arbitrary Perl code, but they still have full access to their own local data.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
@@ -339,15 +339,16 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## What Perl Executing Browser Is Not
   
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
-* Unlike JavaScript in general purpose web browsers, Perl scripts executed by PEB have no direct access to the HTML DOM tree of any page.
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
 * PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
+* Perl scripts executed by PEB, unlike JavaScript in general purpose web browsers, have no direct access to the HTML DOM tree of any page.
   
 ## Limitations
   
 * No history and cache.  
   JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
-* No page produced by a local Perl script can be reloaded, but local HTML pages, as well as web pages, can be reloaded using the JavaScript function ```location.reload()```.
+* No page produced by a local Perl script can be reloaded.  
+  Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ```location.reload()```.
 * No file can be downloaded on hard disk.
 * No support for plugins and HTML 5 video.
   
