@@ -217,7 +217,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
   
 ## Security
-   Being a small GUI framework for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary. All Perl scripts executed by PEB are treated as ordinary desktop applications with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts within PEB. A PEB user can not endanger the opreating system and can not fall victim to remote or arbitrary Perl code, but still has access to all data he or she rightfully owns.  
+   Being a small GUI framework for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary. All Perl scripts executed by PEB are treated as ordinary desktop applications with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. A PEB user can not endanger the opreating system and can not fall victim to remote or arbitrary Perl code, but still has access to all data he or she rightfully owns.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
