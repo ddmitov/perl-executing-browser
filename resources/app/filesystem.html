@@ -10,8 +10,8 @@
 		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
 
 		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all"/>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all"/>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
 
 		<script type="text/javascript" src="peb/peb.js"></script>
 
@@ -19,25 +19,25 @@
 
 	<body>
 
-		<a href='http://perl-executing-browser-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
+		<a href='http://local-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
 		Select Single File</a>
 		<div id="file-selection"></div>
 
 		<br>
 
-		<a href='http://perl-executing-browser-pseudodomain/open-files.function?target=files-selection' class="btn btn-info btn-primary">
+		<a href='http://local-pseudodomain/open-files.function?target=files-selection' class="btn btn-info btn-primary">
 		Select Multiple Files</a>
 		<div id="files-selection"></div>
 
 		<br>
 
-		<a href='http://perl-executing-browser-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
+		<a href='http://local-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
 		Select New Filename</a>
 		<div id="new-file-name-selection"></div>
 
 		<br>
 
-		<a href='http://perl-executing-browser-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
+		<a href='http://local-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
 		Select Directory</a>
 		<div id="directory-selection"></div>
 
@@ -45,7 +45,7 @@
 			$(document).ready(function() {
 				$('#file-selection').bind("inodeselection", function(){
 					$.ajax({
-						url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
+						url: 'http://local-pseudodomain/perl/open-file.pl',
 						data: {filename: $('#file-selection').html()},
 						method: 'POST',
 						dataType: 'text',
@@ -62,7 +62,7 @@
 
 				$('#directory-selection').bind("inodeselection", function(){
 					$.ajax({
-						url: 'http://perl-executing-browser-pseudodomain/perl/open-directory.pl',
+						url: 'http://local-pseudodomain/perl/open-directory.pl',
 						data: {directoryname: $('#directory-selection').html()},
 						method: 'POST',
 						dataType: 'text',

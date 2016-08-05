@@ -17,7 +17,7 @@ print "
 		<title>Perl Executing Browser - SQLite Test</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
-		<link rel='stylesheet' type='text/css' href='http://perl-executing-browser-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'/>
+		<link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
 	</head>
 
 	<body>

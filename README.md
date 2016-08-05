@@ -99,7 +99,7 @@ Compiled and tested successfully using:
   $(document).ready(function() {
       $('#ajax-button').click(function() {
           $.ajax({
-              url: 'http://perl-executing-browser-pseudodomain/perl/ajax-test.pl',
+              url: 'http://local-pseudodomain/perl/ajax-test.pl',
               method: 'GET',
               dataType: 'text',
               success: function(data) {
@@ -191,7 +191,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
   
-  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://perl-executing-browser-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery] (https://jquery.com/) and [Alertify.js] (http://alertifyjs.com/).  
 
@@ -207,7 +207,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
       alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
           if (confirmation) {
               $jQuery.ajax({
-                  url: 'http://perl-executing-browser-pseudodomain/close-window.function',
+                  url: 'http://local-pseudodomain/close-window.function',
                   method: 'GET'
               });
           }
@@ -217,11 +217,11 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
   
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes only Perl scripts distributed with the browser binary and they are treated as ordinary desktop programs with normal user privileges. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users can not endanger the opreating system or fall victims to remote or arbitrary Perl code, but they still have full access to their own local data.  
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in it's application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users can not endanger the opreating system or fall victims to remote Perl code, but they still have full access to their own local data.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://perl-executing-browser-pseudodomain/```.
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
@@ -236,14 +236,14 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Special URLs for Users and Interaction with Files and Folders
   
-* **PEB pseudo-domain:** ```http://perl-executing-browser-pseudodomain/```  
+* **PEB pseudo-domain:** ```http://local-pseudodomain/```  
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
-* **Close current window:** ```http://perl-executing-browser-pseudodomain/close-window.function```  
+* **Close current window:** ```http://local-pseudodomain/close-window.function```  
   Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
   
-* **Select single file:** ```http://perl-executing-browser-pseudodomain/open-file.function?target=DOM_element```  
+* **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
@@ -258,7 +258,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   $(document).ready(function() {
       $('#file-selection').bind("inodeselection", function(){
           $.ajax({
-              url: 'http://perl-executing-browser-pseudodomain/perl/open-file.pl',
+              url: 'http://local-pseudodomain/perl/open-file.pl',
               data: {filename: $('#file-selection').html()},
               method: 'POST',
               dataType: 'text',
@@ -270,34 +270,34 @@ JavaScript-based settings are created to facilitate the development of fully tra
   });
 ```
   
-* **Select multiple files:** ```http://perl-executing-browser-pseudodomain/open-files.function?target=DOM_element```  
+* **Select multiple files:** ```http://local-pseudodomain/open-files.function?target=DOM_element```  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
   Different file names are separated by a semicolon - ```;```  
   
-* **Select new file name:** ```http://perl-executing-browser-pseudodomain/new-file-name.function?target=DOM_element```  
+* **Select new file name:** ```http://local-pseudodomain/new-file-name.function?target=DOM_element```  
   The full path of the new file name will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
   
   Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself creates the new file.  
   
-* **Select directory:** ```http://perl-executing-browser-pseudodomain/open-directory.function?target=DOM_element```  
+* **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
   
   Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be passed to a local Perl script.  
   
-* **Print:** ```http://perl-executing-browser-pseudodomain/print.function?action=print```  
+* **Print:** ```http://local-pseudodomain/print.function?action=print```  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.
   
-* **Print Preview:** ```http://perl-executing-browser-pseudodomain/print.function?action=preview```
+* **Print Preview:** ```http://local-pseudodomain/print.function?action=preview```
   
-* **About PEB embedded page:** ```http://perl-executing-browser-pseudodomain/about.function?type=browser```
+* **About PEB embedded page:** ```http://local-pseudodomain/about.function?type=browser```
   
-* **About Qt dialog box:** ```http://perl-executing-browser-pseudodomain/about.function?type=qt```
+* **About Qt dialog box:** ```http://local-pseudodomain/about.function?type=qt```
   
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
@@ -306,14 +306,14 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## Special URLs for Interaction with the Perl Debugger
   
-* **Select file:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file```  
+* **Select file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
   Using the above URL the selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
   
-* **Send command:** ```http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M```  
+* **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
   
 * **Combined Perl Debugger URL:**  
   Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
-  Example: ```http://perl-executing-browser-pseudodomain/perl-debugger.function?action=select-file&command=M```  
+  Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
 ## Supported File Extensions for Local Content
@@ -340,8 +340,8 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
 * PEB is not an implementation of the CGI protocol. It uses only three environment variables together with the GET and POST methods from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
-* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.
-* Perl scripts executed by PEB, unlike JavaScript in general purpose web browsers, have no direct access to the HTML DOM tree of any page.
+* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
+  Perl scripts executed by PEB, unlike JavaScript in general purpose web browsers, have no direct access to the HTML DOM tree of any page.
   
 ## Limitations
   

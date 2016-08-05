@@ -50,7 +50,7 @@
 // PSEUDO-DOMAIN:
 // ==============================
 #ifndef PSEUDO_DOMAIN
-#define PSEUDO_DOMAIN "perl-executing-browser-pseudodomain"
+#define PSEUDO_DOMAIN "local-pseudodomain"
 #endif
 
 // ==============================
