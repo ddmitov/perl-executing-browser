@@ -74,20 +74,22 @@ Compiled and tested successfully using:
   PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
-    Long running Perl scripts are expected to produce either:
-    **1. a complete HTML page that will replace the calling page or
-    **2. pieces of data that will be inserted one after the other into the calling page using JavaScript.  
-    
-    **1. If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
-    
-    **2. If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
+    Long running Perl scripts are expected to produce either:  
+    **1.** a complete HTML page that will replace the calling page or
+    **2.** pieces of data that will be inserted one after the other into the calling page using JavaScript.  
+  
+    **1.** If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
+  
+    **2.** If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
+  
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
+  
     The ```target``` query item should point to a valid HTML DOM element. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page in this scenario. HTML event called ```scriptoutput``` is emitted when script output is inserted into the calling local page. This event can be binded to a JavaScript function for a variety of reasons including daisy chaining of different scripts. The calling page must not be reloaded during the script execution, otherwise no script output will be inserted.  
-    
+  
     Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
-    
+  
     **Note for Windows developers:** Long running scripts producing output that is going to be inserted into the calling page should contain the line ```$|=1;``` in their beginning to diasble the built-in buffering of the Perl interpreter.  Some Windows builds of Perl may not give any output until the script is finished if the buffering is enabled.  
-    
+  
     There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section *Special URLs for Users and Interaction with Files and Folders*. The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
@@ -101,9 +103,9 @@ Compiled and tested successfully using:
 * **AJAX Perl scripts:**  
     Inside PEB AJAX scripts have two differences compared to long running scripts.  
   
-    **1. PEB returns all output from an AJAX script in one piece after the script has finished with no timeout.
+    **1.** PEB returns all output from an AJAX script in one piece after the script has finished with no timeout.  
   
-    **2. AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
+    **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
   
     The following example calls a local AJAX Perl script and inserts it's output into the ```ajax-results``` HTML DOM element of the calling page:  
 
@@ -179,16 +181,16 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ```javascript
   function pebMessageBoxElements() {
       var messageBoxElementsObject = new Object();
-
+  
       messageBoxElementsObject.alertTitle = "Custom Alert Label";
       messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
       messageBoxElementsObject.promptTitle = "Custom Prompt Label";
-
+  
       messageBoxElementsObject.okLabel = "Custom Ok Label";
       messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
       messageBoxElementsObject.yesLabel = "Custom Yes Label";
       messageBoxElementsObject.noLabel = "Custom No Label";
-
+  
       return  JSON.stringify(messageBoxElementsObject);
   }
 ```
@@ -213,7 +215,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
       var confirmation = confirm("Are you sure you want to close the window?");
       return confirmation;
   }
-
+  
   function pebCloseConfirmationAsync() {
       alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
       alertify.set({buttonFocus: "cancel"});
@@ -283,7 +285,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
       });
   });
 ```
-  
+
 * **Select multiple files:** ```http://local-pseudodomain/open-files.function?target=DOM_element```  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
@@ -316,9 +318,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
-   
+  
    If the debugged script is inside the application directory of PEB (see section *Settings*), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
-   
+  
    HTML interface for the Perl debugger is not available in the Windows builds of PEB due to the very slow response of the Perl debugger executed by PEB on Windows.
   
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
