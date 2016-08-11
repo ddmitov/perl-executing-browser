@@ -18,17 +18,24 @@ print "
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
 		<link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
+		<style type='text/css'>
+			body {
+				text-align: left;
+				font-size: 22px;
+				-webkit-text-size-adjust: 100%;
+			}
+			pre {
+				font-size: 14px;
+				font-family: monospace;
+			}
+		</style>
 	</head>
 
 	<body>
-
-		<p>
-			<font size='5'>
-				SQLite Test
-			</font>
+		<p align='center'>
+			SQLite Test
 		</p>
-
-		<div>\n";
+<pre>";
 
 my $cwd = cwd();
 my $database_relative_pathname = "/resources/data/test.db";
@@ -50,13 +57,12 @@ $all_records = $db->selectall_arrayref ("SELECT * FROM USER");
 
 foreach my $row (@$all_records) {
 	my ($id, $name, $surname) = @$row;
-	print "$id $name $surname <br>\n";
+	print "$id $name $surname\n";
 }
 
 $db->disconnect;
 
-print "\n
-		</div>
+print "</pre>
 
 	</body>
 

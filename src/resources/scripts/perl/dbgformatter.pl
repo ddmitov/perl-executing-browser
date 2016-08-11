@@ -9,6 +9,9 @@ use warnings;
 use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
+# Disable built-in Perl buffering.
+$|=1;
+
 my $debugger_command = "DEBUGGER_COMMAND";
 
 ##############################
@@ -118,29 +121,29 @@ my $html = "
 	<body>
 
 		<div class='source'>
-			<b>Debugging SCRIPT</b>
+			<b>FILE_TO_HIGHLIGHT</b>
 			<ol>
 HIGHLIGHTED_SOURCE
 			</ol>
 		</div>
 
-		<form action='http://perl-executing-browser-pseudodomain/perl-debugger.function' method='get'>
+		<form action='http://local-pseudodomain/perl-debugger.function' method='get'>
 
-			<b>FILE_TO_HIGHLIGHT</b>
+			<b>Debugging SCRIPT</b>
 			<input type='text' name='command' placeholder='Type Perl debugger command and press Enter' title='Debugger Command'/>
 
 			<div class='btn-area'>
 				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;'/>
 				Commands: 
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=n' class='btn' title='Next line'>n</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=r' class='btn' title='Return from subroutine'>r</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=c' class='btn' title='Continue'>c</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=M' class='btn' title='List All Modules'>M</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=S' class='btn' title='List All Subroutine Names'>S</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=V' class='btn' title='List All Variables'>V</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=X' class='btn' title='List Variables in Current Package'>X</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=s' class='btn' title='Step Into...'>s</a>
-				<a href='http://perl-executing-browser-pseudodomain/perl-debugger.function?command=R' class='btn' title='Restart debugger'>R</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=n' class='btn' title='Next line'>n</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=r' class='btn' title='Return from subroutine'>r</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=c' class='btn' title='Continue'>c</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=M' class='btn' title='List All Modules'>M</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=S' class='btn' title='List All Subroutine Names'>S</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=V' class='btn' title='List All Variables'>V</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=X' class='btn' title='List Variables in Current Package'>X</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=s' class='btn' title='Step Into...'>s</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?command=R' class='btn' title='Restart debugger'>R</a>
 				&nbsp; DEBUGGER_COMMAND_MESSAGE
 			</div>
 		</form>

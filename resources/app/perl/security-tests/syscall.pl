@@ -3,5 +3,6 @@
 use strict;
 use warnings;
 
-$new_directory = "/tmp/test";
-syscall(&SYS_mkdir, $new_directory);
+require 'syscall.ph';
+my $pid = syscall(&SYS_getpid);
+print "PID is $pid\n";

@@ -3,7 +3,7 @@
 
 	<head>
 
-		<title>Perl Executing Browser - Filesystem Interactions</title>
+		<title>Perl Executing Browser - Filesystem Interaction</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta charset="utf-8">
 
@@ -15,30 +15,38 @@
 
 		<script type="text/javascript" src="peb/peb.js"></script>
 
+		<style type="text/css">
+			body {
+				text-align: center;
+				font-size: 16px;
+				-webkit-text-size-adjust: 100%;
+			}
+		</style>
+
 	</head>
 
 	<body>
 
 		<a href='http://local-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
-		Select Single File</a>
+			Select Single File</a>
 		<div id="file-selection"></div>
 
 		<br>
 
 		<a href='http://local-pseudodomain/open-files.function?target=files-selection' class="btn btn-info btn-primary">
-		Select Multiple Files</a>
+			Select Multiple Files</a>
 		<div id="files-selection"></div>
 
 		<br>
 
 		<a href='http://local-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
-		Select New Filename</a>
+			Select New Filename</a>
 		<div id="new-file-name-selection"></div>
 
 		<br>
 
 		<a href='http://local-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
-		Select Directory</a>
+			Select Directory</a>
 		<div id="directory-selection"></div>
 
 		<script>

@@ -7,7 +7,7 @@ Amata mea Argeia - gratiam magnam tibi ago!
 Patientia tua in studiis meis computatoriis auxilium meum maximum!
 
 Being in debt to each and every one,
-who prepared the official Qt documentation or
+who prepared the official Perl and Qt documentation or
 shared usefull knowledge on a variety of forums, blogs and other sites,
 I thank them all! Their expertise, effort and good will are highly appreciated!
 
@@ -95,6 +95,7 @@ http://doc.qt.io/qt-4.8/qinputdialog.html
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html (defunct)
 http://doc.qt.io/qt-5/qtglobal.html
 http://doc.qt.io/archives/qt-5.5/qwebview.html
+http://doc.qt.io/archives/qt-5.5/qurlquery.html
 
 https://wiki.qt.io/Qt_Coding_Style
 https://wiki.qt.io/Open_Web_Page_in_QWebView
@@ -182,6 +183,7 @@ http://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-
 http://stackoverflow.com/questions/13189296/how-to-get-the-qwebframe-for-an-iframe-frame-qwebelement
 http://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray
 http://stackoverflow.com/questions/17512542/getting-multiple-inputs-from-qinputdialog-in-qtcreator
+http://stackoverflow.com/questions/3846887/how-to-get-the-mime-type-of-a-file-in-qt
 
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
@@ -203,10 +205,6 @@ http://okolovich.info/tag/code-snippets-c/
 http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp
 http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/
-
-CGI
-================================
-http://en.wikipedia.org/wiki/Common_Gateway_Interface
 
 PERL
 ================================
@@ -244,12 +242,6 @@ http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input
 http://modperlbook.org/html/3-9-2-1-Modifying-INC.html
 http://www.tutorialspoint.com/perl/perl_syscall.htm
 
-MAC
-================================
-http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
-http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
-http://iconverticons.com/online/
-
 HTML, CSS & JAVASCRIPT
 ================================
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
@@ -266,19 +258,21 @@ http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 http://stackoverflow.com/questions/1955265/how-do-i-load-a-page-in-javascript-from-its-source-string
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 
+http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp
+http://www.w3schools.com/cssref/css_websafe_fonts.asp
+http://www.w3schools.com/html/html_iframe.asp
 http://www.w3schools.com/html/html_lists.asp
-http://www.w3schools.com/jsref/event_onclick.asp
 http://www.w3schools.com/jquery/html_html.asp
 http://www.w3schools.com/jquery/ajax_get.asp
 http://www.w3schools.com/js/js_loop_for.asp
 http://www.w3schools.com/js/js_popup.asp
-http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp
+http://www.w3schools.com/jsref/event_onclick.asp
 http://www.w3schools.com/jsref/prop_html_innerhtml.asp
-http://www.w3schools.com/html/html_iframe.asp
 http://www.w3schools.com/jsref/event_onsubmit.asp
 
 http://getbootstrap.com/components/#dropdowns
 http://getbootstrap.com/javascript/#tooltips-methods
+
 http://bootswatch.com/
 http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php
 http://www.tutorialspoint.com/bootstrap/bootstrap_dropdown_plugin.htm
@@ -295,3 +289,28 @@ https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calli
 MARKDOWN
 ================================
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
+
+MAC
+================================
+http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html
+http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
+http://iconverticons.com/online/
+
+CGI
+================================
+http://en.wikipedia.org/wiki/Common_Gateway_Interface
+
+HTTP STATUS CODES
+================================
+https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success
+https://www.koozai.com/blog/analytics/server-response-codes-and-what-they-mean/#204
+
+MIME TYPES
+================================
+https://en.wikipedia.org/wiki/JSON
+https://en.wikipedia.org/wiki/Embedded_OpenType
+https://en.wikipedia.org/wiki/Web_Open_Font_Format
+
+http://stackoverflow.com/questions/26177849/mime-types-for-woff-ttf-svg-and-eot-404ing-despite-being-setup-in-iis
+http://www.alienfactory.co.uk/articles/mime-types-for-web-fonts-in-bedsheet
+https://www.w3.org/services/svg-server/

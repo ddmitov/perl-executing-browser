@@ -3,4 +3,4 @@
 use strict;
 use warnings;
 
-dump;
+CORE::dump;

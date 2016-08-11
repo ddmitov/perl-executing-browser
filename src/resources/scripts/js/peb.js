@@ -68,3 +68,15 @@ function pebInodeSelection(elementName, inodes) {
 	event.eventName = "inodeselection"
 	element.dispatchEvent(event);
 }
+
+
+function pebScriptOutput(elementName, output) {
+	var element = document.getElementById(elementName);
+	element.innerHTML = output;
+
+	var event;
+	event = document.createEvent("HTMLEvents");
+	event.initEvent("scriptoutput", true, true);
+	event.eventName = "scriptoutput"
+	element.dispatchEvent(event);
+}

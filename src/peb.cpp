@@ -388,15 +388,15 @@ int main(int argc, char **argv)
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
 
         // Start page existence check and loading:
-        QFile staticStartPageFile(applicationDirName + QDir::separator()
-                                  + "index.html");
+        QFile staticStartPageFile(
+                    applicationDirName + QDir::separator() + "index.html");
         if (staticStartPageFile.exists()) {
             mainWindow.webViewWidget->setUrl(
                         QUrl("http://" + QString(PSEUDO_DOMAIN)
                              + "/index.html"));
         } else {
-            QFile dynamicStartPageFile(applicationDirName + QDir::separator()
-                                       + "index.pl");
+            QFile dynamicStartPageFile(
+                        applicationDirName + QDir::separator() + "index.pl");
             if (dynamicStartPageFile.exists()) {
                 mainWindow.webViewWidget->setUrl(
                             QUrl("http://" + QString(PSEUDO_DOMAIN)
@@ -405,7 +405,6 @@ int main(int argc, char **argv)
                 QString htmlErrorContents = readHtmlErrorTemplate();
                 QString errorMessage = "Start page was not found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
                 qDebug() << "Start page was not found.";
@@ -430,57 +429,6 @@ QMainBrowserWindow::QMainBrowserWindow(QWidget *parent)
 }
 
 // ==============================
-// FILE DETECTOR CLASS CONSTRUCTOR:
-// ==============================
-QFileDetector::QFileDetector()
-    : QObject(0)
-{
-    perlShebang.setPattern("#!/.{1,}perl");
-
-    // Regular expressions for file type detection by extension:
-    plExtension.setPattern("pl");
-    plExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    htmlExtensions.setPattern("htm");
-    htmlExtensions.setCaseSensitivity(Qt::CaseInsensitive);
-
-    xmlExtension.setPattern("xml");
-    xmlExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    jsonExtension.setPattern("json");
-    jsonExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    cssExtension.setPattern("css");
-    cssExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    jsExtension.setPattern("js");
-    jsExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    ttfExtension.setPattern("ttf");
-    ttfExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    eotExtension.setPattern("eot");
-    eotExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    woffExtensions.setPattern("woff");
-    woffExtensions.setCaseSensitivity(Qt::CaseInsensitive);
-
-    svgExtension.setPattern("svg");
-    svgExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    pngExtension.setPattern("png");
-    pngExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    jpgExtensions.setPattern("jpe{0,1}g");
-    jpgExtensions.setCaseSensitivity(Qt::CaseInsensitive);
-
-    gifExtension.setPattern("gif");
-    gifExtension.setCaseSensitivity(Qt::CaseInsensitive);
-
-    fileExists = true;
-}
-
-// ==============================
 // CUSTOM NETWORK REPLY CONSTRUCTOR:
 // ==============================
 struct QCustomNetworkReplyPrivate
@@ -489,7 +437,8 @@ struct QCustomNetworkReplyPrivate
     int offset;
 };
 
-QCustomNetworkReply::QCustomNetworkReply(const QUrl &url, QString &data)
+QCustomNetworkReply::QCustomNetworkReply(
+        const QUrl &url, const QString &data, const QString &mime)
     : QNetworkReply()
 {
     setFinished(true);
@@ -500,17 +449,23 @@ QCustomNetworkReply::QCustomNetworkReply(const QUrl &url, QString &data)
 
     setUrl(url);
 
-    setHeader(QNetworkRequest::ContentLengthHeader,
-              QVariant(reply->data.size()));
-    setHeader(QNetworkRequest::LastModifiedHeader,
-              QVariant(QDateTime::currentDateTimeUtc()));
+    if (data.length() > 0) {
+        setHeader(QNetworkRequest::ContentLengthHeader,
+                  QVariant(reply->data.size()));
+        setHeader(QNetworkRequest::LastModifiedHeader,
+                  QVariant(QDateTime::currentDateTimeUtc()));
+        setHeader(QNetworkRequest::ContentTypeHeader, mime);
+    }
 
     QTimer::singleShot(0, this, SIGNAL(metaDataChanged()));
 
-    setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
-    setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, "OK");
-
-    reply->data = data.toUtf8();
+    if (data.length() > 0) {
+        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
+        setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, "OK");
+        reply->data = data.toUtf8();
+    } else {
+        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 204);
+    }
 
     QTimer::singleShot(0, this, SIGNAL(readyRead()));
     QTimer::singleShot(0, this, SIGNAL(finished()));
@@ -556,6 +511,74 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
     memcpy(data, reply->data.constData() + reply->offset, number);
     reply->offset += number;
     return number;
+}
+
+// ==============================
+// LONG RUNNING SCRIPT HANDLER:
+// ==============================
+QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
+    : QObject(0)
+{
+    // Connect signals and slots for all local long running Perl scripts:
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
+                     this, SLOT(qLongrunScriptOutputSlot()));
+    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
+                     this, SLOT(qLongrunScriptErrorsSlot()));
+    QObject::connect(&scriptHandler,
+                     SIGNAL(finished(int, QProcess::ExitStatus)),
+                     this,
+                     SLOT(qLongrunScriptFinishedSlot()));
+
+    QUrlQuery scriptQuery(url);
+    scriptOutputTarget = scriptQuery.queryItemValue("target");
+    scriptQuery.removeQueryItem("target");
+    // qDebug() << "Script output target:" << scriptOutputTarget;
+
+    scriptFullFilePath = QDir::toNativeSeparators
+            ((qApp->property("application").toString()) + url.path());
+
+    QString queryString = scriptQuery.toString();
+    QString postData(postDataArray);
+
+    QProcessEnvironment scriptEnvironment;
+
+    if (queryString.length() > 0) {
+        scriptEnvironment.insert("REQUEST_METHOD", "GET");
+        scriptEnvironment.insert("QUERY_STRING", queryString);
+        // qDebug() << "Query string:" << queryString;
+    }
+
+    if (postData.length() > 0) {
+        scriptEnvironment.insert("REQUEST_METHOD", "POST");
+        QString postDataSize = QString::number(postData.size());
+        scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
+        // qDebug() << "POST data:" << postData;
+    }
+
+    scriptHandler.setProcessEnvironment(scriptEnvironment);
+
+    // 'censor.pl' is compiled into the resources of
+    // the binary file and is called from there.
+    QString censorScriptFileName(":/scripts/perl/censor.pl");
+    QFile censorScriptFile(censorScriptFileName);
+    censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream censorStream(&censorScriptFile);
+    QString censorScriptContents = censorStream.readAll();
+    censorScriptFile.close();
+
+    scriptHandler.start((qApp->property("perlInterpreter").toString()),
+                         QStringList()
+                         << "-e"
+                         << censorScriptContents
+                         << "--"
+                         << scriptFullFilePath,
+                         QProcess::Unbuffered | QProcess::ReadWrite);
+
+    if (postData.length() > 0) {
+        scriptHandler.write(postDataArray);
+    }
+
+    qDebug() << "Script started:" << scriptFullFilePath;
 }
 
 // ==============================
@@ -634,16 +657,6 @@ QPage::QPage()
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Connect signals and slots for all local non-AJAX Perl scripts:
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qScriptOutputSlot()));
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qScriptErrorsSlot()));
-    QObject::connect(&scriptHandler,
-                     SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this,
-                     SLOT(qScriptFinishedSlot()));
-
     // Connect signals and slots for actions taken after page is loaded:
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
@@ -654,6 +667,7 @@ QPage::QPage()
     mainFrame()->setScrollBarPolicy(Qt::Vertical,
                                               Qt::ScrollBarAsNeeded);
 
+    // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
     alertTitle = "Alert";
     confirmTitle = "Confirmation";
     promptTitle = "Prompt";
@@ -711,8 +725,8 @@ QWebViewWidget::QWebViewWidget()
 
     // Connect signals and slots for
     // displaying script errors, printing and changing window title:
-    QObject::connect(mainPage, SIGNAL(displayErrorsSignal(QString)),
-                     this, SLOT(qDisplayErrorsSlot(QString)));
+    QObject::connect(mainPage, SIGNAL(displayScriptErrorsSignal(QString)),
+                     this, SLOT(qDisplayScriptErrorsSlot(QString)));
 
     QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
                      this, SLOT(qStartPrintPreviewSlot()));

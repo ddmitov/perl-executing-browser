@@ -20,6 +20,7 @@
 #include <QApplication>
 #include <QMainWindow>
 #include <QtNetwork/QNetworkAccessManager>
+#include <QMimeDatabase>
 #include <QNetworkReply>
 #include <QtWebKit>
 #include <QUrl>
@@ -146,91 +147,6 @@ public:
 };
 
 // ==============================
-// FILE DETECTOR CLASS DEFINITION:
-// ==============================
-class QFileDetector : public QObject
-{
-    Q_OBJECT
-
-public slots:
-    void qDefineInterpreter(QString filepath)
-    {
-        interpreter = "undefined";
-
-        QFileInfo fileInfo(filepath);
-        extension = fileInfo.suffix();
-
-        if (extension.length() == 0) {
-            QString firstLine;
-
-            QFile file(filepath);
-            if (file.open (QIODevice::ReadOnly | QIODevice::Text)) {
-                firstLine = file.readLine();
-            }
-
-            if (firstLine.contains(perlShebang)) {
-                interpreter = (qApp->property("perlInterpreter").toString());
-            }
-        } else {
-            if (extension.contains(htmlExtensions) or
-                    extension.contains(xmlExtension) or
-                    extension.contains(jsonExtension) or
-                    extension.contains(cssExtension) or
-                    extension.contains(jsExtension)) {
-                interpreter = "browser-text";
-            }
-            if (extension.contains(ttfExtension) or
-                    extension.contains(eotExtension) or
-                    extension.contains(woffExtensions) or
-                    extension.contains(svgExtension) or
-                    extension.contains(pngExtension) or
-                    extension.contains(jpgExtensions) or
-                    extension.contains(gifExtension)) {
-                interpreter = "browser-images";
-            }
-
-            if (extension == "pl") {
-                interpreter = (qApp->property("perlInterpreter").toString());
-            }
-        }
-    }
-
-    void qCheckFileExistence(QString fullFilePath)
-    {
-        QFile file(QDir::toNativeSeparators(fullFilePath));
-        if (!file.exists()) {
-            fileExists = false;
-            qDebug() << QDir::toNativeSeparators(fullFilePath) <<
-                        "is missing.";
-        }
-    }
-
-public:
-    QFileDetector();
-    bool fileExists;
-    QString interpreter;
-
-private:
-    QString extension;
-    QRegExp perlShebang;
-
-    // Regular expressions for file type detection by extension:
-    QRegExp plExtension;
-    QRegExp htmlExtensions;
-    QRegExp xmlExtension;
-    QRegExp jsonExtension;
-    QRegExp cssExtension;
-    QRegExp jsExtension;
-    QRegExp svgExtension;
-    QRegExp ttfExtension;
-    QRegExp eotExtension;
-    QRegExp woffExtensions;
-    QRegExp pngExtension;
-    QRegExp jpgExtensions;
-    QRegExp gifExtension;
-};
-
-// ==============================
 // CUSTOM NETWORK REPLY CLASS DEFINITION:
 // ==============================
 class QCustomNetworkReply : public QNetworkReply
@@ -239,7 +155,8 @@ class QCustomNetworkReply : public QNetworkReply
 
 public:
 
-    QCustomNetworkReply(const QUrl &url, QString &data);
+    QCustomNetworkReply(
+            const QUrl &url, const QString &data, const QString &mime);
     ~QCustomNetworkReply();
 
     void abort();
@@ -272,174 +189,152 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+        // Necessary for some empty network replies below:
+        QString emptyString;
+
+        // Case-insensitive marker for AJAX Perl scripts:
+        QRegExp scriptAjaxMarker;
+        scriptAjaxMarker.setPattern("ajax");
+        scriptAjaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
+
         // Window closing URL:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().fileName() == "close-window.function") {
                     emit closeWindowSignal();
 
-            QNetworkRequest emptyNetworkRequest;
-            return QNetworkAccessManager::createRequest
-                    (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest(emptyNetworkRequest));
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (
+                        request.url(), emptyString, emptyString);
+            return reply;
         }
-
-        QRegExp ajaxMarker;
-        ajaxMarker.setPattern("ajax");
-        ajaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
 
         // Local AJAX GET and POST requests:
         if ((operation == GetOperation or
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
-                request.url().path().contains(ajaxMarker)) {
+                request.url().path().contains(scriptAjaxMarker)) {
 
             QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
                      + request.url().path());
 
-            QFileDetector fileDetector;
-            fileDetector.qCheckFileExistence(ajaxScriptFullFilePath);
+            QFile file(ajaxScriptFullFilePath);
+            if (file.exists()) {
+                QString queryString = request.url().query();
 
-            if (fileDetector.fileExists == true) {
-                if (qApp->property("perlInterpreter").toString().length() > 0) {
-                    QString queryString = request.url().query();
+                QByteArray postDataArray;
+                if (outgoingData) {
+                    postDataArray = outgoingData->readAll();
+                }
+                QString postData(postDataArray);
 
-                    QByteArray postDataArray;
-                    if (outgoingData) {
-                        postDataArray = outgoingData->readAll();
-                    }
-                    QString postData(postDataArray);
+                qDebug() << "AJAX script started:"
+                         << ajaxScriptFullFilePath;
 
-                    qDebug() << "AJAX script started:"
+                QProcessEnvironment scriptEnvironment;
+
+                if (queryString.length() > 0) {
+                    scriptEnvironment.insert("REQUEST_METHOD", "GET");
+                    scriptEnvironment.insert("QUERY_STRING", queryString);
+                    // qDebug() << "Query string:" << queryString;
+                }
+
+                if (postData.length() > 0) {
+                    scriptEnvironment
+                            .insert("REQUEST_METHOD", "POST");
+                    QString postDataSize = QString::number(postData.size());
+                    scriptEnvironment
+                            .insert("CONTENT_LENGTH", postDataSize);
+                    // qDebug() << "POST data:" << postData;
+                }
+
+                QProcess ajaxScriptHandler;
+                ajaxScriptHandler.setProcessEnvironment(scriptEnvironment);
+
+                // Non-blocking event loop waiting for AJAX script results:
+                QEventLoop ajaxScriptHandlerWaitingLoop;
+                QObject::connect(&ajaxScriptHandler,
+                                 SIGNAL(finished(
+                                            int, QProcess::ExitStatus)),
+                                 &ajaxScriptHandlerWaitingLoop,
+                                 SLOT(quit()));
+
+                // AJAX scripts timer- 2 seconds:
+                // QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
+                //                    SLOT(quit()));
+
+                QString ajaxScriptResultString;
+                QString ajaxScriptErrorString;
+
+                // 'censor.pl' is compiled into the resources of
+                // the binary file and is called from there.
+                QString censorScriptFileName(":/scripts/perl/censor.pl");
+                QFile censorScriptFile(censorScriptFileName);
+                censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
+                QTextStream stream(&censorScriptFile);
+                QString censorScriptContents = stream.readAll();
+                censorScriptFile.close();
+
+                ajaxScriptHandler.start((qApp->property("perlInterpreter")
+                                         .toString()),
+                                        QStringList()
+                                        << "-e"
+                                        << censorScriptContents
+                                        << "--"
+                                        << ajaxScriptFullFilePath,
+                                        QProcess::Unbuffered
+                                        | QProcess::ReadWrite);
+
+                if (postData.length() > 0) {
+                    ajaxScriptHandler.write(postDataArray);
+                }
+
+                ajaxScriptHandlerWaitingLoop.exec();
+
+                QByteArray scriptResultArray =
+                        ajaxScriptHandler.readAllStandardOutput();
+                ajaxScriptResultString =
+                        QString::fromLatin1(scriptResultArray);
+
+                QByteArray scriptErrorArray =
+                        ajaxScriptHandler.readAllStandardError();
+                ajaxScriptErrorString =
+                        QString::fromLatin1(scriptErrorArray);
+
+                if (ajaxScriptResultString.length() == 0 and
+                        ajaxScriptErrorString == 0) {
+                    qDebug() << "AJAX script timed out or gave no output:"
                              << ajaxScriptFullFilePath;
+                } else {
+                    qDebug() << "AJAX script finished:"
+                             << ajaxScriptFullFilePath;
+                }
 
-                    QProcessEnvironment scriptEnvironment;
-
-                    if (queryString.length() > 0) {
-                        scriptEnvironment.insert("REQUEST_METHOD", "GET");
-                        scriptEnvironment.insert("QUERY_STRING", queryString);
-                        // qDebug() << "Query string:" << queryString;
-                    }
-
-                    if (postData.length() > 0) {
-                        scriptEnvironment
-                                .insert("REQUEST_METHOD", "POST");
-                        QString postDataSize = QString::number(postData.size());
-                        scriptEnvironment
-                                .insert("CONTENT_LENGTH", postDataSize);
-                        // qDebug() << "POST data:" << postData;
-                    }
-
-                    QProcess ajaxScriptHandler;
-                    ajaxScriptHandler.setProcessEnvironment(scriptEnvironment);
-
-                    // Non-blocking event loop waiting for AJAX script results:
-                    QEventLoop ajaxScriptHandlerWaitingLoop;
-                    QObject::connect(&ajaxScriptHandler,
-                                     SIGNAL(finished(
-                                                int, QProcess::ExitStatus)),
-                                     &ajaxScriptHandlerWaitingLoop,
-                                     SLOT(quit()));
-
-                    // AJAX scripts timer- 2 seconds:
-                    // QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
-                    //                    SLOT(quit()));
-
-                    QString ajaxScriptResultString;
-                    QString ajaxScriptErrorString;
-
-                    // 'censor.pl' is compiled into the resources of
-                    // the binary file and called from there.
-                    QString censorScriptFileName(
-                                ":/scripts/perl/censor.pl");
-                    QFile censorScriptFile(censorScriptFileName);
-                    censorScriptFile.open(QIODevice::ReadOnly
-                                          | QIODevice::Text);
-                    QTextStream stream(&censorScriptFile);
-                    QString censorScriptContents = stream.readAll();
-                    censorScriptFile.close();
-
-                    ajaxScriptHandler.start((qApp->property("perlInterpreter")
-                                             .toString()),
-                                            QStringList()
-                                            << "-e"
-                                            << censorScriptContents
-                                            << "--"
-                                            << QDir::toNativeSeparators(
-                                                ajaxScriptFullFilePath),
-                                            QProcess::Unbuffered
-                                            | QProcess::ReadWrite);
-
-                    if (postData.length() > 0) {
-                        ajaxScriptHandler.write(postDataArray);
-                    }
-
-                    ajaxScriptHandlerWaitingLoop.exec();
-
-                    QByteArray scriptResultArray =
-                            ajaxScriptHandler.readAllStandardOutput();
-                    ajaxScriptResultString =
-                            QString::fromLatin1(scriptResultArray);
-
-                    QByteArray scriptErrorArray =
-                            ajaxScriptHandler.readAllStandardError();
-                    ajaxScriptErrorString =
-                            QString::fromLatin1(scriptErrorArray);
-
-                    if (ajaxScriptResultString.length() == 0 and
-                            ajaxScriptErrorString == 0) {
-                        qDebug() << "AJAX script timed out or gave no output:"
-                                 << ajaxScriptFullFilePath;
-                    } else {
-                        qDebug() << "AJAX script finished:"
-                                 << ajaxScriptFullFilePath;
-                    }
-
-                    if (ajaxScriptErrorString.length() > 0) {
-                        qDebug() << "AJAX script errors:";
-                        QStringList scriptErrors =
-                                ajaxScriptErrorString.split("\n");
-                        foreach (QString scriptError, scriptErrors) {
-                            if (scriptError.length() > 0) {
-                                qDebug() << scriptError;
-                            }
+                if (ajaxScriptErrorString.length() > 0) {
+                    qDebug() << "AJAX script errors:";
+                    QStringList scriptErrors =
+                            ajaxScriptErrorString.split("\n");
+                    foreach (QString scriptError, scriptErrors) {
+                        if (scriptError.length() > 0) {
+                            qDebug() << scriptError;
                         }
                     }
-
-                    QWebSettings::clearMemoryCaches();
-
-                    scriptEnvironment.remove("REQUEST_METHOD");
-
-                    if (queryString.length() > 0) {
-                        scriptEnvironment.remove("QUERY_STRING");
-                    }
-
-                    if (postData.length() > 0) {
-                        scriptEnvironment.remove("CONTENT_LENGTH");
-                    }
-
-                    QCustomNetworkReply *reply =
-                            new QCustomNetworkReply (request.url(),
-                                                     ajaxScriptResultString);
-                    return reply;
-                } else {
-                    qDebug() << "AJAX script not started:"
-                             << ajaxScriptFullFilePath;
-                    qDebug() << "Perl interpreter was not set.";
-
-                    QNetworkRequest emptyNetworkRequest;
-                    return QNetworkAccessManager::createRequest
-                            (QNetworkAccessManager::GetOperation,
-                             QNetworkRequest(emptyNetworkRequest));
                 }
-            }
 
-            if (fileDetector.fileExists == false) {
-                QNetworkRequest emptyNetworkRequest;
-                return QNetworkAccessManager::createRequest
-                        (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest(emptyNetworkRequest));
+                QWebSettings::clearMemoryCaches();
+
+                QCustomNetworkReply *reply =
+                        new QCustomNetworkReply (
+                            request.url(), ajaxScriptResultString, emptyString);
+                return reply;
+            } else {
+                qDebug() << "File not found:" << ajaxScriptFullFilePath;
+
+                QCustomNetworkReply *reply =
+                        new QCustomNetworkReply (
+                            request.url(), emptyString, emptyString);
+                return reply;
             }
         }
 
@@ -447,113 +342,97 @@ protected:
         // local files and non-AJAX scripts:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                (!request.url().path().contains(ajaxMarker))) {
+                (!request.url().path().contains(scriptAjaxMarker))) {
 
-            // Get the full file path and file extension:
+            // Compose the full file path:
             QString fullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
                      + request.url().path());
 
-            QFileDetector fileDetector;
-            fileDetector.qCheckFileExistence(fullFilePath);
-
-            if (fileDetector.fileExists == true) {
-                fileDetector.qDefineInterpreter(fullFilePath);
-                QString interpreter = fileDetector.interpreter;
+            // Check if file exists:
+            QFile file(fullFilePath);
+            if (file.exists()) {
+                // Get the MIME type of the local file:
+                QMimeDatabase mimeDatabase;
+                QMimeType type = mimeDatabase.mimeTypeForFile(fullFilePath);
+                // qDebug() << "MIME type:" << type.name();
+                QString mimeType = type.name();
 
                 // Handle local Perl scripts:
-                if (interpreter ==
-                        qApp->property("perlInterpreter").toString()) {
+                if (mimeType == "application/x-perl") {
 
                     QByteArray emptyPostDataArray;
                     emit startScriptSignal(request.url(), emptyPostDataArray);
 
-                    QNetworkRequest emptyNetworkRequest;
-                    return QNetworkAccessManager::createRequest
-                            (QNetworkAccessManager::GetOperation,
-                             QNetworkRequest(emptyNetworkRequest));
+                    QCustomNetworkReply *reply =
+                            new QCustomNetworkReply (
+                                request.url(), emptyString, emptyString);
+                    return reply;
                 }
 
                 // Handle other supported local files:
-                if (interpreter.contains ("browser")) {
-                    if (interpreter.contains ("text")) {
-                        qDebug() << "Local link requested:"
-                                 << request.url().toString();
+                if (mimeType == "text/html" or
+                        mimeType == "text/xml" or
+                        mimeType == "text/css" or
+                        mimeType == "application/javascript" or
+                        mimeType == "application/json" or
+                        mimeType == "image/gif" or
+                        mimeType == "image/jpeg" or
+                        mimeType == "image/png" or
+                        mimeType == "image/svg+xml" or
+                        mimeType == "application/vnd.ms-fontobject" or
+                        mimeType == "application/x-font-ttf" or
+                        mimeType == "application/font-sfnt" or
+                        mimeType.contains("application/font-woff")) {
 
-                        QString localFileName(QDir::toNativeSeparators(
-                                                  (qApp->property("application")
-                                                   .toString())
-                                                  + request.url().path()));
-                        QFile localFile(localFileName);
-                        localFile.open(QIODevice::ReadOnly);
-                        QTextStream stream(&localFile);
-                        QString localFileContents = stream.readAll();
-                        localFile.close();
+                    qDebug() << "Local link requested:"
+                             << request.url().toString();
 
-                        QCustomNetworkReply *reply =
-                                new QCustomNetworkReply (request.url(),
-                                                         localFileContents);
-                        return reply;
-                    }
+                    QFile localFile(fullFilePath);
+                    localFile.open(QIODevice::ReadOnly);
+                    QTextStream stream(&localFile);
+                    QString localFileContents = stream.readAll();
+                    localFile.close();
 
-                    if (interpreter.contains ("images")) {
-                        qDebug() << "Local link requested:"
-                                 << request.url().toString();
+                    QCustomNetworkReply *reply =
+                            new QCustomNetworkReply (
+                                request.url(), localFileContents, mimeType);
+                    return reply;
+                } else {
+                    qDebug() << "File type not supported:" << fullFilePath;
 
-                        QString localFileName(QDir::toNativeSeparators(
-                                                  (qApp->property("application")
-                                                   .toString())
-                                                  + request.url().path()));
+                    QDesktopServices::openUrl(
+                                QUrl::fromLocalFile(fullFilePath));
 
-                        QNetworkRequest networkRequest;
-                        networkRequest
-                                .setUrl(QUrl::fromLocalFile(localFileName));
-                        return QNetworkAccessManager::createRequest
-                                (QNetworkAccessManager::GetOperation,
-                                 QNetworkRequest(networkRequest));
-                    }
+                    QCustomNetworkReply *reply =
+                            new QCustomNetworkReply (
+                                request.url(), emptyString, emptyString);
+                    return reply;
                 }
+            } else {
+                qDebug() << "File not found:" << fullFilePath;
 
-                // Unsupported local files:
-                if (interpreter.contains("undefined")) {
-                    qDebug() << "File type not supported by browser:"
-                             << fullFilePath;
-
-                    QDesktopServices::openUrl(QUrl::fromLocalFile(
-                                                  fullFilePath));
-
-                    QNetworkRequest emptyNetworkRequest;
-                    return QNetworkAccessManager::createRequest
-                            (QNetworkAccessManager::GetOperation,
-                             QNetworkRequest(emptyNetworkRequest));
-                }
-            }
-
-            if (fileDetector.fileExists == false) {
-                qDebug() << "File not found:"
-                         << fullFilePath;
-
-                QNetworkRequest emptyNetworkRequest;
-                return QNetworkAccessManager::createRequest
-                        (QNetworkAccessManager::GetOperation,
-                         QNetworkRequest(emptyNetworkRequest));
+                QCustomNetworkReply *reply =
+                        new QCustomNetworkReply (
+                            request.url(), emptyString, emptyString);
+                return reply;
             }
         }
 
         // POST requests to the browser pseudodomain - non-AJAX scripts:
         if (operation == PostOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                (!request.url().path().contains(ajaxMarker))) {
+                (!request.url().path().contains(scriptAjaxMarker))) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
                 emit startScriptSignal(request.url(), postDataArray);
             }
 
-            QNetworkRequest emptyNetworkRequest;
-            return QNetworkAccessManager::createRequest
-                    (QNetworkAccessManager::GetOperation,
-                     QNetworkRequest(emptyNetworkRequest));
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (
+                        request.url(), emptyString, emptyString);
+            return reply;
         }
 
         qDebug() << "Link requested:"
@@ -566,6 +445,94 @@ protected:
 };
 
 // ==============================
+// LONG RUNNING SCRIPT HANDLER:
+// ==============================
+class QLongRunScriptHandler : public QObject
+{
+    Q_OBJECT
+
+signals:
+    void displayScriptOutputSignal(QString output, QString scriptOutputTarget);
+    void displayScriptErrorsSignal(QString errors);
+
+public slots:
+    void qLongrunScriptOutputSlot()
+    {
+        QString output = scriptHandler.readAllStandardOutput();
+        scriptAccumulatedOutput.append(output);
+
+        if (scriptOutputTarget.length() > 0) {
+            emit displayScriptOutputSignal(output, scriptOutputTarget);
+        }
+
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch: output from" << scriptFullFilePath;
+    }
+
+    void qLongrunScriptErrorsSlot()
+    {
+        QString error = scriptHandler.readAllStandardError();
+        scriptAccumulatedErrors.append(error);
+        scriptAccumulatedErrors.append("\n");
+
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch: errors from" << scriptFullFilePath;
+    }
+
+    void qLongrunScriptFinishedSlot()
+    {
+        QString emptyString;
+
+        // If long running script has no errors and no target DOM element:
+        if (scriptAccumulatedOutput.length() > 0 and
+                scriptAccumulatedErrors.length() == 0 and
+                scriptOutputTarget.length() == 0) {
+            emit displayScriptOutputSignal(
+                        scriptAccumulatedOutput, emptyString);
+        }
+
+        if (scriptAccumulatedErrors.length() > 0) {
+            if (scriptAccumulatedOutput.length() == 0) {
+                if (scriptOutputTarget.length() == 0) {
+                    // If long running script has no output and only errors and
+                    // no target DOM element is defined,
+                    // all HTML formatted errors will be displayed
+                    // in the same window:
+                    emit displayScriptOutputSignal(
+                                scriptAccumulatedErrors, emptyString);
+                } else {
+                    // If long running script has no output and only errors and
+                    // a target DOM element is defined,
+                    // all HTML formatted errors will be displayed
+                    // in a new window:
+                    emit displayScriptErrorsSignal(
+                                scriptAccumulatedErrors);
+                }
+            } else {
+                // If long running script has some output and errors,
+                // HTML formatted errors will be displayed in a new window:
+                emit displayScriptErrorsSignal(
+                            scriptAccumulatedErrors);
+            }
+        }
+
+        scriptHandler.close();
+
+        qDebug() << "Script finished:" << scriptFullFilePath;
+    }
+
+public:
+    QLongRunScriptHandler(QUrl url, QByteArray postDataArray);
+
+private:
+    QString scriptFullFilePath;
+    QString scriptOutputTarget;
+    QProcess scriptHandler;
+    QString scriptAccumulatedOutput;
+    QString scriptAccumulatedErrors;
+};
+
+// ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
 // ==============================
 class QPage : public QWebPage
@@ -574,7 +541,7 @@ class QPage : public QWebPage
 
 signals:
     void changeTitleSignal();
-    void displayErrorsSignal(QString errors);
+    void displayScriptErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
     void selectInodeSignal(QNetworkRequest request);
@@ -590,114 +557,45 @@ public slots:
 
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
-        scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("application").toString()) + url.path());
+        QLongRunScriptHandler *longRunScriptHandler =
+                new QLongRunScriptHandler(url, postDataArray);
 
-        if (qApp->property("perlInterpreter").toString().length() > 0) {
-            if (scriptHandler.isOpen()) {
-                scriptHandler.close();
-                qDebug() << "Script is going to be restarted:"
-                         << scriptFullFilePath;
-            }
+        // Connect signals and slots for all local long running Perl scripts:
+        QObject::connect(longRunScriptHandler,
+                         SIGNAL(displayScriptOutputSignal(QString, QString)),
+                         this,
+                         SLOT(qDisplayScriptOutputSlot(QString, QString)));
+        QObject::connect(longRunScriptHandler,
+                         SIGNAL(displayScriptErrorsSignal(QString)),
+                         this,
+                         SLOT(qDisplayScriptErrorsTransmitterSlot(QString)));
+    }
 
-            QString queryString = url.query();
-            QString postData(postDataArray);
+    void qDisplayScriptOutputSlot(QString output, QString target)
+    {
+        if (target.length() > 0) {
+            // JavaScript bridge back to
+            // the local HTML page where request originated:
+            QPage::currentFrame()->
+                    evaluateJavaScript(qApp->property("pebJS").toString());
 
-            qDebug() << "Script started:" << scriptFullFilePath;
+            QString longRunningScriptOutputJavaScript =
+                    "pebScriptOutput(\"" +
+                    target +
+                    "\" , \"" +
+                    output +
+                    "\"); null";
 
-            QProcessEnvironment scriptEnvironment;
-
-            if (queryString.length() > 0) {
-                scriptEnvironment.insert("REQUEST_METHOD", "GET");
-                scriptEnvironment.insert("QUERY_STRING", queryString);
-                // qDebug() << "Query string:" << queryString;
-            }
-
-            if (postData.length() > 0) {
-                scriptEnvironment.insert("REQUEST_METHOD", "POST");
-                QString postDataSize = QString::number(postData.size());
-                scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
-                // qDebug() << "POST data:" << postData;
-            }
-
-            scriptHandler.setProcessEnvironment(scriptEnvironment);
-
-            // 'censor.pl' is compiled into the resources of
-            // the binary file and called from there.
-            QString censorScriptFileName(":/scripts/perl/censor.pl");
-            QFile censorScriptFile(censorScriptFileName);
-            censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
-            QTextStream censorStream(&censorScriptFile);
-            QString censorScriptContents = censorStream.readAll();
-            censorScriptFile.close();
-
-            scriptHandler.start((qApp->property("perlInterpreter").toString()),
-                                QStringList()
-                                << "-e"
-                                << censorScriptContents
-                                << "--"
-                                << QDir::toNativeSeparators(scriptFullFilePath),
-                                QProcess::Unbuffered | QProcess::ReadWrite);
-
-            if (postData.length() > 0) {
-                scriptHandler.write(postDataArray);
-            }
-
-            QWebSettings::clearMemoryCaches();
-
-            scriptEnvironment.remove("REQUEST_METHOD");
-
-            if (queryString.length() > 0) {
-                scriptEnvironment.remove("QUERY_STRING");
-            }
-
-            if (postData.length() > 0) {
-                scriptEnvironment.remove("CONTENT_LENGTH");
-            }
+            QPage::currentFrame()->
+                    evaluateJavaScript(longRunningScriptOutputJavaScript);
         } else {
-            qDebug() << "Script not started:" << scriptFullFilePath;
-            qDebug() << "Perl interpreter was not set.";
+            QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
     }
 
-    void qScriptOutputSlot()
+    void qDisplayScriptErrorsTransmitterSlot(QString errors)
     {
-        QString output = scriptHandler.readAllStandardOutput();
-        scriptAccumulatedOutput.append(output);
-
-        QPage::currentFrame()->setHtml(scriptAccumulatedOutput,
-                                       QUrl(PSEUDO_DOMAIN));
-
-        qDebug() << QDateTime::currentMSecsSinceEpoch()
-                 << "msecs from epoch: output from" << scriptFullFilePath;
-    }
-
-    void qScriptErrorsSlot()
-    {
-        QString error = scriptHandler.readAllStandardError();
-        scriptAccumulatedErrors.append(error);
-        scriptAccumulatedErrors.append("\n");
-    }
-
-    void qScriptFinishedSlot()
-    {
-        QPage::currentFrame()->setHtml(scriptAccumulatedOutput,
-                                       QUrl(PSEUDO_DOMAIN));
-
-        if (scriptAccumulatedErrors.length() > 0) {
-            if (scriptAccumulatedOutput.length() == 0) {
-                QPage::currentFrame()->setHtml(scriptAccumulatedErrors,
-                                               QUrl(PSEUDO_DOMAIN));
-            } else {
-                emit displayErrorsSignal(scriptAccumulatedErrors);
-            }
-        }
-
-        scriptHandler.close();
-        scriptAccumulatedOutput = "";
-        scriptAccumulatedErrors = "";
-
-        qDebug() << "Script finished:" << scriptFullFilePath;
+        emit displayScriptErrorsSignal(errors);
     }
 
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
@@ -748,7 +646,7 @@ public slots:
 
                 if (debuggerScriptToDebug
                         .contains(qApp->property("application").toString())) {
-                    debuggerHandler.setProcessEnvironment(scriptEnvironment);
+                    debuggerHandler.setProcessEnvironment(debuggerEnvironment);
                 } else {
                     bool ok;
                     QString input =
@@ -847,12 +745,12 @@ public slots:
     void qDebuggerStartHtmlFormatter()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            scriptEnvironment.insert("REQUEST_METHOD", "POST");
+            debuggerEnvironment.insert("REQUEST_METHOD", "POST");
             QString debuggerDataSize =
                     QString::number(debuggerAccumulatedOutput.size());
-            scriptEnvironment.insert("CONTENT_LENGTH", debuggerDataSize);
+            debuggerEnvironment.insert("CONTENT_LENGTH", debuggerDataSize);
 
-            debuggerOutputHandler.setProcessEnvironment(scriptEnvironment);
+            debuggerOutputHandler.setProcessEnvironment(debuggerEnvironment);
 
             debuggerOutputFormatterScript
                     .replace("PEBLIB_PATH",
@@ -879,8 +777,8 @@ public slots:
                     .append(debuggerAccumulatedOutput);
             debuggerOutputHandler.write(debuggerAccumulatedOutputArray);
 
-            scriptEnvironment.remove("REQUEST_METHOD");
-            scriptEnvironment.remove("CONTENT_LENGTH");
+            debuggerEnvironment.remove("REQUEST_METHOD");
+            debuggerEnvironment.remove("CONTENT_LENGTH");
             debuggerAccumulatedOutput = "";
 
             qDebug() << QDateTime::currentMSecsSinceEpoch()
@@ -1098,20 +996,13 @@ private:
     QString yesLabel;
     QString noLabel;
 
-    QString scriptFullFilePath;
-    QProcess scriptHandler;
-    QProcessEnvironment scriptEnvironment;
-    QString scriptAccumulatedOutput;
-    QString scriptAccumulatedErrors;
-
-    QString userSelectedFileName;
-
 #ifndef Q_OS_WIN
     QWebFrame *targetFrame;
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
     QString debuggerLastCommand;
     QProcess debuggerHandler;
+    QProcessEnvironment debuggerEnvironment;
     QString debuggerOutputFormatterScript;
     QProcess debuggerOutputHandler;
     QString debuggerAccumulatedOutput;
@@ -1142,6 +1033,9 @@ public slots:
             inodesDialog.setWindowModality(Qt::WindowModal);
             inodesDialog.setViewMode(QFileDialog::Detail);
             inodesDialog.setWindowTitle(QWebViewWidget::title());
+#ifdef Q_OS_WIN
+            inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
+#endif
 
             if (request.url().fileName() == "open-file.function") {
                 inodesDialog.setFileMode(QFileDialog::AnyFile);
@@ -1384,7 +1278,7 @@ public slots:
 #endif
     }
 
-    void qDisplayErrorsSlot(QString errors)
+    void qDisplayScriptErrorsSlot(QString errors)
     {
         errorsWindow = new QWebViewWidget();
         errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
