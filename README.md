@@ -30,7 +30,7 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
 * Any version of Perl 5 can be used.
 * Basic security restrictions are imposed on every Perl script.
 * PEB can be started from any folder.
-* PEB is usefull for both single-page or multi-page applications.
+* PEB is useful for both single-page or multi-page applications.
 * Single file or multiple files, new filename, existing or new directory can be selected by user.  
   Their full paths are displayed in the calling local page and they can be supplied to local Perl scripts.
 * Browser functions are accessible from special URLs.
@@ -68,14 +68,14 @@ Compiled and tested successfully using:
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
   [Strawberry Perl] (http://strawberryperl.com/) PortableZIP editions are successfully used with all Windows builds of PEB.  
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
-  Being unable to start scripts with administrative privileges PEB can use, but not abuse, any system Perl on PATH.
+  Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
   
 ## How to Call Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
     Long running Perl scripts are expected to produce either:  
-    **1.** a complete HTML page that will replace the calling page or
+    **1.** a complete HTML page that will replace the calling page or  
     **2.** pieces of data that will be inserted one after the other into the calling page using JavaScript.  
   
     **1.** If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
@@ -88,7 +88,7 @@ Compiled and tested successfully using:
   
     Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
-    **Note for Windows developers:** Long running scripts producing output that is going to be inserted into the calling page should contain the line ```$|=1;``` in their beginning to diasble the built-in buffering of the Perl interpreter.  Some Windows builds of Perl may not give any output until the script is finished if the buffering is enabled.  
+    **Note for Windows developers:** Any long running script producing output that is going to be inserted into the calling page should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
     There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section *Special URLs for Users and Interaction with Files and Folders*. The following code is an example of a direct POST request to a local script from an HTML form:
 
@@ -107,7 +107,7 @@ Compiled and tested successfully using:
   
     **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
   
-    The following example calls a local AJAX Perl script and inserts it's output into the ```ajax-results``` HTML DOM element of the calling page:  
+    The following example calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
 ```javascript
   $(document).ready(function() {
@@ -127,13 +127,13 @@ Compiled and tested successfully using:
 ## Settings
   
 **Settings based on the existence of certain files and folders:**  
-PEB is designed to run from any directory without setting anything beforehand and every file or directory, that is checked during program start-up, is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
+PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program start-up is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
 * **Name of the binary file:**  
-    The binary file of the browser, ```peb``` or ```peb.exe``` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the file extension), whatever the name may be.
+    The binary file of the browser, ```peb```, ```peb.app```, ```peb.dmg``` or ```peb.exe``` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
 * **Application directory:**  
-    Application directory is ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder. Application directory is hardcoded in C++ code for compatibility with the [Electron] (http://electron.atom.io/) framework. [Epigraphista] (https://github.com/ddmitov/epigraphista) provides an example of a PEB-based application, that is also compatible with [Electron] (http://electron.atom.io/) and [NW.js] (http://nwjs.io/).
+    Application directory is ```{PEB_binary_directory}/resources/app```. All files used by PEB, with the exception of data files, must be located within this folder. Application directory is hard-coded in C++ code for compatibility with the [Electron] (http://electron.atom.io/) framework. [Epigraphista] (https://github.com/ddmitov/epigraphista) provides an example of a PEB-based application, that is also compatible with [Electron] (http://electron.atom.io/) and [NW.js] (http://nwjs.io/).
 * **Data directory:**  
-    Data directory is not hardcoded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite database(s) or other files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ```{PEB_binary_directory}/resources``` directory. ```data``` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
+    Data directory is not hard-coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ```{PEB_binary_directory}/resources``` directory. ```data``` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
 
 ```perl
     use Cwd;
@@ -145,19 +145,19 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Perl interpreter:**  
     PEB expects to find Perl interpreter in ```{PEB_binary_directory}/perl/bin``` folder. The interpreter must be named ```perl``` on Linux and Mac machines and ```perl.exe``` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
 * **Start page:**  
-    PEB can start with a static HTML start page or with a start page, that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayed as a start page. If ```index.html``` and ```index.pl``` are not found, an error message will be displayed. No start page is a showstopper for PEB.  
+    PEB can start with a static HTML start page or with a start page that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayed as a start page. If both ```index.html``` and ```index.pl``` are not found, an error message will be displayed. No start page is a showstopper for PEB.  
     Note that both static and dynamic start page pathnames are case sensitive.
 * **Icon:**  
-    A PEB-based application can have it's own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
+    A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Log files:**  
-    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on it's own and if this directory is missing, no logs will be written, which is the default behaviour.  
+    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
     
     Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
 JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
 * **Custom or translated context menu labels:**  
-  Using the following code any local HTML page can have custom labels on the default right-click context menu (if the contextmenu event is not already intercepted):  
+  Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
 ```javascript
   function pebContextMenu() {
@@ -206,7 +206,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
   
-  The asynchronous warning function is implemented using JavaScript, HTML and CSS code, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery] (https://jquery.com/) and [Alertify.js] (http://alertifyjs.com/).  
 
@@ -232,7 +232,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
   
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in it's application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users can not endanger the opreating system or fall victims to remote Perl code, but they still have full access to their own local data.  
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local files without posing a danger to a healthy operating system or falling victim to remote Perl code.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
@@ -268,7 +268,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
   
-  The following code is an example of how to select a local file and transmit it's full path to a local Perl script using ```jQuery```:  
+  The following code is an example of how to select a local file and transmit its full path to a local Perl script using ```jQuery```:  
 
 ```javascript
   $(document).ready(function() {
@@ -317,7 +317,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **About Qt dialog box:** ```http://local-pseudodomain/about.function?type=qt```
   
 ## HTML Interface for the Perl Debugger
-   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and it's modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
+   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
   
    If the debugged script is inside the application directory of PEB (see section *Settings*), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
   
@@ -333,7 +333,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
   
 * **Combined Perl Debugger URL:**  
-  Selecting file to debug and sending command to the Pel debugger can be combined in a single URL.  
+  Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
@@ -342,14 +342,15 @@ JavaScript-based settings are created to facilitate the development of fully tra
    All local files can have multi-dotted names.  
 * **CSS files:** ```.css```
 * **Font files:** ```.eot``` ```.otf``` ```.ttf``` ```.woff``` ```.woff2```
-* **HTML pages:** ```.htm``` ```.html```
+* **HTML files:** ```.htm``` ```.html```
 * **Image files:** ```.gif``` ```.jpeg``` ```.jpg``` ```.png``` ```.svg```
 * **JavaScript files:** ```.js```
 * **JSON files:** ```.json```
-* **Perl scripts:** ```.pl```  
+* **Perl files:** ```.pl```  
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
-  Examples: ```#!/usr/bin/perl``` ```#!/usr/bin/env perl```
-* **XML files:** ```.xml```
+  Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```
+* **XML files:** ```.xml```  
+   All unsupported file types linked from local pages are opened using the default application of the operating system.
   
 ## Keyboard Shortcuts
 * ```Alt+F4``` - Close window
@@ -364,7 +365,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
 * PEB does not act as a server and is not an implementation of the CGI protocol. It uses only three environment variables borrowed from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
-* PEB does not embed any Perl interpreter in itself and rellies on an external Perl distribution, which could be easily changed or upgraded independently.  
+* PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
   
 ## Limitations
   

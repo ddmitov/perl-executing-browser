@@ -629,7 +629,7 @@ public slots:
             debuggerOutputFormatterFile.close();
 
             qDebug() << "File passed to Perl debugger:"
-                     << QDir::toNativeSeparators(debuggerScriptToDebug);
+                     << debuggerScriptToDebug;
 
             // Clean accumulated debugger output from previous debugger session:
             debuggerAccumulatedOutput = "";

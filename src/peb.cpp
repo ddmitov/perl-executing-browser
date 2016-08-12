@@ -57,16 +57,16 @@ BOOL isUserAdmin()
 // READ EMBEDDED HTML TEMPLATE
 // FOR ERROR MESSAGES:
 // ==============================
-QString readHtmlErrorTemplate()
+QString readHtmlTemplate(QString fileName)
 {
-    QString htmlErrorFileName(":/html/error.html");
-    QFile htmlErrorFile(htmlErrorFileName);
-    htmlErrorFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream htmlErrorStream(&htmlErrorFile);
-    QString htmlErrorContents = htmlErrorStream.readAll();
-    htmlErrorFile.close();
+    QString htmlTemplateFileName(":/html/" + fileName);
+    QFile htmlTemplateFile(htmlTemplateFileName);
+    htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream htmlTemplateStream(&htmlTemplateFile);
+    QString htmlTemplateContents = htmlTemplateStream.readAll();
+    htmlTemplateFile.close();
 
-    return htmlErrorContents;
+    return htmlTemplateContents;
 }
 
 // ==============================
@@ -129,7 +129,7 @@ int main(int argc, char **argv)
     // SET BASIC APPLICATION VARIABLES:
     // ==============================
     application.setApplicationName("Perl Executing Browser");
-    application.setApplicationVersion("0.1");
+    application.setApplicationVersion("0.2");
     bool startedAsRoot = false;
 
     // ==============================
@@ -331,7 +331,7 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if application is started by
     // a user with administrative privileges:
     if (startedAsRoot == true) {
-        QString htmlErrorContents = readHtmlErrorTemplate();
+        QString htmlErrorContents = readHtmlTemplate("error.html");
         QString errorMessage =
                 "Using "
                 + application.applicationName().toLatin1() + " "
@@ -350,7 +350,7 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if
     // Perl interpreter is not found:
     if (perlInterpreterFullPath.length() == 0) {
-        QString htmlErrorContents = readHtmlErrorTemplate();
+        QString htmlErrorContents = readHtmlTemplate("error.html");
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
                 + "is not found and "
                 + "Perl interpreter is not available on PATH.";
@@ -402,7 +402,7 @@ int main(int argc, char **argv)
                             QUrl("http://" + QString(PSEUDO_DOMAIN)
                                  + "/index.pl"));
             } else {
-                QString htmlErrorContents = readHtmlErrorTemplate();
+                QString htmlErrorContents = readHtmlTemplate("error.html");
                 QString errorMessage = "Start page was not found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
@@ -835,7 +835,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 request.url().fileName() == "about.function" and
                 request.url().query() == "type=browser") {
 
-            frame->load(QUrl("qrc:/html/about.html"));
+            QString aboutPageContents = readHtmlTemplate("about.html");
+            aboutPageContents
+                    .replace("VERSION_STRING",
+                             QApplication::applicationVersion().toLatin1());
+
+            frame->setHtml(aboutPageContents);
 
             return false;
         }
@@ -877,17 +882,14 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                     selectScriptToDebugDialog.deleteLater();
 
                     if (debuggerScriptToDebug.length() > 1) {
-                        qDebug() << "File to load in the Perl Debugger:"
-                                 << debuggerScriptToDebug;
+                        debuggerScriptToDebug =
+                                QDir::toNativeSeparators(debuggerScriptToDebug);
 
                         // Get Perl debugger command (if any):
                         debuggerLastCommand = request.url().query().toLatin1()
                                 .replace("action=select-file", "")
                                 .replace("&command=", "")
                                 .replace("+", " ");
-
-                        qDebug() << "Debugger command:"
-                                 << debuggerLastCommand;
 
                         // Close any still open Perl debugger session:
                         debuggerHandler.close();
@@ -903,9 +905,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 debuggerLastCommand = request.url().query().toLatin1()
                         .replace("command=", "")
                         .replace("+", " ");
-
-                qDebug() << "Debugger command:"
-                         << debuggerLastCommand;
 
                 qStartPerlDebuggerSlot();
                 return false;

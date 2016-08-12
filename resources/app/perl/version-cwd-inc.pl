@@ -8,7 +8,7 @@ print "<!DOCTYPE html>
 <html>
 
 	<head>
-		<title>Perl Executing Browser - Working Directory and \@INC Array</title>
+		<title>Perl Executing Browser - Perl Version, Working Directory and \@INC Array</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
 		<link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
@@ -27,14 +27,16 @@ print "<!DOCTYPE html>
 
 	<body>
 		<p align='center'>
-			Working Directory and \@INC Array
+			Perl Version, Working Directory and \@INC Array
 		</p>
 <pre>\n";
 
-my $cwd = cwd();
-print "WORKING DIRECTORY:\n$cwd\n";
+print "Perl $^V\n\n";
 
-print "\n\@INC ARRAY:\n";
+my $cwd = cwd();
+print "Working Directory:\n$cwd\n";
+
+print "\n\@INC Array:\n";
 
 print join "\n", @INC;
 
