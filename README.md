@@ -1,7 +1,7 @@
 Perl Executing Browser  
 ----------------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for interaction with the built-in Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for interaction with the default Perl debugger is also available.  
   
 Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications with Perl doing the heavy lifting.
   
@@ -70,7 +70,7 @@ Compiled and tested successfully using:
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
   
-## How to Call Local Perl Scripts from a Local Page?
+## How to Call a Local Perl Scripts from a Local Page?
   PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
@@ -257,7 +257,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that using this URL the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a jQuery AJAX GET request.  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a ```jQuery``` AJAX GET request.  
   
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
@@ -328,7 +328,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## Special URLs for Interaction with the Perl Debugger
   
 * **Select file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
-  Using the above URL the selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
+  The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
   
 * **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
   
