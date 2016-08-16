@@ -321,7 +321,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
    If the debugged script is inside the application directory of PEB (see section *Settings*), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
   
-   HTML interface for the Perl debugger is not available in the Windows builds of PEB due to the very slow response of the Perl debugger executed by PEB on Windows.
+   HTML interface for the Perl debugger is not available in the Windows builds of PEB.  
   
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
   
@@ -348,7 +348,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **JSON files:** ```.json```
 * **Perl files:** ```.pl```  
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
-  Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```
+  Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
+  A shebang line can not change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
+  PEB detects its Perl distribution at start-up and uses shebang line only to detect Perl scripts without filename extension.  
 * **XML files:** ```.xml```  
    All unsupported file types linked from local pages are opened using the default application of the operating system.
   
