@@ -1,9 +1,31 @@
 Perl Executing Browser  
-----------------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) WebKit implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for interaction with the default Perl debugger is also available.  
+Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) [WebKit] (https://webkit.org/) implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available.  
   
 Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications with Perl doing the heavy lifting.
+  
+## Contents
+  
+* [Design Objectives] (#design-objectives)
+* [Features] (#features)
+* [Compile-time Requirements] (#compile-time-requirements)
+* [Runtime Requirements] (#runtime-requirements)
+* [How to Call a Local Perl Script from a Local Page?] (#how-to-call-a-local-perl-script-from-a-local-page?)
+* [Settings] (#settings)
+* [Security] (#security)
+* [Special URLs for Users and Interaction with Files and Folders] (#special-urls-for-users-and-interaction-with-files-and-folders)
+* [HTML Interface for the Perl Debugger] (#html-interface-for-the-perl-debugger)
+* [Special URLs for Interaction with the Perl Debugger] (#special-urls-for-interaction-with-the-perl-debugger)
+* [Supported Filename Extensions for Local Content] (#supported-filename-extensions-for-local-content)
+* [Keyboard Shortcuts] (#keyboard-shortcuts)
+* [What Perl Executing Browser Is Not] (#what-perl-executing-browser-is-not)
+* [Limitations] (#limitations)
+* [Target Audience] (#target-audience)
+* [History](#history)
+* [Application using Perl Executing Browser] (#application-using-perl-executing-browser)
+* [License](#license)
+* [Authors](#authors)
   
 ## Design Objectives
   
@@ -37,10 +59,10 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
 * Any icon can be displayed on windows and message boxes.
 * Optional JavaScript translation of context menu and dialog boxes.
 * Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss.
-* Cross-site scripting is disabled for all web pages.
+* Cross-site scripting is disabled for all web and local pages.
   
 **Development goodies:**
-* PEB can interact with the Perl 5 debugger in graphical mode - see section *HTML Interface for the Perl Debugger*  
+* PEB can interact with the Perl 5 debugger in graphical mode - see section [HTML Interface for the Perl Debugger] (#html-interface-for-the-perl-debugger)  
 * ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
 * Extensive optional logging of all browser actions.
   
@@ -70,7 +92,7 @@ Compiled and tested successfully using:
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
   
-## How to Call a Local Perl Scripts from a Local Page?
+## How to Call a Local Perl Script from a Local Page?
   PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
@@ -90,7 +112,7 @@ Compiled and tested successfully using:
   
     **Note for Windows developers:** Any long running script producing output that is going to be inserted into the calling page should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
-    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section *Special URLs for Users and Interaction with Files and Folders*. The following code is an example of a direct POST request to a local script from an HTML form:
+    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section [Special URLs for Interaction with the Perl Debugger] (#special-urls-for-interaction-with-the-perl-debugger). The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -105,7 +127,7 @@ Compiled and tested successfully using:
   
     **1.** PEB returns all output from an AJAX script in one piece after the script has finished with no timeout.  
   
-    **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section *Settings*.
+    **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings] (#settings).
   
     The following example calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
@@ -236,6 +258,8 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
+* Cross-site scripting is disabled for all web and local pages.
+* Plugin support is disabled.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
@@ -319,7 +343,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
   
-   If the debugged script is inside the application directory of PEB (see section *Settings*), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
+   If the debugged script is inside the application directory of PEB (see section [Settings] (#settings)), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
   
    HTML interface for the Perl debugger is not available in the Windows builds of PEB.  
   
@@ -337,7 +361,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
-## Supported File Extensions for Local Content
+## Supported Filename Extensions for Local Content
    PEB is case-insensitive for all local filename extensions with the exception of the start page filename extensions.  
    All local files can have multi-dotted names.  
 * **CSS files:** ```.css```
@@ -385,11 +409,11 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 ## History
   
-PEB was started as a simple GUI for personal databases.
+PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
   
-## Application(s) using Perl Executing Browser
+## Application using Perl Executing Browser
   
-* [Epigraphista](https://github.com/ddmitov/epigraphista) - Epigraphista is an [EpiDoc] (https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator using Perl Executing Browser, [Electron] (http://electron.atom.io/) or [NW.js] (http://nwjs.io/) as a desktop GUI framework, HTML 5 and [Bootstrap] (http://getbootstrap.com/) for a themable user interface, JavaScript for on-screen text conversion and [Perl 5] (https://www.perl.org/) for a file-writing backend.
+* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc] (https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is implemented as a hybrid desktop and server application using [Perl Executing Browser] (https://github.com/ddmitov/perl-executing-browser), [Electron] (http://electron.atom.io/) or [NW.js] (http://nwjs.io/) as a desktop GUI framework, [Bootstrap] (http://getbootstrap.com/) for a themable HTML 5 user interface, JavaScript for on-screen text conversion and [Perl 5] (https://www.perl.org/) for a file-writing backend.
   
 ## License
   
