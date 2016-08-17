@@ -11,7 +11,7 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
 * [Features] (#features)
 * [Compile-time Requirements] (#compile-time-requirements)
 * [Runtime Requirements] (#runtime-requirements)
-* [How to Call a Local Perl Script from a Local Page?] (#how-to-call-a-local-perl-script-from-a-local-page?)
+* [Calling a Local Perl Script from a Local Page] (#calling-a-local-perl-script-from-a-local-page)
 * [Settings] (#settings)
 * [Security] (#security)
 * [Special URLs for Users and Interaction with Files and Folders] (#special-urls-for-users-and-interaction-with-files-and-folders)
@@ -92,7 +92,7 @@ Compiled and tested successfully using:
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
   
-## How to Call a Local Perl Script from a Local Page?
+## Calling a Local Perl Script from a Local Page
   PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
@@ -373,7 +373,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * **Perl files:** ```.pl```  
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
   Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
-  A shebang line can not change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
+  No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
   PEB detects its Perl distribution at start-up and uses shebang line only to detect Perl scripts without filename extension.  
 * **XML files:** ```.xml```  
    All unsupported file types linked from local pages are opened using the default application of the operating system.
