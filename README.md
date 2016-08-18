@@ -370,14 +370,13 @@ JavaScript-based settings are created to facilitate the development of fully tra
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
   PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.  
   
-  All other supported local files are recognized using the fllowing filename extensions:  
+  All other supported local file types are recognized using the fllowing filename extensions:  
 * **CSS files:** ```.css```
 * **Font files:** ```.eot``` ```.otf``` ```.ttf``` ```.woff``` ```.woff2```
 * **HTML files:** ```.htm``` ```.html```
 * **Image files:** ```.gif``` ```.jpeg``` ```.jpg``` ```.png``` ```.svg```
 * **JavaScript files:** ```.js```
 * **JSON files:** ```.json```
-* **Perl files:** 
 * **XML files:** ```.xml```
   
 ## Keyboard Shortcuts
