@@ -1,15 +1,13 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 use strict;
 use warnings;
-use 5.010;
 
 BEGIN {
 	##############################
-	# BAN ALL PROHIBITED CORE FUNCTIONS:
+	# BAN 'fork' CORE FUNCTION:
 	##############################
-	#no ops qw(syscall dump chroot fork);
-	no ops qw(:dangerous fork);
+	no ops qw(fork);
 
 	##############################
 	# ENVIRONMENT:

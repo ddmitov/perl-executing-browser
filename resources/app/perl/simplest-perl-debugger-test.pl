@@ -1,4 +1,7 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
+
+use strict;
+use warnings;
 
 my $value = 1;
 print ++$value, $/;

@@ -254,7 +254,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 
   
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local files without posing a danger to a healthy operating system or falling victim to remote Perl code.  
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local files without posing a danger to the underlying operating system or being exposed to remote code execution.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
@@ -265,9 +265,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
 * Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
 **Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning potentially unsafe core functions. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started.  
-  All core functions from the ```:dangerous group``` - ```syscall```, ```dump``` and ```chroot```, as well as ```fork``` are banned.  
-  ```fork``` is banned to avoid any orphan processes, which may be created if this function is carelessly used.  
+* Perl scripts are executed in an ```eval``` function after banning the ```fork``` core function. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   ```censor.pl``` also takes care about displaying nicely formatted HTML error pages when security violations are prevented or script errors are found.
 * The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
   
@@ -374,8 +372,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
   Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
-  PEB detects its Perl distribution at start-up and uses shebang line only to detect Perl scripts without filename extension.  
+  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.  
 * **XML files:** ```.xml```  
+  
    All unsupported file types linked from local pages are opened using the default application of the operating system.
   
 ## Keyboard Shortcuts
