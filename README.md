@@ -3,7 +3,7 @@ Perl Executing Browser
   
 Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) [WebKit] (https://webkit.org/) implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available.  
   
-Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies for the development of desktop applications with Perl doing the heavy lifting.
+Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop application development with Perl doing the heavy lifting.
   
 ## Contents
   
@@ -266,7 +266,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
 **Security features based on Perl code:**
 * Perl scripts are executed in an ```eval``` function after banning the ```fork``` core function. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
-  ```censor.pl``` also takes care about displaying nicely formatted HTML error pages when security violations are prevented or script errors are found.
+  ```censor.pl``` also takes care about displaying nicely formatted HTML error page if the use of ```fork``` is prevented or script errors are found.
 * The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
   
 **Perl Debugger Interaction:**
@@ -372,7 +372,7 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
   Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
-  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.  
+  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.
 * **XML files:** ```.xml```  
   
    All unsupported file types linked from local pages are opened using the default application of the operating system.
