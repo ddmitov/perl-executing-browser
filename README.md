@@ -3,7 +3,7 @@ Perl Executing Browser
   
 Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) [WebKit] (https://webkit.org/) implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available.  
   
-Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop application development with Perl doing the heavy lifting.
+Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.
   
 ## Contents
   
@@ -17,7 +17,7 @@ Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/),
 * [Special URLs for Users and Interaction with Files and Folders] (#special-urls-for-users-and-interaction-with-files-and-folders)
 * [HTML Interface for the Perl Debugger] (#html-interface-for-the-perl-debugger)
 * [Special URLs for Interaction with the Perl Debugger] (#special-urls-for-interaction-with-the-perl-debugger)
-* [Supported Filename Extensions for Local Content] (#supported-filename-extensions-for-local-content)
+* [Supported Local File Types] (#supported-local-file-types)
 * [Keyboard Shortcuts] (#keyboard-shortcuts)
 * [What Perl Executing Browser Is Not] (#what-perl-executing-browser-is-not)
 * [Limitations] (#limitations)
@@ -359,23 +359,26 @@ JavaScript-based settings are created to facilitate the development of fully tra
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
   
-## Supported Filename Extensions for Local Content
-   PEB is case-insensitive for all local filename extensions with the exception of the start page filename extensions.  
-   All local files can have multi-dotted names.  
+## Supported Local File Types
+  PEB is case-insensitive for all local filename extensions with the exception of the start page filename extensions.  
+  All local files can have multi-dotted names.  
+  
+  The fllowing filename extensions are supported for local files:
 * **CSS files:** ```.css```
 * **Font files:** ```.eot``` ```.otf``` ```.ttf``` ```.woff``` ```.woff2```
 * **HTML files:** ```.htm``` ```.html```
 * **Image files:** ```.gif``` ```.jpeg``` ```.jpg``` ```.png``` ```.svg```
 * **JavaScript files:** ```.js```
 * **JSON files:** ```.json```
-* **Perl files:** ```.pl```  
+* **Perl files:** ```.pl```
+* **XML files:** ```.xml```
+  
   Perl scripts without filename extensions can be recognized using a Perl shebang line.  
   Examples: ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
-  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.
-* **XML files:** ```.xml```  
+  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.  
   
-   All unsupported file types linked from local pages are opened using the default application of the operating system.
+  All unsupported file types linked from local pages are opened using the default application of the operating system.
   
 ## Keyboard Shortcuts
 * ```Alt+F4``` - Close window

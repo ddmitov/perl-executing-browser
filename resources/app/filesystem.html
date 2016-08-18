@@ -2,7 +2,6 @@
 <html>
 
 	<head>
-
 		<title>Perl Executing Browser - Filesystem Interaction</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta charset="utf-8">
@@ -22,14 +21,12 @@
 				-webkit-text-size-adjust: 100%;
 			}
 		</style>
-
 	</head>
 
 	<body>
-
 		<a href='http://local-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
 			Select Single File</a>
-		<div id="file-selection" style="display: none"></div>
+		<div id="file-selection" style="display: hidden"></div>
 
 		<br>
 
@@ -47,7 +44,7 @@
 
 		<a href='http://local-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
 			Select Directory</a>
-		<div id="directory-selection" style="display: none"></div>
+		<div id="directory-selection" style="display: hidden"></div>
 
 		<script>
 			$(document).ready(function() {
@@ -81,7 +78,6 @@
 				});
 			});
 		</script>
-
 	</body>
 
 </html>
