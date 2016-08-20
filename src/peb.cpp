@@ -57,17 +57,17 @@ BOOL isUserAdmin()
 // READ EMBEDDED HTML TEMPLATE
 // FOR ERROR MESSAGES:
 // ==============================
-QString readHtmlTemplate(QString fileName)
-{
-    QString htmlTemplateFileName(":/html/" + fileName);
-    QFile htmlTemplateFile(htmlTemplateFileName);
-    htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream htmlTemplateStream(&htmlTemplateFile);
-    QString htmlTemplateContents = htmlTemplateStream.readAll();
-    htmlTemplateFile.close();
+//QString readHtmlTemplate(QString fileName)
+//{
+//    QString htmlTemplateFileName(":/html/" + fileName);
+//    QFile htmlTemplateFile(htmlTemplateFileName);
+//    htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
+//    QTextStream htmlTemplateStream(&htmlTemplateFile);
+//    QString htmlTemplateContents = htmlTemplateStream.readAll();
+//    htmlTemplateFile.close();
 
-    return htmlTemplateContents;
-}
+//    return htmlTemplateContents;
+//}
 
 // ==============================
 // MESSAGE HANDLER FOR REDIRECTING
@@ -331,7 +331,10 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if application is started by
     // a user with administrative privileges:
     if (startedAsRoot == true) {
-        QString htmlErrorContents = readHtmlTemplate("error.html");
+        QHtmlTemplateReader templateReader;
+        templateReader.qReadTemplate("error.html");
+        QString htmlErrorContents = templateReader.htmlTemplateContents;
+
         QString errorMessage =
                 "Using "
                 + application.applicationName().toLatin1() + " "
@@ -350,7 +353,10 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if
     // Perl interpreter is not found:
     if (perlInterpreterFullPath.length() == 0) {
-        QString htmlErrorContents = readHtmlTemplate("error.html");
+        QHtmlTemplateReader templateReader;
+        templateReader.qReadTemplate("error.html");
+        QString htmlErrorContents = templateReader.htmlTemplateContents;
+
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
                 + "is not found and "
                 + "Perl interpreter is not available on PATH.";
@@ -402,7 +408,10 @@ int main(int argc, char **argv)
                             QUrl("http://" + QString(PSEUDO_DOMAIN)
                                  + "/index.pl"));
             } else {
-                QString htmlErrorContents = readHtmlTemplate("error.html");
+                QHtmlTemplateReader templateReader;
+                templateReader.qReadTemplate("error.html");
+                QString htmlErrorContents = templateReader.htmlTemplateContents;
+
                 QString errorMessage = "Start page was not found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
@@ -417,6 +426,15 @@ int main(int argc, char **argv)
     mainWindow.showMaximized();
 
     return application.exec();
+}
+
+// ==============================
+// HTML TEMPLATE READER CONSTRUCTOR:
+// ==============================
+QHtmlTemplateReader::QHtmlTemplateReader()
+    : QObject(0)
+{
+    // !!! No need to implement code here, but must be declared !!!
 }
 
 // ==============================
@@ -514,7 +532,7 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 }
 
 // ==============================
-// LONG RUNNING SCRIPT HANDLER:
+// LONG RUNNING SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
 QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
     : QObject(0)
@@ -639,11 +657,17 @@ QPage::QPage()
     // Use the modified Network Access Manager:
     setNetworkAccessManager(networkAccessManager);
 
-    // Connect signal and slot for SSL Errors:
+    // Connect signal and slot for SSL errors:
     QObject::connect(networkAccessManager,
                      SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
                      this,
                      SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
+
+    // Connect signal and slot for other network errors:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(finished(QNetworkReply*)),
+                     this,
+                     SLOT(qNetworkReply(QNetworkReply*)));
 
     // Connect signal and slot for closing window from URL:
     QObject::connect(networkAccessManager,
@@ -834,8 +858,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "about.function" and
                 request.url().query() == "type=browser") {
+            QHtmlTemplateReader templateReader;
+            templateReader.qReadTemplate("about.html");
+            QString aboutPageContents = templateReader.htmlTemplateContents;
 
-            QString aboutPageContents = readHtmlTemplate("about.html");
             aboutPageContents
                     .replace("VERSION_STRING",
                              QApplication::applicationVersion().toLatin1());

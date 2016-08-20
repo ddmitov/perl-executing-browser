@@ -55,6 +55,29 @@
 #endif
 
 // ==============================
+// HTML TEMPLATE READER DEFINITION:
+// ==============================
+class QHtmlTemplateReader : public QObject
+{
+    Q_OBJECT
+
+public slots:
+    void qReadTemplate (QString fileName)
+    {
+        QString htmlTemplateFileName(":/html/" + fileName);
+        QFile htmlTemplateFile(htmlTemplateFileName);
+        htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
+        QTextStream htmlTemplateStream(&htmlTemplateFile);
+        htmlTemplateContents = htmlTemplateStream.readAll();
+        htmlTemplateFile.close();
+    }
+
+public:
+    QHtmlTemplateReader();
+    QString htmlTemplateContents;
+};
+
+// ==============================
 // MAIN WINDOW CLASS DEFINITION:
 // ==============================
 class QMainBrowserWindow : public QMainWindow
@@ -331,9 +354,20 @@ protected:
             } else {
                 qDebug() << "File not found:" << ajaxScriptFullFilePath;
 
+                QHtmlTemplateReader templateReader;
+                templateReader.qReadTemplate("error.html");
+                QString htmlErrorContents = templateReader.htmlTemplateContents;
+
+                QString errorMessage = "File not found:<br>"
+                        + ajaxScriptFullFilePath;
+                htmlErrorContents
+                        .replace("ERROR_MESSAGE", errorMessage);
+
+                QString mimeType = "text/html";
+
                 QCustomNetworkReply *reply =
                         new QCustomNetworkReply (
-                            request.url(), emptyString, emptyString);
+                            request.url(), htmlErrorContents, mimeType);
                 return reply;
             }
         }
@@ -412,9 +446,19 @@ protected:
             } else {
                 qDebug() << "File not found:" << fullFilePath;
 
+                QHtmlTemplateReader templateReader;
+                templateReader.qReadTemplate("error.html");
+                QString htmlErrorContents = templateReader.htmlTemplateContents;
+
+                QString errorMessage = "File not found:<br>" + fullFilePath;
+                htmlErrorContents
+                        .replace("ERROR_MESSAGE", errorMessage);
+
+                QString mimeType = "text/html";
+
                 QCustomNetworkReply *reply =
                         new QCustomNetworkReply (
-                            request.url(), emptyString, emptyString);
+                            request.url(), htmlErrorContents, mimeType);
                 return reply;
             }
         }
@@ -604,6 +648,26 @@ public slots:
 
         foreach (QSslError error, errors) {
             qDebug() << "SSL error:" << error;
+        }
+    }
+
+    void qNetworkReply(QNetworkReply *reply)
+    {
+        if (reply->error() != QNetworkReply::NoError) {
+            QString filename = reply->url().fileName();
+            QMimeDatabase mimeDatabase;
+            QMimeType type = mimeDatabase.mimeTypeForName(filename);
+            QString mimeType = type.name();
+
+            if (filename.length() == 0 or mimeType == "text/html") {
+                QHtmlTemplateReader templateReader;
+                templateReader.qReadTemplate("error.html");
+                QString htmlErrorContents = templateReader.htmlTemplateContents;
+
+                htmlErrorContents
+                        .replace("ERROR_MESSAGE", reply->errorString());
+                QPage::currentFrame()->setHtml(htmlErrorContents);
+            }
         }
     }
 

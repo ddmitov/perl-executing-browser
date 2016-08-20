@@ -187,6 +187,7 @@ http://stackoverflow.com/questions/3846887/how-to-get-the-mime-type-of-a-file-in
 
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu
+http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=600&key=QNetworkManagerErrorReturnCode
 
 http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)
 http://comments.gmane.org/gmane.comp.lib.qt.general/35521 (webkit - how to prevent alert popups)
