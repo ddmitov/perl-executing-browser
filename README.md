@@ -1,7 +1,7 @@
 Perl Executing Browser  
 --------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is a C++ [Qt 5] (https://www.qt.io/) [WebKit] (https://webkit.org/) implementation of an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
+Perl Executing Browser (PEB) is an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. It is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
   
 ## Contents
   

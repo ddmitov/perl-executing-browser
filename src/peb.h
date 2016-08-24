@@ -653,6 +653,7 @@ public slots:
 
     void qNetworkReply(QNetworkReply *reply)
     {
+
         if (reply->error() != QNetworkReply::NoError) {
             QString filename = reply->url().fileName();
             QMimeDatabase mimeDatabase;
@@ -667,6 +668,8 @@ public slots:
                 htmlErrorContents
                         .replace("ERROR_MESSAGE", reply->errorString());
                 QPage::currentFrame()->setHtml(htmlErrorContents);
+
+                qDebug() << "Network error:" << reply->errorString();
             }
         }
     }
@@ -738,8 +741,7 @@ public slots:
                                       .toString(),
                                       QStringList()
                                       << "-d"
-                                      << QDir::toNativeSeparators(
-                                          debuggerScriptToDebug)
+                                      << debuggerScriptToDebug
                                       << commandLineArguments,
                                       QProcess::Unbuffered
                                       | QProcess::ReadWrite);
@@ -1089,8 +1091,8 @@ public slots:
 
     void qSelectInodesSlot(QNetworkRequest request)
     {
-        if (mainPage->currentFrame()->baseUrl()
-                .toString().contains(PSEUDO_DOMAIN)) {
+        if (mainPage->currentFrame()->baseUrl().authority() == PSEUDO_DOMAIN or
+                mainPage->currentFrame()->baseUrl().authority() == "") {
             QString target = request.url().query().replace("target=", "");
 
             QFileDialog inodesDialog (this);
@@ -1439,10 +1441,16 @@ public:
         Q_UNUSED(type);
 
         QWebView *window = new QWebViewWidget();
+
+        QHtmlTemplateReader templateReader;
+        templateReader.qReadTemplate("loading.html");
+        QString loadingContents = templateReader.htmlTemplateContents;
+        window->setHtml(loadingContents);
+
         window->adjustSize();
         window->setFocus();
 
-        qDebug() << "New window requested.";
+        qDebug() << "New window opened.";
 
         return window;
     }

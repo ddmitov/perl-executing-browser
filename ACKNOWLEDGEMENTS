@@ -37,6 +37,11 @@ Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::H
 This is the syntax highlighter of the Perl Debugger GUI inside Perl Executing Browser.
 https://metacpan.org/release/Syntax-Highlight-Engine-Kate
 
+Thanks to all creators of loading.io for their beautifull loading icons!
+"Dots", Istiko Rahadi,
+"Kingthings Sans", Kingthings
+http://loading.io/
+
 QT
 ================================
 https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser
@@ -288,6 +293,7 @@ http://css3buttongenerator.com/
 http://callmenick.com/post/various-css-input-text-styles
 http://www.raymondcamden.com/2015/03/06/warning-a-user-before-they-leave-a-form/
 https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calling/
+http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/
 
 MARKDOWN
 ================================

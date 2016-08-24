@@ -54,22 +54,6 @@ BOOL isUserAdmin()
 #endif
 
 // ==============================
-// READ EMBEDDED HTML TEMPLATE
-// FOR ERROR MESSAGES:
-// ==============================
-//QString readHtmlTemplate(QString fileName)
-//{
-//    QString htmlTemplateFileName(":/html/" + fileName);
-//    QFile htmlTemplateFile(htmlTemplateFileName);
-//    htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
-//    QTextStream htmlTemplateStream(&htmlTemplateFile);
-//    QString htmlTemplateContents = htmlTemplateStream.readAll();
-//    htmlTemplateFile.close();
-
-//    return htmlTemplateContents;
-//}
-
-// ==============================
 // MESSAGE HANDLER FOR REDIRECTING
 // PROGRAM MESSAGES TO A LOG FILE:
 // ==============================
@@ -359,7 +343,7 @@ int main(int argc, char **argv)
 
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
                 + "is not found and "
-                + "Perl interpreter is not available on PATH.";
+                + "no Perl interpreter is available on PATH.";
         htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
@@ -369,7 +353,7 @@ int main(int argc, char **argv)
                  << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug() << "Perl interpreter was not found.";
+        qDebug() << "No Perl interpreter is found.";
     }
 
     // Display start page:
@@ -412,11 +396,11 @@ int main(int argc, char **argv)
                 templateReader.qReadTemplate("error.html");
                 QString htmlErrorContents = templateReader.htmlTemplateContents;
 
-                QString errorMessage = "Start page was not found.";
+                QString errorMessage = "No start page is found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-                qDebug() << "Start page was not found.";
+                qDebug() << "No start page is found.";
             }
         }
     }
@@ -732,6 +716,9 @@ QPage::QPage()
 QWebViewWidget::QWebViewWidget()
     : QWebView(0)
 {
+    // Start maximized:
+    showMaximized();
+
     // Configure keyboard shortcuts:
 #ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
@@ -747,16 +734,17 @@ QWebViewWidget::QWebViewWidget()
     // Start QPage instance:
     mainPage = new QPage();
 
-    // Connect signals and slots for
-    // displaying script errors, printing and changing window title:
+    // Connect signal and slot for displaying script errors:
     QObject::connect(mainPage, SIGNAL(displayScriptErrorsSignal(QString)),
                      this, SLOT(qDisplayScriptErrorsSlot(QString)));
 
+    // Connect signals and slots for printing:
     QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
                      this, SLOT(qStartPrintPreviewSlot()));
     QObject::connect(mainPage, SIGNAL(printSignal()),
                      this, SLOT(qPrintSlot()));
 
+    // Connect signal and slot for changing window title:
     QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
                      this, SLOT(qChangeTitleSlot()));
 
@@ -770,9 +758,6 @@ QWebViewWidget::QWebViewWidget()
 
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
-
-    // Start new window maximized:
-    showMaximized();
 
     // Initialize variable necessary for
     // user input check before closing a new window
