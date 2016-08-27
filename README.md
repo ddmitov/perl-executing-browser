@@ -178,7 +178,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 **Settings based on JavaScript code:**  
 JavaScript-based settings have three main functions:  
 1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files,  
-2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form and
+2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form and  
 3. to regulate whether new windows are maximized or not.
 * **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
@@ -219,7 +219,7 @@ JavaScript-based settings have three main functions:
   }
 ```
 
-* **Checking for unsaved user input before closing a window:**
+* **Checking for unsaved user input before closing a window:**  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
@@ -267,20 +267,20 @@ JavaScript-based settings have three main functions:
    Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local files without posing a danger to the underlying operating system or being exposed to remote code execution.  
   
 **Security features based on C++ code:**
-* PEB can not and does not download remote files on hard disk and can not execute any Perl scripts from remote locations.
+* PEB can not and does not download remote files and can not execute any Perl scripts from remote locations.
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
-* Perl 5 scripts are executed in a clean environment and only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
+* Perl 5 scripts are executed in a clean environment where only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
 **Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning the ```fork``` core function. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl script is started. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
-  ```censor.pl``` also takes care about displaying nicely formatted HTML error page if the use of ```fork``` is prevented or script errors are found.
+* Perl scripts are executed in an ```eval``` function after banning the ```fork``` core function. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl scripts are started. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
+  ```censor.pl``` also takes care about displaying nicely formatted HTML error pages if the use of ```fork``` is prevented or script errors are found.
 * The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
   
 **Perl Debugger Interaction:**
-* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the project file of the browser (peb.pro) and compile the binary.  
+* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
   
 ## Special URLs for Users and Opening Files and Folders
   
