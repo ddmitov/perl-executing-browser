@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>scripts/perl/dbgformatter.pl</file>
-    </qresource>
-</RCC>

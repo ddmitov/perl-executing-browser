@@ -1,4 +1,4 @@
-#!/usr/bin/perl -w
+#!/usr/bin/perl
 
 BEGIN {
 	push @INC, 'PEBLIB_PATH';
@@ -6,13 +6,12 @@ BEGIN {
 
 use strict;
 use warnings;
-use Term::ANSIColor;
 use Syntax::Highlight::Engine::Kate;
 
 # Disable built-in Perl buffering.
 $|=1;
 
-my $debugger_command = "DEBUGGER_COMMAND";
+my $SCRIPT_TO_DEBUG = $ARGV[0];
 
 ##############################
 # EMBEDDED HTML TEMPLATE:
@@ -129,11 +128,11 @@ HIGHLIGHTED_SOURCE
 
 		<form action='http://local-pseudodomain/perl-debugger.function' method='get'>
 
-			<b>Debugging SCRIPT</b>
-			<input type='text' name='command' placeholder='Type Perl debugger command and press Enter' title='Debugger Command'/>
+			<b>Debugging $SCRIPT_TO_DEBUG</b>
+			<input type='text' name='command' placeholder='Type Perl debugger command and press Enter' title='Debugger Command'>
 
 			<div class='btn-area'>
-				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;'/>
+				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;'>
 				Commands: 
 				<a href='http://local-pseudodomain/perl-debugger.function?command=n' class='btn' title='Next line'>n</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=r' class='btn' title='Return from subroutine'>r</a>
@@ -144,7 +143,7 @@ HIGHLIGHTED_SOURCE
 				<a href='http://local-pseudodomain/perl-debugger.function?command=X' class='btn' title='List Variables in Current Package'>X</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=s' class='btn' title='Step Into...'>s</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=R' class='btn' title='Restart debugger'>R</a>
-				&nbsp; DEBUGGER_COMMAND_MESSAGE
+				&nbsp;
 			</div>
 		</form>
 
@@ -165,8 +164,7 @@ DEBUGGER_OUTPUT
 ##############################
 # READING PERL DEBUGGER OUTPUT:
 ##############################
-my $perl_debugger_output;
-read (STDIN, $perl_debugger_output, $ENV{'CONTENT_LENGTH'});
+my $perl_debugger_output = $ENV{'QUERY_STRING'};
 
 my $lineinfo;
 my @debugger_output = split /\n/, $perl_debugger_output;
@@ -179,9 +177,10 @@ foreach my $debugger_output_line (@debugger_output) {
 # Purely aesthetic replacement:
 $perl_debugger_output =~ s/\`/\'/g;
 # Editor support is not available within the Perl debugger GUI:
-$perl_debugger_output =~ s/Editor support available.\n//g;
+$perl_debugger_output =~ s/Editor support available.(\n|(\r\n))//g;
 # Remove debugger command prompt line:
 $perl_debugger_output =~ s/\s{1,}DB\<\d{1,}\>\s//g;
+
 # Escape any angled brackets from HTML tags so that
 # any HTML output from the debugger is not rendered;
 # sequence of substitute statements is important here:
@@ -288,13 +287,6 @@ if (defined $lineinfo) {
 	$html =~ s/FILE_TO_HIGHLIGHT//g;
 	$html =~ s/HIGHLIGHTED_SOURCE//g;
 	$html =~ s/SCROLL_TO_LINE//g;
-}
-
-my $debugger_command_message = "Last command: ${debugger_command}";
-if (length ($debugger_command) >= 1) {
-	$html =~ s/DEBUGGER_COMMAND_MESSAGE/$debugger_command_message/g;
-} else {
-	$html =~ s/DEBUGGER_COMMAND_MESSAGE//g;
 }
 
 print $html;

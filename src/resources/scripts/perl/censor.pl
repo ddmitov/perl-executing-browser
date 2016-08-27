@@ -1,8 +1,5 @@
 #!/usr/bin/perl
 
-use strict;
-use warnings;
-
 BEGIN {
 	##############################
 	# BAN 'fork' CORE FUNCTION:
@@ -29,6 +26,9 @@ BEGIN {
 	%ENV = %CLEAN_ENV;
 }
 
+use strict;
+use warnings;
+
 ##############################
 # REDIRECT STDERR TO A VARIABLE:
 ##############################
@@ -42,7 +42,7 @@ open (STDERR, '>', \$stderr) or die "Unable to open STDERR: $!";
 # THE FIRST COMMAND LINE ARGUMENT:
 ##############################
 my $filepath = shift @ARGV;
-open my $filehandle, '<', $filepath or die "Unable to open file: $!";;
+open my $filehandle, '<', $filepath or die "Unable to open file: $!";
 $/ = undef;
 my $user_code = <$filehandle>;
 close $filehandle;

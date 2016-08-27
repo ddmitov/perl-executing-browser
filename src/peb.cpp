@@ -186,8 +186,7 @@ int main(int argc, char **argv)
     // ==============================
     // BINARY FILE DIRECTORY:
     // ==============================
-    QDir binaryDir =
-            QDir::toNativeSeparators(application.applicationDirPath());
+    QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
         binaryDir.cdUp();
@@ -195,8 +194,7 @@ int main(int argc, char **argv)
     }
 #endif
 
-    QString binaryDirName =
-            binaryDir.absolutePath().toLatin1();
+    QString binaryDirName = binaryDir.absolutePath().toLatin1();
 
     // ==============================
     // CHECK FILES AND FOLDERS:
@@ -244,6 +242,7 @@ int main(int argc, char **argv)
                 binaryDirName + QDir::separator()
                 + "resources" + QDir::separator()
                 + "app");
+
     application.setProperty("application", applicationDirName);
 
     // APPLICATION ICON:
@@ -251,6 +250,7 @@ int main(int argc, char **argv)
                 binaryDirName + QDir::separator()
                 + "resources" + QDir::separator()
                 + "app.png");
+
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
     if (iconFile.exists()) {
@@ -272,25 +272,16 @@ int main(int argc, char **argv)
     QDir logDir(logDirFullPath);
     if (logDir.exists()) {
         application.setProperty("logDirFullPath", logDirFullPath);
+
         // Application start date and time for logging:
         QString applicationStartDateAndTime =
                 QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
         application.setProperty("applicationStartDateAndTime",
                                 applicationStartDateAndTime);
+
         // Install message handler for redirecting all messages to a log file:
         qInstallMessageHandler(customMessageHandler);
     }
-
-    // ==============================
-    // READ INTERNALLY COMPILED JAVASCRIPT:
-    // ==============================
-    QFile file;
-    file.setFileName(":/scripts/js/peb.js");
-    file.open(QIODevice::ReadOnly);
-    QString pebJS = file.readAll();
-    file.close();
-
-    application.setProperty("pebJS", pebJS);
 
     // ==============================
     // MAIN GUI CLASSES INITIALIZATION:
@@ -315,9 +306,9 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if application is started by
     // a user with administrative privileges:
     if (startedAsRoot == true) {
-        QHtmlTemplateReader templateReader;
-        templateReader.qReadTemplate("error.html");
-        QString htmlErrorContents = templateReader.htmlTemplateContents;
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("html/error.html"));
+        QString htmlErrorContents = resourceReader->resourceContents;
 
         QString errorMessage =
                 "Using "
@@ -337,9 +328,9 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if
     // Perl interpreter is not found:
     if (perlInterpreterFullPath.length() == 0) {
-        QHtmlTemplateReader templateReader;
-        templateReader.qReadTemplate("error.html");
-        QString htmlErrorContents = templateReader.htmlTemplateContents;
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("html/error.html"));
+        QString htmlErrorContents = resourceReader->resourceContents;
 
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
                 + "is not found and "
@@ -367,14 +358,12 @@ int main(int argc, char **argv)
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
-#ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 0) {
             qDebug() << "Perl debugger interaction is disabled.";
         }
         if (PERL_DEBUGGER_INTERACTION == 1) {
             qDebug() << "Perl debugger interaction is enabled.";
         }
-#endif
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
 
         // Start page existence check and loading:
@@ -392,9 +381,9 @@ int main(int argc, char **argv)
                             QUrl("http://" + QString(PSEUDO_DOMAIN)
                                  + "/index.pl"));
             } else {
-                QHtmlTemplateReader templateReader;
-                templateReader.qReadTemplate("error.html");
-                QString htmlErrorContents = templateReader.htmlTemplateContents;
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("html/error.html"));
+                QString htmlErrorContents = resourceReader->resourceContents;
 
                 QString errorMessage = "No start page is found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
@@ -413,12 +402,17 @@ int main(int argc, char **argv)
 }
 
 // ==============================
-// HTML TEMPLATE READER CONSTRUCTOR:
+// RESOURCE READER CONSTRUCTOR:
 // ==============================
-QHtmlTemplateReader::QHtmlTemplateReader()
+QResourceReader::QResourceReader(QString resourcePath)
     : QObject(0)
 {
-    // !!! No need to implement code here, but must be declared !!!
+    QString resourceFileName(":/" + resourcePath);
+    QFile resourceFile(resourceFileName);
+    resourceFile.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream resourceStream(&resourceFile);
+    resourceContents = resourceStream.readAll();
+    resourceFile.close();
 }
 
 // ==============================
@@ -560,13 +554,10 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
     scriptHandler.setProcessEnvironment(scriptEnvironment);
 
     // 'censor.pl' is compiled into the resources of
-    // the binary file and is called from there.
-    QString censorScriptFileName(":/scripts/perl/censor.pl");
-    QFile censorScriptFile(censorScriptFileName);
-    censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream censorStream(&censorScriptFile);
-    QString censorScriptContents = censorStream.readAll();
-    censorScriptFile.close();
+    // the binary file and is read from there.
+    QResourceReader *resourceReader =
+            new QResourceReader(QString("scripts/perl/censor.pl"));
+    QString censorScriptContents = resourceReader->resourceContents;
 
     scriptHandler.start((qApp->property("perlInterpreter").toString()),
                          QStringList()
@@ -685,7 +676,6 @@ QPage::QPage()
     yesLabel = "Yes";
     noLabel = "No";
 
-#ifndef Q_OS_WIN
     // Connect signals and slots for the perl debugger:
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
@@ -707,7 +697,6 @@ QPage::QPage()
         // Explicit initialization of important perl-debugger-related value:
         debuggerJustStarted = false;
     }
-#endif
 }
 
 // ==============================
@@ -716,9 +705,6 @@ QPage::QPage()
 QWebViewWidget::QWebViewWidget()
     : QWebView(0)
 {
-    // Start maximized:
-    showMaximized();
-
     // Configure keyboard shortcuts:
 #ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
@@ -748,7 +734,7 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
                      this, SLOT(qChangeTitleSlot()));
 
-    // Connect signal and slot for selecting file from URL:
+    // Connect signal and slot for selecting files or folders from URL:
     QObject::connect(mainPage, SIGNAL(selectInodeSignal(QNetworkRequest)),
                      this, SLOT(qSelectInodesSlot(QNetworkRequest)));
 
@@ -776,7 +762,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // User selected single file:
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "open-file.function") {
-
             if (request.url().query().replace("target=", "").length() > 0) {
                 emit selectInodeSignal(request);
             }
@@ -787,7 +772,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // User selected multiple files:
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "open-files.function") {
-
             if (request.url().query().replace("target=", "").length() > 0) {
                 emit selectInodeSignal(request);
             }
@@ -798,7 +782,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // User selected new file name:
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "new-file-name.function") {
-
             if (request.url().query().replace("target=", "").length() > 0) {
                 emit selectInodeSignal(request);
             }
@@ -809,7 +792,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         // User selected directory:
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "open-directory.function") {
-
             if (request.url().query().replace("target=", "").length() > 0) {
                 emit selectInodeSignal(request);
             }
@@ -832,7 +814,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "print.function" and
                 request.url().query() == "action=print") {
-
             emit printSignal();
 
             return false;
@@ -843,9 +824,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "about.function" and
                 request.url().query() == "type=browser") {
-            QHtmlTemplateReader templateReader;
-            templateReader.qReadTemplate("about.html");
-            QString aboutPageContents = templateReader.htmlTemplateContents;
+            QResourceReader *resourceReader =
+                    new QResourceReader(QString("html/about.html"));
+            QString aboutPageContents = resourceReader->resourceContents;
 
             aboutPageContents
                     .replace("VERSION_STRING",
@@ -860,7 +841,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "about.function" and
                 request.url().query() == "type=qt") {
-
             QApplication::aboutQt();
 
             return false;
@@ -868,39 +848,40 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
 
         // PERL DEBUGGER INTERACTION:
         // Implementation of an idea proposed by Valcho Nedelchev.
-#ifndef Q_OS_WIN
         if (PERL_DEBUGGER_INTERACTION == 1) {
             if ((navigationType == QWebPage::NavigationTypeLinkClicked or
                  navigationType == QWebPage::NavigationTypeFormSubmitted) and
                     request.url().fileName() == "perl-debugger.function") {
-                targetFrame = frame;
+                debuggerFrame = frame;
+
+                // Get a Perl debugger command (if any):
+                QUrlQuery scriptQuery(request.url());
+                debuggerLastCommand = scriptQuery.queryItemValue("command");
 
                 // Select a Perl script for debugging:
                 if (request.url().query().contains("action=select-file")) {
 
-                    QFileDialog selectScriptToDebugDialog (qApp->activeWindow());
+                    QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
                     selectScriptToDebugDialog
                             .setFileMode(QFileDialog::ExistingFile);
-                    selectScriptToDebugDialog.setViewMode(QFileDialog::Detail);
-                    selectScriptToDebugDialog.setWindowModality(Qt::WindowModal);
+                    selectScriptToDebugDialog
+                            .setViewMode(QFileDialog::Detail);
+                    selectScriptToDebugDialog
+                            .setWindowModality(Qt::WindowModal);
+
                     debuggerScriptToDebug = selectScriptToDebugDialog
                             .getOpenFileName
                             (qApp->activeWindow(),
                              "Select Perl File",
                              QDir::currentPath(),
                              "Perl scripts (*.pl);;All files (*)");
+
                     selectScriptToDebugDialog.close();
                     selectScriptToDebugDialog.deleteLater();
 
                     if (debuggerScriptToDebug.length() > 1) {
                         debuggerScriptToDebug =
                                 QDir::toNativeSeparators(debuggerScriptToDebug);
-
-                        // Get Perl debugger command (if any):
-                        debuggerLastCommand = request.url().query().toLatin1()
-                                .replace("action=select-file", "")
-                                .replace("&command=", "")
-                                .replace("+", " ");
 
                         // Close any still open Perl debugger session:
                         debuggerHandler.close();
@@ -912,16 +893,11 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                         return false;
                     }
                 }
-                // Get Perl debugger command:
-                debuggerLastCommand = request.url().query().toLatin1()
-                        .replace("command=", "")
-                        .replace("+", " ");
 
                 qStartPerlDebuggerSlot();
                 return false;
             }
         }
-#endif
     }
 
     return QWebPage::acceptNavigationRequest(frame, request, navigationType);

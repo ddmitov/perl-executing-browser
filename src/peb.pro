@@ -44,38 +44,33 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # Interaction with the Perl debugger -
-    # not available on Windows:
+    # Perl Debugger Interaction:
+    # To switch off Perl debugger interaction:
+    # PERL_DEBUGGER_INTERACTION = 0
+    # If PEB is going to be compiled for end users and
+    # interaction with the biult-in Perl debugger is
+    # not needed or not wanted for security reasons,
+    # this functionality can be turned off.
     ##########################################################
-    !win32 {
-        ##########################################################
-        # To switch off Perl debugger interaction:
-        # PERL_DEBUGGER_INTERACTION = 0
-        # If PEB is going to be compiled for end users and
-        # interaction with the biult-in Perl debugger is
-        # not needed or not wanted for security reasons,
-        # this functionality can be turned off.
-        ##########################################################
-        # To compile with Perl debugger interaction:
-        # PERL_DEBUGGER_INTERACTION = 1
-        ##########################################################
-        PERL_DEBUGGER_INTERACTION = 1
+    # To compile with Perl debugger interaction:
+    # PERL_DEBUGGER_INTERACTION = 1
+    ##########################################################
+    PERL_DEBUGGER_INTERACTION = 1
 
-        DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+    DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
 
-        equals (PERL_DEBUGGER_INTERACTION, 0) {
-            message ("Configured without Perl debugger interaction capability.")
-        }
-        equals (PERL_DEBUGGER_INTERACTION, 1) {
-            message ("Configured with Perl debugger interaction capability.")
-        }
+    equals (PERL_DEBUGGER_INTERACTION, 0) {
+        message ("Configured without Perl debugger interaction capability.")
+    }
+    equals (PERL_DEBUGGER_INTERACTION, 1) {
+        message ("Configured with Perl debugger interaction capability.")
     }
 
     ##########################################################
 
-    CONFIG+=release
+    # Binary basics:
     # CONFIG+=debug
-
+    CONFIG+=release
     TEMPLATE = app
     TARGET = peb
 
@@ -96,21 +91,10 @@ equals (QT_MAJOR_VERSION, 5) {
     SOURCES += peb.cpp
 
     # Resources:
+    RESOURCES += resources/peb.qrc
     win32 {
-        RESOURCES += resources/peb.qrc
         OTHER_FILES += resources/peb.rc resources/icons/camel.ico
         RC_FILE = resources/peb.rc
-    }
-
-    !win32 {
-        equals (PERL_DEBUGGER_INTERACTION, 0) {
-            RESOURCES += resources/peb.qrc
-        }
-
-        equals (PERL_DEBUGGER_INTERACTION, 1) {
-            RESOURCES += resources/peb.qrc \
-            resources/peb-perl-debugger.qrc
-        }
     }
 
     # Destination directory for the compiled binary:

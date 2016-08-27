@@ -55,26 +55,15 @@
 #endif
 
 // ==============================
-// HTML TEMPLATE READER DEFINITION:
+// RESOURCE READER DEFINITION:
 // ==============================
-class QHtmlTemplateReader : public QObject
+class QResourceReader : public QObject
 {
     Q_OBJECT
 
-public slots:
-    void qReadTemplate (QString fileName)
-    {
-        QString htmlTemplateFileName(":/html/" + fileName);
-        QFile htmlTemplateFile(htmlTemplateFileName);
-        htmlTemplateFile.open(QIODevice::ReadOnly | QIODevice::Text);
-        QTextStream htmlTemplateStream(&htmlTemplateFile);
-        htmlTemplateContents = htmlTemplateStream.readAll();
-        htmlTemplateFile.close();
-    }
-
 public:
-    QHtmlTemplateReader();
-    QString htmlTemplateContents;
+    QResourceReader(QString resourcePath);
+    QString resourceContents;
 };
 
 // ==============================
@@ -115,7 +104,11 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
 
         QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
@@ -291,13 +284,10 @@ protected:
                 QString ajaxScriptErrorString;
 
                 // 'censor.pl' is compiled into the resources of
-                // the binary file and is called from there.
-                QString censorScriptFileName(":/scripts/perl/censor.pl");
-                QFile censorScriptFile(censorScriptFileName);
-                censorScriptFile.open(QIODevice::ReadOnly | QIODevice::Text);
-                QTextStream stream(&censorScriptFile);
-                QString censorScriptContents = stream.readAll();
-                censorScriptFile.close();
+                // the binary file and is read from there.
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("scripts/perl/censor.pl"));
+                QString censorScriptContents = resourceReader->resourceContents;
 
                 ajaxScriptHandler.start((qApp->property("perlInterpreter")
                                          .toString()),
@@ -354,9 +344,9 @@ protected:
             } else {
                 qDebug() << "File not found:" << ajaxScriptFullFilePath;
 
-                QHtmlTemplateReader templateReader;
-                templateReader.qReadTemplate("error.html");
-                QString htmlErrorContents = templateReader.htmlTemplateContents;
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("html/error.html"));
+                QString htmlErrorContents = resourceReader->resourceContents;
 
                 QString errorMessage = "File not found:<br>"
                         + ajaxScriptFullFilePath;
@@ -446,9 +436,9 @@ protected:
             } else {
                 qDebug() << "File not found:" << fullFilePath;
 
-                QHtmlTemplateReader templateReader;
-                templateReader.qReadTemplate("error.html");
-                QString htmlErrorContents = templateReader.htmlTemplateContents;
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("html/error.html"));
+                QString htmlErrorContents = resourceReader->resourceContents;
 
                 QString errorMessage = "File not found:<br>" + fullFilePath;
                 htmlErrorContents
@@ -620,8 +610,11 @@ public slots:
         if (target.length() > 0) {
             // JavaScript bridge back to
             // the local HTML page where request originated:
-            QPage::currentFrame()->
-                    evaluateJavaScript(qApp->property("pebJS").toString());
+            QResourceReader *resourceReader =
+                    new QResourceReader(QString("scripts/js/peb.js"));
+            QString pebJavaScript = resourceReader->resourceContents;
+
+            QPage::currentFrame()->evaluateJavaScript(pebJavaScript);
 
             QString longRunningScriptOutputJavaScript =
                     "pebScriptOutput(\"" +
@@ -655,21 +648,21 @@ public slots:
     {
 
         if (reply->error() != QNetworkReply::NoError) {
+            qDebug() << "Network error:" << reply->errorString();
+
             QString filename = reply->url().fileName();
             QMimeDatabase mimeDatabase;
             QMimeType type = mimeDatabase.mimeTypeForName(filename);
             QString mimeType = type.name();
 
             if (filename.length() == 0 or mimeType == "text/html") {
-                QHtmlTemplateReader templateReader;
-                templateReader.qReadTemplate("error.html");
-                QString htmlErrorContents = templateReader.htmlTemplateContents;
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("html/error.html"));
+                QString htmlErrorContents = resourceReader->resourceContents;
 
                 htmlErrorContents
                         .replace("ERROR_MESSAGE", reply->errorString());
                 QPage::currentFrame()->setHtml(htmlErrorContents);
-
-                qDebug() << "Network error:" << reply->errorString();
             }
         }
     }
@@ -683,22 +676,13 @@ public slots:
     // PERL DEBUGGER INTERACTION.
     // Implementation of an idea proposed by Valcho Nedelchev.
     // ==============================
-#ifndef Q_OS_WIN
     void qStartPerlDebuggerSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            // Read and store in memory
-            // the Perl debugger output formatter script:
-            QFile debuggerOutputFormatterFile(":/scripts/perl/dbgformatter.pl");
-            debuggerOutputFormatterFile.open(QFile::ReadOnly | QFile::Text);
-            debuggerOutputFormatterScript =
-                    QString(debuggerOutputFormatterFile.readAll());
-            debuggerOutputFormatterFile.close();
-
             qDebug() << "File passed to Perl debugger:"
                      << debuggerScriptToDebug;
 
-            // Clean accumulated debugger output from previous debugger session:
+            // Clean any previous debugger output:
             debuggerAccumulatedOutput = "";
 
             QString commandLineArguments;
@@ -713,7 +697,11 @@ public slots:
 
                 if (debuggerScriptToDebug
                         .contains(qApp->property("application").toString())) {
-                    debuggerHandler.setProcessEnvironment(debuggerEnvironment);
+                    // Clean environment for all Perl scripts in
+                    // the application directory:
+                    QProcessEnvironment cleanEnvironment;
+                    cleanEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
+                    debuggerHandler.setProcessEnvironment(cleanEnvironment);
                 } else {
                     bool ok;
                     QString input =
@@ -724,12 +712,17 @@ public slots:
                                 QLineEdit::Normal,
                                 "",
                                 &ok);
+
                     if (ok && !input.isEmpty()) {
                         commandLineArguments = input;
                     }
 
-                    debuggerHandler.setProcessEnvironment(
-                                QProcessEnvironment::systemEnvironment());
+                    // System environment for all Perl scripts outside of
+                    // the application directory:
+                    QProcessEnvironment systemEnvironment =
+                            QProcessEnvironment::systemEnvironment();
+                    systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
+                    debuggerHandler.setProcessEnvironment(systemEnvironment);
                 }
 
                 QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
@@ -768,38 +761,42 @@ public slots:
             // the accumulated debugger output:
             debuggerAccumulatedOutput.append(debuggerOutput);
 
-            qDebug() << QDateTime::currentMSecsSinceEpoch()
-                     << "msecs from epoch: output from Perl debugger received.";
+            // qDebug() << QDateTime::currentMSecsSinceEpoch()
+            //          << "msecs from epoch:"
+            //          << "output from Perl debugger received.";
             // qDebug() << "Debugger raw output:" << endl
             //          << debuggerOutput;
 
             // Formatting of Perl debugger output is started only after
             // the final command prompt comes out of the debugger:
             if (debuggerJustStarted == true) {
-                if ((debuggerLastCommand.length() > 0) and
-                        (debuggerAccumulatedOutput.contains(
-                             QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>")))) {
+                if (debuggerLastCommand.length() > 0 and
+                        debuggerAccumulatedOutput.contains(
+                            QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>"))) {
                     debuggerJustStarted = false;
+
                     if (debuggerOutputHandler.isOpen()) {
                         debuggerOutputHandler.close();
                     }
                     qDebuggerStartHtmlFormatter();
                 }
 
-                if ((debuggerLastCommand.length() == 0) and
-                        (debuggerAccumulatedOutput
-                         .contains(QRegExp ("DB\\<\\d{1,5}\\>")))) {
+                if (debuggerLastCommand.length() == 0 and
+                        debuggerAccumulatedOutput
+                        .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
                     debuggerJustStarted = false;
+
                     if (debuggerOutputHandler.isOpen()) {
                         debuggerOutputHandler.close();
                     }
+
                     qDebuggerStartHtmlFormatter();
                 }
             }
 
-            if ((debuggerJustStarted == false) and
-                    (debuggerAccumulatedOutput
-                     .contains(QRegExp ("DB\\<\\d{1,5}\\>")))) {
+            if (debuggerJustStarted == false and
+                    debuggerAccumulatedOutput
+                    .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
                 if (debuggerOutputHandler.isOpen()) {
                     debuggerOutputHandler.close();
                 }
@@ -811,41 +808,39 @@ public slots:
     void qDebuggerStartHtmlFormatter()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            debuggerEnvironment.insert("REQUEST_METHOD", "POST");
-            QString debuggerDataSize =
-                    QString::number(debuggerAccumulatedOutput.size());
-            debuggerEnvironment.insert("CONTENT_LENGTH", debuggerDataSize);
+            // 'dbgformatter.pl' is compiled into the resources of
+            // the binary file and is read from there.
+            QResourceReader *resourceReader =
+                    new QResourceReader(
+                        QString("scripts/perl/dbgformatter.pl"));
+            QString debuggerOutputFormatterScript =
+                    resourceReader->resourceContents;
 
-            debuggerOutputHandler.setProcessEnvironment(debuggerEnvironment);
+            // Set clean environment:
+            QProcessEnvironment cleanEnvironment;
+            cleanEnvironment.insert("REQUEST_METHOD", "GET");
+            cleanEnvironment.insert("QUERY_STRING", debuggerAccumulatedOutput);
+            debuggerOutputHandler.setProcessEnvironment(cleanEnvironment);
 
+            // Clean any previous debugger output:
+            debuggerAccumulatedOutput = "";
+
+            // Set path to the syntax highlighting module:
             debuggerOutputFormatterScript
                     .replace("PEBLIB_PATH",
                              QApplication::applicationDirPath()
-                             + QDir::separator()
-                             + "peblib");
+                             + QDir::separator() + "sdk"
+                             + QDir::separator() + "peblib");
 
-            debuggerOutputFormatterScript
-                    .replace("SCRIPT", debuggerScriptToDebug);
-            debuggerOutputFormatterScript
-                    .replace("DEBUGGER_COMMAND", debuggerLastCommand);
-
+            // Start the Perl debugger output formatting script:
             debuggerOutputHandler
                     .start((qApp->property("perlInterpreter")
                             .toString()),
                            QStringList()
                            << "-e"
-                           << debuggerOutputFormatterScript,
-                           QProcess::Unbuffered
-                           | QProcess::ReadWrite);
-
-            QByteArray debuggerAccumulatedOutputArray;
-            debuggerAccumulatedOutputArray
-                    .append(debuggerAccumulatedOutput);
-            debuggerOutputHandler.write(debuggerAccumulatedOutputArray);
-
-            debuggerEnvironment.remove("REQUEST_METHOD");
-            debuggerEnvironment.remove("CONTENT_LENGTH");
-            debuggerAccumulatedOutput = "";
+                           << debuggerOutputFormatterScript
+                           << debuggerScriptToDebug,
+                           QProcess::Unbuffered | QProcess::ReadWrite);
 
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch:"
@@ -883,21 +878,17 @@ public slots:
     void qDebuggerHtmlFormatterFinishedSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            targetFrame->setHtml(debuggerAccumulatedHtmlOutput,
-                                 QUrl(PSEUDO_DOMAIN));
+            debuggerFrame->setHtml(debuggerAccumulatedHtmlOutput,
+                                   QUrl(PSEUDO_DOMAIN));
 
             qDebug() << QDateTime::currentMSecsSinceEpoch()
                      << "msecs from epoch:"
                      << "output from Perl debugger formatter displayed.";
 
-            // qDebug() << "Perl debugger formatter output:" << endl
-            //          << debuggerAccumulatedHtmlOutput;
-
             debuggerOutputHandler.close();
             debuggerAccumulatedHtmlOutput = "";
         }
     }
-#endif
 
 public:
     QPage();
@@ -909,7 +900,11 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -947,7 +942,11 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -997,7 +996,11 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -1062,18 +1065,14 @@ private:
     QString yesLabel;
     QString noLabel;
 
-#ifndef Q_OS_WIN
-    QWebFrame *targetFrame;
+    QWebFrame *debuggerFrame;
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
     QString debuggerLastCommand;
     QProcess debuggerHandler;
-    QProcessEnvironment debuggerEnvironment;
-    QString debuggerOutputFormatterScript;
-    QProcess debuggerOutputHandler;
     QString debuggerAccumulatedOutput;
+    QProcess debuggerOutputHandler;
     QString debuggerAccumulatedHtmlOutput;
-#endif
 };
 
 // ==============================
@@ -1138,8 +1137,11 @@ public slots:
 
                 // JavaScript bridge back to
                 // the local HTML page where request originated:
-                mainPage->currentFrame()->
-                        evaluateJavaScript(qApp->property("pebJS").toString());
+                QResourceReader *resourceReader =
+                        new QResourceReader(QString("scripts/js/peb.js"));
+                QString pebJavaScript = resourceReader->resourceContents;
+
+                mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
 
                 QString inodeSelectedEventJavaScript =
                         "pebInodeSelection(\"" +
@@ -1174,8 +1176,11 @@ public slots:
         QString pasteLabel;
         QString selectAllLabel;
 
-        mainPage->currentFrame()->
-                evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
 
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
@@ -1380,7 +1385,11 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        frame->evaluateJavaScript(qApp->property("pebJS").toString());
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = resourceReader->resourceContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
 
         QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
@@ -1440,14 +1449,14 @@ public:
     {
         Q_UNUSED(type);
 
+        QResourceReader *resourceReader =
+                new QResourceReader(QString("html/loading.html"));
+        QString loadingContents = resourceReader->resourceContents;
+
         QWebView *window = new QWebViewWidget();
-
-        QHtmlTemplateReader templateReader;
-        templateReader.qReadTemplate("loading.html");
-        QString loadingContents = templateReader.htmlTemplateContents;
         window->setHtml(loadingContents);
-
         window->adjustSize();
+        //window->showMaximized();
         window->setFocus();
 
         qDebug() << "New window opened.";

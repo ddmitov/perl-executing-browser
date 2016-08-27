@@ -6,5 +6,6 @@
         <file>icons/camel.png</file>
         <file>scripts/js/peb.js</file>
         <file>scripts/perl/censor.pl</file>
+        <file>scripts/perl/dbgformatter.pl</file>
     </qresource>
 </RCC>

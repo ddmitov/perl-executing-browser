@@ -1,7 +1,8 @@
 Perl Executing Browser  
 --------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications. It is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
+Perl Executing Browser (PEB) is an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications.  
+It is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
   
 ## Contents
   
@@ -341,7 +342,9 @@ JavaScript-based settings are created to facilitate the development of fully tra
   
    If the debugged script is inside the application directory of PEB (see section [Settings] (#settings)), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
   
-   HTML interface for the Perl debugger is not available in the Windows builds of PEB.  
+  Normal operation of the HTML interface for the Perl debugger is not possible without [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module, which is located in ```{PEB_binary_directory}/sdk/peblib``` directory. This relative path is hard-coded in C++ code and must not be changed.  
+  
+  The [the default Perl debugger] (http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes ```$console``` variable ```undef```. Modifying the debugger was initially avoided due to its high level of complexity, but tests proved that undef-ing the ```$console``` is a minor change, which does not affect the normal operation and output of the debugger. This alteration is necessary because the ```Qprocess``` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ```perl5db.pl``` manually by replacing ```$console = "con";``` with ```undef $console;``` or by using ```{PEB_binary_directory}/sdk/peblib/perl5db-win32.patch```.  
   
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
   
