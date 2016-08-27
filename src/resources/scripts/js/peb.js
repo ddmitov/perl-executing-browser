@@ -15,6 +15,12 @@ function pebFindMessageBoxElements() {
 	}
 }
 
+function pebFindNewWindowSetting() {
+	if (typeof pebNewWindowSetting == 'function') {
+		var returnValue = pebNewWindowSetting();
+		return returnValue;
+	}
+}
 
 function pebCheckUserInputBeforeClose() {
 	var textEntered = false;

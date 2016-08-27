@@ -176,7 +176,10 @@ PEB is designed to run from any directory without setting anything beforehand an
     Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
-JavaScript-based settings are created to facilitate the development of fully translated and multilanguage applications without depending on compiled Qt translation files. JavaScript is also used to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
+JavaScript-based settings have three main functions:  
+1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files,  
+2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form and
+3. to regulate whether new windows are maximized or not.
 * **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
@@ -248,6 +251,14 @@ JavaScript-based settings are created to facilitate the development of fully tra
               });
           }
       });
+  }
+```
+
+* **Maximized new windows:**  
+  Every new window opened from the page containing the following code will be maximized. If no ```pebNewWindowSetting()``` function is found, new windows are not maximized.  
+```javascript
+  function pebNewWindowSetting() {
+      return "maximized";
   }
 ```
 

@@ -1276,6 +1276,12 @@ public slots:
                 QObject::connect(printAct, SIGNAL(triggered()),
                                  this, SLOT(qPrintSlot()));
             }
+
+            if (selectAllLabel.length() > 0) {
+                QAction *selectAllAct = menu.addAction(selectAllLabel);
+                QObject::connect(selectAllAct, SIGNAL(triggered()),
+                                 this, SLOT(qSelectAllAction()));
+            }
         }
 
         menu.exec(mapToGlobal(event->pos()));
@@ -1449,14 +1455,28 @@ public:
     {
         Q_UNUSED(type);
 
-        QResourceReader *resourceReader =
+        QResourceReader *htmlReader =
                 new QResourceReader(QString("html/loading.html"));
-        QString loadingContents = resourceReader->resourceContents;
+        QString loadingContents = htmlReader->resourceContents;
+
+        QResourceReader *javaScriptReader =
+                new QResourceReader(QString("scripts/js/peb.js"));
+        QString pebJavaScript = javaScriptReader->resourceContents;
+        QWebViewWidget::page()->currentFrame()->
+                evaluateJavaScript(pebJavaScript);
+
+        QVariant newWindowSettingResult = QWebViewWidget::page()->currentFrame()->
+                evaluateJavaScript("pebFindNewWindowSetting()");
+        QString newWindowSetting = newWindowSettingResult.toString();
+
 
         QWebView *window = new QWebViewWidget();
         window->setHtml(loadingContents);
-        window->adjustSize();
-        //window->showMaximized();
+
+        if (newWindowSetting == "maximized") {
+            window->showMaximized();
+        }
+
         window->setFocus();
 
         qDebug() << "New window opened.";
