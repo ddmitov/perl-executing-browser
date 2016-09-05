@@ -325,8 +325,7 @@ int main(int argc, char **argv)
                  << "with administrative privileges is not allowed.";
     }
 
-    // Display embedded HTML error message if
-    // Perl interpreter is not found:
+    // Display embedded HTML error message if Perl interpreter is not found:
     if (perlInterpreterFullPath.length() == 0) {
         QResourceReader *resourceReader =
                 new QResourceReader(QString("html/error.html"));
@@ -347,7 +346,6 @@ int main(int argc, char **argv)
         qDebug() << "No Perl interpreter is found.";
     }
 
-    // Display start page:
     if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
         // ==============================
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
@@ -366,20 +364,28 @@ int main(int argc, char **argv)
         }
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
 
-        // Start page existence check and loading:
+        // ==============================
+        // START PAGE EXISTENCE CHECK AND LOADING:
+        // ==============================
+        QString startPage;
         QFile staticStartPageFile(
                     applicationDirName + QDir::separator() + "index.html");
+
         if (staticStartPageFile.exists()) {
-            mainWindow.webViewWidget->setUrl(
-                        QUrl("http://" + QString(PSEUDO_DOMAIN)
-                             + "/index.html"));
+            startPage = "http://" + QString(PSEUDO_DOMAIN) + "/index.html";
+
+            application.setProperty("startPage", startPage);
+
+            mainWindow.webViewWidget->setUrl(QUrl(startPage));
         } else {
             QFile dynamicStartPageFile(
                         applicationDirName + QDir::separator() + "index.pl");
             if (dynamicStartPageFile.exists()) {
-                mainWindow.webViewWidget->setUrl(
-                            QUrl("http://" + QString(PSEUDO_DOMAIN)
-                                 + "/index.pl"));
+                startPage = "http://" + QString(PSEUDO_DOMAIN) + "/index.pl";
+
+                application.setProperty("startPage", startPage);
+
+                mainWindow.webViewWidget->setUrl(QUrl(startPage));
             } else {
                 QResourceReader *resourceReader =
                         new QResourceReader(QString("html/error.html"));
@@ -644,6 +650,12 @@ QPage::QPage()
                      this,
                      SLOT(qNetworkReply(QNetworkReply*)));
 
+    // Connect signal and slot for the detection of web content:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(webContentDetectedSignal(bool)),
+                     this,
+                     SLOT(qWebContentDetectedTransmitterSlot(bool)));
+
     // Connect signal and slot for closing window from URL:
     QObject::connect(networkAccessManager,
                      SIGNAL(closeWindowSignal()),
@@ -742,8 +754,15 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowFromURLSlot()));
 
+    // Connect signal and slot for the detection of web content:
+    QObject::connect(mainPage, SIGNAL(webContentDetectedSignal(bool)),
+                     this, SLOT(qWebContentDetectedSlot(bool)));
+
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
+
+    // Initialize the web content detection variable:
+    webContentDetected = false;
 
     // Initialize variable necessary for
     // user input check before closing a new window
@@ -759,6 +778,13 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                     QWebPage::NavigationType navigationType)
 {
     if (request.url().authority() == PSEUDO_DOMAIN) {
+        // Start page is displayed only in
+        // the main frame of a browser window:
+        if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                request.url() == qApp->property("startPage").toString()) {
+            mainFrame()->setUrl(request.url());
+        }
+
         // User selected single file:
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "open-file.function") {

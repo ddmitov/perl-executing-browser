@@ -198,6 +198,7 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
+    void webContentDetectedSignal(bool webContentDetected);
     void closeWindowSignal();
 
 protected:
@@ -205,14 +206,6 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
-        // Necessary for some empty network replies below:
-        QString emptyString;
-
-        // Case-insensitive marker for AJAX Perl scripts:
-        QRegExp scriptAjaxMarker;
-        scriptAjaxMarker.setPattern("ajax");
-        scriptAjaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
-
         // Window closing URL:
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
@@ -225,11 +218,50 @@ protected:
             return reply;
         }
 
+        // Detect start page:
+        if (request.url() == qApp->property("startPage").toString()) {
+                webContentDetected = false;
+                emit webContentDetectedSignal(webContentDetected);
+        }
+
+        // Detect web content:
+        if (request.url().authority() != PSEUDO_DOMAIN) {
+                webContentDetected = true;
+                emit webContentDetectedSignal(webContentDetected);
+        }
+
+        // Case-insensitive marker for AJAX Perl scripts:
+        scriptAjaxMarker.setPattern("ajax");
+        scriptAjaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
+
+        // Starting local AJAX Perl scripts is prohibited if
+        // web content is loaded in the same window:
+        if ((operation == GetOperation or
+             operation == PostOperation) and
+                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().path().contains(scriptAjaxMarker) and
+                webContentDetected == true) {
+
+            QString errorMessage =
+                    "Calling local Perl scripts after "
+                    "web content is loaded is prohibited. "
+                    "Go to start page to unlock local Perl scripts.";
+            qDebug() << "Local Perl script called after"
+                     << "web content was loaded:"
+                     << request.url().toString();
+
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (
+                        request.url(), errorMessage, emptyString);
+            return reply;
+        }
+
         // Local AJAX GET and POST requests:
         if ((operation == GetOperation or
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
-                request.url().path().contains(scriptAjaxMarker)) {
+                request.url().path().contains(scriptAjaxMarker) and
+                webContentDetected == false) {
 
             QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
@@ -271,8 +303,7 @@ protected:
                 // Non-blocking event loop waiting for AJAX script results:
                 QEventLoop ajaxScriptHandlerWaitingLoop;
                 QObject::connect(&ajaxScriptHandler,
-                                 SIGNAL(finished(
-                                            int, QProcess::ExitStatus)),
+                                 SIGNAL(finished(int, QProcess::ExitStatus)),
                                  &ajaxScriptHandlerWaitingLoop,
                                  SLOT(quit()));
 
@@ -335,8 +366,6 @@ protected:
                     }
                 }
 
-                QWebSettings::clearMemoryCaches();
-
                 QCustomNetworkReply *reply =
                         new QCustomNetworkReply (
                             request.url(), ajaxScriptResultString, emptyString);
@@ -384,14 +413,49 @@ protected:
 
                 // Handle local Perl scripts:
                 if (mimeType == "application/x-perl") {
+                    // Start local Perl scripts only if
+                    // no web content is loaded in the same window:
+                    if (webContentDetected == false) {
+                        QByteArray emptyPostDataArray;
+                        emit startScriptSignal(
+                                    request.url(), emptyPostDataArray);
 
-                    QByteArray emptyPostDataArray;
-                    emit startScriptSignal(request.url(), emptyPostDataArray);
+                        QCustomNetworkReply *reply =
+                                new QCustomNetworkReply (
+                                    request.url(), emptyString, emptyString);
+                        return reply;
+                    }
 
-                    QCustomNetworkReply *reply =
-                            new QCustomNetworkReply (
-                                request.url(), emptyString, emptyString);
-                    return reply;
+                    // If an attempt is made to start local Perl scripts after
+                    // web content is loaded in the same window,
+                    // display an error page:
+                    if (webContentDetected == true) {
+                        QString errorMessage =
+                                "Calling local Perl scripts after "
+                                "web content is loaded is prohibited.<br>"
+                                "Go to <a href='" +
+                                qApp->property("startPage").toString() +
+                                "'>start page</a> "
+                                "to unlock local Perl scripts.";
+                        qDebug() << "Local Perl script called after"
+                                 << "web content was loaded:"
+                                 << request.url().toString();
+
+                        QResourceReader *resourceReader =
+                                new QResourceReader(QString("html/error.html"));
+                        QString htmlErrorContents =
+                                resourceReader->resourceContents;
+
+                        htmlErrorContents
+                                .replace("ERROR_MESSAGE", errorMessage);
+
+                        QString mimeType = "text/html";
+
+                        QCustomNetworkReply *reply =
+                                new QCustomNetworkReply (
+                                    request.url(), htmlErrorContents, mimeType);
+                        return reply;
+                    }
                 }
 
                 // Handle other supported local files:
@@ -476,6 +540,13 @@ protected:
                 (QNetworkAccessManager::GetOperation,
                  QNetworkRequest(request));
     }
+
+public:
+    bool webContentDetected;
+
+private:
+    QString emptyString;
+    QRegExp scriptAjaxMarker;
 };
 
 // ==============================
@@ -579,6 +650,7 @@ signals:
     void printPreviewSignal();
     void printSignal();
     void selectInodeSignal(QNetworkRequest request);
+    void webContentDetectedSignal(bool webContentDetected);
     void closeWindowSignal();
 
 public slots:
@@ -665,6 +737,11 @@ public slots:
                 QPage::currentFrame()->setHtml(htmlErrorContents);
             }
         }
+    }
+
+    void qWebContentDetectedTransmitterSlot(bool webContentDetectedQWebPage)
+    {
+        emit webContentDetectedSignal(webContentDetectedQWebPage);
     }
 
     void qCloseWindowFromURLTransmitterSlot()
@@ -1090,8 +1167,7 @@ public slots:
 
     void qSelectInodesSlot(QNetworkRequest request)
     {
-        if (mainPage->currentFrame()->baseUrl().authority() == PSEUDO_DOMAIN or
-                mainPage->currentFrame()->baseUrl().authority() == "") {
+        if (webContentDetected == false) {
             QString target = request.url().query().replace("target=", "");
 
             QFileDialog inodesDialog (this);
@@ -1156,9 +1232,30 @@ public slots:
                 qDebug() << "User selected inode:"
                          << userSelectedInodesFormatted;
             }
-        } else {
-            qDebug() << "Webpage attempted local full path selection:"
-                     << mainPage->currentFrame()->baseUrl().toString();
+        }
+
+        if (webContentDetected == true) {
+            QString errorMessage =
+                    "Full path selection after "
+                    "web content is loaded is prohibited.<br>"
+                    "Go to <a href='" +
+                    qApp->property("startPage").toString() +
+                    "'>start page</a> "
+                    "to unlock selection of "
+                    "files or folders with their full paths.";
+            qDebug() << "Full path selection attempted after"
+                     << "web content is loaded:"
+                     << mainPage->currentFrame()->
+                        baseUrl().toString();
+
+            QResourceReader *resourceReader =
+                    new QResourceReader(QString("html/error.html"));
+            QString htmlErrorContents = resourceReader->resourceContents;
+
+            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+            mainPage->currentFrame()->setHtml(htmlErrorContents);
+
+            qDebug() << errorMessage;
         }
     }
 
@@ -1436,6 +1533,11 @@ public slots:
         }
     }
 
+    void qWebContentDetectedSlot(bool webContentDetectedQWebView)
+    {
+        webContentDetected = webContentDetectedQWebView;
+    }
+
     void qCloseWindowFromURLSlot()
     {
         if (!this->parentWidget()) {
@@ -1465,7 +1567,8 @@ public:
         QWebViewWidget::page()->currentFrame()->
                 evaluateJavaScript(pebJavaScript);
 
-        QVariant newWindowSettingResult = QWebViewWidget::page()->currentFrame()->
+        QVariant newWindowSettingResult =
+                QWebViewWidget::page()->currentFrame()->
                 evaluateJavaScript("pebFindNewWindowSetting()");
         QString newWindowSetting = newWindowSettingResult.toString();
 
@@ -1489,6 +1592,7 @@ private:
     QWebView *newWindow;
     QWebView *errorsWindow;
 
+    bool webContentDetected;
     bool windowCloseRequested;
 };
 
