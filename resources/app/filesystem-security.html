@@ -12,7 +12,7 @@
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
 		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
 
-		<script type="text/javascript" src="peb/peb.js"></script>
+		<script type="text/javascript" src="pebjs/filesystem.js"></script>
 
 		<style type="text/css">
 			body {
@@ -30,7 +30,6 @@
 	</head>
 
 	<body>
-
 		<br>
 
 		<a href='http://local-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
@@ -58,39 +57,6 @@
 		<br>
 
 		<iframe src="http://www.perl.org/" name="iframe_a"></iframe>
-
-		<script>
-			$(document).ready(function() {
-				$('#file-selection').bind("inodeselection", function(){
-					$.ajax({
-						url: 'http://local-pseudodomain/perl/open-file.pl',
-						data: {filename: $('#file-selection').html()},
-						method: 'POST',
-						dataType: 'text',
-						success: function(data) {
-							document.write(data);
-						}
-					});
-				});
-
-				$('#files-selection').bind("inodeselection", function(){
-					var selectedFilesElement = document.getElementById("files-selection");
-					selectedFilesElement.innerHTML = selectedFilesElement.innerHTML.replace(/;/g, "<br>");
-				});
-
-				$('#directory-selection').bind("inodeselection", function(){
-					$.ajax({
-						url: 'http://local-pseudodomain/perl/open-directory.pl',
-						data: {directoryname: $('#directory-selection').html()},
-						method: 'POST',
-						dataType: 'text',
-						success: function(data) {
-							document.write(data);
-						}
-					});
-				});
-			});
-		</script>
 	</body>
 
 </html>
