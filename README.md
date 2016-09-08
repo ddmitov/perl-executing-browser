@@ -1,8 +1,7 @@
 Perl Executing Browser  
 --------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/) desktop applications.  
-PEB runs local Perl 5 scripts without server and without timeout and is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
+Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and without timeout and is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
   
 ## Contents
   
@@ -277,7 +276,7 @@ JavaScript-based settings have three main functions:
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
   
-**Perl security setting:**
+**Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   
 **Perl Debugger Interaction:**
@@ -352,7 +351,7 @@ JavaScript-based settings have three main functions:
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
   
-   If the debugged script is outside of the application directory (see section [Settings] (#settings)), PEB asks for command line arguments, which may be necessary for the debugged Perl program.  
+   If the debugged script is outside of the application directory (see section [Settings] (#settings)), PEB asks for command line arguments which may be necessary for the debugged Perl program.  
   
   Normal operation of the HTML interface for the Perl debugger is not possible without [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module, which is located in ```{PEB_binary_directory}/sdk/peblib``` directory. This relative path is hard-coded in C++ code and must not be changed.  
   
