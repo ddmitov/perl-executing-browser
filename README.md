@@ -279,8 +279,8 @@ JavaScript-based settings have three main functions:
 **Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   
-**Perl Debugger Interaction:**
-* Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
+**Perl Debugger Interaction:**  
+  Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
   
 ## Special URLs for Users and Opening Files and Folders
   
