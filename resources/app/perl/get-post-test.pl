@@ -7,17 +7,18 @@ print "<!DOCTYPE html>
 <html>
 
 	<head>
-		<title>Perl Executing Browser - GET or POST Test</title>
+		<title>Perl Executing Browser - GET and POST Test</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
 		<link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
 		<style type='text/css'>
 			body {
-				text-align: left;
+				text-align: center;
 				font-size: 22px;
 				-webkit-text-size-adjust: 100%;
 			}
 			pre {
+				text-align: left;
 				font-size: 14px;
 				font-family: monospace;
 			}
@@ -25,7 +26,7 @@ print "<!DOCTYPE html>
 	</head>
 
 	<body>
-		<p align='center'>
+		<p>
 			GET and POST Test
 		</p>
 <pre>
@@ -49,14 +50,7 @@ foreach $pair (@pairs) {
 	print "$name = $value\n";
 }
 
-print "\nENVIRONMENT VARIABLES:\n";
-
-foreach my $key (sort(keys(%ENV))) {
-	print "$key = $ENV{$key}\n";
-}
-
 print "</pre>
-
 	</body>
 
 </html>\n";

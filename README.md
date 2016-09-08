@@ -1,8 +1,8 @@
 Perl Executing Browser  
 --------------------------------------------------------------------------------
   
-Perl Executing Browser (PEB) is an HTML GUI for local [Perl 5] (https://www.perl.org/) scripts executed without server as desktop applications.  
-It is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. Perl 5 scripts are run without timeout and they can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
+Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/) desktop applications.  
+PEB runs local Perl 5 scripts without server and without timeout and is implemented as a C++ compiled executable based on [Qt 5] (https://www.qt.io/) and [QtWebKit] (https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger] (http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js] (http://nwjs.io/) and [Electron] (http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
   
 ## Contents
   
@@ -264,20 +264,21 @@ JavaScript-based settings have three main functions:
 
   
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in both C++ and Perl code, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local files without posing a danger to the underlying operating system or being exposed to remote code execution.  
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a single Perl setting, but they do not constitute a sandbox for Perl scripts. PEB users have full access to their local data without posing a danger to the underlying operating system or being exposed to remote code execution.  
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files and can not execute any Perl scripts from remote locations.
+* No local Perl scripts are executed if any remote content is loaded in the calling local page.  
+  No local Perl scripts are executed if they are called from a web page.
+* No files or folders can be selected with their full paths if any remote content is loaded in the calling local page.  
+  No files or folders can be selected with their full paths from a web page.
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
-* Perl 5 scripts are executed in a clean environment where only ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` environment variables (borrowed from the CGI protocol) are used for communication between local HTML forms and local Perl scripts.
   
-**Security features based on Perl code:**
-* Perl scripts are executed in an ```eval``` function after banning the ```fork``` core function. This feature is implemented in a special script named ```censor.pl```, which is compiled into the resources of the browser binary and is executed from memory when Perl scripts are started. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
-  ```censor.pl``` also takes care about displaying nicely formatted HTML error pages if the use of ```fork``` is prevented or script errors are found.
-* The environment of all Perl scripts is once again filtered in the ```BEGIN``` block of ```censor.pl``` to ensure no unwanted environment variables are inserted by the operating system.
+**Perl security setting:**
+  PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   
 **Perl Debugger Interaction:**
 * Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
@@ -351,7 +352,7 @@ JavaScript-based settings have three main functions:
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
   
-   If the debugged script is inside the application directory of PEB (see section [Settings] (#settings)), PEB assumes that this script is going to be executed by PEB and starts the Perl debugger with a clean environment like the one for all other PEB Perl scripts. If the debugged script is outside the application directory, PEB asks for any command line arguments and starts the Perl debugger with the environment of the user who started PEB.  
+   If the debugged script is outside of the application directory (see section [Settings] (#settings)), PEB asks for command line arguments, which may be necessary for the debugged Perl program.  
   
   Normal operation of the HTML interface for the Perl debugger is not possible without [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module, which is located in ```{PEB_binary_directory}/sdk/peblib``` directory. This relative path is hard-coded in C++ code and must not be changed.  
   
@@ -406,7 +407,7 @@ JavaScript-based settings have three main functions:
 ## What Perl Executing Browser Is Not
   
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
-* PEB does not act as a server and is not an implementation of the CGI protocol. It uses only three environment variables borrowed from the CGI protocol in a purely local context without any attempt to communicate with the outside world.
+* PEB does not act as a server and is not an implementation of the CGI protocol. Only three environment variables are borrowed from the CGI protocol: ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` and they are used for communication between local HTML forms and local Perl scripts in a purely local context without any attempt to communicate with the outside world.
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
   
 ## Limitations
@@ -420,7 +421,7 @@ JavaScript-based settings have three main functions:
   
 ## Target Audience
   
-* Perl 5 enthusiasts and developers creating custom desktop applications
+* Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
 * Perl 5 enthusiasts and developers willing to use the built-in Perl debugger in graphical mode
   
 ## History

@@ -306,9 +306,9 @@ int main(int argc, char **argv)
     // Display embedded HTML error message if application is started by
     // a user with administrative privileges:
     if (startedAsRoot == true) {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("html/error.html"));
-        QString htmlErrorContents = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString htmlErrorContents = resourceReader->fileContents;
 
         QString errorMessage =
                 "Using "
@@ -327,9 +327,9 @@ int main(int argc, char **argv)
 
     // Display embedded HTML error message if Perl interpreter is not found:
     if (perlInterpreterFullPath.length() == 0) {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("html/error.html"));
-        QString htmlErrorContents = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString htmlErrorContents = resourceReader->fileContents;
 
         QString errorMessage = privatePerlInterpreterFullPath + "<br>"
                 + "is not found and "
@@ -387,9 +387,9 @@ int main(int argc, char **argv)
 
                 mainWindow.webViewWidget->setUrl(QUrl(startPage));
             } else {
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("html/error.html"));
-                QString htmlErrorContents = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/error.html"));
+                QString htmlErrorContents = resourceReader->fileContents;
 
                 QString errorMessage = "No start page is found.";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
@@ -408,17 +408,18 @@ int main(int argc, char **argv)
 }
 
 // ==============================
-// RESOURCE READER CONSTRUCTOR:
+// FILE READER CONSTRUCTOR:
+// Usefull for both files inside binary resources and files on disk
 // ==============================
-QResourceReader::QResourceReader(QString resourcePath)
+QFileReader::QFileReader(QString filePath)
     : QObject(0)
 {
-    QString resourceFileName(":/" + resourcePath);
-    QFile resourceFile(resourceFileName);
-    resourceFile.open(QIODevice::ReadOnly | QIODevice::Text);
-    QTextStream resourceStream(&resourceFile);
-    resourceContents = resourceStream.readAll();
-    resourceFile.close();
+    QString fileName(filePath);
+    QFile file(fileName);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QTextStream fileStream(&file);
+    fileContents = fileStream.readAll();
+    file.close();
 }
 
 // ==============================
@@ -542,7 +543,8 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
     QString queryString = scriptQuery.toString();
     QString postData(postDataArray);
 
-    QProcessEnvironment scriptEnvironment;
+    QProcessEnvironment scriptEnvironment =
+            QProcessEnvironment::systemEnvironment();
 
     if (queryString.length() > 0) {
         scriptEnvironment.insert("REQUEST_METHOD", "GET");
@@ -559,19 +561,16 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
 
     scriptHandler.setProcessEnvironment(scriptEnvironment);
 
-    // 'censor.pl' is compiled into the resources of
-    // the binary file and is read from there.
-    QResourceReader *resourceReader =
-            new QResourceReader(QString("scripts/perl/censor.pl"));
-    QString censorScriptContents = resourceReader->resourceContents;
+    QFileReader *resourceReader =
+            new QFileReader(QString(scriptFullFilePath));
+    QString fileContents = resourceReader->fileContents;
 
     scriptHandler.start((qApp->property("perlInterpreter").toString()),
-                         QStringList()
-                         << "-e"
-                         << censorScriptContents
-                         << "--"
-                         << scriptFullFilePath,
-                         QProcess::Unbuffered | QProcess::ReadWrite);
+                        QStringList()
+                        << "-M-ops=fork"
+                        << "-e"
+                        << fileContents,
+                        QProcess::Unbuffered | QProcess::ReadWrite);
 
     if (postData.length() > 0) {
         scriptHandler.write(postDataArray);
@@ -850,9 +849,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName() == "about.function" and
                 request.url().query() == "type=browser") {
-            QResourceReader *resourceReader =
-                    new QResourceReader(QString("html/about.html"));
-            QString aboutPageContents = resourceReader->resourceContents;
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/about.html"));
+            QString aboutPageContents = resourceReader->fileContents;
 
             aboutPageContents
                     .replace("VERSION_STRING",

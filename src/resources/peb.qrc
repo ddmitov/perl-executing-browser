@@ -4,8 +4,7 @@
         <file>html/error.html</file>
         <file>html/loading.html</file>
         <file>icons/camel.png</file>
-        <file>scripts/js/peb.js</file>
-        <file>scripts/perl/censor.pl</file>
-        <file>scripts/perl/dbgformatter.pl</file>
+        <file>scripts/peb.js</file>
+        <file>scripts/dbgformatter.pl</file>
     </qresource>
 </RCC>

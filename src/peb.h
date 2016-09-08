@@ -55,15 +55,16 @@
 #endif
 
 // ==============================
-// RESOURCE READER DEFINITION:
+// FILE READER DEFINITION:
+// Usefull for both files inside binary resources and files on disk
 // ==============================
-class QResourceReader : public QObject
+class QFileReader : public QObject
 {
     Q_OBJECT
 
 public:
-    QResourceReader(QString resourcePath);
-    QString resourceContents;
+    QFileReader(QString filePath);
+    QString fileContents;
 };
 
 // ==============================
@@ -104,9 +105,9 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
 
@@ -280,7 +281,8 @@ protected:
                 qDebug() << "AJAX script started:"
                          << ajaxScriptFullFilePath;
 
-                QProcessEnvironment scriptEnvironment;
+                QProcessEnvironment scriptEnvironment =
+                        QProcessEnvironment::systemEnvironment();
 
                 if (queryString.length() > 0) {
                     scriptEnvironment.insert("REQUEST_METHOD", "GET");
@@ -314,21 +316,17 @@ protected:
                 QString ajaxScriptResultString;
                 QString ajaxScriptErrorString;
 
-                // 'censor.pl' is compiled into the resources of
-                // the binary file and is read from there.
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("scripts/perl/censor.pl"));
-                QString censorScriptContents = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(ajaxScriptFullFilePath));
+                QString fileContents = resourceReader->fileContents;
 
-                ajaxScriptHandler.start((qApp->property("perlInterpreter")
-                                         .toString()),
-                                        QStringList()
-                                        << "-e"
-                                        << censorScriptContents
-                                        << "--"
-                                        << ajaxScriptFullFilePath,
-                                        QProcess::Unbuffered
-                                        | QProcess::ReadWrite);
+                ajaxScriptHandler.start(
+                            (qApp->property("perlInterpreter").toString()),
+                            QStringList()
+                            << "-M-ops=fork"
+                            << "-e"
+                            << fileContents,
+                            QProcess::Unbuffered | QProcess::ReadWrite);
 
                 if (postData.length() > 0) {
                     ajaxScriptHandler.write(postDataArray);
@@ -373,9 +371,9 @@ protected:
             } else {
                 qDebug() << "File not found:" << ajaxScriptFullFilePath;
 
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("html/error.html"));
-                QString htmlErrorContents = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/error.html"));
+                QString htmlErrorContents = resourceReader->fileContents;
 
                 QString errorMessage = "File not found:<br>"
                         + ajaxScriptFullFilePath;
@@ -441,10 +439,10 @@ protected:
                                  << "web content was loaded:"
                                  << request.url().toString();
 
-                        QResourceReader *resourceReader =
-                                new QResourceReader(QString("html/error.html"));
+                        QFileReader *resourceReader =
+                                new QFileReader(QString(":/html/error.html"));
                         QString htmlErrorContents =
-                                resourceReader->resourceContents;
+                                resourceReader->fileContents;
 
                         htmlErrorContents
                                 .replace("ERROR_MESSAGE", errorMessage);
@@ -500,9 +498,9 @@ protected:
             } else {
                 qDebug() << "File not found:" << fullFilePath;
 
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("html/error.html"));
-                QString htmlErrorContents = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/error.html"));
+                QString htmlErrorContents = resourceReader->fileContents;
 
                 QString errorMessage = "File not found:<br>" + fullFilePath;
                 htmlErrorContents
@@ -588,6 +586,29 @@ public slots:
     {
         QString emptyString;
 
+        QString scriptErrorTitle;
+        if (scriptAccumulatedErrors.contains("trapped")) {
+            scriptErrorTitle = "Insecure code was blocked:";
+        } else {
+            scriptErrorTitle = "Errors were found during script execution:";
+        }
+
+        scriptAccumulatedErrors.replace(QRegExp("\n\n$"), "\n");
+
+        QString scriptError = scriptErrorTitle +
+                "<br>" +
+                scriptFullFilePath +
+                "<br><br>" +
+                "<pre>" +
+                scriptAccumulatedErrors +
+                "</pre>";
+
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString scriptFormattedErrors = resourceReader->fileContents;
+
+        scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
+
         // If long running script has no errors and no target DOM element:
         if (scriptAccumulatedOutput.length() > 0 and
                 scriptAccumulatedErrors.length() == 0 and
@@ -604,20 +625,18 @@ public slots:
                     // all HTML formatted errors will be displayed
                     // in the same window:
                     emit displayScriptOutputSignal(
-                                scriptAccumulatedErrors, emptyString);
+                                scriptFormattedErrors, emptyString);
                 } else {
                     // If long running script has no output and only errors and
                     // a target DOM element is defined,
                     // all HTML formatted errors will be displayed
                     // in a new window:
-                    emit displayScriptErrorsSignal(
-                                scriptAccumulatedErrors);
+                    emit displayScriptErrorsSignal(scriptFormattedErrors);
                 }
             } else {
                 // If long running script has some output and errors,
                 // HTML formatted errors will be displayed in a new window:
-                emit displayScriptErrorsSignal(
-                            scriptAccumulatedErrors);
+                emit displayScriptErrorsSignal(scriptFormattedErrors);
             }
         }
 
@@ -682,9 +701,9 @@ public slots:
         if (target.length() > 0) {
             // JavaScript bridge back to
             // the local HTML page where request originated:
-            QResourceReader *resourceReader =
-                    new QResourceReader(QString("scripts/js/peb.js"));
-            QString pebJavaScript = resourceReader->resourceContents;
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/scripts/peb.js"));
+            QString pebJavaScript = resourceReader->fileContents;
 
             QPage::currentFrame()->evaluateJavaScript(pebJavaScript);
 
@@ -728,9 +747,9 @@ public slots:
             QString mimeType = type.name();
 
             if (filename.length() == 0 or mimeType == "text/html") {
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("html/error.html"));
-                QString htmlErrorContents = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/error.html"));
+                QString htmlErrorContents = resourceReader->fileContents;
 
                 htmlErrorContents
                         .replace("ERROR_MESSAGE", reply->errorString());
@@ -772,14 +791,14 @@ public slots:
             } else {
                 debuggerJustStarted = true;
 
-                if (debuggerScriptToDebug
-                        .contains(qApp->property("application").toString())) {
-                    // Clean environment for all Perl scripts in
-                    // the application directory:
-                    QProcessEnvironment cleanEnvironment;
-                    cleanEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-                    debuggerHandler.setProcessEnvironment(cleanEnvironment);
-                } else {
+                // Sеt the environment for the debugged script:
+                QProcessEnvironment systemEnvironment =
+                        QProcessEnvironment::systemEnvironment();
+                systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
+                debuggerHandler.setProcessEnvironment(systemEnvironment);
+
+                if (!debuggerScriptToDebug.contains(
+                            qApp->property("application").toString())) {
                     bool ok;
                     QString input =
                             QInputDialog::getText(
@@ -793,13 +812,6 @@ public slots:
                     if (ok && !input.isEmpty()) {
                         commandLineArguments = input;
                     }
-
-                    // System environment for all Perl scripts outside of
-                    // the application directory:
-                    QProcessEnvironment systemEnvironment =
-                            QProcessEnvironment::systemEnvironment();
-                    systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-                    debuggerHandler.setProcessEnvironment(systemEnvironment);
                 }
 
                 QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
@@ -887,11 +899,11 @@ public slots:
         if (PERL_DEBUGGER_INTERACTION == 1) {
             // 'dbgformatter.pl' is compiled into the resources of
             // the binary file and is read from there.
-            QResourceReader *resourceReader =
-                    new QResourceReader(
-                        QString("scripts/perl/dbgformatter.pl"));
+            QFileReader *resourceReader =
+                    new QFileReader(
+                        QString(":/scripts/dbgformatter.pl"));
             QString debuggerOutputFormatterScript =
-                    resourceReader->resourceContents;
+                    resourceReader->fileContents;
 
             // Set clean environment:
             QProcessEnvironment cleanEnvironment;
@@ -977,9 +989,9 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
 
@@ -1019,9 +1031,9 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
 
@@ -1073,9 +1085,9 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
 
@@ -1213,9 +1225,9 @@ public slots:
 
                 // JavaScript bridge back to
                 // the local HTML page where request originated:
-                QResourceReader *resourceReader =
-                        new QResourceReader(QString("scripts/js/peb.js"));
-                QString pebJavaScript = resourceReader->resourceContents;
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/scripts/peb.js"));
+                QString pebJavaScript = resourceReader->fileContents;
 
                 mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
 
@@ -1248,9 +1260,9 @@ public slots:
                      << mainPage->currentFrame()->
                         baseUrl().toString();
 
-            QResourceReader *resourceReader =
-                    new QResourceReader(QString("html/error.html"));
-            QString htmlErrorContents = resourceReader->resourceContents;
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/error.html"));
+            QString htmlErrorContents = resourceReader->fileContents;
 
             htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
             mainPage->currentFrame()->setHtml(htmlErrorContents);
@@ -1273,9 +1285,9 @@ public slots:
         QString pasteLabel;
         QString selectAllLabel;
 
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
 
@@ -1488,9 +1500,9 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
     {
-        QResourceReader *resourceReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = resourceReader->resourceContents;
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
 
@@ -1557,13 +1569,13 @@ public:
     {
         Q_UNUSED(type);
 
-        QResourceReader *htmlReader =
-                new QResourceReader(QString("html/loading.html"));
-        QString loadingContents = htmlReader->resourceContents;
+        QFileReader *htmlReader =
+                new QFileReader(QString(":/html/loading.html"));
+        QString loadingContents = htmlReader->fileContents;
 
-        QResourceReader *javaScriptReader =
-                new QResourceReader(QString("scripts/js/peb.js"));
-        QString pebJavaScript = javaScriptReader->resourceContents;
+        QFileReader *javaScriptReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = javaScriptReader->fileContents;
         QWebViewWidget::page()->currentFrame()->
                 evaluateJavaScript(pebJavaScript);
 

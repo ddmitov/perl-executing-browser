@@ -20,11 +20,12 @@ print "
 		<link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
 		<style type='text/css'>
 			body {
-				text-align: left;
+				text-align: center;
 				font-size: 22px;
 				-webkit-text-size-adjust: 100%;
 			}
 			pre {
+				text-align: left;
 				font-size: 14px;
 				font-family: monospace;
 			}
@@ -32,7 +33,7 @@ print "
 	</head>
 
 	<body>
-		<p align='center'>
+		<p>
 			SQLite Test
 		</p>
 <pre>";
@@ -63,7 +64,6 @@ foreach my $row (@$all_records) {
 $db->disconnect;
 
 print "</pre>
-
 	</body>
 
 </html>\n";
