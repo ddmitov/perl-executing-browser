@@ -352,7 +352,8 @@ protected:
                 QLongRunScriptHandler *longRunScriptHandler =
                         new QLongRunScriptHandler(request.url(), postDataArray);
 
-                // Non-blocking waiting for all local AJAX Perl scripts:
+                // Non-blocking event loop waiting for
+                // AJAX script output and errors:
                 QEventLoop ajaxScriptHandlerWaitingLoop;
 
                 // Signal and slot for reading output and errors from
