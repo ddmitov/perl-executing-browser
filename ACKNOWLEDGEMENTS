@@ -97,6 +97,7 @@ http://doc.qt.io/qt-4.8/signalsandslots.html
 http://doc.qt.io/qt-4.8/qfileinfo.html
 http://doc.qt.io/qt-4.8/qwebinspector.html
 http://doc.qt.io/qt-4.8/qinputdialog.html
+http://doc.qt.io/qt-4.8/qwebelement.html
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html (defunct)
 http://doc.qt.io/qt-5/qtglobal.html
 http://doc.qt.io/archives/qt-5.5/qwebview.html
@@ -109,6 +110,7 @@ https://forum.qt.io/topic/24213/qmessagebox-too-small
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file
 https://forum.qt.io/topic/551/get-filename-without-extension
 https://forum.qt.io/topic/45982/solved-is-there-a-problem-with-the-following-non-blocking-sleep-function
+https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute
 
 http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit
 http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only

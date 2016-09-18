@@ -263,6 +263,38 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
+    // TRUSTED DOMAINS:
+    QString trustedDomainsFilePath =
+            applicationDirName + QDir::separator() + "trusted-domains.json";
+    QFile trustedDomainsFile(trustedDomainsFilePath);
+    QStringList trustedDomainsList;
+
+    if (trustedDomainsFile.exists()) {
+        QFileReader *resourceReader =
+                new QFileReader(QString(trustedDomainsFilePath));
+        QString trustedDomainsContents = resourceReader->fileContents;
+
+        QJsonDocument trustedDomainsJsonDocument =
+                QJsonDocument::fromJson(trustedDomainsContents.toUtf8());
+
+        if (!trustedDomainsJsonDocument.isNull()) {
+            QJsonObject trustedDomainsJsonObject =
+                    trustedDomainsJsonDocument.object();
+
+            if (!trustedDomainsJsonObject.isEmpty()) {
+                QJsonArray trustedDomainsArray =
+                        trustedDomainsJsonObject["trusted-domains"].toArray();
+
+                if (!trustedDomainsArray.isEmpty()) {
+                    foreach (QVariant trustedDomain, trustedDomainsArray) {
+                        trustedDomainsList.append(trustedDomain.toString());
+                    }
+                }
+            }
+        }
+        application.setProperty("trustedDomainsList", trustedDomainsList);
+    }
+
     // LOGGING:
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
@@ -294,12 +326,12 @@ int main(int argc, char **argv)
     // the special window closing URL.
     qApp->setProperty("mainWindowCloseRequested", false);
 
-    // Connect signal and slot for setting the main window title:
+    // Signal and slot for setting the main window title:
     QObject::connect(mainWindow.webViewWidget,
                      SIGNAL(titleChanged(QString)),
                      &mainWindow, SLOT(setMainWindowTitleSlot(QString)));
 
-    // Connect signal and slot for actions taken before application exit:
+    // Signal and slot for actions taken before application exit:
     QObject::connect(qApp, SIGNAL(aboutToQuit()),
                      &mainWindow, SLOT(qExitApplicationSlot()));
 
@@ -356,6 +388,9 @@ int main(int argc, char **argv)
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
         qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+        foreach (QString trustedDomain, trustedDomainsList) {
+            qDebug() << "Trusted domain:" << trustedDomain;
+        }
         if (PERL_DEBUGGER_INTERACTION == 0) {
             qDebug() << "Perl debugger interaction is disabled.";
         }
@@ -403,7 +438,6 @@ int main(int argc, char **argv)
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
     mainWindow.setWindowIcon(icon);
     mainWindow.showMaximized();
-
     return application.exec();
 }
 
@@ -522,7 +556,7 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
-    // Connect signals and slots for all local long running Perl scripts:
+    // Signals and slots for all local long running Perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qLongrunScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
@@ -637,37 +671,37 @@ QPage::QPage()
     // Use the modified Network Access Manager:
     setNetworkAccessManager(networkAccessManager);
 
-    // Connect signal and slot for SSL errors:
+    // Signal and slot for SSL errors:
     QObject::connect(networkAccessManager,
                      SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
                      this,
                      SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
 
-    // Connect signal and slot for other network errors:
+    // Signal and slot for other network errors:
     QObject::connect(networkAccessManager,
                      SIGNAL(finished(QNetworkReply*)),
                      this,
                      SLOT(qNetworkReply(QNetworkReply*)));
 
-    // Connect signal and slot for the detection of web content:
+    // Signal and slot for the detection of untrusted content:
     QObject::connect(networkAccessManager,
-                     SIGNAL(webContentDetectedSignal(bool)),
+                     SIGNAL(untrustedContentDetectedSignal(bool)),
                      this,
-                     SLOT(qWebContentDetectedTransmitterSlot(bool)));
+                     SLOT(qUntrustedContentDetectedTransmitterSlot(bool)));
 
-    // Connect signal and slot for closing window from URL:
+    // Signal and slot for closing window from URL:
     QObject::connect(networkAccessManager,
                      SIGNAL(closeWindowSignal()),
                      this,
                      SLOT(qCloseWindowFromURLTransmitterSlot()));
 
-    // Connect signal and slot for starting local scripts:
+    // Signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Connect signals and slots for actions taken after page is loaded:
+    // Signals and slots for actions taken after page is loaded:
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
 
@@ -676,6 +710,10 @@ QPage::QPage()
                                               Qt::ScrollBarAsNeeded);
     mainFrame()->setScrollBarPolicy(Qt::Vertical,
                                               Qt::ScrollBarAsNeeded);
+
+    // Regular expression for detection of HTML file extensions:
+    htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
+    htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
 
     // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
     alertTitle = "Alert";
@@ -687,7 +725,7 @@ QPage::QPage()
     yesLabel = "Yes";
     noLabel = "No";
 
-    // Connect signals and slots for the perl debugger:
+    // Signals and slots for the perl debugger:
     if (PERL_DEBUGGER_INTERACTION == 1) {
         QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                          this, SLOT(qDebuggerOutputSlot()));
@@ -731,37 +769,34 @@ QWebViewWidget::QWebViewWidget()
     // Start QPage instance:
     mainPage = new QPage();
 
-    // Connect signal and slot for displaying script errors:
+    // Signal and slot for displaying script errors:
     QObject::connect(mainPage, SIGNAL(displayScriptErrorsSignal(QString)),
                      this, SLOT(qDisplayScriptErrorsSlot(QString)));
 
-    // Connect signals and slots for printing:
+    // Signals and slots for printing:
     QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
                      this, SLOT(qStartPrintPreviewSlot()));
     QObject::connect(mainPage, SIGNAL(printSignal()),
                      this, SLOT(qPrintSlot()));
 
-    // Connect signal and slot for changing window title:
+    // Signal and slot for changing window title:
     QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
                      this, SLOT(qChangeTitleSlot()));
 
-    // Connect signal and slot for selecting files or folders from URL:
+    // Signal and slot for selecting files or folders from URL:
     QObject::connect(mainPage, SIGNAL(selectInodeSignal(QNetworkRequest)),
                      this, SLOT(qSelectInodesSlot(QNetworkRequest)));
 
-    // Connect signal and slot for closing window from URL:
+    // Signal and slot for closing window from URL:
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowFromURLSlot()));
 
-    // Connect signal and slot for the detection of web content:
-    QObject::connect(mainPage, SIGNAL(webContentDetectedSignal(bool)),
-                     this, SLOT(qWebContentDetectedSlot(bool)));
+    // Signal and slot for the detection of untrusted content:
+    QObject::connect(mainPage, SIGNAL(untrustedContentDetectedSignal(bool)),
+                     this, SLOT(qUntrustedContentDetectedSlot(bool)));
 
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
-
-    // Initialize the web content detection variable:
-    webContentDetected = false;
 
     // Initialize variable necessary for
     // user input check before closing a new window

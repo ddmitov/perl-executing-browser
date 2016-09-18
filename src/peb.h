@@ -164,6 +164,67 @@ public:
 };
 
 // ==============================
+// LONG RUNNING SCRIPT HANDLER:
+// ==============================
+class QLongRunScriptHandler : public QObject
+{
+    Q_OBJECT
+
+signals:
+    void displayScriptOutputSignal(QString output, QString scriptOutputTarget);
+    void scriptFinishedSignal(QString scriptAccumulatedOutput,
+                              QString scriptAccumulatedErrors,
+                              QString scriptFullFilePath,
+                              QString scriptOutputTarget);
+
+public slots:
+    void qLongrunScriptOutputSlot()
+    {
+        QString output = scriptHandler.readAllStandardOutput();
+        scriptAccumulatedOutput.append(output);
+
+        if (scriptOutputTarget.length() > 0) {
+            emit displayScriptOutputSignal(output, scriptOutputTarget);
+        }
+
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch: output from" << scriptFullFilePath;
+    }
+
+    void qLongrunScriptErrorsSlot()
+    {
+        QString error = scriptHandler.readAllStandardError();
+        scriptAccumulatedErrors.append(error);
+        scriptAccumulatedErrors.append("\n");
+
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch: errors from" << scriptFullFilePath;
+    }
+
+    void qLongrunScriptFinishedSlot()
+    {
+        emit scriptFinishedSignal(scriptAccumulatedOutput,
+                                  scriptAccumulatedErrors,
+                                  scriptFullFilePath,
+                                  scriptOutputTarget);
+
+        scriptHandler.close();
+
+        qDebug() << "Script finished:" << scriptFullFilePath;
+    }
+
+public:
+    QLongRunScriptHandler(QUrl url, QByteArray postDataArray);
+    QString scriptAccumulatedOutput;
+    QString scriptAccumulatedErrors;
+
+private:
+    QProcess scriptHandler;
+    QString scriptFullFilePath;
+    QString scriptOutputTarget;
+};
+
+// ==============================
 // CUSTOM NETWORK REPLY CLASS DEFINITION:
 // ==============================
 class QCustomNetworkReply : public QNetworkReply
@@ -199,7 +260,7 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
-    void webContentDetectedSignal(bool webContentDetected);
+    void untrustedContentDetectedSignal(bool untrustedContent);
     void closeWindowSignal();
 
 protected:
@@ -207,7 +268,9 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+        // ==============================
         // Window closing URL:
+        // ==============================
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().fileName() == "close-window.function") {
@@ -219,36 +282,45 @@ protected:
             return reply;
         }
 
+        // ==============================
         // Detect start page:
+        // ==============================
         if (request.url() == qApp->property("startPage").toString()) {
-                webContentDetected = false;
-                emit webContentDetectedSignal(webContentDetected);
+                untrustedContentDetected = false;
+                emit untrustedContentDetectedSignal(untrustedContentDetected);
         }
 
-        // Detect web content:
-        if (request.url().authority() != PSEUDO_DOMAIN) {
-                webContentDetected = true;
-                emit webContentDetectedSignal(webContentDetected);
+        // ==============================
+        // Detect untrusted content:
+        // ==============================
+        trustedDomains = qApp->property("trustedDomainsList").toStringList();
+        trustedDomains.append(PSEUDO_DOMAIN);
+
+        if (!trustedDomains.contains(request.url().authority())) {
+            untrustedContentDetected = true;
+            emit untrustedContentDetectedSignal(untrustedContentDetected);
         }
 
         // Case-insensitive marker for AJAX Perl scripts:
         scriptAjaxMarker.setPattern("ajax");
         scriptAjaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
 
+        // ==============================
         // Starting local AJAX Perl scripts is prohibited if
-        // web content is loaded in the same window:
+        // untrusted content is loaded in the same window:
+        // ==============================
         if ((operation == GetOperation or
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains(scriptAjaxMarker) and
-                webContentDetected == true) {
+                untrustedContentDetected == true) {
 
             QString errorMessage =
-                    "Calling local Perl scripts after "
-                    "web content is loaded is prohibited. "
-                    "Go to start page to unlock local Perl scripts.";
+                    "<p>Calling local Perl scripts after "
+                    "untrusted content is loaded is prohibited. "
+                    "Go to start page to unlock local Perl scripts.</p>";
             qDebug() << "Local Perl script called after"
-                     << "web content was loaded:"
+                     << "untrusted content was loaded:"
                      << request.url().toString();
 
             QCustomNetworkReply *reply =
@@ -257,12 +329,14 @@ protected:
             return reply;
         }
 
+        // ==============================
         // Local AJAX GET and POST requests:
+        // ==============================
         if ((operation == GetOperation or
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains(scriptAjaxMarker) and
-                webContentDetected == false) {
+                untrustedContentDetected == false) {
 
             QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
@@ -270,93 +344,45 @@ protected:
 
             QFile file(ajaxScriptFullFilePath);
             if (file.exists()) {
-                QString queryString = request.url().query();
-
                 QByteArray postDataArray;
                 if (outgoingData) {
                     postDataArray = outgoingData->readAll();
                 }
-                QString postData(postDataArray);
 
-                qDebug() << "AJAX script started:"
-                         << ajaxScriptFullFilePath;
+                QLongRunScriptHandler *longRunScriptHandler =
+                        new QLongRunScriptHandler(request.url(), postDataArray);
 
-                QProcessEnvironment scriptEnvironment =
-                        QProcessEnvironment::systemEnvironment();
-
-                if (queryString.length() > 0) {
-                    scriptEnvironment.insert("REQUEST_METHOD", "GET");
-                    scriptEnvironment.insert("QUERY_STRING", queryString);
-                    // qDebug() << "Query string:" << queryString;
-                }
-
-                if (postData.length() > 0) {
-                    scriptEnvironment
-                            .insert("REQUEST_METHOD", "POST");
-                    QString postDataSize = QString::number(postData.size());
-                    scriptEnvironment
-                            .insert("CONTENT_LENGTH", postDataSize);
-                    // qDebug() << "POST data:" << postData;
-                }
-
-                QProcess ajaxScriptHandler;
-                ajaxScriptHandler.setProcessEnvironment(scriptEnvironment);
-
-                // Non-blocking event loop waiting for AJAX script results:
+                // Non-blocking waiting for all local AJAX Perl scripts:
                 QEventLoop ajaxScriptHandlerWaitingLoop;
-                QObject::connect(&ajaxScriptHandler,
-                                 SIGNAL(finished(int, QProcess::ExitStatus)),
+
+                // Signal and slot for reading output and errors from
+                // all local AJAX Perl scripts:
+                QObject::connect(longRunScriptHandler,
+                                 SIGNAL(scriptFinishedSignal(QString,
+                                                             QString,
+                                                             QString,
+                                                             QString)),
                                  &ajaxScriptHandlerWaitingLoop,
                                  SLOT(quit()));
 
-                // AJAX scripts timer- 2 seconds:
-                // QTimer::singleShot(2000, &scriptHandlerWaitingLoop,
-                //                    SLOT(quit()));
-
-                QString ajaxScriptResultString;
-                QString ajaxScriptErrorString;
-
-                QFileReader *resourceReader =
-                        new QFileReader(QString(ajaxScriptFullFilePath));
-                QString fileContents = resourceReader->fileContents;
-
-                ajaxScriptHandler.start(
-                            (qApp->property("perlInterpreter").toString()),
-                            QStringList()
-                            << "-M-ops=fork"
-                            << "-e"
-                            << fileContents,
-                            QProcess::Unbuffered | QProcess::ReadWrite);
-
-                if (postData.length() > 0) {
-                    ajaxScriptHandler.write(postDataArray);
-                }
-
                 ajaxScriptHandlerWaitingLoop.exec();
 
-                QByteArray scriptResultArray =
-                        ajaxScriptHandler.readAllStandardOutput();
-                ajaxScriptResultString =
-                        QString::fromLatin1(scriptResultArray);
+                QString ajaxScriptOutput =
+                        longRunScriptHandler->scriptAccumulatedOutput;
 
-                QByteArray scriptErrorArray =
-                        ajaxScriptHandler.readAllStandardError();
-                ajaxScriptErrorString =
-                        QString::fromLatin1(scriptErrorArray);
+                QString ajaxScriptErrors =
+                        longRunScriptHandler->scriptAccumulatedErrors;
 
-                if (ajaxScriptResultString.length() == 0 and
-                        ajaxScriptErrorString == 0) {
+                if (ajaxScriptOutput.length() == 0 and
+                        ajaxScriptErrors == 0) {
                     qDebug() << "AJAX script timed out or gave no output:"
-                             << ajaxScriptFullFilePath;
-                } else {
-                    qDebug() << "AJAX script finished:"
                              << ajaxScriptFullFilePath;
                 }
 
-                if (ajaxScriptErrorString.length() > 0) {
+                if (ajaxScriptErrors.length() > 0) {
                     qDebug() << "AJAX script errors:";
                     QStringList scriptErrors =
-                            ajaxScriptErrorString.split("\n");
+                            ajaxScriptErrors.split("\n");
                     foreach (QString scriptError, scriptErrors) {
                         if (scriptError.length() > 0) {
                             qDebug() << scriptError;
@@ -366,7 +392,7 @@ protected:
 
                 QCustomNetworkReply *reply =
                         new QCustomNetworkReply (
-                            request.url(), ajaxScriptResultString, emptyString);
+                            request.url(), ajaxScriptOutput, emptyString);
                 return reply;
             } else {
                 qDebug() << "File not found:" << ajaxScriptFullFilePath;
@@ -375,8 +401,9 @@ protected:
                         new QFileReader(QString(":/html/error.html"));
                 QString htmlErrorContents = resourceReader->fileContents;
 
-                QString errorMessage = "File not found:<br>"
-                        + ajaxScriptFullFilePath;
+                QString errorMessage =
+                        "<p>File not found:<br>"
+                        + ajaxScriptFullFilePath + "</p>";
                 htmlErrorContents
                         .replace("ERROR_MESSAGE", errorMessage);
 
@@ -389,8 +416,10 @@ protected:
             }
         }
 
-        // GET requests to the browser pseudodomain -
+        // ==============================
+        // GET requests to the browser pseudodomain:
         // local files and non-AJAX scripts:
+        // ==============================
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains(scriptAjaxMarker))) {
@@ -412,8 +441,8 @@ protected:
                 // Handle local Perl scripts:
                 if (mimeType == "application/x-perl") {
                     // Start local Perl scripts only if
-                    // no web content is loaded in the same window:
-                    if (webContentDetected == false) {
+                    // no untrusted content is loaded in the same window:
+                    if (untrustedContentDetected == false) {
                         QByteArray emptyPostDataArray;
                         emit startScriptSignal(
                                     request.url(), emptyPostDataArray);
@@ -425,18 +454,19 @@ protected:
                     }
 
                     // If an attempt is made to start local Perl scripts after
-                    // web content is loaded in the same window,
-                    // display an error page:
-                    if (webContentDetected == true) {
+                    // untrusted content is loaded in the same window,
+                    //  an error page is displayed:
+                    if (untrustedContentDetected == true) {
                         QString errorMessage =
-                                "Calling local Perl scripts after "
-                                "web content is loaded is prohibited.<br>"
+                                "<p>Calling local Perl scripts after "
+                                "untrusted content is loaded in "
+                                "the same window is prohibited.<br>"
                                 "Go to <a href='" +
                                 qApp->property("startPage").toString() +
                                 "'>start page</a> "
-                                "to unlock local Perl scripts.";
+                                "to unlock local Perl scripts.</p>";
                         qDebug() << "Local Perl script called after"
-                                 << "web content was loaded:"
+                                 << "untrusted content was loaded:"
                                  << request.url().toString();
 
                         QFileReader *resourceReader =
@@ -502,7 +532,8 @@ protected:
                         new QFileReader(QString(":/html/error.html"));
                 QString htmlErrorContents = resourceReader->fileContents;
 
-                QString errorMessage = "File not found:<br>" + fullFilePath;
+                QString errorMessage =
+                        "<p>File not found:<br>" + fullFilePath + "</p>";
                 htmlErrorContents
                         .replace("ERROR_MESSAGE", errorMessage);
 
@@ -515,7 +546,10 @@ protected:
             }
         }
 
-        // POST requests to the browser pseudodomain - non-AJAX scripts:
+        // ==============================
+        // POST requests to the browser pseudodomain:
+        // non-AJAX scripts:
+        // ==============================
         if (operation == PostOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
                 (!request.url().path().contains(scriptAjaxMarker))) {
@@ -540,120 +574,12 @@ protected:
     }
 
 public:
-    bool webContentDetected;
+    bool untrustedContentDetected;
 
 private:
     QString emptyString;
     QRegExp scriptAjaxMarker;
-};
-
-// ==============================
-// LONG RUNNING SCRIPT HANDLER:
-// ==============================
-class QLongRunScriptHandler : public QObject
-{
-    Q_OBJECT
-
-signals:
-    void displayScriptOutputSignal(QString output, QString scriptOutputTarget);
-    void displayScriptErrorsSignal(QString errors);
-
-public slots:
-    void qLongrunScriptOutputSlot()
-    {
-        QString output = scriptHandler.readAllStandardOutput();
-        scriptAccumulatedOutput.append(output);
-
-        if (scriptOutputTarget.length() > 0) {
-            emit displayScriptOutputSignal(output, scriptOutputTarget);
-        }
-
-        qDebug() << QDateTime::currentMSecsSinceEpoch()
-                 << "msecs from epoch: output from" << scriptFullFilePath;
-    }
-
-    void qLongrunScriptErrorsSlot()
-    {
-        QString error = scriptHandler.readAllStandardError();
-        scriptAccumulatedErrors.append(error);
-        scriptAccumulatedErrors.append("\n");
-
-        qDebug() << QDateTime::currentMSecsSinceEpoch()
-                 << "msecs from epoch: errors from" << scriptFullFilePath;
-    }
-
-    void qLongrunScriptFinishedSlot()
-    {
-        QString emptyString;
-
-        QString scriptErrorTitle;
-        if (scriptAccumulatedErrors.contains("trapped")) {
-            scriptErrorTitle = "Insecure code was blocked:";
-        } else {
-            scriptErrorTitle = "Errors were found during script execution:";
-        }
-
-        scriptAccumulatedErrors.replace(QRegExp("\n\n$"), "\n");
-
-        QString scriptError = scriptErrorTitle +
-                "<br>" +
-                scriptFullFilePath +
-                "<br><br>" +
-                "<pre>" +
-                scriptAccumulatedErrors +
-                "</pre>";
-
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/html/error.html"));
-        QString scriptFormattedErrors = resourceReader->fileContents;
-
-        scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
-
-        // If long running script has no errors and no target DOM element:
-        if (scriptAccumulatedOutput.length() > 0 and
-                scriptAccumulatedErrors.length() == 0 and
-                scriptOutputTarget.length() == 0) {
-            emit displayScriptOutputSignal(
-                        scriptAccumulatedOutput, emptyString);
-        }
-
-        if (scriptAccumulatedErrors.length() > 0) {
-            if (scriptAccumulatedOutput.length() == 0) {
-                if (scriptOutputTarget.length() == 0) {
-                    // If long running script has no output and only errors and
-                    // no target DOM element is defined,
-                    // all HTML formatted errors will be displayed
-                    // in the same window:
-                    emit displayScriptOutputSignal(
-                                scriptFormattedErrors, emptyString);
-                } else {
-                    // If long running script has no output and only errors and
-                    // a target DOM element is defined,
-                    // all HTML formatted errors will be displayed
-                    // in a new window:
-                    emit displayScriptErrorsSignal(scriptFormattedErrors);
-                }
-            } else {
-                // If long running script has some output and errors,
-                // HTML formatted errors will be displayed in a new window:
-                emit displayScriptErrorsSignal(scriptFormattedErrors);
-            }
-        }
-
-        scriptHandler.close();
-
-        qDebug() << "Script finished:" << scriptFullFilePath;
-    }
-
-public:
-    QLongRunScriptHandler(QUrl url, QByteArray postDataArray);
-
-private:
-    QString scriptFullFilePath;
-    QString scriptOutputTarget;
-    QProcess scriptHandler;
-    QString scriptAccumulatedOutput;
-    QString scriptAccumulatedErrors;
+    QStringList trustedDomains;
 };
 
 // ==============================
@@ -669,7 +595,7 @@ signals:
     void printPreviewSignal();
     void printSignal();
     void selectInodeSignal(QNetworkRequest request);
-    void webContentDetectedSignal(bool webContentDetected);
+    void untrustedContentDetectedSignal(bool untrustedContent);
     void closeWindowSignal();
 
 public slots:
@@ -685,45 +611,144 @@ public slots:
         QLongRunScriptHandler *longRunScriptHandler =
                 new QLongRunScriptHandler(url, postDataArray);
 
-        // Connect signals and slots for all local long running Perl scripts:
+        // Signals and slots for all local long running Perl scripts:
         QObject::connect(longRunScriptHandler,
                          SIGNAL(displayScriptOutputSignal(QString, QString)),
                          this,
                          SLOT(qDisplayScriptOutputSlot(QString, QString)));
         QObject::connect(longRunScriptHandler,
-                         SIGNAL(displayScriptErrorsSignal(QString)),
+                         SIGNAL(scriptFinishedSignal(QString,
+                                                     QString,
+                                                     QString,
+                                                     QString)),
                          this,
-                         SLOT(qDisplayScriptErrorsTransmitterSlot(QString)));
+                         SLOT(qScriptFinishedSlot(QString,
+                                                  QString,
+                                                  QString,
+                                                  QString)));
+    }
+
+    void qScriptFinishedSlot(QString scriptAccumulatedOutput,
+                             QString scriptAccumulatedErrors,
+                             QString scriptFullFilePath,
+                             QString scriptOutputTarget)
+    {
+        if (untrustedContentDetected == true) {
+            QString errorMessage =
+                    "<p>Displaying output from local Perl scripts after "
+                    "untrusted content is loaded in the same window "
+                    "is prohibited.<br>"
+                    "Go to <a href='" +
+                    qApp->property("startPage").toString() +
+                    "'>start page</a> "
+                    "to unlock local Perl scripts.</p>";
+            qDebug() << "Displaying output from local Perl scripts stopped "
+                     << "after untrusted content is loaded:"
+                     << QPage::currentFrame()->
+                        baseUrl().toString();
+
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/error.html"));
+            QString htmlErrorContents = resourceReader->fileContents;
+
+            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+            QPage::currentFrame()->setHtml(htmlErrorContents);
+
+            qDebug() << errorMessage;
+        } else {
+            // If long running script has no errors and no target DOM element:
+            if (scriptAccumulatedOutput.length() > 0 and
+                    scriptAccumulatedErrors.length() == 0 and
+                    scriptOutputTarget.length() == 0) {
+
+                qDisplayScriptOutputSlot(scriptAccumulatedOutput, emptyString);
+            }
+
+            if (scriptAccumulatedErrors.length() > 0) {
+                if (scriptAccumulatedOutput.length() == 0) {
+                    if (scriptOutputTarget.length() == 0) {
+                        // If long running script has no output and
+                        // only errors and
+                        // no target DOM element is defined,
+                        // all HTML formatted errors will be displayed
+                        // in the same window:
+                        qFormatScriptErrors(scriptAccumulatedErrors,
+                                            scriptFullFilePath,
+                                            false);
+                    } else {
+                        // If long running script has no output and
+                        // only errors and
+                        // a target DOM element is defined,
+                        // all HTML formatted errors will be displayed
+                        // in a new window:
+                        qFormatScriptErrors(scriptAccumulatedErrors,
+                                            scriptFullFilePath,
+                                            true);
+                    }
+                } else {
+                    // If long running script has some output and errors,
+                    // HTML formatted errors will be displayed in a new window:
+                    qFormatScriptErrors(scriptAccumulatedErrors,
+                                        scriptFullFilePath,
+                                        true);
+                    qDisplayScriptOutputSlot(scriptAccumulatedOutput,
+                                             emptyString);
+                }
+            }
+        }
     }
 
     void qDisplayScriptOutputSlot(QString output, QString target)
     {
         if (target.length() > 0) {
-            // JavaScript bridge back to
-            // the local HTML page where request originated:
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/scripts/peb.js"));
-            QString pebJavaScript = resourceReader->fileContents;
+            QWebElement targetDomElement =
+                    QPage::currentFrame()->documentElement()
+                    .findFirst("#" + target);
 
-            QPage::currentFrame()->evaluateJavaScript(pebJavaScript);
-
-            QString longRunningScriptOutputJavaScript =
-                    "pebScriptOutput(\"" +
-                    target +
-                    "\" , \"" +
-                    output +
-                    "\"); null";
-
-            QPage::currentFrame()->
-                    evaluateJavaScript(longRunningScriptOutputJavaScript);
+            if (!targetDomElement.isNull()) {
+                targetDomElement.setPlainText(output);
+            } else {
+                qDebug() << "Target DOM element not found:" << target;
+            }
         } else {
             QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
     }
 
-    void qDisplayScriptErrorsTransmitterSlot(QString errors)
+    void qFormatScriptErrors(QString errors,
+                             QString scriptFullFilePath,
+                             bool newWindow)
     {
-        emit displayScriptErrorsSignal(errors);
+        QString scriptErrorTitle;
+        if (errors.contains("trapped")) {
+            scriptErrorTitle = "Insecure code was blocked:";
+        } else {
+            scriptErrorTitle = "Errors were found during script execution:";
+        }
+
+        errors.replace(QRegExp("\n\n$"), "\n");
+
+        QString scriptError = scriptErrorTitle +
+                "<br>" +
+                scriptFullFilePath +
+                "<br><br>" +
+                "<pre>" +
+                errors +
+                "</pre>";
+
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString scriptFormattedErrors = resourceReader->fileContents;
+
+        scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
+
+        if (newWindow == false) {
+            qDisplayScriptOutputSlot(scriptFormattedErrors, emptyString);
+        }
+
+        if (newWindow == true) {
+            emit displayScriptErrorsSignal(scriptFormattedErrors);
+        }
     }
 
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
@@ -737,30 +762,59 @@ public slots:
 
     void qNetworkReply(QNetworkReply *reply)
     {
-
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "Network error:" << reply->errorString();
 
-            QString filename = reply->url().fileName();
-            QMimeDatabase mimeDatabase;
-            QMimeType type = mimeDatabase.mimeTypeForName(filename);
-            QString mimeType = type.name();
-
-            if (filename.length() == 0 or mimeType == "text/html") {
+            if (reply->url().fileName().length() == 0 or
+                    reply->url().fileName()
+                    .contains(htmlFileNameExtensionMarker)) {
                 QFileReader *resourceReader =
                         new QFileReader(QString(":/html/error.html"));
                 QString htmlErrorContents = resourceReader->fileContents;
 
                 htmlErrorContents
-                        .replace("ERROR_MESSAGE", reply->errorString());
+                        .replace("ERROR_MESSAGE",
+                                 "<p>" + reply->errorString() + "</p>");
                 QPage::currentFrame()->setHtml(htmlErrorContents);
+            }
+        }
+
+        if (reply->error() == QNetworkReply::NoError) {
+            if (reply->url().authority() == PSEUDO_DOMAIN) {
+                if (untrustedContentDetected == true) {
+                    if (reply->url().fileName().length() == 0 or
+                            reply->url().fileName()
+                            .contains(htmlFileNameExtensionMarker)) {
+                        QString errorMessage =
+                                "<p>Displaying local page after "
+                                "untrusted content is loaded in "
+                                "the same window is prohibited.<br>"
+                                "Go to <a href='" +
+                                qApp->property("startPage").toString() +
+                                "'>start page</a> "
+                                "to unlock local pages.</p>";
+                        qDebug() << "Local page called after"
+                                 << "untrusted content was loaded:"
+                                 << reply->url().toString();
+
+                        QFileReader *resourceReader =
+                                new QFileReader(QString(":/html/error.html"));
+                        QString htmlErrorContents =
+                                resourceReader->fileContents;
+
+                        htmlErrorContents
+                                .replace("ERROR_MESSAGE", errorMessage);
+                        QPage::currentFrame()->setHtml(htmlErrorContents);
+                    }
+                }
             }
         }
     }
 
-    void qWebContentDetectedTransmitterSlot(bool webContentDetectedQWebPage)
+    void qUntrustedContentDetectedTransmitterSlot(bool untrustedContent)
     {
-        emit webContentDetectedSignal(webContentDetectedQWebPage);
+        untrustedContentDetected = untrustedContent;
+        emit untrustedContentDetectedSignal(untrustedContent);
     }
 
     void qCloseWindowFromURLTransmitterSlot()
@@ -1145,6 +1199,11 @@ protected:
 private:
     QWebView *webViewWidget;
 
+    QString emptyString;
+
+    bool untrustedContentDetected;
+    QRegExp htmlFileNameExtensionMarker;
+
     QString alertTitle;
     QString confirmTitle;
     QString promptTitle;
@@ -1179,7 +1238,7 @@ public slots:
 
     void qSelectInodesSlot(QNetworkRequest request)
     {
-        if (webContentDetected == false) {
+        if (untrustedContentDetected == false) {
             QString target = request.url().query().replace("target=", "");
 
             QFileDialog inodesDialog (this);
@@ -1246,17 +1305,18 @@ public slots:
             }
         }
 
-        if (webContentDetected == true) {
+        if (untrustedContentDetected == true) {
             QString errorMessage =
-                    "Full path selection after "
-                    "web content is loaded is prohibited.<br>"
+                    "<p>Full path selection after "
+                    "untrusted content is loaded in the same window "
+                    "is prohibited.<br>"
                     "Go to <a href='" +
                     qApp->property("startPage").toString() +
                     "'>start page</a> "
                     "to unlock selection of "
-                    "files or folders with their full paths.";
+                    "files or folders with their full paths.</p>";
             qDebug() << "Full path selection attempted after"
-                     << "web content is loaded:"
+                     << "untrusted content is loaded:"
                      << mainPage->currentFrame()->
                         baseUrl().toString();
 
@@ -1504,7 +1564,7 @@ public slots:
                 new QFileReader(QString(":/scripts/peb.js"));
         QString pebJavaScript = resourceReader->fileContents;
 
-        frame->evaluateJavaScript(pebJavaScript);
+       frame->evaluateJavaScript(pebJavaScript);
 
         QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
@@ -1545,9 +1605,9 @@ public slots:
         }
     }
 
-    void qWebContentDetectedSlot(bool webContentDetectedQWebView)
+    void qUntrustedContentDetectedSlot(bool untrustedContent)
     {
-        webContentDetected = webContentDetectedQWebView;
+        untrustedContentDetected = untrustedContent;
     }
 
     void qCloseWindowFromURLSlot()
@@ -1576,6 +1636,7 @@ public:
         QFileReader *javaScriptReader =
                 new QFileReader(QString(":/scripts/peb.js"));
         QString pebJavaScript = javaScriptReader->fileContents;
+
         QWebViewWidget::page()->currentFrame()->
                 evaluateJavaScript(pebJavaScript);
 
@@ -1604,7 +1665,7 @@ private:
     QWebView *newWindow;
     QWebView *errorsWindow;
 
-    bool webContentDetected;
+    bool untrustedContentDetected;
     bool windowCloseRequested;
 };
 
