@@ -960,5 +960,50 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
         }
     }
 
+    // Untrusted content is displayed in
+    // a new browser window:
+    QStringList trustedDomains =
+            qApp->property("trustedDomainsList").toStringList();
+    trustedDomains.append(PSEUDO_DOMAIN);
+
+    if (request.url().authority() != PSEUDO_DOMAIN) {
+        if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                (!trustedDomains.contains(request.url().authority()))) {
+            qDebug() << "Untrusted content loaded in a new window:"
+                     << request.url().toString();
+
+            QFileReader *htmlReader =
+                    new QFileReader(QString(":/html/loading.html"));
+            QString loadingContents = htmlReader->fileContents;
+
+            QFileReader *javaScriptReader =
+                    new QFileReader(QString(":/scripts/peb.js"));
+            QString pebJavaScript = javaScriptReader->fileContents;
+
+            QPage::currentFrame()->evaluateJavaScript(pebJavaScript);
+
+            QVariant newWindowSettingResult =
+                    QPage::currentFrame()->
+                    evaluateJavaScript("pebFindNewWindowSetting()");
+            QString newWindowSetting = newWindowSettingResult.toString();
+
+            QWebViewWidget *newWindow = new QWebViewWidget();
+            newWindow->setAttribute(Qt::WA_DeleteOnClose, true);
+            newWindow->setHtml(loadingContents);
+
+            if (newWindowSetting == "maximized") {
+                newWindow->showMaximized();
+
+            }
+
+            newWindow->setFocus();
+            newWindow->adjustSize();
+
+            newWindow->setUrl(request.url());
+
+            return false;
+        }
+    }
+
     return QWebPage::acceptNavigationRequest(frame, request, navigationType);
 }

@@ -1646,7 +1646,6 @@ public:
                 evaluateJavaScript("pebFindNewWindowSetting()");
         QString newWindowSetting = newWindowSettingResult.toString();
 
-
         QWebView *window = new QWebViewWidget();
         window->setHtml(loadingContents);
 
