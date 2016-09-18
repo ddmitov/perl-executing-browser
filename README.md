@@ -266,9 +266,9 @@ JavaScript-based settings have three main functions:
   
 ## Security
    Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a single Perl setting, but they do not constitute a sandbox for Perl scripts. PEB security is based on the following principles:  
-   **1.** Users have full access to their local data.
-   **2.** PEB-based applications are no danger to the underlying operating system.
-   **3.** What is local, stays local and what is web-based, stays web-based.  
+   **1.** Users have full access to their local data.  
+   **2.** PEB-based applications are no danger to the underlying operating system.  
+   **3.** By default, what is local, stays local and what is web-based, stays web-based.  
    Mixing local and remote content is possible only if ```{PEB_binary_directory}/resources/app/trusted-domains.json``` is explicitely created by a developer of a PEB-based application. This file is read only once at application startup and can not be manipulated remotely.  
   
 **Security features based on C++ code:**
