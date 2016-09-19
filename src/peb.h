@@ -787,8 +787,8 @@ public slots:
                             reply->url().fileName()
                             .contains(htmlFileNameExtensionMarker)) {
                         QString errorMessage =
-                                "<p>Displaying local page after "
-                                "untrusted content is loaded in "
+                                "<p>Mixing local page with "
+                                "untrusted content in "
                                 "the same window is prohibited.<br>"
                                 "Go to <a href='" +
                                 qApp->property("startPage").toString() +
@@ -1651,9 +1651,9 @@ public:
 
         if (newWindowSetting == "maximized") {
             window->showMaximized();
+        } else {
+            window->show();
         }
-
-        window->setFocus();
 
         qDebug() << "New window opened.";
 
