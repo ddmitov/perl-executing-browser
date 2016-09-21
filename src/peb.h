@@ -781,32 +781,34 @@ public slots:
         }
 
         if (reply->error() == QNetworkReply::NoError) {
-            if (reply->url().authority() == PSEUDO_DOMAIN) {
+            if (pageStatus.length() == 0) {
+                if (reply->url().authority() == PSEUDO_DOMAIN) {
+                    pageStatus = "local";
+                }
+            }
+
+            if (pageStatus == "local") {
                 if (untrustedContentDetected == true) {
-                    if (reply->url().fileName().length() == 0 or
-                            reply->url().fileName()
-                            .contains(htmlFileNameExtensionMarker)) {
-                        QString errorMessage =
-                                "<p>Mixing local page with "
-                                "untrusted content in "
-                                "the same window is prohibited.<br>"
-                                "Go to <a href='" +
-                                qApp->property("startPage").toString() +
-                                "'>start page</a> "
-                                "to unlock local pages.</p>";
-                        qDebug() << "Local page called after"
-                                 << "untrusted content was loaded:"
-                                 << reply->url().toString();
+                    QString errorMessage =
+                            "<p>Untrusted content detected:<br>" +
+                            reply->url().toString() + "<br>"
+                            "Mixing local pages with "
+                            "untrusted content is prohibited.<br>"
+                            "Go to <a href='" +
+                            qApp->property("startPage").toString() +
+                            "'>start page</a> "
+                            "to unlock local pages.</p>";
+                    qDebug() << "Untrusted content detected:"
+                             << reply->url().toString();
 
-                        QFileReader *resourceReader =
-                                new QFileReader(QString(":/html/error.html"));
-                        QString htmlErrorContents =
-                                resourceReader->fileContents;
+                    QFileReader *resourceReader =
+                            new QFileReader(QString(":/html/error.html"));
+                    QString htmlErrorContents =
+                            resourceReader->fileContents;
 
-                        htmlErrorContents
-                                .replace("ERROR_MESSAGE", errorMessage);
-                        QPage::currentFrame()->setHtml(htmlErrorContents);
-                    }
+                    htmlErrorContents
+                            .replace("ERROR_MESSAGE", errorMessage);
+                    QPage::currentFrame()->setHtml(htmlErrorContents);
                 }
             }
         }
@@ -1199,6 +1201,7 @@ protected:
 
 private:
     QWebView *webViewWidget;
+    QString pageStatus;
 
     QString emptyString;
 
@@ -1634,26 +1637,9 @@ public:
                 new QFileReader(QString(":/html/loading.html"));
         QString loadingContents = htmlReader->fileContents;
 
-        QFileReader *javaScriptReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = javaScriptReader->fileContents;
-
-        QWebViewWidget::page()->currentFrame()->
-                evaluateJavaScript(pebJavaScript);
-
-        QVariant newWindowSettingResult =
-                QWebViewWidget::page()->currentFrame()->
-                evaluateJavaScript("pebFindNewWindowSetting()");
-        QString newWindowSetting = newWindowSettingResult.toString();
-
         QWebView *window = new QWebViewWidget();
         window->setHtml(loadingContents);
-
-        if (newWindowSetting == "maximized") {
-            window->showMaximized();
-        } else {
-            window->show();
-        }
+        window->show();
 
         qDebug() << "New window opened.";
 

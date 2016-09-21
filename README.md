@@ -177,10 +177,9 @@ PEB is designed to run from any directory without setting anything beforehand an
     Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
 **Settings based on JavaScript code:**  
-JavaScript-based settings have three main functions:  
-1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files,  
-2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form and  
-3. to regulate whether new windows are maximized or not.
+JavaScript-based settings have two functions:  
+1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and
+2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
 * **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
@@ -255,15 +254,6 @@ JavaScript-based settings have three main functions:
   }
 ```
 
-* **Maximized new windows:**  
-  Every new window opened from the page containing the following code will be maximized. If no ```pebNewWindowSetting()``` function is found, new windows are not maximized.  
-```javascript
-  function pebNewWindowSetting() {
-      return "maximized";
-  }
-```
-
-  
 ## Security
    Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a single Perl setting, but they do not constitute a sandbox for Perl scripts. PEB security is based on the following principles:  
    **1.** Users have full access to their local data.  
@@ -273,10 +263,11 @@ JavaScript-based settings have three main functions:
   
 **Security features based on C++ code:**
 * PEB can not and does not download remote files and can not execute any Perl scripts from remote locations.
-* No local Perl scripts are started if any untrusted content is loaded in the calling local page.  
-  No local Perl scripts are started if they are called from a web page.
-* No output from local Perl scripts is displayed if any untrusted content is loaded in the calling local page.
-* No files or folders can be selected with their full paths if any untrusted content is loaded in the calling local page.  
+* All local pages are blocked if loading untrusted content in a local page is attempted.
+* No local Perl scripts can be started if loading untrusted content in a local page is attempted.  
+  No local Perl scripts can be started if they are called from a web page.
+* No output from local Perl scripts is displayed if loading untrusted content in a local page is attempted.
+* No files or folders can be selected with their full paths if loading untrusted content in a local page is attempted.  
   No files or folders can be selected with their full paths from a web page.
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
