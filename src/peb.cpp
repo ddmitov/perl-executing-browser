@@ -683,17 +683,15 @@ QPage::QPage()
                      this,
                      SLOT(qNetworkReply(QNetworkReply*)));
 
-    // Signal and slot for the detection of untrusted content:
-    QObject::connect(networkAccessManager,
-                     SIGNAL(untrustedContentDetectedSignal(bool)),
-                     this,
-                     SLOT(qUntrustedContentDetectedTransmitterSlot(bool)));
+    // Signal and slot for the detection of page status:
+    QObject::connect(this,
+                     SIGNAL(pageStatusSignal(QString)),
+                     networkAccessManager,
+                     SLOT(qPageStatusSlot(QString)));
 
-    // Signal and slot for closing window from URL:
-    QObject::connect(networkAccessManager,
-                     SIGNAL(closeWindowSignal()),
-                     this,
-                     SLOT(qCloseWindowFromURLTransmitterSlot()));
+    // Signals and slots for actions taken after page is loaded:
+    QObject::connect(this, SIGNAL(loadFinished(bool)),
+                     this, SLOT(qPageLoadedSlot(bool)));
 
     // Signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
@@ -701,9 +699,11 @@ QPage::QPage()
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Signals and slots for actions taken after page is loaded:
-    QObject::connect(this, SIGNAL(loadFinished(bool)),
-                     this, SLOT(qPageLoadedSlot(bool)));
+    // Signal and slot for closing window from URL:
+    QObject::connect(networkAccessManager,
+                     SIGNAL(closeWindowSignal()),
+                     this,
+                     SLOT(qCloseWindowFromURLTransmitterSlot()));
 
     // Configure scroll bars:
     mainFrame()->setScrollBarPolicy(Qt::Horizontal,
@@ -714,6 +714,10 @@ QPage::QPage()
     // Regular expression for detection of HTML file extensions:
     htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
     htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
+
+    // Trusted domains:
+    trustedDomains = qApp->property("trustedDomainsList").toStringList();
+    trustedDomains.append(PSEUDO_DOMAIN);
 
     // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
     alertTitle = "Alert";
@@ -791,10 +795,6 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowFromURLSlot()));
 
-    // Signal and slot for the detection of untrusted content:
-    QObject::connect(mainPage, SIGNAL(untrustedContentDetectedSignal(bool)),
-                     this, SLOT(qUntrustedContentDetectedSlot(bool)));
-
     // Install QPage instance inside every QWebViewWidget instance:
     setPage(mainPage);
 
@@ -819,144 +819,153 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             mainFrame()->setUrl(request.url());
         }
 
-        // User selected single file:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "open-file.function") {
-            if (request.url().query().replace("target=", "").length() > 0) {
-                emit selectInodeSignal(request);
-            }
-
-            return false;
-        }
-
-        // User selected multiple files:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "open-files.function") {
-            if (request.url().query().replace("target=", "").length() > 0) {
-                emit selectInodeSignal(request);
-            }
-
-            return false;
-        }
-
-        // User selected new file name:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "new-file-name.function") {
-            if (request.url().query().replace("target=", "").length() > 0) {
-                emit selectInodeSignal(request);
-            }
-
-            return false;
-        }
-
-        // User selected directory:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "open-directory.function") {
-            if (request.url().query().replace("target=", "").length() > 0) {
-                emit selectInodeSignal(request);
-            }
-
-            return false;
-        }
-
-#ifndef QT_NO_PRINTER
-        // Print preview from URL:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "print.function" and
-                request.url().query() == "action=preview") {
-
-            emit printPreviewSignal();
-
-            return false;
-        }
-
-        // Print page from URL:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "print.function" and
-                request.url().query() == "action=print") {
-            emit printSignal();
-
-            return false;
-        }
-#endif
-
-        // About browser dialog box:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "about.function" and
-                request.url().query() == "type=browser") {
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/html/about.html"));
-            QString aboutPageContents = resourceReader->fileContents;
-
-            aboutPageContents
-                    .replace("VERSION_STRING",
-                             QApplication::applicationVersion().toLatin1());
-
-            frame->setHtml(aboutPageContents);
-
-            return false;
-        }
-
-        // About Qt dialog box:
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName() == "about.function" and
-                request.url().query() == "type=qt") {
-            QApplication::aboutQt();
-
-            return false;
-        }
-
-        // PERL DEBUGGER INTERACTION:
-        // Implementation of an idea proposed by Valcho Nedelchev.
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            if ((navigationType == QWebPage::NavigationTypeLinkClicked or
-                 navigationType == QWebPage::NavigationTypeFormSubmitted) and
-                    request.url().fileName() == "perl-debugger.function") {
-                debuggerFrame = frame;
-
-                // Get a Perl debugger command (if any):
-                QUrlQuery scriptQuery(request.url());
-                debuggerLastCommand = scriptQuery.queryItemValue("command");
-
-                // Select a Perl script for debugging:
-                if (request.url().query().contains("action=select-file")) {
-
-                    QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
-                    selectScriptToDebugDialog
-                            .setFileMode(QFileDialog::ExistingFile);
-                    selectScriptToDebugDialog
-                            .setViewMode(QFileDialog::Detail);
-                    selectScriptToDebugDialog
-                            .setWindowModality(Qt::WindowModal);
-
-                    debuggerScriptToDebug = selectScriptToDebugDialog
-                            .getOpenFileName
-                            (qApp->activeWindow(),
-                             "Select Perl File",
-                             QDir::currentPath(),
-                             "Perl scripts (*.pl);;All files (*)");
-
-                    selectScriptToDebugDialog.close();
-                    selectScriptToDebugDialog.deleteLater();
-
-                    if (debuggerScriptToDebug.length() > 1) {
-                        debuggerScriptToDebug =
-                                QDir::toNativeSeparators(debuggerScriptToDebug);
-
-                        // Close any still open Perl debugger session:
-                        debuggerHandler.close();
-
-                        // Start the Perl debugger:
-                        qStartPerlDebuggerSlot();
-                        return false;
-                    } else {
-                        return false;
-                    }
+        if (pageStatus == "trusted") {
+            // User selected single file:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-file.function") {
+                if (request.url().query().replace("target=", "").length() > 0) {
+                    emit selectInodeSignal(request);
                 }
 
-                qStartPerlDebuggerSlot();
                 return false;
             }
+
+            // User selected multiple files:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-files.function") {
+                if (request.url().query().replace("target=", "").length() > 0) {
+                    emit selectInodeSignal(request);
+                }
+
+                return false;
+            }
+
+            // User selected new file name:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "new-file-name.function") {
+                if (request.url().query().replace("target=", "").length() > 0) {
+                    emit selectInodeSignal(request);
+                }
+
+                return false;
+            }
+
+            // User selected directory:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-directory.function") {
+                if (request.url().query().replace("target=", "").length() > 0) {
+                    emit selectInodeSignal(request);
+                }
+
+                return false;
+            }
+
+#ifndef QT_NO_PRINTER
+            // Print preview from URL:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "print.function" and
+                    request.url().query() == "action=preview") {
+
+                emit printPreviewSignal();
+
+                return false;
+            }
+
+            // Print page from URL:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "print.function" and
+                    request.url().query() == "action=print") {
+                emit printSignal();
+
+                return false;
+            }
+#endif
+
+            // About browser dialog box:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "about.function" and
+                    request.url().query() == "type=browser") {
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/about.html"));
+                QString aboutPageContents = resourceReader->fileContents;
+
+                aboutPageContents
+                        .replace("VERSION_STRING",
+                                 QApplication::applicationVersion().toLatin1());
+
+                frame->setHtml(aboutPageContents);
+
+                return false;
+            }
+
+            // About Qt dialog box:
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "about.function" and
+                    request.url().query() == "type=qt") {
+                QApplication::aboutQt();
+
+                return false;
+            }
+
+            // PERL DEBUGGER INTERACTION:
+            // Implementation of an idea proposed by Valcho Nedelchev.
+            if (PERL_DEBUGGER_INTERACTION == 1) {
+                if ((navigationType == QWebPage::NavigationTypeLinkClicked or
+                     navigationType == QWebPage::NavigationTypeFormSubmitted)
+                        and
+                        request.url().fileName() == "perl-debugger.function") {
+                    debuggerFrame = frame;
+
+                    // Get a Perl debugger command (if any):
+                    QUrlQuery scriptQuery(request.url());
+                    debuggerLastCommand = scriptQuery.queryItemValue("command");
+
+                    // Select a Perl script for debugging:
+                    if (request.url().query().contains("action=select-file")) {
+
+                        QFileDialog selectScriptToDebugDialog(
+                                    qApp->activeWindow());
+                        selectScriptToDebugDialog
+                                .setFileMode(QFileDialog::ExistingFile);
+                        selectScriptToDebugDialog
+                                .setViewMode(QFileDialog::Detail);
+                        selectScriptToDebugDialog
+                                .setWindowModality(Qt::WindowModal);
+
+                        debuggerScriptToDebug = selectScriptToDebugDialog
+                                .getOpenFileName
+                                (qApp->activeWindow(),
+                                 "Select Perl File",
+                                 QDir::currentPath(),
+                                 "Perl scripts (*.pl);;All files (*)");
+
+                        selectScriptToDebugDialog.close();
+                        selectScriptToDebugDialog.deleteLater();
+
+                        if (debuggerScriptToDebug.length() > 1) {
+                            debuggerScriptToDebug =
+                                    QDir::toNativeSeparators(
+                                        debuggerScriptToDebug);
+
+                            // Close any still open Perl debugger session:
+                            debuggerHandler.close();
+
+                            // Start the Perl debugger:
+                            qStartPerlDebuggerSlot();
+                            return false;
+                        } else {
+                            return false;
+                        }
+                    }
+
+                    qStartPerlDebuggerSlot();
+                    return false;
+                }
+            }
+        }
+
+        if (pageStatus == "untrusted") {
+            qMixedContentWarning(request.url());
         }
     }
 

@@ -260,7 +260,6 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
-    void untrustedContentDetectedSignal(bool untrustedContent);
     void closeWindowSignal();
 
 protected:
@@ -283,25 +282,8 @@ protected:
         }
 
         // ==============================
-        // Detect start page:
-        // ==============================
-        if (request.url() == qApp->property("startPage").toString()) {
-                untrustedContentDetected = false;
-                emit untrustedContentDetectedSignal(untrustedContentDetected);
-        }
-
-        // ==============================
-        // Detect untrusted content:
-        // ==============================
-        trustedDomains = qApp->property("trustedDomainsList").toStringList();
-        trustedDomains.append(PSEUDO_DOMAIN);
-
-        if (!trustedDomains.contains(request.url().authority())) {
-            untrustedContentDetected = true;
-            emit untrustedContentDetectedSignal(untrustedContentDetected);
-        }
-
         // Case-insensitive marker for AJAX Perl scripts:
+        // ==============================
         scriptAjaxMarker.setPattern("ajax");
         scriptAjaxMarker.setCaseSensitivity(Qt::CaseInsensitive);
 
@@ -313,14 +295,14 @@ protected:
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains(scriptAjaxMarker) and
-                untrustedContentDetected == true) {
+                pageStatus == "untrusted") {
 
             QString errorMessage =
-                    "<p>Calling local Perl scripts after "
-                    "untrusted content is loaded is prohibited. "
-                    "Go to start page to unlock local Perl scripts.</p>";
-            qDebug() << "Local Perl script called after"
-                     << "untrusted content was loaded:"
+                    "Calling local Perl scripts after "
+                    "untrusted content is loaded is prohibited.<br>"
+                    "Go to start page to unlock local Perl scripts.";
+            qDebug() << "Local AJAX Perl script called after"
+                     << "untrusted content is loaded:"
                      << request.url().toString();
 
             QCustomNetworkReply *reply =
@@ -336,7 +318,7 @@ protected:
              operation == PostOperation) and
                 request.url().authority() == PSEUDO_DOMAIN and
                 request.url().path().contains(scriptAjaxMarker) and
-                untrustedContentDetected == false) {
+                pageStatus == "trusted") {
 
             QString ajaxScriptFullFilePath = QDir::toNativeSeparators
                     ((qApp->property("application").toString())
@@ -443,7 +425,7 @@ protected:
                 if (mimeType == "application/x-perl") {
                     // Start local Perl scripts only if
                     // no untrusted content is loaded in the same window:
-                    if (untrustedContentDetected == false) {
+                    if (pageStatus == "trusted") {
                         QByteArray emptyPostDataArray;
                         emit startScriptSignal(
                                     request.url(), emptyPostDataArray);
@@ -457,7 +439,7 @@ protected:
                     // If an attempt is made to start local Perl scripts after
                     // untrusted content is loaded in the same window,
                     //  an error page is displayed:
-                    if (untrustedContentDetected == true) {
+                    if (pageStatus == "untrusted") {
                         QString errorMessage =
                                 "<p>Calling local Perl scripts after "
                                 "untrusted content is loaded in "
@@ -574,13 +556,17 @@ protected:
                  QNetworkRequest(request));
     }
 
-public:
-    bool untrustedContentDetected;
+public slots:
+    void qPageStatusSlot(QString pageStatusTransmitted)
+    {
+        pageStatus = pageStatusTransmitted;
+    }
 
 private:
     QString emptyString;
     QRegExp scriptAjaxMarker;
     QStringList trustedDomains;
+    QString pageStatus;
 };
 
 // ==============================
@@ -596,7 +582,7 @@ signals:
     void printPreviewSignal();
     void printSignal();
     void selectInodeSignal(QNetworkRequest request);
-    void untrustedContentDetectedSignal(bool untrustedContent);
+    void pageStatusSignal(QString pageStatus);
     void closeWindowSignal();
 
 public slots:
@@ -634,7 +620,7 @@ public slots:
                              QString scriptFullFilePath,
                              QString scriptOutputTarget)
     {
-        if (untrustedContentDetected == true) {
+        if (pageStatus == "untrusted") {
             QString errorMessage =
                     "<p>Displaying output from local Perl scripts after "
                     "untrusted content is loaded in the same window "
@@ -656,7 +642,9 @@ public slots:
             QPage::currentFrame()->setHtml(htmlErrorContents);
 
             qDebug() << errorMessage;
-        } else {
+        }
+
+        if (pageStatus == "trusted") {
             // If long running script has no errors and no target DOM element:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
@@ -781,43 +769,53 @@ public slots:
         }
 
         if (reply->error() == QNetworkReply::NoError) {
+            if (reply->url() == qApp->property("startPage").toString()) {
+                pageStatus = "trusted";
+                emit pageStatusSignal(pageStatus);
+            }
+
             if (pageStatus.length() == 0) {
-                if (reply->url().authority() == PSEUDO_DOMAIN) {
-                    pageStatus = "local";
+                if (trustedDomains.contains(reply->url().authority())) {
+                    pageStatus = "trusted";
+                    emit pageStatusSignal(pageStatus);
+                }
+
+                if (!trustedDomains.contains(reply->url().authority())) {
+                    pageStatus = "untrusted";
+                    emit pageStatusSignal(pageStatus);
                 }
             }
 
-            if (pageStatus == "local") {
-                if (untrustedContentDetected == true) {
-                    QString errorMessage =
-                            "<p>Untrusted content detected:<br>" +
-                            reply->url().toString() + "<br>"
-                            "Mixing local pages with "
-                            "untrusted content is prohibited.<br>"
-                            "Go to <a href='" +
-                            qApp->property("startPage").toString() +
-                            "'>start page</a> "
-                            "to unlock local pages.</p>";
-                    qDebug() << "Untrusted content detected:"
-                             << reply->url().toString();
-
-                    QFileReader *resourceReader =
-                            new QFileReader(QString(":/html/error.html"));
-                    QString htmlErrorContents =
-                            resourceReader->fileContents;
-
-                    htmlErrorContents
-                            .replace("ERROR_MESSAGE", errorMessage);
-                    QPage::currentFrame()->setHtml(htmlErrorContents);
+            if (pageStatus == "trusted") {
+                if (!trustedDomains.contains(reply->url().authority())) {
+                    qMixedContentWarning(reply->url());
                 }
             }
         }
     }
 
-    void qUntrustedContentDetectedTransmitterSlot(bool untrustedContent)
+    void qMixedContentWarning(QUrl url)
     {
-        untrustedContentDetected = untrustedContent;
-        emit untrustedContentDetectedSignal(untrustedContent);
+        QString errorMessage =
+                "<p>Mixed content is detected.<br>"
+                "Offending URL:<br>" +
+                url.toString() + "<br>"
+                "Mixing trusted and untrusted content is prohibited.<br>"
+                "Go to <a href='" +
+                qApp->property("startPage").toString() +
+                "'>start page</a> "
+                "to unlock local scripting.</p>";
+        qDebug() << "Mixed content is detected. Offending URL:"
+                 << url.toString();
+
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString htmlErrorContents =
+                resourceReader->fileContents;
+
+        htmlErrorContents
+                .replace("ERROR_MESSAGE", errorMessage);
+        QPage::mainFrame()->setHtml(htmlErrorContents);
     }
 
     void qCloseWindowFromURLTransmitterSlot()
@@ -1201,12 +1199,11 @@ protected:
 
 private:
     QWebView *webViewWidget;
+
+    QStringList trustedDomains;
     QString pageStatus;
-
-    QString emptyString;
-
-    bool untrustedContentDetected;
     QRegExp htmlFileNameExtensionMarker;
+    QString emptyString;
 
     QString alertTitle;
     QString confirmTitle;
@@ -1242,96 +1239,69 @@ public slots:
 
     void qSelectInodesSlot(QNetworkRequest request)
     {
-        if (untrustedContentDetected == false) {
-            QString target = request.url().query().replace("target=", "");
+        QString target = request.url().query().replace("target=", "");
 
-            QFileDialog inodesDialog (this);
-            inodesDialog.setWindowModality(Qt::WindowModal);
-            inodesDialog.setViewMode(QFileDialog::Detail);
-            inodesDialog.setWindowTitle(QWebViewWidget::title());
+        QFileDialog inodesDialog (this);
+        inodesDialog.setWindowModality(Qt::WindowModal);
+        inodesDialog.setViewMode(QFileDialog::Detail);
+        inodesDialog.setWindowTitle(QWebViewWidget::title());
 #ifdef Q_OS_WIN
-            inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
+        inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
 #endif
 
-            if (request.url().fileName() == "open-file.function") {
-                inodesDialog.setFileMode(QFileDialog::AnyFile);
-            }
-
-            if (request.url().fileName() == "open-files.function") {
-                inodesDialog.setFileMode(QFileDialog::ExistingFiles);
-            }
-
-            if (request.url().fileName() == "new-file-name.function") {
-                inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
-            }
-
-            if (request.url().fileName() == "open-directory.function") {
-                inodesDialog.setFileMode(QFileDialog::Directory);
-            }
-
-            QStringList userSelectedInodes;
-            if (inodesDialog.exec()) {
-                userSelectedInodes = inodesDialog.selectedFiles();
-            }
-
-            inodesDialog.close();
-            inodesDialog.deleteLater();
-
-            if (!userSelectedInodes.isEmpty()) {
-                QString userSelectedInodesFormatted;
-                foreach (QString userSelectedInode, userSelectedInodes) {
-                    userSelectedInodesFormatted.append(userSelectedInode);
-                    userSelectedInodesFormatted.append(";");
-                }
-                userSelectedInodesFormatted
-                        .replace(QRegularExpression(";$"), "");
-
-                // JavaScript bridge back to
-                // the local HTML page where request originated:
-                QFileReader *resourceReader =
-                        new QFileReader(QString(":/scripts/peb.js"));
-                QString pebJavaScript = resourceReader->fileContents;
-
-                mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
-
-                QString inodeSelectedEventJavaScript =
-                        "pebInodeSelection(\"" +
-                        target +
-                        "\" , \"" +
-                        userSelectedInodesFormatted +
-                        "\"); null";
-
-                mainPage->currentFrame()->
-                        evaluateJavaScript(inodeSelectedEventJavaScript);
-
-                qDebug() << "User selected inode:"
-                         << userSelectedInodesFormatted;
-            }
+        if (request.url().fileName() == "open-file.function") {
+            inodesDialog.setFileMode(QFileDialog::AnyFile);
         }
 
-        if (untrustedContentDetected == true) {
-            QString errorMessage =
-                    "<p>Full path selection after "
-                    "untrusted content is loaded in the same window "
-                    "is prohibited.<br>"
-                    "Go to <a href='" +
-                    qApp->property("startPage").toString() +
-                    "'>start page</a> "
-                    "to unlock selection of "
-                    "files or folders with their full paths.</p>";
-            qDebug() << "Full path selection attempted after"
-                     << "untrusted content is loaded:"
-                     << mainPage->currentFrame()->
-                        baseUrl().toString();
+        if (request.url().fileName() == "open-files.function") {
+            inodesDialog.setFileMode(QFileDialog::ExistingFiles);
+        }
 
+        if (request.url().fileName() == "new-file-name.function") {
+            inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
+        }
+
+        if (request.url().fileName() == "open-directory.function") {
+            inodesDialog.setFileMode(QFileDialog::Directory);
+        }
+
+        QStringList userSelectedInodes;
+        if (inodesDialog.exec()) {
+            userSelectedInodes = inodesDialog.selectedFiles();
+        }
+
+        inodesDialog.close();
+        inodesDialog.deleteLater();
+
+        if (!userSelectedInodes.isEmpty()) {
+            QString userSelectedInodesFormatted;
+            foreach (QString userSelectedInode, userSelectedInodes) {
+                userSelectedInodesFormatted.append(userSelectedInode);
+                userSelectedInodesFormatted.append(";");
+            }
+            userSelectedInodesFormatted
+                    .replace(QRegularExpression(";$"), "");
+
+            // JavaScript bridge back to
+            // the local HTML page where request originated:
             QFileReader *resourceReader =
-                    new QFileReader(QString(":/html/error.html"));
-            QString htmlErrorContents = resourceReader->fileContents;
+                    new QFileReader(QString(":/scripts/peb.js"));
+            QString pebJavaScript = resourceReader->fileContents;
 
-            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-            mainPage->currentFrame()->setHtml(htmlErrorContents);
+            mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
 
-            qDebug() << errorMessage;
+            QString inodeSelectedEventJavaScript =
+                    "pebInodeSelection(\"" +
+                    target +
+                    "\" , \"" +
+                    userSelectedInodesFormatted +
+                    "\"); null";
+
+            mainPage->currentFrame()->
+                    evaluateJavaScript(inodeSelectedEventJavaScript);
+
+            qDebug() << "User selected inode:"
+                     << userSelectedInodesFormatted;
         }
     }
 
@@ -1609,11 +1579,6 @@ public slots:
         }
     }
 
-    void qUntrustedContentDetectedSlot(bool untrustedContent)
-    {
-        untrustedContentDetected = untrustedContent;
-    }
-
     void qCloseWindowFromURLSlot()
     {
         if (!this->parentWidget()) {
@@ -1651,7 +1616,6 @@ private:
     QWebView *newWindow;
     QWebView *errorsWindow;
 
-    bool untrustedContentDetected;
     bool windowCloseRequested;
 };
 
