@@ -262,23 +262,24 @@ JavaScript-based settings have two functions:
    Mixing local and remote content is possible only if ```{PEB_binary_directory}/resources/app/trusted-domains.json``` is explicitely created by a developer of a PEB-based application. This file is read only once at application startup and can not be manipulated remotely.  
   
 **Security features based on C++ code:**
-* PEB can not and does not download remote files and can not execute any Perl scripts from remote locations.
-* All local pages are blocked if loading untrusted content in a local page is attempted.
-* No local Perl scripts can be started if loading untrusted content in a local page is attempted.  
+* If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
+* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
+* PEB can not and does not download remote files and can not execute Perl scripts from remote locations.
+* All local pages are blocked if loading of untrusted content in the same window is attempted.
+* No local Perl scripts can be started if loading of untrusted content in the same window is attempted.  
   No local Perl scripts can be started if they are called from a web page.
-* No output from local Perl scripts is displayed if loading untrusted content in a local page is attempted.
-* No files or folders can be selected with their full paths if loading untrusted content in a local page is attempted.  
+* No output from local Perl scripts is displayed if loading of untrusted content in the same window is attempted.
+* No files or folders can be selected with their full paths if loading of untrusted content in the same window is attempted.  
   No files or folders can be selected with their full paths from a web page.
+* The HTML interface for the Perl debugger inside PEB can not be accessed from a web page.
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
-* If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
   
 **Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   
 **Perl Debugger Interaction:**  
-  Any Perl script can be selected for debugging, which is also a security risk. So if Perl debugger interaction is not needed, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
+  If Perl debugger interaction is not needed or considered a security risk, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
   
 ## Special URLs for Users and Opening Files and Folders
   
