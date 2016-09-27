@@ -297,7 +297,9 @@ int main(int argc, char **argv)
                 }
             }
         }
-        application.setProperty("trustedDomainsList", trustedDomainsList);
+
+        trustedDomainsList.append(PSEUDO_DOMAIN);
+        application.setProperty("trustedDomains", trustedDomainsList);
     }
 
     // ==============================
@@ -724,10 +726,6 @@ QPage::QPage()
     // Regular expression for detection of HTML file extensions:
     htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
     htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
-
-    // Trusted domains:
-    trustedDomains = qApp->property("trustedDomainsList").toStringList();
-    trustedDomains.append(PSEUDO_DOMAIN);
 
     // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
     alertTitle = "Alert";

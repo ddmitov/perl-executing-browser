@@ -751,6 +751,9 @@ public slots:
 
     void qNetworkReply(QNetworkReply *reply)
     {
+        QStringList trustedDomains =
+                qApp->property("trustedDomains").toStringList();
+
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "Network error:" << reply->errorString();
 
@@ -1200,7 +1203,6 @@ protected:
 private:
     QWebView *webViewWidget;
 
-    QStringList trustedDomains;
     QString pageStatus;
     QRegExp htmlFileNameExtensionMarker;
     QString emptyString;
