@@ -31,7 +31,7 @@
 #endif
 
 // ==============================
-// DETECT WINDOWS USER PRIVILEGES SUBROUTINE:
+// WINDOWS USER PRIVILEGES DETECTION SUBROUTINE:
 // ==============================
 #ifdef Q_OS_WIN
 BOOL isUserAdmin()
@@ -110,20 +110,19 @@ int main(int argc, char **argv)
     QApplication application(argc, argv);
 
     // ==============================
-    // SET BASIC APPLICATION VARIABLES:
+    // BASIC APPLICATION VARIABLES:
     // ==============================
     application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.2");
     bool startedAsRoot = false;
 
     // ==============================
-    // SET UTF-8 ENCODING APPLICATION-WIDE:
+    // UTF-8 ENCODING APPLICATION-WIDE:
     // ==============================
-    // Use UTF-8 encoding within the application:
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 
     // ==============================
-    // DETECT USER PRIVILEGES:
+    // USER PRIVILEGES DETECTION:
     // ==============================
 #ifndef Q_OS_WIN
     // Linux and Mac:
@@ -142,7 +141,7 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // DETECT START FROM TERMINAL:
+    // START FROM TERMINAL:
     // ==============================
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
@@ -187,6 +186,7 @@ int main(int argc, char **argv)
     // BINARY FILE DIRECTORY:
     // ==============================
     QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
+
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
         binaryDir.cdUp();
@@ -197,9 +197,8 @@ int main(int argc, char **argv)
     QString binaryDirName = binaryDir.absolutePath().toLatin1();
 
     // ==============================
-    // CHECK FILES AND FOLDERS:
-    // ==============================
     // PERL INTERPRETER:
+    // ==============================
     QString perlExecutable;
 
 #ifndef Q_OS_WIN
@@ -237,7 +236,9 @@ int main(int argc, char **argv)
 
     application.setProperty("perlInterpreter", perlInterpreterFullPath);
 
+    // ==============================
     // APPLICATION DIRECTORY:
+    // ==============================
     QString applicationDirName = QDir::toNativeSeparators(
                 binaryDirName + QDir::separator()
                 + "resources" + QDir::separator()
@@ -245,7 +246,9 @@ int main(int argc, char **argv)
 
     application.setProperty("application", applicationDirName);
 
+    // ==============================
     // APPLICATION ICON:
+    // ==============================
     QString iconPathName = QDir::toNativeSeparators(
                 binaryDirName + QDir::separator()
                 + "resources" + QDir::separator()
@@ -263,7 +266,9 @@ int main(int argc, char **argv)
         QApplication::setWindowIcon(icon);
     }
 
+    // ==============================
     // TRUSTED DOMAINS:
+    // ==============================
     QString trustedDomainsFilePath =
             applicationDirName + QDir::separator() + "trusted-domains.json";
     QFile trustedDomainsFile(trustedDomainsFilePath);
@@ -295,7 +300,9 @@ int main(int argc, char **argv)
         application.setProperty("trustedDomainsList", trustedDomainsList);
     }
 
+    // ==============================
     // LOGGING:
+    // ==============================
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
@@ -335,8 +342,9 @@ int main(int argc, char **argv)
     QObject::connect(qApp, SIGNAL(aboutToQuit()),
                      &mainWindow, SLOT(qExitApplicationSlot()));
 
-    // Display embedded HTML error message if application is started by
-    // a user with administrative privileges:
+    // ==============================
+    // ADMINISTRATIVE PRIVILEGES ERROR MESSAGE:
+    // ==============================
     if (startedAsRoot == true) {
         QFileReader *resourceReader =
                 new QFileReader(QString(":/html/error.html"));
@@ -357,7 +365,9 @@ int main(int argc, char **argv)
                  << "with administrative privileges is not allowed.";
     }
 
-    // Display embedded HTML error message if Perl interpreter is not found:
+    // ==============================
+    // MISSING PERL INTERPRETER ERROR MESSAGE:
+    // ==============================
     if (perlInterpreterFullPath.length() == 0) {
         QFileReader *resourceReader =
                 new QFileReader(QString(":/html/error.html"));
@@ -556,7 +566,7 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
-    // Signals and slots for all local long running Perl scripts:
+    // Signals and slots for local long running Perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qLongrunScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
@@ -619,8 +629,8 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
 QPage::QPage()
     : QWebPage(0)
 {
+    // QWebPage settings:
     QNetworkProxyFactory::setUseSystemConfiguration(true);
-
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
     QWebSettings::globalSettings()->
@@ -653,22 +663,22 @@ QPage::QPage()
     // No download of files:
     setForwardUnsupportedContent(false);
 
-    // Disable cache:
+    // Disabled cache:
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
-    // Disable history:
+    // Disabled history:
     QWebHistory *history = this->history();
     history->setMaximumItemCount(0);
 
-    // Initialize modified Network Access Manager:
+    // Initialization of a modified Network Access Manager:
     QAccessManager *networkAccessManager = new QAccessManager();
 
     // Cookies and HTTPS support:
     QNetworkCookieJar *cookieJar = new QNetworkCookieJar;
     networkAccessManager->setCookieJar(cookieJar);
 
-    // Use the modified Network Access Manager:
+    // Using the modified Network Access Manager:
     setNetworkAccessManager(networkAccessManager);
 
     // Signal and slot for SSL errors:
@@ -705,7 +715,7 @@ QPage::QPage()
                      this,
                      SLOT(qCloseWindowFromURLTransmitterSlot()));
 
-    // Configure scroll bars:
+    // Scroll bars:
     mainFrame()->setScrollBarPolicy(Qt::Horizontal,
                                               Qt::ScrollBarAsNeeded);
     mainFrame()->setScrollBarPolicy(Qt::Vertical,
@@ -758,7 +768,7 @@ QPage::QPage()
 QWebViewWidget::QWebViewWidget()
     : QWebView(0)
 {
-    // Configure keyboard shortcuts:
+    // Keyboard shortcuts:
 #ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
@@ -770,7 +780,7 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
                      this, SLOT(qStartQWebInspector()));
 
-    // Start QPage instance:
+    // Starting of a QPage instance:
     mainPage = new QPage();
 
     // Signal and slot for displaying script errors:
@@ -795,32 +805,36 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowFromURLSlot()));
 
-    // Install QPage instance inside every QWebViewWidget instance:
+    // Installing of the started QPage instance:
     setPage(mainPage);
 
-    // Initialize variable necessary for
+    // Initialization of a variable necessary for
     // user input check before closing a new window
     // (any window opened after the initial one):
     windowCloseRequested = false;
 }
 
 // ==============================
-// MANAGE CLICKING OF LINKS:
+// CLICKING OF LINKS MANAGEMENT:
 // ==============================
 bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                     const QNetworkRequest &request,
                                     QWebPage::NavigationType navigationType)
 {
     if (request.url().authority() == PSEUDO_DOMAIN) {
+        // ==============================
         // Start page is displayed only in
         // the main frame of a browser window:
+        // ==============================
         if (navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url() == qApp->property("startPage").toString()) {
             mainFrame()->setUrl(request.url());
         }
 
         if (pageStatus == "trusted") {
+            // ==============================
             // User selected single file:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "open-file.function") {
                 if (request.url().query().replace("target=", "").length() > 0) {
@@ -830,7 +844,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // User selected multiple files:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "open-files.function") {
                 if (request.url().query().replace("target=", "").length() > 0) {
@@ -840,7 +856,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // User selected new file name:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "new-file-name.function") {
                 if (request.url().query().replace("target=", "").length() > 0) {
@@ -850,7 +868,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // User selected directory:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "open-directory.function") {
                 if (request.url().query().replace("target=", "").length() > 0) {
@@ -861,7 +881,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             }
 
 #ifndef QT_NO_PRINTER
+            // ==============================
             // Print preview from URL:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "print.function" and
                     request.url().query() == "action=preview") {
@@ -871,7 +893,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // Print page from URL:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "print.function" and
                     request.url().query() == "action=print") {
@@ -881,7 +905,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             }
 #endif
 
+            // ==============================
             // About browser dialog box:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "about.function" and
                     request.url().query() == "type=browser") {
@@ -898,7 +924,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // About Qt dialog box:
+            // ==============================
             if (navigationType == QWebPage::NavigationTypeLinkClicked and
                     request.url().fileName() == "about.function" and
                     request.url().query() == "type=qt") {
@@ -907,8 +935,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 return false;
             }
 
+            // ==============================
             // PERL DEBUGGER INTERACTION:
             // Implementation of an idea proposed by Valcho Nedelchev.
+            // ==============================
             if (PERL_DEBUGGER_INTERACTION == 1) {
                 if ((navigationType == QWebPage::NavigationTypeLinkClicked or
                      navigationType == QWebPage::NavigationTypeFormSubmitted)
