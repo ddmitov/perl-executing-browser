@@ -819,6 +819,20 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                     const QNetworkRequest &request,
                                     QWebPage::NavigationType navigationType)
 {
+    QStringList trustedDomains =
+            qApp->property("trustedDomains").toStringList();
+
+    if (pageStatus == "trusted" and
+            (!trustedDomains.contains(request.url().authority())) and
+            (request.url().fileName().length() == 0 or
+             request.url().fileName().contains(htmlFileNameExtensionMarker))) {
+        QWebPage *page =
+                QPage::createWindow(QWebPage::WebBrowserWindow);
+        page->mainFrame()->load(request.url());
+
+        return false;
+    }
+
     if (request.url().authority() == PSEUDO_DOMAIN) {
         // ==============================
         // Start page is displayed only in
