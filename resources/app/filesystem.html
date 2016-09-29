@@ -20,30 +20,28 @@
 				font-size: 16px;
 				-webkit-text-size-adjust: 100%;
 			}
+			.selected-inodes {
+				margin-top: 10px;
+				margin-bottom: 10px;
+			}
 		</style>
 	</head>
 
 	<body>
 		<a href='http://local-pseudodomain/open-file.function?target=file-selection' class="btn btn-info btn-primary">
 			Select Single File</a>
-		<div id="file-selection" style="display: hidden"></div>
-
-		<br>
+		<div id="file-selection" class="selected-inodes" style="display: hidden"></div>
 
 		<a href='http://local-pseudodomain/open-files.function?target=files-selection' class="btn btn-info btn-primary">
 			Select Multiple Files</a>
-		<div id="files-selection"></div>
-
-		<br>
+		<div id="files-selection" class="selected-inodes"></div>
 
 		<a href='http://local-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
 			Select New Filename</a>
-		<div id="new-file-name-selection"></div>
-
-		<br>
+		<div id="new-file-name-selection" class="selected-inodes"></div>
 
 		<a href='http://local-pseudodomain/open-directory.function?target=directory-selection' class="btn btn-info btn-primary">
 			Select Directory</a>
-		<div id="directory-selection" style="display: hidden"></div>
+		<div id="directory-selection" class="selected-inodes" style="display: hidden"></div>
 	</body>
 </html>
