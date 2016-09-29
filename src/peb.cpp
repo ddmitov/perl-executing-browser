@@ -819,6 +819,10 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                     const QNetworkRequest &request,
                                     QWebPage::NavigationType navigationType)
 {
+    // ==============================
+    // Untrusted domains called from a trusted page
+    // are loaded in a new browser window:
+    // ==============================
     QStringList trustedDomains =
             qApp->property("trustedDomains").toStringList();
 

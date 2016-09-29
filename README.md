@@ -69,7 +69,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/)
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebKit``` headers).  
 Later versions of Qt are unusable due to the deprecation of ```QtWebKit```.  
   
-The most important Qt dependency of PEB is actually not the ```QtWebkit``` set of classes, but ```QNetworkAccessManager``` class, which is subclassed to implement the local pseudo-domain of PEB together with all POST and AJAX GET requests to local Perl scripts. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` remains problematic.  
+The most important Qt dependency of PEB is actually not the ```QtWebkit``` set of classes, but ```QNetworkAccessManager``` class, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` remains problematic.  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1] (http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -170,7 +170,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**  
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
-    If PEB is able to find and read ```{PEB_binary_directory}/resources/app/trusted-domains.json``` all domains listed in this file are considered trusted. Mixing local content with any content originating from a trusted domain is allowed. No domains are trusted by default if ```trusted-domains.json``` is missing. This setting should be used with care and is created to allow loading of web fonts in PEB-based applications, if this is necessary for any reason.
+    If PEB is able to find and read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Mixing local content with any content originating from a trusted domain is allowed. Only ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting allows loading of web fonts in PEB-based applications or developing rich/thick/fat clients based on PEB. It should be used with care.
 * **Log files:**  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
     
