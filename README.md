@@ -147,7 +147,7 @@ Compiled and tested successfully using:
 ## Settings
   
 **Settings based on the existence of certain files and folders:**  
-PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program start-up is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
+PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located, further labeled as ```{PEB_binary_directory}```.
 * **Name of the binary file:**  
     The binary file of the browser, ```peb```, ```peb.app```, ```peb.dmg``` or ```peb.exe``` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
 * **Application directory:**  
@@ -168,11 +168,11 @@ PEB is designed to run from any directory without setting anything beforehand an
     PEB can start with a static HTML start page or with a start page that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayed as a start page. If both ```index.html``` and ```index.pl``` are not found, an error message will be displayed. No start page is a showstopper for PEB.  
     Note that both static and dynamic start page pathnames are case sensitive.
 * **Icon:**  
-    A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application start-up, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
+    A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
     If PEB is able to find and read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Mixing local content with any content originating from a trusted domain is allowed. Only ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting allows loading of web fonts in PEB-based applications or developing rich/thick/fat clients based on PEB. It should be used with care.
 * **Log files:**  
-    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application start-up, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
+    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
     
     Please note, that log files can rapidly grow in size because every requested link is logged. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
   
@@ -381,7 +381,7 @@ JavaScript-based settings have two functions:
   Perl scripts without filename extensions are recognized using a Perl shebang line like:  
   ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
-  PEB finds Perl interpreter at start-up and uses shebang line only to detect Perl scripts without filename extension.  
+  PEB finds Perl interpreter at application startup and uses shebang line only to detect Perl scripts without filename extension.  
   
   All other supported local file types are recognized using the fllowing filename extensions:  
 * **CSS files:** ```.css```
