@@ -170,7 +170,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**  
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
-    If PEB is able to find and read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Mixing local content with any content originating from a trusted domain is allowed. Only ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting allows loading of web fonts in PEB-based applications or developing rich/thick/fat clients based on PEB. It should be used with care.
+    If PEB is able to find and read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. This setting should be used with care considering all security implications - see section [Security] (#security)).
 * **Log files:**  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
     
@@ -255,17 +255,21 @@ JavaScript-based settings have two functions:
 ```
 
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a single Perl setting, but they do not constitute a sandbox for Perl scripts. PEB security is based on the following principles:  
-   **1.** Users have full access to their local data.  
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a Perl command-line argument, but they do not constitute a sandbox for Perl scripts.  
+   
+   PEB security is based on the following principles:  
+   **1.** Users have full access to their local data using PEB.  
    **2.** PEB-based applications are no danger to the underlying operating system.  
-   **3.** By default, what is local, stays local and what is web-based, stays web-based.  
-   Mixing local and remote content is possible only if ```{PEB_binary_directory}/resources/app/trusted-domains.json``` is explicitely created by a developer of a PEB-based application. This file is read only once at application startup and can not be manipulated remotely.  
+   **3.** Mixing trusted and untrusted content in one browser window is not possible.  
+   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. Only the local pseudo-domain is trusted if ```trusted-domains.json``` is missing. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content to load web fonts in PEB-based applications or developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
+   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
   
 **Security features based on C++ code:**
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * PEB can not and does not download remote files and can not execute Perl scripts from remote locations.
-* All local pages are blocked if loading of untrusted content in the same window is attempted.
+* If loading of untrusted content is attempted in any browser window, a warning message is displayed and all local pages in the same window are blocked until user reloads the start page to restore local scripting.
+* All HTML pages from untrusted domains, if called from a trusted page, are automatically displayed in a separate browser window.
 * No local Perl scripts can be started if loading of untrusted content in the same window is attempted.  
   No local Perl scripts can be started if they are called from a web page.
 * No output from local Perl scripts is displayed if loading of untrusted content in the same window is attempted.
