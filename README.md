@@ -216,7 +216,7 @@ They have two functions:
   
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
   
-  The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
+  The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window-closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window-closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
   The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery](https://jquery.com/) and [Alertify.js](http://alertifyjs.com/).  
 
@@ -247,7 +247,7 @@ They have two functions:
 * Users have full access to their local data using PEB.
 * PEB-based applications are no danger to the underlying operating system.
 * Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts in PEB-based applications or for developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
+  Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts or for developing rich/thick/fat clients. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
 
 **Security features based on C++ code:**
@@ -277,7 +277,7 @@ They have two functions:
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a [jQuery](https://jquery.com/) AJAX GET request. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section [Settings](#settings).  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL can be called not only by clicking a link, but also by using a [jQuery](https://jquery.com/) AJAX GET request. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section [Settings](#settings).  
   
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
@@ -354,7 +354,7 @@ They have two functions:
   
 * **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
   
-* **Combined Perl Debugger URL:**
+* **Combined Perl Debugger URL:**  
   Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
   Using the above URL, the selected file will be loaded in the Perl debugger, the ```M``` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
