@@ -171,7 +171,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 They have two functions:  
 1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
 2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
-* **Custom or translated context menu labels:**
+* **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
 ```javascript
@@ -190,7 +190,7 @@ They have two functions:
   }
 ```
 
-* **Custom or translated labels for JavaScript dialog boxes:**
+* **Custom or translated labels for JavaScript dialog boxes:**  
   Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
 
 ```javascript
