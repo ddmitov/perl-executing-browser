@@ -170,7 +170,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**  
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
-    If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. This setting should be used with care - see section [Security] (#security).
+    If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security] (#security).
 * **Log files:**  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
     
@@ -262,7 +262,7 @@ JavaScript-based settings have two functions:
 * PEB-based applications are no danger to the underlying operating system.
 * Trusted and untrusted content are not mixed together in one browser window.
   
-   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. Only the local pseudo-domain is trusted if ```trusted-domains.json``` is missing. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts in PEB-based applications or for developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
+   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts in PEB-based applications or for developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
   
    Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
   
