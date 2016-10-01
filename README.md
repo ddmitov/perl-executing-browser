@@ -351,9 +351,7 @@ They have two functions:
   
 * **Select file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
   The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
-  
 * **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
-  
 * **Combined Perl Debugger URL:**  
   Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
