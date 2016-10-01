@@ -260,9 +260,9 @@ JavaScript-based settings have two functions:
 **PEB security principles:**
 * Users have full access to their local data using PEB.
 * PEB-based applications are no danger to the underlying operating system.
-* Mixing trusted and untrusted content in one browser window is not possible.
+* Trusted and untrusted content are not mixed together in one browser window.
   
-   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. Only the local pseudo-domain is trusted if ```trusted-domains.json``` is missing. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content to load web fonts in a PEB-based applications or developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
+   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. Only the local pseudo-domain is trusted if ```trusted-domains.json``` is missing. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts in PEB-based applications or for developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
   
    Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
   
