@@ -8,10 +8,10 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/)
 * [Features](#features)
 * [Compile-time Requirements](#compile-time-requirements)
 * [Runtime Requirements](#runtime-requirements)
-* [Calling a Local Perl Script from a Local Page](#calling-a-local-perl-script-from-a-local-page)
+* [Calling a Local Perl Script](#calling-a-local-perl-script)
 * [Settings](#settings)
 * [Security](#security)
-* [Special URLs for Users and Opening Files and Folders](#special-urls-for-users-and-opening-files-and-folders)
+* [Special URLs for Users](#special-urls-for-users)
 * [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)
 * [Special URLs for Interaction with the Perl Debugger](#special-urls-for-interaction-with-the-perl-debugger)
 * [Local File Types](#local-file-types)
@@ -56,7 +56,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/)
 * Cross-site scripting is disabled for all web and local pages.
 
 **Development goodies:**
-* PEB can interact with the Perl 5 debugger in graphical mode - see section [HTML Interface for the Perl Debugger] (#html-interface-for-the-perl-debugger)  
+* PEB can interact with the Perl 5 debugger in graphical mode - see section [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)  
 * ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
 * Extensive optional logging of all browser actions.
 
@@ -84,7 +84,7 @@ Compiled and tested successfully using:
   [Perlbrew] (https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
 
-## Calling a Local Perl Script from a Local Page
+## Calling a Local Perl Script
   PEB recognizes two types of local Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
@@ -104,7 +104,7 @@ Compiled and tested successfully using:
   
     **Note for Windows developers:** Any long running script producing output that is going to be inserted into the calling page should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
-    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section [Special URLs for Interaction with the Perl Debugger] (#special-urls-for-interaction-with-the-perl-debugger). The following code is an example of a direct POST request to a local script from an HTML form:
+    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section [Special URLs for Interaction with the Perl Debugger](#special-urls-for-interaction-with-the-perl-debugger). The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -115,9 +115,9 @@ Compiled and tested successfully using:
 ```
 
 * **AJAX Perl scripts:**  
-    AJAX scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings] (#settings).
+    AJAX scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
   
-    The following example calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
+    The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
 ```javascript
   $(document).ready(function() {
@@ -159,7 +159,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**  
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
-    If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security] (#security).
+    If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security](#security).
 * **Log files:**  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note, that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
 
@@ -219,7 +219,7 @@ They have two functions:
   
   The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
-  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery] (https://jquery.com/) and [Alertify.js] (http://alertifyjs.com/).  
+  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery](https://jquery.com/) and [Alertify.js](http://alertifyjs.com/).  
 
 ```javascript
   function pebCloseConfirmationSync() {
@@ -255,7 +255,7 @@ They have two functions:
 * If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * PEB can not and does not download remote files and can not execute Perl scripts from remote locations.
-* If loading of untrusted content is attempted in any browser window, a warning message is displayed and all local pages in the same window are blocked until user reloads the start page to restore local scripting.
+* If loading of untrusted content is attempted in a trusted page, a warning message blocks the entire browser window until user reloads the start page to restore local scripting.
 * All HTML pages from untrusted domains, if called from a trusted page, are automatically displayed in a separate browser window.
 * No local Perl scripts can be started if loading of untrusted content in the same window is attempted.  
   No local Perl scripts can be started if they are called from a web page.
@@ -272,13 +272,13 @@ They have two functions:
 **Perl Debugger Interaction:**  
   If Perl debugger interaction is not needed or considered a security risk, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
 
-## Special URLs for Users and Opening Files and Folders
+## Special URLs for Users
 * **PEB pseudo-domain:** ```http://local-pseudodomain/```  
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a ```jQuery``` AJAX GET request.  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window closing URL can be called not only by clicking a link, but also by using a [jQuery](https://jquery.com/) AJAX GET request. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section [Settings](#settings).  
   
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
@@ -289,7 +289,7 @@ They have two functions:
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
   
-  The following code is an example of how to select a local file and transmit its full path to a local Perl script using ```jQuery```:  
+  The following code is an example of how to select a local file and transmit its full path to a local Perl script using [jQuery](https://jquery.com/):  
 
 ```javascript
   $(document).ready(function() {
@@ -340,7 +340,7 @@ They have two functions:
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
   
-   If the debugged script is outside of the application directory (see section [Settings] (#settings)), PEB asks for command line arguments which may be necessary for the debugged Perl program.  
+   If the debugged script is outside of the application directory (see section [Settings](#settings)), PEB asks for command line arguments which may be necessary for the debugged Perl program.  
   
   Normal operation of the HTML interface for the Perl debugger is not possible without [Syntax::Highlight::Engine::Kate] (https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module, which is located in ```{PEB_binary_directory}/sdk/peblib``` directory. This relative path is hard-coded in C++ code and must not be changed.  
   
