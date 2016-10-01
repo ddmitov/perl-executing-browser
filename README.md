@@ -85,16 +85,16 @@ Compiled and tested successfully using:
   Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
 
 ## Calling a Local Perl Script from a Local Page
-  PEB recognizes two types of local Perl scripts: long running and AJAX scripts.  
+  PEB recognizes two types of local Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
     Long running Perl scripts are expected to produce either:  
-    **1.** a complete HTML page that will replace the calling page or  
-    **2.** pieces of data that will be inserted one after the other into the calling page using JavaScript.  
   
-    **1.** If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
+    **1.** a complete HTML page that will replace the calling page:  
+    If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
   
-    **2.** If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
+    **2.** pieces of data that will be inserted one after the other into the calling page using JavaScript:  
+    If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
@@ -116,9 +116,7 @@ Compiled and tested successfully using:
 
 * **AJAX Perl scripts:**  
     Inside PEB AJAX scripts have two differences compared to long running scripts.  
-  
     **1.** PEB returns all output from an AJAX script in one piece after the script has finished with no timeout.  
-  
     **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings] (#settings).
   
     The following example calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
@@ -169,8 +167,8 @@ PEB is designed to run from any directory without setting anything beforehand an
 
 **Settings based on JavaScript code:**  
 They have two functions:  
-1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
-2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
+**1.** to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
+**2.** to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
 * **Custom or translated context menu labels:**  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
