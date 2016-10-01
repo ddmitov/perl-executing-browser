@@ -115,9 +115,7 @@ Compiled and tested successfully using:
 ```
 
 * **AJAX Perl scripts:**  
-    Inside PEB AJAX scripts have two differences compared to long running scripts.  
-    **1.** PEB returns all output from an AJAX script in one piece after the script has finished with no timeout.  
-    **2.** AJAX scripts must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings] (#settings).
+    AJAX scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings] (#settings).
   
     The following example calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
