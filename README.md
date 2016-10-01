@@ -166,11 +166,12 @@ PEB is designed to run from any directory without setting anything beforehand an
     If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security] (#security).
 * **Log files:**  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior.  
+  
     Please note, that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
 
-**Settings based on JavaScript code:**
-JavaScript-based settings have two functions:  
-1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and
+**Settings based on JavaScript code:**  
+They have two functions:  
+1. to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
 2. to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
 * **Custom or translated context menu labels:**
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
@@ -253,7 +254,9 @@ JavaScript-based settings have two functions:
 * Users have full access to their local data using PEB.
 * PEB-based applications are no danger to the underlying operating system.
 * Trusted and untrusted content are not mixed together in one browser window.  
+  
   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts in PEB-based applications or for developing rich/thick/fat clients based on PEB. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
+  
   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
 
 **Security features based on C++ code:**
@@ -271,10 +274,10 @@ JavaScript-based settings have two functions:
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 
-**Perl security setting:**
+**Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
   
-**Perl Debugger Interaction:**
+**Perl Debugger Interaction:**  
   If Perl debugger interaction is not needed or considered a security risk, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
 
 ## Special URLs for Users and Opening Files and Folders
