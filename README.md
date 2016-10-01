@@ -13,7 +13,6 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5] (https://www.perl.org/)
 * [Security](#security)
 * [Special URLs for Users](#special-urls-for-users)
 * [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)
-* [Special URLs for Interaction with the Perl Debugger](#special-urls-for-interaction-with-the-perl-debugger)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
 * [What Perl Executing Browser Is Not](#what-perl-executing-browser-is-not)
@@ -347,8 +346,9 @@ They have two functions:
   The [default Perl debugger] (http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes ```$console``` variable ```undef```. Modifying the debugger was initially avoided due to its high level of complexity, but tests proved that undef-ing the ```$console``` is a minor change, which does not affect the normal operation and output of the debugger. This alteration is necessary because the ```Qprocess``` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ```perl5db.pl``` manually by replacing ```$console = "con";``` with ```undef $console;``` or by using ```{PEB_binary_directory}/sdk/peblib/perl5db-win32.patch```.  
   
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
-
-## Special URLs for Interaction with the Perl Debugger
+  
+  The following special URLs for interaction with the Perl debugger are implemented:  
+  
 * **Select file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
   The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
   
@@ -371,7 +371,7 @@ They have two functions:
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
   PEB finds Perl interpreter at application startup and uses shebang line only to detect Perl scripts without filename extension.  
   
-  All other supported local file types are recognized using the fllowing filename extensions:  
+  All other supported local file types are recognized using the following filename extensions:  
 * **CSS files:** ```.css```
 * **Font files:** ```.eot``` ```.otf``` ```.ttf``` ```.woff``` ```.woff2```
 * **HTML files:** ```.htm``` ```.html```
