@@ -1,6 +1,4 @@
-
-Perl Executing Browser (PEB):  
-Thanks, Acknowledgements and References
+Thanks, Acknowledgements and References for Perl Executing Browser (PEB)
 --------------------------------------------------------------------------------
 Amata mea Argeia - gratiam magnam tibi ago!  
 Patientia tua in studiis meis computatoriis auxilium meum maximum!  
@@ -10,7 +8,8 @@ who prepared the official Perl and Qt documentation or
 shared usefull knowledge on a variety of forums, blogs and other sites,  
 I thank them all! Their expertise, effort and good will are highly appreciated!  
   
-Special thanks to the staff of the Library of the New Bulgarian University,  
+Special thanks to the staff of the Library of the
+[New Bulgarian University](http://www.nbu.bg/en/library/library),  
 where much of the development effort took place!  
   
 Special thanks to Stack Overflow user peppe for answering competently and swiftly my question  
@@ -41,7 +40,7 @@ Thanks to all creators of loading.io for their beautifull loading icons!
 "Kingthings Sans", Kingthings  
 http://loading.io/  
 
-## QT
+## Qt
 https://gitorious.org/qt-examples/qt-examples/source/sitespecificbrowser  
   
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
@@ -212,7 +211,7 @@ http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp
 http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/  
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 
-## PERL
+## Perl 5
 Larry Wall, Tom Christiansen, Jon Orwant "Programming Perl. Third Edition", O'Reilly, July 2000, ISBN 0-596-00027-8,  
 31.13. use lib  
 http://docstore.mik.ua/orelly/perl2/prog/ch31_13.htm  
@@ -247,7 +246,7 @@ http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input
 http://modperlbook.org/html/3-9-2-1-Modifying-INC.html  
 http://www.tutorialspoint.com/perl/perl_syscall.htm  
   
-## HTML, CSS & JAVASCRIPT
+## HTML, CSS & JavaScript
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
 http://stackoverflow.com/questions/9436534/ajax-tutorial-for-post-and-get  
 http://stackoverflow.com/questions/6395720/get-data-from-php-array-ajax-jquery  
@@ -293,11 +292,11 @@ http://www.raymondcamden.com/2015/03/06/warning-a-user-before-they-leave-a-form/
 https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calling/  
 http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/  
 
-## MARKDOWN
+## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/sindresorhus/awesome  
 
-## MAC
+## Mac
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html  
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 http://iconverticons.com/online/  
@@ -305,11 +304,11 @@ http://iconverticons.com/online/
 ## CGI
 http://en.wikipedia.org/wiki/Common_Gateway_Interface  
 
-## HTTP STATUS CODES
+## HTTP Status Codes
 https://en.wikipedia.org/wiki/List_of_HTTP_status_codes#2xx_Success  
 https://www.koozai.com/blog/analytics/server-response-codes-and-what-they-mean/#204  
 
-## MIME TYPES
+## MIME Types
 https://en.wikipedia.org/wiki/JSON  
 https://en.wikipedia.org/wiki/Embedded_OpenType  
 https://en.wikipedia.org/wiki/Web_Open_Font_Format  
