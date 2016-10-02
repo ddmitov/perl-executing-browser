@@ -1,4 +1,4 @@
-Thanks, Acknowledgements and References for Perl Executing Browser (PEB)
+Thanks, Acknowledgements and References for Perl Executing Browser
 --------------------------------------------------------------------------------
 Amata mea Argeia - gratiam magnam tibi ago!  
 Patientia tua in studiis meis computatoriis auxilium meum maximum!  
@@ -8,8 +8,8 @@ who prepared the official Perl and Qt documentation or
 shared usefull knowledge on a variety of forums, blogs and other sites,  
 I thank them all! Their expertise, effort and good will are highly appreciated!  
   
-Special thanks to the staff of the Library of the
-[New Bulgarian University](http://www.nbu.bg/en/library/library),  
+Special thanks to the staff of the 
+[Library of the New Bulgarian University](http://www.nbu.bg/en/library/library),  
 where much of the development effort took place!  
   
 Special thanks to Stack Overflow user peppe for answering competently and swiftly my question  
@@ -17,7 +17,7 @@ Special thanks to Stack Overflow user peppe for answering competently and swiftl
 http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application  
   
 I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué  
-for their code, which I adopted and modified for an important part of PEB:  
+for their code, which I adopted and modified for an important part of Perl Executing Browser:  
 http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources  
 http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application  
   
@@ -212,14 +212,20 @@ http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 
 ## Perl 5
-Larry Wall, Tom Christiansen, Jon Orwant "Programming Perl. Third Edition", O'Reilly, July 2000, ISBN 0-596-00027-8,  
+Larry Wall, Tom Christiansen, Jon Orwant  
+"Programming Perl. Third Edition",  
+O'Reilly, July 2000, ISBN 0-596-00027-8,  
 31.13. use lib  
 http://docstore.mik.ua/orelly/perl2/prog/ch31_13.htm  
   
-Peter Wainwright "Pro Perl. A comprehensive guide for developers who want to master the Perl programming language", Apress, 2005, p. 104 - 107  
+Peter Wainwright  
+"Pro Perl. A comprehensive guide for developers who want to master the Perl programming language",  
+Apress, 2005, p. 104 - 107  
 https://books.google.bg/books?id=1bbjLxkBLaMC&pg=PA105  
   
-Eric Cholet, Stas Bekman "Practical mod_perl", O'Reilly, May 2003, ISBN 0-596-00227-0,  
+Eric Cholet, Stas Bekman  
+"Practical mod_perl",  
+O'Reilly, May 2003, ISBN 0-596-00227-0,  
 3.9.2.1. Modifying @INC  
 http://modperlbook.org/html/3-9-2-1-Modifying-INC.html  
   
