@@ -9,12 +9,11 @@ shared usefull knowledge on a variety of forums, blogs and other sites,
 I thank them all! Their expertise, effort and good will are highly appreciated!  
   
 Special thanks to the staff of the 
-[Library of the New Bulgarian University](http://www.nbu.bg/en/library/library),  
+[Library of the New Bulgarian University](http://www.nbu.bg/en/library/library),
 where much of the development effort took place!  
   
 Special thanks to Stack Overflow user peppe for answering competently and swiftly my question  
-"How to read POST data "sent" from my own QtWebKit application?":  
-http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application  
+[How to read POST data "sent" from my own QtWebKit application?](http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application)  
   
 I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué  
 for their code, which I adopted and modified for an important part of Perl Executing Browser:  
