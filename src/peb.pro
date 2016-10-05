@@ -20,10 +20,11 @@ equals (QT_MAJOR_VERSION, 5) {
     ##########################################################
     macx {
         ##########################################################
-        # To make a bundle-less application: (recommended)
+        # To make a bundle-less application:
         # BUNDLE = 0
         # CONFIG -= app_bundle
-        ##########################################################
+        # By default bundle-less application are
+        # compiled on Macintosh machines.
         # To make a bundle (peb.app):
         # BUNDLE = 1
         # CONFIG += app_bundle
@@ -44,17 +45,40 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
+    # Administrative privileges check:
+    # To disable administrative privileges check:
+    # ADMIN_PRIVILEGES_CHECK = 0
+    # By default administrative privileges check is disabled.
+    # To enable administrative privileges check:
+    # ADMIN_PRIVILEGES_CHECK = 1
+    ##########################################################
+
+    ADMIN_PRIVILEGES_CHECK = 0
+
+    DEFINES += "ADMIN_PRIVILEGES_CHECK=$$ADMIN_PRIVILEGES_CHECK"
+
+    equals (ADMIN_PRIVILEGES_CHECK, 0) {
+        message ("Configured without administrative privileges check.")
+    }
+    equals (ADMIN_PRIVILEGES_CHECK, 1) {
+        message ("Configured with administrative privileges check.")
+    }
+
+    ##########################################################
+
+    ##########################################################
     # Perl Debugger Interaction:
-    # To switch off Perl debugger interaction:
+    # To enable Perl debugger interaction:
+    # PERL_DEBUGGER_INTERACTION = 1
+    # By default Perl debugger interaction is enabled.
+    # To disable Perl debugger interaction:
     # PERL_DEBUGGER_INTERACTION = 0
     # If PEB is going to be compiled for end users and
     # interaction with the biult-in Perl debugger is
     # not needed or not wanted for security reasons,
     # this functionality can be turned off.
     ##########################################################
-    # To compile with Perl debugger interaction:
-    # PERL_DEBUGGER_INTERACTION = 1
-    ##########################################################
+
     PERL_DEBUGGER_INTERACTION = 1
 
     DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"

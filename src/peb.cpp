@@ -27,7 +27,9 @@
 #endif
 
 #ifdef Q_OS_WIN
+if (ADMIN_PRIVILEGES_CHECK == 1) {
 #include <windows.h> // for isUserAdmin()
+}
 #endif
 
 // ==============================
@@ -36,20 +38,22 @@
 #ifdef Q_OS_WIN
 BOOL isUserAdmin()
 {
-    BOOL bResult;
-    SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
-    PSID administratorsGroup;
-    bResult = AllocateAndInitializeSid(
-                &ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
-                DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
-                &administratorsGroup);
-    if (bResult) {
-        if (!CheckTokenMembership(NULL, administratorsGroup, &bResult)) {
-            bResult = FALSE;
+    if (ADMIN_PRIVILEGES_CHECK == 1) {
+        BOOL bResult;
+        SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
+        PSID administratorsGroup;
+        bResult = AllocateAndInitializeSid(
+                    &ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
+                    DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
+                    &administratorsGroup);
+        if (bResult) {
+            if (!CheckTokenMembership(NULL, administratorsGroup, &bResult)) {
+                bResult = FALSE;
+            }
+            FreeSid(administratorsGroup);
         }
-        FreeSid(administratorsGroup);
+        return(bResult);
     }
-    return(bResult);
 }
 #endif
 
@@ -124,19 +128,23 @@ int main(int argc, char **argv)
     // ==============================
     // USER PRIVILEGES DETECTION:
     // ==============================
-#ifndef Q_OS_WIN
     // Linux and Mac:
-    int userEuid = geteuid();
+#ifndef Q_OS_WIN
+    if (ADMIN_PRIVILEGES_CHECK == 1) {
+        int userEuid = geteuid();
 
-    if (userEuid == 0) {
-        startedAsRoot = true;
+        if (userEuid == 0) {
+            startedAsRoot = true;
+        }
     }
 #endif
 
-#ifdef Q_OS_WIN
     // Windows:
-    if (isUserAdmin()) {
-        startedAsRoot = true;
+#ifdef Q_OS_WIN
+    if (ADMIN_PRIVILEGES_CHECK == 1) {
+        if (isUserAdmin()) {
+            startedAsRoot = true;
+        }
     }
 #endif
 
@@ -149,34 +157,32 @@ int main(int argc, char **argv)
 #ifndef Q_OS_WIN
     if (PERL_DEBUGGER_INTERACTION == 1) {
         if (isatty(fileno(stdin))) {
-            if (userEuid > 0) {
-                // Fork another instance of the browser:
-                int pid = fork();
-                if (pid < 0) {
-                    return 1;
-                    QApplication::exit();
-                }
+            // Fork another instance of the browser:
+            int pid = fork();
+            if (pid < 0) {
+                return 1;
+                QApplication::exit();
+            }
 
-                if (pid == 0) {
-                    // Detach all standard I/O descriptors:
-                    close(0);
-                    close(1);
-                    close(2);
-                    // Enter a new session:
-                    setsid();
-                    // New instance is now detached from terminal:
-                    QProcess anotherInstance;
-                    anotherInstance.startDetached(
-                                QApplication::applicationFilePath());
-                    if (anotherInstance.waitForStarted(-1)) {
-                        return 1;
-                        QApplication::exit();
-                    }
-                } else {
-                    // The parent instance should be closed now:
+            if (pid == 0) {
+                // Detach all standard I/O descriptors:
+                close(0);
+                close(1);
+                close(2);
+                // Enter a new session:
+                setsid();
+                // New instance is now detached from terminal:
+                QProcess anotherInstance;
+                anotherInstance.startDetached(
+                            QApplication::applicationFilePath());
+                if (anotherInstance.waitForStarted(-1)) {
                     return 1;
                     QApplication::exit();
                 }
+            } else {
+                // The parent instance should be closed now:
+                return 1;
+                QApplication::exit();
             }
         }
     }
@@ -345,26 +351,30 @@ int main(int argc, char **argv)
                      &mainWindow, SLOT(qExitApplicationSlot()));
 
     // ==============================
-    // ADMINISTRATIVE PRIVILEGES ERROR MESSAGE:
+    // STARTED WITH
+    // ADMINISTRATIVE PRIVILEGES
+    // ERROR MESSAGE:
     // ==============================
-    if (startedAsRoot == true) {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/html/error.html"));
-        QString htmlErrorContents = resourceReader->fileContents;
+    if (ADMIN_PRIVILEGES_CHECK == 1) {
+        if (startedAsRoot == true) {
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/error.html"));
+            QString htmlErrorContents = resourceReader->fileContents;
 
-        QString errorMessage =
-                "Using "
-                + application.applicationName().toLatin1() + " "
-                + application.applicationVersion().toLatin1() + " "
-                + "with administrative privileges is not allowed.";
-        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+            QString errorMessage =
+                    "Using "
+                    + application.applicationName().toLatin1() + " "
+                    + application.applicationVersion().toLatin1() + " "
+                    + "with administrative privileges is not allowed.";
+            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
-        mainWindow.webViewWidget->setHtml(htmlErrorContents);
+            mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qDebug() << "Using"
-                 << application.applicationName().toLatin1().constData()
-                 << application.applicationVersion().toLatin1().constData()
-                 << "with administrative privileges is not allowed.";
+            qDebug() << "Using"
+                     << application.applicationName().toLatin1().constData()
+                     << application.applicationVersion().toLatin1().constData()
+                     << "with administrative privileges is not allowed.";
+        }
     }
 
     // ==============================
@@ -399,17 +409,30 @@ int main(int argc, char **argv)
                  << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
-        foreach (QString trustedDomain, trustedDomainsList) {
-            qDebug() << "Trusted domain:" << trustedDomain;
+
+        if (ADMIN_PRIVILEGES_CHECK == 0) {
+            qDebug() << "Administrative privileges check is disabled.";
         }
+        if (ADMIN_PRIVILEGES_CHECK == 1) {
+            qDebug() << "Administrative privileges check is enabled.";
+        }
+
         if (PERL_DEBUGGER_INTERACTION == 0) {
             qDebug() << "Perl debugger interaction is disabled.";
         }
         if (PERL_DEBUGGER_INTERACTION == 1) {
             qDebug() << "Perl debugger interaction is enabled.";
         }
+
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
+
+        qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+
+        foreach (QString trustedDomain, trustedDomainsList) {
+            if (trustedDomain != PSEUDO_DOMAIN) {
+                qDebug() << "Trusted domain:" << trustedDomain;
+            }
+        }
 
         // ==============================
         // START PAGE EXISTENCE CHECK AND LOADING:
@@ -997,6 +1020,9 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                             debuggerHandler.close();
 
                             // Start the Perl debugger:
+                            qDebug() << "File passed to Perl debugger:"
+                                     << debuggerScriptToDebug;
+
                             qStartPerlDebuggerSlot();
                             return false;
                         } else {

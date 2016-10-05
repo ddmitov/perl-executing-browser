@@ -833,9 +833,6 @@ public slots:
     void qStartPerlDebuggerSlot()
     {
         if (PERL_DEBUGGER_INTERACTION == 1) {
-            qDebug() << "File passed to Perl debugger:"
-                     << debuggerScriptToDebug;
-
             // Clean any previous debugger output:
             debuggerAccumulatedOutput = "";
 

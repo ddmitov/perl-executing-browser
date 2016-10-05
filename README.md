@@ -81,7 +81,7 @@ Compiled and tested successfully using:
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
   [Strawberry Perl](http://strawberryperl.com/) PortableZIP editions are successfully used with all Windows builds of PEB.  
   [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
-  Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
+  PEB can also use any Perl on PATH.
 
 ## Calling a Local Perl Script
   PEB recognizes two types of local Perl scripts: **long running scripts** and **AJAX scripts**.  
@@ -245,13 +245,12 @@ They have two functions:
 
 **PEB security principles:**
 * Users have full access to their local data using PEB.
-* PEB-based applications are no danger to the underlying operating system.
+* PEB does not need administrative privileges by itself, but does not refuse to start so if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
   Trusted content is any content originating from either the local pseudo-domain ```http://local-pseudodomain/``` or from a trusted domain listed in ```{PEB_binary_directory}/resources/app/trusted-domains.json```. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts or for developing rich/thick/fat clients. ```trusted-domains.json``` has to be explicitely created by a developer of a PEB-based application if needed.  
   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ```trusted-domains.json``` file.
 
 **Security features based on C++ code:**
-* If PEB is started with administrative privileges, it displays a warning page and no scripts can be executed.
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ```{PEB_binary_directory}/resources/app``` directory can be executed if they are invoked from the PEB pseudo-domain: ```http://local-pseudodomain/```.
 * PEB can not and does not download remote files and can not execute Perl scripts from remote locations.
 * If loading of untrusted content is attempted in a trusted page, a warning message blocks the entire browser window until user reloads the start page to restore local scripting.
@@ -265,11 +264,12 @@ They have two functions:
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 
+**Optional security features based on C++ code and compile-time variables:**
+* Starting PEB with administrative privileges may be disabled by setting the compile-time variable ```ADMIN_PRIVILEGES_CHECK = 1``` in the ```peb.pro``` project file before compiling the binary. A warning page is displayed in this scenario and no scripts can be executed.
+* If Perl debugger interaction is not needed or considered a security risk, it can be turned off by setting the compile-time variable ```PERL_DEBUGGER_INTERACTION = 0```.
+
 **Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
-  
-**Perl Debugger Interaction:**  
-  If Perl debugger interaction is not needed or considered a security risk, it can be turned off by a compile-time variable. Just change ```PERL_DEBUGGER_INTERACTION = 1``` to ```PERL_DEBUGGER_INTERACTION = 0``` in the ```peb.pro``` project file and compile the binary.  
 
 ## Special URLs for Users
 * **PEB pseudo-domain:** ```http://local-pseudodomain/```  
