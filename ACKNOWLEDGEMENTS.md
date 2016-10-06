@@ -187,6 +187,7 @@ http://stackoverflow.com/questions/13189296/how-to-get-the-qwebframe-for-an-ifra
 http://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
 http://stackoverflow.com/questions/17512542/getting-multiple-inputs-from-qinputdialog-in-qtcreator  
 http://stackoverflow.com/questions/3846887/how-to-get-the-mime-type-of-a-file-in-qt  
+http://stackoverflow.com/questions/25254043/is-it-possible-to-compare-ifdef-values-for-conditional-use  
   
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList  
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu  

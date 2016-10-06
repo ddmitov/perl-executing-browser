@@ -15,17 +15,14 @@ equals (QT_MAJOR_VERSION, 5) {
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
-    ##########################################################
-    # Macintosh specific settings:
-    ##########################################################
     macx {
         ##########################################################
-        # To make a bundle-less application:
+        # MACINTOSH-SPECIFIC SETTING:
+        # To make a bundle-less binary:
         # BUNDLE = 0
         # CONFIG -= app_bundle
-        # By default bundle-less application are
-        # compiled on Macintosh machines.
-        # To make a bundle (peb.app):
+        # By default bundle-less binary is compiled.
+        # To make a bundled binary (peb.app):
         # BUNDLE = 1
         # CONFIG += app_bundle
         ##########################################################
@@ -45,7 +42,7 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # Administrative privileges check:
+    # ADMINISTRATIVE PRIVILEGES CHECK:
     # To disable administrative privileges check:
     # ADMIN_PRIVILEGES_CHECK = 0
     # By default administrative privileges check is disabled.
@@ -65,9 +62,7 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-
-    ##########################################################
-    # Perl Debugger Interaction:
+    # PERL DEBUGGER INTERACTION:
     # To enable Perl debugger interaction:
     # PERL_DEBUGGER_INTERACTION = 1
     # By default Perl debugger interaction is enabled.

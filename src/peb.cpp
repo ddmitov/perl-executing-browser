@@ -23,13 +23,15 @@
 #include "peb.h"
 
 #ifndef Q_OS_WIN
-#include <unistd.h> // for isatty()
+#if ADMIN_PRIVILEGES_CHECK == 1 or PERL_DEBUGGER_INTERACTION == 1
+#include <unistd.h> // for geteuid() and isatty()
+#endif
 #endif
 
 #ifdef Q_OS_WIN
-if (ADMIN_PRIVILEGES_CHECK == 1) {
+#if ADMIN_PRIVILEGES_CHECK == 1
 #include <windows.h> // for isUserAdmin()
-}
+#endif
 #endif
 
 // ==============================
@@ -130,62 +132,64 @@ int main(int argc, char **argv)
     // ==============================
     // Linux and Mac:
 #ifndef Q_OS_WIN
-    if (ADMIN_PRIVILEGES_CHECK == 1) {
-        int userEuid = geteuid();
+#if ADMIN_PRIVILEGES_CHECK == 1
+    int userEuid = geteuid();
 
-        if (userEuid == 0) {
-            startedAsRoot = true;
-        }
+    if (userEuid == 0) {
+        startedAsRoot = true;
     }
+#endif
 #endif
 
     // Windows:
 #ifdef Q_OS_WIN
-    if (ADMIN_PRIVILEGES_CHECK == 1) {
-        if (isUserAdmin()) {
-            startedAsRoot = true;
-        }
+#if ADMIN_PRIVILEGES_CHECK == 1
+    if (isUserAdmin()) {
+        startedAsRoot = true;
     }
+#endif
 #endif
 
     // ==============================
-    // START FROM TERMINAL:
+    // START FROM TERMINAL DETECTION:
     // ==============================
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
     // This is necessary for a working interaction with the Perl debugger.
 #ifndef Q_OS_WIN
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        if (isatty(fileno(stdin))) {
-            // Fork another instance of the browser:
-            int pid = fork();
-            if (pid < 0) {
-                return 1;
-                QApplication::exit();
-            }
+#if PERL_DEBUGGER_INTERACTION == 1
+    if (isatty(fileno(stdin))) {
+        // Fork another instance of the browser:
+        int pid = fork();
+        if (pid < 0) {
+            return 1;
+            QApplication::exit();
+        }
 
-            if (pid == 0) {
-                // Detach all standard I/O descriptors:
-                close(0);
-                close(1);
-                close(2);
-                // Enter a new session:
-                setsid();
-                // New instance is now detached from terminal:
-                QProcess anotherInstance;
-                anotherInstance.startDetached(
-                            QApplication::applicationFilePath());
-                if (anotherInstance.waitForStarted(-1)) {
-                    return 1;
-                    QApplication::exit();
-                }
-            } else {
-                // The parent instance should be closed now:
+        if (pid == 0) {
+            // Detach all standard I/O descriptors:
+            close(0);
+            close(1);
+            close(2);
+
+            // Enter a new session:
+            setsid();
+
+            // New instance is now detached from terminal:
+            QProcess anotherInstance;
+            anotherInstance.startDetached(
+                        QApplication::applicationFilePath());
+            if (anotherInstance.waitForStarted(-1)) {
                 return 1;
                 QApplication::exit();
             }
+        } else {
+            // The parent instance should be closed now:
+            return 1;
+            QApplication::exit();
         }
     }
+#endif
 #endif
 
     // ==============================
@@ -410,19 +414,21 @@ int main(int argc, char **argv)
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
 
-        if (ADMIN_PRIVILEGES_CHECK == 0) {
-            qDebug() << "Administrative privileges check is disabled.";
-        }
-        if (ADMIN_PRIVILEGES_CHECK == 1) {
-            qDebug() << "Administrative privileges check is enabled.";
-        }
+#if ADMIN_PRIVILEGES_CHECK == 0
+        qDebug() << "Administrative privileges check is disabled.";
+#endif
 
-        if (PERL_DEBUGGER_INTERACTION == 0) {
-            qDebug() << "Perl debugger interaction is disabled.";
-        }
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            qDebug() << "Perl debugger interaction is enabled.";
-        }
+#if ADMIN_PRIVILEGES_CHECK == 1
+        qDebug() << "Administrative privileges check is enabled.";
+#endif
+
+#if PERL_DEBUGGER_INTERACTION == 0
+        qDebug() << "Perl debugger interaction is disabled.";
+#endif
+
+#if PERL_DEBUGGER_INTERACTION == 1
+        qDebug() << "Perl debugger interaction is enabled.";
+#endif
 
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
 
@@ -761,26 +767,26 @@ QPage::QPage()
     noLabel = "No";
 
     // Signals and slots for the perl debugger:
-    if (PERL_DEBUGGER_INTERACTION == 1) {
-        QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
-                         this, SLOT(qDebuggerOutputSlot()));
+#if PERL_DEBUGGER_INTERACTION == 1
+    QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
+                     this, SLOT(qDebuggerOutputSlot()));
 
-        QObject::connect(&debuggerOutputHandler,
-                         SIGNAL(readyReadStandardOutput()),
-                         this,
-                         SLOT(qDebuggerHtmlFormatterOutputSlot()));
-        QObject::connect(&debuggerOutputHandler,
-                         SIGNAL(readyReadStandardError()),
-                         this,
-                         SLOT(qDebuggerHtmlFormatterErrorsSlot()));
-        QObject::connect(&debuggerOutputHandler,
-                         SIGNAL(finished(int, QProcess::ExitStatus)),
-                         this,
-                         SLOT(qDebuggerHtmlFormatterFinishedSlot()));
+    QObject::connect(&debuggerOutputHandler,
+                     SIGNAL(readyReadStandardOutput()),
+                     this,
+                     SLOT(qDebuggerHtmlFormatterOutputSlot()));
+    QObject::connect(&debuggerOutputHandler,
+                     SIGNAL(readyReadStandardError()),
+                     this,
+                     SLOT(qDebuggerHtmlFormatterErrorsSlot()));
+    QObject::connect(&debuggerOutputHandler,
+                     SIGNAL(finished(int, QProcess::ExitStatus)),
+                     this,
+                     SLOT(qDebuggerHtmlFormatterFinishedSlot()));
 
-        // Explicit initialization of important perl-debugger-related value:
-        debuggerJustStarted = false;
-    }
+    // Explicit initialization of important perl-debugger-related value:
+    debuggerJustStarted = false;
+#endif
 }
 
 // ==============================
@@ -978,62 +984,59 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             // PERL DEBUGGER INTERACTION:
             // Implementation of an idea proposed by Valcho Nedelchev.
             // ==============================
-            if (PERL_DEBUGGER_INTERACTION == 1) {
-                if ((navigationType == QWebPage::NavigationTypeLinkClicked or
-                     navigationType == QWebPage::NavigationTypeFormSubmitted)
-                        and
-                        request.url().fileName() == "perl-debugger.function") {
-                    debuggerFrame = frame;
+#if PERL_DEBUGGER_INTERACTION == 1
+            if ((navigationType == QWebPage::NavigationTypeLinkClicked or
+                 navigationType == QWebPage::NavigationTypeFormSubmitted) and
+                    request.url().fileName() == "perl-debugger.function") {
+                debuggerFrame = frame;
 
-                    // Get a Perl debugger command (if any):
-                    QUrlQuery scriptQuery(request.url());
-                    debuggerLastCommand = scriptQuery.queryItemValue("command");
+                // Get a Perl debugger command (if any):
+                QUrlQuery scriptQuery(request.url());
+                debuggerLastCommand = scriptQuery.queryItemValue("command");
 
-                    // Select a Perl script for debugging:
-                    if (request.url().query().contains("action=select-file")) {
+                // Select a Perl script for debugging:
+                if (request.url().query().contains("action=select-file")) {
 
-                        QFileDialog selectScriptToDebugDialog(
-                                    qApp->activeWindow());
-                        selectScriptToDebugDialog
-                                .setFileMode(QFileDialog::ExistingFile);
-                        selectScriptToDebugDialog
-                                .setViewMode(QFileDialog::Detail);
-                        selectScriptToDebugDialog
-                                .setWindowModality(Qt::WindowModal);
+                    QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
+                    selectScriptToDebugDialog
+                            .setFileMode(QFileDialog::ExistingFile);
+                    selectScriptToDebugDialog
+                            .setViewMode(QFileDialog::Detail);
+                    selectScriptToDebugDialog
+                            .setWindowModality(Qt::WindowModal);
 
-                        debuggerScriptToDebug = selectScriptToDebugDialog
-                                .getOpenFileName
-                                (qApp->activeWindow(),
-                                 "Select Perl File",
-                                 QDir::currentPath(),
-                                 "Perl scripts (*.pl);;All files (*)");
+                    debuggerScriptToDebug = selectScriptToDebugDialog
+                            .getOpenFileName
+                            (qApp->activeWindow(),
+                             "Select Perl File",
+                             QDir::currentPath(),
+                             "Perl scripts (*.pl);;All files (*)");
 
-                        selectScriptToDebugDialog.close();
-                        selectScriptToDebugDialog.deleteLater();
+                    selectScriptToDebugDialog.close();
+                    selectScriptToDebugDialog.deleteLater();
 
-                        if (debuggerScriptToDebug.length() > 1) {
-                            debuggerScriptToDebug =
-                                    QDir::toNativeSeparators(
-                                        debuggerScriptToDebug);
+                    if (debuggerScriptToDebug.length() > 1) {
+                        debuggerScriptToDebug =
+                                QDir::toNativeSeparators(debuggerScriptToDebug);
 
-                            // Close any still open Perl debugger session:
-                            debuggerHandler.close();
+                        // Close any still open Perl debugger session:
+                        debuggerHandler.close();
 
-                            // Start the Perl debugger:
-                            qDebug() << "File passed to Perl debugger:"
-                                     << debuggerScriptToDebug;
+                        // Start the Perl debugger:
+                        qDebug() << "File passed to Perl debugger:"
+                                 << debuggerScriptToDebug;
 
-                            qStartPerlDebuggerSlot();
-                            return false;
-                        } else {
-                            return false;
-                        }
+                        qStartPerlDebuggerSlot();
+                        return false;
+                    } else {
+                        return false;
                     }
-
-                    qStartPerlDebuggerSlot();
-                    return false;
                 }
+
+                qStartPerlDebuggerSlot();
+                return false;
             }
+#endif
         }
 
         if (pageStatus == "untrusted") {

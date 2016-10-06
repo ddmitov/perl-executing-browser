@@ -832,206 +832,202 @@ public slots:
     // ==============================
     void qStartPerlDebuggerSlot()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            // Clean any previous debugger output:
-            debuggerAccumulatedOutput = "";
+#if PERL_DEBUGGER_INTERACTION == 1
+        // Clean any previous debugger output:
+        debuggerAccumulatedOutput = "";
 
-            QString commandLineArguments;
+        QString commandLineArguments;
 
-            if (debuggerHandler.isOpen()) {
-                QByteArray debuggerCommand;
-                debuggerCommand.append(debuggerLastCommand.toLatin1());
-                debuggerCommand.append(QString("\n").toLatin1());
-                debuggerHandler.write(debuggerCommand);
-            } else {
-                debuggerJustStarted = true;
+        if (debuggerHandler.isOpen()) {
+            QByteArray debuggerCommand;
+            debuggerCommand.append(debuggerLastCommand.toLatin1());
+            debuggerCommand.append(QString("\n").toLatin1());
+            debuggerHandler.write(debuggerCommand);
+        } else {
+            debuggerJustStarted = true;
 
-                // Sеt the environment for the debugged script:
-                QProcessEnvironment systemEnvironment =
-                        QProcessEnvironment::systemEnvironment();
-                systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-                debuggerHandler.setProcessEnvironment(systemEnvironment);
+            // Sеt the environment for the debugged script:
+            QProcessEnvironment systemEnvironment =
+                    QProcessEnvironment::systemEnvironment();
+            systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
+            debuggerHandler.setProcessEnvironment(systemEnvironment);
 
-                if (!debuggerScriptToDebug.contains(
-                            qApp->property("application").toString())) {
-                    bool ok;
-                    QString input =
-                            QInputDialog::getText(
-                                qApp->activeWindow(),
-                                "Command Line",
-                                "Enter all command line arguments, if any:",
-                                QLineEdit::Normal,
-                                "",
-                                &ok);
+            if (!debuggerScriptToDebug.contains(
+                        qApp->property("application").toString())) {
+                bool ok;
+                QString input =
+                        QInputDialog::getText(
+                            qApp->activeWindow(),
+                            "Command Line",
+                            "Enter all command line arguments, if any:",
+                            QLineEdit::Normal,
+                            "",
+                            &ok);
 
-                    if (ok && !input.isEmpty()) {
-                        commandLineArguments = input;
-                    }
+                if (ok && !input.isEmpty()) {
+                    commandLineArguments = input;
                 }
-
-                QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
-                QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-                debuggerHandler.setWorkingDirectory(scriptDirectory);
-
-                debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
-                debuggerHandler.start(qApp->property("perlInterpreter")
-                                      .toString(),
-                                      QStringList()
-                                      << "-d"
-                                      << debuggerScriptToDebug
-                                      << commandLineArguments,
-                                      QProcess::Unbuffered
-                                      | QProcess::ReadWrite);
-
-                QByteArray debuggerCommand;
-                debuggerCommand.append(debuggerLastCommand.toLatin1());
-                debuggerCommand.append(QString("\n").toLatin1());
-                debuggerHandler.write(debuggerCommand);
-
-                qDebug() << QDateTime::currentMSecsSinceEpoch()
-                         << "msecs from epoch: command sent to Perl debugger:"
-                         << debuggerLastCommand;
             }
+
+            QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
+            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+            debuggerHandler.setWorkingDirectory(scriptDirectory);
+
+            debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
+            debuggerHandler.start(qApp->property("perlInterpreter")
+                                  .toString(),
+                                  QStringList()
+                                  << "-d"
+                                  << debuggerScriptToDebug
+                                  << commandLineArguments,
+                                  QProcess::Unbuffered
+                                  | QProcess::ReadWrite);
+
+            QByteArray debuggerCommand;
+            debuggerCommand.append(debuggerLastCommand.toLatin1());
+            debuggerCommand.append(QString("\n").toLatin1());
+            debuggerHandler.write(debuggerCommand);
+
+            qDebug() << QDateTime::currentMSecsSinceEpoch()
+                     << "msecs from epoch: command sent to Perl debugger:"
+                     << debuggerLastCommand;
         }
+#endif
     }
 
     void qDebuggerOutputSlot()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            // Read debugger output:
-            QString debuggerOutput = debuggerHandler.readAllStandardOutput();
+#if PERL_DEBUGGER_INTERACTION == 1
+        // Read debugger output:
+        QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
-            // Append last output of the debugger to
-            // the accumulated debugger output:
-            debuggerAccumulatedOutput.append(debuggerOutput);
+        // Append last output of the debugger to
+        // the accumulated debugger output:
+        debuggerAccumulatedOutput.append(debuggerOutput);
 
-            // qDebug() << QDateTime::currentMSecsSinceEpoch()
-            //          << "msecs from epoch:"
-            //          << "output from Perl debugger received.";
-            // qDebug() << "Debugger raw output:" << endl
-            //          << debuggerOutput;
+        // qDebug() << QDateTime::currentMSecsSinceEpoch()
+        //          << "msecs from epoch:"
+        //          << "output from Perl debugger received.";
+        // qDebug() << "Debugger raw output:" << endl
+        //          << debuggerOutput;
 
-            // Formatting of Perl debugger output is started only after
-            // the final command prompt comes out of the debugger:
-            if (debuggerJustStarted == true) {
-                if (debuggerLastCommand.length() > 0 and
-                        debuggerAccumulatedOutput.contains(
-                            QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>"))) {
-                    debuggerJustStarted = false;
+        // Formatting of Perl debugger output is started only after
+        // the final command prompt comes out of the debugger:
+        if (debuggerJustStarted == true) {
+            if (debuggerLastCommand.length() > 0 and
+                    debuggerAccumulatedOutput.contains(
+                        QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>"))) {
+                debuggerJustStarted = false;
 
-                    if (debuggerOutputHandler.isOpen()) {
-                        debuggerOutputHandler.close();
-                    }
-                    qDebuggerStartHtmlFormatter();
-                }
-
-                if (debuggerLastCommand.length() == 0 and
-                        debuggerAccumulatedOutput
-                        .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-                    debuggerJustStarted = false;
-
-                    if (debuggerOutputHandler.isOpen()) {
-                        debuggerOutputHandler.close();
-                    }
-
-                    qDebuggerStartHtmlFormatter();
-                }
-            }
-
-            if (debuggerJustStarted == false and
-                    debuggerAccumulatedOutput
-                    .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
                 if (debuggerOutputHandler.isOpen()) {
                     debuggerOutputHandler.close();
                 }
                 qDebuggerStartHtmlFormatter();
             }
+
+            if (debuggerLastCommand.length() == 0 and
+                    debuggerAccumulatedOutput
+                    .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
+                debuggerJustStarted = false;
+
+                if (debuggerOutputHandler.isOpen()) {
+                    debuggerOutputHandler.close();
+                }
+
+                qDebuggerStartHtmlFormatter();
+            }
         }
+
+        if (debuggerJustStarted == false and
+                debuggerAccumulatedOutput
+                .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
+            if (debuggerOutputHandler.isOpen()) {
+                debuggerOutputHandler.close();
+            }
+            qDebuggerStartHtmlFormatter();
+        }
+#endif
     }
 
     void qDebuggerStartHtmlFormatter()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            // 'dbgformatter.pl' is compiled into the resources of
-            // the binary file and is read from there.
-            QFileReader *resourceReader =
-                    new QFileReader(
-                        QString(":/scripts/dbgformatter.pl"));
-            QString debuggerOutputFormatterScript =
-                    resourceReader->fileContents;
+#if PERL_DEBUGGER_INTERACTION == 1
+        // 'dbgformatter.pl' is compiled into the resources of
+        // the binary file and is read from there.
+        QFileReader *resourceReader = new QFileReader(
+                    QString(":/scripts/dbgformatter.pl"));
+        QString debuggerOutputFormatterScript = resourceReader->fileContents;
 
-            // Set clean environment:
-            QProcessEnvironment cleanEnvironment;
-            cleanEnvironment.insert("REQUEST_METHOD", "GET");
-            cleanEnvironment.insert("QUERY_STRING", debuggerAccumulatedOutput);
-            debuggerOutputHandler.setProcessEnvironment(cleanEnvironment);
+        // Set clean environment:
+        QProcessEnvironment cleanEnvironment;
+        cleanEnvironment.insert("REQUEST_METHOD", "GET");
+        cleanEnvironment.insert("QUERY_STRING", debuggerAccumulatedOutput);
+        debuggerOutputHandler.setProcessEnvironment(cleanEnvironment);
 
-            // Clean any previous debugger output:
-            debuggerAccumulatedOutput = "";
+        // Clean any previous debugger output:
+        debuggerAccumulatedOutput = "";
 
-            // Set path to the syntax highlighting module:
-            debuggerOutputFormatterScript
-                    .replace("PEBLIB_PATH",
-                             QApplication::applicationDirPath()
-                             + QDir::separator() + "sdk"
-                             + QDir::separator() + "peblib");
+        // Set path to the syntax highlighting module:
+        debuggerOutputFormatterScript.replace("PEBLIB_PATH",
+                         QApplication::applicationDirPath()
+                         + QDir::separator() + "sdk"
+                         + QDir::separator() + "peblib");
 
-            // Start the Perl debugger output formatting script:
-            debuggerOutputHandler
-                    .start((qApp->property("perlInterpreter")
-                            .toString()),
-                           QStringList()
-                           << "-e"
-                           << debuggerOutputFormatterScript
-                           << debuggerScriptToDebug,
-                           QProcess::Unbuffered | QProcess::ReadWrite);
+        // Start the Perl debugger output formatting script:
+        debuggerOutputHandler
+                .start((qApp->property("perlInterpreter").toString()),
+                       QStringList()
+                       << "-e"
+                       << debuggerOutputFormatterScript
+                       << debuggerScriptToDebug,
+                       QProcess::Unbuffered | QProcess::ReadWrite);
 
-            qDebug() << QDateTime::currentMSecsSinceEpoch()
-                     << "msecs from epoch:"
-                     << "Perl debugger output formatter script started.";
-        }
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch:"
+                 << "Perl debugger output formatter script started.";
+#endif
     }
 
     void qDebuggerHtmlFormatterOutputSlot()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            QString debuggerHtmlOutput =
-                    debuggerOutputHandler.readAllStandardOutput();
+#if PERL_DEBUGGER_INTERACTION == 1
+        QString debuggerHtmlOutput =
+                debuggerOutputHandler.readAllStandardOutput();
 
-            // Append last output of the debugger formatter to
-            // the accumulated debugger formatter output:
-            debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
+        // Append last output of the debugger formatter to
+        // the accumulated debugger formatter output:
+        debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
 
-            qDebug() << QDateTime::currentMSecsSinceEpoch()
-                     << "msecs from epoch:"
-                     << "output from Perl debugger formatter received.";
-        }
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch:"
+                 << "output from Perl debugger formatter received.";
+#endif
     }
 
     void qDebuggerHtmlFormatterErrorsSlot()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            QString debuggerOutputFormatterErrors =
-                    debuggerOutputHandler.readAllStandardError();
+#if PERL_DEBUGGER_INTERACTION == 1
+        QString debuggerOutputFormatterErrors =
+                debuggerOutputHandler.readAllStandardError();
 
-            qDebug() << "Perl debugger formatter error:"
-                     << debuggerOutputFormatterErrors;
-        }
+        qDebug() << "Perl debugger formatter error:"
+                 << debuggerOutputFormatterErrors;
+#endif
     }
 
     void qDebuggerHtmlFormatterFinishedSlot()
     {
-        if (PERL_DEBUGGER_INTERACTION == 1) {
-            debuggerFrame->setHtml(debuggerAccumulatedHtmlOutput,
-                                   QUrl(PSEUDO_DOMAIN));
+#if PERL_DEBUGGER_INTERACTION == 1
+        debuggerFrame->setHtml(debuggerAccumulatedHtmlOutput,
+                               QUrl(PSEUDO_DOMAIN));
 
-            qDebug() << QDateTime::currentMSecsSinceEpoch()
-                     << "msecs from epoch:"
-                     << "output from Perl debugger formatter displayed.";
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
+                 << "msecs from epoch:"
+                 << "output from Perl debugger formatter displayed.";
 
-            debuggerOutputHandler.close();
-            debuggerAccumulatedHtmlOutput = "";
-        }
+        debuggerOutputHandler.close();
+        debuggerAccumulatedHtmlOutput = "";
+#endif
     }
 
 public:
