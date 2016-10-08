@@ -270,6 +270,7 @@ http://stackoverflow.com/questions/5113246/make-div-invisible-in-css-and-javascr
 http://stackoverflow.com/questions/1992114/how-do-you-create-a-hidden-div-that-doesnt-create-a-line-break-or-horizontal-space  
   
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
+http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  
 http://www.w3schools.com/cssref/css_websafe_fonts.asp  
 http://www.w3schools.com/html/html_iframe.asp  
 http://www.w3schools.com/html/html_lists.asp  
@@ -301,6 +302,9 @@ http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/
 ## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/sindresorhus/awesome  
+
+## Linux
+http://askubuntu.com/questions/501812/how-do-i-provide-arguments-to-a-command-run-from-gksudo  
 
 ## Mac
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html  

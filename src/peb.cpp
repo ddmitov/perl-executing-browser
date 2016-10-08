@@ -155,7 +155,8 @@ int main(int argc, char **argv)
     // ==============================
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
-    // This is necessary for a working interaction with the Perl debugger.
+    // This is necessary for a working interaction with the Perl debugger on
+    // all Unix-like operating systems.
 #ifndef Q_OS_WIN
 #if PERL_DEBUGGER_INTERACTION == 1
     if (isatty(fileno(stdin))) {
@@ -359,27 +360,26 @@ int main(int argc, char **argv)
     // ADMINISTRATIVE PRIVILEGES
     // ERROR MESSAGE:
     // ==============================
-    if (ADMIN_PRIVILEGES_CHECK == 1) {
-        if (startedAsRoot == true) {
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/html/error.html"));
-            QString htmlErrorContents = resourceReader->fileContents;
+#if ADMIN_PRIVILEGES_CHECK == 1
+    if (startedAsRoot == true) {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString htmlErrorContents = resourceReader->fileContents;
 
-            QString errorMessage =
-                    "Using "
-                    + application.applicationName().toLatin1() + " "
-                    + application.applicationVersion().toLatin1() + " "
-                    + "with administrative privileges is not allowed.";
-            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+        QString errorMessage = "Using "
+                + application.applicationName().toLatin1() + " "
+                + application.applicationVersion().toLatin1() + " "
+                + "with administrative privileges is not allowed.";
+        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
-            mainWindow.webViewWidget->setHtml(htmlErrorContents);
+        mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-            qDebug() << "Using"
-                     << application.applicationName().toLatin1().constData()
-                     << application.applicationVersion().toLatin1().constData()
-                     << "with administrative privileges is not allowed.";
-        }
+        qDebug() << "Using"
+                 << application.applicationName().toLatin1().constData()
+                 << application.applicationVersion().toLatin1().constData()
+                 << "with administrative privileges is not allowed.";
     }
+#endif
 
     // ==============================
     // MISSING PERL INTERPRETER ERROR MESSAGE:
@@ -608,9 +608,16 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
                      SLOT(qLongrunScriptFinishedSlot()));
 
     QUrlQuery scriptQuery(url);
+
     scriptOutputTarget = scriptQuery.queryItemValue("target");
     scriptQuery.removeQueryItem("target");
     // qDebug() << "Script output target:" << scriptOutputTarget;
+
+#if ADMIN_PRIVILEGES_CHECK == 0
+    scriptUser = scriptQuery.queryItemValue("user");
+    scriptQuery.removeQueryItem("user");
+    // qDebug() << "Script user:" << scriptUser;
+#endif
 
     scriptFullFilePath = QDir::toNativeSeparators
             ((qApp->property("application").toString()) + url.path());
@@ -636,20 +643,52 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
 
     scriptHandler.setProcessEnvironment(scriptEnvironment);
 
-    QFileReader *resourceReader =
-            new QFileReader(QString(scriptFullFilePath));
-    QString fileContents = resourceReader->fileContents;
+    if (scriptUser != "root") {
+        scriptHandler.start((qApp->property("perlInterpreter").toString()),
+                            QStringList()
+                            << "-M-ops=fork"
+                            << scriptFullFilePath,
+                            QProcess::Unbuffered | QProcess::ReadWrite);
 
-    scriptHandler.start((qApp->property("perlInterpreter").toString()),
-                        QStringList()
-                        << "-M-ops=fork"
-                        << "-e"
-                        << fileContents,
-                        QProcess::Unbuffered | QProcess::ReadWrite);
-
-    if (postData.length() > 0) {
-        scriptHandler.write(postDataArray);
+        if (postData.length() > 0) {
+            scriptHandler.write(postDataArray);
+        }
     }
+
+#ifdef Q_OS_LINUX
+#if ADMIN_PRIVILEGES_CHECK == 0
+    if (scriptUser == "root") {
+        QString scriptCommadLineArgument;
+
+        if (postData.length() > 0) {
+            scriptCommadLineArgument = postData;
+        }
+
+        if (queryString.length() > 0) {
+            scriptCommadLineArgument = queryString;
+        }
+
+//        scriptHandler.start(QString("pkexec"),
+//                            QStringList()
+//                            << qApp->property("perlInterpreter").toString()
+//                            << "-M-ops=fork"
+//                            << scriptFullFilePath
+//                            << scriptCommadLineArgument,
+//                            QProcess::Unbuffered | QProcess::ReadWrite);
+
+        scriptHandler.start(QString("gksudo"),
+                            QStringList()
+                            << "-D"
+                            + qApp->applicationName().toLatin1()
+                            << "--"
+                            << qApp->property("perlInterpreter").toString()
+                            << "-M-ops=fork"
+                            << scriptFullFilePath
+                            << scriptCommadLineArgument,
+                            QProcess::Unbuffered | QProcess::ReadWrite);
+    }
+#endif
+#endif
 
     qDebug() << "Script started:" << scriptFullFilePath;
 }

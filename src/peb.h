@@ -193,12 +193,14 @@ public slots:
 
     void qLongrunScriptErrorsSlot()
     {
-        QString error = scriptHandler.readAllStandardError();
-        scriptAccumulatedErrors.append(error);
+        QString scriptErrors = scriptHandler.readAllStandardError();
+        scriptAccumulatedErrors.append(scriptErrors);
         scriptAccumulatedErrors.append("\n");
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: errors from" << scriptFullFilePath;
+
+        // qDebug() << "Script errors:" << scriptErrors;
     }
 
     void qLongrunScriptFinishedSlot()
@@ -222,6 +224,7 @@ private:
     QProcess scriptHandler;
     QString scriptFullFilePath;
     QString scriptOutputTarget;
+    QString scriptUser;
 };
 
 // ==============================
@@ -487,15 +490,13 @@ protected:
                     qDebug() << "Local link requested:"
                              << request.url().toString();
 
-                    QFile localFile(fullFilePath);
-                    localFile.open(QIODevice::ReadOnly);
-                    QTextStream stream(&localFile);
-                    QString localFileContents = stream.readAll();
-                    localFile.close();
+                    QFileReader *resourceReader =
+                            new QFileReader(QString(fullFilePath));
+                    QString fileContents = resourceReader->fileContents;
 
                     QCustomNetworkReply *reply =
                             new QCustomNetworkReply (
-                                request.url(), localFileContents, mimeType);
+                                request.url(), fileContents, mimeType);
                     return reply;
                 } else {
                     qDebug() << "File type not supported:" << fullFilePath;

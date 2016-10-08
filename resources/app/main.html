@@ -68,6 +68,27 @@
 			</p>
 
 			<p>
+				<a href="http://local-pseudodomain/root-get.html"
+					data-toggle="tooltip" title="http://local-pseudodomain/root-get.html"
+					data-placement="right">
+				Linux Root Non-AJAX GET Request Test</a>
+			</p>
+
+			<p>
+				<a href="http://local-pseudodomain/root-post.html"
+					data-toggle="tooltip" title="http://local-pseudodomain/root-post.html"
+					data-placement="right">
+				Linux Root Non-AJAX POST Request Test</a>
+			</p>
+
+			<p>
+				<a href="http://local-pseudodomain/perl/root-open-directory.pl?user=root"
+					data-toggle="tooltip" title="http://local-pseudodomain/perl/root-open-directory.pl?user=root"
+					data-placement="right" id="root-directory-lister">
+				Linux /root Directory Lister</a>
+			</p>
+
+			<p>
 				<div id="ajax-script-results">
 					<button id="ajax-button" class="btn btn-primary"
 							data-toggle="tooltip" title="http://local-pseudodomain/perl/ajax-test.pl"
@@ -182,6 +203,10 @@
 		<script>
 			$(document).ready(function() {
 				$('[data-toggle="tooltip"]').tooltip();
+
+				$('#root-directory-lister').click(function() {
+					$('#root-directory-lister').tooltip('destroy');
+				}); 
 
 				$('#ajax-button').click(function() {
 					$.ajax({
