@@ -38,6 +38,7 @@
 // WINDOWS USER PRIVILEGES DETECTION SUBROUTINE:
 // ==============================
 #ifdef Q_OS_WIN
+#if ADMIN_PRIVILEGES_CHECK == 1
 BOOL isUserAdmin()
 {
     if (ADMIN_PRIVILEGES_CHECK == 1) {
@@ -57,6 +58,7 @@ BOOL isUserAdmin()
         return(bResult);
     }
 }
+#endif
 #endif
 
 // ==============================
@@ -308,10 +310,10 @@ int main(int argc, char **argv)
                 }
             }
         }
-
-        trustedDomainsList.append(PSEUDO_DOMAIN);
-        application.setProperty("trustedDomains", trustedDomainsList);
     }
+
+    trustedDomainsList.append(PSEUDO_DOMAIN);
+    application.setProperty("trustedDomains", trustedDomainsList);
 
     // ==============================
     // LOGGING:
