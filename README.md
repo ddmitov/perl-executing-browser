@@ -6,10 +6,12 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 ## Contents
 * [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
+* [Target Audience](#target-audience)
 * [Features](#features)
 * [Compile-time Requirements](#compile-time-requirements)
 * [Runtime Requirements](#runtime-requirements)
-* [Calling Local Perl Scripts](#calling-local-perl-scripts)
+* [Calling User Perl Scripts](#calling-user-perl-scripts)
+* [Calling Linux Superuser Scripts](#calling-linux-superuser-scripts)
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs for Users](#special-urls-for-users)
@@ -18,7 +20,6 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Keyboard Shortcuts](#keyboard-shortcuts)
 * [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
-* [Target Audience](#target-audience)
 * [History](#history)
 * [Application using PEB](#application-using-peb)
 * [License](#license)
@@ -30,9 +31,9 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
 * **1.1.** If your users will have to enter data manually, don't forget to make an appropriate HTML form for them.
 * **1.2.** If your users will have to open files or folders, see section [Special URLs for Users](#special-urls-for-users) for information on how to open local files and folders from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
-* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling Local Perl Scripts](#calling-local-perl-scripts).
+* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling User Perl Scripts](#calling-user-perl-scripts).
 * **2.** Write your Perl scripts.  
-    The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is readd just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
+    The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
   
   Note that all files and directories used by PEB are relational to the directory where the PEB binary is located, because PEB is created to work from any folder without installation. All your local HTML files and Perl scripts must be located inside the ```{PEB_binary_directory}/resources/app``` directory - see section [Settings](#settings).  
 
@@ -51,6 +52,11 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
   
 * **5. Maximal (re)use of existing web technologies and standards:**  
     use as much as possible from existing web technologies, standards and their documentation.
+
+## Target Audience
+* Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
+* DevOps people developing custom Perl-based GUI monitoring and administration solutions
+* Perl 5 enthusiasts and developers willing to use the built-in Perl debugger in graphical mode
 
 ## Features
 **Usability:**
@@ -96,8 +102,8 @@ Compiled and tested successfully using:
   [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   PEB can also use any Perl on PATH.
 
-## Calling Local Perl Scripts
-  PEB recognizes two types of local Perl scripts: **long running scripts** and **AJAX scripts**.  
+## Calling User Perl Scripts
+  PEB recognizes two types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
     Long running Perl scripts are expected to produce either:  
@@ -110,7 +116,7 @@ Compiled and tested successfully using:
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
-    The ```target``` query item should point to a valid HTML DOM element. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page in this scenario. HTML event called ```scriptoutput``` is emitted when script output is inserted into the calling local page. This event can be binded to a JavaScript function for a variety of reasons including daisy chaining of different scripts. The calling page must not be reloaded during the script execution, otherwise no script output will be inserted.  
+    The ```target``` query item should point to a valid HTML DOM element. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page in this scenario. HTML event called ```scriptoutput``` is emitted when script output is inserted into the calling local page. This event can be binded to a JavaScript function for a variety of reasons including daisy chaining of different scripts. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
     Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
@@ -145,6 +151,9 @@ Compiled and tested successfully using:
       });
   });
 ```
+
+## Calling Linux Superuser Scripts
+Linux superuser Perl scripts with elevated privileges can be started using ```gksudo``` and a special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other Perl script. User data is supplied to the superuser Perl scripts as the first command line argument without STDIN input or QUERY_STRING environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
@@ -412,10 +421,6 @@ They have two functions:
   Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ```location.reload()```.
 * No file can be downloaded on hard disk.
 * No support for plugins and HTML 5 video.
-
-## Target Audience
-* Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
-* Perl 5 enthusiasts and developers willing to use the built-in Perl debugger in graphical mode
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
