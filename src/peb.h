@@ -263,27 +263,12 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
-    void closeWindowSignal();
 
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
-        // ==============================
-        // Window closing URL:
-        // ==============================
-        if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
-                request.url().fileName() == "close-window.function") {
-                    emit closeWindowSignal();
-
-            QCustomNetworkReply *reply =
-                    new QCustomNetworkReply (
-                        request.url(), emptyString, emptyString);
-            return reply;
-        }
-
         // ==============================
         // Case-insensitive marker for AJAX Perl scripts:
         // ==============================
@@ -820,11 +805,6 @@ public slots:
         htmlErrorContents
                 .replace("ERROR_MESSAGE", errorMessage);
         QPage::mainFrame()->setHtml(htmlErrorContents);
-    }
-
-    void qCloseWindowFromURLTransmitterSlot()
-    {
-        emit closeWindowSignal();
     }
 
     // ==============================

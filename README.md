@@ -277,7 +277,7 @@ They have two functions:
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL can be called not only by clicking a link, but also by using a [jQuery](https://jquery.com/) AJAX GET request. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section [Settings](#settings).  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section [Settings](#settings).  
   
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  

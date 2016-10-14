@@ -12,20 +12,27 @@
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
+message ("Trying to configure Perl Executing Browser to use Qt $$[QT_VERSION]")
+
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
+    error ("Perl Executing Browser requires at least Qt 5.1 headers.")
 }
 
 equals (QT_MAJOR_VERSION, 5) {
     lessThan (QT_MINOR_VERSION, 1) {
-        error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
+        error ("Perl Executing Browser requires at least Qt 5.1 headers.")
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        error ("Perl Executing Browser requires Qt5.1 - Qt5.5 headers.")
+        packagesExist(webkitwidgets) {
+            message ("Going to build with manually added QtWebKit libraries.")
+        }
+
+        !packagesExist(webkitwidgets) {
+            error ("QtWebKit libraries are not found.")
+        }
     }
 
-    message ("Perl Executing Browser using Qt $$[QT_VERSION]")
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 

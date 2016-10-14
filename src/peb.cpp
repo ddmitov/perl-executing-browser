@@ -781,12 +781,6 @@ QPage::QPage()
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Signal and slot for closing window from URL:
-    QObject::connect(networkAccessManager,
-                     SIGNAL(closeWindowSignal()),
-                     this,
-                     SLOT(qCloseWindowFromURLTransmitterSlot()));
-
     // Scroll bars:
     mainFrame()->setScrollBarPolicy(Qt::Horizontal,
                                               Qt::ScrollBarAsNeeded);
@@ -1017,6 +1011,16 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                     request.url().fileName() == "about.function" and
                     request.url().query() == "type=qt") {
                 QApplication::aboutQt();
+
+                return false;
+            }
+
+            // ==============================
+            // Window closing URL:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "close-window.function") {
+                emit closeWindowSignal();
 
                 return false;
             }
