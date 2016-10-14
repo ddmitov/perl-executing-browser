@@ -12,7 +12,7 @@
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
-message ("Trying to configure Perl Executing Browser to use Qt $$[QT_VERSION]")
+message ("Trying to configure Perl Executing Browser for Qt $$[QT_VERSION]")
 
 lessThan (QT_MAJOR_VERSION, 5) {
     error ("Perl Executing Browser requires at least Qt 5.1 headers.")

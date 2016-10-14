@@ -4,24 +4,38 @@ Perl Executing Browser
 Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
 
 ## Contents
+* [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
 * [Features](#features)
 * [Compile-time Requirements](#compile-time-requirements)
 * [Runtime Requirements](#runtime-requirements)
-* [Calling a Local Perl Script](#calling-a-local-perl-script)
+* [Calling Local Perl Scripts](#calling-local-perl-scripts)
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs for Users](#special-urls-for-users)
 * [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
-* [What Perl Executing Browser Is Not](#what-perl-executing-browser-is-not)
+* [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
 * [Target Audience](#target-audience)
 * [History](#history)
-* [Application using Perl Executing Browser](#application-using-perl-executing-browser)
+* [Application using PEB](#application-using-peb)
 * [License](#license)
 * [Authors](#authors)
+
+## Quick Start
+  These are the basic steps for building your first PEB-based application:  
+  **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
+  Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
+    **1.1.** If your users will have to enter data manually, don't forget to make an appropriate HTML form for them.  
+    **1.2.** If your users will have to open files or folders, see section [Special URLs for Users](#special-urls-for-users) for information on how to open local files and folders from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.  
+    **1.3.** Connect your local HTML file(s) to your Perl 5 scripts.  
+  This is best explained in section [Calling Local Perl Scripts](#calling-local-perl-scripts).  
+  **3.** Write your Perl scripts.  
+  The only limitation imposes by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.
+  
+  Note that all files and directories used by PEB are relational to the directory where the PEB binary is located, because PEB is created to work from any folder without installation. All your local HTML files and Perl scripts must be located inside the ```{PEB_binary_directory}/resources/app``` directory - see section [Settings](#settings).  
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
@@ -83,7 +97,7 @@ Compiled and tested successfully using:
   [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   PEB can also use any Perl on PATH.
 
-## Calling a Local Perl Script
+## Calling Local Perl Scripts
   PEB recognizes two types of local Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
 * **Long running Perl scripts:**  
@@ -387,7 +401,7 @@ They have two functions:
 * ```Ctrl+V``` - Paste
 * ```F11``` - toggle Fullscreen
 
-## What Perl Executing Browser Is Not
+## What PEB Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
 * PEB does not act as a server and is not an implementation of the CGI protocol. Only three environment variables are borrowed from the CGI protocol: ```REQUEST_METHOD```, ```QUERY_STRING``` and ```CONTENT_LENGTH``` and they are used for communication between local HTML forms and local Perl scripts in a purely local context without any attempt to communicate with the outside world.
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
@@ -407,7 +421,7 @@ They have two functions:
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
-## Application using Perl Executing Browser
+## Application using PEB
 * [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is implemented as a hybrid desktop and server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework, [Bootstrap](http://getbootstrap.com/) for a themable HTML 5 user interface, JavaScript for on-screen text conversion and [Perl 5](https://www.perl.org/) for a file-writing backend.
 
 ## License
