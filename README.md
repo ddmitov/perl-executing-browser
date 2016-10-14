@@ -39,19 +39,19 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
-    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop applications,
+    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop applications
   
 * **2. Zero installation:**  
-    run from any folder,
+    run from any folder
   
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available,
+    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available
   
 * **4. Secure user-space solution:**  
-    no server of any kind is installed or started,
+    no server of any kind is installed or started
   
 * **5. Maximal (re)use of existing web technologies and standards:**  
-    use as much as possible from existing web technologies, standards and their documentation.
+    use as much as possible from existing web technologies, standards and their documentation
 
 ## Target Audience
 * Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
@@ -153,7 +153,7 @@ Compiled and tested successfully using:
 ```
 
 ## Calling Linux Superuser Scripts
-Linux superuser Perl scripts with elevated privileges can be started using ```gksudo``` and a special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other Perl script. User data is supplied to the superuser Perl scripts as the first command line argument without STDIN input or QUERY_STRING environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts with elevated privileges can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other Perl script. User data is supplied to superuser Perl scripts as the first command line argument without STDIN input or QUERY_STRING environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
