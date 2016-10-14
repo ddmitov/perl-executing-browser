@@ -25,8 +25,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Authors](#authors)
 
 ## Quick Start
-  These are the basic steps for building your first PEB-based application:  
-  
+  These are the basic steps for building your first PEB-based application:
 * **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
 * **1.1.** If your users will have to enter data manually, don't forget to make an appropriate HTML form for them.
