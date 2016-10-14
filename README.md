@@ -45,13 +45,13 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
     run from any folder
   
 * **3. Cross-platform availability:**  
-    use it on every platform, where Perl 5, Qt 5 and QtWebKit are available
+    usable on every platform, where Perl 5, Qt 5 and QtWebKit are available
   
 * **4. Secure user-space solution:**  
     no server of any kind is installed or started
   
-* **5. Maximal (re)use of existing web technologies and standards:**  
-    use as much as possible from existing web technologies, standards and their documentation
+* **5. Maximal reuse of existing web technologies and standards:**  
+    based on existing web technologies, standards and their documentation
 
 ## Target Audience
 * Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
