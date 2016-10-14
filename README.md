@@ -31,8 +31,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
 * **1.1.** If your users will have to enter data manually, don't forget to make an appropriate HTML form for them.
 * **1.2.** If your users will have to open files or folders, see section [Special URLs for Users](#special-urls-for-users) for information on how to open local files and folders from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
-* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts.  
-    This is best explained in section [Calling Local Perl Scripts](#calling-local-perl-scripts).  
+* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling Local Perl Scripts](#calling-local-perl-scripts).
   
 * **2.** Write your Perl scripts.  
     The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is readd just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
