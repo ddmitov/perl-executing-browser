@@ -11,7 +11,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Compile-time Requirements](#compile-time-requirements)
 * [Runtime Requirements](#runtime-requirements)
 * [Calling User Perl Scripts](#calling-user-perl-scripts)
-* [Calling Linux Superuser Scripts](#calling-linux-superuser-scripts)
+* [Calling Linux Superuser Perl Scripts](#calling-linux-superuser-perl-scripts)
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs for Users](#special-urls-for-users)
@@ -78,10 +78,10 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * Extensive optional logging of all browser actions.
 
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebKit``` headers).  
-Later versions of Qt are unusable due to the deprecation of ```QtWebKit```.  
+GCC compiler and Qt 5.1 - Qt 5.5 headers.  
+Later versions of Qt could be usable if ```QtWebKit``` headers and libraries are manually added, but this approach is still not tested.  
   
-The most important Qt dependency of PEB is actually not the ```QtWebkit``` set of classes, but ```QNetworkAccessManager``` class, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` remains problematic.  
+The most important Qt dependency of PEB is actually not the ```QtWebkit``` set of classes, but ```QNetworkAccessManager```, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` is problematic.  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -104,14 +104,12 @@ Compiled and tested successfully using:
 ## Calling User Perl Scripts
   PEB recognizes two types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
-* **Long running Perl scripts:**  
-    Long running Perl scripts are expected to produce either:  
+* **Types of Long Running Perl Scripts:**  
+    **1. page-producing scripts:**  
+    They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
   
-    **1.** a complete HTML page that will replace the calling page:  
-    If a complete HTML page is expected from the Perl script that is called, no special settings should be added. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
-  
-    **2.** pieces of data that will be inserted one after the other into the calling page using JavaScript:  
-    If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
+    **2. data-only scripts:**  
+    They don't produce a complete HTML page, but only pieces of data that will be inserted one after the other into the calling page using JavaScript. If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
@@ -119,9 +117,9 @@ Compiled and tested successfully using:
   
     Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
-    **Note for Windows developers:** Any long running script producing output that is going to be inserted into the calling page should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+    **Note for Windows developers:** Any long running data-only script should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
-    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically - see section [Special URLs for Interaction with the Perl Debugger](#special-urls-for-interaction-with-the-perl-debugger). The following code is an example of a direct POST request to a local script from an HTML form:
+    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -132,7 +130,7 @@ Compiled and tested successfully using:
 ```
 
 * **AJAX Perl scripts:**  
-    AJAX scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
+    Local AJAX Perl scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
   
     The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
@@ -151,7 +149,7 @@ Compiled and tested successfully using:
   });
 ```
 
-## Calling Linux Superuser Scripts
+## Calling Linux Superuser Perl Scripts
 Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other Perl script. User data is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings

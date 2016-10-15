@@ -1,6 +1,6 @@
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebKit``` headers).  
-Later versions of Qt are unusable due to the deprecation of ```QtWebKit```.  
+GCC compiler and Qt 5.1 - Qt 5.5 headers.  
+Later versions of Qt could be usable if ```QtWebKit``` headers and libraries are manually added, but this approach is still not tested.  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -18,5 +18,5 @@ Compiled and tested successfully using:
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
   [Strawberry Perl](http://strawberryperl.com/) PortableZIP editions are successfully used with all Windows builds of PEB.  
   [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
-  Being unable to start scripts with administrative privileges, PEB can use, but not abuse, any system Perl on PATH.
+  PEB can also use any Perl on PATH.
 

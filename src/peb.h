@@ -799,11 +799,9 @@ public slots:
 
         QFileReader *resourceReader =
                 new QFileReader(QString(":/html/error.html"));
-        QString htmlErrorContents =
-                resourceReader->fileContents;
+        QString htmlErrorContents = resourceReader->fileContents;
 
-        htmlErrorContents
-                .replace("ERROR_MESSAGE", errorMessage);
+        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
         QPage::mainFrame()->setHtml(htmlErrorContents);
     }
 
