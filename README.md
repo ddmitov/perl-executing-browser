@@ -101,7 +101,7 @@ Compiled and tested successfully using:
 
 ## Compile-time Variables
 Changing the compile-time variables of PEB requires editing its project file - ```peb.pro```.
-* **Macintosh binary type:** ```BUNDLE```
+* **Macintosh binary type:** ```BUNDLE```  
 To make a bundle-less binary, which is the default setting:  
 
 ```
@@ -119,13 +119,13 @@ To make a bundled binary (peb.app):
 <a name="security-compile-time-variables"></a>
 The following two compile-time variables can tighten further the security of PEB.
 
-* **Administrative privileges check:** ```ADMIN_PRIVILEGES_CHECK```
+* **Administrative privileges check:** ```ADMIN_PRIVILEGES_CHECK```  
 To disable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 0```  
 By default administrative privileges check is disabled.  
 To enable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 1```  
 If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
 
-* **Perl debugger interaction:** ```PERL_DEBUGGER_INTERACTION```
+* **Perl debugger interaction:** ```PERL_DEBUGGER_INTERACTION```  
 To enable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 1```  
 By default Perl debugger interaction is enabled.  
 To disable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 0```  
@@ -324,7 +324,7 @@ They have two functions:
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 
-**[Optional security features based on compile-time variables and C++ code:](#security-compile-time-variables)**
+**[Optional security features based on compile-time variables and C++ code](#security-compile-time-variables)**
 
 **Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
