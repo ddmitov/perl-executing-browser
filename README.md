@@ -104,12 +104,13 @@ Compiled and tested successfully using:
 ## Calling User Perl Scripts
   PEB recognizes two types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
-* **Types of Long Running Perl Scripts:**  
+* **Types of long running Perl scripts:**  
+  
     **1. page-producing scripts:**  
     They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
   
     **2. data-only scripts:**  
-    They don't produce a complete HTML page, but only pieces of data that will be inserted one after the other into the calling page using JavaScript. If script output is going to be inserted piece by piece into the HTML DOM of the calling page, then a special query item should be inserted into the script URL.  
+    They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query item ```target``` should be added to the script URL in this case.  
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
@@ -117,7 +118,7 @@ Compiled and tested successfully using:
   
     Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
-    **Note for Windows developers:** Any long running data-only script should have ```$|=1;``` among its first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+    **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
     There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
 
@@ -150,7 +151,7 @@ Compiled and tested successfully using:
 ```
 
 ## Calling Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other Perl script. User data is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other long running Perl script. User data is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
