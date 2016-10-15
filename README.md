@@ -226,7 +226,7 @@ They have two functions:
   }
 ```
 
-* **Checking for unsaved user input before closing a window:** {#checking-for-unsaved-user-input-before-closing-a-window}  
+* **Checking for unsaved user input before closing a window:**(#checking-for-unsaved-user-input-before-closing-a-window)  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
