@@ -59,25 +59,26 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Features
 **Usability:**
-* [Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain](#feeding-from-forms).
-* [Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page](#data-only-scripts).
-* [Linux superuser Perl scripts can be started](#calling-linux-superuser-perl-scripts).
-* [Any version of Perl 5 can be used](#runtime-requirements).
-* [PEB can be started from any folder](#settings).
+
+* [Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
+* [Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain.](#feeding-from-forms)
+* [Linux superuser Perl scripts can be started.](#calling-linux-superuser-perl-scripts)
+* [Any version of Perl 5 can be used.](#runtime-requirements)
+* [PEB can be started from any folder.](#settings)
 * PEB is useful for both single-page or multi-page applications.
-* [Single file or multiple files, new filename, existing or new directory can be selected by user](#special-urls-for-users).  
+* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-users)  
   Their full paths can be displayed in the calling local page and they can be supplied to local Perl scripts.
-* [Browser functions are accessible from special URLs](#browser-functions).
-* [Any icon can be displayed on windows and message boxes](#icon).
-* [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels).
-* [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes).
-* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window).
+* [Browser functions are accessible from special URLs.](#browser-functions)
+* [Any icon can be displayed on windows and message boxes.](#icon)
+* [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels)
+* [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes)
+* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
 * Cross-site scripting is disabled for all web and local pages.
 
 **Development goodies:**
-* PEB can interact with the Perl 5 debugger in graphical mode - see section [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)  
+* [PEB can interact with the Perl 5 debugger in graphical mode.](#html-interface-for-the-perl-debugger)
 * ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
-* Extensive optional logging of all browser actions.
+* [Optional extensive logging of all browser actions.](#log-files)
 
 ## Compile-time Requirements
 GCC compiler and Qt 5.1 - Qt 5.5 headers.  
@@ -183,7 +184,8 @@ PEB is designed to run from any directory without setting anything beforehand an
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
     If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security](#security).
-* **Log files:**  
+* **Log files:**
+<a name="log-files"></a>  
     If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note, that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
 
 **Settings based on JavaScript code:**  
