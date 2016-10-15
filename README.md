@@ -59,18 +59,19 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Features
 **Usability:**
-* Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain.
-* Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.
-* Linux superuser Perl scripts can be started.
-* Any version of Perl 5 can be used.
-* PEB can be started from any folder.
+* [Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain](#feeding-from-forms).
+* [Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page](#data-only-scripts).
+* [Linux superuser Perl scripts can be started](#calling-linux-superuser-perl-scripts).
+* [Any version of Perl 5 can be used](#runtime-requirements).
+* [PEB can be started from any folder](#settings).
 * PEB is useful for both single-page or multi-page applications.
-* Single file or multiple files, new filename, existing or new directory can be selected by user.  
-  Their full paths are displayed in the calling local page and they can be supplied to local Perl scripts.
-* Browser functions are accessible from special URLs.
-* Any icon can be displayed on windows and message boxes.
-* Optional JavaScript translation of context menu and dialog boxes.
-* Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss.
+* [Single file or multiple files, new filename, existing or new directory can be selected by user](#special-urls-for-users).  
+  Their full paths can be displayed in the calling local page and they can be supplied to local Perl scripts.
+* [Browser functions are accessible from special URLs](#special-urls-for-users).
+* [Any icon can be displayed on windows and message boxes](#icon).
+* [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels).
+* [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes).
+* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#checking-for-unsaved-user-input-before-closing-a-window).
 * Cross-site scripting is disabled for all web and local pages.
 
 **Development goodies:**
@@ -110,7 +111,7 @@ Compiled and tested successfully using:
     **1. page-producing scripts:**  
     They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
   
-    **2. data-only scripts:**  
+    **2. data-only scripts:**<a name="data-only-scripts"></a>  
     They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
@@ -121,6 +122,7 @@ Compiled and tested successfully using:
   
     **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
+    <a name="feeding-from-forms"></a>
     There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
@@ -176,7 +178,8 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Start page:**  
     PEB can start with a static HTML start page or with a start page that is produced dynamically by a Perl script. When PEB is started, it will first try to find ```{PEB_binary_directory}/resources/app/index.html```. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ```{PEB_binary_directory}/resources/app/index.pl```. If this script is found, it will be executed and the resulting HTML output will be displayed as a start page. If both ```index.html``` and ```index.pl``` are not found, an error message will be displayed. No start page is a showstopper for PEB.  
     Note that both static and dynamic start page pathnames are case sensitive.
-* **Icon:**  
+* **Icon:**
+<a name="icon"></a>  
     A PEB-based application can have its own icon and it must be located at ```{PEB_binary_directory}/resources/app/app.png```. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 * **Trusted domains:**  
     If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security](#security).
@@ -187,7 +190,8 @@ PEB is designed to run from any directory without setting anything beforehand an
 They have two functions:  
 **1.** to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
 **2.** to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
-* **Custom or translated context menu labels:**  
+* **Custom or translated context menu labels:**
+<a name="custom-or-translated-context-menu-labels"></a>  
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ```contextmenu``` event is not already intercepted):  
 
 ```javascript
@@ -206,8 +210,9 @@ They have two functions:
   }
 ```
 
-* **Custom or translated labels for JavaScript dialog boxes:**  
-  Using the following code any local HTML page can have custom labels on the default JavaScript Alert, Confirm and Prompt dialog boxes:
+* **Custom or translated labels for JavaScript dialog boxes:**
+<a name="custom-or-translated-labels-for-javascript-dialog-boxes"></a>  
+  Using the following code any local HTML page can have custom labels on the default JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes:
 
 ```javascript
   function pebMessageBoxElements() {
@@ -295,9 +300,6 @@ They have two functions:
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
-* **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section *Settings*, paragraph [Checking for unsaved user input before closing a window](#checking-for-unsaved-user-input-before-closing-a-window).  
-  
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```
 <a name="select-single-file"></a>  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
@@ -359,6 +361,9 @@ They have two functions:
 * **About PEB embedded page:** ```http://local-pseudodomain/about.function?type=browser```
   
 * **About Qt dialog box:** ```http://local-pseudodomain/about.function?type=qt```
+  
+* **Close current window:** ```http://local-pseudodomain/close-window.function```  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section *Settings*, paragraph [Checking for unsaved user input before closing a window](#checking-for-unsaved-user-input-before-closing-a-window).
 
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
