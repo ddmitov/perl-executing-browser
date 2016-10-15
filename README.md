@@ -226,7 +226,7 @@ They have two functions:
   }
 ```
 
-* **Checking for unsaved user input before closing a window:**  
+* **Checking for unsaved user input before closing a window:** {#checking-for-unsaved-user-input-before-closing-a-window}  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
@@ -239,7 +239,7 @@ They have two functions:
   
   The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window-closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window-closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
   
-  The following code is an example of both synchronous and asynchronous warning functions. It is expected, that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [jQuery](https://jquery.com/) and [Alertify.js](http://alertifyjs.com/).  
+  The following code is an example of both synchronous and asynchronous warning functions. It is expected that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [Alertify.js](http://alertifyjs.com/).  
 
 ```javascript
   function pebCloseConfirmationSync() {
@@ -252,10 +252,7 @@ They have two functions:
       alertify.set({buttonFocus: "cancel"});
       alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
           if (confirmation) {
-              $jQuery.ajax({
-                  url: 'http://local-pseudodomain/close-window.function',
-                  method: 'GET'
-              });
+              window.location.href = "http://local-pseudodomain/close-window.function";
           }
       });
   }
@@ -305,7 +302,7 @@ They have two functions:
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
   This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
-  Actual opening of the selected file is performed only after the selected file is transmitted to and opened from a Perl script.  
+  The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
   
@@ -338,14 +335,15 @@ They have two functions:
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
   
-  Please note that the actual creation of the new file is not performed directly by PEB. Only after the new file name is transmitted to a Perl script, the script itself will create the new file.  
+  The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
   
 * **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
   
-  Please note that if you choose to create a new directory, it will be created immediately by PEB and it will be already existing when it will be passed to a local Perl script.  
+  Please note that if you choose to create a new directory, it will be created immediately by PEB.  
+  It will be already existing when passed to a local Perl script.  
   
 * **Print:** ```http://local-pseudodomain/print.function?action=print```  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.  
