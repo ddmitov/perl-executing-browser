@@ -29,7 +29,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
   These are the basic steps for building your first PEB-based application:
 * **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
-* **1.1.** If your users will have to enter data manually, don't forget to make an appropriate HTML form for them.
+* **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
 * **1.2.** If your users will have to open files or folders, see section [Special URLs for Users](#special-urls-for-users) for information on how to open local files and folders from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling User Perl Scripts](#calling-user-perl-scripts).
 * **2.** Write your Perl scripts.  
@@ -39,7 +39,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
-    use Perl 5, JavaScript, HTML 5 and CSS to create beautiful desktop applications
+    use Perl 5, JavaScript, HTML and CSS to create beautiful desktop applications
   
 * **2. Zero installation:**  
     run from any folder
@@ -61,6 +61,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 **Usability:**
 * Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain.
 * Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.
+* Linux superuser Perl scripts can be started.
 * Any version of Perl 5 can be used.
 * PEB can be started from any folder.
 * PEB is useful for both single-page or multi-page applications.
@@ -102,9 +103,9 @@ Compiled and tested successfully using:
   PEB can also use any Perl on PATH.
 
 ## Calling User Perl Scripts
-  PEB recognizes two types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
+  PEB recognizes two main types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.
-* **Types of long running Perl scripts:**  
+* **Subtypes of long running Perl scripts:**  
   
     **1. page-producing scripts:**  
     They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
