@@ -30,7 +30,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks. PEB supports both HTML 4 & 5, although not all HTML 5 features are supported.
 * **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
-* **1.2.** If your users will have to open files or folders, see section [Special URLs for Users](#special-urls-for-users) for information on how to open local files and folders from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
+* **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling User Perl Scripts](#calling-user-perl-scripts).
 * **2.** Write your Perl scripts.  
     The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
@@ -230,9 +230,9 @@ They have two functions:
 <a name="checking-for-unsaved-user-input-before-closing-a-window"></a>  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
-  If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: synchronous and asynchronous.  
+  If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
   
-  If the local HTML page, that is going to be closed, contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
+  If a local HTML page going to be closed contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
   
   What are the differences between the two routines?  
   
@@ -296,9 +296,10 @@ They have two functions:
   It is intercepted inside PEB and is not passed to the underlying operating system.  
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section 'Settings', paragraph [Checking for unsaved user input before closing a window](#checking-for-unsaved-user-input-before-closing-a-window).  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section *Settings*, paragraph [Checking for unsaved user input before closing a window](#checking-for-unsaved-user-input-before-closing-a-window).  
   
-* **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```  
+* **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```
+<a name="select-single-file"></a>  
   The full path of the selected file will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
@@ -325,20 +326,23 @@ They have two functions:
   });
 ```
 
-* **Select multiple files:** ```http://local-pseudodomain/open-files.function?target=DOM_element```  
+* **Select multiple files:** ```http://local-pseudodomain/open-files.function?target=DOM_element```
+<a name="select-multiple-files"></a>  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
   Different file names are separated by a semicolon - ```;```  
   
-* **Select new file name:** ```http://local-pseudodomain/new-file-name.function?target=DOM_element```  
+* **Select new file name:** ```http://local-pseudodomain/new-file-name.function?target=DOM_element```
+<a name="select-new-file-name"></a>  
   The full path of the new file name will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
   
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
   
-* **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```  
+* **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```
+<a name="select-directory"></a>  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
   Having a target DOM element is mandatory when using this special URL.  
   ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
