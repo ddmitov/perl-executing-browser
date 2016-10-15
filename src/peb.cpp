@@ -121,7 +121,7 @@ int main(int argc, char **argv)
     // BASIC APPLICATION VARIABLES:
     // ==============================
     application.setApplicationName("Perl Executing Browser");
-    application.setApplicationVersion("0.2");
+    application.setApplicationVersion("0.3");
     bool startedAsRoot = false;
 
     // ==============================
