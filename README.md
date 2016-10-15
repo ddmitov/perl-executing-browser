@@ -67,11 +67,11 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * PEB is useful for both single-page or multi-page applications.
 * [Single file or multiple files, new filename, existing or new directory can be selected by user](#special-urls-for-users).  
   Their full paths can be displayed in the calling local page and they can be supplied to local Perl scripts.
-* [Browser functions are accessible from special URLs](#special-urls-for-users).
+* [Browser functions are accessible from special URLs](#browser-functions).
 * [Any icon can be displayed on windows and message boxes](#icon).
 * [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels).
 * [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes).
-* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#checking-for-unsaved-user-input-before-closing-a-window).
+* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window).
 * Cross-site scripting is disabled for all web and local pages.
 
 **Development goodies:**
@@ -231,8 +231,8 @@ They have two functions:
   }
 ```
 
-* **Checking for unsaved user input before closing a window:**
-<a name="checking-for-unsaved-user-input-before-closing-a-window"></a>  
+* **Warning for unsaved user input before closing a window:**
+<a name="warning-for-unsaved-user-input-before-closing-a-window"></a>  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
   
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
@@ -352,6 +352,7 @@ They have two functions:
   Please note that if you choose to create a new directory, it will be created immediately by PEB.  
   It will be already existing when passed to a local Perl script.  
   
+<a name="browser-functions"></a>
 * **Print:** ```http://local-pseudodomain/print.function?action=print```  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.  
   If no printer is configured, no dialog is displayed and no action is taken.
@@ -363,7 +364,7 @@ They have two functions:
 * **About Qt dialog box:** ```http://local-pseudodomain/about.function?type=qt```
   
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to make possible asynchronous window close confirmation JavaScript routines - see section *Settings*, paragraph [Checking for unsaved user input before closing a window](#checking-for-unsaved-user-input-before-closing-a-window).
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).
 
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
@@ -378,9 +379,9 @@ They have two functions:
   
   The following special URLs for interaction with the Perl debugger are implemented:  
   
-* **Select file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
+* **Select debugged file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
   The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
-* **Send command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
+* **Send debugger command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
 * **Combined Perl Debugger URL:**  
   Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
   Example: ```http://local-pseudodomain/perl-debugger.function?action=select-file&command=M```  
