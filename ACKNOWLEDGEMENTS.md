@@ -302,6 +302,7 @@ http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/
 ## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/sindresorhus/awesome  
+http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 
 ## Linux
 http://askubuntu.com/questions/501812/how-do-i-provide-arguments-to-a-command-run-from-gksudo  

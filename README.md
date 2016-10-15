@@ -9,6 +9,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Target Audience](#target-audience)
 * [Features](#features)
 * [Compile-time Requirements](#compile-time-requirements)
+* [Compile-time Variables](#compile-time-variables)
 * [Runtime Requirements](#runtime-requirements)
 * [Calling User Perl Scripts](#calling-user-perl-scripts)
 * [Calling Linux Superuser Perl Scripts](#calling-linux-superuser-perl-scripts)
@@ -97,6 +98,39 @@ Compiled and tested successfully using:
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
 (main development and testing platform - Dimitar D. Mitov).
   
+
+## Compile-time Variables
+Changing the compile-time variables of PEB requires editing its project file - ```peb.pro```.
+* **Macintosh binary type:** ```BUNDLE```
+To make a bundle-less binary, which is the default setting:  
+
+```
+  BUNDLE = 0
+  CONFIG -= app_bundle
+```
+
+To make a bundled binary (peb.app):  
+
+```
+  BUNDLE = 1
+  CONFIG += app_bundle
+```
+
+<a name="security-compile-time-variables"></a>
+The following two compile-time variables can tighten further the security of PEB.
+
+* **Administrative privileges check:** ```ADMIN_PRIVILEGES_CHECK```
+To disable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 0```  
+By default administrative privileges check is disabled.  
+To enable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 1```  
+If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
+
+* **Perl debugger interaction:** ```PERL_DEBUGGER_INTERACTION```
+To enable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 1```  
+By default Perl debugger interaction is enabled.  
+To disable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 0```  
+If PEB is going to be compiled for end users and interaction with the Perl debugger is not needed or not wanted for security reasons, it can be turned off.
+
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ```start-peb.sh``` script,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
@@ -186,7 +220,7 @@ PEB is designed to run from any directory without setting anything beforehand an
     If PEB is able to read ```{PEB_binary_directory}/resources/app/trusted-domains.json```, all domains listed in this file are considered trusted. Only the local pseudo-domain ```http://local-pseudodomain/``` is trusted if ```trusted-domains.json``` is missing. This setting should be used with care - see section [Security](#security).
 * **Log files:**
 <a name="log-files"></a>  
-    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note, that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
+    If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ```{PEB_binary_directory}/logs```. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ```{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log```. PEB will not create ```{PEB_binary_directory}/logs``` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ```{PEB_binary_directory}/logs```.
 
 **Settings based on JavaScript code:**  
 They have two functions:  
@@ -290,9 +324,7 @@ They have two functions:
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 
-**Optional security features based on C++ code and compile-time variables:**
-* Starting PEB with administrative privileges may be disabled by setting the compile-time variable ```ADMIN_PRIVILEGES_CHECK = 1``` in the ```peb.pro``` project file before compiling the binary. A warning page is displayed in this scenario and no scripts can be executed.
-* If Perl debugger interaction is not needed or considered a security risk, it can be turned off by setting the compile-time variable ```PERL_DEBUGGER_INTERACTION = 0```.
+**[Optional security features based on compile-time variables and C++ code:](#security-compile-time-variables)**
 
 **Perl security setting:**  
   PEB executes all Perl scripts with the ```fork``` core function banned using the command line switch ```-M-ops=fork```. ```fork``` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
