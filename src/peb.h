@@ -375,8 +375,7 @@ protected:
                 QString errorMessage =
                         "<p>File not found:<br>"
                         + ajaxScriptFullFilePath + "</p>";
-                htmlErrorContents
-                        .replace("ERROR_MESSAGE", errorMessage);
+                htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
                 QString mimeType = "text/html";
 
@@ -503,8 +502,7 @@ protected:
 
                 QString errorMessage =
                         "<p>File not found:<br>" + fullFilePath + "</p>";
-                htmlErrorContents
-                        .replace("ERROR_MESSAGE", errorMessage);
+                htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
                 QString mimeType = "text/html";
 

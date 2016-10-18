@@ -104,14 +104,14 @@ Changing the compile-time variables of PEB requires editing its project file - `
 * **Macintosh binary type:** ```BUNDLE```  
 To make a bundle-less binary, which is the default setting:  
 
-```
+```QMake
   BUNDLE = 0
   CONFIG -= app_bundle
 ```
 
 To make a bundled binary (peb.app):  
 
-```
+```QMake
   BUNDLE = 1
   CONFIG += app_bundle
 ```
