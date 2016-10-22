@@ -82,10 +82,10 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Optional extensive logging of all browser actions.](#log-files)
 
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - Qt 5.5 headers.  
-Later versions of Qt could be usable if ```QtWebKit``` headers and libraries are manually added, but this approach is still not tested.  
+GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebkit``` headers).  
+The ```QtWebkit``` set of classes is deprecated in all later versions of Qt. They could still be usable if ```QtWebKit``` headers are manually added, but this approach is still not tested.  
   
-The most important Qt dependency of PEB is actually not the ```QtWebkit``` set of classes, but ```QNetworkAccessManager```, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. The removal of this class from the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt, means that transition to ```QtWebEngine``` is problematic.  
+The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager```, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local AJAX requests, as well as direct POST requests to local scripts could not be supported.  If you have to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -189,7 +189,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## Calling Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will call ```gksudo```, which will ask the user for the root password and start the script. Output is displayed inside PEB like the output from any other long running Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will and start the script. Root password will be remembered for 5 minutes inside the memory of the running PEB and will be deleted after that period. Output from superuser scripts is displayed inside PEB like the output from any other long running Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  

@@ -215,13 +215,18 @@ public slots:
         qDebug() << "Script finished:" << scriptFullFilePath;
     }
 
+    void qRootPasswordTimeoutSlot()
+    {
+        qApp->setProperty("rootPassword", "");
+    }
+
 public:
     QLongRunScriptHandler(QUrl url, QByteArray postDataArray);
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
+    QProcess scriptHandler;
 
 private:
-    QProcess scriptHandler;
     QString scriptFullFilePath;
     QString scriptOutputTarget;
     QString scriptUser;
@@ -1566,6 +1571,8 @@ public slots:
 public:
     QWebViewWidget();
 
+    QPage *mainPage;
+
     QWebView *createWindow(QWebPage::WebWindowType type)
     {
         Q_UNUSED(type);
@@ -1584,7 +1591,6 @@ public:
     }
 
 private:
-    QPage *mainPage;
     QWebView *newWindow;
     QWebView *errorsWindow;
 

@@ -32,23 +32,25 @@ print "<!DOCTYPE html>
 <pre>
 FORM DATA:\n";
 
+my $input = "";
+my (@pairs, $pair, $name, $value);
+
 # Read input:
-my ($buffer, @pairs, $pair, $name, $value);
-if ($ENV{'REQUEST_METHOD'})  {
+if ($ENV{'REQUEST_METHOD'}) {
 	$ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
 	if ($ENV{'REQUEST_METHOD'} eq "POST") {
-		read (STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
+		read (STDIN, $input, $ENV{'CONTENT_LENGTH'});
 	} else {
-		$buffer = $ENV{'QUERY_STRING'};
+		$input = $ENV{'QUERY_STRING'};
 	}
 }
 
-if ($ARGV[0] and length($ARGV[0]) > 0)  {
-	$buffer = $ARGV[0];
+if ($ARGV[0] and length($ARGV[0]) > 0) {
+	$input = $ARGV[0];
 }
 
 # Split information into name/value pairs:
-@pairs = split(/&/, $buffer);
+@pairs = split(/&/, $input);
 foreach $pair (@pairs) {
 	($name, $value) = split(/=/, $pair);
 	$value =~ tr/+/ /;

@@ -678,16 +678,58 @@ QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
 //                            << scriptCommadLineArgument,
 //                            QProcess::Unbuffered | QProcess::ReadWrite);
 
-        scriptHandler.start(QString("gksudo"),
-                            QStringList()
-                            << "-D"
-                            + qApp->applicationName().toLatin1()
-                            << "--"
-                            << qApp->property("perlInterpreter").toString()
-                            << "-M-ops=fork"
-                            << scriptFullFilePath
-                            << scriptCommadLineArgument,
-                            QProcess::Unbuffered | QProcess::ReadWrite);
+//        scriptHandler.start(QString("gksudo"),
+//                            QStringList()
+//                            << "-D"
+//                            + qApp->applicationName().toLatin1()
+//                            << "--"
+//                            << qApp->property("perlInterpreter").toString()
+//                            << "-M-ops=fork"
+//                            << scriptFullFilePath
+//                            << scriptCommadLineArgument,
+//                            QProcess::Unbuffered | QProcess::ReadWrite);
+
+        if (qApp->property("rootPassword").toString().length() == 0) {
+            bool ok;
+            QString input =
+                    QInputDialog::getText(
+                        qApp->activeWindow(),
+                        "Root Password",
+                        "Please enter your root password:",
+                        QLineEdit::Password,
+                        "",
+                        &ok);
+
+            if (ok && !input.isEmpty()) {
+                qApp->setProperty("rootPassword", input);
+
+                int maximumTimeMilliseconds = 300 * 1000 ;
+                QTimer::singleShot(maximumTimeMilliseconds,
+                                   this, SLOT(qRootPasswordTimeoutSlot()));
+            }
+        }
+
+        if (qApp->property("rootPassword").toString().length() > 0) {
+            QProcess echo;
+            echo.setStandardOutputProcess(&scriptHandler);
+            echo.start(QString("echo"),
+                       QStringList()
+                       << qApp->property("rootPassword").toString(),
+                       QProcess::Unbuffered | QProcess::ReadWrite);
+            echo.waitForFinished();
+            echo.close();
+
+            scriptHandler.start(QString("sudo"),
+                                QStringList()
+                                << "--stdin"
+                                << "--prompt="
+                                << "--"
+                                << qApp->property("perlInterpreter").toString()
+                                << "-M-ops=fork"
+                                << scriptFullFilePath
+                                << scriptCommadLineArgument,
+                                QProcess::Unbuffered | QProcess::ReadWrite);
+        }
     }
 #endif
 #endif
