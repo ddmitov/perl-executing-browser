@@ -85,7 +85,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebkit``` headers).  
 The ```QtWebkit``` set of classes is deprecated in all later versions of Qt. They could still be usable if ```QtWebKit``` headers are manually added, but this approach is still not tested.  
   
-The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager```, which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine```, the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local AJAX requests, as well as direct POST requests to local scripts could not be supported.  If you have to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
+The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager``` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine``` - the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local AJAX requests, as well as direct POST requests to local scripts could not be supported.  If you have to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -189,7 +189,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## Calling Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will and start the script. Root password will be remembered for 5 minutes inside the memory of the running PEB and will be deleted after that period. Output from superuser scripts is displayed inside PEB like the output from any other long running Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other long running Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
@@ -457,10 +457,11 @@ They have two functions:
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
 
 ## Limitations
-* No history and cache.  
-  JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
+* No new data can be sent to an already running script. Local Perl scripts should receive their data input on startup.
 * No page produced by a local Perl script can be reloaded because no temporary files for script output are written.  
   Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ```location.reload()```.
+* No history and cache.  
+  JavaScript functions ```window.history.back()```, ```window.history.forward()``` and ```window.history.go()``` are disabled.
 * No file can be downloaded on hard disk.
 * No support for plugins and HTML 5 video.
 

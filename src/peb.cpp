@@ -481,6 +481,7 @@ int main(int argc, char **argv)
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
     mainWindow.setWindowIcon(icon);
     mainWindow.showMaximized();
+
     return application.exec();
 }
 
