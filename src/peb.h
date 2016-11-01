@@ -55,7 +55,7 @@
 #endif
 
 // ==============================
-// FILE READER DEFINITION:
+// FILE READER CLASS DEFINITION:
 // Usefull for both files inside binary resources and files on disk
 // ==============================
 class QFileReader : public QObject
@@ -74,6 +74,9 @@ class QMainBrowserWindow : public QMainWindow
 {
     Q_OBJECT
 
+signals:
+    void initiateMainWindowClosingSignal();
+
 public slots:
     void setMainWindowTitleSlot(QString title)
     {
@@ -83,79 +86,13 @@ public slots:
     void closeEvent(QCloseEvent *event)
     {
         if (qApp->property("mainWindowCloseRequested").toBool() == false) {
-            if (webViewWidget->
-                    page()->mainFrame()->childFrames().length() > 0) {
-                foreach (QWebFrame *frame,
-                         webViewWidget->page()->mainFrame()->childFrames()) {
-                    qCheckUserInputBeforeClose(frame, event);
-                }
-            } else {
-                qCheckUserInputBeforeClose(
-                            webViewWidget->page()->mainFrame(), event);
-            }
+            event->ignore();
+            emit initiateMainWindowClosingSignal();
         }
 
-        // If closing the main window is requested using
-        // the special window closing URL,
-        // no check for user input is performed.
         if (qApp->property("mainWindowCloseRequested").toBool() == true) {
             event->accept();
         }
-    }
-
-    void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
-    {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
-
-        QVariant checkUserInputJsResult =
-                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
-        bool textIsEntered = checkUserInputJsResult.toBool();
-
-        QVariant checkCloseWarningJsResult =
-                frame->evaluateJavaScript("pebCheckCloseWarning()");
-        QString closeWarning = checkCloseWarningJsResult.toString();
-
-        if (textIsEntered == false) {
-            event->accept();
-        }
-
-        if (textIsEntered == true) {
-            if (closeWarning == "async") {
-                event->ignore();
-                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
-            }
-            if (closeWarning == "sync") {
-                QVariant jsSyncResult =
-                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
-
-                bool jsCloseDecision;
-                if (jsSyncResult.toString().length() > 0) {
-                    jsCloseDecision = jsSyncResult.toBool();
-                } else {
-                    jsCloseDecision = true;
-                }
-
-                if (jsCloseDecision == true) {
-                    event->accept();
-                }
-                if (jsCloseDecision == false) {
-                    event->ignore();
-                }
-            }
-        }
-    }
-
-    void qExitApplicationSlot()
-    {
-        qDebug() << qApp->applicationName().toLatin1().constData()
-                 << qApp->applicationVersion().toLatin1().constData()
-                 << "terminated normally.";
-
-        QApplication::exit();
     }
 
 public:
@@ -164,9 +101,9 @@ public:
 };
 
 // ==============================
-// LONG RUNNING SCRIPT HANDLER:
+// NONINTERACTIVE SCRIPT HANDLER:
 // ==============================
-class QLongRunScriptHandler : public QObject
+class QNonInteractiveScriptHandler : public QObject
 {
     Q_OBJECT
 
@@ -178,7 +115,7 @@ signals:
                               QString scriptOutputTarget);
 
 public slots:
-    void qLongrunScriptOutputSlot()
+    void qNonInteractiveScriptOutputSlot()
     {
         QString output = scriptHandler.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
@@ -191,7 +128,7 @@ public slots:
                  << "msecs from epoch: output from" << scriptFullFilePath;
     }
 
-    void qLongrunScriptErrorsSlot()
+    void qNonInteractiveScriptErrorsSlot()
     {
         QString scriptErrors = scriptHandler.readAllStandardError();
         scriptAccumulatedErrors.append(scriptErrors);
@@ -203,7 +140,7 @@ public slots:
         // qDebug() << "Script errors:" << scriptErrors;
     }
 
-    void qLongrunScriptFinishedSlot()
+    void qNonInteractiveScriptFinishedSlot()
     {
         emit scriptFinishedSignal(scriptAccumulatedOutput,
                                   scriptAccumulatedErrors,
@@ -221,7 +158,7 @@ public slots:
     }
 
 public:
-    QLongRunScriptHandler(QUrl url, QByteArray postDataArray);
+    QNonInteractiveScriptHandler(QUrl url, QByteArray postDataArray);
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
 
@@ -268,6 +205,7 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void startScriptSignal(QUrl url, QByteArray postDataArray);
+    void closeWindowSignal();
 
 protected:
     virtual QNetworkReply *createRequest(Operation operation,
@@ -324,8 +262,9 @@ protected:
                     postDataArray = outgoingData->readAll();
                 }
 
-                QLongRunScriptHandler *longRunScriptHandler =
-                        new QLongRunScriptHandler(request.url(), postDataArray);
+                QNonInteractiveScriptHandler *ajaxScriptHandler =
+                        new QNonInteractiveScriptHandler(
+                            request.url(), postDataArray);
 
                 // Non-blocking event loop waiting for
                 // AJAX script output and errors:
@@ -333,7 +272,7 @@ protected:
 
                 // Signal and slot for reading output and errors from
                 // all local AJAX Perl scripts:
-                QObject::connect(longRunScriptHandler,
+                QObject::connect(ajaxScriptHandler,
                                  SIGNAL(scriptFinishedSignal(QString,
                                                              QString,
                                                              QString,
@@ -344,10 +283,10 @@ protected:
                 ajaxScriptHandlerWaitingLoop.exec();
 
                 QString ajaxScriptOutput =
-                        longRunScriptHandler->scriptAccumulatedOutput;
+                        ajaxScriptHandler->scriptAccumulatedOutput;
 
                 QString ajaxScriptErrors =
-                        longRunScriptHandler->scriptAccumulatedErrors;
+                        ajaxScriptHandler->scriptAccumulatedErrors;
 
                 if (ajaxScriptOutput.length() == 0 and
                         ajaxScriptErrors == 0) {
@@ -397,7 +336,8 @@ protected:
         // ==============================
         if (operation == GetOperation and
                 request.url().authority() == PSEUDO_DOMAIN and
-                (!request.url().path().contains(scriptAjaxMarker))) {
+                (!request.url().path().contains(scriptAjaxMarker)) and
+                (!request.url().path().contains(".function"))) {
 
             // Compose the full file path:
             QString fullFilePath = QDir::toNativeSeparators
@@ -537,6 +477,20 @@ protected:
             return reply;
         }
 
+        // ==============================
+        // Window closing URL:
+        // ==============================
+        if (operation == GetOperation and
+                request.url().fileName() == "close-window.function" and
+                pageStatus == "trusted") {
+            emit closeWindowSignal();
+
+            QCustomNetworkReply *reply =
+                    new QCustomNetworkReply (
+                        request.url(), emptyString, emptyString);
+            return reply;
+        }
+
         qDebug() << "Link requested:"
                  << request.url().toString();
 
@@ -572,6 +526,7 @@ signals:
     void printSignal();
     void selectInodeSignal(QNetworkRequest request);
     void pageStatusSignal(QString pageStatus);
+    void closeInteractiveScriptSignal();
     void closeWindowSignal();
 
 public slots:
@@ -582,26 +537,186 @@ public slots:
         }
     }
 
+    // ==============================
+    // STARTING SCRIPTS:
+    // ==============================
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
-        QLongRunScriptHandler *longRunScriptHandler =
-                new QLongRunScriptHandler(url, postDataArray);
+        QString scriptFullFilePath = QDir::toNativeSeparators
+                ((qApp->property("application").toString()) +
+                 url.path());
 
-        // Signals and slots for all local long running Perl scripts:
-        QObject::connect(longRunScriptHandler,
-                         SIGNAL(displayScriptOutputSignal(QString, QString)),
-                         this,
-                         SLOT(qDisplayScriptOutputSlot(QString, QString)));
-        QObject::connect(longRunScriptHandler,
-                         SIGNAL(scriptFinishedSignal(QString,
-                                                     QString,
-                                                     QString,
-                                                     QString)),
-                         this,
-                         SLOT(qScriptFinishedSlot(QString,
-                                                  QString,
-                                                  QString,
-                                                  QString)));
+        QUrlQuery scriptQuery(url);
+        QString scriptType = scriptQuery.queryItemValue("type");
+
+        // Start the interactive script:
+        if (scriptType == "interactive" and
+                (!interactiveScriptHandler.isOpen())) {
+
+            interactiveScriptFullFilePath = scriptFullFilePath;
+
+            interactiveScriptOutputTarget =
+                    scriptQuery.queryItemValue("target");
+            if (interactiveScriptOutputTarget.length() == 0) {
+                qDebug() << "Target DOM element is not defined"
+                         << "for interactive script:"
+                         << interactiveScriptFullFilePath;
+            }
+
+            interactiveScriptCloseCommand =
+                    scriptQuery.queryItemValue("close_command");
+            if (interactiveScriptCloseCommand.length() == 0) {
+                qDebug() << "Close command is not defined"
+                         << "for interactive script:"
+                         << interactiveScriptFullFilePath;
+            }
+
+            interactiveScriptClosedConfirmation =
+                    scriptQuery.queryItemValue("close_confirmation");
+            if (interactiveScriptClosedConfirmation.length() == 0) {
+                qDebug() << "Closed confirmation is not defined"
+                         << "for interactive script:"
+                         << interactiveScriptFullFilePath;
+            }
+
+            if (interactiveScriptOutputTarget.length() > 0 and
+                    interactiveScriptCloseCommand.length() > 0 and
+                    interactiveScriptClosedConfirmation.length() > 0) {
+                interactiveScriptHandler.start(
+                            (qApp->property("perlInterpreter").toString()),
+                            QStringList()
+                            << "-M-ops=fork"
+                            << interactiveScriptFullFilePath,
+                            QProcess::Unbuffered | QProcess::ReadWrite);
+
+                qDebug() << "Interactive script"
+                         << interactiveScriptFullFilePath
+                         << "started.";
+
+                if (postDataArray.length() > 0) {
+                    postDataArray.append(QString("\n").toLatin1());
+                    interactiveScriptHandler.write(postDataArray);
+                }
+            }
+        }
+
+        // Transmitt data to the interactive script:
+        if (scriptFullFilePath == interactiveScriptFullFilePath and
+                interactiveScriptHandler.isOpen() and
+                postDataArray.length() > 0) {
+            postDataArray.append(QString("\n").toLatin1());
+            interactiveScriptHandler.write(postDataArray);
+        }
+
+        // Start noninteractive script:
+        if (scriptFullFilePath != interactiveScriptFullFilePath) {
+            QNonInteractiveScriptHandler *nonInteractiveScriptHandler =
+                    new QNonInteractiveScriptHandler(url, postDataArray);
+
+            // Signals and slots for all local noninteractive scripts:
+            QObject::connect(nonInteractiveScriptHandler,
+                             SIGNAL(displayScriptOutputSignal(QString,
+                                                              QString)),
+                             this,
+                             SLOT(qDisplayScriptOutputSlot(QString,
+                                                           QString)));
+            QObject::connect(nonInteractiveScriptHandler,
+                             SIGNAL(scriptFinishedSignal(QString,
+                                                         QString,
+                                                         QString,
+                                                         QString)),
+                             this,
+                             SLOT(qScriptFinishedSlot(QString,
+                                                      QString,
+                                                      QString,
+                                                      QString)));
+        }
+    }
+
+    // ==============================
+    // HANDLING THE INTERACTIVE SCRIPT:
+    // ==============================
+    void qInteractiveScriptOutputSlot()
+    {
+        QString output = interactiveScriptHandler.readAllStandardOutput();
+
+        QWebElement targetDomElement =
+                QPage::currentFrame()->documentElement()
+                .findFirst("#" + interactiveScriptOutputTarget);
+
+        if (!targetDomElement.isNull()) {
+            targetDomElement.setInnerXml(output);
+        } else {
+            qDebug() << "Target DOM element not found:"
+                     << interactiveScriptOutputTarget;
+        }
+
+        if (output.contains(interactiveScriptClosedConfirmation)) {
+            interactiveScriptHandler.close();
+
+            qDebug() << "Interactive script"
+                     << interactiveScriptFullFilePath
+                     << "terminated normally.";
+
+            emit closeWindowSignal();
+        }
+    }
+
+    void qInteractiveScriptErrorSlot()
+    {
+        QString interactiveScriptErrors =
+                interactiveScriptHandler.readAllStandardError();
+
+        qDebug() << "Interactive script"
+                 << interactiveScriptFullFilePath << "errors:"
+                 << interactiveScriptErrors;
+    }
+
+    void qCloseInteractiveScriptSlot()
+    {
+        QByteArray interactiveScriptCloseCommandArray;
+        interactiveScriptCloseCommandArray
+                .append(QString(interactiveScriptCloseCommand).toLatin1());
+        interactiveScriptCloseCommandArray.append(QString("\n").toLatin1());
+        interactiveScriptHandler.write(interactiveScriptCloseCommandArray);
+
+        int maximumTimeMilliseconds = 5 * 1000;
+        QTimer::singleShot(maximumTimeMilliseconds,
+                           this, SLOT(qInteractiveScriptTimeoutSlot()));
+    }
+
+    void qInteractiveScriptTimeoutSlot()
+    {
+        if (interactiveScriptHandler.isOpen()) {
+            interactiveScriptHandler.close();
+
+            qDebug() << "Interactive script"
+                     << interactiveScriptFullFilePath
+                     << "timed out after close command was issued and"
+                     << "was forcefully terminated.";
+
+            emit closeWindowSignal();
+        }
+    }
+
+    // ==============================
+    // HANDLING NONINTERACTIVE SCRIPTS:
+    // ==============================
+    void qDisplayScriptOutputSlot(QString output, QString target)
+    {
+        if (target.length() > 0) {
+            QWebElement targetDomElement =
+                    QPage::currentFrame()->documentElement()
+                    .findFirst("#" + target);
+
+            if (!targetDomElement.isNull()) {
+                targetDomElement.setInnerXml(output);
+            } else {
+                qDebug() << "Target DOM element not found:" << target;
+            }
+        } else {
+            QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
+        }
     }
 
     void qScriptFinishedSlot(QString scriptAccumulatedOutput,
@@ -634,7 +749,8 @@ public slots:
         }
 
         if (pageStatus == "trusted") {
-            // If long running script has no errors and no target DOM element:
+            // If noninteractive script has no errors and
+            // no target DOM element:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
                     scriptOutputTarget.length() == 0) {
@@ -645,7 +761,7 @@ public slots:
             if (scriptAccumulatedErrors.length() > 0) {
                 if (scriptAccumulatedOutput.length() == 0) {
                     if (scriptOutputTarget.length() == 0) {
-                        // If long running script has no output and
+                        // If noninteractive script has no output and
                         // only errors and
                         // no target DOM element is defined,
                         // all HTML formatted errors will be displayed
@@ -654,7 +770,7 @@ public slots:
                                             scriptFullFilePath,
                                             false);
                     } else {
-                        // If long running script has no output and
+                        // If noninteractive script has no output and
                         // only errors and
                         // a target DOM element is defined,
                         // all HTML formatted errors will be displayed
@@ -664,7 +780,7 @@ public slots:
                                             true);
                     }
                 } else {
-                    // If long running script has some output and errors,
+                    // If noninteractive script has some output and errors,
                     // HTML formatted errors will be displayed in a new window:
                     qFormatScriptErrors(scriptAccumulatedErrors,
                                         scriptFullFilePath,
@@ -673,23 +789,6 @@ public slots:
                                              emptyString);
                 }
             }
-        }
-    }
-
-    void qDisplayScriptOutputSlot(QString output, QString target)
-    {
-        if (target.length() > 0) {
-            QWebElement targetDomElement =
-                    QPage::currentFrame()->documentElement()
-                    .findFirst("#" + target);
-
-            if (!targetDomElement.isNull()) {
-                targetDomElement.setPlainText(output);
-            } else {
-                qDebug() << "Target DOM element not found:" << target;
-            }
-        } else {
-            QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
     }
 
@@ -729,6 +828,9 @@ public slots:
         }
     }
 
+    // ==============================
+    // PAGE SECURITY:
+    // ==============================
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
         reply->ignoreSslErrors();
@@ -809,8 +911,86 @@ public slots:
     }
 
     // ==============================
-    // PERL DEBUGGER INTERACTION.
-    // Implementation of an idea proposed by Valcho Nedelchev.
+    // PAGE-CLOSING ROUTINES:
+    // ==============================
+    void qInitiateWindowClosingSlot()
+    {
+        if (mainFrame()->childFrames().length() > 0) {
+            foreach (QWebFrame *frame, mainFrame()->childFrames()) {
+                qCheckUserInputBeforeClose(frame);
+            }
+        } else {
+            qCheckUserInputBeforeClose(mainFrame());
+        }
+    }
+
+    void qCheckUserInputBeforeClose(QWebFrame *frame)
+    {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
+
+        QVariant checkUserInputJsResult =
+                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
+        bool textIsEntered = checkUserInputJsResult.toBool();
+
+        QVariant checkCloseWarningJsResult =
+                frame->evaluateJavaScript("pebCheckCloseWarning()");
+        QString closeWarning = checkCloseWarningJsResult.toString();
+
+        if (textIsEntered == true) {
+            if (closeWarning == "async") {
+                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
+            }
+
+            if (closeWarning == "sync") {
+                QVariant jsSyncResult =
+                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
+
+                bool jsCloseDecision;
+                if (jsSyncResult.toString().length() > 0) {
+                    jsCloseDecision = jsSyncResult.toBool();
+                } else {
+                    jsCloseDecision = true;
+                }
+
+                if (jsCloseDecision == true) {
+                    if (interactiveScriptHandler.isOpen()){
+                        emit closeInteractiveScriptSignal();
+                    } else {
+                        emit closeWindowSignal();
+                    }
+                }
+            }
+
+            if (closeWarning == "none") {
+                if (interactiveScriptHandler.isOpen()){
+                    emit closeInteractiveScriptSignal();
+                } else {
+                    emit closeWindowSignal();
+                }
+            }
+        }
+
+        if (textIsEntered == false) {
+            if (interactiveScriptHandler.isOpen()){
+                emit closeInteractiveScriptSignal();
+            } else {
+                emit closeWindowSignal();
+            }
+        }
+    }
+
+    void qCloseWindowTransmitterSlot()
+    {
+        emit closeWindowSignal();
+    }
+
+    // ==============================
+    // PERL DEBUGGER INTERACTION:
+    // Implementation of an idea proposed by Valcho Nedelchev
     // ==============================
     void qStartPerlDebuggerSlot()
     {
@@ -1191,6 +1371,12 @@ private:
     QString yesLabel;
     QString noLabel;
 
+    QString interactiveScriptFullFilePath;
+    QProcess interactiveScriptHandler;
+    QString interactiveScriptOutputTarget;
+    QString interactiveScriptCloseCommand;
+    QString interactiveScriptClosedConfirmation;
+
     QWebFrame *debuggerFrame;
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
@@ -1207,6 +1393,9 @@ private:
 class QWebViewWidget : public QWebView
 {
     Q_OBJECT
+
+signals:
+    void initiateWindowClosingSignal();
 
 public slots:
     void qChangeTitleSlot()
@@ -1495,70 +1684,20 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (!this->parentWidget() and windowCloseRequested == false) {
-            if (mainPage->mainFrame()->childFrames().length() > 0) {
-                foreach (QWebFrame *frame,
-                         mainPage->mainFrame()->childFrames()) {
-                    qCheckUserInputBeforeClose(frame, event);
-                }
-            } else {
-                qCheckUserInputBeforeClose(mainPage->mainFrame(), event);
-            }
-        } else {
+        if (windowCloseRequested == false) {
+            event->ignore();
+            emit initiateWindowClosingSignal();
+        }
+
+        if (windowCloseRequested == true) {
             event->accept();
         }
     }
 
-    void qCheckUserInputBeforeClose(QWebFrame *frame, QCloseEvent *event)
-    {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-       frame->evaluateJavaScript(pebJavaScript);
-
-        QVariant checkUserInputJsResult =
-                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
-        bool textIsEntered = checkUserInputJsResult.toBool();
-
-        QVariant checkCloseWarningJsResult =
-                frame->evaluateJavaScript("pebCheckCloseWarning()");
-        QString closeWarning = checkCloseWarningJsResult.toString();
-
-        if (textIsEntered == false) {
-            event->accept();
-        }
-
-        if (textIsEntered == true) {
-            if (closeWarning == "async") {
-                event->ignore();
-                windowCloseRequested = true;
-                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
-            }
-            if (closeWarning == "sync") {
-                QVariant jsSyncResult =
-                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
-
-                bool jsCloseDecision;
-                if (jsSyncResult.toString().length() > 0) {
-                    jsCloseDecision = jsSyncResult.toBool();
-                } else {
-                    jsCloseDecision = true;
-                }
-
-                if (jsCloseDecision == true) {
-                    event->accept();
-                }
-                if (jsCloseDecision == false) {
-                    event->ignore();
-                }
-            }
-        }
-    }
-
-    void qCloseWindowFromURLSlot()
+    void qCloseWindowSlot()
     {
         if (!this->parentWidget()) {
+            windowCloseRequested = true;
             this->close();
         }
 
@@ -1594,6 +1733,27 @@ private:
     QWebView *errorsWindow;
 
     bool windowCloseRequested;
+};
+
+// ==============================
+// EXIT HANDLER CLASS DEFINITION:
+// ==============================
+class QExitHandler : public QObject
+{
+    Q_OBJECT
+
+public slots:
+    void qExitApplicationSlot()
+    {
+        qDebug() << qApp->applicationName().toLatin1().constData()
+                 << qApp->applicationVersion().toLatin1().constData()
+                 << "terminated normally.";
+
+        QApplication::exit();
+    }
+
+public:
+    QExitHandler();
 };
 
 #endif // PEB_H

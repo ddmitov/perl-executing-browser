@@ -9,7 +9,7 @@ $|=1;
 
 my $maximal_time = 10; # seconds
 
-print "Long running Perl script started.";
+print "Noninteractive Perl script started.";
 
 for (my $counter=1; $counter <= $maximal_time; $counter++){
 	sleep (1);
@@ -22,4 +22,4 @@ for (my $counter=1; $counter <= $maximal_time; $counter++){
 }
 
 sleep (1);
-print "Long running Perl script ended.";
+print "Noninteractive Perl script ended.";

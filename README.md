@@ -60,8 +60,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Features
 **Usability:**
-
-* [Output from long running Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
+* [Output from noninteractive Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
 * [Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain.](#feeding-from-forms)
 * [Linux superuser Perl scripts can be started.](#calling-linux-superuser-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
@@ -91,12 +90,11 @@ Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,
-* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5  
-(main development and testing platform - Valcho Nedelchev),
+* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5,
 * [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
 * [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
-(main development and testing platform - Dimitar D. Mitov).
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
   
 
 ## Compile-time Variables
@@ -139,9 +137,39 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   PEB can also use any Perl on PATH.
 
 ## Calling User Perl Scripts
-  PEB recognizes two main types of local user-level Perl scripts: **long running scripts** and **AJAX scripts**.  
-  There is no timeout for all Perl scripts executed by PEB.
-* **Subtypes of long running Perl scripts:**  
+  PEB recognizes three main types of local user-level Perl scripts: **interactive scripts**, **noninteractive scripts** and **AJAX scripts**.  
+  There is no timeout for all Perl scripts executed by PEB.  
+* **Interactive Perl scripts:**  
+  Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special query string items ```type=interactive```, ```target```, ```close_command``` and ```close_confirmation```.  
+  The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
+  The ```target``` query string item should point to a valid HTML DOM element. Every piece of script output is inserted immediately into the target DOM element of its calling page.  
+  The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
+  The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:  
+
+```javascript
+  document.addEventListener("DOMContentLoaded", function(event) {
+      var request = new XMLHttpRequest();
+      var parameters = {
+          type: "interactive",
+          target: "output",
+          close_command: "_close_",
+          close_confirmation: "_closed_"
+      }
+      request.open('GET', 'perl/interactive-script.pl' + formatParameters(parameters), true);
+      request.send();
+  });
+  
+  function formatParameters(parameters) {
+      return "?" + Object
+          .keys(parameters)
+          .map(function(key){
+              return key + "=" + parameters[key]
+          })
+      .join("&")
+  }
+```
+
+* **Subtypes of noninteractive Perl scripts:**  
   
     **1. page-producing scripts:**  
     They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
@@ -153,12 +181,12 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
     The ```target``` query string item should point to a valid HTML DOM element. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page in this scenario. HTML event called ```scriptoutput``` is emitted when script output is inserted into the calling local page. This event can be binded to a JavaScript function for a variety of reasons including daisy chaining of different scripts. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
-    Two or more long running scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
+    Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
     **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
     <a name="feeding-from-forms"></a>
-    There is no special naming convention for long running scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
+    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -169,7 +197,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 * **AJAX Perl scripts:**  
-    Local AJAX Perl scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and long running scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
+    Local AJAX Perl scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and all other scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
   
     The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
@@ -189,7 +217,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## Calling Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other long running Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other noninteractive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  

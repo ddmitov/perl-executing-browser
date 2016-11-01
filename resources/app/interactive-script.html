@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html>
+
+	<head>
+		<title>Perl Executing Browser - Interactive Script Test</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta charset="utf-8">
+
+		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+
+		<script type="text/javascript" src="pebjs/context-menu.js"></script>
+		<script type="text/javascript" src="pebjs/dialogs.js"></script>
+		<script type="text/javascript" src="pebjs/forms-close-window.js"></script>
+
+		<style type='text/css'>
+			.output {
+				font-size: 20px;
+			}
+		</style>
+	</head>
+
+	<body>
+		<form action="perl/interactive-script.pl" method="post">
+			<br>
+			<div class="col-lg-10 col-lg-offset-1">
+				<div class="form-group">
+					<div class="input-prepend">
+						<input type="text" id="input" name="input" class="form-control" placeholder="Send data to a running script">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<input type="reset" value="Reset" class="btn btn-default">
+					<input type="submit" value="Submit" class="btn btn-primary">
+				</div>
+
+				<div id="output" class="output">
+				</div>
+
+			</div>
+		</form>
+
+		<script type="text/javascript">
+			document.addEventListener("DOMContentLoaded", function(event) {
+				var request = new XMLHttpRequest();
+				var parameters = {
+					type: "interactive",
+					target: "output",
+					close_command: "_close_",
+					close_confirmation: "_closed_"
+				}
+				request.open('GET', 'perl/interactive-script.pl' + formatParameters(parameters), true);
+				request.send();
+			});
+
+			function formatParameters(parameters) {
+				return "?" + Object
+					.keys(parameters)
+					.map(function(key){
+						return key + "=" + parameters[key]
+					})
+				.join("&")
+			}
+		</script>
+	</body>
+
+</html>

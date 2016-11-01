@@ -96,6 +96,7 @@ http://doc.qt.io/qt-4.8/qinputdialog.html
 http://doc.qt.io/qt-4.8/qwebelement.html  
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html (defunct)  
 http://doc.qt.io/qt-5/qtglobal.html  
+http://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
 http://doc.qt.io/archives/qt-5.5/qwebview.html  
 http://doc.qt.io/archives/qt-5.5/qurlquery.html  
   
@@ -127,6 +128,7 @@ http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width
 http://www.qtcentre.org/threads/29104-QMake-DEFINES  
 http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit  
 http://www.qtcentre.org/threads/45001-using-two-qrc-files-in-one-application  
+http://www.qtcentre.org/threads/6695-writing-a-username-and-password-dialog  
   
 http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.html  
 http://www.qtforum.org/article/18224/get-directory-path.html  
@@ -269,6 +271,8 @@ http://stackoverflow.com/questions/1955265/how-do-i-load-a-page-in-javascript-fr
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
 http://stackoverflow.com/questions/5113246/make-div-invisible-in-css-and-javascript  
 http://stackoverflow.com/questions/1992114/how-do-you-create-a-hidden-div-that-doesnt-create-a-line-break-or-horizontal-space  
+http://stackoverflow.com/questions/588040/window-onload-vs-document-onload  
+http://stackoverflow.com/questions/8064691/how-do-i-pass-along-variables-with-xmlhttprequest  
   
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
 http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  
@@ -299,6 +303,7 @@ http://callmenick.com/post/various-css-input-text-styles
 http://www.raymondcamden.com/2015/03/06/warning-a-user-before-they-leave-a-form/  
 https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calling/  
 http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/  
+http://youmightnotneedjquery.com/  
 
 ## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  

@@ -351,11 +351,20 @@ int main(int argc, char **argv)
     // Signal and slot for setting the main window title:
     QObject::connect(mainWindow.webViewWidget,
                      SIGNAL(titleChanged(QString)),
-                     &mainWindow, SLOT(setMainWindowTitleSlot(QString)));
+                     &mainWindow,
+                     SLOT(setMainWindowTitleSlot(QString)));
+
+    // Signal and slot for closing the main window:
+    QObject::connect(&mainWindow,
+                     SIGNAL(initiateMainWindowClosingSignal()),
+                     mainWindow.webViewWidget->page(),
+                     SLOT(qInitiateWindowClosingSlot()));
+
+    QExitHandler exitHandler;
 
     // Signal and slot for actions taken before application exit:
     QObject::connect(qApp, SIGNAL(aboutToQuit()),
-                     &mainWindow, SLOT(qExitApplicationSlot()));
+                     &exitHandler, SLOT(qExitApplicationSlot()));
 
     // ==============================
     // STARTED WITH
@@ -595,20 +604,21 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 }
 
 // ==============================
-// LONG RUNNING SCRIPT HANDLER CONSTRUCTOR:
+// NONINTERACTIVE SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
-QLongRunScriptHandler::QLongRunScriptHandler(QUrl url, QByteArray postDataArray)
+QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
+        QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
     // Signals and slots for local long running Perl scripts:
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qLongrunScriptOutputSlot()));
+                     this, SLOT(qNonInteractiveScriptOutputSlot()));
     QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qLongrunScriptErrorsSlot()));
+                     this, SLOT(qNonInteractiveScriptErrorsSlot()));
     QObject::connect(&scriptHandler,
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
-                     SLOT(qLongrunScriptFinishedSlot()));
+                     SLOT(qNonInteractiveScriptFinishedSlot()));
 
     QUrlQuery scriptQuery(url);
 
@@ -786,6 +796,26 @@ QPage::QPage()
     QWebHistory *history = this->history();
     history->setMaximumItemCount(0);
 
+    // Scroll bars:
+    mainFrame()->setScrollBarPolicy(Qt::Horizontal,
+                                              Qt::ScrollBarAsNeeded);
+    mainFrame()->setScrollBarPolicy(Qt::Vertical,
+                                              Qt::ScrollBarAsNeeded);
+
+    // Regular expression for detection of HTML file extensions:
+    htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
+    htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
+
+    // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
+    alertTitle = "Alert";
+    confirmTitle = "Confirmation";
+    promptTitle = "Prompt";
+
+    okLabel = "Ok";
+    cancelLabel = "Cancel";
+    yesLabel = "Yes";
+    noLabel = "No";
+
     // Initialization of a modified Network Access Manager:
     QAccessManager *networkAccessManager = new QAccessManager();
 
@@ -814,37 +844,35 @@ QPage::QPage()
                      networkAccessManager,
                      SLOT(qPageStatusSlot(QString)));
 
-    // Signals and slots for actions taken after page is loaded:
-    QObject::connect(this, SIGNAL(loadFinished(bool)),
-                     this, SLOT(qPageLoadedSlot(bool)));
-
     // Signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Scroll bars:
-    mainFrame()->setScrollBarPolicy(Qt::Horizontal,
-                                              Qt::ScrollBarAsNeeded);
-    mainFrame()->setScrollBarPolicy(Qt::Vertical,
-                                              Qt::ScrollBarAsNeeded);
+    // Signals and slots for the interactive script handler:
+    QObject::connect(&interactiveScriptHandler,
+                     SIGNAL(readyReadStandardOutput()),
+                     this,
+                     SLOT(qInteractiveScriptOutputSlot()));
 
-    // Regular expression for detection of HTML file extensions:
-    htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
-    htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
+    QObject::connect(&interactiveScriptHandler,
+                     SIGNAL(readyReadStandardError()),
+                     this,
+                     SLOT(qInteractiveScriptErrorSlot()));
 
-    // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
-    alertTitle = "Alert";
-    confirmTitle = "Confirmation";
-    promptTitle = "Prompt";
+    QObject::connect(this, SIGNAL(closeInteractiveScriptSignal()),
+                     this, SLOT(qCloseInteractiveScriptSlot()));
 
-    okLabel = "Ok";
-    cancelLabel = "Cancel";
-    yesLabel = "Yes";
-    noLabel = "No";
+    // Signal and slot for closing window:
+    QObject::connect(networkAccessManager, SIGNAL(closeWindowSignal()),
+                     this, SLOT(qCloseWindowTransmitterSlot()));
 
-    // Signals and slots for the perl debugger:
+    // Signals and slots for actions taken after page is loaded:
+    QObject::connect(this, SIGNAL(loadFinished(bool)),
+                     this, SLOT(qPageLoadedSlot(bool)));
+
+    // Signals and slots for the Perl debugger:
 #if PERL_DEBUGGER_INTERACTION == 1
     QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qDebuggerOutputSlot()));
@@ -906,9 +934,12 @@ QWebViewWidget::QWebViewWidget()
     QObject::connect(mainPage, SIGNAL(selectInodeSignal(QNetworkRequest)),
                      this, SLOT(qSelectInodesSlot(QNetworkRequest)));
 
-    // Signal and slot for closing window from URL:
+    // Signals and slots for closing windows:
+    QObject::connect(this, SIGNAL(initiateWindowClosingSignal()),
+                     mainPage, SLOT(qInitiateWindowClosingSlot()));
+
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
-                     this, SLOT(qCloseWindowFromURLSlot()));
+                     this, SLOT(qCloseWindowSlot()));
 
     // Installing of the started QPage instance:
     setPage(mainPage);
@@ -920,7 +951,16 @@ QWebViewWidget::QWebViewWidget()
 }
 
 // ==============================
-// CLICKING OF LINKS MANAGEMENT:
+// EXIT HANDLER CONSTRUCTOR:
+// ==============================
+QExitHandler::QExitHandler()
+    : QObject(0)
+{
+    // !!! No need to implement code here, but must be declared !!!
+}
+
+// ==============================
+// LINK CLICKING MANAGEMENT:
 // ==============================
 bool QPage::acceptNavigationRequest(QWebFrame *frame,
                                     const QNetworkRequest &request,
@@ -1059,18 +1099,8 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             }
 
             // ==============================
-            // Window closing URL:
-            // ==============================
-            if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                    request.url().fileName() == "close-window.function") {
-                emit closeWindowSignal();
-
-                return false;
-            }
-
-            // ==============================
             // PERL DEBUGGER INTERACTION:
-            // Implementation of an idea proposed by Valcho Nedelchev.
+            // Implementation of an idea proposed by Valcho Nedelchev
             // ==============================
 #if PERL_DEBUGGER_INTERACTION == 1
             if ((navigationType == QWebPage::NavigationTypeLinkClicked or

@@ -2,12 +2,14 @@
 
 var formSubmitted = false;
 
-// This function is necessary to prevent
-// navigate away confirmation when form is being submitted.
+// This functions is usefull only inside Perl Executing Browser.
+// It is necessary to prevent navigate away confirmation when form is being submitted.
 function submitFunction() {
 	formSubmitted = true;
 }
 
+
+// This functions is usefull only inside Perl Executing Browser.
 // Navigate away confirmation -
 // it will be trigered only if form is not being submitted:
 $(window).on("beforeunload", function() {
@@ -38,11 +40,3 @@ $(window).on("beforeunload", function() {
 		}
 	}
 });
-
-
-// This functions is usefull only inside Perl Executing Browser.
-function pebCloseConfirmationSync() {
-	var confirmation = confirm("Text was entered in a form and it is going to be lost!\n" +
-							"Are you sure you want to close the window?");
-	return confirmation;
-}
