@@ -137,12 +137,16 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   PEB can also use any Perl on PATH.
 
 ## Calling User Perl Scripts
-  PEB recognizes three main types of local user-level Perl scripts: **interactive scripts**, **noninteractive scripts** and **AJAX scripts**.  
+  PEB recognizes three main types of local user-level Perl scripts:  
+  **interactive scripts**, **noninteractive scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.  
 * **Interactive Perl scripts:**  
   Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special query string items ```type=interactive```, ```target```, ```close_command``` and ```close_confirmation```.  
+  
   The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
+  
   The ```target``` query string item should point to a valid HTML DOM element. Every piece of script output is inserted immediately into the target DOM element of its calling page.  
+  
   The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
   The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:  
 
@@ -169,7 +173,8 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   }
 ```
 
-* **Subtypes of noninteractive Perl scripts:**  
+* **Noninteractive Perl scripts:**  
+  They can not receive any user input once they are started and have the following subtypes:  
   
     **1. page-producing scripts:**  
     They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
