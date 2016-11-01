@@ -145,9 +145,10 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
   The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
   
-  The ```target``` query string item should point to a valid HTML DOM element. Every piece of script output is inserted immediately into the target DOM element of its calling page.  
+  The ```target``` query string item should point to a valid HTML DOM element. Every piece of script output is inserted immediately into the target DOM element of the calling HTML page.  
   
   The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
+  
   The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:  
 
 ```javascript
