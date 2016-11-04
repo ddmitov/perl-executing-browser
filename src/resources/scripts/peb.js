@@ -67,3 +67,13 @@ function pebInodeSelection(elementName, inodes) {
 	event.eventName = "inodeselection"
 	element.dispatchEvent(event);
 }
+
+
+function pebOutputInsertion(target, output) {
+	if (typeof window["target"] == 'function') {
+		window["target"](output);
+	} else {
+		var element = document.getElementById(target);
+		element.innerHTML = output;
+	}
+}

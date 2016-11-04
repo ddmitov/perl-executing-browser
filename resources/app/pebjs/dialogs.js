@@ -1,6 +1,6 @@
 
 
-// This functions is usefull only inside Perl Executing Browser.
+// This function is usefull only inside Perl Executing Browser.
 function pebMessageBoxElements() {
 	var messageBoxElementsObject = new Object();
 

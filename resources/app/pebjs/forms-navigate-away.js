@@ -2,14 +2,15 @@
 
 var formSubmitted = false;
 
-// This functions is usefull only inside Perl Executing Browser.
+
+// This function is usefull only inside Perl Executing Browser.
 // It is necessary to prevent navigate away confirmation when form is being submitted.
 function submitFunction() {
 	formSubmitted = true;
 }
 
 
-// This functions is usefull only inside Perl Executing Browser.
+// This function is usefull only inside Perl Executing Browser.
 // Navigate away confirmation -
 // it will be trigered only if form is not being submitted:
 $(window).on("beforeunload", function() {

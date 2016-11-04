@@ -1,6 +1,6 @@
 
 
-// This functions is usefull only inside Perl Executing Browser.
+// This function is usefull only inside Perl Executing Browser.
 // Synchronous dialog for window close confirmation:
 function pebCloseConfirmationSync() {
 	var confirmation = confirm("Text was entered in a form and it is going to be lost!\n" +

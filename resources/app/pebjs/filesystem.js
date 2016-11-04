@@ -1,4 +1,6 @@
 
+
+// These functions are usefull only inside Perl Executing Browser.
 $(document).ready(function() {
 	$('#file-selection').bind("inodeselection", function(){
 		$.ajax({

@@ -145,7 +145,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
     The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
   
-    The ```target``` query string item should point to a valid HTML DOM element. Every piece of script output is inserted immediately into the target DOM element of the calling HTML page.  
+    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
     The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
   
@@ -185,7 +185,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
-    The ```target``` query string item should point to a valid HTML DOM element. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page in this scenario. HTML event called ```scriptoutput``` is emitted when script output is inserted into the calling local page. This event can be binded to a JavaScript function for a variety of reasons including daisy chaining of different scripts. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
     Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   

@@ -93,7 +93,6 @@ http://doc.qt.io/qt-4.8/signalsandslots.html
 http://doc.qt.io/qt-4.8/qfileinfo.html  
 http://doc.qt.io/qt-4.8/qwebinspector.html  
 http://doc.qt.io/qt-4.8/qinputdialog.html  
-http://doc.qt.io/qt-4.8/qwebelement.html  
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html (defunct)  
 http://doc.qt.io/qt-5/qtglobal.html  
 http://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
@@ -107,7 +106,6 @@ https://forum.qt.io/topic/24213/qmessagebox-too-small
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file  
 https://forum.qt.io/topic/551/get-filename-without-extension  
 https://forum.qt.io/topic/45982/solved-is-there-a-problem-with-the-following-non-blocking-sleep-function  
-https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute  
   
 http://www.qtcentre.org/threads/23094-cancle-right-click-context-menu-in-qtwebkit  
 http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only  
@@ -273,6 +271,7 @@ http://stackoverflow.com/questions/5113246/make-div-invisible-in-css-and-javascr
 http://stackoverflow.com/questions/1992114/how-do-you-create-a-hidden-div-that-doesnt-create-a-line-break-or-horizontal-space  
 http://stackoverflow.com/questions/588040/window-onload-vs-document-onload  
 http://stackoverflow.com/questions/8064691/how-do-i-pass-along-variables-with-xmlhttprequest  
+http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string  
   
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
 http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  

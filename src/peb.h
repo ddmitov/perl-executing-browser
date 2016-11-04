@@ -640,17 +640,23 @@ public slots:
     {
         QString output = interactiveScriptHandler.readAllStandardOutput();
 
-        QWebElement targetDomElement =
-                QPage::currentFrame()->documentElement()
-                .findFirst("#" + interactiveScriptOutputTarget);
+        // JavaScript bridge to insert output from the interactive script:
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
 
-        if (!targetDomElement.isNull()) {
-            targetDomElement.setInnerXml(output);
-        } else {
-            qDebug() << "Target DOM element not found:"
-                     << interactiveScriptOutputTarget;
-        }
+        currentFrame()->evaluateJavaScript(pebJavaScript);
 
+        QString outputInsertionJavaScript =
+                "pebOutputInsertion(\"" +
+                interactiveScriptOutputTarget +
+                "\" , \"" +
+                output +
+                "\"); null";
+
+        currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
+
+        // Handling the interactive script closed confirmation:
         if (output.contains(interactiveScriptClosedConfirmation)) {
             interactiveScriptHandler.close();
 
@@ -705,15 +711,21 @@ public slots:
     void qDisplayScriptOutputSlot(QString output, QString target)
     {
         if (target.length() > 0) {
-            QWebElement targetDomElement =
-                    QPage::currentFrame()->documentElement()
-                    .findFirst("#" + target);
+            // JavaScript bridge to insert output from noninteractive scripts:
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/scripts/peb.js"));
+            QString pebJavaScript = resourceReader->fileContents;
 
-            if (!targetDomElement.isNull()) {
-                targetDomElement.setInnerXml(output);
-            } else {
-                qDebug() << "Target DOM element not found:" << target;
-            }
+            currentFrame()->evaluateJavaScript(pebJavaScript);
+
+            QString outputInsertionJavaScript =
+                    "pebOutputInsertion(\"" +
+                    target +
+                    "\" , \"" +
+                    output +
+                    "\"); null";
+
+            currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
         } else {
             QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
@@ -917,10 +929,22 @@ public slots:
     {
         if (mainFrame()->childFrames().length() > 0) {
             foreach (QWebFrame *frame, mainFrame()->childFrames()) {
-                qCheckUserInputBeforeClose(frame);
+                qFrameIterator(frame);
             }
         } else {
             qCheckUserInputBeforeClose(mainFrame());
+        }
+    }
+
+    void qFrameIterator(QWebFrame *frame)
+    {
+        if (frame->childFrames().length() > 0) {
+            qCheckUserInputBeforeClose(frame);
+            foreach (QWebFrame *frame, frame->childFrames()) {
+                qFrameIterator(frame);
+            }
+        } else {
+            qCheckUserInputBeforeClose(frame);
         }
     }
 
