@@ -1,7 +1,7 @@
 Perl Executing Browser
 --------------------------------------------------------------------------------
 
-Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
+Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -61,7 +61,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 ## Features
 **Usability:**
 * [Output from noninteractive Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
-* [Perl 5 scripts can be fed from HTML forms using direct GET and POST or AJAX requests to a built-in pseudo-domain.](#feeding-from-forms)
+* [Perl 5 scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
 * [Linux superuser Perl scripts can be started.](#calling-linux-superuser-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * [PEB can be started from any folder.](#settings)
@@ -84,7 +84,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebkit``` headers).  
 The ```QtWebkit``` set of classes is deprecated in all later versions of Qt. They could still be usable if ```QtWebKit``` headers are manually added, but this approach is still not tested.  
   
-The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager``` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine``` - the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local AJAX requests, as well as direct POST requests to local scripts could not be supported.  If you have to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
+The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager``` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine``` - the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local AJAX and non-AJAX POST requests, as well as all calls to local Perl scripts from JavaScript could not be supported.  If you have to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
   
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -145,7 +145,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
     The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
   
-    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
     The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
   
@@ -185,14 +185,14 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   
     Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
-    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
     Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
     **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
     <a name="feeding-from-forms"></a>
-    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a direct POST request to a local script from an HTML form:
+    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
