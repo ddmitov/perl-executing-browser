@@ -641,11 +641,7 @@ public slots:
         QString output = interactiveScriptHandler.readAllStandardOutput();
 
         // JavaScript bridge to insert output from the interactive script:
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        currentFrame()->evaluateJavaScript(pebJavaScript);
+        qJavaScriptInjector(currentFrame());
 
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
@@ -712,11 +708,7 @@ public slots:
     {
         if (target.length() > 0) {
             // JavaScript bridge to insert output from noninteractive scripts:
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/scripts/peb.js"));
-            QString pebJavaScript = resourceReader->fileContents;
-
-            currentFrame()->evaluateJavaScript(pebJavaScript);
+            qJavaScriptInjector(currentFrame());
 
             QString outputInsertionJavaScript =
                     "pebOutputInsertion(\"" +
@@ -923,6 +915,18 @@ public slots:
     }
 
     // ==============================
+    // JAVASCRIPT INJECTOR:
+    // ==============================
+    void qJavaScriptInjector(QWebFrame *frame)
+    {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/scripts/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
+    }
+
+    // ==============================
     // PAGE-CLOSING ROUTINES:
     // ==============================
     void qInitiateWindowClosingSlot()
@@ -950,11 +954,7 @@ public slots:
 
     void qCheckUserInputBeforeClose(QWebFrame *frame)
     {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
+        qJavaScriptInjector(frame);
 
         QVariant checkUserInputJsResult =
                 frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
@@ -1226,11 +1226,7 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
+        qJavaScriptInjector(frame);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -1268,11 +1264,7 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
+        qJavaScriptInjector(frame);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -1322,11 +1314,7 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
+        qJavaScriptInjector(frame);
 
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
@@ -1474,11 +1462,7 @@ public slots:
 
             // JavaScript bridge back to
             // the local HTML page where request originated:
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/scripts/peb.js"));
-            QString pebJavaScript = resourceReader->fileContents;
-
-            mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
+            mainPage->qJavaScriptInjector(mainPage->currentFrame());
 
             QString inodeSelectedEventJavaScript =
                     "pebInodeSelection(\"" +
