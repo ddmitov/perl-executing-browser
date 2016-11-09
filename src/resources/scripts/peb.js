@@ -1,7 +1,7 @@
 
 
 function pebFindContextMenu() {
-	if (typeof pebContextMenu == 'function') {
+	if (typeof pebContextMenu === "function") {
 		var returnValue = pebContextMenu();
 		return returnValue;
 	}
@@ -9,7 +9,7 @@ function pebFindContextMenu() {
 
 
 function pebFindMessageBoxElements() {
-	if (typeof pebMessageBoxElements == 'function') {
+	if (typeof pebMessageBoxElements === "function") {
 		var returnValue = pebMessageBoxElements();
 		return returnValue;
 	}
@@ -43,10 +43,10 @@ function pebCheckUserInputBeforeClose() {
 function pebCheckCloseWarning() {
 	var closeWarning;
 
-	if (typeof pebCloseConfirmationAsync == 'function') {
+	if (typeof pebCloseConfirmationAsync === "function") {
 		closeWarning = "async";
 	} else {
-		if (typeof pebCloseConfirmationSync == 'function') {
+		if (typeof pebCloseConfirmationSync === "function") {
 			closeWarning = "sync";
 		} else {
 			closeWarning = "none";
@@ -58,21 +58,35 @@ function pebCheckCloseWarning() {
 
 
 function pebInodeSelection(target, inodes) {
-	if (typeof window[target] == 'function') {
+	if (typeof window[target] === "function") {
 		var inodesTransmitted = inodes;
 		window[target](inodesTransmitted);
 	} else {
 		var element = document.getElementById(target);
-		element.innerHTML = inodes;
+		if (element === null) {
+			console.error(
+				'PEB Embedded JavaScript: Target \''
+				+ target +
+				'\' was not found!');
+		} else {
+			element.innerHTML = inodes;
+		}
 	}
 }
 
 
 function pebOutputInsertion(target, output) {
-	if (typeof window[target] == 'function') {
+	if (typeof window[target] === "function") {
 		window[target](output);
 	} else {
 		var element = document.getElementById(target);
-		element.innerHTML = output;
+		if (element === null) {
+			console.error(
+				'PEB Embedded JavaScript: Target \''
+				+ target +
+				'\' was not found!');
+		} else {
+			element.innerHTML = output;
+		}
 	}
 }
