@@ -370,10 +370,8 @@ They have two functions:
   
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```
 <a name="select-single-file"></a>  
-  The full path of the selected file will be inserted in the target DOM element of the calling local page.  
-  Having a target DOM element is mandatory when using this special URL.  
-  HTML event called ```inodeselection``` is emitted when the path of the selected file is inserted into the calling local page.  
-  This event can be binded to a JavaScript function transmitting the file path to a local Perl script.  
+  The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
+  Having a target query string item is mandatory when using this special URL.  
   The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
   
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
@@ -381,41 +379,36 @@ They have two functions:
   The following code is an example of how to select a local file and transmit its full path to a local Perl script using [jQuery](https://jquery.com/):  
 
 ```javascript
-  $(document).ready(function() {
-      $('#file-selection').bind("inodeselection", function(){
-          $.ajax({
-              url: 'http://local-pseudodomain/perl/open-file.pl',
-              data: {filename: $('#file-selection').html()},
-              method: 'POST',
-              dataType: 'text',
-              success: function(data) {
-                  document.write(data);
-              }
-          });
+  function fileSelection(file) {
+      $.ajax({
+          url: 'http://local-pseudodomain/perl/open-file.pl',
+          data: {filename: file},
+          method: 'POST',
+          dataType: 'text',
+          success: function(data) {
+              document.write(data);
+          }
       });
-  });
+  }
 ```
 
 * **Select multiple files:** ```http://local-pseudodomain/open-files.function?target=DOM_element```
 <a name="select-multiple-files"></a>  
-  The full paths of the selected files will be inserted in the target DOM element of the calling local page.  
-  Having a target DOM element is mandatory when using this special URL.  
-  ```inodeselection``` HTML event is emitted when the paths of the selected files are inserted into the calling local page.  
+  The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
+  Having a target query string item is mandatory when using this special URL.  
   Different file names are separated by a semicolon - ```;```  
   
 * **Select new file name:** ```http://local-pseudodomain/new-file-name.function?target=DOM_element```
 <a name="select-new-file-name"></a>  
-  The full path of the new file name will be inserted in the target DOM element of the calling local page.  
-  Having a target DOM element is mandatory when using this special URL.  
-  ```inodeselection``` HTML event is emitted when the new file name is inserted into the calling local page.  
+  The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
+  Having a target query string item is mandatory when using this special URL.  
   
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
   
 * **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```
 <a name="select-directory"></a>  
-  The full path of the selected directory will be inserted in the target DOM element of the calling local page.  
-  Having a target DOM element is mandatory when using this special URL.  
-  ```inodeselection``` HTML event is emitted when the path of the selected directory is inserted into the calling local page.  
+  The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
+  Having a target query string item is mandatory when using this special URL.  
   
   Please note that if you choose to create a new directory, it will be created immediately by PEB.  
   It will be already existing when passed to a local Perl script.  

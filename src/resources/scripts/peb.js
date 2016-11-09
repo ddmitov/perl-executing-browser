@@ -57,21 +57,20 @@ function pebCheckCloseWarning() {
 }
 
 
-function pebInodeSelection(elementName, inodes) {
-	var element = document.getElementById(elementName);
-	element.innerHTML = inodes;
-
-	var event;
-	event = document.createEvent("HTMLEvents");
-	event.initEvent("inodeselection", true, true);
-	event.eventName = "inodeselection"
-	element.dispatchEvent(event);
+function pebInodeSelection(target, inodes) {
+	if (typeof window[target] == 'function') {
+		var inodesTransmitted = inodes;
+		window[target](inodesTransmitted);
+	} else {
+		var element = document.getElementById(target);
+		element.innerHTML = inodes;
+	}
 }
 
 
 function pebOutputInsertion(target, output) {
-	if (typeof window["target"] == 'function') {
-		window["target"](output);
+	if (typeof window[target] == 'function') {
+		window[target](output);
 	} else {
 		var element = document.getElementById(target);
 		element.innerHTML = output;

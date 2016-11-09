@@ -1465,7 +1465,7 @@ public slots:
             // the local HTML page where request originated:
             mainPage->qJavaScriptInjector(mainPage->currentFrame());
 
-            QString inodeSelectedEventJavaScript =
+            QString inodeSelectedJavaScript =
                     "pebInodeSelection(\"" +
                     target +
                     "\" , \"" +
@@ -1473,7 +1473,7 @@ public slots:
                     "\"); null";
 
             mainPage->currentFrame()->
-                    evaluateJavaScript(inodeSelectedEventJavaScript);
+                    evaluateJavaScript(inodeSelectedJavaScript);
 
             qDebug() << "User selected inode:"
                      << userSelectedInodesFormatted;
