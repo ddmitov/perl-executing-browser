@@ -43,7 +43,7 @@ my $wait_one_second = AnyEvent->timer (
 	after => 0,
 	interval => 1,
 	cb => sub {
-		print "Seconds from the Unix epoch: ".time."<br>Input: ".$input_text;
+		print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
 	},
 );
 

@@ -641,17 +641,7 @@ public slots:
     {
         QString output = interactiveScriptHandler.readAllStandardOutput();
 
-        // JavaScript bridge to insert output from the interactive script:
-        qJavaScriptInjector(currentFrame());
-
-        QString outputInsertionJavaScript =
-                "pebOutputInsertion(\"" +
-                interactiveScriptOutputTarget +
-                "\" , \"" +
-                output +
-                "\"); null";
-
-        currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
+        qOutputInserter(output, interactiveScriptOutputTarget);
 
         // Handling the interactive script closed confirmation:
         if (output.contains(interactiveScriptClosedConfirmation)) {
@@ -703,22 +693,29 @@ public slots:
     }
 
     // ==============================
+    // SCRIPT OUTPUT INSERTION:
+    // ==============================
+    void qOutputInserter(QString output, QString target)
+    {
+        qJavaScriptInjector(currentFrame());
+
+        QString outputInsertionJavaScript =
+                "pebOutputInsertion(\"" +
+                output +
+                "\" , \"" +
+                target +
+                "\"); null";
+
+        currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
+    }
+
+    // ==============================
     // HANDLING NONINTERACTIVE SCRIPTS:
     // ==============================
     void qDisplayScriptOutputSlot(QString output, QString target)
     {
         if (target.length() > 0) {
-            // JavaScript bridge to insert output from noninteractive scripts:
-            qJavaScriptInjector(currentFrame());
-
-            QString outputInsertionJavaScript =
-                    "pebOutputInsertion(\"" +
-                    target +
-                    "\" , \"" +
-                    output +
-                    "\"); null";
-
-            currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
+            qOutputInserter(output, target);
         } else {
             QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
@@ -1467,9 +1464,9 @@ public slots:
 
             QString inodeSelectedJavaScript =
                     "pebInodeSelection(\"" +
-                    target +
-                    "\" , \"" +
                     userSelectedInodesFormatted +
+                    "\" , \"" +
+                    target +
                     "\"); null";
 
             mainPage->currentFrame()->

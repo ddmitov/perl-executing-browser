@@ -15,6 +15,7 @@ function pebFindMessageBoxElements() {
 	}
 }
 
+
 function pebCheckUserInputBeforeClose() {
 	var textEntered = false;
 
@@ -57,7 +58,7 @@ function pebCheckCloseWarning() {
 }
 
 
-function pebInodeSelection(target, inodes) {
+function pebInodeSelection(inodes, target) {
 	if (typeof window[target] === "function") {
 		var inodesTransmitted = inodes;
 		window[target](inodesTransmitted);
@@ -65,8 +66,7 @@ function pebInodeSelection(target, inodes) {
 		var element = document.getElementById(target);
 		if (element === null) {
 			console.error(
-				'PEB Embedded JavaScript: Target \''
-				+ target +
+				'PEB Embedded JavaScript: Target \'' + target +
 				'\' was not found!');
 		} else {
 			element.innerHTML = inodes;
@@ -75,15 +75,14 @@ function pebInodeSelection(target, inodes) {
 }
 
 
-function pebOutputInsertion(target, output) {
+function pebOutputInsertion(output, target) {
 	if (typeof window[target] === "function") {
 		window[target](output);
 	} else {
 		var element = document.getElementById(target);
 		if (element === null) {
 			console.error(
-				'PEB Embedded JavaScript: Target \''
-				+ target +
+				'PEB Embedded JavaScript: Target \'' + target +
 				'\' was not found!');
 		} else {
 			element.innerHTML = output;

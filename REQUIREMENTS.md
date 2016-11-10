@@ -6,12 +6,11 @@ Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,
-* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5  
-(main development and testing platform - Valcho Nedelchev),
+* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5,
 * [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
 * [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux  
-(main development and testing platform - Dimitar D. Mitov).
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
   
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ```start-peb.sh``` script,
