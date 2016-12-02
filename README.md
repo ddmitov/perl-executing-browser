@@ -77,7 +77,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 **Development goodies:**
 * [PEB can interact with the Perl 5 debugger in graphical mode.](#html-interface-for-the-perl-debugger)
-* ```QWebInspector``` window can be invoked using ```Ctrl+I``` keyboard shortcut.
+* ```QWebInspector``` window can be invoked using <kbd>Ctrl</kbd> + <kbd>I</kbd> keyboard shortcut.
 * [Optional extensive logging of all browser actions.](#log-files)
 
 ## Compile-time Requirements
@@ -203,7 +203,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 * **AJAX Perl scripts:**  
-    Local AJAX Perl scripts executed by PEB must have the keyword ```ajax``` (case insensitive) somewhere in their pathnames so that PEB is able to distinguish between AJAX and all other scripts. An AJAX script could be named ```ajax-test.pl``` or all AJAX scripts could be placed in a folder called ```ajax-scripts``` somewhere inside the application directory - see section [Settings](#settings).
+    Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
   
     The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
@@ -211,7 +211,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   $(document).ready(function() {
       $('#ajax-button').click(function() {
           $.ajax({
-              url: 'http://local-pseudodomain/perl/ajax-test.pl',
+              url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
               method: 'GET',
               dataType: 'text',
               success: function(data) {
@@ -470,13 +470,13 @@ They have two functions:
 * **XML files:** ```.xml```
 
 ## Keyboard Shortcuts
-* ```Alt+F4``` - Close window
-* ```Ctrl+A``` - Select All
-* ```Ctrl+C``` - Copy
-* ```Ctrl+I``` - debug current page using ```QWebInspector```
-* ```Ctrl+P``` - Print
-* ```Ctrl+V``` - Paste
-* ```F11``` - toggle Fullscreen
+* <kbd>Alt</kbd> + <kbd>F4</kbd> - Close window
+* <kbd>Ctrl</kbd> + <kbd>A</kbd> - Select All
+* <kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy
+* <kbd>Ctrl</kbd> + <kbd>I</kbd> - debug current page using ```QWebInspector```
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - Print
+* <kbd>Ctrl</kbd> + <kbd>V</kbd> - Paste
+* <kbd>F11</kbd> - toggle Fullscreen
 
 ## What PEB Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.

@@ -386,10 +386,10 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qDebug() << "Using"
-                 << application.applicationName().toLatin1().constData()
-                 << application.applicationVersion().toLatin1().constData()
-                 << "with administrative privileges is not allowed.";
+        qInfo() << "Using"
+                << application.applicationName().toLatin1().constData()
+                << application.applicationVersion().toLatin1().constData()
+                << "with administrative privileges is not allowed.";
     }
 #endif
 
@@ -408,47 +408,47 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qDebug() << application.applicationName().toLatin1().constData()
-                 << application.applicationVersion().toLatin1().constData()
-                 << "started.";
-        qDebug() << "Qt version:" << QT_VERSION_STR;
-        qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug() << "No Perl interpreter is found.";
+        qInfo() << application.applicationName().toLatin1().constData()
+                << application.applicationVersion().toLatin1().constData()
+                << "started.";
+        qInfo() << "Qt version:" << QT_VERSION_STR;
+        qInfo() << "Executable:" << application.applicationFilePath();
+        qInfo() << "No Perl interpreter is found.";
     }
 
     if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
         // ==============================
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
         // ==============================
-        qDebug() << application.applicationName().toLatin1().constData()
+        qInfo() << application.applicationName().toLatin1().constData()
                  << application.applicationVersion().toLatin1().constData()
                  << "started.";
-        qDebug() << "Qt version:" << QT_VERSION_STR;
-        qDebug() << "Executable:" << application.applicationFilePath();
+        qInfo() << "Qt version:" << QT_VERSION_STR;
+        qInfo() << "Executable:" << application.applicationFilePath();
+        qInfo() << "PID:" << application.applicationPid();
 
 #if ADMIN_PRIVILEGES_CHECK == 0
-        qDebug() << "Administrative privileges check is disabled.";
+        qInfo() << "Administrative privileges check is disabled.";
 #endif
 
 #if ADMIN_PRIVILEGES_CHECK == 1
-        qDebug() << "Administrative privileges check is enabled.";
+        qInfo() << "Administrative privileges check is enabled.";
 #endif
 
 #if PERL_DEBUGGER_INTERACTION == 0
-        qDebug() << "Perl debugger interaction is disabled.";
+        qInfo() << "Perl debugger interaction is disabled.";
 #endif
 
 #if PERL_DEBUGGER_INTERACTION == 1
-        qDebug() << "Perl debugger interaction is enabled.";
+        qInfo() << "Perl debugger interaction is enabled.";
 #endif
 
-        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
-
-        qDebug()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+        qInfo() << "Perl interpreter:" << perlInterpreterFullPath;
+        qInfo()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
 
         foreach (QString trustedDomain, trustedDomainsList) {
             if (trustedDomain != PSEUDO_DOMAIN) {
-                qDebug() << "Trusted domain:" << trustedDomain;
+                qInfo() << "Trusted domain:" << trustedDomain;
             }
         }
 
@@ -483,7 +483,7 @@ int main(int argc, char **argv)
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-                qDebug() << "No start page is found.";
+                qInfo() << "No start page is found.";
             }
         }
     }
@@ -746,7 +746,7 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
 #endif
 #endif
 
-    qDebug() << "Script started:" << scriptFullFilePath;
+    qInfo() << "Script started:" << scriptFullFilePath;
 }
 
 // ==============================
@@ -1142,7 +1142,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                         debuggerHandler.close();
 
                         // Start the Perl debugger:
-                        qDebug() << "File passed to Perl debugger:"
+                        qInfo() << "File passed to Perl debugger:"
                                  << debuggerScriptToDebug;
 
                         qStartPerlDebuggerSlot();

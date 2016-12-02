@@ -307,8 +307,9 @@ http://youmightnotneedjquery.com/
 ## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/sindresorhus/awesome  
-http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 https://github.com/IQAndreas/markdown-licenses  
+http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
+http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
 
 ## Linux
 http://askubuntu.com/questions/501812/how-do-i-provide-arguments-to-a-command-run-from-gksudo  
