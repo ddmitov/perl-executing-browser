@@ -14,7 +14,7 @@ before_install:
   - sudo apt-get update -qq
 
 install:
-  - sudo apt-get -y install qt55
+  - sudo apt-get -y install wk55
 
 script:
   - source /opt/qt55/bin/qt55-env.sh
