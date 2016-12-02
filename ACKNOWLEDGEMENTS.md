@@ -334,3 +334,8 @@ https://en.wikipedia.org/wiki/Web_Open_Font_Format
 http://stackoverflow.com/questions/26177849/mime-types-for-woff-ttf-svg-and-eot-404ing-despite-being-setup-in-iis  
 http://www.alienfactory.co.uk/articles/mime-types-for-web-fonts-in-bedsheet  
 https://www.w3.org/services/svg-server/  
+
+## Travis CI
+http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
+https://forum.qt.io/topic/50340/installing-qt-5-4-dev-packages-in-travis-ci/16  
+
