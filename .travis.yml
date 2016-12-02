@@ -18,7 +18,8 @@ install:
 
 script:
   - source /opt/qt55/bin/qt55-env.sh
-  - /opt/qt55/bin/qmake src/peb.pro
+  - /opt/qt55/bin/qmake $TRAVIS_BUILD_DIR/src/peb.pro
+  - cd $TRAVIS_BUILD_DIR/src
   - make
 
 notifications:
