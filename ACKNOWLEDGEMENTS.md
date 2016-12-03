@@ -339,3 +339,7 @@ https://www.w3.org/services/svg-server/
 http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
 https://forum.qt.io/topic/50340/installing-qt-5-4-dev-packages-in-travis-ci/16  
 
+## AppVeyor
+https://www.appveyor.com/docs/  
+http://stackoverflow.com/questions/26586006/build-qt-project-from-appveyor  
+
