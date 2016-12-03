@@ -2,6 +2,6 @@ install:
   - set QTDIR=C:\Qt\5.5\mingw492_32
   - set PATH=%PATH%;%QTDIR%\bin;C:\MinGW\bin
 build_script:
-  - chdir APPVEYOR_BUILD_FOLDER\src
+  - chdir %APPVEYOR_BUILD_FOLDER%\src
   - qmake peb.pro
   - mingw32-make
