@@ -48,12 +48,11 @@
 			document.addEventListener("DOMContentLoaded", function(event) {
 				var request = new XMLHttpRequest();
 				var parameters = {
-					type: "interactive",
 					target: "output",
 					close_command: "_close_",
 					close_confirmation: "_closed_"
 				}
-				request.open('GET', 'perl/interactive-script.pl' + formatParameters(parameters), true);
+				request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' + formatParameters(parameters), true);
 				request.send();
 			});
 

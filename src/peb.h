@@ -330,7 +330,7 @@ protected:
         // local files and non-AJAX scripts:
         // ==============================
         if (operation == GetOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().host() == PSEUDO_DOMAIN and
                 (request.url().userName() != "ajax") and
                 (!request.url().path().contains(".function"))) {
 
@@ -458,7 +458,7 @@ protected:
         // non-AJAX scripts:
         // ==============================
         if (operation == PostOperation and
-                request.url().authority() == PSEUDO_DOMAIN and
+                request.url().host() == PSEUDO_DOMAIN and
                 (request.url().userName() != "ajax")) {
 
             if (outgoingData) {
@@ -486,8 +486,7 @@ protected:
             return reply;
         }
 
-        qInfo() << "Link requested:"
-                << request.url().toString();
+        qInfo() << "Link requested:" << request.url().toString();
 
         return QNetworkAccessManager::createRequest
                 (QNetworkAccessManager::GetOperation,
@@ -541,10 +540,9 @@ public slots:
                  url.path());
 
         QUrlQuery scriptQuery(url);
-        QString scriptType = scriptQuery.queryItemValue("type");
 
         // Start the interactive script:
-        if (scriptType == "interactive" and
+        if (url.userName() == "interactive" and
                 (!interactiveScriptHandler.isOpen())) {
 
             interactiveScriptFullFilePath = scriptFullFilePath;

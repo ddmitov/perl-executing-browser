@@ -142,9 +142,9 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   **interactive scripts**, **noninteractive scripts** and **AJAX scripts**.  
   There is no timeout for all Perl scripts executed by PEB.  
 * **Interactive Perl scripts:**  
-    Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special query string items ```type=interactive```, ```target```, ```close_command``` and ```close_confirmation```.  
+    Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special pseudo-user ```interactive``` and with the query string items ```target```, ```close_command``` and ```close_confirmation```.  
   
-    The query string item ```type=interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
+    The pseudo-user ```interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
   
     The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
@@ -156,12 +156,11 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   document.addEventListener("DOMContentLoaded", function(event) {
       var request = new XMLHttpRequest();
       var parameters = {
-          type: "interactive",
           target: "output",
           close_command: "_close_",
           close_confirmation: "_closed_"
       }
-      request.open('GET', 'perl/interactive-script.pl' + formatParameters(parameters), true);
+      request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' + formatParameters(parameters), true);
       request.send();
   });
   
