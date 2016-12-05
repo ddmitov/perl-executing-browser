@@ -160,7 +160,8 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
           close_command: "_close_",
           close_confirmation: "_closed_"
       }
-      request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' + formatParameters(parameters), true);
+      request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
+                           formatParameters(parameters), true);
       request.send();
   });
   
@@ -223,7 +224,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## Calling Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special query string item ```user=root```. So if PEB finds an URL like: ```http://local-pseudodomain/perl/root-open-directory.pl?user=root```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other noninteractive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special pseudo-user ```root```. So if PEB finds an URL like: ```http://root@local-pseudodomain/perl/root-open-directory.pl```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other noninteractive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  

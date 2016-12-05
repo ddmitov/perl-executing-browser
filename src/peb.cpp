@@ -628,9 +628,7 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
     // qDebug() << "Script output target:" << scriptOutputTarget;
 
 #if ADMIN_PRIVILEGES_CHECK == 0
-    scriptUser = scriptQuery.queryItemValue("user");
-    scriptQuery.removeQueryItem("user");
-    // qDebug() << "Script user:" << scriptUser;
+    scriptUser = url.userName();
 #endif
 
     scriptFullFilePath = QDir::toNativeSeparators
