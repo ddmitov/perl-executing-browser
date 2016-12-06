@@ -185,26 +185,26 @@ The ```close_command``` query string item should contain the command used to ini
 The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
 ```javascript
-  document.addEventListener("DOMContentLoaded", function(event) {
-      var request = new XMLHttpRequest();
-      var parameters = {
-          target: "output",
-          close_command: "_close_",
-          close_confirmation: "_closed_"
-      }
-      request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
-                           formatParameters(parameters), true);
-      request.send();
-  });
+document.addEventListener("DOMContentLoaded", function(event) {
+    var request = new XMLHttpRequest();
+    var parameters = {
+        target: "output",
+        close_command: "_close_",
+        close_confirmation: "_closed_"
+    }
+    request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
+                         formatParameters(parameters), true);
+    request.send();
+});
   
-  function formatParameters(parameters) {
-      return "?" + Object
-          .keys(parameters)
-          .map(function(key){
-              return key + "=" + parameters[key]
-          })
-      .join("&")
-  }
+function formatParameters(parameters) {
+    return "?" + Object
+        .keys(parameters)
+        .map(function(key){
+            return key + "=" + parameters[key]
+        })
+    .join("&")
+}
 ```
 
 ## AJAX Perl Scripts
@@ -213,18 +213,18 @@ Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in 
 The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
 ```javascript
-  $(document).ready(function() {
-      $('#ajax-button').click(function() {
-          $.ajax({
-              url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
-              method: 'GET',
-              dataType: 'text',
-              success: function(data) {
-                  $('#ajax-results').html(data);
-              }
-          });
-      });
-  });
+$(document).ready(function() {
+    $('#ajax-button').click(function() {
+        $.ajax({
+            url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
+            method: 'GET',
+            dataType: 'text',
+            success: function(data) {
+                $('#ajax-results').html(data);
+            }
+        });
+    });
+});
 ```
 
 ## Linux Superuser Perl Scripts
