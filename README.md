@@ -122,16 +122,16 @@ To make a bundled binary (peb.app):
 The following two compile-time variables can tighten further the security of PEB.
 
 * **Administrative privileges check:** ```ADMIN_PRIVILEGES_CHECK```  
-To disable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 0```  
-By default administrative privileges check is disabled.  
-To enable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 1```  
-If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
+  To disable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 0```  
+  By default administrative privileges check is disabled.  
+  To enable administrative privileges check: ```ADMIN_PRIVILEGES_CHECK = 1```  
+  If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
 
 * **Perl debugger interaction:** ```PERL_DEBUGGER_INTERACTION```  
-To enable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 1```  
-By default Perl debugger interaction is enabled.  
-To disable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 0```  
-If PEB is going to be compiled for end users and interaction with the Perl debugger is not needed or not wanted for security reasons, it can be turned off.
+  To enable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 1```  
+  By default Perl debugger interaction is enabled.  
+  To disable Perl debugger interaction: ```PERL_DEBUGGER_INTERACTION = 0```  
+  If PEB is going to be compiled for end users and interaction with the Perl debugger is not needed or not wanted for security reasons, it can be turned off.
 
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ```start-peb.sh``` script,
@@ -142,29 +142,28 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 
 ## Supported Perl Script Types
   PEB recognizes four main types of local Perl scripts:  
-  
   [**noninteractive scripts**](#noninteractive-perl-scripts), [**interactive scripts**](#interactive-perl-scripts), [**AJAX scripts**](#ajax-perl-scripts) and [**Linux superuser scripts**](#linux-superuser-perl-scripts).  
   There is no timeout for all Perl scripts executed by PEB.
 
 ## Noninteractive Perl Scripts
-  They can not receive any user input once they are started and they are subdivided into the following two subtypes:  
+They can not receive any user input once they are started and they are subdivided into the following two subtypes:  
   
 * **Page-producing scripts:**  
-    They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
+  They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
   
 * **Data-only scripts:**<a name="data-only-scripts"></a>  
-    They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
+  They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
   
-    Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
+  Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
   
-    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+  The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
-    Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
+  Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
   
-    **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
   
-    <a name="feeding-from-forms"></a>
-    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
+  <a name="feeding-from-forms"></a>
+  There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
 
 ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -175,15 +174,15 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## Interactive Perl Scripts
-    Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special pseudo-user ```interactive``` and with the query string items ```target```, ```close_command``` and ```close_confirmation```.  
+Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special pseudo-user ```interactive``` and with the query string items ```target```, ```close_command``` and ```close_confirmation```.  
   
-    The pseudo-user ```interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
+The pseudo-user ```interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
   
-    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
   
-    The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
+The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
   
-    The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
+The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
 ```javascript
   document.addEventListener("DOMContentLoaded", function(event) {
@@ -209,9 +208,9 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
 ```
 
 ## AJAX Perl Scripts
-    Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
+Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
   
-    The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
+The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
 ```javascript
   $(document).ready(function() {
