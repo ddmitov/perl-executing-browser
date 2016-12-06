@@ -12,8 +12,11 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * [Compile-time Requirements](#compile-time-requirements)
 * [Compile-time Variables](#compile-time-variables)
 * [Runtime Requirements](#runtime-requirements)
-* [Calling User Perl Scripts](#calling-user-perl-scripts)
-* [Calling Linux Superuser Perl Scripts](#calling-linux-superuser-perl-scripts)
+* [Supported Perl Script Types](#supported-perl-script-types)
+* [Noninteractive Perl Scripts](#noninteractive-perl-scripts)
+* [Interactive Perl Scripts](#interactive-perl-scripts)
+* [AJAX Perl Scripts](#ajax-perl-scripts)
+* [Linux Superuser Perl Scripts](#linux-superuser-perl-scripts)
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs for Users](#special-urls-for-users)
@@ -33,7 +36,7 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
     Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks.
 * **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
 * **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ```filesystem.html``` file in the demo package shipped with PEB.
-* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. This is best explained in section [Calling User Perl Scripts](#calling-user-perl-scripts).
+* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
 * **2.** Write your Perl scripts.  
     The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
   
@@ -61,9 +64,9 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 
 ## Features
 **Usability:**
-* [Output from noninteractive Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
+* [Output from Perl 5 scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
 * [Perl 5 scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
-* [Linux superuser Perl scripts can be started.](#calling-linux-superuser-perl-scripts)
+* [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * [PEB can be started from any folder.](#settings)
 * PEB is useful for both single-page or multi-page applications.
@@ -137,11 +140,41 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
   PEB can also use any Perl on PATH.
 
-## Calling User Perl Scripts
-  PEB recognizes three main types of local user-level Perl scripts:  
-  **interactive scripts**, **noninteractive scripts** and **AJAX scripts**.  
-  There is no timeout for all Perl scripts executed by PEB.  
-* **Interactive Perl scripts:**  
+## Supported Perl Script Types
+  PEB recognizes four main types of local Perl scripts:  
+  
+  [**noninteractive scripts**](#noninteractive-perl-scripts), [**interactive scripts**](#interactive-perl-scripts), [**AJAX scripts**](#ajax-perl-scripts) and [**Linux superuser scripts**](#linux-superuser-perl-scripts).  
+  There is no timeout for all Perl scripts executed by PEB.
+
+## Noninteractive Perl Scripts
+  They can not receive any user input once they are started and they are subdivided into the following two subtypes:  
+  
+* **Page-producing scripts:**  
+    They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
+  
+* **Data-only scripts:**<a name="data-only-scripts"></a>  
+    They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
+  
+    Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
+  
+    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+  
+    Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
+  
+    **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  
+    <a name="feeding-from-forms"></a>
+    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
+
+```html
+  <form action="http://local-pseudodomain/perl/test.pl" method="post">
+      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
+      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
+      <input type="submit" value="Submit">
+  </form>
+```
+
+## Interactive Perl Scripts
     Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special pseudo-user ```interactive``` and with the query string items ```target```, ```close_command``` and ```close_confirmation```.  
   
     The pseudo-user ```interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
@@ -175,35 +208,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   }
 ```
 
-* **Noninteractive Perl scripts:**  
-  They can not receive any user input once they are started and have two subtypes:  
-  
-    **1. page-producing scripts:**  
-    They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
-  
-    **2. data-only scripts:**<a name="data-only-scripts"></a>  
-    They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
-  
-    Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
-  
-    The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
-  
-    Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
-  
-    **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
-  
-    <a name="feeding-from-forms"></a>
-    There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
-
-```html
-  <form action="http://local-pseudodomain/perl/test.pl" method="post">
-      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
-      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
-      <input type="submit" value="Submit">
-  </form>
-```
-
-* **AJAX Perl scripts:**  
+## AJAX Perl Scripts
     Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
   
     The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
@@ -223,7 +228,7 @@ If PEB is going to be compiled for end users and interaction with the Perl debug
   });
 ```
 
-## Calling Linux Superuser Perl Scripts
+## Linux Superuser Perl Scripts
 Linux superuser Perl scripts can be started using the special pseudo-user ```root```. So if PEB finds an URL like: ```http://root@local-pseudodomain/perl/root-open-directory.pl```, it will ask the user for the root password and then call ```sudo```, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other noninteractive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ```STDIN``` input or ```QUERY_STRING``` environment variable like in the user-level Perl scripts.
 
 ## Settings
