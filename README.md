@@ -491,7 +491,6 @@ They have two functions:
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
 
 ## Limitations
-* No new data can be sent to an already running script. Local Perl scripts should receive their data input on startup.
 * No page produced by a local Perl script can be reloaded because no temporary files for script output are written.  
   Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ```location.reload()```.
 * No history and cache.  
