@@ -1,7 +1,8 @@
 Perl Executing Browser
 --------------------------------------------------------------------------------
 
-[![GitHub version](https://img.shields.io/github/release/ddmitov/perl-executing-browser.svg)](https://github.com/ddmitov/perl-executing-browser/releases)
+[![GitHub Version](https://img.shields.io/github/release/ddmitov/perl-executing-browser.svg)](https://github.com/ddmitov/perl-executing-browser/releases)
+[![GitHub License](http://img.shields.io/badge/License-LGPL%20v3-blue.svg)](./LICENSE.md)
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available. Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting.  
@@ -41,22 +42,22 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
 * **2.** Write your Perl scripts.  
     The only limitation imposed by PEB on local Perl scripts is the banning of the ```fork``` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ```get-post-test.pl``` file in the demo package.  
-  
+
   Note that all files and directories used by PEB are relational to the directory where the PEB binary is located, because PEB is created to work from any folder without installation. All your local HTML files and Perl scripts must be located inside the ```{PEB_binary_directory}/resources/app``` directory - see section [Settings](#settings).  
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
     use Perl 5, JavaScript, HTML and CSS to create beautiful desktop applications
-  
+
 * **2. Zero installation:**  
     run from any folder
-  
+
 * **3. Cross-platform availability:**  
     usable on every platform, where Perl 5, Qt 5 and QtWebKit are available
-  
+
 * **4. Secure serverless solution:**  
     no server of any kind is installed or started
-  
+
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Target Audience
@@ -89,9 +90,9 @@ Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) 
 ## Compile-time Requirements
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including ```QtWebkit``` headers).  
 The ```QtWebkit``` set of classes is deprecated in all later versions of Qt. They could still be usable if ```QtWebKit``` headers are manually added, but this approach is still not tested.  
-  
+
 The most important Qt dependency of PEB is not ```QtWebkit```, but ```QNetworkAccessManager``` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ```QNetworkAccessManager``` is incompatible with the ecosystem of ```QtWebEngine``` - the new Blink-based web engine of Qt. This makes transition to ```QtWebEngine``` impractical because all local POST requests and all calls to local Perl scripts from JavaScript could not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
-  
+
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
@@ -101,7 +102,7 @@ Compiled and tested successfully using:
 * [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
-  
+
 
 ## Compile-time Variables
 Changing the compile-time variables of PEB requires editing its project file - ```peb.pro```.
@@ -149,21 +150,21 @@ The following two compile-time variables can tighten further the security of PEB
 
 ## Noninteractive Perl Scripts
 They can not receive any user input once they are started and they are subdivided into the following two subtypes:  
-  
+
 * **Page-producing scripts:**  
   They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
-  
+
 * **Data-only scripts:**<a name="data-only-scripts"></a>  
   They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ```target``` should be added to the script URL in this case.  
-  
+
   Example: ```http://local-pseudodomain/perl/counter.pl?target=script-results```  
-  
+
   The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
-  
+
   Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
-  
+
   **Note for Windows developers:** All data-only scripts should have ```$|=1;``` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
-  
+
   <a name="feeding-from-forms"></a>
   There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
 
@@ -177,13 +178,13 @@ They can not receive any user input once they are started and they are subdivide
 
 ## Interactive Perl Scripts
 Interactive Perl scripts have their own event loop waiting constantly for new data arriving on STDIN and that's why they have bidirectional connection with PEB. There can be only one interactive script per browser window. Interactive scripts must be started with the special pseudo-user ```interactive``` and with the query string items ```target```, ```close_command``` and ```close_confirmation```.  
-  
+
 The pseudo-user ```interactive``` is the token used by PEB to distinguish between interactive and all other scripts.  
-  
+
 The ```target``` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
-  
+
 The ```close_command``` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ```close_confirmation``` to signal PEB that it completed normally its shutdown. If PEB receives no ```close_confirmation``` in 5 seconds, it will close forcefully the handler of the interactive script.  
-  
+
 The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
 ```javascript
@@ -198,7 +199,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
                          formatParameters(parameters), true);
     request.send();
 });
-  
+
 function formatParameters(parameters) {
     return "?" + Object
         .keys(parameters)
@@ -211,7 +212,7 @@ function formatParameters(parameters) {
 
 ## AJAX Perl Scripts
 Local AJAX Perl scripts executed by PEB must have the pseudo-user ```ajax``` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
-  
+
 The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ```ajax-results``` HTML DOM element of the calling page:  
 
 ```javascript
@@ -244,7 +245,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 
 ```perl
     use Cwd;
-  
+
     my $current_working_directory = cwd();
     my $data_directory = "$current_working_directory/resources/data";
 ```
@@ -274,15 +275,15 @@ They have two functions:
 ```javascript
   function pebContextMenu() {
       var contextMenuObject = new Object();
-  
+
       contextMenuObject.printPreview = "Custom Print Preview Label";
       contextMenuObject.print = "Custom Print Label";
-  
+
       contextMenuObject.cut = "Custom Cut Label";
       contextMenuObject.copy = "Custom Copy Label";
       contextMenuObject.paste = "Custom Paste Label";
       contextMenuObject.selectAll = "Custom Select All Label";
-  
+
       return JSON.stringify(contextMenuObject);
   }
 ```
@@ -294,16 +295,16 @@ They have two functions:
 ```javascript
   function pebMessageBoxElements() {
       var messageBoxElementsObject = new Object();
-  
+
       messageBoxElementsObject.alertTitle = "Custom Alert Label";
       messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
       messageBoxElementsObject.promptTitle = "Custom Prompt Label";
-  
+
       messageBoxElementsObject.okLabel = "Custom Ok Label";
       messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
       messageBoxElementsObject.yesLabel = "Custom Yes Label";
       messageBoxElementsObject.noLabel = "Custom No Label";
-  
+
       return  JSON.stringify(messageBoxElementsObject);
   }
 ```
@@ -311,17 +312,17 @@ They have two functions:
 * **Warning for unsaved user input before closing a window:**
 <a name="warning-for-unsaved-user-input-before-closing-a-window"></a>  
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
-  
+
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
-  
+
   If a local HTML page going to be closed contains a JavaScript function called ```pebCloseConfirmationAsync()```, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ```pebCloseConfirmationSync()```. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
-  
+
   What are the differences between the two routines?  
-  
+
   The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
-  
+
   The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window-closing URL, ```http://local-pseudodomain/close-window.function```, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window-closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
-  
+
   The following code is an example of both synchronous and asynchronous warning functions. It is expected that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [Alertify.js](http://alertifyjs.com/).  
 
 ```javascript
@@ -329,7 +330,7 @@ They have two functions:
       var confirmation = confirm("Are you sure you want to close the window?");
       return confirmation;
   }
-  
+
   function pebCloseConfirmationAsync() {
       alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
       alertify.set({buttonFocus: "cancel"});
@@ -374,15 +375,15 @@ They have two functions:
 * **PEB pseudo-domain:** ```http://local-pseudodomain/```  
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
   It is intercepted inside PEB and is not passed to the underlying operating system.  
-  
+
 * **Select single file:** ```http://local-pseudodomain/open-file.function?target=DOM_element```
 <a name="select-single-file"></a>  
   The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
-  
+
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
-  
+
   The following code is an example of how to select a local file and transmit its full path to a local Perl script using [jQuery](https://jquery.com/):  
 
 ```javascript
@@ -404,49 +405,49 @@ They have two functions:
   The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   Different file names are separated by a semicolon - ```;```  
-  
+
 * **Select new file name:** ```http://local-pseudodomain/new-file-name.function?target=DOM_element```
 <a name="select-new-file-name"></a>  
   The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
-  
+
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
-  
+
 * **Select directory:** ```http://local-pseudodomain/open-directory.function?target=DOM_element```
 <a name="select-directory"></a>  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
-  
+
   Please note that if you choose to create a new directory, it will be created immediately by PEB.  
   It will be already existing when passed to a local Perl script.  
-  
+
 <a name="browser-functions"></a>
 * **Print:** ```http://local-pseudodomain/print.function?action=print```  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.  
   If no printer is configured, no dialog is displayed and no action is taken.
-  
+
 * **Print Preview:** ```http://local-pseudodomain/print.function?action=preview```
-  
+
 * **About PEB embedded page:** ```http://local-pseudodomain/about.function?type=browser```
-  
+
 * **About Qt dialog box:** ```http://local-pseudodomain/about.function?type=qt```
-  
+
 * **Close current window:** ```http://local-pseudodomain/close-window.function```  
   Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).
 
 ## HTML Interface for the Perl Debugger
    Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
-  
+
    If the debugged script is outside of the application directory (see section [Settings](#settings)), PEB asks for command line arguments which may be necessary for the debugged Perl program.  
-  
+
   Normal operation of the HTML interface for the Perl debugger is not possible without [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module, which is located in ```{PEB_binary_directory}/sdk/peblib``` directory. This relative path is hard-coded in C++ code and must not be changed.  
-  
+
   The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes ```$console``` variable ```undef```. Modifying the debugger was initially avoided due to its high level of complexity, but tests proved that undef-ing the ```$console``` is a minor change, which does not affect the normal operation and output of the debugger. This alteration is necessary because the ```Qprocess``` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ```perl5db.pl``` manually by replacing ```$console = "con";``` with ```undef $console;``` or by using ```{PEB_binary_directory}/sdk/peblib/perl5db-win32.patch```.  
-  
+
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
-  
+
   The following special URLs for interaction with the Perl debugger are implemented:  
-  
+
 * **Select debugged file:** ```http://local-pseudodomain/perl-debugger.function?action=select-file```  
   The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
 * **Send debugger command:** ```http://local-pseudodomain/perl-debugger.function?command=M```  
@@ -457,16 +458,16 @@ They have two functions:
 
 ## Local File Types
   All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  
-  
+
   PEB is case-insensitive for all local filename extensions with the exception of the start page filename extensions.  
   All local files can have multi-dotted names.  
-  
+
   Perl scripts are usually recognized by PEB using the ```.pl``` filename extension.  
   Perl scripts without filename extensions are recognized using a Perl shebang line like:  
   ```#!/usr/bin/perl``` or ```#!/usr/bin/env perl```  
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
   PEB finds Perl interpreter at application startup and uses shebang line only to detect Perl scripts without filename extension.  
-  
+
   All other supported local file types are recognized using the following filename extensions:  
 * **CSS files:** ```.css```
 * **Font files:** ```.eot``` ```.otf``` ```.ttf``` ```.woff``` ```.woff2```
@@ -515,4 +516,3 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 ## Authors
 Dimitar D. Mitov, 2013 - 2016,  
 Valcho Nedelchev, 2014 - 2016.  
-
