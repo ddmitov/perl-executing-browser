@@ -114,15 +114,15 @@ Changing the compile-time variables of PEB requires editing its project file - `
   To make a bundle-less binary, which is the default setting:  
 
   ```QMake
-    BUNDLE = 0
-    CONFIG -= app_bundle
+  BUNDLE = 0
+  CONFIG -= app_bundle
   ```
 
   To make a bundled binary (peb.app):  
 
   ```QMake
-    BUNDLE = 1
-    CONFIG += app_bundle
+  BUNDLE = 1
+  CONFIG += app_bundle
   ```
 
 <a name="security-compile-time-variables"></a>
@@ -149,10 +149,10 @@ The following two compile-time variables can tighten further the security of PEB
 
 ## Supported Perl Script Types
   PEB recognizes four main types of local Perl scripts:  
-* [**noninteractive scripts**](#noninteractive-perl-scripts),
-* [**interactive scripts**](#interactive-perl-scripts),
-* [**AJAX scripts**](#ajax-perl-scripts) and
-* [**Linux superuser scripts**](#linux-superuser-perl-scripts).
+* [**noninteractive scripts**](#noninteractive-perl-scripts)
+* [**interactive scripts**](#interactive-perl-scripts)
+* [**AJAX scripts**](#ajax-perl-scripts)
+* [**Linux superuser scripts**](#linux-superuser-perl-scripts)  
   PEB does not impose execution timeout on any Perl scripts.
 
 ## Noninteractive Perl Scripts
@@ -176,21 +176,21 @@ They can not receive any user input once they are started and they are divided i
   There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
 
   ```html
-    <form action="http://local-pseudodomain/perl/test.pl" method="post">
-        <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
-        <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
-        <input type="submit" value="Submit">
-    </form>
+  <form action="http://local-pseudodomain/perl/test.pl" method="post">
+      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
+      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
+      <input type="submit" value="Submit">
+  </form>
   ```
 
 ## Interactive Perl Scripts
 PEB interactive Perl scripts have their own event loops waiting constantly for new data on STDIN and that allows them to have bidirectional connection with PEB. There can be many interactive scripts per browser window, but each of them must have an unique file name. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``target``, ``close_command`` and ``close_confirmation``.  
 
-The pseudo-user ``interactive`` is the token used by PEB to distinguish between interactive and all other scripts.  
+The pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
 
 The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
-The ``close_command`` query string item should contain the command used to initiate the shutdown sequence of the interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. If PEB receives no ``close_confirmation`` in 5 seconds, it will kill the process of the interactive script.  
+The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. If PEB receives no ``close_confirmation`` from all interactive scripts in the window that is going to be closed in 5 seconds, it will kill the processes of all unresponsive interactive scripts.  
 
 The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
@@ -251,10 +251,10 @@ PEB is designed to run from any directory without setting anything beforehand an
   Data directory is not hard-coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
 
   ```perl
-      use Cwd;
+  use Cwd;
 
-      my $current_working_directory = cwd();
-      my $data_directory = "$current_working_directory/resources/data";
+  my $current_working_directory = cwd();
+  my $data_directory = "$current_working_directory/resources/data";
   ```
 
 * **Perl interpreter:**  
@@ -280,19 +280,19 @@ They have two functions:
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ``contextmenu`` event is not already intercepted):  
 
   ```javascript
-    function pebContextMenu() {
-        var contextMenuObject = new Object();
+  function pebContextMenu() {
+      var contextMenuObject = new Object();
 
-        contextMenuObject.printPreview = "Custom Print Preview Label";
-        contextMenuObject.print = "Custom Print Label";
+      contextMenuObject.printPreview = "Custom Print Preview Label";
+      contextMenuObject.print = "Custom Print Label";
 
-        contextMenuObject.cut = "Custom Cut Label";
-        contextMenuObject.copy = "Custom Copy Label";
-        contextMenuObject.paste = "Custom Paste Label";
-        contextMenuObject.selectAll = "Custom Select All Label";
+      contextMenuObject.cut = "Custom Cut Label";
+      contextMenuObject.copy = "Custom Copy Label";
+      contextMenuObject.paste = "Custom Paste Label";
+      contextMenuObject.selectAll = "Custom Select All Label";
 
-        return JSON.stringify(contextMenuObject);
-    }
+      return JSON.stringify(contextMenuObject);
+  }
   ```
 
 * **Custom or translated labels for JavaScript dialog boxes:**
@@ -300,20 +300,20 @@ They have two functions:
   Using the following code any local HTML page can have custom labels on the default JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes:
 
   ```javascript
-    function pebMessageBoxElements() {
-        var messageBoxElementsObject = new Object();
+  function pebMessageBoxElements() {
+      var messageBoxElementsObject = new Object();
 
-        messageBoxElementsObject.alertTitle = "Custom Alert Label";
-        messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
-        messageBoxElementsObject.promptTitle = "Custom Prompt Label";
+      messageBoxElementsObject.alertTitle = "Custom Alert Label";
+      messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
+      messageBoxElementsObject.promptTitle = "Custom Prompt Label";
 
-        messageBoxElementsObject.okLabel = "Custom Ok Label";
-        messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
-        messageBoxElementsObject.yesLabel = "Custom Yes Label";
-        messageBoxElementsObject.noLabel = "Custom No Label";
+      messageBoxElementsObject.okLabel = "Custom Ok Label";
+      messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
+      messageBoxElementsObject.yesLabel = "Custom Yes Label";
+      messageBoxElementsObject.noLabel = "Custom No Label";
 
-        return  JSON.stringify(messageBoxElementsObject);
-    }
+      return  JSON.stringify(messageBoxElementsObject);
+  }
   ```
 
 * **Warning for unsaved user input before closing a window:**
@@ -333,20 +333,20 @@ They have two functions:
   The following code is an example of both synchronous and asynchronous warning functions. It is expected that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [Alertify.js](http://alertifyjs.com/).  
 
   ```javascript
-    function pebCloseConfirmationSync() {
-        var confirmation = confirm("Are you sure you want to close the window?");
-        return confirmation;
-    }
+  function pebCloseConfirmationSync() {
+      var confirmation = confirm("Are you sure you want to close the window?");
+      return confirmation;
+  }
 
-    function pebCloseConfirmationAsync() {
-        alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
-        alertify.set({buttonFocus: "cancel"});
-        alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
-            if (confirmation) {
-                window.location.href = "http://local-pseudodomain/close-window.function";
-            }
-        });
-    }
+  function pebCloseConfirmationAsync() {
+      alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
+      alertify.set({buttonFocus: "cancel"});
+      alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
+          if (confirmation) {
+              window.location.href = "http://local-pseudodomain/close-window.function";
+          }
+      });
+  }
   ```
 
 ## Security
@@ -394,17 +394,17 @@ They have two functions:
   The following code is an example of how to select a local file and transmit its full path to a local Perl script using [jQuery](https://jquery.com/):  
 
   ```javascript
-    function fileSelection(file) {
-        $.ajax({
-            url: 'http://local-pseudodomain/perl/open-file.pl',
-            data: {filename: file},
-            method: 'POST',
-            dataType: 'text',
-            success: function(data) {
-                document.write(data);
-            }
-        });
-    }
+  function fileSelection(file) {
+      $.ajax({
+          url: 'http://local-pseudodomain/perl/open-file.pl',
+          data: {filename: file},
+          method: 'POST',
+          dataType: 'text',
+          success: function(data) {
+              document.write(data);
+          }
+      });
+  }
   ```
 
 * **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=DOM_element``
