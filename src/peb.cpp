@@ -605,34 +605,48 @@ qint64 QCustomNetworkReply::readData(char *data, qint64 maxSize)
 }
 
 // ==============================
-// NONINTERACTIVE SCRIPT HANDLER CONSTRUCTOR:
+// SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
-QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
+QScriptHandler::QScriptHandler(
         QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
     // Signals and slots for local long running Perl scripts:
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qNonInteractiveScriptOutputSlot()));
-    QObject::connect(&scriptHandler, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qNonInteractiveScriptErrorsSlot()));
-    QObject::connect(&scriptHandler,
+    QObject::connect(&scriptProcess, SIGNAL(readyReadStandardOutput()),
+                     this, SLOT(qScriptOutputSlot()));
+    QObject::connect(&scriptProcess, SIGNAL(readyReadStandardError()),
+                     this, SLOT(qScriptErrorsSlot()));
+    QObject::connect(&scriptProcess,
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
-                     SLOT(qNonInteractiveScriptFinishedSlot()));
+                     SLOT(qScriptFinishedSlot()));
 
     QUrlQuery scriptQuery(url);
 
-    scriptOutputTarget = scriptQuery.queryItemValue("target");
-    scriptQuery.removeQueryItem("target");
-    // qDebug() << "Script output target:" << scriptOutputTarget;
+    scriptFullFilePath = QDir::toNativeSeparators
+            ((qApp->property("application").toString()) + url.path());
 
 #if ADMIN_PRIVILEGES_CHECK == 0
     scriptUser = url.userName();
 #endif
 
-    scriptFullFilePath = QDir::toNativeSeparators
-            ((qApp->property("application").toString()) + url.path());
+    scriptOutputTarget = scriptQuery.queryItemValue("target");
+    scriptQuery.removeQueryItem("target");
+    // qDebug() << "Script output target:" << scriptOutputTarget;
+
+    scriptCloseCommand = scriptQuery.queryItemValue("close_command");
+    if (scriptCloseCommand.length() == 0) {
+        qDebug() << "Close command is not defined"
+                 << "for interactive script:"
+                 << scriptFullFilePath;
+    }
+
+    scriptClosedConfirmation = scriptQuery.queryItemValue("close_confirmation");
+    if (scriptClosedConfirmation.length() == 0) {
+        qDebug() << "Closed confirmation is not defined"
+                 << "for interactive script:"
+                 << scriptFullFilePath;
+    }
 
     QString queryString = scriptQuery.toString();
     QString postData(postDataArray);
@@ -653,17 +667,17 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
         // qDebug() << "POST data:" << postData;
     }
 
-    scriptHandler.setProcessEnvironment(scriptEnvironment);
+    scriptProcess.setProcessEnvironment(scriptEnvironment);
 
     if (scriptUser != "root") {
-        scriptHandler.start((qApp->property("perlInterpreter").toString()),
+        scriptProcess.start((qApp->property("perlInterpreter").toString()),
                             QStringList()
                             << "-M-ops=fork"
                             << scriptFullFilePath,
                             QProcess::Unbuffered | QProcess::ReadWrite);
 
         if (postData.length() > 0) {
-            scriptHandler.write(postDataArray);
+            scriptProcess.write(postDataArray);
         }
     }
 
@@ -705,7 +719,7 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
                     QInputDialog::getText(
                         qApp->activeWindow(),
                         "Root Password",
-                        "Please enter your root password:",
+                        "Please enter your Linux root password:",
                         QLineEdit::Password,
                         "",
                         &ok);
@@ -721,7 +735,7 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
 
         if (qApp->property("rootPassword").toString().length() > 0) {
             QProcess echo;
-            echo.setStandardOutputProcess(&scriptHandler);
+            echo.setStandardOutputProcess(&scriptProcess);
             echo.start(QString("echo"),
                        QStringList()
                        << qApp->property("rootPassword").toString(),
@@ -729,7 +743,7 @@ QNonInteractiveScriptHandler::QNonInteractiveScriptHandler(
             echo.waitForFinished();
             echo.close();
 
-            scriptHandler.start(QString("sudo"),
+            scriptProcess.start(QString("sudo"),
                                 QStringList()
                                 << "--stdin"
                                 << "--prompt="
@@ -827,15 +841,15 @@ QPage::QPage()
 
     // Signal and slot for SSL errors:
     QObject::connect(networkAccessManager,
-                     SIGNAL(sslErrors(QNetworkReply*, QList<QSslError>)),
+                     SIGNAL(sslErrors(QNetworkReply *, QList<QSslError>)),
                      this,
-                     SLOT(qSslErrorsSlot(QNetworkReply*, QList<QSslError>)));
+                     SLOT(qSslErrorsSlot(QNetworkReply *, QList<QSslError>)));
 
     // Signal and slot for other network errors:
     QObject::connect(networkAccessManager,
-                     SIGNAL(finished(QNetworkReply*)),
+                     SIGNAL(finished(QNetworkReply *)),
                      this,
-                     SLOT(qNetworkReply(QNetworkReply*)));
+                     SLOT(qNetworkReply(QNetworkReply *)));
 
     // Signal and slot for the detection of page status:
     QObject::connect(this,
@@ -849,21 +863,10 @@ QPage::QPage()
                      this,
                      SLOT(qStartScriptSlot(QUrl, QByteArray)));
 
-    // Signals and slots for the interactive script handler:
-    QObject::connect(&interactiveScriptHandler,
-                     SIGNAL(readyReadStandardOutput()),
-                     this,
-                     SLOT(qInteractiveScriptOutputSlot()));
+    // Signals and slots for closing windows:
+    QObject::connect(this, SIGNAL(closeAllScriptsSignal()),
+                     this, SLOT(qCloseAllScriptsSlot()));
 
-    QObject::connect(&interactiveScriptHandler,
-                     SIGNAL(readyReadStandardError()),
-                     this,
-                     SLOT(qInteractiveScriptErrorSlot()));
-
-    QObject::connect(this, SIGNAL(closeInteractiveScriptSignal()),
-                     this, SLOT(qCloseInteractiveScriptSlot()));
-
-    // Signal and slot for closing window:
     QObject::connect(networkAccessManager, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowTransmitterSlot()));
 
@@ -889,7 +892,8 @@ QPage::QPage()
                      this,
                      SLOT(qDebuggerHtmlFormatterFinishedSlot()));
 
-    // Explicit initialization of important perl-debugger-related value:
+    windowCloseRequested = false;
+
     debuggerJustStarted = false;
 #endif
 }

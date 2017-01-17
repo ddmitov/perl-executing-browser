@@ -2,7 +2,7 @@
 <html>
 
 	<head>
-		<title>Perl Executing Browser - Interactive Script Test</title>
+		<title>Perl Executing Browser - Interactive Scripts Test</title>
 		<meta name="viewport" content="width=device-width, initial-scale=1">
 		<meta charset="utf-8">
 
@@ -24,12 +24,12 @@
 	</head>
 
 	<body>
-		<form action="perl/interactive-script.pl" method="post">
+		<form action="http://interactive@local-pseudodomain/perl/interactive-script-one.pl" method="post">
 			<br>
 			<div class="col-lg-10 col-lg-offset-1">
 				<div class="form-group">
 					<div class="input-prepend">
-						<input type="text" id="input" name="input" class="form-control" placeholder="Send data to a running script">
+						<input type="text" name="input" class="form-control" placeholder="Send data to script one">
 					</div>
 				</div>
 
@@ -38,7 +38,31 @@
 					<input type="submit" value="Submit" class="btn btn-primary">
 				</div>
 
-				<div id="output" class="output">
+				<div id="script-one-output" class="output">
+					<br>
+					<br>
+				</div>
+
+			</div>
+		</form>
+
+		<form action="http://interactive@local-pseudodomain/perl/interactive-script-two.pl" method="post">
+			<br>
+			<div class="col-lg-10 col-lg-offset-1">
+				<div class="form-group">
+					<div class="input-prepend">
+						<input type="text" name="input" class="form-control" placeholder="Send data to script two">
+					</div>
+				</div>
+
+				<div class="form-group">
+					<input type="reset" value="Reset" class="btn btn-default">
+					<input type="submit" value="Submit" class="btn btn-primary">
+				</div>
+
+				<div id="script-two-output" class="output">
+					<br>
+					<br>
 				</div>
 
 			</div>
@@ -46,15 +70,25 @@
 
 		<script type="text/javascript">
 			document.addEventListener("DOMContentLoaded", function(event) {
-				var request = new XMLHttpRequest();
-				var parameters = {
-					target: "output",
+				var scriptOneRequest = new XMLHttpRequest();
+				var scriptOneParameters = {
+					target: "script-one-output",
 					close_command: "_close_",
 					close_confirmation: "_closed_"
 				}
-				request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
-								formatParameters(parameters), true);
-				request.send();
+				scriptOneRequest.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script-one.pl' +
+								formatParameters(scriptOneParameters), true);
+				scriptOneRequest.send();
+
+				var scriptTwoRequest = new XMLHttpRequest();
+				var scriptTwoParameters = {
+					target: "script-two-output",
+					close_command: "_close_",
+					close_confirmation: "_closed_"
+				}
+				scriptTwoRequest.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script-two.pl' +
+								formatParameters(scriptTwoParameters), true);
+				scriptTwoRequest.send();
 			});
 
 			function formatParameters(parameters) {
