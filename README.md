@@ -148,15 +148,14 @@ The following two compile-time variables can tighten further the security of PEB
   PEB can also use any Perl on PATH.
 
 ## Supported Perl Script Types
-  PEB recognizes four main types of local Perl scripts:  
+  PEB does not impose execution timeouts and recognizes four main types of local Perl scripts:  
 * [**noninteractive scripts**](#noninteractive-perl-scripts)
 * [**interactive scripts**](#interactive-perl-scripts)
 * [**AJAX scripts**](#ajax-perl-scripts)
-* [**Linux superuser scripts**](#linux-superuser-perl-scripts)  
-  PEB does not impose execution timeout on any Perl scripts.
+* [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
 ## Noninteractive Perl Scripts
-They can not receive any user input once they are started and they are divided into the following two subtypes:  
+They can not receive any user input once they are started and are divided into the following two subtypes:  
 
 * **Page-producing scripts:**  
   They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
@@ -190,7 +189,7 @@ The pseudo-user ``interactive`` is the token used by PEB to detect interactive s
 
 The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
-The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. If PEB receives no ``close_confirmation`` from all interactive scripts in the window that is going to be closed in 5 seconds, it will kill the processes of all unresponsive interactive scripts.  
+The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the processes of the unresponsive scripts will be killed and the window will be closed.  
 
 The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
@@ -521,5 +520,5 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## Authors
-Dimitar D. Mitov, 2013 - 2016,  
+Dimitar D. Mitov, 2013 - 2017,  
 Valcho Nedelchev, 2014 - 2016.  
