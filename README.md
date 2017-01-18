@@ -7,7 +7,8 @@ Perl Executing Browser
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
 Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content and is also capable to run local Perl scripts in multi-frame HTML pages.  
+
+Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content and is also capable to run local Perl scripts in multi-frame HTML pages.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -189,9 +190,9 @@ The pseudo-user ``interactive`` is the token used by PEB to detect interactive s
 
 The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
-The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the processes of the unresponsive scripts will be killed and the window will be closed.  
+The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the unresponsive scripts will be killed and the window will be closed.  
 
-The following JavaScript code demonstartes how to start an interactive Perl script immediately after its calling HTML page is loaded:
+The following JavaScript code demonstrates how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
 ```javascript
 document.addEventListener("DOMContentLoaded", function(event) {
