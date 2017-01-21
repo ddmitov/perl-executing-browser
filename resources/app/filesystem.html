@@ -1,47 +1,47 @@
 <!DOCTYPE html>
 <html>
 
-	<head>
-		<title>Perl Executing Browser - Filesystem Interaction</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta charset="utf-8">
+  <head>
+    <title>Perl Executing Browser - Filesystem Interaction</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
 
-		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
 
-		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
 
-		<script type="text/javascript" src="pebjs/filesystem.js"></script>
+    <script type="text/javascript" src="pebjs/filesystem.js"></script>
 
-		<style type="text/css">
-			body {
-				text-align: center;
-				font-size: 16px;
-				-webkit-text-size-adjust: 100%;
-			}
-			.selected-inodes {
-				margin-top: 10px;
-				margin-bottom: 10px;
-			}
-		</style>
-	</head>
+    <style type="text/css">
+      body {
+        text-align: center;
+        font-size: 16px;
+        -webkit-text-size-adjust: 100%;
+      }
+      .selected-inodes {
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+    </style>
+  </head>
 
-	<body>
-		<a href='http://local-pseudodomain/open-file.function?target=fileSelection' class="btn btn-info btn-primary">
-			Select Single File</a>
-		<div id="file-selection" class="selected-inodes" style="display: hidden"></div>
+  <body>
+    <a href='http://local-pseudodomain/open-file.function?target=fileSelection' class="btn btn-info btn-primary">
+      Select Single File</a>
+    <div id="file-selection" class="selected-inodes" style="display: hidden"></div>
 
-		<a href='http://local-pseudodomain/open-files.function?target=filesSelection' class="btn btn-info btn-primary">
-			Select Multiple Files</a>
-		<div id="files-selection" class="selected-inodes"></div>
+    <a href='http://local-pseudodomain/open-files.function?target=filesSelection' class="btn btn-info btn-primary">
+      Select Multiple Files</a>
+    <div id="files-selection" class="selected-inodes"></div>
 
-		<a href='http://local-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
-			Select New Filename</a>
-		<div id="new-file-name-selection" class="selected-inodes"></div>
+    <a href='http://local-pseudodomain/new-file-name.function?target=new-file-name-selection' class="btn btn-info btn-primary">
+      Select New Filename</a>
+    <div id="new-file-name-selection" class="selected-inodes"></div>
 
-		<a href='http://local-pseudodomain/open-directory.function?target=directorySelection' class="btn btn-info btn-primary">
-			Select Directory</a>
-		<div id="directory-selection" class="selected-inodes" style="display: hidden"></div>
-	</body>
+    <a href='http://local-pseudodomain/open-directory.function?target=directorySelection' class="btn btn-info btn-primary">
+      Select Directory</a>
+    <div id="directory-selection" class="selected-inodes" style="display: hidden"></div>
+  </body>
 </html>

@@ -112,6 +112,7 @@ signals:
     void displayScriptOutputSignal(QString output, QString scriptOutputTarget);
     void scriptFinishedSignal(QString scriptAccumulatedOutput,
                               QString scriptAccumulatedErrors,
+                              QString scriptId,
                               QString scriptFullFilePath,
                               QString scriptOutputTarget);
 
@@ -151,6 +152,7 @@ public slots:
     {
         emit scriptFinishedSignal(scriptAccumulatedOutput,
                                   scriptAccumulatedErrors,
+                                  scriptId,
                                   scriptFullFilePath,
                                   scriptOutputTarget);
 
@@ -166,6 +168,7 @@ public slots:
 
 public:
     QScriptHandler(QUrl url, QByteArray postDataArray);
+    QString scriptId;
     QString scriptFullFilePath;
     QProcess scriptProcess;
     QString scriptAccumulatedOutput;
@@ -277,6 +280,7 @@ protected:
                 // all local AJAX Perl scripts:
                 QObject::connect(ajaxScriptHandler,
                                  SIGNAL(scriptFinishedSignal(QString,
+                                                             QString,
                                                              QString,
                                                              QString,
                                                              QString)),
@@ -555,12 +559,10 @@ public slots:
     // ==============================
     void qStartScriptSlot(QUrl url, QByteArray postDataArray)
     {
-        QString scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("application").toString()) +
-                 url.path());
+        QString scriptId = url.password() + "@" + url.path();
 
         if ((url.userName() == "interactive" and
-             (!interactiveScripts.contains(scriptFullFilePath))) or
+             (!runningScripts.contains(scriptId))) or
                 (url.userName() != "interactive")) {
             QScriptHandler *scriptHandler =
                     new QScriptHandler(url, postDataArray);
@@ -575,24 +577,26 @@ public slots:
                              SIGNAL(scriptFinishedSignal(QString,
                                                          QString,
                                                          QString,
+                                                         QString,
                                                          QString)),
                              this,
                              SLOT(qScriptFinishedSlot(QString,
                                                       QString,
                                                       QString,
+                                                      QString,
                                                       QString)));
 
             if (url.userName() == "interactive") {
-                interactiveScripts.insert(scriptFullFilePath, scriptHandler);
+                runningScripts.insert(scriptId, scriptHandler);
             }
         }
 
         if (url.userName() == "interactive" and
-                interactiveScripts.contains(scriptFullFilePath) and
+                runningScripts.contains(scriptId) and
                 postDataArray.length() > 0) {
 
             QScriptHandler *handler =
-                    interactiveScripts.value(scriptFullFilePath);
+                    runningScripts.value(scriptId);
             if (handler->scriptProcess.isOpen()) {
                 postDataArray.append(QString("\n").toLatin1());
                 handler->scriptProcess.write(postDataArray);
@@ -611,10 +615,11 @@ public slots:
 
     void qScriptFinishedSlot(QString scriptAccumulatedOutput,
                              QString scriptAccumulatedErrors,
+                             QString scriptId,
                              QString scriptFullFilePath,
                              QString scriptOutputTarget)
     {
-        interactiveScripts.remove(scriptFullFilePath);
+        runningScripts.remove(scriptId);
 
         if (pageStatus == "untrusted") {
             QString errorMessage =
@@ -681,7 +686,7 @@ public slots:
             }
         }
 
-        if (windowCloseRequested == true and interactiveScripts.isEmpty()) {
+        if (windowCloseRequested == true and runningScripts.isEmpty()) {
             emit closeWindowSignal();
         }
     }
@@ -884,7 +889,7 @@ public slots:
                 }
 
                 if (jsCloseDecision == true) {
-                    if (!interactiveScripts.isEmpty()){
+                    if (!runningScripts.isEmpty()){
                         emit closeAllScriptsSignal();
                     } else {
                         emit closeWindowSignal();
@@ -893,7 +898,7 @@ public slots:
             }
 
             if (closeWarning == "none") {
-                if (!interactiveScripts.isEmpty()){
+                if (!runningScripts.isEmpty()){
                     emit closeAllScriptsSignal();
                 } else {
                     emit closeWindowSignal();
@@ -902,7 +907,7 @@ public slots:
         }
 
         if (textIsEntered == false) {
-            if (!interactiveScripts.isEmpty()){
+            if (!runningScripts.isEmpty()){
                 emit closeAllScriptsSignal();
             } else {
                 emit closeWindowSignal();
@@ -914,15 +919,15 @@ public slots:
     {
         windowCloseRequested = true;
 
-        int maximumTimeMilliseconds = 5000;
-        QTimer::singleShot(maximumTimeMilliseconds,
-                           this,
-                           SLOT(qScriptsTimeoutSlot()));
+        if (!runningScripts.isEmpty()) {
+            int maximumTimeMilliseconds = 5000;
+            QTimer::singleShot(maximumTimeMilliseconds,
+                               this,
+                               SLOT(qScriptsTimeoutSlot()));
 
-        if (!interactiveScripts.isEmpty()) {
             QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = interactiveScripts.begin();
-                 iterator != interactiveScripts.end();
+            for (iterator = runningScripts.begin();
+                 iterator != runningScripts.end();
                  ++iterator) {
                 QScriptHandler *handler = iterator.value();
 
@@ -939,10 +944,10 @@ public slots:
 
     void qScriptsTimeoutSlot()
     {
-        if (!interactiveScripts.isEmpty()) {
+        if (!runningScripts.isEmpty()) {
             QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = interactiveScripts.begin();
-                 iterator != interactiveScripts.end();
+            for (iterator = runningScripts.begin();
+                 iterator != runningScripts.end();
                  ++iterator) {
                 QScriptHandler *handler = iterator.value();
 
@@ -1348,7 +1353,7 @@ private:
     QString debuggerAccumulatedHtmlOutput;
 
 public:
-    QHash<QString, QScriptHandler*> interactiveScripts;
+    QHash<QString, QScriptHandler*> runningScripts;
 };
 
 // ==============================

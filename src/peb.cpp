@@ -621,14 +621,14 @@ QScriptHandler::QScriptHandler(
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    QUrlQuery scriptQuery(url);
-
     scriptFullFilePath = QDir::toNativeSeparators
             ((qApp->property("application").toString()) + url.path());
 
-#if ADMIN_PRIVILEGES_CHECK == 0
     scriptUser = url.userName();
-#endif
+
+    scriptId = url.password() + "@" + url.path();
+
+    QUrlQuery scriptQuery(url);
 
     scriptOutputTarget = scriptQuery.queryItemValue("target");
     scriptQuery.removeQueryItem("target");

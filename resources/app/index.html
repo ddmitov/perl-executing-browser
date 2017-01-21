@@ -1,85 +1,85 @@
 <!DOCTYPE html>
 <html>
 
-	<head>
-		<title>Perl Executing Browser - Demo</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta charset="utf-8">
+  <head>
+    <title>Perl Executing Browser - Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
 
-		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
 
-		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
-		<script type="text/javascript" src="bootstrap/js/bootstrap-dropdown.js"></script>
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+    <script type="text/javascript" src="bootstrap/js/bootstrap-dropdown.js"></script>
 
-		<style>
-			html, body{
-				height: 100%;
-			}
-			iframe{
-				width: 100%;
-				height: 83%;
-				border: none
-			}
-		</style>
-	</head>
+    <style>
+      html, body{
+        height: 100%;
+      }
+      iframe{
+        width: 100%;
+        height: 83%;
+        border: none
+      }
+    </style>
+  </head>
 
-	<body>
-		<div class="navbar navbar-inverse">
+  <body>
+    <div class="navbar navbar-inverse">
 
-			<div class="navbar-header">
-				<a class="navbar-brand" href="main.html" target="iframe_a">PEB</a>
-			</div>
+      <div class="navbar-header">
+        <a class="navbar-brand" href="main.html" target="iframe_a">PEB</a>
+      </div>
 
-			<ul class="nav navbar-nav">
-				<li>
-					<a id="perl-debugger" role="button" data-toggle="dropdown" data-target="#" href="index.html">
-					Perl Debugger GUI<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="requests">
-						<li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=M" target="iframe_a">List All Modules</a></li>
-						<li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=S" target="iframe_a">List All Subroutine Names</a></li>
-						<li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=V" target="iframe_a">List All Variables</a></li>
-						<li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=s" target="iframe_a">Step-by-Step Debugging</a></li>
-					</ul>
-				</li>
+      <ul class="nav navbar-nav">
+        <li>
+          <a id="perl-debugger" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Perl Debugger GUI<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=M" target="iframe_a">List All Modules</a></li>
+            <li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=S" target="iframe_a">List All Subroutine Names</a></li>
+            <li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=V" target="iframe_a">List All Variables</a></li>
+            <li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=s" target="iframe_a">Step-by-Step Debugging</a></li>
+          </ul>
+        </li>
 
-				<li>
-					<a id="printing" role="button" data-toggle="dropdown" data-target="#" href="index.html">
-					Printing<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="requests">
-						<li><a href="http://local-pseudodomain/print.function?action=preview" target="iframe_a">Print Preview</a></li>
-						<li><a href="http://local-pseudodomain/print.function?action=print" target="iframe_a">Print</a></li>
-					</ul>
-				</li>
+        <li>
+          <a id="printing" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Printing<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/print.function?action=preview" target="iframe_a">Print Preview</a></li>
+            <li><a href="http://local-pseudodomain/print.function?action=print" target="iframe_a">Print</a></li>
+          </ul>
+        </li>
 
-				<li>
-					<a href="javascript:location.reload();" >Reload</a>
-				</li>
+        <li>
+          <a href="javascript:location.reload();" >Reload</a>
+        </li>
 
-				<li>
-					<a id="about" role="button" data-toggle="dropdown" data-target="#" href="index.html">
-					About<span class="caret"></span>
-					</a>
-					<ul class="dropdown-menu" role="menu" aria-labelledby="requests">
-						<li><a href="http://local-pseudodomain/about.function?type=browser" target="iframe_a">About PEB</a></li>
-						<li><a href="http://local-pseudodomain/about.function?type=qt" target="iframe_a">About Qt</a></li>
-					</ul>
-				</li>
+        <li>
+          <a id="about" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          About<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/about.function?type=browser" target="iframe_a">About PEB</a></li>
+            <li><a href="http://local-pseudodomain/about.function?type=qt" target="iframe_a">About Qt</a></li>
+          </ul>
+        </li>
 
-				<li>
-					<a href="http://local-pseudodomain/close-window.function">Close window</a>
-				</li>
-			</ul>
-		</div>
+        <li>
+          <a href="http://local-pseudodomain/close-window.function">Close window</a>
+        </li>
+      </ul>
+    </div>
 
-		<iframe src="main.html" name="iframe_a"></iframe>
+    <iframe src="main.html" name="iframe_a"></iframe>
 
-		<footer>
-			Perl Executing Browser is an HTML GUI for Perl 5 desktop applications
-		</footer>
-	</body>
+    <footer>
+      Perl Executing Browser is an HTML GUI for Perl 5 desktop applications
+    </footer>
+  </body>
 
 </html>

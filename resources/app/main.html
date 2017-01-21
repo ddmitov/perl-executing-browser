@@ -1,212 +1,212 @@
 <!DOCTYPE html>
 <html>
 
-	<head>
-		<title>Perl Executing Browser - Demo</title>
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta charset="utf-8">
+  <head>
+    <title>Perl Executing Browser - Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
 
-		<script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
 
-		<script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
-		<link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
 
-		<style type="text/css">
-			body {
-				text-align: center;
-				font-size: 22px;
-				-webkit-text-size-adjust: 100%;
-			}
-		</style>
+    <style type="text/css">
+      body {
+        text-align: center;
+        font-size: 22px;
+        -webkit-text-size-adjust: 100%;
+      }
+    </style>
 
-	</head>
+  </head>
 
-	<body>
-		<div class="container">
-			<p>
-				Local Content
-			</p>
+  <body>
+    <div class="container">
+      <p>
+        Local Content
+      </p>
 
-			<p>
-				<button onclick="window.open('http://local-pseudodomain/index.html')" class="btn btn-primary">
-				Start Page in a New Window</button>
-			</p>
+      <p>
+        <button onclick="window.open('http://local-pseudodomain/index.html')" class="btn btn-primary">
+        Start Page in a New Window</button>
+      </p>
 
-			<p>
-				<button onclick="window.open('http://local-pseudodomain/interactive-script.html')" class="btn btn-primary">
-				Interactive Script Test</button>
-			</p>
+      <p>
+        <button onclick="window.open('http://local-pseudodomain/interactive-script.html')" class="btn btn-primary">
+        Interactive Script Test</button>
+      </p>
 
-			<p>
-				<div id="script-results-1">
-					<a href='http://local-pseudodomain/perl/counter.pl?target=script-results-1'
-						data-toggle="tooltip" title="http://local-pseudodomain/perl/counter.pl?target=script-results-1"
-						data-placement="right">
-					Noninteractive Script - First Instance</a>
-				</div>
-			</p>
+      <p>
+        <div id="script-results-1">
+          <a href='http://local-pseudodomain/perl/counter.pl?target=script-results-1'
+            data-toggle="tooltip" title="http://local-pseudodomain/perl/counter.pl?target=script-results-1"
+            data-placement="right">
+          Noninteractive Script - First Instance</a>
+        </div>
+      </p>
 
-			<p>
-				<div id="script-results-2">
-					<a href='http://local-pseudodomain/perl/counter.pl?target=script-results-2'
-						data-toggle="tooltip" title="http://local-pseudodomain/perl/counter.pl?target=script-results-2"
-						data-placement="right">
-					Noninteractive Script - Second Instance</a>
-				</div>
-			</p>
+      <p>
+        <div id="script-results-2">
+          <a href='http://local-pseudodomain/perl/counter.pl?target=script-results-2'
+            data-toggle="tooltip" title="http://local-pseudodomain/perl/counter.pl?target=script-results-2"
+            data-placement="right">
+          Noninteractive Script - Second Instance</a>
+        </div>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/get.html">
-				Non-AJAX GET Request Test</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/get.html">
+        Non-AJAX GET Request Test</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/post.html">
-				Non-AJAX POST Request Test</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/post.html">
+        Non-AJAX POST Request Test</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/root-get.html">
-				Linux Root Non-AJAX GET Request Test</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/root-get.html">
+        Linux Root Non-AJAX GET Request Test</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/root-post.html">
-				Linux Root Non-AJAX POST Request Test</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/root-post.html">
+        Linux Root Non-AJAX POST Request Test</a>
+      </p>
 
-			<p>
-				<a href="http://root@local-pseudodomain/perl/root-open-directory.pl"
-					data-toggle="tooltip" title="http://root@local-pseudodomain/perl/root-open-directory.pl"
-					data-placement="right" id="root-directory-lister">
-				Linux /root Directory Lister</a>
-			</p>
+      <p>
+        <a href="http://root@local-pseudodomain/perl/root-open-directory.pl"
+          data-toggle="tooltip" title="http://root@local-pseudodomain/perl/root-open-directory.pl"
+          data-placement="right" id="root-directory-lister">
+        Linux /root Directory Lister</a>
+      </p>
 
-			<p>
-				<div id="ajax-script-results">
-					<button id="ajax-button" class="btn btn-primary"
-							data-toggle="tooltip" title="http://ajax@local-pseudodomain/perl/ajax-test.pl"
-							data-placement="right">
-					AJAX GET Request Test</button>
-				</div>
-			</p>
+      <p>
+        <div id="ajax-script-results">
+          <button id="ajax-button" class="btn btn-primary"
+              data-toggle="tooltip" title="http://ajax@local-pseudodomain/perl/ajax-test.pl"
+              data-placement="right">
+          AJAX GET Request Test</button>
+        </div>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/filesystem.html">
-				Filesystem Interaction</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/filesystem.html">
+        Filesystem Interaction</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/perl/noextpl"
-					data-toggle="tooltip" title="http://local-pseudodomain/perl/noextpl"
-					data-placement="right">
-				Extensionless Script</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/perl/noextpl"
+          data-toggle="tooltip" title="http://local-pseudodomain/perl/noextpl"
+          data-placement="right">
+        Extensionless Script</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/dummy.txt"
-					data-toggle="tooltip" title="http://local-pseudodomain/dummy.txt"
-					data-placement="right">
-				Unsupported File</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/dummy.txt"
+          data-toggle="tooltip" title="http://local-pseudodomain/dummy.txt"
+          data-placement="right">
+        Unsupported File</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/nonexistent.html">
-				Nonexistent File</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/nonexistent.html">
+        Nonexistent File</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/perl/version-cwd-inc.pl"
-					data-toggle="tooltip" title="http://local-pseudodomain/perl/version-cwd-inc.pl"
-					data-placement="right">
-				Perl Version, Working Directory and @INC Array</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/perl/version-cwd-inc.pl"
+          data-toggle="tooltip" title="http://local-pseudodomain/perl/version-cwd-inc.pl"
+          data-placement="right">
+        Perl Version, Working Directory and @INC Array</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/perl/sqlite.pl"
-					data-toggle="tooltip" title="http://local-pseudodomain/perl/sqlite.pl"
-					data-placement="right">
-				SQLite Test</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/perl/sqlite.pl"
+          data-toggle="tooltip" title="http://local-pseudodomain/perl/sqlite.pl"
+          data-placement="right">
+        SQLite Test</a>
+      </p>
 
-			<hr width="75%">
+      <hr width="75%">
 
-			<p>
-				Security Tests
-			</p>
+      <p>
+        Security Tests
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/mixed-iframes.html">
-				Mixed Content - Iframes</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/mixed-iframes.html">
+        Mixed Content - Iframes</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/mixed-javascript.html">
-				Mixed Content - JavaScript</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/mixed-javascript.html">
+        Mixed Content - JavaScript</a>
+      </p>
 
-			<p>
-				<a href="http://local-pseudodomain/perl/fork.pl"
-					data-toggle="tooltip" title="http://local-pseudodomain/perl/fork.pl"
-					data-placement="right">
-				Perl Fork</a>
-			</p>
+      <p>
+        <a href="http://local-pseudodomain/perl/fork.pl"
+          data-toggle="tooltip" title="http://local-pseudodomain/perl/fork.pl"
+          data-placement="right">
+        Perl Fork</a>
+      </p>
 
-			<hr width="75%">
+      <hr width="75%">
 
-			<p>
-				Web Content
-			</p>
+      <p>
+        Web Content
+      </p>
 
-			<p>
-				<a href="http://www.perl.org/"
-					data-toggle="tooltip" title="http://www.perl.org/"
-					data-placement="right">
-				Perl.org</a>
-			</p>
+      <p>
+        <a href="http://www.perl.org/"
+          data-toggle="tooltip" title="http://www.perl.org/"
+          data-placement="right">
+        Perl.org</a>
+      </p>
 
-			<p>
-				<a href="https://html5test.com/"
-					data-toggle="tooltip" title="https://html5test.com/"
-					data-placement="right">
-				HTML 5 Test</a>
-			</p>
+      <p>
+        <a href="https://html5test.com/"
+          data-toggle="tooltip" title="https://html5test.com/"
+          data-placement="right">
+        HTML 5 Test</a>
+      </p>
 
-			<p>
-				<a href="https://www.google.bg/"
-					data-toggle="tooltip" title="https://www.google.bg/"
-					data-placement="right">
-				Google Search</a>
-			</p>
+      <p>
+        <a href="https://www.google.bg/"
+          data-toggle="tooltip" title="https://www.google.bg/"
+          data-placement="right">
+        Google Search</a>
+      </p>
 
-			<p>
-				<a href="http://www.nonexistent.com/index.htm"
-					data-toggle="tooltip" title="http://www.nonexistent.com/index.htm"
-					data-placement="right">
-				Nonexistent Web Site</a>
-			</p>
+      <p>
+        <a href="http://www.nonexistent.com/"
+          data-toggle="tooltip" title="http://www.nonexistent.com/"
+          data-placement="right">
+        Nonexistent Web Site</a>
+      </p>
 
-		<script>
-			$(document).ready(function() {
-				$('[data-toggle="tooltip"]').tooltip();
+    <script>
+      $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
 
-				$('#root-directory-lister').click(function() {
-					$('#root-directory-lister').tooltip('destroy');
-				});
+        $('#root-directory-lister').click(function() {
+          $('#root-directory-lister').tooltip('destroy');
+        });
 
-				$('#ajax-button').click(function() {
-					$.ajax({
-						url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
-						method: 'GET',
-						dataType: 'text',
-						success: function(data) {
-							$('#ajax-script-results').html(data);
-						}
-					});
-				});
-			});
-		</script>
-	</body>
+        $('#ajax-button').click(function() {
+          $.ajax({
+            url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
+            method: 'GET',
+            dataType: 'text',
+            success: function(data) {
+              $('#ajax-script-results').html(data);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
 
 </html>

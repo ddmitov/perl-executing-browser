@@ -1,6 +1,6 @@
 {
-	"trusted-domains" : [
-		"fonts.googleapis.com",
-		"fonts.gstatic.com"
-	]
+  "trusted-domains" : [
+    "fonts.googleapis.com",
+    "fonts.gstatic.com"
+  ]
 }
