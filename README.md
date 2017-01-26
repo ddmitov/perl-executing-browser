@@ -39,12 +39,11 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 ## Quick Start
   These are the basic steps for building your first PEB-based application:
 * **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
-    Use your favorite WYSIWIG editor or code by hand including your favorite libraries or frameworks.
 * **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
 * **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ``filesystem.html`` file in the demo package shipped with PEB.
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
 * **2.** Write your Perl scripts.  
-    The only limitation imposed by PEB on local Perl scripts is the banning of the ``fork`` core function. Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file in the demo package.  
+    Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file in the demo package.  
 
   Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory - see section [Settings](#settings).  
 
@@ -409,9 +408,6 @@ They have two functions:
 * Plugin support is disabled.
 
 **[Optional security features based on compile-time variables and C++ code](#security-compile-time-variables)**
-
-**Perl security setting:**  
-  PEB executes all Perl scripts with the ``fork`` core function banned using the command line switch ``-M-ops=fork``. ``fork`` is banned to avoid orphan processes, which may be created if this function is carelessly used.  
 
 ## Special URLs for Users
 * **PEB pseudo-domain:** ``http://local-pseudodomain/``  

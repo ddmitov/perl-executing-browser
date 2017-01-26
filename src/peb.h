@@ -517,18 +517,6 @@ private:
     QString pageStatus;
 };
 
-
-
-class QScriptTimer : public QTimer
-{
-    Q_OBJECT
-
-signals:
-    void scriptTimeout(QScriptHandler *handler);
-};
-
-
-
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
 // ==============================

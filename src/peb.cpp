@@ -672,7 +672,6 @@ QScriptHandler::QScriptHandler(
     if (scriptUser != "root") {
         scriptProcess.start((qApp->property("perlInterpreter").toString()),
                             QStringList()
-                            << "-M-ops=fork"
                             << scriptFullFilePath,
                             QProcess::Unbuffered | QProcess::ReadWrite);
 
@@ -697,7 +696,6 @@ QScriptHandler::QScriptHandler(
 //        scriptHandler.start(QString("pkexec"),
 //                            QStringList()
 //                            << qApp->property("perlInterpreter").toString()
-//                            << "-M-ops=fork"
 //                            << scriptFullFilePath
 //                            << scriptCommadLineArgument,
 //                            QProcess::Unbuffered | QProcess::ReadWrite);
@@ -708,7 +706,6 @@ QScriptHandler::QScriptHandler(
 //                            + qApp->applicationName().toLatin1()
 //                            << "--"
 //                            << qApp->property("perlInterpreter").toString()
-//                            << "-M-ops=fork"
 //                            << scriptFullFilePath
 //                            << scriptCommadLineArgument,
 //                            QProcess::Unbuffered | QProcess::ReadWrite);
@@ -749,7 +746,6 @@ QScriptHandler::QScriptHandler(
                                 << "--prompt="
                                 << "--"
                                 << qApp->property("perlInterpreter").toString()
-                                << "-M-ops=fork"
                                 << scriptFullFilePath
                                 << scriptCommadLineArgument,
                                 QProcess::Unbuffered | QProcess::ReadWrite);
@@ -874,6 +870,8 @@ QPage::QPage()
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
 
+    windowCloseRequested = false;
+
     // Signals and slots for the Perl debugger:
 #if PERL_DEBUGGER_INTERACTION == 1
     QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
@@ -891,8 +889,6 @@ QPage::QPage()
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
                      SLOT(qDebuggerHtmlFormatterFinishedSlot()));
-
-    windowCloseRequested = false;
 
     debuggerJustStarted = false;
 #endif
