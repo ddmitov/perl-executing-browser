@@ -96,6 +96,8 @@ http://doc.qt.io/qt-4.8/qinputdialog.html
 http://doc.qt.io/qt-5/qtwebkitexamples-webkitwidgets-fancybrowser-example.html (defunct)  
 http://doc.qt.io/qt-5/qtglobal.html  
 http://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
+http://doc.qt.io/qt-5/qhash.html  
+http://doc.qt.io/qt-5/qhash-iterator.html  
 http://doc.qt.io/archives/qt-5.5/qwebview.html  
 http://doc.qt.io/archives/qt-5.5/qurlquery.html  
 
@@ -189,6 +191,7 @@ http://stackoverflow.com/questions/17512542/getting-multiple-inputs-from-qinputd
 http://stackoverflow.com/questions/3846887/how-to-get-the-mime-type-of-a-file-in-qt  
 http://stackoverflow.com/questions/25254043/is-it-possible-to-compare-ifdef-values-for-conditional-use  
 http://stackoverflow.com/questions/10701504/command-working-in-terminal-but-not-via-qprocess  
+http://stackoverflow.com/questions/17680207/qhash-iterator-example-no-match-for-operator  
 
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList  
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu  

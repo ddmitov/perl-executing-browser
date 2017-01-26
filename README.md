@@ -184,9 +184,9 @@ They can not receive any user input once they are started and are divided into t
   ```
 
 ## Interactive Perl Scripts
-PEB interactive Perl scripts have their own event loops waiting constantly for new data on STDIN and that allows them to have bidirectional connection with PEB. There can be many interactive scripts per browser window, but each of them must have an unique file name. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``target``, ``close_command`` and ``close_confirmation``.  
+Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``target``, ``close_command`` and ``close_confirmation``.  
 
-The pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
+The URL pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
 
 The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
@@ -203,7 +203,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         close_confirmation: "_closed_"
     }
     request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
-                         formatParameters(parameters), true);
+            formatParameters(parameters), true);
     request.send();
 });
 
@@ -214,6 +214,41 @@ function formatParameters(parameters) {
             return key + "=" + parameters[key]
         })
     .join("&")
+}
+```
+
+The following JavaScript code demonstrates how to start one script in two instances immediately after the calling HTML page is loaded:
+
+```javascript
+document.addEventListener("DOMContentLoaded", function(event) {
+  var scriptOneRequest = new XMLHttpRequest();
+  var scriptOneParameters = {
+    target: "script-one-output",
+    close_command: "_close_",
+    close_confirmation: "_closed_"
+  }
+  scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive-script.pl' +
+          formatParameters(scriptOneParameters), true);
+  scriptOneRequest.send();
+
+  var scriptTwoRequest = new XMLHttpRequest();
+  var scriptTwoParameters = {
+    target: "script-two-output",
+    close_command: "_close_",
+    close_confirmation: "_closed_"
+  }
+  scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive-script.pl' +
+          formatParameters(scriptTwoParameters), true);
+  scriptTwoRequest.send();
+});
+
+function formatParameters(parameters) {
+  return "?" + Object
+    .keys(parameters)
+    .map(function(key){
+      return key + "=" + parameters[key]
+    })
+  .join("&")
 }
 ```
 
