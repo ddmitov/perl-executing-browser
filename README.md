@@ -384,7 +384,7 @@ They have two functions:
   ```
 
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code and a Perl command-line argument, but they do not constitute a sandbox for Perl scripts.
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code, but they do not constitute a sandbox for Perl scripts.
 
 **PEB security principles:**
 * Users have full access to their local data using PEB.
