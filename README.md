@@ -8,7 +8,7 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
 
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content and is also capable to run local Perl scripts in multi-frame HTML pages.
+Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content and is also capable to run Perl scripts in local multi-frame HTML pages.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -393,21 +393,19 @@ They have two functions:
   Trusted content is any content originating from either the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts or for developing rich/thick/fat clients. ``trusted-domains.json`` has to be explicitely created by a developer of a PEB-based application if needed.  
   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ``trusted-domains.json`` file.
 
-**Security features based on C++ code:**
+**Hard-coded security features:**
 * Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ``{PEB_binary_directory}/resources/app`` directory can be executed if they are invoked from the PEB pseudo-domain: ``http://local-pseudodomain/``.
-* PEB binary can not and does not download remote files and can not execute Perl scripts from remote locations.
-* If loading of untrusted content is attempted in a trusted page, a warning message blocks the entire browser window until user reloads the start page to restore local scripting.
-* All HTML pages from untrusted domains, if called from a trusted page, are automatically displayed in a separate browser window.
-* No local Perl scripts can be started if loading of untrusted content in the same window is attempted.  
-  No local Perl scripts can be started if they are called from a web page.
-* No output from local Perl scripts is displayed if loading of untrusted content in the same window is attempted.
-* No files or folders can be selected with their full paths if loading of untrusted content in the same window is attempted.  
-  No files or folders can be selected with their full paths from a web page.
-* The HTML interface for the Perl debugger inside PEB can not be accessed from a web page.
+* PEB can not execute Perl scripts from remote locations.
+* If loading of untrusted content is attempted in a trusted page, a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
+* If untrusted page is called from a trusted one, it is automatically displayed in a separate browser window.
+* Local Perl scripts can not be started if they are called from untrusted pages.
+* No output from local Perl scripts is displayed in untrusted pages.
+* Files or folders can not be selected with their full paths from untrusted pages.
+* PEB HTML interface for the Perl debugger can not be accessed from an untrusted page.
 * Cross-site scripting is disabled for all web and local pages.
 * Plugin support is disabled.
 
-**[Optional security features based on compile-time variables and C++ code](#security-compile-time-variables)**
+**[Optional security features based on compile-time variables](#security-compile-time-variables)**
 
 ## Special URLs for Users
 * **PEB pseudo-domain:** ``http://local-pseudodomain/``  

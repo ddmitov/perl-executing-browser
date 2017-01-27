@@ -1081,6 +1081,12 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                         .replace("VERSION_STRING",
                                  QApplication::applicationVersion().toLatin1());
 
+                aboutPageContents
+                        .replace("START_PAGE",
+                                 "<a href='" +
+                                 qApp->property("startPage").toString() +
+                                 "'>start page</a>");
+
                 frame->setHtml(aboutPageContents);
 
                 return false;
