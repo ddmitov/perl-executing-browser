@@ -394,9 +394,10 @@ They have two functions:
   Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ``trusted-domains.json`` file.
 
 **Hard-coded security features:**
-* Users have no dialog to select arbitrary local scripts for execution by PEB. Only scripts within the ``{PEB_binary_directory}/resources/app`` directory can be executed if they are invoked from the PEB pseudo-domain: ``http://local-pseudodomain/``.
+* Users have no dialog to select arbitrary local scripts for execution by PEB.  
+  Only scripts within the ``{PEB_binary_directory}/resources/app`` directory can be executed if they are invoked from the PEB pseudo-domain: ``http://local-pseudodomain/``.
 * PEB can not execute Perl scripts from remote locations.
-* If loading of untrusted content is attempted in a trusted page, a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
+* If untrusted JavaScript is called from a trusted page, a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
 * If untrusted page is called from a trusted one, it is automatically displayed in a separate browser window.
 * Local Perl scripts can not be started if they are called from untrusted pages.
 * No output from local Perl scripts is displayed in untrusted pages.
