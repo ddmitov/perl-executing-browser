@@ -5,7 +5,7 @@ Patientia tua in studiis meis computatoriis auxilium meum maximum!
 
 Being in debt to each and every one,  
 who prepared the official Perl and Qt documentation or  
-shared usefull knowledge on a variety of forums, blogs and other sites,  
+shared useful knowledge on a variety of forums, blogs and other sites,  
 I thank them all! Their expertise, effort and good will are highly appreciated!  
 
 Special thanks to the staff of the
@@ -15,7 +15,7 @@ where much of the development effort took place!
 Special thanks to Stack Overflow user peppe for answering competently and swiftly my question  
 [How to read POST data "sent" from my own QtWebKit application?](http://stackoverflow.com/questions/20640862/how-to-read-post-data-sent-from-my-own-qtwebkit-application)  
 
-I am also thankfull to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué  
+I am also thankful to Stack Overflow users Piotr Dobrogost and Fèlix Galindo Allué  
 for their code, which I adopted and modified for an important part of Perl Executing Browser:  
 http://stackoverflow.com/questions/4575245/how-to-tell-qwebpage-not-to-load-specific-type-of-resources  
 http://stackoverflow.com/questions/10775154/get-raw-packet-data-from-qt-application  
@@ -26,8 +26,8 @@ http://www.totoro.org/jen/
 
 Thanks to Leon Anavi, Valentin Alexiev, Stefan Chekanov, Rangel Ivanov, Philip Georgiev,  
 karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,  
-for beeing welcoming host of the first public presentation of Perl Executing Browser  
-on the 2nd of March 2014 and for their helpfull proposals.  
+for being welcoming host of the first public presentation of Perl Executing Browser  
+on the 2nd of March 2014 and for their helpful proposals.  
 http://hackafe.org/  
 
 Thanks to Hans Jeuken and Gábor Szabó for developing and maintaining Syntax::Highlight::Engine::Kate CPAN module.  
@@ -196,7 +196,6 @@ http://stackoverflow.com/questions/17680207/qhash-iterator-example-no-match-for-
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=176&key=QStringtoQStringList  
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu  
 http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=600&key=QNetworkManagerErrorReturnCode  
-
 http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)  
 http://comments.gmane.org/gmane.comp.lib.qt.general/35521 (webkit - how to prevent alert popups)  
 
@@ -216,32 +215,17 @@ http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 
 ## Perl 5
-Larry Wall, Tom Christiansen, Jon Orwant  
-"Programming Perl. Third Edition",  
-O'Reilly, July 2000, ISBN 0-596-00027-8,  
-31.13. use lib  
-http://docstore.mik.ua/orelly/perl2/prog/ch31_13.htm  
-
-Peter Wainwright  
-"Pro Perl. A comprehensive guide for developers who want to master the Perl programming language",  
-Apress, 2005, p. 104 - 107  
-https://books.google.bg/books?id=1bbjLxkBLaMC&pg=PA105  
-
 Eric Cholet, Stas Bekman  
 "Practical mod_perl",  
 O'Reilly, May 2003, ISBN 0-596-00227-0,  
 3.9.2.1. Modifying @INC  
 http://modperlbook.org/html/3-9-2-1-Modifying-INC.html  
 
-http://www.perlmonks.org/?node_id=737134 "How to redirect STDOUT to an array (not executing program)"  
-http://www.perlmonks.org/?node_id=1013683 "How to restore from redirecting STDOUT to variable?"  
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
-http://stackoverflow.com/questions/3321829/how-do-i-best-pass-arguments-to-a-perl-one-liner  
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 http://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
-http://stackoverflow.com/questions/651124/how-do-i-redefine-built-in-perl-functions  
 http://stackoverflow.com/questions/2526804/how-is-perls-inc-constructed-aka-what-are-all-the-ways-of-affecting-where-perl-modules-are-searched-for  
 http://stackoverflow.com/questions/841785/how-do-i-include-a-perl-module-thats-in-a-different-directory  
 http://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
@@ -254,8 +238,6 @@ http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
 http://www.perl.com/pub/2002/05/14/mod_perl.html  
 http://www.tizag.com/perlT/perlhashes.php  
 http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input  
-http://modperlbook.org/html/3-9-2-1-Modifying-INC.html  
-http://www.tutorialspoint.com/perl/perl_syscall.htm  
 
 ## HTML, CSS & JavaScript
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
