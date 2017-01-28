@@ -70,9 +70,9 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 ## Features
 **Usability:**
 * [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
-* [Interactive Perl scripts having STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
+* [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
-* [Perl script output can be seamlessly inserted into the calling local page using HTML DOM elements or JavaScript functions.](#data-only-scripts)
+* [Perl script output can be seamlessly inserted into the calling local page.](#data-only-scripts)
 * [Untrusted web content is never mixed with trusted local content.](#security)
 * Cross-site scripting is disabled for all web and local pages.
 * [Any version of Perl 5 can be used.](#runtime-requirements)
