@@ -19,8 +19,16 @@
       }
       iframe{
         width: 100%;
-        height: 83%;
+        height: 88%;
         border: none
+      }
+      .navbar .navbar-nav {
+        display: inline-block;
+        float: none;
+        vertical-align: top;
+      }
+      .navbar .navbar-inverse {
+        text-align: center;
       }
     </style>
   </head>
@@ -34,8 +42,31 @@
 
       <ul class="nav navbar-nav">
         <li>
+          <a id="filesystem" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Files<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/filesystem.html" target="iframe_a">Open Files or Folders</a></li>
+            <li><a href="http://local-pseudodomain/nonexistent.html" target="iframe_a">Nonexistent File</a></li>
+            <li><a href="http://local-pseudodomain/dummy.txt" target="iframe_a">Unsupported File</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a id="forms" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Forms<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/get.html" target="iframe_a">GET Form</a></li>
+            <li><a href="http://local-pseudodomain/post.html" target="iframe_a">POST Form</a></li>
+            <li><a href="http://local-pseudodomain/root-get.html" target="iframe_a">Linux Root GET Form</a></li>
+            <li><a href="http://local-pseudodomain/root-post.html" target="iframe_a">Linux Root POST Form</a></li>
+          </ul>
+        </li>
+
+        <li>
           <a id="perl-debugger" role="button" data-toggle="dropdown" data-target="#" href="index.html">
-          Perl Debugger GUI<span class="caret"></span>
+          Perl Debugger<span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
             <li><a href="http://local-pseudodomain/perl-debugger.function?action=select-file&command=M" target="iframe_a">List All Modules</a></li>
@@ -46,8 +77,20 @@
         </li>
 
         <li>
+          <a id="web" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Web<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="https://www.google.com/">Google</a></li>
+            <li><a href="https://html5test.com/">HTML5test</a></li>
+            <li><a href="http://www.perl.org/">www.perl.org</a></li>
+            <li><a href="http://www.nonexistent.com/">Nonexistent Web Site</a></li>
+          </ul>
+        </li>
+
+        <li>
           <a id="printing" role="button" data-toggle="dropdown" data-target="#" href="index.html">
-          Printing<span class="caret"></span>
+          Print<span class="caret"></span>
           </a>
           <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
             <li><a href="http://local-pseudodomain/print.function?action=preview" target="iframe_a">Print Preview</a></li>
@@ -56,7 +99,7 @@
         </li>
 
         <li>
-          <a href="javascript:location.reload();" >Reload</a>
+          <a href="javascript:location.reload();">Reload</a>
         </li>
 
         <li>
@@ -70,16 +113,12 @@
         </li>
 
         <li>
-          <a href="http://local-pseudodomain/close-window.function">Close window</a>
+          <a href="http://local-pseudodomain/close-window.function">Close</a>
         </li>
       </ul>
     </div>
 
     <iframe src="main.html" name="iframe_a"></iframe>
-
-    <footer>
-      Perl Executing Browser is an HTML GUI for Perl 5 desktop applications
-    </footer>
   </body>
 
 </html>

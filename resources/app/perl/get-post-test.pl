@@ -31,7 +31,7 @@ print "<!DOCTYPE html>
     </p>
 <pre>\n";
 
-print "REQUEST_METHOD: $ENV{'REQUEST_METHOD'}\n";
+print "REQUEST_METHOD: $ENV{'REQUEST_METHOD'}\n\n";
 
 print "FORM DATA:\n";
 

@@ -539,6 +539,7 @@ public slots:
     {
         if (ok) {
             emit changeTitleSignal();
+            qJavaScriptInjector(QPage::mainFrame());
         }
     }
 
@@ -618,7 +619,7 @@ public slots:
                     qApp->property("startPage").toString() +
                     "'>start page</a> "
                     "to unlock local Perl scripts.</p>";
-            qWarning() << "Displaying output from local Perl scripts stopped "
+            qWarning() << "Displaying output from local Perl scripts stopped"
                        << "after untrusted content is loaded:"
                        << QPage::currentFrame()->
                           baseUrl().toString();
@@ -681,8 +682,6 @@ public slots:
 
     void qOutputInserter(QString output, QString target)
     {
-        qJavaScriptInjector(currentFrame());
-
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
                 output +
@@ -811,8 +810,13 @@ public slots:
     }
 
     // ==============================
-    // JAVASCRIPT INJECTOR:
+    // CUSTOM-JAVASCRIPT-INJECTING ROUTINES:
     // ==============================
+    void qFrameCustomizerSlot(QWebFrame *frame)
+    {
+        qJavaScriptInjector(frame);
+    }
+
     void qJavaScriptInjector(QWebFrame *frame)
     {
         QFileReader *resourceReader =
@@ -1172,8 +1176,6 @@ protected:
 
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
-        qJavaScriptInjector(frame);
-
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
@@ -1210,8 +1212,6 @@ protected:
 
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
-        qJavaScriptInjector(frame);
-
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
@@ -1260,8 +1260,6 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
-        qJavaScriptInjector(frame);
-
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
@@ -1406,7 +1404,7 @@ public slots:
                     .replace(QRegularExpression(";$"), "");
 
             // JavaScript bridge back to
-            // the local HTML page where request originated:
+            // the local HTML frame where request originated:
             mainPage->qJavaScriptInjector(mainPage->currentFrame());
 
             QString inodeSelectedJavaScript =

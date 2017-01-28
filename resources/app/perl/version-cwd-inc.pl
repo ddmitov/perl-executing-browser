@@ -8,7 +8,7 @@ print "<!DOCTYPE html>
 <html>
 
   <head>
-    <title>Perl Executing Browser - Perl Version, Working Directory and \@INC Array</title>
+    <title>Perl Executing Browser - Perl Basic Information</title>
     <meta name='viewport' content='width=device-width, initial-scale=1'>
     <meta charset='utf-8'>
     <link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
@@ -27,7 +27,7 @@ print "<!DOCTYPE html>
 
   <body>
     <p align='center'>
-      Perl Version, Working Directory and \@INC Array
+      Perl Basic Information
     </p>
 <pre>\n";
 
@@ -41,7 +41,6 @@ print "\n\@INC Array:\n";
 print join "\n", @INC;
 
 print "\n</pre>
-
   </body>
 
 </html>\n";

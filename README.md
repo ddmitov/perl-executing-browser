@@ -8,7 +8,7 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
 
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content and is also capable to run Perl scripts in local multi-frame HTML pages.
+Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content in different browser windows.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -69,22 +69,22 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 
 ## Features
 **Usability:**
-* [Output from Perl scripts can be seamlessly inserted into the HTML DOM of the calling local page.](#data-only-scripts)
 * [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
-* [Interactive Perl scripts with their own event loops can be started and repeatedly fed with data.](#interactive-perl-scripts)
+* [Interactive Perl scripts having STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
+* [Perl script output can be seamlessly inserted into the calling local page using HTML DOM elements or JavaScript functions.](#data-only-scripts)
+* [Untrusted web content is never mixed with trusted local content.](#security)
+* Cross-site scripting is disabled for all web and local pages.
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * [PEB can be started from any folder.](#settings)
 * PEB is useful for both single-page (including multi-frame) or multi-page applications.
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-users)  
-  Their full paths can be displayed in the calling local page and they can be supplied to local Perl scripts.
+  Their full paths are easily supplied to local Perl scripts.
 * [Browser functions are accessible from special URLs.](#browser-functions)
-* [Any icon can be displayed on windows and message boxes.](#icon)
 * [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels)
 * [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes)
 * [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
-* Cross-site scripting is disabled for all web and local pages.
-* [Untrusted web content is never mixed with trusted local content.](#security)
+* [Any icon can be displayed on windows and message boxes.](#icon)
 
 **Development goodies:**
 * [PEB can interact with the Perl 5 debugger in graphical mode.](#html-interface-for-the-perl-debugger)
@@ -534,7 +534,7 @@ They have two functions:
 * No history and cache.  
   JavaScript functions ``window.history.back()``, ``window.history.forward()`` and ``window.history.go()`` are disabled.
 * No file can be downloaded on hard disk.
-* No support for plugins and HTML 5 video.
+* No plugins and HTML 5 video.
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
