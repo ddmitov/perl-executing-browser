@@ -12,5 +12,5 @@ function pebMessageBoxElements() {
   messageBoxElementsObject.yesLabel = "YES";
   messageBoxElementsObject.noLabel = "NO";
 
-  return  JSON.stringify(messageBoxElementsObject);
+  return JSON.stringify(messageBoxElementsObject);
 }

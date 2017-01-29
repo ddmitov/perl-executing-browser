@@ -630,9 +630,9 @@ QScriptHandler::QScriptHandler(
 
     QUrlQuery scriptQuery(url);
 
-    scriptOutputTarget = scriptQuery.queryItemValue("target");
-    scriptQuery.removeQueryItem("target");
-    // qDebug() << "Script output target:" << scriptOutputTarget;
+    scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
+    scriptQuery.removeQueryItem("stdout");
+    // qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
 
     scriptCloseCommand = scriptQuery.queryItemValue("close_command");
     if (scriptCloseCommand.length() == 0) {
@@ -767,32 +767,34 @@ QPage::QPage()
     QNetworkProxyFactory::setUseSystemConfiguration(true);
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
+
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PluginsEnabled, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::AutoLoadImages, true);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
+    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
+            setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::SpatialNavigationEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LinksIncludedInFocusChain, true);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::AutoLoadImages, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::XSSAuditingEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
 
     // No download of files:
     setForwardUnsupportedContent(false);

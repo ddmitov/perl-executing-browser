@@ -72,7 +72,7 @@
       document.addEventListener("DOMContentLoaded", function(event) {
         var scriptOneRequest = new XMLHttpRequest();
         var scriptOneParameters = {
-          target: "script-one-output",
+          stdout: "script-one-output",
           close_command: "_close_",
           close_confirmation: "_closed_",
           mode: "unix-epoch"
@@ -83,7 +83,7 @@
 
         var scriptTwoRequest = new XMLHttpRequest();
         var scriptTwoParameters = {
-          target: "script-two-output",
+          stdout: "script-two-output",
           close_command: "_close_",
           close_confirmation: "_closed_",
           mode: "local-time"

@@ -109,12 +109,12 @@ class QScriptHandler : public QObject
     Q_OBJECT
 
 signals:
-    void displayScriptOutputSignal(QString output, QString scriptOutputTarget);
+    void displayScriptOutputSignal(QString output, QString scriptStdoutTarget);
     void scriptFinishedSignal(QString scriptAccumulatedOutput,
                               QString scriptAccumulatedErrors,
                               QString scriptId,
                               QString scriptFullFilePath,
-                              QString scriptOutputTarget);
+                              QString scriptStdoutTarget);
 
 public slots:
     void qScriptOutputSlot()
@@ -130,8 +130,8 @@ public slots:
             qInfo() << "Interactive script terminated normally:"
                     << scriptFullFilePath;
         } else {
-            if (scriptOutputTarget.length() > 0) {
-                emit displayScriptOutputSignal(output, scriptOutputTarget);
+            if (scriptStdoutTarget.length() > 0) {
+                emit displayScriptOutputSignal(output, scriptStdoutTarget);
             }
         }
     }
@@ -154,7 +154,7 @@ public slots:
                                   scriptAccumulatedErrors,
                                   scriptId,
                                   scriptFullFilePath,
-                                  scriptOutputTarget);
+                                  scriptStdoutTarget);
 
         scriptProcess.close();
 
@@ -177,7 +177,7 @@ public:
     QString scriptClosedConfirmation;
 
 private:
-    QString scriptOutputTarget;
+    QString scriptStdoutTarget;
     QString scriptUser;
 };
 
@@ -593,10 +593,10 @@ public slots:
         }
     }
 
-    void qDisplayScriptOutputSlot(QString output, QString target)
+    void qDisplayScriptOutputSlot(QString output, QString stdoutTarget)
     {
-        if (target.length() > 0) {
-            qOutputInserter(output, target);
+        if (stdoutTarget.length() > 0) {
+            qOutputInserter(output, stdoutTarget);
         } else {
             QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
@@ -606,7 +606,7 @@ public slots:
                              QString scriptAccumulatedErrors,
                              QString scriptId,
                              QString scriptFullFilePath,
-                             QString scriptOutputTarget)
+                             QString scriptStdoutTarget)
     {
         runningScripts.remove(scriptId);
 
@@ -634,20 +634,20 @@ public slots:
 
         if (pageStatus == "trusted") {
             // If script has no errors and
-            // no target DOM element:
+            // no STDOUT target DOM element:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
-                    scriptOutputTarget.length() == 0) {
+                    scriptStdoutTarget.length() == 0) {
 
                 qDisplayScriptOutputSlot(scriptAccumulatedOutput, emptyString);
             }
 
             if (scriptAccumulatedErrors.length() > 0) {
                 if (scriptAccumulatedOutput.length() == 0) {
-                    if (scriptOutputTarget.length() == 0) {
+                    if (scriptStdoutTarget.length() == 0) {
                         // If script has no output and
                         // only errors and
-                        // no target DOM element is defined,
+                        // no STDOUT target DOM element is defined,
                         // all HTML formatted errors will be displayed
                         // in the same window:
                         qFormatScriptErrors(scriptAccumulatedErrors,
@@ -656,7 +656,7 @@ public slots:
                     } else {
                         // If script has no output and
                         // only errors and
-                        // a target DOM element is defined,
+                        // a STDOUT target DOM element is defined,
                         // all HTML formatted errors will be displayed
                         // in a new window:
                         qFormatScriptErrors(scriptAccumulatedErrors,
@@ -680,13 +680,13 @@ public slots:
         }
     }
 
-    void qOutputInserter(QString output, QString target)
+    void qOutputInserter(QString stdoutData, QString stdoutTarget)
     {
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
-                output +
+                stdoutData +
                 "\" , \"" +
-                target +
+                stdoutTarget +
                 "\"); null";
 
         currentFrame()->evaluateJavaScript(outputInsertionJavaScript);

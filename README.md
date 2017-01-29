@@ -19,13 +19,13 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Compile-time Variables](#compile-time-variables)
 * [Runtime Requirements](#runtime-requirements)
 * [Supported Perl Script Types](#supported-perl-script-types)
-* [Noninteractive Perl Scripts](#noninteractive-perl-scripts)
+* [Non-interactive Perl Scripts](#non-interactive-perl-scripts)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
 * [AJAX Perl Scripts](#ajax-perl-scripts)
 * [Linux Superuser Perl Scripts](#linux-superuser-perl-scripts)
 * [Settings](#settings)
 * [Security](#security)
-* [Special URLs for Users](#special-urls-for-users)
+* [Special URLs](#special-urls)
 * [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
@@ -149,30 +149,30 @@ The following two compile-time variables can tighten further the security of PEB
 
 ## Supported Perl Script Types
   PEB does not impose execution timeouts and recognizes four main types of local Perl scripts:  
-* [**noninteractive scripts**](#noninteractive-perl-scripts)
+* [**non-interactive scripts**](#non-interactive-perl-scripts)
 * [**interactive scripts**](#interactive-perl-scripts)
 * [**AJAX scripts**](#ajax-perl-scripts)
 * [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
-## Noninteractive Perl Scripts
+## Non-interactive Perl Scripts
 They can not receive any user input once they are started and are divided into the following two subtypes:  
 
 * **Page-producing scripts:**  
   They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
 
 * **Data-only scripts:**<a name="data-only-scripts"></a>  
-  They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``target`` should be added to the script URL in this case.  
+  They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``stdout`` should be added to the script URL in this case.  
 
-  Example: ``http://local-pseudodomain/perl/counter.pl?target=script-results``  
+  Example: ``http://local-pseudodomain/perl/counter.pl?stdout=script-results``  
 
-  The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+  The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the specified DOM element or JavaScript function of the calling page as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
-  Two or more noninteractive scripts can be started within a single calling page. They will be executed independently and their output will be updated in real time using separate target DOM elements. This could be convenient for all sorts of monitoring or data conversion scripts that have to run for a long time.  
+  Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
   **Note for Windows developers:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
 
   <a name="feeding-from-forms"></a>
-  There is no special naming convention for noninteractive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
+  There is no special naming convention for non-interactive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
 
   ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -183,11 +183,11 @@ They can not receive any user input once they are started and are divided into t
   ```
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``target``, ``close_command`` and ``close_confirmation``.  
+Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
 
 The URL pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
 
-The ``target`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the target DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+The ``stdout`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the specified DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
 The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the unresponsive scripts will be killed and the window will be closed.  
 
@@ -197,7 +197,7 @@ The following JavaScript code demonstrates how to start an interactive Perl scri
 document.addEventListener("DOMContentLoaded", function(event) {
     var request = new XMLHttpRequest();
     var parameters = {
-        target: "output",
+        stdout: "output",
         close_command: "_close_",
         close_confirmation: "_closed_"
     }
@@ -222,7 +222,7 @@ The following JavaScript code demonstrates how to start one script in two instan
 document.addEventListener("DOMContentLoaded", function(event) {
   var scriptOneRequest = new XMLHttpRequest();
   var scriptOneParameters = {
-    target: "script-one-output",
+    stdout: "script-one-output",
     close_command: "_close_",
     close_confirmation: "_closed_"
   }
@@ -232,7 +232,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
 
   var scriptTwoRequest = new XMLHttpRequest();
   var scriptTwoParameters = {
-    target: "script-two-output",
+    stdout: "script-two-output",
     close_command: "_close_",
     close_confirmation: "_closed_"
   }
@@ -272,7 +272,7 @@ $(document).ready(function() {
 ```
 
 ## Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special pseudo-user ``root``. So if PEB finds an URL like: ``http://root@local-pseudodomain/perl/root-open-directory.pl``, it will ask the user for the root password and then call ``sudo``, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other noninteractive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ``STDIN`` input or ``QUERY_STRING`` environment variable like in the user-level Perl scripts.
+Linux superuser Perl scripts can be started using the special pseudo-user ``root``. So if PEB finds an URL like: ``http://root@local-pseudodomain/perl/root-open-directory.pl``, it will ask the user for the root password and then call ``sudo``, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other non-interactive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ``STDIN`` input or ``QUERY_STRING`` environment variable like in the user-level Perl scripts.
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
@@ -390,17 +390,16 @@ They have two functions:
 * Users have full access to their local data using PEB.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from either the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of web fonts or for developing rich/thick/fat clients. ``trusted-domains.json`` has to be explicitely created by a developer of a PEB-based application if needed.  
-  Untrusted content is any content coming not from the local pseudo-domain or from domains listed in the ``trusted-domains.json`` file.
+  Trusted content is any content originating from either the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of remote content and for developing rich/thick/fat clients. ``trusted-domains.json`` has to be manually created by a developer of a PEB-based application if needed.  
+  Untrusted content is any content not coming from the local pseudo-domain or from domains listed in the ``trusted-domains.json`` file.
 
 **Hard-coded security features:**
-* Users have no dialog to select arbitrary local scripts for execution by PEB.  
-  Only scripts within the ``{PEB_binary_directory}/resources/app`` directory can be executed if they are invoked from the PEB pseudo-domain: ``http://local-pseudodomain/``.
 * PEB can not execute Perl scripts from remote locations.
-* If untrusted JavaScript is called from a trusted page, a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
-* If untrusted page is called from a trusted one, it is automatically displayed in a separate browser window.
-* Local Perl scripts can not be started if they are called from untrusted pages.
-* No output from local Perl scripts is displayed in untrusted pages.
+* If untrusted page is called from a trusted one,  
+  it is automatically displayed in a separate browser window.
+* If untrusted JavaScript is called from a trusted page,  
+  a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
+* Local Perl scripts can not be started from untrusted pages.
 * Files or folders can not be selected with their full paths from untrusted pages.
 * PEB HTML interface for the Perl debugger can not be accessed from an untrusted page.
 * Cross-site scripting is disabled for all web and local pages.
@@ -408,7 +407,7 @@ They have two functions:
 
 **[Optional security features based on compile-time variables](#security-compile-time-variables)**
 
-## Special URLs for Users
+## Special URLs
 * **PEB pseudo-domain:** ``http://local-pseudodomain/``  
   The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
   It is intercepted inside PEB and is not passed to the underlying operating system.  
