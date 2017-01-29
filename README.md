@@ -165,11 +165,11 @@ They can not receive any user input once they are started and are divided into t
 
   Example: ``http://local-pseudodomain/perl/counter.pl?stdout=script-results``  
 
-  The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function. It is removed from the query string before the script is started. Every piece of script output is inserted immediately into the specified DOM element or JavaScript function of the calling page as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+  The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
   Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
-  **Note for Windows developers:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  **Windows Perl scripts caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
 
   <a name="feeding-from-forms"></a>
   There is no special naming convention for non-interactive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
@@ -187,7 +187,7 @@ Each PEB interactive Perl script has its own event loop waiting constantly for n
 
 The URL pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
 
-The ``stdout`` query string item should point to a valid HTML DOM element or to a valid JavaScript function. Every piece of script output is inserted immediately into the specified DOM element of the calling page or passed to the specified JavaScript function as its first and only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
+The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
 
 The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the unresponsive scripts will be killed and the window will be closed.  
 
