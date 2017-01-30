@@ -123,7 +123,7 @@ public slots:
         scriptAccumulatedOutput.append(output);
 
         qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: output from" << scriptFullFilePath;
+                << "msecs from epoch: Output from" << scriptFullFilePath;
 
         // Handling 'script closed' confirmation:
         if (output == scriptClosedConfirmation) {
@@ -143,7 +143,7 @@ public slots:
         scriptAccumulatedErrors.append("\n");
 
         qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: errors from" << scriptFullFilePath;
+                << "msecs from epoch: Errors from" << scriptFullFilePath;
 
         // qDebug() << "Script errors:" << scriptErrors;
     }
@@ -634,7 +634,7 @@ public slots:
 
         if (pageStatus == "trusted") {
             // If script has no errors and
-            // no STDOUT target DOM element:
+            // no STDOUT target:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
                     scriptStdoutTarget.length() == 0) {
@@ -647,7 +647,7 @@ public slots:
                     if (scriptStdoutTarget.length() == 0) {
                         // If script has no output and
                         // only errors and
-                        // no STDOUT target DOM element is defined,
+                        // no STDOUT target is defined,
                         // all HTML formatted errors will be displayed
                         // in the same window:
                         qFormatScriptErrors(scriptAccumulatedErrors,
@@ -656,7 +656,7 @@ public slots:
                     } else {
                         // If script has no output and
                         // only errors and
-                        // a STDOUT target DOM element is defined,
+                        // a STDOUT target is defined,
                         // all HTML formatted errors will be displayed
                         // in a new window:
                         qFormatScriptErrors(scriptAccumulatedErrors,
@@ -963,12 +963,12 @@ public slots:
     }
 
     // ==============================
-    // PERL DEBUGGER INTERACTION:
+    // PERL DEBUGGER GUI:
     // Implementation of an idea proposed by Valcho Nedelchev
     // ==============================
     void qStartPerlDebuggerSlot()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         // Clean any previous debugger output:
         debuggerAccumulatedOutput = "";
 
@@ -1024,8 +1024,9 @@ public slots:
             debuggerCommand.append(QString("\n").toLatin1());
             debuggerHandler.write(debuggerCommand);
 
-            qInfo() << QDateTime::currentMSecsSinceEpoch()
-                    << "msecs from epoch: command sent to Perl debugger:"
+            // qInfo() << QDateTime::currentMSecsSinceEpoch()
+            //         << "msecs from epoch:";
+            qInfo() << "Command sent to Perl debugger:"
                     << debuggerLastCommand;
         }
 #endif
@@ -1033,7 +1034,7 @@ public slots:
 
     void qDebuggerOutputSlot()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         // Read debugger output:
         QString debuggerOutput = debuggerHandler.readAllStandardOutput();
 
@@ -1043,8 +1044,8 @@ public slots:
 
         // qDebug() << QDateTime::currentMSecsSinceEpoch()
         //          << "msecs from epoch:"
-        //          << "output from Perl debugger received.";
-        // qDebug() << "Debugger raw output:" << endl
+        //          << "Output from Perl debugger received.";
+        // qDebug() << "Perl debugger raw output:" << endl
         //          << debuggerOutput;
 
         // Formatting of Perl debugger output is started only after
@@ -1087,7 +1088,7 @@ public slots:
 
     void qDebuggerStartHtmlFormatter()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         // 'dbgformatter.pl' is compiled into the resources of
         // the binary file and is read from there.
         QFileReader *resourceReader = new QFileReader(
@@ -1118,15 +1119,15 @@ public slots:
                        << debuggerScriptToDebug,
                        QProcess::Unbuffered | QProcess::ReadWrite);
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch:"
-                << "Perl debugger output formatter script started.";
+        // qDebug() << QDateTime::currentMSecsSinceEpoch()
+        //          << "msecs from epoch:"
+        //          << "Perl debugger output formatter script started.";
 #endif
     }
 
     void qDebuggerHtmlFormatterOutputSlot()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         QString debuggerHtmlOutput =
                 debuggerOutputHandler.readAllStandardOutput();
 
@@ -1134,15 +1135,15 @@ public slots:
         // the accumulated debugger formatter output:
         debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch:"
-                << "output from Perl debugger formatter received.";
+        // qDebug() << QDateTime::currentMSecsSinceEpoch()
+        //          << "msecs from epoch:"
+        //          << "Output from Perl debugger formatter received.";
 #endif
     }
 
     void qDebuggerHtmlFormatterErrorsSlot()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         QString debuggerOutputFormatterErrors =
                 debuggerOutputHandler.readAllStandardError();
 
@@ -1153,13 +1154,13 @@ public slots:
 
     void qDebuggerHtmlFormatterFinishedSlot()
     {
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
         debuggerFrame->setHtml(debuggerAccumulatedHtmlOutput,
                                QUrl(PSEUDO_DOMAIN));
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch:"
-                << "output from Perl debugger formatter displayed.";
+        // qDebug() << QDateTime::currentMSecsSinceEpoch()
+        //          << "msecs from epoch:"
+        //          << "Output from Perl debugger formatter displayed.";
 
         debuggerOutputHandler.close();
         debuggerAccumulatedHtmlOutput = "";

@@ -26,7 +26,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs](#special-urls)
-* [HTML Interface for the Perl Debugger](#html-interface-for-the-perl-debugger)
+* [Perl Debugger GUI](#perl-debugger-gui)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
 * [What PEB Is Not](#what-peb-is-not)
@@ -64,7 +64,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 
 ## Target Audience
 * Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
-* DevOps people developing custom Perl-based GUI monitoring and administration solutions
+* DevOps people in need of custom Perl-based GUI monitoring and administration solutions
 * Perl 5 enthusiasts and developers willing to use the built-in Perl debugger in graphical mode
 
 ## Features
@@ -134,11 +134,11 @@ The following two compile-time variables can tighten further the security of PEB
   To enable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 1``  
   If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
 
-* **Perl debugger interaction:** ``PERL_DEBUGGER_INTERACTION``  
-  To enable Perl debugger interaction: ``PERL_DEBUGGER_INTERACTION = 1``  
-  By default Perl debugger interaction is enabled.  
-  To disable Perl debugger interaction: ``PERL_DEBUGGER_INTERACTION = 0``  
-  If PEB is going to be compiled for end users and interaction with the Perl debugger is not needed or not wanted for security reasons, it can be turned off.
+* **Perl debugger GUI:** ``PERL_DEBUGGER_GUI``  
+  To enable Perl debugger GUI: ``PERL_DEBUGGER_GUI = 1``  
+  By default Perl debugger GUI is enabled.  
+  To disable Perl debugger GUI: ``PERL_DEBUGGER_GUI = 0``  
+  If PEB is going to be compiled for end users and Perl debugger GUI is not needed or not wanted for security reasons, it can be turned off.
 
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
@@ -169,7 +169,7 @@ They can not receive any user input once they are started and are divided into t
 
   Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
-  **Windows Perl scripts caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  **Windows caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
 
   <a name="feeding-from-forms"></a>
   There is no special naming convention for non-interactive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
@@ -469,10 +469,20 @@ They have two functions:
 * **About Qt dialog box:** ``http://local-pseudodomain/about.function?type=qt``
 
 * **Close current window:** ``http://local-pseudodomain/close-window.function``  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).  
 
-## HTML Interface for the Perl Debugger
-   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. Interaction with the built-in Perl debugger is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
+The following special URLs are implemented for the Perl debugger GUI:  
+
+* **Select debugged file:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``  
+  The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
+* **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``  
+* **Combined Perl Debugger URL:**  
+  Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
+  Example: ``http://local-pseudodomain/perl-debugger.function?action=select-file&command=M``  
+  Using the above URL, the selected file will be loaded in the Perl debugger and the ``M`` command (*Display all loaded modules*) will be immediately issued. Any command can be given later and step-by-step debugging can be performed.
+
+## Perl Debugger GUI
+   Any Perl script can be selected for debugging in an embedded HTML user interface. The debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules. Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó. PEB-based Perl debugger GUI is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
 
    If the debugged script is outside of the application directory (see section [Settings](#settings)), PEB asks for command line arguments which may be necessary for the debugged Perl program.  
 
@@ -481,16 +491,6 @@ They have two functions:
   The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes ``$console`` variable ``undef``. Modifying the debugger was initially avoided due to its high level of complexity, but tests proved that undef-ing the ``$console`` is a minor change, which does not affect the normal operation and output of the debugger. This alteration is necessary because the ``Qprocess`` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ``perl5db.pl`` manually by replacing ``$console = "con";`` with ``undef $console;`` or by using ``{PEB_binary_directory}/sdk/peblib/perl5db-win32.patch``.  
 
    ![PEB HTML Interface for the Perl Debugger](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
-
-  The following special URLs for interaction with the Perl debugger are implemented:  
-
-* **Select debugged file:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``  
-  The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
-* **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``  
-* **Combined Perl Debugger URL:**  
-  Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
-  Example: ``http://local-pseudodomain/perl-debugger.function?action=select-file&command=M``  
-  Using the above URL, the selected file will be loaded in the Perl debugger, the ``M`` command ('Display all loaded modules') will be immediately issued and all resulting output will be displayed. Any command can be given later and step-by-step debugging can be performed.
 
 ## Local File Types
   All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  

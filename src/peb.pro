@@ -84,27 +84,27 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # PERL DEBUGGER INTERACTION:
-    # To enable Perl debugger interaction:
-    # PERL_DEBUGGER_INTERACTION = 1
-    # By default Perl debugger interaction is enabled.
-    # To disable Perl debugger interaction:
-    # PERL_DEBUGGER_INTERACTION = 0
+    # PERL DEBUGGER GUI:
+    # To enable Perl debugger GUI:
+    # PERL_DEBUGGER_GUI = 1
+    # By default Perl debugger GUI is enabled.
+    # To disable Perl debugger GUI:
+    # PERL_DEBUGGER_GUI = 0
     # If PEB is going to be compiled for end users and
     # interaction with the biult-in Perl debugger is
     # not needed or not wanted for security reasons,
     # this functionality can be turned off.
     ##########################################################
 
-    PERL_DEBUGGER_INTERACTION = 1
+    PERL_DEBUGGER_GUI = 1
 
-    DEFINES += "PERL_DEBUGGER_INTERACTION=$$PERL_DEBUGGER_INTERACTION"
+    DEFINES += "PERL_DEBUGGER_GUI=$$PERL_DEBUGGER_GUI"
 
-    equals (PERL_DEBUGGER_INTERACTION, 0) {
-        message ("Configured without Perl debugger interaction capability.")
+    equals (PERL_DEBUGGER_GUI, 0) {
+        message ("Configured without Perl debugger GUI.")
     }
-    equals (PERL_DEBUGGER_INTERACTION, 1) {
-        message ("Configured with Perl debugger interaction capability.")
+    equals (PERL_DEBUGGER_GUI, 1) {
+        message ("Configured with Perl debugger GUI.")
     }
 
     ##########################################################

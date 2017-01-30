@@ -24,7 +24,7 @@
 #include "peb.h"
 
 #ifndef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1 or PERL_DEBUGGER_INTERACTION == 1
+#if ADMIN_PRIVILEGES_CHECK == 1 or PERL_DEBUGGER_GUI == 1
 #include <unistd.h> // for geteuid() and isatty()
 #endif
 #endif
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
     // This is necessary for a working interaction with the Perl debugger on
     // all Unix-like operating systems.
 #ifndef Q_OS_WIN
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
     if (isatty(fileno(stdin))) {
         // Fork another instance of the browser:
         int pid = fork();
@@ -435,12 +435,12 @@ int main(int argc, char **argv)
         qInfo() << "Administrative privileges check is enabled.";
 #endif
 
-#if PERL_DEBUGGER_INTERACTION == 0
-        qInfo() << "Perl debugger interaction is disabled.";
+#if PERL_DEBUGGER_GUI == 0
+        qInfo() << "Perl debugger GUI is disabled.";
 #endif
 
-#if PERL_DEBUGGER_INTERACTION == 1
-        qInfo() << "Perl debugger interaction is enabled.";
+#if PERL_DEBUGGER_GUI == 1
+        qInfo() << "Perl debugger GUI is enabled.";
 #endif
 
         qInfo() << "Perl interpreter:" << perlInterpreterFullPath;
@@ -879,7 +879,7 @@ QPage::QPage()
     windowCloseRequested = false;
 
     // Signals and slots for the Perl debugger:
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
     QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qDebuggerOutputSlot()));
 
@@ -1110,14 +1110,19 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             }
 
             // ==============================
-            // PERL DEBUGGER INTERACTION:
+            // PERL DEBUGGER GUI:
             // Implementation of an idea proposed by Valcho Nedelchev
             // ==============================
-#if PERL_DEBUGGER_INTERACTION == 1
+#if PERL_DEBUGGER_GUI == 1
             if ((navigationType == QWebPage::NavigationTypeLinkClicked or
                  navigationType == QWebPage::NavigationTypeFormSubmitted) and
                     request.url().fileName() == "perl-debugger.function") {
-                debuggerFrame = frame;
+                // Check the existence of the target HTML frame:
+                if (mainFrame()->childFrames().contains(frame)) {
+                    debuggerFrame = frame;
+                } else {
+                    debuggerFrame = mainFrame();
+                }
 
                 // Get a Perl debugger command (if any):
                 QUrlQuery scriptQuery(request.url());
