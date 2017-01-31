@@ -859,7 +859,7 @@ QPage::QPage()
     QObject::connect(networkAccessManager,
                      SIGNAL(startScriptSignal(QUrl, QByteArray)),
                      this,
-                     SLOT(qStartScriptSlot(QUrl, QByteArray)));
+                     SLOT(qHandleScriptSlot(QUrl, QByteArray)));
 
     // Signals and slots for closing windows:
     QObject::connect(this, SIGNAL(closeAllScriptsSignal()),
@@ -1124,9 +1124,15 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                     debuggerFrame = mainFrame();
                 }
 
-                // Get a Perl debugger command (if any):
+                // Get a Perl debugger command:
                 QUrlQuery scriptQuery(request.url());
-                debuggerLastCommand = scriptQuery.queryItemValue("command");
+
+                debuggerLastCommand = scriptQuery
+                        .queryItemValue("command", QUrl::FullyDecoded);
+                debuggerLastCommand.replace("+", " ");
+
+                qInfo() << "Perl debugger command:"
+                        << debuggerLastCommand;
 
                 // Select a Perl script for debugging:
                 if (request.url().query().contains("action=select-file")) {
@@ -1160,14 +1166,14 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                         qInfo() << "File passed to Perl debugger:"
                                  << debuggerScriptToDebug;
 
-                        qStartPerlDebuggerSlot();
+                        qHandlePerlDebuggerSlot();
                         return false;
                     } else {
                         return false;
                     }
                 }
 
-                qStartPerlDebuggerSlot();
+                qHandlePerlDebuggerSlot();
                 return false;
             }
 #endif

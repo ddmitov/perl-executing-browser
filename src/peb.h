@@ -546,7 +546,7 @@ public slots:
     // ==============================
     // SCRIPT HANDLING:
     // ==============================
-    void qStartScriptSlot(QUrl url, QByteArray postDataArray)
+    void qHandleScriptSlot(QUrl url, QByteArray postDataArray)
     {
         QString scriptId = url.password() + "@" + url.path();
 
@@ -609,28 +609,6 @@ public slots:
                              QString scriptStdoutTarget)
     {
         runningScripts.remove(scriptId);
-
-        if (pageStatus == "untrusted") {
-            QString errorMessage =
-                    "<p>Displaying output from local Perl scripts after "
-                    "untrusted content is loaded in the same window "
-                    "is prohibited.<br>"
-                    "Go to <a href='" +
-                    qApp->property("startPage").toString() +
-                    "'>start page</a> "
-                    "to unlock local Perl scripts.</p>";
-            qWarning() << "Displaying output from local Perl scripts stopped"
-                       << "after untrusted content is loaded:"
-                       << QPage::currentFrame()->
-                          baseUrl().toString();
-
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/html/error.html"));
-            QString htmlErrorContents = resourceReader->fileContents;
-
-            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-            QPage::currentFrame()->setHtml(htmlErrorContents);
-        }
 
         if (pageStatus == "trusted") {
             // If script has no errors and
@@ -696,12 +674,7 @@ public slots:
                              QString scriptFullFilePath,
                              bool newWindow)
     {
-        QString scriptErrorTitle;
-        if (errors.contains("trapped")) {
-            scriptErrorTitle = "Insecure code was blocked:";
-        } else {
-            scriptErrorTitle = "Errors were found during script execution:";
-        }
+        QString scriptErrorTitle = "Errors were found during script execution:";
 
         errors.replace(QRegExp("\n\n$"), "\n");
 
@@ -966,7 +939,7 @@ public slots:
     // PERL DEBUGGER GUI:
     // Implementation of an idea proposed by Valcho Nedelchev
     // ==============================
-    void qStartPerlDebuggerSlot()
+    void qHandlePerlDebuggerSlot()
     {
 #if PERL_DEBUGGER_GUI == 1
         // Clean any previous debugger output:
@@ -988,21 +961,18 @@ public slots:
             systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
             debuggerHandler.setProcessEnvironment(systemEnvironment);
 
-            if (!debuggerScriptToDebug.contains(
-                        qApp->property("application").toString())) {
-                bool ok;
-                QString input =
-                        QInputDialog::getText(
-                            qApp->activeWindow(),
-                            "Command Line",
-                            "Enter all command line arguments, if any:",
-                            QLineEdit::Normal,
-                            "",
-                            &ok);
+            bool ok;
+            QString input =
+                    QInputDialog::getText(
+                        qApp->activeWindow(),
+                        "Command Line",
+                        "Enter all command line arguments, if any:",
+                        QLineEdit::Normal,
+                        "",
+                        &ok);
 
-                if (ok && !input.isEmpty()) {
-                    commandLineArguments = input;
-                }
+            if (ok && !input.isEmpty()) {
+                commandLineArguments = input;
             }
 
             QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
@@ -1023,11 +993,6 @@ public slots:
             debuggerCommand.append(debuggerLastCommand.toLatin1());
             debuggerCommand.append(QString("\n").toLatin1());
             debuggerHandler.write(debuggerCommand);
-
-            // qInfo() << QDateTime::currentMSecsSinceEpoch()
-            //         << "msecs from epoch:";
-            qInfo() << "Command sent to Perl debugger:"
-                    << debuggerLastCommand;
         }
 #endif
     }
