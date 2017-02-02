@@ -215,20 +215,13 @@ http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 
 ## Perl 5
-Eric Cholet, Stas Bekman  
-"Practical mod_perl",  
-O'Reilly, May 2003, ISBN 0-596-00227-0,  
-3.9.2.1. Modifying @INC  
-http://modperlbook.org/html/3-9-2-1-Modifying-INC.html  
-
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 http://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
-http://stackoverflow.com/questions/2526804/how-is-perls-inc-constructed-aka-what-are-all-the-ways-of-affecting-where-perl-modules-are-searched-for  
-http://stackoverflow.com/questions/841785/how-do-i-include-a-perl-module-thats-in-a-different-directory  
 http://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
+http://stackoverflow.com/questions/787899/how-do-i-use-a-perl-module-from-a-relative-location  
 
 http://perlmaven.com/manipulating-perl-arrays  
 http://perlmaven.com/how-to-sort-a-hash-in-perl  

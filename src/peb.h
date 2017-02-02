@@ -793,7 +793,7 @@ public slots:
     void qJavaScriptInjector(QWebFrame *frame)
     {
         QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
+                new QFileReader(QString(":/peb.js"));
         QString pebJavaScript = resourceReader->fileContents;
 
         frame->evaluateJavaScript(pebJavaScript);
@@ -1054,11 +1054,9 @@ public slots:
     void qDebuggerStartHtmlFormatter()
     {
 #if PERL_DEBUGGER_GUI == 1
-        // 'dbgformatter.pl' is compiled into the resources of
-        // the binary file and is read from there.
-        QFileReader *resourceReader = new QFileReader(
-                    QString(":/scripts/dbgformatter.pl"));
-        QString debuggerOutputFormatterScript = resourceReader->fileContents;
+        QString debuggerOutputFormatterFullPath =
+                QDir::toNativeSeparators(QApplication::applicationDirPath()) +
+                 "/perl5dbgui/dbgformatter.pl";
 
         // Set clean environment:
         QProcessEnvironment cleanEnvironment;
@@ -1069,18 +1067,11 @@ public slots:
         // Clean any previous debugger output:
         debuggerAccumulatedOutput = "";
 
-        // Set path to the syntax highlighting module:
-        debuggerOutputFormatterScript.replace("PEBLIB_PATH",
-                         QApplication::applicationDirPath()
-                         + QDir::separator() + "sdk"
-                         + QDir::separator() + "peblib");
-
         // Start the Perl debugger output formatting script:
         debuggerOutputHandler
                 .start((qApp->property("perlInterpreter").toString()),
                        QStringList()
-                       << "-e"
-                       << debuggerOutputFormatterScript
+                       << debuggerOutputFormatterFullPath
                        << debuggerScriptToDebug,
                        QProcess::Unbuffered | QProcess::ReadWrite);
 
@@ -1403,7 +1394,7 @@ public slots:
         QString selectAllLabel;
 
         QFileReader *resourceReader =
-                new QFileReader(QString(":/scripts/peb.js"));
+                new QFileReader(QString(":/peb.js"));
         QString pebJavaScript = resourceReader->fileContents;
 
         mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);

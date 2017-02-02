@@ -95,7 +95,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 GCC compiler and Qt 5.1 - Qt 5.5 headers (including ``QtWebkit`` headers).  
 The ``QtWebkit`` set of classes is deprecated in all later versions of Qt. They could still be usable if ``QtWebKit`` headers are manually added, but this approach is still not tested.  
 
-The most important Qt dependency of PEB is not ``QtWebkit``, but ``QNetworkAccessManager`` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with the ecosystem of ``QtWebEngine`` - the new Blink-based web engine of Qt. This makes transition to ``QtWebEngine`` impractical because local POST requests and calls to local Perl scripts from JavaScript could not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [CamelHarness.js](https://github.com/ddmitov/camel-harness).  
+The most important Qt dependency of PEB is not ``QtWebkit``, but ``QNetworkAccessManager`` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with the ecosystem of ``QtWebEngine`` - the new Blink-based web engine of Qt. This makes transition to ``QtWebEngine`` impractical because local POST requests and calls to local Perl scripts from JavaScript could not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -473,7 +473,7 @@ They have two functions:
 
 The following special URLs are implemented for the Perl debugger GUI:  
 
-* **Select debugged file:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``  
+* **Select file to debug:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``  
   The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
 * **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``  
 * **Combined Perl Debugger URL:**  
