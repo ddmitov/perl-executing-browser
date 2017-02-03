@@ -484,7 +484,7 @@ PEB-based Perl debugger GUI is an idea proposed by Valcho Nedelchev and provoked
 
 Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó.
 
-The ``{PEB_binary_directory}/perl5dbgui`` directory is home of the Perl debugger GUI script and the [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module. This folder and all files inside should not be removed or renamed for the proper operation of the Perl debugger GUI.  
+``{PEB_binary_directory}/perl5dbgui`` is home of the Perl debugger GUI script and the [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module. This folder and all files inside it should not be removed or renamed for the proper operation of the Perl debugger GUI.  
 
 **Windows caveat:** The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes the ``$console`` variable undefined. Tests proved that this is a minor change and it does not affect the normal operation of the debugger. This alteration is necessary because the ``Qprocess`` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ``perl5db.pl`` manually by replacing ``$console = "con";`` with ``undef $console;`` or by using ``{PEB_binary_directory}/perl5dbgui/perl5db-win32.patch``.  
 
