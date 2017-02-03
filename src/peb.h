@@ -123,11 +123,13 @@ public slots:
         scriptAccumulatedOutput.append(output);
 
         qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: Output from" << scriptFullFilePath;
+                << "msecs from epoch: output from" << scriptFullFilePath;
 
         // Handling 'script closed' confirmation:
-        if (output == scriptClosedConfirmation) {
-            qInfo() << "Interactive script terminated normally:"
+        if (output == scriptCloseConfirmation) {
+            qInfo() << QDateTime::currentMSecsSinceEpoch()
+                    << "msecs from epoch:"
+                    << "interactive script terminated normally:"
                     << scriptFullFilePath;
         } else {
             if (scriptStdoutTarget.length() > 0) {
@@ -143,8 +145,7 @@ public slots:
         scriptAccumulatedErrors.append("\n");
 
         qInfo() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: Errors from" << scriptFullFilePath;
-
+                << "msecs from epoch: errors from" << scriptFullFilePath;
         // qDebug() << "Script errors:" << scriptErrors;
     }
 
@@ -158,7 +159,8 @@ public slots:
 
         scriptProcess.close();
 
-        qInfo() << "Script finished:" << scriptFullFilePath;
+        qInfo() << QDateTime::currentMSecsSinceEpoch()
+                << "msecs from epoch: script finished:" << scriptFullFilePath;
     }
 
     void qRootPasswordTimeoutSlot()
@@ -174,7 +176,7 @@ public:
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
     QString scriptCloseCommand;
-    QString scriptClosedConfirmation;
+    QString scriptCloseConfirmation;
 
 private:
     QString scriptStdoutTarget;
@@ -216,7 +218,8 @@ class QAccessManager : public QNetworkAccessManager
     Q_OBJECT
 
 signals:
-    void startScriptSignal(QUrl url, QByteArray postDataArray);
+    void handleScriptSignal(QUrl url, QByteArray postDataArray);
+    void handlePerlDebuggerSignal(QUrl url);
     void closeWindowSignal();
 
 protected:
@@ -224,6 +227,22 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
+        // ==============================
+        // Start page redirection:
+        // ==============================
+        if ((operation == GetOperation) and
+                request.url().host() == PSEUDO_DOMAIN and
+                request.url().fileName().length() == 0 and
+                pageStatus == "trusted") {
+            QNetworkRequest startPageRequest;
+            startPageRequest
+                    .setUrl(QUrl(qApp->property("startPage").toString()));
+
+            return QAccessManager::createRequest
+                    (QAccessManager::GetOperation,
+                     QNetworkRequest(startPageRequest));
+        }
+
         // ==============================
         // Starting local AJAX Perl scripts is prohibited if
         // untrusted content is loaded in the same window:
@@ -366,7 +385,7 @@ protected:
                     // no untrusted content is loaded in the same window:
                     if (pageStatus == "trusted") {
                         QByteArray emptyPostDataArray;
-                        emit startScriptSignal(
+                        emit handleScriptSignal(
                                     request.url(), emptyPostDataArray);
 
                         QCustomNetworkReply *reply =
@@ -475,7 +494,7 @@ protected:
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
-                emit startScriptSignal(request.url(), postDataArray);
+                emit handleScriptSignal(request.url(), postDataArray);
             }
 
             QCustomNetworkReply *reply =
@@ -598,7 +617,7 @@ public slots:
         if (stdoutTarget.length() > 0) {
             qOutputInserter(output, stdoutTarget);
         } else {
-            QPage::currentFrame()->setHtml(output, QUrl(PSEUDO_DOMAIN));
+            lastTargetFrame->setHtml(output, QUrl(PSEUDO_DOMAIN));
         }
     }
 
@@ -939,19 +958,77 @@ public slots:
     // PERL DEBUGGER GUI:
     // Implementation of an idea proposed by Valcho Nedelchev
     // ==============================
-    void qHandlePerlDebuggerSlot()
+    void qHandlePerlDebugger(QUrl url)
     {
 #if PERL_DEBUGGER_GUI == 1
+        QString commandLineArguments;
+
+        // Select a Perl script for debugging:
+        if (url.query().contains("action=select-file")) {
+            QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
+            selectScriptToDebugDialog
+                    .setFileMode(QFileDialog::ExistingFile);
+            selectScriptToDebugDialog
+                    .setViewMode(QFileDialog::Detail);
+            selectScriptToDebugDialog
+                    .setWindowModality(Qt::WindowModal);
+
+            QString scriptToDebug = selectScriptToDebugDialog
+                    .getOpenFileName
+                    (qApp->activeWindow(), "Select Perl File",
+                     QDir::currentPath(), "Perl scripts (*.pl);;All files (*)");
+
+            selectScriptToDebugDialog.close();
+            selectScriptToDebugDialog.deleteLater();
+
+            if (scriptToDebug.length() > 1) {
+                debuggerScriptToDebug = QDir::toNativeSeparators(scriptToDebug);
+
+                bool ok;
+                QString input =
+                        QInputDialog::getText(
+                            qApp->activeWindow(),
+                            "Command Line",
+                            "Enter all command line arguments, if any:",
+                            QLineEdit::Normal,
+                            "",
+                            &ok);
+
+                if (ok && !input.isEmpty()) {
+                    commandLineArguments = input;
+                }
+
+                // Close any still open Perl debugger session:
+                debuggerHandler.close();
+
+                // Start the Perl debugger:
+                qInfo() << QDateTime::currentMSecsSinceEpoch()
+                        << "msecs from epoch: file passed to Perl debugger:"
+                        << debuggerScriptToDebug;
+            }
+        }
+
+        // Get a Perl debugger command:
+        QUrlQuery scriptQuery(url);
+
+        debuggerLastCommand = scriptQuery
+                .queryItemValue("command", QUrl::FullyDecoded);
+        debuggerLastCommand.replace("+", " ");
+
         // Clean any previous debugger output:
         debuggerAccumulatedOutput = "";
 
-        QString commandLineArguments;
-
         if (debuggerHandler.isOpen()) {
-            QByteArray debuggerCommand;
-            debuggerCommand.append(debuggerLastCommand.toLatin1());
-            debuggerCommand.append(QString("\n").toLatin1());
-            debuggerHandler.write(debuggerCommand);
+            if (debuggerLastCommand.length() > 0) {
+                qInfo() << QDateTime::currentMSecsSinceEpoch()
+                        << "msecs from epoch: Perl debugger command:"
+                        << debuggerLastCommand;
+
+                QByteArray debuggerCommandArray;
+                debuggerCommandArray.append(debuggerLastCommand.toLatin1());
+                debuggerCommandArray.append(QString("\n").toLatin1());
+                debuggerHandler.write(debuggerCommandArray);
+            }
         } else {
             debuggerJustStarted = true;
 
@@ -960,20 +1037,6 @@ public slots:
                     QProcessEnvironment::systemEnvironment();
             systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
             debuggerHandler.setProcessEnvironment(systemEnvironment);
-
-            bool ok;
-            QString input =
-                    QInputDialog::getText(
-                        qApp->activeWindow(),
-                        "Command Line",
-                        "Enter all command line arguments, if any:",
-                        QLineEdit::Normal,
-                        "",
-                        &ok);
-
-            if (ok && !input.isEmpty()) {
-                commandLineArguments = input;
-            }
 
             QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
@@ -989,10 +1052,10 @@ public slots:
                                   QProcess::Unbuffered
                                   | QProcess::ReadWrite);
 
-            QByteArray debuggerCommand;
-            debuggerCommand.append(debuggerLastCommand.toLatin1());
-            debuggerCommand.append(QString("\n").toLatin1());
-            debuggerHandler.write(debuggerCommand);
+            QByteArray debuggerCommandArray;
+            debuggerCommandArray.append(debuggerLastCommand.toLatin1());
+            debuggerCommandArray.append(QString("\n").toLatin1());
+            debuggerHandler.write(debuggerCommandArray);
         }
 #endif
     }
@@ -1009,7 +1072,6 @@ public slots:
 
         // qDebug() << QDateTime::currentMSecsSinceEpoch()
         //          << "msecs from epoch:"
-        //          << "Output from Perl debugger received.";
         // qDebug() << "Perl debugger raw output:" << endl
         //          << debuggerOutput;
 
@@ -1021,9 +1083,6 @@ public slots:
                         QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>"))) {
                 debuggerJustStarted = false;
 
-                if (debuggerOutputHandler.isOpen()) {
-                    debuggerOutputHandler.close();
-                }
                 qDebuggerStartHtmlFormatter();
             }
 
@@ -1032,10 +1091,6 @@ public slots:
                     .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
                 debuggerJustStarted = false;
 
-                if (debuggerOutputHandler.isOpen()) {
-                    debuggerOutputHandler.close();
-                }
-
                 qDebuggerStartHtmlFormatter();
             }
         }
@@ -1043,9 +1098,7 @@ public slots:
         if (debuggerJustStarted == false and
                 debuggerAccumulatedOutput
                 .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-            if (debuggerOutputHandler.isOpen()) {
-                debuggerOutputHandler.close();
-            }
+
             qDebuggerStartHtmlFormatter();
         }
 #endif
@@ -1054,72 +1107,20 @@ public slots:
     void qDebuggerStartHtmlFormatter()
     {
 #if PERL_DEBUGGER_GUI == 1
-        QString debuggerOutputFormatterFullPath =
-                QDir::toNativeSeparators(QApplication::applicationDirPath()) +
-                 "/perl5dbgui/dbgformatter.pl";
+        QUrl debuggerOutputFormatterUrl =
+                QUrl::fromLocalFile(
+                    QDir::toNativeSeparators(
+                        QApplication::applicationDirPath()) +
+                    "/perl5dbgui/dbgformatter.pl");
 
-        // Set clean environment:
-        QProcessEnvironment cleanEnvironment;
-        cleanEnvironment.insert("REQUEST_METHOD", "GET");
-        cleanEnvironment.insert("QUERY_STRING", debuggerAccumulatedOutput);
-        debuggerOutputHandler.setProcessEnvironment(cleanEnvironment);
+        QByteArray debuggerOutputArray;
+        debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
+        debuggerOutputArray.append(QString("\n").toLatin1());
 
         // Clean any previous debugger output:
         debuggerAccumulatedOutput = "";
 
-        // Start the Perl debugger output formatting script:
-        debuggerOutputHandler
-                .start((qApp->property("perlInterpreter").toString()),
-                       QStringList()
-                       << debuggerOutputFormatterFullPath
-                       << debuggerScriptToDebug,
-                       QProcess::Unbuffered | QProcess::ReadWrite);
-
-        // qDebug() << QDateTime::currentMSecsSinceEpoch()
-        //          << "msecs from epoch:"
-        //          << "Perl debugger output formatter script started.";
-#endif
-    }
-
-    void qDebuggerHtmlFormatterOutputSlot()
-    {
-#if PERL_DEBUGGER_GUI == 1
-        QString debuggerHtmlOutput =
-                debuggerOutputHandler.readAllStandardOutput();
-
-        // Append last output of the debugger formatter to
-        // the accumulated debugger formatter output:
-        debuggerAccumulatedHtmlOutput.append(debuggerHtmlOutput);
-
-        // qDebug() << QDateTime::currentMSecsSinceEpoch()
-        //          << "msecs from epoch:"
-        //          << "Output from Perl debugger formatter received.";
-#endif
-    }
-
-    void qDebuggerHtmlFormatterErrorsSlot()
-    {
-#if PERL_DEBUGGER_GUI == 1
-        QString debuggerOutputFormatterErrors =
-                debuggerOutputHandler.readAllStandardError();
-
-        qDebug() << "Perl debugger formatter error:"
-                 << debuggerOutputFormatterErrors;
-#endif
-    }
-
-    void qDebuggerHtmlFormatterFinishedSlot()
-    {
-#if PERL_DEBUGGER_GUI == 1
-        debuggerFrame->setHtml(debuggerAccumulatedHtmlOutput,
-                               QUrl(PSEUDO_DOMAIN));
-
-        // qDebug() << QDateTime::currentMSecsSinceEpoch()
-        //          << "msecs from epoch:"
-        //          << "Output from Perl debugger formatter displayed.";
-
-        debuggerOutputHandler.close();
-        debuggerAccumulatedHtmlOutput = "";
+        qHandleScriptSlot(debuggerOutputFormatterUrl, debuggerOutputArray);
 #endif
     }
 
@@ -1183,8 +1184,7 @@ protected:
             if (messageBoxElementsJsonObject["confirmTitle"]
                     .toString().length() > 0) {
                 confirmTitle =
-                        messageBoxElementsJsonObject["confirmTitle"]
-                        .toString();
+                        messageBoxElementsJsonObject["confirmTitle"].toString();
             }
 
             if (messageBoxElementsJsonObject["yesLabel"]
@@ -1270,12 +1270,12 @@ protected:
 
 private:
     QWebView *webViewWidget;
-
-    bool windowCloseRequested;
+    QWebFrame *lastTargetFrame;
 
     QString pageStatus;
     QRegExp htmlFileNameExtensionMarker;
     QString emptyString;
+    bool windowCloseRequested;
 
     QString alertTitle;
     QString confirmTitle;
@@ -1286,14 +1286,11 @@ private:
     QString yesLabel;
     QString noLabel;
 
-    QWebFrame *debuggerFrame;
     bool debuggerJustStarted;
     QString debuggerScriptToDebug;
     QString debuggerLastCommand;
     QProcess debuggerHandler;
     QString debuggerAccumulatedOutput;
-    QProcess debuggerOutputHandler;
-    QString debuggerAccumulatedHtmlOutput;
 
 public:
     QHash<QString, QScriptHandler*> runningScripts;

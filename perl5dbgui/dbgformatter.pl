@@ -9,8 +9,6 @@ use Syntax::Highlight::Engine::Kate;
 # Disable built-in Perl buffering.
 $|=1;
 
-my $SCRIPT_TO_DEBUG = $ARGV[0];
-
 ##############################
 # EMBEDDED HTML TEMPLATE:
 ##############################
@@ -19,7 +17,6 @@ my $html = "
 <html>
 
 	<head>
-
 		<title>Perl Debugger GUI</title>
 		<meta name='viewport' content='width=device-width, initial-scale=1'>
 		<meta charset='utf-8'>
@@ -112,26 +109,23 @@ my $html = "
 				padding: 3px 5px 3px 5px;
 			}
 		</style>
-
 	</head>
 
 	<body>
-
 		<div class='source'>
-			<b>FILE_TO_HIGHLIGHT</b>
 			<ol>
 HIGHLIGHTED_SOURCE
 			</ol>
 		</div>
 
 		<form action='http://local-pseudodomain/perl-debugger.function' method='get'>
-
-			<b>Debugging $SCRIPT_TO_DEBUG</b>
+			<b>FILE_TO_HIGHLIGHT</b>
 			<input type='text' name='command' placeholder='Type Perl debugger command and press Enter' title='Debugger Command'>
 
 			<div class='btn-area'>
 				<input type='submit' style='visibility: hidden; width: 0px; height: 0px; opacity: 0; border: none; padding: 0px;'>
-				Commands: 
+				<a href='http://local-pseudodomain/' class='btn' title='Home'>Home</a>
+				<a href='http://local-pseudodomain/perl-debugger.function?action=select-file' class='btn' title='File'>File</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=n' class='btn' title='Next line'>n</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=r' class='btn' title='Return from subroutine'>r</a>
 				<a href='http://local-pseudodomain/perl-debugger.function?command=c' class='btn' title='Continue'>c</a>
@@ -153,7 +147,6 @@ DEBUGGER_OUTPUT
 		var scrollToLine = document.getElementById('SCROLL_TO_LINE');
 		scrollToLine.scrollIntoView();
 		</script>
-
 	</body>
 
 </html>
@@ -162,12 +155,14 @@ DEBUGGER_OUTPUT
 ##############################
 # READING PERL DEBUGGER OUTPUT:
 ##############################
-my $perl_debugger_output = $ENV{'QUERY_STRING'};
 
-my $lineinfo;
+my $perl_debugger_output;
+read (STDIN, $perl_debugger_output, $ENV{'CONTENT_LENGTH'});
+
+my $lineinfo = undef;
 my @debugger_output = split /\n/, $perl_debugger_output;
 foreach my $debugger_output_line (@debugger_output) {
-	if ($debugger_output_line =~ m/[\(\[].*\:{1,1}\d{1,5}[\)\]]/) {
+	if ($debugger_output_line =~ m/[\(\[].*\:\d{1,5}[\)\]]/) {
 		$lineinfo = $debugger_output_line;
 	}
 }
@@ -196,7 +191,7 @@ $perl_debugger_output =~ s/  /\&nbsp\;\&nbsp\;/g;
 
 my $file_to_highlight;
 my $line_to_underline;
-if (defined $lineinfo) {
+if (defined $lineinfo and $perl_debugger_output !~ "Debugged program terminated" ) {
 	chomp $lineinfo;
 	$lineinfo =~ s/^.*[\(\[]//g;
 	$lineinfo =~ s/[\)\]].*//g;
@@ -217,7 +212,7 @@ if (defined $lineinfo) {
 ##############################
 my $formatted_perl_source_code;
 my $scroll_to_line;
-if (defined $lineinfo) {
+if (defined $lineinfo and $perl_debugger_output !~ "Debugged program terminated" ) {
 	# Open the file to highlight read-only:
 	my $file_to_highlight_filehandle;
 	open ($file_to_highlight_filehandle, "<", "$file_to_highlight");
@@ -266,9 +261,8 @@ if (defined $lineinfo) {
 ##############################
 my $source_box_height;
 my $debugger_output_box_height;
-if (defined $lineinfo) {
-	my $file_to_highlight_message = "Highlighting ${file_to_highlight}";
-	$html =~ s/FILE_TO_HIGHLIGHT/$file_to_highlight_message/g;
+if (defined $lineinfo and $perl_debugger_output !~ "Debugged program terminated") {
+	$html =~ s/FILE_TO_HIGHLIGHT/$file_to_highlight/g;
 	$html =~ s/HIGHLIGHTED_SOURCE/$formatted_perl_source_code/g;
 	$html =~ s/SCROLL_TO_LINE/$scroll_to_line/g;
 	$source_box_height = "height: 42%;";

@@ -621,42 +621,52 @@ QScriptHandler::QScriptHandler(
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    scriptFullFilePath = QDir::toNativeSeparators
-            ((qApp->property("application").toString()) + url.path());
-
-    scriptUser = url.userName();
-
-    scriptId = url.password() + "@" + url.path();
-
     QUrlQuery scriptQuery(url);
 
-    scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
-    scriptQuery.removeQueryItem("stdout");
-    // qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
+    if (url.scheme().contains("http")) {
+        scriptFullFilePath = QDir::toNativeSeparators
+                ((qApp->property("application").toString()) + url.path());
 
-    scriptCloseCommand = scriptQuery.queryItemValue("close_command");
-    if (scriptCloseCommand.length() == 0) {
-        qDebug() << "Close command is not defined"
-                 << "for interactive script:"
-                 << scriptFullFilePath;
+        scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
+        scriptQuery.removeQueryItem("stdout");
+        if (scriptStdoutTarget.length() > 0) {
+            qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
+        }
+
+        scriptUser = url.userName();
+        if (scriptUser.length() > 0) {
+            scriptId = url.password() + "@" + url.path();
+
+            scriptCloseCommand =
+                    scriptQuery.queryItemValue("close_command");
+            if (scriptCloseCommand.length() == 0) {
+                qDebug() << "Close command is not defined"
+                         << "for interactive script:"
+                         << scriptFullFilePath;
+            }
+
+            scriptCloseConfirmation =
+                    scriptQuery.queryItemValue("close_confirmation");
+            if (scriptCloseConfirmation.length() == 0) {
+                qDebug() << "Close confirmation is not defined"
+                         << "for interactive script:"
+                         << scriptFullFilePath;
+            }
+        }
     }
 
-    scriptClosedConfirmation = scriptQuery.queryItemValue("close_confirmation");
-    if (scriptClosedConfirmation.length() == 0) {
-        qDebug() << "Closed confirmation is not defined"
-                 << "for interactive script:"
-                 << scriptFullFilePath;
+    if (url.scheme().contains("file")) {
+        scriptFullFilePath = QDir::toNativeSeparators(url.path());
     }
 
-    QString queryString = scriptQuery.toString();
     QString postData(postDataArray);
 
     QProcessEnvironment scriptEnvironment =
             QProcessEnvironment::systemEnvironment();
 
-    if (queryString.length() > 0) {
+    if (scriptQuery.toString().length() > 0) {
         scriptEnvironment.insert("REQUEST_METHOD", "GET");
-        scriptEnvironment.insert("QUERY_STRING", queryString);
+        scriptEnvironment.insert("QUERY_STRING", scriptQuery.toString());
         // qDebug() << "Query string:" << queryString;
     }
 
@@ -689,8 +699,8 @@ QScriptHandler::QScriptHandler(
             scriptCommadLineArgument = postData;
         }
 
-        if (queryString.length() > 0) {
-            scriptCommadLineArgument = queryString;
+        if (scriptQuery.toString().length() > 0) {
+            scriptCommadLineArgument = scriptQuery.toString();
         }
 
 //        scriptHandler.start(QString("pkexec"),
@@ -754,7 +764,8 @@ QScriptHandler::QScriptHandler(
 #endif
 #endif
 
-    qInfo() << "Script started:" << scriptFullFilePath;
+    qInfo() << QDateTime::currentMSecsSinceEpoch()
+            << "msecs from epoch: script started:" << scriptFullFilePath;
 }
 
 // ==============================
@@ -857,7 +868,7 @@ QPage::QPage()
 
     // Signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,
-                     SIGNAL(startScriptSignal(QUrl, QByteArray)),
+                     SIGNAL(handleScriptSignal(QUrl, QByteArray)),
                      this,
                      SLOT(qHandleScriptSlot(QUrl, QByteArray)));
 
@@ -876,25 +887,13 @@ QPage::QPage()
     QObject::connect(this, SIGNAL(frameCreated(QWebFrame *)),
                      this, SLOT(qFrameCustomizerSlot(QWebFrame *)));
 
+    lastTargetFrame = currentFrame();
     windowCloseRequested = false;
 
-    // Signals and slots for the Perl debugger:
+    // Signal and slot for the Perl debugger:
 #if PERL_DEBUGGER_GUI == 1
     QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qDebuggerOutputSlot()));
-
-    QObject::connect(&debuggerOutputHandler,
-                     SIGNAL(readyReadStandardOutput()),
-                     this,
-                     SLOT(qDebuggerHtmlFormatterOutputSlot()));
-    QObject::connect(&debuggerOutputHandler,
-                     SIGNAL(readyReadStandardError()),
-                     this,
-                     SLOT(qDebuggerHtmlFormatterErrorsSlot()));
-    QObject::connect(&debuggerOutputHandler,
-                     SIGNAL(finished(int, QProcess::ExitStatus)),
-                     this,
-                     SLOT(qDebuggerHtmlFormatterFinishedSlot()));
 
     debuggerJustStarted = false;
 #endif
@@ -990,14 +989,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
     }
 
     if (request.url().authority() == PSEUDO_DOMAIN) {
-        // ==============================
-        // Start page is displayed only in
-        // the main frame of a browser window:
-        // ==============================
-        if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url() == qApp->property("startPage").toString()) {
-            mainFrame()->setUrl(request.url());
-        }
+        lastTargetFrame = frame;
 
         if (pageStatus == "trusted") {
             // ==============================
@@ -1117,63 +1109,7 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
             if ((navigationType == QWebPage::NavigationTypeLinkClicked or
                  navigationType == QWebPage::NavigationTypeFormSubmitted) and
                     request.url().fileName() == "perl-debugger.function") {
-                // Check the existence of the target HTML frame:
-                if (mainFrame()->childFrames().contains(frame)) {
-                    debuggerFrame = frame;
-                } else {
-                    debuggerFrame = mainFrame();
-                }
-
-                // Get a Perl debugger command:
-                QUrlQuery scriptQuery(request.url());
-
-                debuggerLastCommand = scriptQuery
-                        .queryItemValue("command", QUrl::FullyDecoded);
-                debuggerLastCommand.replace("+", " ");
-
-                qInfo() << "Perl debugger command:"
-                        << debuggerLastCommand;
-
-                // Select a Perl script for debugging:
-                if (request.url().query().contains("action=select-file")) {
-
-                    QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
-                    selectScriptToDebugDialog
-                            .setFileMode(QFileDialog::ExistingFile);
-                    selectScriptToDebugDialog
-                            .setViewMode(QFileDialog::Detail);
-                    selectScriptToDebugDialog
-                            .setWindowModality(Qt::WindowModal);
-
-                    debuggerScriptToDebug = selectScriptToDebugDialog
-                            .getOpenFileName
-                            (qApp->activeWindow(),
-                             "Select Perl File",
-                             QDir::currentPath(),
-                             "Perl scripts (*.pl);;All files (*)");
-
-                    selectScriptToDebugDialog.close();
-                    selectScriptToDebugDialog.deleteLater();
-
-                    if (debuggerScriptToDebug.length() > 1) {
-                        debuggerScriptToDebug =
-                                QDir::toNativeSeparators(debuggerScriptToDebug);
-
-                        // Close any still open Perl debugger session:
-                        debuggerHandler.close();
-
-                        // Start the Perl debugger:
-                        qInfo() << "File passed to Perl debugger:"
-                                 << debuggerScriptToDebug;
-
-                        qHandlePerlDebuggerSlot();
-                        return false;
-                    } else {
-                        return false;
-                    }
-                }
-
-                qHandlePerlDebuggerSlot();
+                qHandlePerlDebugger(request.url());
                 return false;
             }
 #endif
