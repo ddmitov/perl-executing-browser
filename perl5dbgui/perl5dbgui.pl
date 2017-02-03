@@ -144,8 +144,19 @@ DEBUGGER_OUTPUT
 		</div>
 
 		<script type='text/javascript'>
-		var scrollToLine = document.getElementById('SCROLL_TO_LINE');
-		scrollToLine.scrollIntoView();
+			var scrollToLine = document.getElementById('SCROLL_TO_LINE');
+			scrollToLine.scrollIntoView();
+
+			function pebContextMenu() {
+				var contextMenuObject = new Object();
+
+				contextMenuObject.cut = 'Cut';
+				contextMenuObject.copy = 'Copy';
+				contextMenuObject.paste = 'Paste';
+				contextMenuObject.selectAll = 'Select All';
+
+				return JSON.stringify(contextMenuObject);
+			}
 		</script>
 	</body>
 

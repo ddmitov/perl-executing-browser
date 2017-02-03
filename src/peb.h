@@ -1111,7 +1111,7 @@ public slots:
                 QUrl::fromLocalFile(
                     QDir::toNativeSeparators(
                         QApplication::applicationDirPath()) +
-                    "/perl5dbgui/dbgformatter.pl");
+                    "/perl5dbgui/perl5dbgui.pl");
 
         QByteArray debuggerOutputArray;
         debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
