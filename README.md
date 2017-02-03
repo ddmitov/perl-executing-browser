@@ -473,13 +473,9 @@ They have two functions:
 
 The following special URLs are implemented for the Perl debugger GUI:  
 
-* **Select file to debug:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``  
-  The selected file will be loaded in the Perl debugger, but no command will be automatically issued. Any command can be given later by buttons or by typing it in an input box inside the HTML user interface of the debugger.
-* **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``  
-* **Combined Perl Debugger URL:**  
-  Selecting file to debug and sending command to the Perl debugger can be combined in a single URL.  
-  Example: ``http://local-pseudodomain/perl-debugger.function?action=select-file&command=M``  
-  Using the above URL, the selected file will be loaded in the Perl debugger and the ``M`` command (*Display all loaded modules*) will be immediately issued. Any command can be given later and step-by-step debugging can be performed.
+* **Select file to debug:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``
+
+* **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``
 
 ## Perl Debugger GUI
 PEB is also an HTML user interface for the default Perl debugger. Any Perl script can be selected for debugging and the debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules.  

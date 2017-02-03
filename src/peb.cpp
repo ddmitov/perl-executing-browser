@@ -655,9 +655,11 @@ QScriptHandler::QScriptHandler(
         }
     }
 
+#if PERL_DEBUGGER_GUI == 1
     if (url.scheme().contains("file")) {
         scriptFullFilePath = QDir::toNativeSeparators(url.path());
     }
+#endif
 
     QString postData(postDataArray);
 
@@ -894,8 +896,6 @@ QPage::QPage()
 #if PERL_DEBUGGER_GUI == 1
     QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qDebuggerOutputSlot()));
-
-    debuggerJustStarted = false;
 #endif
 }
 
@@ -1078,12 +1078,6 @@ bool QPage::acceptNavigationRequest(QWebFrame *frame,
                 aboutPageContents
                         .replace("VERSION_STRING",
                                  QApplication::applicationVersion().toLatin1());
-
-                aboutPageContents
-                        .replace("START_PAGE",
-                                 "<a href='" +
-                                 qApp->property("startPage").toString() +
-                                 "'>start page</a>");
 
                 frame->setHtml(aboutPageContents);
 

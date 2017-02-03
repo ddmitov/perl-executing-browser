@@ -961,6 +961,7 @@ public slots:
     void qHandlePerlDebugger(QUrl url)
     {
 #if PERL_DEBUGGER_GUI == 1
+        QString scriptToDebug;
         QString commandLineArguments;
 
         // Select a Perl script for debugging:
@@ -973,7 +974,7 @@ public slots:
             selectScriptToDebugDialog
                     .setWindowModality(Qt::WindowModal);
 
-            QString scriptToDebug = selectScriptToDebugDialog
+            scriptToDebug = selectScriptToDebugDialog
                     .getOpenFileName
                     (qApp->activeWindow(), "Select Perl File",
                      QDir::currentPath(), "Perl scripts (*.pl);;All files (*)");
@@ -982,7 +983,7 @@ public slots:
             selectScriptToDebugDialog.deleteLater();
 
             if (scriptToDebug.length() > 1) {
-                debuggerScriptToDebug = QDir::toNativeSeparators(scriptToDebug);
+                scriptToDebug = QDir::toNativeSeparators(scriptToDebug);
 
                 bool ok;
                 QString input =
@@ -1004,41 +1005,39 @@ public slots:
                 // Start the Perl debugger:
                 qInfo() << QDateTime::currentMSecsSinceEpoch()
                         << "msecs from epoch: file passed to Perl debugger:"
-                        << debuggerScriptToDebug;
+                        << scriptToDebug;
             }
         }
 
         // Get a Perl debugger command:
         QUrlQuery scriptQuery(url);
 
-        debuggerLastCommand = scriptQuery
+        QString debuggerCommand = scriptQuery
                 .queryItemValue("command", QUrl::FullyDecoded);
-        debuggerLastCommand.replace("+", " ");
+        debuggerCommand.replace("+", " ");
 
         // Clean any previous debugger output:
         debuggerAccumulatedOutput = "";
 
         if (debuggerHandler.isOpen()) {
-            if (debuggerLastCommand.length() > 0) {
+            if (debuggerCommand.length() > 0) {
                 qInfo() << QDateTime::currentMSecsSinceEpoch()
                         << "msecs from epoch: Perl debugger command:"
-                        << debuggerLastCommand;
+                        << debuggerCommand;
 
                 QByteArray debuggerCommandArray;
-                debuggerCommandArray.append(debuggerLastCommand.toLatin1());
+                debuggerCommandArray.append(debuggerCommand.toLatin1());
                 debuggerCommandArray.append(QString("\n").toLatin1());
                 debuggerHandler.write(debuggerCommandArray);
             }
         } else {
-            debuggerJustStarted = true;
-
             // Sеt the environment for the debugged script:
             QProcessEnvironment systemEnvironment =
                     QProcessEnvironment::systemEnvironment();
             systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
             debuggerHandler.setProcessEnvironment(systemEnvironment);
 
-            QFileInfo scriptAbsoluteFilePath(debuggerScriptToDebug);
+            QFileInfo scriptAbsoluteFilePath(scriptToDebug);
             QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
             debuggerHandler.setWorkingDirectory(scriptDirectory);
 
@@ -1047,13 +1046,13 @@ public slots:
                                   .toString(),
                                   QStringList()
                                   << "-d"
-                                  << debuggerScriptToDebug
+                                  << scriptToDebug
                                   << commandLineArguments,
                                   QProcess::Unbuffered
                                   | QProcess::ReadWrite);
 
             QByteArray debuggerCommandArray;
-            debuggerCommandArray.append(debuggerLastCommand.toLatin1());
+            debuggerCommandArray.append(debuggerCommand.toLatin1());
             debuggerCommandArray.append(QString("\n").toLatin1());
             debuggerHandler.write(debuggerCommandArray);
         }
@@ -1077,50 +1076,22 @@ public slots:
 
         // Formatting of Perl debugger output is started only after
         // the final command prompt comes out of the debugger:
-        if (debuggerJustStarted == true) {
-            if (debuggerLastCommand.length() > 0 and
-                    debuggerAccumulatedOutput.contains(
-                        QRegExp ("DB\\<\\d{1,5}\\>.*DB\\<\\d{1,5}\\>"))) {
-                debuggerJustStarted = false;
+        if (debuggerAccumulatedOutput.contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
+            QUrl debuggerOutputFormatterUrl =
+                    QUrl::fromLocalFile(
+                        QDir::toNativeSeparators(
+                            QApplication::applicationDirPath()) +
+                        "/perl5dbgui/perl5dbgui.pl");
 
-                qDebuggerStartHtmlFormatter();
-            }
+            QByteArray debuggerOutputArray;
+            debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
+            debuggerOutputArray.append(QString("\n").toLatin1());
 
-            if (debuggerLastCommand.length() == 0 and
-                    debuggerAccumulatedOutput
-                    .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-                debuggerJustStarted = false;
+            // Clean any previous debugger output:
+            debuggerAccumulatedOutput = "";
 
-                qDebuggerStartHtmlFormatter();
-            }
+            qHandleScriptSlot(debuggerOutputFormatterUrl, debuggerOutputArray);
         }
-
-        if (debuggerJustStarted == false and
-                debuggerAccumulatedOutput
-                .contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-
-            qDebuggerStartHtmlFormatter();
-        }
-#endif
-    }
-
-    void qDebuggerStartHtmlFormatter()
-    {
-#if PERL_DEBUGGER_GUI == 1
-        QUrl debuggerOutputFormatterUrl =
-                QUrl::fromLocalFile(
-                    QDir::toNativeSeparators(
-                        QApplication::applicationDirPath()) +
-                    "/perl5dbgui/perl5dbgui.pl");
-
-        QByteArray debuggerOutputArray;
-        debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
-        debuggerOutputArray.append(QString("\n").toLatin1());
-
-        // Clean any previous debugger output:
-        debuggerAccumulatedOutput = "";
-
-        qHandleScriptSlot(debuggerOutputFormatterUrl, debuggerOutputArray);
 #endif
     }
 
@@ -1286,9 +1257,6 @@ private:
     QString yesLabel;
     QString noLabel;
 
-    bool debuggerJustStarted;
-    QString debuggerScriptToDebug;
-    QString debuggerLastCommand;
     QProcess debuggerHandler;
     QString debuggerAccumulatedOutput;
 
