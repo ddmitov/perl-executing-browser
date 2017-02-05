@@ -167,7 +167,6 @@ int main(int argc, char **argv)
         int pid = fork();
         if (pid < 0) {
             return 1;
-            QApplication::exit();
         }
 
         if (pid == 0) {
@@ -185,12 +184,10 @@ int main(int argc, char **argv)
                         QApplication::applicationFilePath());
             if (anotherInstance.waitForStarted(-1)) {
                 return 1;
-                QApplication::exit();
             }
         } else {
             // The parent instance should be closed now:
             return 1;
-            QApplication::exit();
         }
     }
 #endif
@@ -342,7 +339,6 @@ int main(int argc, char **argv)
     // MAIN GUI CLASSES INITIALIZATION:
     // ==============================
     QMainBrowserWindow mainWindow;
-    mainWindow.webViewWidget = new QWebViewWidget();
 
     // Application property necessary when
     // closing the main window is requested using
@@ -516,7 +512,7 @@ QFileReader::QFileReader(QString filePath)
 QMainBrowserWindow::QMainBrowserWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    // !!! No need to implement code here, but must be declared !!!
+    webViewWidget = new QWebViewWidget();
 }
 
 // ==============================

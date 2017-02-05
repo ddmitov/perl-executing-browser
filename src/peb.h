@@ -64,7 +64,7 @@ class QFileReader : public QObject
     Q_OBJECT
 
 public:
-    QFileReader(QString filePath);
+    explicit QFileReader(QString filePath);
     QString fileContents;
 };
 
@@ -1071,7 +1071,7 @@ public slots:
 
         // qDebug() << QDateTime::currentMSecsSinceEpoch()
         //          << "msecs from epoch:"
-        // qDebug() << "Perl debugger raw output:" << endl
+        //          << "Perl debugger raw output:" << endl
         //          << debuggerOutput;
 
         // Formatting of Perl debugger output is started only after
@@ -1085,7 +1085,6 @@ public slots:
 
             QByteArray debuggerOutputArray;
             debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
-            debuggerOutputArray.append(QString("\n").toLatin1());
 
             // Clean any previous debugger output:
             debuggerAccumulatedOutput = "";
