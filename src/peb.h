@@ -191,7 +191,6 @@ class QCustomNetworkReply : public QNetworkReply
     Q_OBJECT
 
 public:
-
     QCustomNetworkReply(
             const QUrl &url, const QString &data, const QString &mime);
     ~QCustomNetworkReply();
@@ -1239,7 +1238,6 @@ protected:
     }
 
 private:
-    QWebView *webViewWidget;
     QWebFrame *lastTargetFrame;
 
     QString pageStatus;
@@ -1538,9 +1536,8 @@ public slots:
 
     void qDisplayScriptErrorsSlot(QString errors)
     {
-        errorsWindow = new QWebViewWidget();
+        QWebViewWidget *errorsWindow = new QWebViewWidget();
         errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
-        errorsWindow->adjustSize();
         errorsWindow->setFocus();
         errorsWindow->show();
     }
@@ -1592,7 +1589,8 @@ public:
 
         QWebView *window = new QWebViewWidget();
         window->setHtml(loadingContents);
-        window->show();
+        window->setGeometry(qApp->desktop()->availableGeometry());
+        window->showMaximized();
 
         qInfo() << "New window opened.";
 
@@ -1601,8 +1599,6 @@ public:
 
 private:
     QPage *mainPage;
-    QWebView *newWindow;
-    QWebView *errorsWindow;
 
     bool windowCloseRequested;
 };

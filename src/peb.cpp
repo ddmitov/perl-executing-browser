@@ -25,7 +25,7 @@
 
 #ifndef Q_OS_WIN
 #if ADMIN_PRIVILEGES_CHECK == 1 or PERL_DEBUGGER_GUI == 1
-#include <unistd.h> // for geteuid() and isatty()
+#include <unistd.h> // geteuid(); isatty();
 #endif
 #endif
 
@@ -417,8 +417,8 @@ int main(int argc, char **argv)
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
         // ==============================
         qInfo() << application.applicationName().toLatin1().constData()
-                 << application.applicationVersion().toLatin1().constData()
-                 << "started.";
+                << application.applicationVersion().toLatin1().constData()
+                << "started.";
         qInfo() << "Qt version:" << QT_VERSION_STR;
         qInfo() << "Executable:" << application.applicationFilePath();
         qInfo() << "PID:" << application.applicationPid();
