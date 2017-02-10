@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Perl Executing Browser - Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+    <script type="text/javascript" src="bootstrap/js/bootstrap-dropdown.js"></script>
+
+    <style>
+      html, body{
+        height: 100%;
+      }
+      iframe{
+        width: 100%;
+        height: 88%;
+        border: none
+      }
+      .navbar .navbar-nav {
+        display: inline-block;
+        float: none;
+        vertical-align: top;
+      }
+      .navbar .navbar-inverse {
+        text-align: center;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="navbar navbar-inverse">
+
+      <div class="navbar-header">
+        <a class="navbar-brand" href="main.html" target="iframe_a">PEB</a>
+      </div>
+
+      <ul class="nav navbar-nav">
+        <li>
+          <a id="filesystem" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Files<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/filesystem.html" target="iframe_a">Open Files or Folders</a></li>
+            <li><a href="http://local-pseudodomain/nonexistent.html" target="iframe_a">Nonexistent File</a></li>
+            <li><a href="http://local-pseudodomain/dummy.txt">Unsupported File</a></li>
+            <li><a href="http://local-pseudodomain/perl/noextpl" target="iframe_a">Extensionless Script</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a id="forms" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Forms<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/get.html" target="iframe_a">GET Form</a></li>
+            <li><a href="http://local-pseudodomain/post.html" target="iframe_a">POST Form</a></li>
+            <li><a href="http://local-pseudodomain/root-get.html" target="iframe_a">Linux Root GET Form</a></li>
+            <li><a href="http://local-pseudodomain/root-post.html" target="iframe_a">Linux Root POST Form</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="http://local-pseudodomain/perl-debugger.function?action=select-file">Perl Debugger</a>
+        </li>
+
+        <li>
+          <a id="web" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Web<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="https://www.google.com/">Google</a></li>
+            <li><a href="https://html5test.com/">HTML5test</a></li>
+            <li><a href="http://www.perl.org/">www.perl.org</a></li>
+            <li><a href="http://www.nonexistent.com/">Nonexistent Web Site</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a id="printing" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          Print<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/print.function?action=preview">Print Preview</a></li>
+            <li><a href="http://local-pseudodomain/print.function?action=print">Print</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="javascript:location.reload();">Reload</a>
+        </li>
+
+        <li>
+          <a id="about" role="button" data-toggle="dropdown" data-target="#" href="index.html">
+          About<span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu" role="menu" aria-labelledby="requests">
+            <li><a href="http://local-pseudodomain/about.function?type=browser">About PEB</a></li>
+            <li><a href="http://local-pseudodomain/about.function?type=qt">About Qt</a></li>
+          </ul>
+        </li>
+
+        <li>
+          <a href="http://local-pseudodomain/close-window.function">Close</a>
+        </li>
+      </ul>
+    </div>
+
+    <iframe src="main.html" name="iframe_a"></iframe>
+  </body>
+
+</html>

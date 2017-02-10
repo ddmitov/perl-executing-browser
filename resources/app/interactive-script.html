@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Perl Executing Browser - Interactive Scripts Test</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+
+    <script type="text/javascript" src="pebjs/context-menu.js"></script>
+    <script type="text/javascript" src="pebjs/dialogs.js"></script>
+    <script type="text/javascript" src="pebjs/forms-close-window.js"></script>
+
+    <style type='text/css'>
+      .output {
+        font-size: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <form action="http://interactive:one@local-pseudodomain/perl/interactive-script.pl" method="post">
+      <br>
+      <div class="col-lg-10 col-lg-offset-1">
+        <div class="form-group">
+          <div class="input-prepend">
+            <input type="text" name="input" class="form-control" placeholder="Send data to the first instance of the interactive script">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="reset" value="Reset" class="btn btn-default">
+          <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+
+        <div id="script-one-output" class="output">
+          <br>
+          <br>
+        </div>
+
+      </div>
+    </form>
+
+    <form action="http://interactive:two@local-pseudodomain/perl/interactive-script.pl" method="post">
+      <br>
+      <div class="col-lg-10 col-lg-offset-1">
+        <div class="form-group">
+          <div class="input-prepend">
+            <input type="text" name="input" class="form-control" placeholder="Send data to the second instance of the interactive script">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <input type="reset" value="Reset" class="btn btn-default">
+          <input type="submit" value="Submit" class="btn btn-primary">
+        </div>
+
+        <div id="script-two-output" class="output">
+          <br>
+          <br>
+        </div>
+
+      </div>
+    </form>
+
+    <script type="text/javascript">
+      document.addEventListener("DOMContentLoaded", function(event) {
+        var scriptOneRequest = new XMLHttpRequest();
+        var scriptOneParameters = {
+          stdout: "script-one-output",
+          close_command: "_close_",
+          close_confirmation: "_closed_",
+          mode: "unix-epoch"
+        }
+        scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive-script.pl' +
+                formatParameters(scriptOneParameters), true);
+        scriptOneRequest.send();
+
+        var scriptTwoRequest = new XMLHttpRequest();
+        var scriptTwoParameters = {
+          stdout: "script-two-output",
+          close_command: "_close_",
+          close_confirmation: "_closed_",
+          mode: "local-time"
+        }
+        scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive-script.pl' +
+                formatParameters(scriptTwoParameters), true);
+        scriptTwoRequest.send();
+      });
+
+      function formatParameters(parameters) {
+        return "?" + Object
+          .keys(parameters)
+          .map(function(key){
+            return key + "=" + parameters[key]
+          })
+        .join("&")
+      }
+    </script>
+  </body>
+
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Perl Executing Browser - POST Form</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+
+    <script type="text/javascript" src="pebjs/context-menu.js"></script>
+    <script type="text/javascript" src="pebjs/dialogs.js"></script>
+    <script type="text/javascript" src="pebjs/forms-close-window.js"></script>
+    <script type="text/javascript" src="pebjs/forms-navigate-away.js"></script>
+  </head>
+
+  <body>
+    <form action="perl/get-post-test.pl" method="post" onsubmit="submitFunction()">
+      <div class="col-lg-10 col-lg-offset-1">
+        <fieldset>
+          <legend>POST Form</legend>
+
+          <div class="form-group">
+            <div class="input-prepend">
+              <input type="text" id="value1" name="value1" class="form-control" placeholder="Value 1" title="Value 1">
+            </div>
+            <div class="input-append">
+              <input type="text" id="value2" name="value2" class="form-control" placeholder="Value 2" title="Value 2">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <input type="reset" value="Reset" class="btn btn-default">
+            <input type="submit" value="Submit" class="btn btn-primary">
+          </div>
+
+          <div>
+            <button type="button" onclick="location.reload();" class="btn btn-default">
+              Reload
+            </button>
+          </div>
+        </fieldset>
+      </div>
+    </form>
+  </body>
+
+</html>

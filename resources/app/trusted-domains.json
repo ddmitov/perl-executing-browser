@@ -1,0 +1,6 @@
+{
+  "trusted-domains" : [
+    "fonts.googleapis.com",
+    "fonts.gstatic.com"
+  ]
+}

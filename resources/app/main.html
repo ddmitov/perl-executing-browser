@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <title>Perl Executing Browser - Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
+
+    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+
+    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+
+    <style type="text/css">
+      .container {
+        text-align: center;
+        font-size: 22px;
+        -webkit-text-size-adjust: 100%;
+      }
+    </style>
+
+  </head>
+
+  <body>
+    <div class="container">
+      <p>
+        <button onclick="window.open('http://local-pseudodomain/index.html')" class="btn btn-primary">
+        Start Page in a New Window</button>
+      </p>
+
+      <p>
+        <button onclick="window.open('http://local-pseudodomain/interactive-script.html')" class="btn btn-primary">
+        Interactive Scripts</button>
+      </p>
+
+      <p>
+        <div id="data-one">
+          <a href='perl/counter.pl?stdout=data-one'
+            data-toggle="tooltip" title="perl/counter.pl?stdout=data-one"
+            data-placement="right">
+          Noninteractive Script - First Instance</a>
+        </div>
+      </p>
+
+      <p>
+        <div id="data-two">
+          <a href='perl/counter.pl?stdout=data-two'
+            data-toggle="tooltip" title="perl/counter.pl?stdout=data-two"
+            data-placement="right">
+          Noninteractive Script - Second Instance</a>
+        </div>
+      </p>
+
+      <p>
+        <a href="http://root@local-pseudodomain/perl/open-root-directory.pl"
+          data-toggle="tooltip" title="http://root@local-pseudodomain/perl/open-root-directory.pl"
+          data-placement="right" id="root-directory-lister">
+        Linux /root Directory Lister</a>
+      </p>
+
+      <p>
+        <div id="ajax-script-results">
+          <button id="ajax-button" class="btn btn-primary"
+              data-toggle="tooltip" title="http://ajax@local-pseudodomain/perl/ajax-test.pl"
+              data-placement="right">
+          AJAX GET Request</button>
+        </div>
+      </p>
+
+      <p>
+        <a href="http://local-pseudodomain/perl/version-cwd-inc.pl">
+        Perl Basic information</a>
+      </p>
+
+      <p>
+        <a href="http://local-pseudodomain/perl/sqlite.pl">
+        SQLite Test</a>
+      </p>
+
+      <p>
+        <a href="http://local-pseudodomain/mixed-content.html">
+        Mixed Content</a>
+      </p>
+    </div>
+
+    <script>
+      $(document).ready(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+
+        $('#root-directory-lister').click(function() {
+          $('#root-directory-lister').tooltip('destroy');
+        });
+
+        $('#ajax-button').click(function() {
+          $.ajax({
+            url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
+            method: 'GET',
+            dataType: 'text',
+            success: function(data) {
+              $('#ajax-script-results').html(data);
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+
+</html>
