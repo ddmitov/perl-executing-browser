@@ -782,10 +782,6 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::JavascriptCanAccessClipboard, false);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessFileUrls, false);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
 
     QWebSettings::globalSettings()->

@@ -92,10 +92,11 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Optional logging of all browser actions](#log-files)
 
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - Qt 5.5 headers (including ``QtWebkit`` headers).  
-The ``QtWebkit`` set of classes is deprecated in all later versions of Qt. They could still be usable if ``QtWebKit`` headers are manually added, but this approach is still not tested.  
+GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebkit`` headers).  
+The ``QtWebkit`` set of classes is deprecated and removed from all later versions of Qt.  
+Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is resource-intensive and is not tested with the PEB sources.  
 
-The most important Qt dependency of PEB is not ``QtWebkit``, but ``QNetworkAccessManager`` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with the ecosystem of ``QtWebEngine`` - the new Blink-based web engine of Qt. This makes transition to ``QtWebEngine`` impractical because local POST requests and calls to local Perl scripts from JavaScript could not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may consider using [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) together with [camel-harness](https://github.com/ddmitov/camel-harness).  
+The most important Qt dependency of PEB is not ``QtWebkit``, but ``QNetworkAccessManager`` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with the ecosystem of ``QtWebEngine`` - the new Blink-based web engine of Qt. The transition to ``QtWebEngine`` is impractical because local POST requests and calling local Perl scripts from JavaScript can not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) and [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,

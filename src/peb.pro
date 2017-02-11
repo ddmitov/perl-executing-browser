@@ -16,22 +16,16 @@
 message ("Going to configure Perl Executing Browser for Qt $$[QT_VERSION]")
 
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires at least Qt 5.1 headers.")
+    error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
 }
 
 equals (QT_MAJOR_VERSION, 5) {
     lessThan (QT_MINOR_VERSION, 1) {
-        error ("Perl Executing Browser requires at least Qt 5.1 headers.")
+        error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        packagesExist(webkitwidgets) {
-            message ("Going to build with manually added QtWebKit libraries.")
-        }
-
-        !packagesExist(webkitwidgets) {
-            error ("QtWebKit libraries are not found.")
-        }
+        error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
     }
 
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
