@@ -81,7 +81,7 @@ void customMessageHandler(QtMsgType type,
     switch (type) {
 #if QT_VERSION >= 0x050500
     case QtInfoMsg:
-        text += QString("{Info} %1").arg(message);
+        text += QString("{Log} %1").arg(message);
         break;
 #endif
     case QtDebugMsg:
@@ -126,6 +126,11 @@ int main(int argc, char **argv)
     application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.4.1");
     bool startedAsRoot = false;
+
+    // ==============================
+    // PSEUDO-DOMAIN:
+    // ==============================
+    application.setProperty("pseudoDomain", QString("local-pseudodomain"));
 
     // ==============================
     // UTF-8 ENCODING APPLICATION-WIDE:
@@ -312,7 +317,7 @@ int main(int argc, char **argv)
         }
     }
 
-    trustedDomainsList.append(PSEUDO_DOMAIN);
+    trustedDomainsList.append(application.property("pseudoDomain").toString());
     application.setProperty("trustedDomains", trustedDomainsList);
 
     // ==============================
@@ -384,7 +389,7 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qInfo() << "Using"
+        qDebug() << "Using"
                 << application.applicationName().toLatin1().constData()
                 << application.applicationVersion().toLatin1().constData()
                 << "with administrative privileges is not allowed.";
@@ -406,47 +411,49 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qInfo() << application.applicationName().toLatin1().constData()
+        qDebug() << application.applicationName().toLatin1().constData()
                 << application.applicationVersion().toLatin1().constData()
                 << "started.";
-        qInfo() << "Qt version:" << QT_VERSION_STR;
-        qInfo() << "Executable:" << application.applicationFilePath();
-        qInfo() << "No Perl interpreter is found.";
+        qDebug() << "Qt version:" << QT_VERSION_STR;
+        qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "No Perl interpreter is found.";
     }
 
     if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
         // ==============================
         // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
         // ==============================
-        qInfo() << application.applicationName().toLatin1().constData()
+        qDebug() << application.applicationName().toLatin1().constData()
                 << application.applicationVersion().toLatin1().constData()
                 << "started.";
-        qInfo() << "Qt version:" << QT_VERSION_STR;
-        qInfo() << "Executable:" << application.applicationFilePath();
-        qInfo() << "PID:" << application.applicationPid();
+        qDebug() << "Qt version:" << QT_VERSION_STR;
+        qDebug() << "Executable:" << application.applicationFilePath();
+        qDebug() << "PID:" << application.applicationPid();
 
 #if ADMIN_PRIVILEGES_CHECK == 0
-        qInfo() << "Administrative privileges check is disabled.";
+        qDebug() << "Administrative privileges check is disabled.";
 #endif
 
 #if ADMIN_PRIVILEGES_CHECK == 1
-        qInfo() << "Administrative privileges check is enabled.";
+        qDebug() << "Administrative privileges check is enabled.";
 #endif
 
 #if PERL_DEBUGGER_GUI == 0
-        qInfo() << "Perl debugger GUI is disabled.";
+        qDebug() << "Perl debugger GUI is disabled.";
 #endif
 
 #if PERL_DEBUGGER_GUI == 1
-        qInfo() << "Perl debugger GUI is enabled.";
+        qDebug() << "Perl debugger GUI is enabled.";
 #endif
 
-        qInfo() << "Perl interpreter:" << perlInterpreterFullPath;
-        qInfo()  <<"Local pseudo-domain:" << PSEUDO_DOMAIN;
+        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
+        qDebug()  <<"Local pseudo-domain:"
+                << application.property("pseudoDomain").toString();
 
         foreach (QString trustedDomain, trustedDomainsList) {
-            if (trustedDomain != PSEUDO_DOMAIN) {
-                qInfo() << "Trusted domain:" << trustedDomain;
+            if (trustedDomain !=
+                    application.property("pseudoDomain").toString()) {
+                qDebug() << "Trusted domain:" << trustedDomain;
             }
         }
 
@@ -458,7 +465,10 @@ int main(int argc, char **argv)
                     applicationDirName + QDir::separator() + "index.html");
 
         if (staticStartPageFile.exists()) {
-            startPage = "http://" + QString(PSEUDO_DOMAIN) + "/index.html";
+            startPage =
+                    "http://" +
+                    QString(application.property("pseudoDomain").toString()) +
+                    "/index.html";
 
             application.setProperty("startPage", startPage);
 
@@ -467,7 +477,11 @@ int main(int argc, char **argv)
             QFile dynamicStartPageFile(
                         applicationDirName + QDir::separator() + "index.pl");
             if (dynamicStartPageFile.exists()) {
-                startPage = "http://" + QString(PSEUDO_DOMAIN) + "/index.pl";
+                startPage =
+                        "http://" +
+                        QString(application.property("pseudoDomain")
+                                .toString()) +
+                        "/index.pl";
 
                 application.setProperty("startPage", startPage);
 
@@ -481,7 +495,7 @@ int main(int argc, char **argv)
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
                 mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-                qInfo() << "No start page is found.";
+                qDebug() << "No start page is found.";
             }
         }
     }

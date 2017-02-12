@@ -44,12 +44,12 @@ public slots:
         QString output = scriptProcess.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
                 << "msecs from epoch: output from" << scriptFullFilePath;
 
         // Handling 'script closed' confirmation:
         if (output == scriptCloseConfirmation) {
-            qInfo() << QDateTime::currentMSecsSinceEpoch()
+            qDebug() << QDateTime::currentMSecsSinceEpoch()
                     << "msecs from epoch:"
                     << "interactive script terminated normally:"
                     << scriptFullFilePath;
@@ -66,7 +66,7 @@ public slots:
         scriptAccumulatedErrors.append(scriptErrors);
         scriptAccumulatedErrors.append("\n");
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
                 << "msecs from epoch: errors from" << scriptFullFilePath;
         // qDebug() << "Script errors:" << scriptErrors;
     }
@@ -81,7 +81,7 @@ public slots:
 
         scriptProcess.close();
 
-        qInfo() << QDateTime::currentMSecsSinceEpoch()
+        qDebug() << QDateTime::currentMSecsSinceEpoch()
                 << "msecs from epoch: script finished:" << scriptFullFilePath;
     }
 

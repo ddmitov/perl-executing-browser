@@ -33,7 +33,6 @@
 
 #include "file-reader.h"
 #include "script-handler.h"
-#include "pseudo-domain.h"
 
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
@@ -116,7 +115,9 @@ public slots:
         if (stdoutTarget.length() > 0) {
             qOutputInserter(output, stdoutTarget);
         } else {
-            lastTargetFrame->setHtml(output, QUrl(PSEUDO_DOMAIN));
+            lastTargetFrame->setHtml(output,
+                                     QUrl(qApp->property("pseudoDomain")
+                                          .toString()));
         }
     }
 
@@ -502,7 +503,7 @@ public slots:
                 debuggerHandler.close();
 
                 // Start the Perl debugger:
-                qInfo() << QDateTime::currentMSecsSinceEpoch()
+                qDebug() << QDateTime::currentMSecsSinceEpoch()
                         << "msecs from epoch: file passed to Perl debugger:"
                         << scriptToDebug;
             }
@@ -520,7 +521,7 @@ public slots:
 
         if (debuggerHandler.isOpen()) {
             if (debuggerCommand.length() > 0) {
-                qInfo() << QDateTime::currentMSecsSinceEpoch()
+                qDebug() << QDateTime::currentMSecsSinceEpoch()
                         << "msecs from epoch: Perl debugger command:"
                         << debuggerCommand;
 
@@ -623,7 +624,8 @@ protected:
             return false;
         }
 
-        if (request.url().authority() == PSEUDO_DOMAIN) {
+        if (request.url().authority() ==
+                qApp->property("pseudoDomain").toString()) {
             lastTargetFrame = frame;
 
             if (pageStatus == "trusted") {

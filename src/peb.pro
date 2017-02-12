@@ -129,7 +129,6 @@ equals (QT_MAJOR_VERSION, 5) {
         local-reply.h \
         main-window.h \
         page.h \
-        pseudo-domain.h \
         script-handler.h \
         view.h
 

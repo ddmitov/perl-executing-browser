@@ -31,7 +31,7 @@ class QExitHandler : public QObject
 public slots:
     void qExitApplicationSlot()
     {
-        qInfo() << qApp->applicationName().toLatin1().constData()
+        qDebug() << qApp->applicationName().toLatin1().constData()
                 << qApp->applicationVersion().toLatin1().constData()
                 << "terminated normally.";
 

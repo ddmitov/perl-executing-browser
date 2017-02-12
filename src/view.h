@@ -118,7 +118,7 @@ public slots:
             mainPage->currentFrame()->
                     evaluateJavaScript(inodeSelectedJavaScript);
 
-            qInfo() << "User selected inode:"
+            qDebug() << "User selected inode:"
                     << userSelectedInodesFormatted;
         }
     }
@@ -300,7 +300,7 @@ public slots:
     void qPrintSlot()
     {
 #ifndef QT_NO_PRINTER
-        qInfo() << "Printing requested.";
+        qDebug() << "Printing requested.";
 
         QPrinter printer;
         QPrintDialog *printDialog = new QPrintDialog(&printer);
@@ -325,7 +325,8 @@ public slots:
     void qDisplayScriptErrorsSlot(QString errors)
     {
         QViewWidget *errorsWindow = new QViewWidget();
-        errorsWindow->setHtml(errors, QUrl(PSEUDO_DOMAIN));
+        errorsWindow->setHtml(errors,
+                              QUrl(qApp->property("pseudoDomain").toString()));
         errorsWindow->setFocus();
         errorsWindow->show();
     }
@@ -335,7 +336,7 @@ public slots:
     // ==============================
     void qStartQWebInspector()
     {
-        qInfo() << "QWebInspector started.";
+        qDebug() << "QWebInspector started.";
 
         QWebInspector *inspector = new QWebInspector;
         inspector->setPage(QViewWidget::page());
@@ -389,7 +390,7 @@ public:
         window->setGeometry(qApp->desktop()->availableGeometry());
         window->showMaximized();
 
-        qInfo() << "New window opened.";
+        qDebug() << "New window opened.";
 
         return window;
     }

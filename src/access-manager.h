@@ -27,7 +27,6 @@
 
 #include "file-reader.h"
 #include "local-reply.h"
-#include "pseudo-domain.h"
 #include "script-handler.h"
 
 // ==============================
@@ -51,7 +50,8 @@ protected:
         // Start page redirection:
         // ==============================
         if ((operation == GetOperation) and
-                request.url().host() == PSEUDO_DOMAIN and
+                request.url().host() ==
+                qApp->property("pseudoDomain").toString() and
                 request.url().fileName().length() == 0 and
                 pageStatus == "trusted") {
             QNetworkRequest startPageRequest;
@@ -69,7 +69,8 @@ protected:
         // ==============================
         if ((operation == GetOperation or
              operation == PostOperation) and
-                request.url().host() == PSEUDO_DOMAIN and
+                request.url().host() ==
+                qApp->property("pseudoDomain").toString() and
                 request.url().userName() == "ajax" and
                 pageStatus == "untrusted") {
 
@@ -77,7 +78,7 @@ protected:
                     "Calling local Perl scripts after "
                     "untrusted content is loaded is prohibited.<br>"
                     "Go to start page to unlock local Perl scripts.";
-            qInfo() << "Local AJAX Perl script called after"
+            qDebug() << "Local AJAX Perl script called after"
                     << "untrusted content is loaded:"
                     << request.url().toString();
 
@@ -91,7 +92,8 @@ protected:
         // ==============================
         if ((operation == GetOperation or
              operation == PostOperation) and
-                request.url().host() == PSEUDO_DOMAIN and
+                request.url().host() ==
+                qApp->property("pseudoDomain").toString() and
                 request.url().userName() == "ajax" and
                 pageStatus == "trusted") {
 
@@ -155,7 +157,7 @@ protected:
                                                      emptyString);
                 return reply;
             } else {
-                qInfo() << "File not found:" << ajaxScriptFullFilePath;
+                qDebug() << "File not found:" << ajaxScriptFullFilePath;
 
                 QFileReader *resourceReader =
                         new QFileReader(QString(":/html/error.html"));
@@ -180,7 +182,8 @@ protected:
         // local files and non-AJAX scripts:
         // ==============================
         if (operation == GetOperation and
-                request.url().host() == PSEUDO_DOMAIN and
+                request.url().host() ==
+                qApp->property("pseudoDomain").toString() and
                 (request.url().userName() != "ajax") and
                 (!request.url().path().contains(".function"))) {
 
@@ -225,7 +228,7 @@ protected:
                                 qApp->property("startPage").toString() +
                                 "'>start page</a> "
                                 "to unlock local Perl scripts.</p>";
-                        qInfo() << "Local Perl script called after"
+                        qDebug() << "Local Perl script called after"
                                 << "untrusted content was loaded:"
                                 << request.url().toString();
 
@@ -261,7 +264,7 @@ protected:
                         mimeType == "application/font-sfnt" or
                         mimeType.contains("application/font-woff")) {
 
-                    qInfo() << "Local link requested:"
+                    qDebug() << "Local link requested:"
                             << request.url().toString();
 
                     QFileReader *resourceReader =
@@ -273,7 +276,7 @@ protected:
                                                          mimeType);
                     return reply;
                 } else {
-                    qInfo() << "File type not supported:" << fullFilePath;
+                    qDebug() << "File type not supported:" << fullFilePath;
 
                     QDesktopServices::openUrl(
                                 QUrl::fromLocalFile(fullFilePath));
@@ -284,7 +287,7 @@ protected:
                     return reply;
                 }
             } else {
-                qInfo() << "File not found:" << fullFilePath;
+                qDebug() << "File not found:" << fullFilePath;
 
                 QFileReader *resourceReader =
                         new QFileReader(QString(":/html/error.html"));
@@ -308,7 +311,8 @@ protected:
         // non-AJAX scripts:
         // ==============================
         if (operation == PostOperation and
-                request.url().host() == PSEUDO_DOMAIN and
+                request.url().host() ==
+                qApp->property("pseudoDomain").toString() and
                 (request.url().userName() != "ajax")) {
 
             if (outgoingData) {
@@ -336,7 +340,7 @@ protected:
             return reply;
         }
 
-        qInfo() << "Link requested:" << request.url().toString();
+        qDebug() << "Link requested:" << request.url().toString();
 
         return QNetworkAccessManager::createRequest
                 (QNetworkAccessManager::GetOperation,

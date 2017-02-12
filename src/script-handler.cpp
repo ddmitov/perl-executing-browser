@@ -186,6 +186,6 @@ QScriptHandler::QScriptHandler(
 #endif
 #endif
 
-    qInfo() << QDateTime::currentMSecsSinceEpoch()
+    qDebug() << QDateTime::currentMSecsSinceEpoch()
             << "msecs from epoch: script started:" << scriptFullFilePath;
 }
