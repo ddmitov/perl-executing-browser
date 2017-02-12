@@ -121,9 +121,28 @@ equals (QT_MAJOR_VERSION, 5) {
     # Printing support:
     QT += printsupport
 
+    # Header files:
+    HEADERS += \
+        access-manager.h \
+        file-reader.h \
+        exit-handler.h \
+        local-reply.h \
+        main-window.h \
+        page.h \
+        pseudo-domain.h \
+        script-handler.h \
+        view.h
+
     # Source files:
-    HEADERS += peb.h
-    SOURCES += peb.cpp
+    SOURCES += \
+        main.cpp \
+        file-reader.cpp \
+        exit-handler.cpp \
+        local-reply.cpp \
+        main-window.cpp \
+        page.cpp \
+        script-handler.cpp \
+        view.cpp
 
     # Resources:
     RESOURCES += resources/peb.qrc
