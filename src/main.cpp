@@ -121,24 +121,24 @@ int main(int argc, char **argv)
     QApplication application(argc, argv);
 
     // ==============================
-    // BASIC APPLICATION VARIABLES:
+    // Basic application properties:
     // ==============================
     application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.4.1");
     bool startedAsRoot = false;
 
     // ==============================
-    // PSEUDO-DOMAIN:
+    // Pseudo-domain:
     // ==============================
     application.setProperty("pseudoDomain", QString("local-pseudodomain"));
 
     // ==============================
-    // UTF-8 ENCODING APPLICATION-WIDE:
+    // UTF-8 encoding application-wide:
     // ==============================
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 
     // ==============================
-    // USER PRIVILEGES DETECTION:
+    // User privileges detection:
     // ==============================
     // Linux and Mac:
 #ifndef Q_OS_WIN
@@ -161,7 +161,7 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // START FROM TERMINAL DETECTION:
+    // Start from terminal detection:
     // ==============================
     // If the browser is started from terminal,
     // it will start another copy of itself and close the first one.
@@ -201,7 +201,7 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // BINARY FILE DIRECTORY:
+    // Binary file directory:
     // ==============================
     QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
 
@@ -215,7 +215,7 @@ int main(int argc, char **argv)
     QString binaryDirName = binaryDir.absolutePath().toLatin1();
 
     // ==============================
-    // PERL INTERPRETER:
+    // Perl interpreter:
     // ==============================
     QString perlExecutable;
 
@@ -255,7 +255,7 @@ int main(int argc, char **argv)
     application.setProperty("perlInterpreter", perlInterpreterFullPath);
 
     // ==============================
-    // APPLICATION DIRECTORY:
+    // Application directory:
     // ==============================
     QString applicationDirName = QDir::toNativeSeparators(
                 binaryDirName + QDir::separator()
@@ -265,7 +265,7 @@ int main(int argc, char **argv)
     application.setProperty("application", applicationDirName);
 
     // ==============================
-    // APPLICATION ICON:
+    // Application icon:
     // ==============================
     QString iconPathName = QDir::toNativeSeparators(
                 binaryDirName + QDir::separator()
@@ -285,7 +285,7 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // TRUSTED DOMAINS:
+    // Trusted domains:
     // ==============================
     QString trustedDomainsFilePath =
             applicationDirName + QDir::separator() + "trusted-domains.json";
@@ -321,7 +321,7 @@ int main(int argc, char **argv)
     application.setProperty("trustedDomains", trustedDomainsList);
 
     // ==============================
-    // LOGGING:
+    // Logging:
     // ==============================
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
@@ -343,7 +343,7 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // MAIN GUI CLASSES INITIALIZATION:
+    // MAIN WINDOW INITIALIZATION:
     // ==============================
     QMainBrowserWindow mainWindow;
 
@@ -371,9 +371,9 @@ int main(int argc, char **argv)
                      &exitHandler, SLOT(qExitApplicationSlot()));
 
     // ==============================
-    // STARTED WITH
-    // ADMINISTRATIVE PRIVILEGES
-    // ERROR MESSAGE:
+    // Started with
+    // administrative privileges
+    // error message:
     // ==============================
 #if ADMIN_PRIVILEGES_CHECK == 1
     if (startedAsRoot == true) {
@@ -397,7 +397,7 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // MISSING PERL INTERPRETER ERROR MESSAGE:
+    // Missing Perl interpreter error message:
     // ==============================
     if (perlInterpreterFullPath.length() == 0) {
         QFileReader *resourceReader =
@@ -421,7 +421,7 @@ int main(int argc, char **argv)
 
     if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
         // ==============================
-        // LOG BASIC PROGRAM INFORMATION AND SETTINGS:
+        // Logging basic program information:
         // ==============================
         qDebug() << application.applicationName().toLatin1().constData()
                 << application.applicationVersion().toLatin1().constData()
@@ -458,7 +458,7 @@ int main(int argc, char **argv)
         }
 
         // ==============================
-        // START PAGE EXISTENCE CHECK AND LOADING:
+        // Start page loading:
         // ==============================
         QString startPage;
         QFile staticStartPageFile(
