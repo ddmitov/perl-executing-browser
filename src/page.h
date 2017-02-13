@@ -30,8 +30,11 @@
 #include <QMessageBox>
 
 #include "file-reader.h"
-#include "perl-debugger-handler.h"
 #include "script-handler.h"
+
+#if PERL_DEBUGGER_GUI == 1
+#include "perl-debugger-handler.h"
+#endif
 
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
