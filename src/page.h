@@ -23,15 +23,14 @@
 #include <QUrlQuery>
 #include <QWebPage>
 #include <QWebFrame>
-#include <QProcess>
 #include <QTimer>
 #include <QJsonDocument>
 #include <QJsonObject>
-#include <QFileDialog>
 #include <QInputDialog>
 #include <QMessageBox>
 
 #include "file-reader.h"
+#include "perl-debugger-handler.h"
 #include "script-handler.h"
 
 // ==============================
@@ -454,149 +453,6 @@ public slots:
         emit closeWindowSignal();
     }
 
-    // ==============================
-    // Perl Debugger GUI:
-    // Implementation of an idea proposed by Valcho Nedelchev
-    // ==============================
-    void qHandlePerlDebugger(QUrl url)
-    {
-#if PERL_DEBUGGER_GUI == 1
-        QString scriptToDebug;
-        QString commandLineArguments;
-
-        // Select a Perl script for debugging:
-        if (url.query().contains("action=select-file")) {
-            QFileDialog selectScriptToDebugDialog(qApp->activeWindow());
-            selectScriptToDebugDialog
-                    .setFileMode(QFileDialog::ExistingFile);
-            selectScriptToDebugDialog
-                    .setViewMode(QFileDialog::Detail);
-            selectScriptToDebugDialog
-                    .setWindowModality(Qt::WindowModal);
-
-            scriptToDebug = selectScriptToDebugDialog
-                    .getOpenFileName
-                    (qApp->activeWindow(), "Select Perl File",
-                     QDir::currentPath(), "Perl scripts (*.pl);;All files (*)");
-
-            selectScriptToDebugDialog.close();
-            selectScriptToDebugDialog.deleteLater();
-
-            if (scriptToDebug.length() > 1) {
-                scriptToDebug = QDir::toNativeSeparators(scriptToDebug);
-
-                bool ok;
-                QString input =
-                        QInputDialog::getText(
-                            qApp->activeWindow(),
-                            "Command Line",
-                            "Enter all command line arguments, if any:",
-                            QLineEdit::Normal,
-                            "",
-                            &ok);
-
-                if (ok && !input.isEmpty()) {
-                    commandLineArguments = input;
-                }
-
-                // Close any still open Perl debugger session:
-                debuggerHandler.close();
-
-                // Start the Perl debugger:
-                qDebug() << QDateTime::currentMSecsSinceEpoch()
-                        << "msecs from epoch: file passed to Perl debugger:"
-                        << scriptToDebug;
-            }
-        }
-
-        // Get a Perl debugger command:
-        QUrlQuery scriptQuery(url);
-
-        QString debuggerCommand = scriptQuery
-                .queryItemValue("command", QUrl::FullyDecoded);
-        debuggerCommand.replace("+", " ");
-
-        // Clean any previous debugger output:
-        debuggerAccumulatedOutput = "";
-
-        if (debuggerHandler.isOpen()) {
-            if (debuggerCommand.length() > 0) {
-                qDebug() << QDateTime::currentMSecsSinceEpoch()
-                        << "msecs from epoch: Perl debugger command:"
-                        << debuggerCommand;
-
-                QByteArray debuggerCommandArray;
-                debuggerCommandArray.append(debuggerCommand.toLatin1());
-                debuggerCommandArray.append(QString("\n").toLatin1());
-                debuggerHandler.write(debuggerCommandArray);
-            }
-        } else {
-            // Sеt the environment for the debugged script:
-            QProcessEnvironment systemEnvironment =
-                    QProcessEnvironment::systemEnvironment();
-            systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-            debuggerHandler.setProcessEnvironment(systemEnvironment);
-
-            QFileInfo scriptAbsoluteFilePath(scriptToDebug);
-            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-            debuggerHandler.setWorkingDirectory(scriptDirectory);
-
-            debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
-            debuggerHandler.start(qApp->property("perlInterpreter")
-                                  .toString(),
-                                  QStringList()
-                                  << "-d"
-                                  << scriptToDebug
-                                  << commandLineArguments,
-                                  QProcess::Unbuffered
-                                  | QProcess::ReadWrite);
-
-            QByteArray debuggerCommandArray;
-            debuggerCommandArray.append(debuggerCommand.toLatin1());
-            debuggerCommandArray.append(QString("\n").toLatin1());
-            debuggerHandler.write(debuggerCommandArray);
-        }
-#endif
-    }
-
-    void qDebuggerOutputSlot()
-    {
-#if PERL_DEBUGGER_GUI == 1
-        // Read debugger output:
-        QString debuggerOutput = debuggerHandler.readAllStandardOutput();
-
-        // Append last output of the debugger to
-        // the accumulated debugger output:
-        debuggerAccumulatedOutput.append(debuggerOutput);
-
-        // qDebug() << QDateTime::currentMSecsSinceEpoch()
-        //          << "msecs from epoch:"
-        //          << "Perl debugger raw output:" << endl
-        //          << debuggerOutput;
-
-        // Formatting of Perl debugger output is started only after
-        // the final command prompt comes out of the debugger:
-        if (debuggerAccumulatedOutput.contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-            QUrl debuggerOutputFormatterUrl =
-                    QUrl::fromLocalFile(
-                        QDir::toNativeSeparators(
-                            QApplication::applicationDirPath()) +
-                        "/perl5dbgui/perl5dbgui.pl");
-
-            QByteArray debuggerOutputArray;
-            debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
-
-            // Clean any previous debugger output:
-            debuggerAccumulatedOutput = "";
-
-            qHandleScriptSlot(debuggerOutputFormatterUrl, debuggerOutputArray);
-        }
-#endif
-    }
-
-public:
-    QPage();
-
 protected:
     // ==============================
     // Link clicking management:
@@ -746,7 +602,23 @@ protected:
                      navigationType ==
                      QWebPage::NavigationTypeFormSubmitted) and
                         request.url().fileName() == "perl-debugger.function") {
-                    qHandlePerlDebugger(request.url());
+
+                    if (request.url().toString()
+                            .contains("action=select-file")) {
+                        debuggerHandler = new QPerlDebuggerHandler();
+
+                        QObject::connect(debuggerHandler,
+                                         SIGNAL(startDebuggerFormatterSignal(
+                                                    QUrl,
+                                                    QByteArray)),
+                                         this,
+                                         SLOT(qHandleScriptSlot(
+                                                  QUrl,
+                                                  QByteArray)));
+                    }
+
+                    debuggerHandler->qHandleDebuggerSlot(request.url());
+
                     return false;
                 }
 #endif
@@ -924,10 +796,10 @@ private:
     QString yesLabel;
     QString noLabel;
 
-    QProcess debuggerHandler;
-    QString debuggerAccumulatedOutput;
+    QPerlDebuggerHandler *debuggerHandler;
 
 public:
+    QPage();
     QHash<QString, QScriptHandler*> runningScripts;
 };
 

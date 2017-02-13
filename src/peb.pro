@@ -121,6 +121,17 @@ equals (QT_MAJOR_VERSION, 5) {
     # Printing support:
     QT += printsupport
 
+    # Source files:
+    SOURCES += \
+        main.cpp \
+        file-reader.cpp \
+        exit-handler.cpp \
+        local-reply.cpp \
+        main-window.cpp \
+        page.cpp \
+        script-handler.cpp \
+        view.cpp
+
     # Header files:
     HEADERS += \
         access-manager.h \
@@ -132,16 +143,15 @@ equals (QT_MAJOR_VERSION, 5) {
         script-handler.h \
         view.h
 
-    # Source files:
-    SOURCES += \
-        main.cpp \
-        file-reader.cpp \
-        exit-handler.cpp \
-        local-reply.cpp \
-        main-window.cpp \
-        page.cpp \
-        script-handler.cpp \
-        view.cpp
+    equals (PERL_DEBUGGER_GUI, 1) {
+        # Perl Debugger GUI source file:
+        SOURCES += \
+            perl-debugger-handler.cpp
+
+        # Perl Debugger GUI header file:
+        HEADERS += \
+            perl-debugger-handler.h
+    }
 
     # Resources:
     RESOURCES += resources/peb.qrc

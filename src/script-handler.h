@@ -22,6 +22,8 @@
 #include <QDateTime>
 #include <QDebug>
 #include <QProcess>
+#include <QFileDialog>
+#include <QInputDialog>
 
 // ==============================
 // SCRIPT HANDLER:

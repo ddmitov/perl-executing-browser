@@ -27,8 +27,7 @@
 // ==============================
 // SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
-QScriptHandler::QScriptHandler(
-        QUrl url, QByteArray postDataArray)
+QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
     // Signals and slots for local long running Perl scripts:

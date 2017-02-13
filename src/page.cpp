@@ -139,10 +139,4 @@ QPage::QPage()
 
     lastTargetFrame = currentFrame();
     windowCloseRequested = false;
-
-    // Signal and slot for the Perl debugger:
-#if PERL_DEBUGGER_GUI == 1
-    QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qDebuggerOutputSlot()));
-#endif
 }
