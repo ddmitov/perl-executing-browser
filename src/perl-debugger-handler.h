@@ -84,20 +84,21 @@ public slots:
         // Formatting of Perl debugger output is started only after
         // the final command prompt comes out of the debugger:
         if (debuggerAccumulatedOutput.contains(QRegExp ("DB\\<\\d{1,5}\\>"))) {
-            QUrl debuggerOutputFormatterUrl =
-                    QUrl::fromLocalFile(
-                        QDir::toNativeSeparators(
-                            QApplication::applicationDirPath()) +
-                        "/perl5dbgui/perl5dbgui.pl");
+
+            QString debuggerOutputFormatterFilePath =
+                    "http://" +
+                    QString(qApp->property("pseudoDomain").toString()) +
+                    "/perl5dbgui/perl5dbgui.pl";
 
             QByteArray debuggerOutputArray;
             debuggerOutputArray.append(debuggerAccumulatedOutput.toLatin1());
 
+
+            startDebuggerFormatterSignal(QUrl(debuggerOutputFormatterFilePath),
+                                         debuggerOutputArray);
+
             // Clean any previous debugger output:
             debuggerAccumulatedOutput = "";
-
-            startDebuggerFormatterSignal(debuggerOutputFormatterUrl,
-                                         debuggerOutputArray);
         }
     }
 private:

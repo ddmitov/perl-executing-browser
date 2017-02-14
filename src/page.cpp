@@ -60,6 +60,9 @@ QPage::QPage()
     // No download of files:
     setForwardUnsupportedContent(false);
 
+    // All links are handled by the application itself:
+    setLinkDelegationPolicy(QWebPage::DontDelegateLinks);
+
     // Disabled cache:
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);

@@ -600,12 +600,13 @@ protected:
                 // Perl Debugger GUI:
                 // Implementation of an idea proposed by Valcho Nedelchev
                 // ==============================
-#if PERL_DEBUGGER_GUI == 1
+
                 if ((navigationType == QWebPage::NavigationTypeLinkClicked or
                      navigationType ==
                      QWebPage::NavigationTypeFormSubmitted) and
                         request.url().fileName() == "perl-debugger.function") {
 
+#if PERL_DEBUGGER_GUI == 1
                     if (request.url().toString()
                             .contains("action=select-file")) {
                         debuggerHandler = new QPerlDebuggerHandler();
@@ -621,10 +622,11 @@ protected:
                     }
 
                     debuggerHandler->qHandleDebuggerSlot(request.url());
+#endif
 
                     return false;
                 }
-#endif
+
             }
 
             if (pageStatus == "untrusted") {
@@ -799,7 +801,9 @@ private:
     QString yesLabel;
     QString noLabel;
 
+#if PERL_DEBUGGER_GUI == 1
     QPerlDebuggerHandler *debuggerHandler;
+#endif
 
 public:
     QPage();

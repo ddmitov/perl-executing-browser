@@ -6,7 +6,7 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML GUI for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
+Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
 
 Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content in different browser windows.
 
@@ -87,16 +87,16 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Any icon can be displayed on windows and message boxes.](#icon)
 
 **Development goodies:**
-* [PEB can interact with the Perl 5 debugger in graphical mode.](#html-interface-for-the-perl-debugger)
+* [PEB can interact with the Perl 5 debugger in graphical mode.](#perl-debugger-gui)
 * ``QWebInspector`` window can be invoked using <kbd>Ctrl</kbd> + <kbd>I</kbd> keyboard shortcut.
 * [Optional logging of all browser actions](#log-files)
 
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebkit`` headers).  
-The ``QtWebkit`` set of classes is deprecated and removed from all later versions of Qt.  
-Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is resource-intensive and is not tested with the PEB sources.  
+GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebKit`` headers).  
+The ``QtWebKit`` set of classes is deprecated and removed from all later versions of Qt.  
+Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is not tested with the PEB sources.  
 
-The most important Qt dependency of PEB is not ``QtWebkit``, but ``QNetworkAccessManager`` which is subclassed to implement the local pseudo-domain of PEB and all requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with the ecosystem of ``QtWebEngine`` - the new Blink-based web engine of Qt. The transition to ``QtWebEngine`` is impractical because local POST requests and calling local Perl scripts from JavaScript can not be supported.  If you want to render the HTML GUI of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) and [camel-harness](https://github.com/ddmitov/camel-harness).  
+The most important Qt dependency of PEB is not ``QtWebKit``, but ``QNetworkAccessManager`` which is used to implement the local pseudo-domain and most of the requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with ``QtWebEngine`` - the new Blink-based web engine of Qt. The transition to ``QtWebEngine`` is impractical because local POST requests and calling local Perl scripts from JavaScript can not be supported.  If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -385,7 +385,7 @@ They have two functions:
   ```
 
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented in C++ code, but they do not constitute a sandbox for Perl scripts.
+   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented, but they do not constitute a sandbox for Perl scripts.
 
 **PEB security principles:**
 * Users have full access to their local data using PEB.
@@ -485,9 +485,9 @@ PEB-based Perl debugger GUI is an idea proposed by Valcho Nedelchev and provoked
 
 Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó.
 
-``{PEB_binary_directory}/perl5dbgui`` is home of the Perl debugger GUI script and the [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module. This folder and all files inside it should not be removed or renamed for the proper operation of the Perl debugger GUI.  
+``{PEB_binary_directory}/resources/app/perl5dbgui`` is home of the Perl debugger GUI script and the [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module. This folder and all files inside it should not be removed or renamed for the proper operation of the Perl debugger GUI.  
 
-**Windows caveat:** The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work inside PEB on Windows without a small, one-line modification, which makes the ``$console`` variable undefined. Tests proved that this is a minor change and it does not affect the normal operation of the debugger. This alteration is necessary because the ``Qprocess`` Qt class, which is used to handle the Perl debugger, doesn't use any console from the underlying operating system to start processes. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ``perl5db.pl`` manually by replacing ``$console = "con";`` with ``undef $console;`` or by using ``{PEB_binary_directory}/perl5dbgui/perl5db-win32.patch``.  
+**Windows caveat:** The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work with PEB on Windows without a small, one-line modification, which makes the ``$console`` variable undefined. Tests proved that this is a minor change and it does not affect the normal operation of the debugger. This alteration is necessary because the ``Qprocess`` class, which is used to handle the Perl debugger, does not use any console from the underlying operating system. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ``perl5db.pl`` manually by replacing ``$console = "con";`` with ``undef $console;`` or by using ``{PEB_binary_directory}/resources/app/perl5dbgui/perl5db-win32.patch``.  
 
 ![PEB Perl Debugger GUI](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
 

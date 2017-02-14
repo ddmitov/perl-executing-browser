@@ -42,43 +42,36 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
 
     QUrlQuery scriptQuery(url);
 
-    if (url.scheme().contains("http")) {
-        scriptFullFilePath = QDir::toNativeSeparators
-                ((qApp->property("application").toString()) + url.path());
+    scriptFullFilePath = QDir::toNativeSeparators
+            ((qApp->property("application").toString()) + url.path());
 
-        scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
-        scriptQuery.removeQueryItem("stdout");
-        if (scriptStdoutTarget.length() > 0) {
-            qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
-        }
-
-        scriptUser = url.userName();
-        if (scriptUser.length() > 0) {
-            scriptId = url.password() + "@" + url.path();
-
-            scriptCloseCommand =
-                    scriptQuery.queryItemValue("close_command");
-            if (scriptCloseCommand.length() == 0) {
-                qDebug() << "Close command is not defined"
-                         << "for interactive script:"
-                         << scriptFullFilePath;
-            }
-
-            scriptCloseConfirmation =
-                    scriptQuery.queryItemValue("close_confirmation");
-            if (scriptCloseConfirmation.length() == 0) {
-                qDebug() << "Close confirmation is not defined"
-                         << "for interactive script:"
-                         << scriptFullFilePath;
-            }
-        }
+    scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
+    scriptQuery.removeQueryItem("stdout");
+    if (scriptStdoutTarget.length() > 0) {
+        qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
     }
 
-#if PERL_DEBUGGER_GUI == 1
-    if (url.scheme().contains("file")) {
-        scriptFullFilePath = QDir::toNativeSeparators(url.path());
+    scriptUser = url.userName();
+
+    if (scriptUser.length() > 0) {
+        scriptId = url.password() + "@" + url.path();
+
+        scriptCloseCommand =
+                scriptQuery.queryItemValue("close_command");
+        if (scriptCloseCommand.length() == 0) {
+            qDebug() << "Close command is not defined"
+                     << "for interactive script:"
+                     << scriptFullFilePath;
+        }
+
+        scriptCloseConfirmation =
+                scriptQuery.queryItemValue("close_confirmation");
+        if (scriptCloseConfirmation.length() == 0) {
+            qDebug() << "Close confirmation is not defined"
+                     << "for interactive script:"
+                     << scriptFullFilePath;
+        }
     }
-#endif
 
     QString postData(postDataArray);
 
