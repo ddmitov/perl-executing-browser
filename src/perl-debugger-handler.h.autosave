@@ -50,9 +50,6 @@ public slots:
                 .queryItemValue("command", QUrl::FullyDecoded);
         debuggerCommand.replace("+", " ");
 
-//        // Clean any previous debugger output:
-//        debuggerAccumulatedOutput = "";
-
         if (debuggerHandler.isOpen()) {
             if (debuggerCommand.length() > 0) {
                 qDebug() << QDateTime::currentMSecsSinceEpoch()

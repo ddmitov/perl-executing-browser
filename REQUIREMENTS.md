@@ -1,7 +1,7 @@
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebkit`` headers).  
-The ``QtWebkit`` set of classes is deprecated and removed from all later versions of Qt.  
-Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is resource-intensive and is not tested with the PEB sources.  
+GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebKit`` headers).  
+The ``QtWebKit`` set of classes is deprecated and removed from all later versions of Qt.  
+Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is not tested with the PEB sources.  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
