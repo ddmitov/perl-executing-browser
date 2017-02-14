@@ -4,8 +4,9 @@ logs/
 tmp/
 perl/bin/perl
 
-test.db
 *.qm
+*.autosave
+test.db
 Makefile
 peb
 peb.exe
