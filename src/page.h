@@ -313,7 +313,6 @@ public slots:
         QFileDialog inodesDialog (qApp->activeWindow());
         inodesDialog.setWindowModality(Qt::WindowModal);
         inodesDialog.setViewMode(QFileDialog::Detail);
-//        inodesDialog.setWindowTitle(QViewWidget::title());
 #ifdef Q_OS_WIN
         inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
 #endif

@@ -271,7 +271,8 @@ public slots:
 
         QWebInspector *inspector = new QWebInspector;
         inspector->setPage(QViewWidget::page());
-        inspector->show();
+        inspector->setGeometry(qApp->desktop()->availableGeometry());
+        inspector->showMaximized();
     }
 
     // ==============================
