@@ -35,11 +35,11 @@ QPerlDebuggerHandler::QPerlDebuggerHandler()
 
     QString scriptToDebugFilePath =
             QDir::toNativeSeparators(selectScriptToDebugDialog
-                                     .getOpenFileName
-                                     (qApp->activeWindow(),
-                                      "Select Perl File",
-                                      QDir::currentPath(),
-                                      "Perl scripts (*.pl);;All files (*)"));
+                                     .getOpenFileName(
+                                         qApp->activeWindow(),
+                                         "Select Perl File",
+                                         QDir::currentPath(),
+                                         "Perl scripts (*.pl);;All files (*)"));
 
     selectScriptToDebugDialog.close();
     selectScriptToDebugDialog.deleteLater();

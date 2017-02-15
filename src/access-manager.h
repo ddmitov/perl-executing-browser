@@ -19,9 +19,9 @@
 #define ACCESSMANAGER_H
 
 #include <QApplication>
-#include <QDir>
 #include <QDesktopServices>
 #include <QDesktopWidget>
+#include <QDir>
 #include <QMimeDatabase>
 #include <QtNetwork/QNetworkAccessManager>
 

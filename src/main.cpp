@@ -29,10 +29,10 @@
 
 #include <qglobal.h>
 #include <QApplication>
-#include <QTextCodec>
-#include <QJsonArray>
 #include <QDateTime>
 #include <QDebug>
+#include <QJsonArray>
+#include <QTextCodec>
 
 #include "main-window.h"
 #include "exit-handler.h"

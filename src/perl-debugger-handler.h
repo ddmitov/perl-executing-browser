@@ -19,9 +19,9 @@
 #define PERLDEBUGGERHANDLER_H
 
 #include <QApplication>
-#include <QDir>
 #include <QDateTime>
 #include <QDebug>
+#include <QDir>
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QProcess>

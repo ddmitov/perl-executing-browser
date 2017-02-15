@@ -18,16 +18,17 @@
 #ifndef PAGE_H
 #define PAGE_H
 
+#include <QInputDialog>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QMessageBox>
 #include <QNetworkReply>
+#include <QRegularExpression>
+#include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QWebPage>
 #include <QWebFrame>
-#include <QTimer>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QInputDialog>
-#include <QMessageBox>
 
 #include "file-reader.h"
 #include "script-handler.h"
@@ -48,7 +49,6 @@ signals:
     void displayScriptErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
-    void selectInodeSignal(QNetworkRequest request);
     void pageStatusSignal(QString pageStatus);
     void closeAllScriptsSignal();
     void closeWindowSignal();
@@ -304,6 +304,70 @@ public slots:
     }
 
     // ==============================
+    // Select files or folders:
+    // ==============================
+    void qSelectInodesSlot(QNetworkRequest request)
+    {
+        QString target = request.url().query().replace("target=", "");
+
+        QFileDialog inodesDialog (qApp->activeWindow());
+        inodesDialog.setWindowModality(Qt::WindowModal);
+        inodesDialog.setViewMode(QFileDialog::Detail);
+//        inodesDialog.setWindowTitle(QViewWidget::title());
+#ifdef Q_OS_WIN
+        inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
+#endif
+
+        if (request.url().fileName() == "open-file.function") {
+            inodesDialog.setFileMode(QFileDialog::AnyFile);
+        }
+
+        if (request.url().fileName() == "open-files.function") {
+            inodesDialog.setFileMode(QFileDialog::ExistingFiles);
+        }
+
+        if (request.url().fileName() == "new-file-name.function") {
+            inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
+        }
+
+        if (request.url().fileName() == "open-directory.function") {
+            inodesDialog.setFileMode(QFileDialog::Directory);
+        }
+
+        QStringList userSelectedInodes;
+        if (inodesDialog.exec()) {
+            userSelectedInodes = inodesDialog.selectedFiles();
+        }
+
+        inodesDialog.close();
+        inodesDialog.deleteLater();
+
+        if (!userSelectedInodes.isEmpty()) {
+            QString userSelectedInodesFormatted;
+            foreach (QString userSelectedInode, userSelectedInodes) {
+                userSelectedInodesFormatted.append(userSelectedInode);
+                userSelectedInodesFormatted.append(";");
+            }
+            userSelectedInodesFormatted.replace(QRegularExpression(";$"), "");
+
+            // JavaScript bridge back to
+            // the local HTML frame where request originated:
+            qJavaScriptInjector(currentFrame());
+
+            QString inodeSelectedJavaScript =
+                    "pebInodeSelection(\"" +
+                    userSelectedInodesFormatted +
+                    "\" , \"" +
+                    target +
+                    "\"); null";
+
+            currentFrame()->evaluateJavaScript(inodeSelectedJavaScript);
+
+            qDebug() << "User selected inode:" << userSelectedInodesFormatted;
+        }
+    }
+
+    // ==============================
     // JavaScript-injecting routines:
     // ==============================
     void qFrameCustomizerSlot(QWebFrame *frame)
@@ -495,7 +559,7 @@ protected:
                         request.url().fileName() == "open-file.function") {
                     if (request.url().query()
                             .replace("target=", "").length() > 0) {
-                        emit selectInodeSignal(request);
+                        qSelectInodesSlot(request);
                     }
 
                     return false;
@@ -508,7 +572,7 @@ protected:
                         request.url().fileName() == "open-files.function") {
                     if (request.url().query()
                             .replace("target=", "").length() > 0) {
-                        emit selectInodeSignal(request);
+                        qSelectInodesSlot(request);
                     }
 
                     return false;
@@ -521,7 +585,7 @@ protected:
                         request.url().fileName() == "new-file-name.function") {
                     if (request.url().query()
                             .replace("target=", "").length() > 0) {
-                        emit selectInodeSignal(request);
+                        qSelectInodesSlot(request);
                     }
 
                     return false;
@@ -534,7 +598,7 @@ protected:
                         request.url().fileName() == "open-directory.function") {
                     if (request.url().query()
                             .replace("target=", "").length() > 0) {
-                        emit selectInodeSignal(request);
+                        qSelectInodesSlot(request);
                     }
 
                     return false;

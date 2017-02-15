@@ -18,13 +18,11 @@
 #ifndef VIEW_H
 #define VIEW_H
 
-#include <QRegularExpression>
-#include <QtNetwork/QNetworkRequest>
-#include <QWebView>
 #include <QContextMenuEvent>
+#include <QDesktopWidget>
 #include <QMenu>
 #include <QWebInspector>
-#include <QDesktopWidget>
+#include <QWebView>
 
 #include "page.h"
 
@@ -54,73 +52,6 @@ public slots:
     void qChangeTitleSlot()
     {
         setWindowTitle(QViewWidget::title());
-    }
-
-    // ==============================
-    // Select files or folders:
-    // ==============================
-    void qSelectInodesSlot(QNetworkRequest request)
-    {
-        QString target = request.url().query().replace("target=", "");
-
-        QFileDialog inodesDialog (this);
-        inodesDialog.setWindowModality(Qt::WindowModal);
-        inodesDialog.setViewMode(QFileDialog::Detail);
-        inodesDialog.setWindowTitle(QViewWidget::title());
-#ifdef Q_OS_WIN
-        inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
-#endif
-
-        if (request.url().fileName() == "open-file.function") {
-            inodesDialog.setFileMode(QFileDialog::AnyFile);
-        }
-
-        if (request.url().fileName() == "open-files.function") {
-            inodesDialog.setFileMode(QFileDialog::ExistingFiles);
-        }
-
-        if (request.url().fileName() == "new-file-name.function") {
-            inodesDialog.setAcceptMode(QFileDialog::AcceptSave);
-        }
-
-        if (request.url().fileName() == "open-directory.function") {
-            inodesDialog.setFileMode(QFileDialog::Directory);
-        }
-
-        QStringList userSelectedInodes;
-        if (inodesDialog.exec()) {
-            userSelectedInodes = inodesDialog.selectedFiles();
-        }
-
-        inodesDialog.close();
-        inodesDialog.deleteLater();
-
-        if (!userSelectedInodes.isEmpty()) {
-            QString userSelectedInodesFormatted;
-            foreach (QString userSelectedInode, userSelectedInodes) {
-                userSelectedInodesFormatted.append(userSelectedInode);
-                userSelectedInodesFormatted.append(";");
-            }
-            userSelectedInodesFormatted
-                    .replace(QRegularExpression(";$"), "");
-
-            // JavaScript bridge back to
-            // the local HTML frame where request originated:
-            mainPage->qJavaScriptInjector(mainPage->currentFrame());
-
-            QString inodeSelectedJavaScript =
-                    "pebInodeSelection(\"" +
-                    userSelectedInodesFormatted +
-                    "\" , \"" +
-                    target +
-                    "\"); null";
-
-            mainPage->currentFrame()->
-                    evaluateJavaScript(inodeSelectedJavaScript);
-
-            qDebug() << "User selected inode:"
-                    << userSelectedInodesFormatted;
-        }
     }
 
     // ==============================

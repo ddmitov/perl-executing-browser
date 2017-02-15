@@ -54,10 +54,6 @@ QViewWidget::QViewWidget()
     QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
                      this, SLOT(qChangeTitleSlot()));
 
-    // Signal and slot for selecting files or folders from URL:
-    QObject::connect(mainPage, SIGNAL(selectInodeSignal(QNetworkRequest)),
-                     this, SLOT(qSelectInodesSlot(QNetworkRequest)));
-
     // Signals and slots for closing windows:
     QObject::connect(this, SIGNAL(initiateWindowClosingSignal()),
                      mainPage, SLOT(qInitiateWindowClosingSlot()));
