@@ -54,22 +54,24 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
     scriptUser = url.userName();
 
     if (scriptUser.length() > 0) {
-        scriptId = url.password() + "@" + url.path();
+        if (scriptUser == "interactive") {
+            scriptId = url.password() + "@" + url.path();
 
-        scriptCloseCommand =
-                scriptQuery.queryItemValue("close_command");
-        if (scriptCloseCommand.length() == 0) {
-            qDebug() << "Close command is not defined"
-                     << "for interactive script:"
-                     << scriptFullFilePath;
-        }
+            scriptCloseCommand =
+                    scriptQuery.queryItemValue("close_command");
+            if (scriptCloseCommand.length() == 0) {
+                qDebug() << "Close command is not defined"
+                         << "for interactive script:"
+                         << scriptFullFilePath;
+            }
 
-        scriptCloseConfirmation =
-                scriptQuery.queryItemValue("close_confirmation");
-        if (scriptCloseConfirmation.length() == 0) {
-            qDebug() << "Close confirmation is not defined"
-                     << "for interactive script:"
-                     << scriptFullFilePath;
+            scriptCloseConfirmation =
+                    scriptQuery.queryItemValue("close_confirmation");
+            if (scriptCloseConfirmation.length() == 0) {
+                qDebug() << "Close confirmation is not defined"
+                         << "for interactive script:"
+                         << scriptFullFilePath;
+            }
         }
     }
 

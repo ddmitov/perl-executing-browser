@@ -33,61 +33,71 @@ QPerlDebuggerHandler::QPerlDebuggerHandler()
     selectScriptToDebugDialog
             .setWindowModality(Qt::WindowModal);
 
-    QString scriptToDebug = selectScriptToDebugDialog
-            .getOpenFileName
-            (qApp->activeWindow(), "Select Perl File",
-             QDir::currentPath(), "Perl scripts (*.pl);;All files (*)");
+    QString scriptToDebugFilePath =
+            QDir::toNativeSeparators(selectScriptToDebugDialog
+                                     .getOpenFileName
+                                     (qApp->activeWindow(),
+                                      "Select Perl File",
+                                      QDir::currentPath(),
+                                      "Perl scripts (*.pl);;All files (*)"));
 
     selectScriptToDebugDialog.close();
     selectScriptToDebugDialog.deleteLater();
 
-    QString commandLineArguments;
+    if (scriptToDebugFilePath.length() > 1) {
+        QString browserScriptMarker =
+                QString("resources") + QDir::separator() + QString("app");
+        QString commandLineArguments;
 
-    if (scriptToDebug.length() > 1) {
-        scriptToDebug = QDir::toNativeSeparators(scriptToDebug);
+        // Get command-line arguments
+        // if the debugged script is not a PEB-based Perl script
+        if (!scriptToDebugFilePath.contains(browserScriptMarker)) {
+            bool ok;
+            QString input =
+                    QInputDialog::getText(
+                        qApp->activeWindow(),
+                        "Command Line",
+                        "Enter all command line arguments, if any:",
+                        QLineEdit::Normal,
+                        "",
+                        &ok);
 
-        // Get all command-line arguments for the debugged Perl script:
-        bool ok;
-        QString input =
-                QInputDialog::getText(
-                    qApp->activeWindow(),
-                    "Command Line",
-                    "Enter all command line arguments, if any:",
-                    QLineEdit::Normal,
-                    "",
-                    &ok);
-
-        if (ok && !input.isEmpty()) {
-            commandLineArguments = input;
+            if (ok && !input.isEmpty()) {
+                commandLineArguments = input;
+            }
         }
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
                  << "msecs from epoch: file passed to Perl debugger:"
-                 << scriptToDebug;
+                 << scriptToDebugFilePath;
+
+        // Signal and slot for reading the Perl debugger output:
+        QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
+                         this, SLOT(qDebuggerOutputSlot()));
+
+        // Sеt the environment for the debugged script:
+        QProcessEnvironment systemEnvironment =
+                QProcessEnvironment::systemEnvironment();
+        systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
+        debuggerHandler.setProcessEnvironment(systemEnvironment);
+
+        // Set the working directory to the script directory
+        // if the debugged script is not a PEB-based Perl script
+        if (!scriptToDebugFilePath.contains(browserScriptMarker)) {
+            QFileInfo scriptAbsoluteFilePath(scriptToDebugFilePath);
+            QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
+            debuggerHandler.setWorkingDirectory(scriptDirectory);
+        }
+
+        debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
+
+        debuggerHandler.start(qApp->property("perlInterpreter")
+                              .toString(),
+                              QStringList()
+                              << "-d"
+                              << scriptToDebugFilePath
+                              << commandLineArguments,
+                              QProcess::Unbuffered
+                              | QProcess::ReadWrite);
     }
-
-    // Signal and slot for reading the Perl debugger output:
-    QObject::connect(&debuggerHandler, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qDebuggerOutputSlot()));
-
-    // Sеt the environment for the debugged script:
-    QProcessEnvironment systemEnvironment =
-            QProcessEnvironment::systemEnvironment();
-    systemEnvironment.insert("PERLDB_OPTS", "ReadLine=0");
-    debuggerHandler.setProcessEnvironment(systemEnvironment);
-
-    QFileInfo scriptAbsoluteFilePath(scriptToDebug);
-    QString scriptDirectory = scriptAbsoluteFilePath.absolutePath();
-    debuggerHandler.setWorkingDirectory(scriptDirectory);
-
-    debuggerHandler.setProcessChannelMode(QProcess::MergedChannels);
-
-    debuggerHandler.start(qApp->property("perlInterpreter")
-                          .toString(),
-                          QStringList()
-                          << "-d"
-                          << scriptToDebug
-                          << commandLineArguments,
-                          QProcess::Unbuffered
-                          | QProcess::ReadWrite);
 }
