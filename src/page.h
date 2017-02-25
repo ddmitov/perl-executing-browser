@@ -33,10 +33,6 @@
 #include "file-reader.h"
 #include "script-handler.h"
 
-#if PERL_DEBUGGER_GUI == 1
-#include "perl-debugger-handler.h"
-#endif
-
 // ==============================
 // WEB PAGE CLASS CONSTRUCTOR:
 // ==============================
@@ -658,38 +654,6 @@ protected:
 
                     return false;
                 }
-
-                // ==============================
-                // Perl Debugger GUI:
-                // Implementation of an idea proposed by Valcho Nedelchev
-                // ==============================
-
-                if ((navigationType == QWebPage::NavigationTypeLinkClicked or
-                     navigationType ==
-                     QWebPage::NavigationTypeFormSubmitted) and
-                        request.url().fileName() == "perl-debugger.function") {
-
-#if PERL_DEBUGGER_GUI == 1
-                    if (request.url().toString()
-                            .contains("action=select-file")) {
-                        debuggerHandler = new QPerlDebuggerHandler();
-
-                        QObject::connect(debuggerHandler,
-                                         SIGNAL(startDebuggerFormatterSignal(
-                                                    QUrl,
-                                                    QByteArray)),
-                                         this,
-                                         SLOT(qHandleScriptSlot(
-                                                  QUrl,
-                                                  QByteArray)));
-                    }
-
-                    debuggerHandler->qHandleDebuggerSlot(request.url());
-#endif
-
-                    return false;
-                }
-
             }
 
             if (pageStatus == "untrusted") {
@@ -863,10 +827,6 @@ private:
     QString cancelLabel;
     QString yesLabel;
     QString noLabel;
-
-#if PERL_DEBUGGER_GUI == 1
-    QPerlDebuggerHandler *debuggerHandler;
-#endif
 
 public:
     QPage();

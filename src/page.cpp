@@ -34,11 +34,11 @@ QPage::QPage()
             setDefaultTextEncoding(QString("utf-8"));
 
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::PluginsEnabled, false);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::PluginsEnabled, false);
 
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);

@@ -38,7 +38,6 @@ class QAccessManager : public QNetworkAccessManager
 
 signals:
     void handleScriptSignal(QUrl url, QByteArray postDataArray);
-    void handlePerlDebuggerSignal(QUrl url);
     void closeWindowSignal();
 
 protected:

@@ -9,7 +9,7 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2016
+# Dimitar D. Mitov, 2013 - 2017
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
@@ -78,34 +78,9 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # PERL DEBUGGER GUI:
-    # To enable Perl debugger GUI:
-    # PERL_DEBUGGER_GUI = 1
-    # By default Perl debugger GUI is enabled.
-    # To disable Perl debugger GUI:
-    # PERL_DEBUGGER_GUI = 0
-    # If PEB is going to be compiled for end users and
-    # interaction with the biult-in Perl debugger is
-    # not needed or not wanted for security reasons,
-    # this functionality can be turned off.
-    ##########################################################
-
-    PERL_DEBUGGER_GUI = 1
-
-    DEFINES += "PERL_DEBUGGER_GUI=$$PERL_DEBUGGER_GUI"
-
-    equals (PERL_DEBUGGER_GUI, 0) {
-        message ("Configured without Perl debugger GUI.")
-    }
-    equals (PERL_DEBUGGER_GUI, 1) {
-        message ("Configured with Perl debugger GUI.")
-    }
-
-    ##########################################################
 
     # Binary basics:
-    # CONFIG+=debug
-    CONFIG+=release
+    CONFIG += release
     TEMPLATE = app
     TARGET = peb
 
@@ -142,16 +117,6 @@ equals (QT_MAJOR_VERSION, 5) {
         page.h \
         script-handler.h \
         view.h
-
-    equals (PERL_DEBUGGER_GUI, 1) {
-        # Perl Debugger GUI source file:
-        SOURCES += \
-            perl-debugger-handler.cpp
-
-        # Perl Debugger GUI header file:
-        HEADERS += \
-            perl-debugger-handler.h
-    }
 
     # Resources:
     RESOURCES += resources/peb.qrc

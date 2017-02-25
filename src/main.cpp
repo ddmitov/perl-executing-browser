@@ -16,9 +16,7 @@
 */
 
 #ifndef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1 or PERL_DEBUGGER_GUI == 1
 #include <unistd.h> // geteuid(); isatty();
-#endif
 #endif
 
 #ifdef Q_OS_WIN
@@ -163,41 +161,10 @@ int main(int argc, char **argv)
     // ==============================
     // Start from terminal detection:
     // ==============================
-    // If the browser is started from terminal,
-    // it will start another copy of itself and close the first one.
-    // This is necessary for a working interaction with the Perl debugger on
-    // all Unix-like operating systems.
 #ifndef Q_OS_WIN
-#if PERL_DEBUGGER_GUI == 1
-    if (isatty(fileno(stdin))) {
-        // Fork another instance of the browser:
-        int pid = fork();
-        if (pid < 0) {
-            return 1;
-        }
+//    if (isatty(fileno(stdin))) {
 
-        if (pid == 0) {
-            // Detach all standard I/O descriptors:
-            close(0);
-            close(1);
-            close(2);
-
-            // Enter a new session:
-            setsid();
-
-            // New instance is now detached from terminal:
-            QProcess anotherInstance;
-            anotherInstance.startDetached(
-                        QApplication::applicationFilePath());
-            if (anotherInstance.waitForStarted(-1)) {
-                return 1;
-            }
-        } else {
-            // The parent instance should be closed now:
-            return 1;
-        }
-    }
-#endif
+//    }
 #endif
 
     // ==============================
@@ -436,14 +403,6 @@ int main(int argc, char **argv)
 
 #if ADMIN_PRIVILEGES_CHECK == 1
         qDebug() << "Administrative privileges check is enabled.";
-#endif
-
-#if PERL_DEBUGGER_GUI == 0
-        qDebug() << "Perl debugger GUI is disabled.";
-#endif
-
-#if PERL_DEBUGGER_GUI == 1
-        qDebug() << "Perl debugger GUI is enabled.";
 #endif
 
         qDebug() << "Perl interpreter:" << perlInterpreterFullPath;

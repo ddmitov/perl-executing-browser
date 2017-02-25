@@ -6,7 +6,7 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain. HTML interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html) is also available.  
+Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain.  
 
 Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content in different browser windows.
 
@@ -26,13 +26,12 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs](#special-urls)
-* [Perl Debugger GUI](#perl-debugger-gui)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
 * [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
 * [History](#history)
-* [Application using PEB](#application-using-peb)
+* [Applications Based on PEB](#applications-based-on-peb)
 * [License](#license)
 * [Authors](#authors)
 
@@ -65,10 +64,8 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 ## Target Audience
 * Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
 * DevOps people in need of custom Perl-based GUI monitoring and administration solutions
-* Perl 5 enthusiasts and developers willing to use the built-in Perl debugger in graphical mode
 
 ## Features
-**Usability:**
 * [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
 * [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
@@ -85,9 +82,6 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes)
 * [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
 * [Any icon can be displayed on windows and message boxes.](#icon)
-
-**Development goodies:**
-* [PEB can interact with the Perl 5 debugger in graphical mode.](#perl-debugger-gui)
 * ``QWebInspector`` window can be invoked using <kbd>Ctrl</kbd> + <kbd>I</kbd> keyboard shortcut.
 * [Optional logging of all browser actions](#log-files)
 
@@ -126,20 +120,14 @@ Changing the compile-time variables of PEB requires editing its project file - `
   CONFIG += app_bundle
   ```
 
-<a name="security-compile-time-variables"></a>
-The following two compile-time variables can tighten further the security of PEB.
+<a name="security-compile-time-variable"></a>
+The following compile-time variable can tighten further the security of PEB.
 
 * **Administrative privileges check:** ``ADMIN_PRIVILEGES_CHECK``  
   To disable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 0``  
   By default administrative privileges check is disabled.  
   To enable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 1``  
   If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
-
-* **Perl debugger GUI:** ``PERL_DEBUGGER_GUI``  
-  To enable Perl debugger GUI: ``PERL_DEBUGGER_GUI = 1``  
-  By default Perl debugger GUI is enabled.  
-  To disable Perl debugger GUI: ``PERL_DEBUGGER_GUI = 0``  
-  If PEB is going to be compiled for end users and Perl debugger GUI is not needed or not wanted for security reasons, it can be turned off.
 
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
@@ -402,11 +390,9 @@ They have two functions:
   a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
 * Local Perl scripts can not be started from untrusted pages.
 * Files or folders can not be selected with their full paths from untrusted pages.
-* PEB HTML interface for the Perl debugger can not be accessed from an untrusted page.
 * Cross-site scripting is disabled for all web and local pages.
-* Plugin support is disabled.
 
-**[Optional security features based on compile-time variables](#security-compile-time-variables)**
+**[Optional security feature based on compile-time variable](#security-compile-time-variable)**
 
 ## Special URLs
 * **PEB pseudo-domain:** ``http://local-pseudodomain/``  
@@ -472,25 +458,6 @@ They have two functions:
 * **Close current window:** ``http://local-pseudodomain/close-window.function``  
   Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).  
 
-The following special URLs are implemented for the Perl debugger GUI:  
-
-* **Select file to debug:** ``http://local-pseudodomain/perl-debugger.function?action=select-file``
-
-* **Send debugger command:** ``http://local-pseudodomain/perl-debugger.function?command=M``
-
-## Perl Debugger GUI
-PEB is also an HTML user interface for the default Perl debugger. Any Perl script can be selected for debugging and the debugger output is displayed together with the syntax highlighted source code of the debugged script and its modules.  
-
-PEB-based Perl debugger GUI is an idea proposed by Valcho Nedelchev and provoked by the scarcity of graphical frontends for the Perl debugger.  
-
-Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) CPAN module by Hans Jeuken and Gábor Szabó.
-
-``{PEB_binary_directory}/resources/app/perl5dbgui`` is home of the Perl debugger GUI script and the [Syntax::Highlight::Engine::Kate](https://metacpan.org/release/Syntax-Highlight-Engine-Kate) module. This folder and all files inside it should not be removed or renamed for the proper operation of the Perl debugger GUI.  
-
-**Windows caveat:** The [default Perl debugger](http://perldoc.perl.org/perldebug.html) can not work with PEB on Windows without a small, one-line modification, which makes the ``$console`` variable undefined. Tests proved that this is a minor change and it does not affect the normal operation of the debugger. This alteration is necessary because the ``Qprocess`` class, which is used to handle the Perl debugger, does not use any console from the underlying operating system. Without the modification the debugger is unable to find a console and hangs. You could easily patch your Windows version of ``perl5db.pl`` manually by replacing ``$console = "con";`` with ``undef $console;`` or by using ``{PEB_binary_directory}/resources/app/perl5dbgui/perl5db-win32.patch``.  
-
-![PEB Perl Debugger GUI](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-perl-debugger.png "PEB HTML Interface for the Perl Debugger")
-
 ## Local File Types
   All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  
 
@@ -527,7 +494,7 @@ Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
 
 ## Limitations
-* No page produced by a local Perl script can be reloaded because no temporary files for script output are written.  
+* No page produced by a local Perl script can be reloaded because no temporary files are written.  
   Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ``location.reload()``.
 * No history and cache.  
   JavaScript functions ``window.history.back()``, ``window.history.forward()`` and ``window.history.go()`` are disabled.
@@ -537,8 +504,9 @@ Syntax highlighting is achieved using [Syntax::Highlight::Engine::Kate](https://
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
-## Application using PEB
+## Applications Based on PEB
 * [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is implemented as a hybrid desktop and server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework, [Bootstrap](http://getbootstrap.com/) for a themable HTML 5 user interface, JavaScript for on-screen text conversion and [Perl 5](https://www.perl.org/) for a file-writing backend.
+* [Camel Doctor](https://github.com/ddmitov/camel-doctor) is an HTML user interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html).
 
 ## License
 This program is free software;  
