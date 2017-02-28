@@ -86,11 +86,12 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Optional logging of all browser actions](#log-files)
 
 ## Compile-time Requirements
-GCC compiler and Qt 5.1 - 5.5 headers (including ``QtWebKit`` headers).  
-The ``QtWebKit`` set of classes is deprecated and removed from all later versions of Qt.  
-Compiling ``QtWebKit`` for a recent Qt version is possible, but this approach is not tested with the PEB sources.  
+* GCC compiler
+* Qt 5.1 - 5.5 (including ``QtWebKit`` libraries and headers)  
+  ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
+  Compiling ``QtWebKit`` for a recent Qt version is possible, but not trivial or tested with PEB.  
 
-The most important Qt dependency of PEB is not ``QtWebKit``, but ``QNetworkAccessManager`` which is used to implement the local pseudo-domain and most of the requests to local content. Unfortunately ``QNetworkAccessManager`` is incompatible with ``QtWebEngine`` - the new Blink-based web engine of Qt. The transition to ``QtWebEngine`` is impractical because local POST requests and calling local Perl scripts from JavaScript can not be supported.  If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
+The implementation of the local pseudo-domain and all requests to local content depend on the ``QNetworkAccessManager`` class, but it is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
