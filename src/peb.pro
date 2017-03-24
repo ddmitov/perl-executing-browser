@@ -54,7 +54,7 @@ equals (QT_MAJOR_VERSION, 5) {
             message ("Configured with Mac OSX bundle support.")
         }
 
-        ICON = icons/camel.icns
+        ICON = resources/icons/camel.icns
     }
 
     ##########################################################
