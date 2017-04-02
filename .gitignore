@@ -1,8 +1,9 @@
 archive/
 qt/
 logs/
+perl/bin
+perl/lib
 tmp/
-perl/bin/perl
 
 *.qm
 *.autosave
