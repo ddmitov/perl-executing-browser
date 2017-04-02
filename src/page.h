@@ -133,7 +133,6 @@ public slots:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
                     scriptStdoutTarget.length() == 0) {
-
                 qDisplayScriptOutputSlot(scriptAccumulatedOutput, emptyString);
             }
 
@@ -160,7 +159,8 @@ public slots:
                     }
                 } else {
                     // If script has some output and errors,
-                    // HTML formatted errors will be displayed in a new window:
+                    // HTML formatted errors
+                    // will be displayed in a new window:
                     qFormatScriptErrors(scriptAccumulatedErrors,
                                         scriptFullFilePath,
                                         true);

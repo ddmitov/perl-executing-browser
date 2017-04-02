@@ -137,7 +137,7 @@ The following compile-time variable can tighten further the security of PEB.
   PEB can also use any Perl on PATH.
 
 ## Supported Perl Script Types
-  PEB does not impose execution timeouts and recognizes four main types of local Perl scripts:  
+  PEB recognizes four main types of local Perl scripts and does not impose execution timeouts on them:  
 * [**non-interactive scripts**](#non-interactive-perl-scripts)
 * [**interactive scripts**](#interactive-perl-scripts)
 * [**AJAX scripts**](#ajax-perl-scripts)

@@ -2,9 +2,15 @@
 
 use strict;
 use warnings;
-use AnyEvent;
 use POSIX qw(strftime);
 binmode STDOUT, ":utf8";
+
+if (eval("require AnyEvent;")) {
+  AnyEvent->import();
+} else {
+  print "AnyEvent Perl module is not loaded.<br><br>";
+  exit 0;
+}
 
 # Disable built-in buffering:
 $| = 1;

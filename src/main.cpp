@@ -21,7 +21,7 @@
 
 #ifdef Q_OS_WIN
 #if ADMIN_PRIVILEGES_CHECK == 1
-#include <windows.h> // for isUserAdmin()
+#include <windows.h> // isUserAdmin()
 #endif
 #endif
 

@@ -216,6 +216,7 @@ http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-w
 
 ## Perl 5
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
+http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
