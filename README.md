@@ -39,10 +39,10 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
   These are the basic steps for building your first PEB-based application:
 * **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
 * **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
-* **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ``filesystem.html`` file in the demo package shipped with PEB.
+* **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ``filesystem.html`` file within the PEB demo package.
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
 * **2.** Write your Perl scripts.  
-    Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file in the demo package.  
+    Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file within the PEB demo package.  
 
   Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory - see section [Settings](#settings).  
 
@@ -91,18 +91,17 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
   ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
   Compiling ``QtWebKit`` for a recent Qt version is possible, but not trivial or tested with PEB.  
 
-The implementation of the local pseudo-domain and all requests to local content depend on the ``QNetworkAccessManager`` class, but it is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
+The implementation of the local pseudo-domain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
-* [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/official_releases/qt/5.1/5.1.1/) on 32-bit Debian Linux,
-* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Debian Linux,
-* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/official_releases/qt/5.2/5.2.0/) on 32-bit Windows XP,
-* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/official_releases/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5,
-* [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/official_releases/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
-* [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/official_releases/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/official_releases/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
-
+* [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian Linux,
+* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian Linux,
+* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Windows XP,
+* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5,
+* [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
+* [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
 
 ## Compile-time Variables
 Changing the compile-time variables of PEB requires editing its project file - ``peb.pro``.
@@ -374,14 +373,14 @@ They have two functions:
   ```
 
 ## Security
-   Being a GUI for Perl 5 desktop applications, PEB executes with normal user privileges only local Perl scripts in its application directory. Reasonable security restrictions are implemented, but they do not constitute a sandbox for Perl scripts.
+Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its application directory.
 
 **PEB security principles:**
 * Users have full access to their local data using PEB.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from either the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content for loading of remote content and for developing rich/thick/fat clients. ``trusted-domains.json`` has to be manually created by a developer of a PEB-based application if needed.  
-  Untrusted content is any content not coming from the local pseudo-domain or from domains listed in the ``trusted-domains.json`` file.
+  Trusted content is any content originating from the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content and has to be manually created by a developer of a PEB-based application if needed.  
+  Untrusted content is any content not coming from the local pseudo-domain or from a domain listed in the ``trusted-domains.json`` file.
 
 **Hard-coded security features:**
 * PEB can not execute Perl scripts from remote locations.
