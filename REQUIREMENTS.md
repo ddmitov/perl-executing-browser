@@ -21,6 +21,8 @@ qmake
 make
 ```
 
+If you are using the Qt Creator IDE, go to 'Projects' and disable the 'Shadow Build' option to produce the binary in the root folder of the project and test the demo package.
+
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  

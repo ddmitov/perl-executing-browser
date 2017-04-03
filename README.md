@@ -110,6 +110,8 @@ qmake
 make
 ```
 
+If you are using the Qt Creator IDE, go to 'Projects' and disable the 'Shadow Build' option to produce the binary in the root folder of the project and test the demo package.
+
 ## Compile-time Variables
 Changing the compile-time variables of PEB requires editing its project file - ``peb.pro``.
 * **Macintosh binary type:** ``BUNDLE``  
