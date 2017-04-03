@@ -14,6 +14,13 @@ Compiled and tested successfully using:
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
 
+To compile PEB type in a terminal inside the ``src`` folder:
+
+```
+qmake
+make
+```
+
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
