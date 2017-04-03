@@ -514,8 +514,8 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
 ## Applications Based on PEB
-* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is implemented as a hybrid desktop and server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework, [Bootstrap](http://getbootstrap.com/) for a themable HTML 5 user interface, JavaScript for on-screen text conversion and [Perl 5](https://www.perl.org/) for a file-writing backend.
-* [Camel Doctor](https://github.com/ddmitov/camel-doctor) is an HTML user interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html).
+* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is a hybrid desktop or server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework.
+* [Camel Doctor](https://github.com/ddmitov/camel-doctor) is a Linux and Mac serverless HTML user interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html).
 
 ## License
 This program is free software;  
