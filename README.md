@@ -113,7 +113,8 @@ make
 If you are using the Qt Creator IDE, go to 'Projects' and disable the 'Shadow Build' option to produce the binary in the root folder of the project and test the demo package.
 
 ## Compile-time Variables
-Changing the compile-time variables of PEB requires editing its project file - ``peb.pro``.
+Changing PEB compile-time variables requires editing the ``src/peb.pro`` project file before compiling the binary.
+
 * **Macintosh binary type:** ``BUNDLE``  
   To make a bundle-less binary, which is the default setting:  
 
@@ -141,8 +142,15 @@ The following compile-time variable can tighten further the security of PEB.
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
-  [Strawberry Perl](http://strawberryperl.com/) PortableZIP editions are successfully used with all Windows builds of PEB.  
-  [Perlbrew](https://perlbrew.pl/) Perl distributions (5.18.4, 5.23.7) are successfully used with many Linux builds of PEB.  
+
+  Tested successfully using the following Perl distributions:  
+  Linux x64 [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
+  Linux x64 [Relocatable Perl](https://github.com/skaji/relocatable-perl) version 5.24.1  
+  Windows x32 [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
+
+  To use a Perlbrew Perl with PEB create a symlink to the wanted Perl interpreter named:  
+  ``{PEB_binary_directory}/perl/bin/perl``  
+
   PEB can also use any Perl on PATH.
 
 ## Supported Perl Script Types
@@ -167,7 +175,7 @@ They can not receive any user input once they are started and are divided into t
 
   Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
-  **Windows caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  **Windows caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
 
   <a name="feeding-from-forms"></a>
   There is no special naming convention for non-interactive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:

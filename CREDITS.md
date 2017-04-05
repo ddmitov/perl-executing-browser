@@ -215,6 +215,10 @@ http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 
 ## Perl 5
+https://perlbrew.pl/  
+https://github.com/skaji/relocatable-perl  
+http://strawberryperl.com/  
+
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
 

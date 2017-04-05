@@ -8,7 +8,7 @@ binmode STDOUT, ":utf8";
 if (eval("require AnyEvent;")) {
   AnyEvent->import();
 } else {
-  print "AnyEvent module is missing in this Perl distribution.<br><br>";
+  print "AnyEvent module is missing in this Perl distribution.";
   exit 0;
 }
 
