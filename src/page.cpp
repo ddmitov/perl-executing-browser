@@ -140,6 +140,5 @@ QPage::QPage()
     QObject::connect(this, SIGNAL(frameCreated(QWebFrame *)),
                      this, SLOT(qFrameCustomizerSlot(QWebFrame *)));
 
-    lastTargetFrame = currentFrame();
     windowCloseRequested = false;
 }

@@ -144,9 +144,9 @@ The following compile-time variable can tighten further the security of PEB.
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
 
   Tested successfully using the following Perl distributions:  
-  Linux x64 [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
-  Linux x64 [Relocatable Perl](https://github.com/skaji/relocatable-perl) version 5.24.1  
-  Windows x32 [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
+  Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
+  Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) version 5.24.1  
+  Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
 
   To use a Perlbrew Perl with PEB create a symlink to the wanted Perl interpreter named:  
   ``{PEB_binary_directory}/perl/bin/perl``  

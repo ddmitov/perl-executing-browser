@@ -54,7 +54,6 @@ public slots:
     {
         if (ok) {
             emit changeTitleSignal();
-            qJavaScriptInjector(QPage::mainFrame());
         }
     }
 
@@ -113,9 +112,9 @@ public slots:
         if (stdoutTarget.length() > 0) {
             qOutputInserter(output, stdoutTarget);
         } else {
-            lastTargetFrame->setHtml(output,
-                                     QUrl(qApp->property("pseudoDomain")
-                                          .toString()));
+            currentFrame()->setHtml(output,
+                                    QUrl(qApp->property("pseudoDomain")
+                                         .toString()));
         }
     }
 
@@ -177,6 +176,8 @@ public slots:
 
     void qOutputInserter(QString stdoutData, QString stdoutTarget)
     {
+        qJavaScriptInjector(currentFrame());
+
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
                 stdoutData +
@@ -363,13 +364,8 @@ public slots:
     }
 
     // ==============================
-    // JavaScript-injecting routines:
+    // JavaScript-injecting routine:
     // ==============================
-    void qFrameCustomizerSlot(QWebFrame *frame)
-    {
-        qJavaScriptInjector(frame);
-    }
-
     void qJavaScriptInjector(QWebFrame *frame)
     {
         QFileReader *resourceReader =
@@ -544,8 +540,6 @@ protected:
 
         if (request.url().authority() ==
                 qApp->property("pseudoDomain").toString()) {
-            lastTargetFrame = frame;
-
             if (pageStatus == "trusted") {
                 // ==============================
                 // User selected single file:
@@ -812,8 +806,6 @@ protected:
     }
 
 private:
-    QWebFrame *lastTargetFrame;
-
     QString pageStatus;
     QRegExp htmlFileNameExtensionMarker;
     QString emptyString;

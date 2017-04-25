@@ -47,14 +47,14 @@ public slots:
         scriptAccumulatedOutput.append(output);
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: output from" << scriptFullFilePath;
+                 << "msecs from epoch: output from" << scriptFullFilePath;
 
         // Handling 'script closed' confirmation:
         if (output == scriptCloseConfirmation) {
             qDebug() << QDateTime::currentMSecsSinceEpoch()
-                    << "msecs from epoch:"
-                    << "interactive script terminated normally:"
-                    << scriptFullFilePath;
+                     << "msecs from epoch:"
+                     << "interactive script terminated normally:"
+                     << scriptFullFilePath;
         } else {
             if (scriptStdoutTarget.length() > 0) {
                 emit displayScriptOutputSignal(output, scriptStdoutTarget);
@@ -69,7 +69,7 @@ public slots:
         scriptAccumulatedErrors.append("\n");
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: errors from" << scriptFullFilePath;
+                 << "msecs from epoch: errors from" << scriptFullFilePath;
         // qDebug() << "Script errors:" << scriptErrors;
     }
 
@@ -84,7 +84,7 @@ public slots:
         scriptProcess.close();
 
         qDebug() << QDateTime::currentMSecsSinceEpoch()
-                << "msecs from epoch: script finished:" << scriptFullFilePath;
+                 << "msecs from epoch: script finished:" << scriptFullFilePath;
     }
 
     void qRootPasswordTimeoutSlot()
