@@ -219,23 +219,32 @@ https://perlbrew.pl/
 https://github.com/skaji/relocatable-perl  
 http://strawberryperl.com/  
 
+http://perldoc.perl.org/Encode.html  
+http://perldoc.perl.org/File/Basename.html  
+
+https://metacpan.org/pod/File::Copy::Recursive  
+https://metacpan.org/pod/Module::ScanDeps  
+
+http://www.perl.com/pub/2002/05/14/mod_perl.html  
+
 http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
+http://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 http://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
 http://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
 http://stackoverflow.com/questions/787899/how-do-i-use-a-perl-module-from-a-relative-location  
+http://stackoverflow.com/questions/229357/what-is-the-best-way-in-perl-to-copy-files-into-a-yet-to-be-created-directory-tr  
 
 http://perlmaven.com/manipulating-perl-arrays  
 http://perlmaven.com/how-to-sort-a-hash-in-perl  
 http://perlmaven.com/recursive-subroutines  
 
-http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
-http://www.perl.com/pub/2002/05/14/mod_perl.html  
-http://www.tizag.com/perlT/perlhashes.php  
 http://www.comp.leeds.ac.uk/cgi-bin/Perl/displaytext/cgi-bin/read-input  
+http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
+http://www.tizag.com/perlT/perlhashes.php  
 
 ## HTML, CSS & JavaScript
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
@@ -294,6 +303,11 @@ https://github.com/sindresorhus/awesome
 https://github.com/IQAndreas/markdown-licenses  
 http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
+
+## Bash
+http://tldp.org/LDP/abs/html/fto.html  
+https://www.shellhacks.com/bash-test-if-file-exists/  
+https://www.shellcheck.net/  
 
 ## Linux
 http://askubuntu.com/questions/501812/how-do-i-provide-arguments-to-a-command-run-from-gksudo  

@@ -47,6 +47,7 @@ sub html_footer() {
 }
 
 if (eval("require DBI;")) {
+  require DBI;
   DBI->import();
 } else {
   html_header();

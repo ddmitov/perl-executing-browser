@@ -232,6 +232,17 @@ int main(int argc, char **argv)
     application.setProperty("application", applicationDirName);
 
     // ==============================
+    // PERL5LIB directory:
+    // ==============================
+    QString perlLibDirString = QDir::toNativeSeparators(
+                binaryDirName + QDir::separator()
+                + "perl" + QDir::separator()
+                + "lib");
+    QByteArray perlLibDirArray = perlLibDirString.toLatin1();
+
+    qputenv("PERL5LIB", perlLibDirArray);
+
+    // ==============================
     // Application icon:
     // ==============================
     QString iconPathName = QDir::toNativeSeparators(

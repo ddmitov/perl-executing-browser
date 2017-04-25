@@ -3,4 +3,4 @@
 use strict;
 use warnings;
 
-print "Hello from an AJAX Perl script!";
+print "Привет от AJAX Perl скрипт!<br>Hello from an AJAX Perl script!";

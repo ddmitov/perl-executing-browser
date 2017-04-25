@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 use POSIX qw(strftime);
+use Encode qw(decode);
 binmode STDOUT, ":utf8";
 
 if (eval("require AnyEvent;")) {
+  require AnyEvent;
   AnyEvent->import();
 } else {
   print "AnyEvent module is missing in this Perl distribution.";
@@ -72,7 +74,7 @@ my $wait_for_input = AnyEvent->io (
       }
 
       if ($name =~ "input") {
-        $input_text = $value;
+        $input_text  = decode('UTF-8', $value);
       }
     }
   }
