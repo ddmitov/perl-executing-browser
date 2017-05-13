@@ -136,9 +136,5 @@ QPage::QPage()
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
 
-    // Signal and slot for injection of browser-specific JavaScript:
-    QObject::connect(this, SIGNAL(frameCreated(QWebFrame *)),
-                     this, SLOT(qFrameCustomizerSlot(QWebFrame *)));
-
     windowCloseRequested = false;
 }

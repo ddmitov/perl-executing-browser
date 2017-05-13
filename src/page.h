@@ -107,10 +107,11 @@ public slots:
         }
     }
 
-    void qDisplayScriptOutputSlot(QString output, QString stdoutTarget)
+    void qDisplayScriptOutputSlot(QString output,
+                                  QString targetElement)
     {
-        if (stdoutTarget.length() > 0) {
-            qOutputInserter(output, stdoutTarget);
+        if (targetElement.length() > 0) {
+            qOutputInserter(currentFrame(), targetElement, output);
         } else {
             currentFrame()->setHtml(output,
                                     QUrl(qApp->property("pseudoDomain")
@@ -122,7 +123,7 @@ public slots:
                              QString scriptAccumulatedErrors,
                              QString scriptId,
                              QString scriptFullFilePath,
-                             QString scriptStdoutTarget)
+                             QString scriptTargetElement)
     {
         runningScripts.remove(scriptId);
 
@@ -131,13 +132,14 @@ public slots:
             // no STDOUT target:
             if (scriptAccumulatedOutput.length() > 0 and
                     scriptAccumulatedErrors.length() == 0 and
-                    scriptStdoutTarget.length() == 0) {
-                qDisplayScriptOutputSlot(scriptAccumulatedOutput, emptyString);
+                    scriptTargetElement.length() == 0) {
+                qDisplayScriptOutputSlot(scriptAccumulatedOutput,
+                                         emptyString);
             }
 
             if (scriptAccumulatedErrors.length() > 0) {
                 if (scriptAccumulatedOutput.length() == 0) {
-                    if (scriptStdoutTarget.length() == 0) {
+                    if (scriptTargetElement.length() == 0) {
                         // If script has no output and
                         // only errors and
                         // no STDOUT target is defined,
@@ -163,8 +165,8 @@ public slots:
                     qFormatScriptErrors(scriptAccumulatedErrors,
                                         scriptFullFilePath,
                                         true);
-                    qDisplayScriptOutputSlot(scriptAccumulatedOutput,
-                                             emptyString);
+                    qDisplayScriptOutputSlot(emptyString,
+                                             scriptAccumulatedOutput);
                 }
             }
         }
@@ -174,18 +176,20 @@ public slots:
         }
     }
 
-    void qOutputInserter(QString stdoutData, QString stdoutTarget)
+    void qOutputInserter(QWebFrame *targetFrame,
+                         QString targetElement,
+                         QString data)
     {
-        qJavaScriptInjector(currentFrame());
+        qJavaScriptInjector(targetFrame);
 
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
-                stdoutData +
+                data +
                 "\" , \"" +
-                stdoutTarget +
+                targetElement +
                 "\"); null";
 
-        currentFrame()->evaluateJavaScript(outputInsertionJavaScript);
+        targetFrame->evaluateJavaScript(outputInsertionJavaScript);
     }
 
     void qFormatScriptErrors(QString errors,
@@ -211,7 +215,8 @@ public slots:
         scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
 
         if (newWindow == false) {
-            qDisplayScriptOutputSlot(scriptFormattedErrors, emptyString);
+            qDisplayScriptOutputSlot(emptyString,
+                                     scriptFormattedErrors);
         }
 
         if (newWindow == true) {
@@ -382,19 +387,19 @@ public slots:
     {
         if (mainFrame()->childFrames().length() > 0) {
             foreach (QWebFrame *frame, mainFrame()->childFrames()) {
-                qFrameIterator(frame);
+                qUserInputFrameIterator(frame);
             }
         } else {
             qCheckUserInputBeforeClose(mainFrame());
         }
     }
 
-    void qFrameIterator(QWebFrame *frame)
+    void qUserInputFrameIterator(QWebFrame *frame)
     {
         if (frame->childFrames().length() > 0) {
             qCheckUserInputBeforeClose(frame);
             foreach (QWebFrame *frame, frame->childFrames()) {
-                qFrameIterator(frame);
+                qUserInputFrameIterator(frame);
             }
         } else {
             qCheckUserInputBeforeClose(frame);

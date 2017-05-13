@@ -31,6 +31,7 @@
 #include <QDebug>
 #include <QJsonArray>
 #include <QTextCodec>
+#include <QtWidgets>
 
 #include "main-window.h"
 #include "exit-handler.h"
