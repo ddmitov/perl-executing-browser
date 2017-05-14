@@ -1,9 +1,9 @@
+#! ././perl/bin/perl
 
 use strict;
 use warnings;
 use 5.010;
 
-# Core modules:
 use Config;
 use Cwd qw (getcwd);
 use File::Basename qw (basename);

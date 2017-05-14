@@ -18,6 +18,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Compile-time Requirements](#compile-time-requirements)
 * [Compile-time Variables](#compile-time-variables)
 * [Runtime Requirements](#runtime-requirements)
+* [Preparing a Perl Distribution for PEB](#preparing-a-perl-distribution-for-peb)
 * [Supported Perl Script Types](#supported-perl-script-types)
 * [Non-interactive Perl Scripts](#non-interactive-perl-scripts)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
@@ -152,6 +153,11 @@ The following compile-time variable can tighten further the security of PEB.
   ``{PEB_binary_directory}/perl/bin/perl``  
 
   PEB can also use any Perl on PATH.
+
+## Preparing a Perl Distribution for PEB
+  Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used for a PEB-based application. ``{PEB_binary_directory}/sdk/compactor.pl`` script is one solution to this problem. It scans all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory, finds all their dependencies and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``{PEB_binary_directory}/perl/bin-original`` and ``{PEB_binary_directory}/perl/lib-original`` respectively. ``bin-original`` and ``lib-original`` directories should be manually archived or removed.  
+  ``compactor.pl`` should be started using ``{PEB_binary_directory}/compactor.sh`` on a Linux and Mac machines and ``{PEB_binary_directory}/compactor.cmd`` on a Windows machine to ensure that only the Perl distribution used by PEB is going to start ``compactor.pl``. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
+  ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Supported Perl Script Types
   PEB recognizes four main types of local Perl scripts and does not impose execution timeouts on them:  
