@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 package Module::ScanDeps;
 use 5.008001;
 use strict;
@@ -14,7 +16,7 @@ our @ISA = qw(Exporter);
 use constant dl_ext  => ".$Config{dlext}";
 use constant lib_ext => $Config{lib_ext};
 use constant is_insensitive_fs => (
-    -s $0 
+    -s $0
         and (-s lc($0) || -1) == (-s uc($0) || -1)
         and (-s lc($0) || -1) == -s $0
 );
@@ -174,7 +176,7 @@ returns a reference to it.
     $perl_name = path_to_inc_name($path, $warn)
 
 Assumes C<$path> refers to a perl file and does it's best to return the
-name as it would appear in %INC. Returns undef if no match was found 
+name as it would appear in %INC. Returns undef if no match was found
 and a prints a warning to STDERR if C<$warn> is true.
 
 E.g. if C<$path> = perl/site/lib/Module/ScanDeps.pm then C<$perl_name>
@@ -189,8 +191,8 @@ which to search modules without modifying C<@INC> itself.
 
 =head2 B<$Module::ScanDeps::ScanFileRE>
 
-You can set this global variable to specify a regular expression to 
-identify what files to scan. By default it includes all files of 
+You can set this global variable to specify a regular expression to
+identify what files to scan. By default it includes all files of
 the following types: .pm, .pl, .t and .al. Additionally, all files
 without a suffix are considered.
 
@@ -226,7 +228,7 @@ my %Preload = (
     'AnyDBM_File.pm'                    => [qw( SDBM_File.pm )],
     'AnyEvent.pm'                       => 'sub',
     'Authen/SASL.pm'                    => 'sub',
-    'B/Hooks/EndOfScope.pm'             => 
+    'B/Hooks/EndOfScope.pm'             =>
         [qw( B/Hooks/EndOfScope/PP.pm B/Hooks/EndOfScope/XS.pm )],
     'Bio/AlignIO.pm'                    => 'sub',
     'Bio/Assembly/IO.pm'                => 'sub',
@@ -257,7 +259,7 @@ my %Preload = (
                 _glob_in_inc('Catalyst/DispatchType', 1));
     },
     'Catalyst/Engine.pm'                => 'sub',
-    'CGI/Application/Plugin/Authentication.pm' => 
+    'CGI/Application/Plugin/Authentication.pm' =>
         [qw( CGI/Application/Plugin/Authentication/Store/Cookie.pm )],
     'CGI/Application/Plugin/AutoRunmode.pm' => [qw( Attribute/Handlers.pm )],
     'charnames.pm'                      => \&_unicore,
@@ -271,7 +273,7 @@ my %Preload = (
     'Crypt/Random/Generator.pm'         => sub {
         _glob_in_inc('Crypt/Random/Provider', 1);
     },
-    'Date/Manip.pm'                     => 
+    'Date/Manip.pm'                     =>
         [qw( Date/Manip/DM5.pm Date/Manip/DM6.pm )],
     'Date/Manip/Base.pm'                => sub {
         _glob_in_inc('Date/Manip/Lang', 1);
@@ -291,7 +293,7 @@ my %Preload = (
     'DBIx/Perlish.pm'                   => [qw( attributes.pm )],
     'DBIx/ReportBuilder.pm'             => 'sub',
     'Device/ParallelPort.pm'            => 'sub',
-    'Device/SerialPort.pm'              => 
+    'Device/SerialPort.pm'              =>
         [qw( termios.ph asm/termios.ph sys/termiox.ph sys/termios.ph sys/ttycom.ph )],
     'diagnostics.pm'                    => sub {
         # shamelessly taken and adapted from diagnostics.pm
@@ -313,7 +315,7 @@ my %Preload = (
         ) {
             return $_ if _find_in_inc($_);
         }
-        
+
         for (
               "$archlib/pods/perldiag.pod",
               "$privlib/pods/perldiag-$Config{version}.pod",
@@ -381,7 +383,7 @@ my %Preload = (
     },
     'LWP/Parallel/UserAgent.pm'         => [qw( LWP/Parallel.pm )],
     'LWP/UserAgent.pm'                  => sub {
-        return( 
+        return(
           qw( URI/URL.pm URI/http.pm LWP/Protocol/http.pm ),
           _glob_in_inc("LWP/Authen", 1),
           _glob_in_inc("LWP/Protocol", 1),
@@ -518,13 +520,13 @@ my %Preload = (
         _glob_in_inc('XMLRPC/Transport', 1);
     },
     'YAML.pm'                           => [qw( YAML/Loader.pm YAML/Dumper.pm )],
-    'YAML/Any.pm'                       => sub { 
+    'YAML/Any.pm'                       => sub {
         # try to figure out what YAML::Any would have used
         my $impl = eval "use YAML::Any; YAML::Any->implementation;";
-        unless ($@) 
-        { 
-            $impl =~ s!::!/!g; 
-            return "$impl.pm"; 
+        unless ($@)
+        {
+            $impl =~ s!::!/!g;
+            return "$impl.pm";
         }
         _glob_in_inc('YAML', 1);        # fallback
     },
@@ -673,7 +675,7 @@ sub scan_deps_static {
         }else{ # no caching callback given
             @pm = scan_file($file);
         }
-        
+
         foreach my $pm (@pm){
             add_deps(
                      used_by => $key,
@@ -699,7 +701,7 @@ sub scan_deps_static {
 
     # prevent utf8.pm from being scanned
     $_skip->{$rv->{"utf8.pm"}{file}}++ if $rv->{"utf8.pm"};
-   
+
     while ($recurse) {
         my $count = keys %$rv;
         my @files = sort grep { defined $_->{file} && -T $_->{file} } values %$rv;
@@ -819,13 +821,13 @@ sub scan_line {
             # be specified for the "autouse" and "if" pragmas, e.g.
             #   use autouse Module => qw(func1 func2);
             #   use autouse "Module", qw(func1);
-            # To avoid to parse them ourself, we simply try to eval the 
+            # To avoid to parse them ourself, we simply try to eval the
             # string after the pragma (in a list context). The MODULE
             # should be the first ("autouse") or second ("if") element
             # of the list.
             my $module;
-            { 
-                no strict; no warnings; 
+            {
+                no strict; no warnings;
                 if ($pragma eq "autouse") {
                     ($module) = eval $args;
                 }
@@ -833,7 +835,7 @@ sub scan_line {
                     # The syntax of the "if" pragma is
                     #   use if COND, MODULE => ARGUMENTS
                     # The COND may contain undefined functions (i.e. undefined
-                    # in Module::ScanDeps' context) which would throw an 
+                    # in Module::ScanDeps' context) which would throw an
                     # exception. Sneak  "1 || " in front of COND so that
                     # COND will not be evaluated. This will work in most
                     # cases, but there are operators with lower precedence
@@ -854,7 +856,7 @@ sub scan_line {
             foreach my $dir (do { no strict; no warnings; eval $libs }) {
                 next unless defined $dir;
                 my @dirs = $dir;
-                push @dirs, "$dir/$ver", "$dir/$archname", "$dir/$ver/$archname" 
+                push @dirs, "$dir/$ver", "$dir/$archname", "$dir/$ver/$archname"
                     if $how =~ /lib/;
                 foreach (@dirs) {
                     unshift(@INC, $_) if -d $_;
@@ -874,7 +876,7 @@ my %LoaderRegexp; # cache
 sub _build_loader_regexp {
     my $loaders = shift;
     my $prefix = (@_ && $_[0]) ? $_[0].'::' : '';
-   
+
     my $loader = join '|', map quotemeta($_), split /\s+/, $loaders;
     my $regexp = qr/^\s* use \s+ ($loader)(?!\:) \b \s* (.*)/sx;
     # WARNING: This doesn't take the prefix into account
@@ -960,7 +962,7 @@ sub scan_chunk {
             return \@mods if @mods;
         }
         if (/\b(?:en|de)code\(\s*['"]?([-\w]+)/) {
-            return [qw( Encode.pm ), _find_encoding($1)]; 
+            return [qw( Encode.pm ), _find_encoding($1)];
         }
 
         return $1 if /\b do \s+ ([\w:\.\-\\\/\"\']*)/x;
@@ -1029,7 +1031,7 @@ sub _add_info {
     $file = File::Spec->rel2abs($file);
     $file =~ s|\\|\/|go;
 
-    # Avoid duplicates that can arise due to case differences that don't actually 
+    # Avoid duplicates that can arise due to case differences that don't actually
     # matter on a case tolerant system
     if (File::Spec->case_tolerant()) {
         foreach my $key (keys %$rv) {
@@ -1063,7 +1065,7 @@ sub _add_info {
           if  ( (!File::Spec->case_tolerant() && !grep { $_ eq $used_by } @{ $rv->{$module}{used_by} })
              or ( File::Spec->case_tolerant() && !grep { lc($_) eq lc($used_by) } @{ $rv->{$module}{used_by} }));
 
-        # We assume here that another _add_info will be called to provide the other parts of $rv->{$used_by}    
+        # We assume here that another _add_info will be called to provide the other parts of $rv->{$used_by}
         push @{ $rv->{$used_by}{uses} }, $module
           if  ( (!File::Spec->case_tolerant() && !grep { $_ eq $module } @{ $rv->{$used_by}{uses} })
              or ( File::Spec->case_tolerant() && !grep { lc($_) eq lc($module) } @{ $rv->{$used_by}{uses} }));
@@ -1184,7 +1186,7 @@ sub _glob_in_inc {
 # like _glob_in_inc, but looks only at the first level
 # (i.e. the children of $subdir)
 # NOTE: File::Find has no public notion of the depth of the traversal
-# in its "wanted" callback, so it's not helpful 
+# in its "wanted" callback, so it's not helpful
 sub _glob_in_inc_1 {
     my $subdir  = shift;
     my $pm_only = shift;
@@ -1196,7 +1198,7 @@ sub _glob_in_inc_1 {
         my $dir = "$inc/$subdir";
         next unless -d $dir;
 
-        opendir my $dh, $dir or next; 
+        opendir my $dh, $dir or next;
         my @names = map { "$subdir/$_" } grep { -f "$dir/$_" } readdir $dh;
         closedir $dh;
 
@@ -1339,7 +1341,7 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
     local $ENV{MSD_DATA_FILE} = $data_file;
 
     # NOTE: When compiling the block will run as the last CHECK block;
-    # when executing the block will run as the first END block and 
+    # when executing the block will run as the first END block and
     # the programs continues.
     print $ih $execute ? "END\n" : "CHECK\n", <<'...';
 {
@@ -1352,7 +1354,7 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
     require Cwd;
     require DynaLoader;
     require Data::Dumper;
-    require B; 
+    require B;
     require Config;
 
     while (my ($k, $v) = each %_INC)
@@ -1385,10 +1387,10 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
     my @shared_objects = ( @so, grep { s/\Q.$dlext\E$/\.bs/ && -e $_ } @bs );
 
     my $data_file = $ENV{MSD_DATA_FILE};
-    open my $fh, ">", $data_file 
+    open my $fh, ">", $data_file
         or die "Couldn't open $data_file: $!\n";
     print $fh Data::Dumper->Dump(
-                  [    \%_INC,  \@_INC,   \@shared_objects    ], 
+                  [    \%_INC,  \@_INC,   \@shared_objects    ],
                   [qw( *inchash *incarray *dl_shared_objects )]);
     print $fh "1;\n";
     close $fh;
@@ -1442,10 +1444,10 @@ BEGIN { my $_0 = $ENV{MSD_ORIGINAL_FILE}; *0 = \$_0; }
         $execute ? @$execute : ());
 
     die $execute
-        ? "SYSTEM ERROR in executing $file @$execute: $rc" 
-        : "SYSTEM ERROR in compiling $file: $rc" 
+        ? "SYSTEM ERROR in executing $file @$execute: $rc"
+        : "SYSTEM ERROR in compiling $file: $rc"
         unless $rc == 0;
-    
+
     return _extract_info($data_file);
 }
 

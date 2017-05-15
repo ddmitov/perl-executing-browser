@@ -1,3 +1,5 @@
+#!/usr/bin/perl
+
 package Module::ScanDeps::Cache;
 use strict;
 use warnings;
@@ -94,4 +96,3 @@ sub _file_2_md5{
     return $md5->hexdigest;
 }
 1;
-
