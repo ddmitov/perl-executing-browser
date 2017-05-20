@@ -123,7 +123,7 @@ int main(int argc, char **argv)
     // Basic application properties:
     // ==============================
     application.setApplicationName("Perl Executing Browser");
-    application.setApplicationVersion("0.4.2");
+    application.setApplicationVersion("0.5.0");
     bool startedAsRoot = false;
 
     // ==============================
