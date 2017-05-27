@@ -312,8 +312,8 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Perl interpreter:**  
   PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
 * **Start page:**  
-  PEB can start with a static HTML start page or with a start page that is produced dynamically by a Perl script. When PEB is started, it will first try to find ``{PEB_binary_directory}/resources/app/index.html``. If this file is found, it will be used as a start page. If this file is missing, PEB will try to find ``{PEB_binary_directory}/resources/app/index.pl``. If this script is found, it will be executed and the resulting HTML output will be displayed as a start page. If both ``index.html`` and ``index.pl`` are not found, an error message will be displayed. No start page is a showstopper for PEB.  
-  Note that both static and dynamic start page pathnames are case sensitive.
+  PEB starts with an HTML page located at ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
+  Note that start page pathname is case sensitive.
 * **Icon:**
 <a name="icon"></a>  
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
@@ -524,9 +524,10 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 
 ## Limitations
 * No page produced by a local Perl script can be reloaded because no temporary files are written.  
-  Local HTML pages, as well as web pages, can be reloaded using the JavaScript function ``location.reload()``.
-* No history and cache.  
-  JavaScript functions ``window.history.back()``, ``window.history.forward()`` and ``window.history.go()`` are disabled.
+  Local static HTML pages, as well as web pages, can be reloaded using the JavaScript function ``location.reload()``.
+* JavaScript functions ``window.history.back()``, ``window.history.forward()`` and ``window.history.go()`` work only for local static HTML pages, as well as for web pages.  
+  No page produced by a local Perl script can use any of these functions.
+* No cache.
 * No file can be downloaded on hard disk.
 * No plugins and HTML 5 video.
 

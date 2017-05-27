@@ -67,10 +67,6 @@ QPage::QPage()
     QWebSettings::setMaximumPagesInCache(0);
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
-    // Disabled history:
-    QWebHistory *history = this->history();
-    history->setMaximumItemCount(0);
-
     // Scroll bars:
     mainFrame()->setScrollBarPolicy(Qt::Horizontal,
                                               Qt::ScrollBarAsNeeded);

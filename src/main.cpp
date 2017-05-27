@@ -16,7 +16,9 @@
 */
 
 #ifndef Q_OS_WIN
-#include <unistd.h> // geteuid(); isatty();
+#if ADMIN_PRIVILEGES_CHECK == 1
+#include <unistd.h> // geteuid()
+#endif
 #endif
 
 #ifdef Q_OS_WIN
@@ -160,15 +162,6 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // Start from terminal detection:
-    // ==============================
-#ifndef Q_OS_WIN
-//    if (isatty(fileno(stdin))) {
-
-//    }
-#endif
-
-    // ==============================
     // Binary file directory:
     // ==============================
     QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
@@ -195,7 +188,7 @@ int main(int argc, char **argv)
     perlExecutable = "perl.exe";
 #endif
 
-    QString perlInterpreterFullPath;
+    QString perlInterpreter;
     QString privatePerlInterpreterFullPath = QDir::toNativeSeparators(
                 binaryDirName + QDir::separator()
                 + "perl" + QDir::separator()
@@ -204,23 +197,12 @@ int main(int argc, char **argv)
 
     QFile privatePerlInterpreterFile(privatePerlInterpreterFullPath);
     if (!privatePerlInterpreterFile.exists()) {
-        // Find the full path to the Perl interpreter on PATH:
-        QProcess systemPerlTester;
-        systemPerlTester.start("perl",
-                               QStringList()
-                               << "-e"
-                               << "print $^X;");
-
-        QByteArray testingScriptResultArray;
-        if (systemPerlTester.waitForFinished()) {
-            testingScriptResultArray = systemPerlTester.readAllStandardOutput();
-        }
-        perlInterpreterFullPath = QString::fromLatin1(testingScriptResultArray);
+        perlInterpreter = "perl";
     } else {
-        perlInterpreterFullPath = privatePerlInterpreterFullPath;
+        perlInterpreter = privatePerlInterpreterFullPath;
     }
 
-    application.setProperty("perlInterpreter", perlInterpreterFullPath);
+    application.setProperty("perlInterpreter", perlInterpreter);
 
     // ==============================
     // Application directory:
@@ -378,7 +360,7 @@ int main(int argc, char **argv)
     // ==============================
     // Missing Perl interpreter error message:
     // ==============================
-    if (perlInterpreterFullPath.length() == 0) {
+    if (perlInterpreter.length() == 0) {
         QFileReader *resourceReader =
                 new QFileReader(QString(":/html/error.html"));
         QString htmlErrorContents = resourceReader->fileContents;
@@ -398,7 +380,7 @@ int main(int argc, char **argv)
         qDebug() << "No Perl interpreter is found.";
     }
 
-    if (startedAsRoot == false and perlInterpreterFullPath.length() > 0) {
+    if (startedAsRoot == false and perlInterpreter.length() > 0) {
         // ==============================
         // Logging basic program information:
         // ==============================
@@ -417,7 +399,7 @@ int main(int argc, char **argv)
         qDebug() << "Administrative privileges check is enabled.";
 #endif
 
-        qDebug() << "Perl interpreter:" << perlInterpreterFullPath;
+        qDebug() << "Perl interpreter:" << perlInterpreter;
         qDebug()  <<"Local pseudo-domain:"
                 << application.property("pseudoDomain").toString();
 
@@ -432,10 +414,10 @@ int main(int argc, char **argv)
         // Start page loading:
         // ==============================
         QString startPage;
-        QFile staticStartPageFile(
+        QFile startPageFile(
                     applicationDirName + QDir::separator() + "index.html");
 
-        if (staticStartPageFile.exists()) {
+        if (startPageFile.exists()) {
             startPage =
                     "http://" +
                     QString(application.property("pseudoDomain").toString()) +
@@ -445,29 +427,15 @@ int main(int argc, char **argv)
 
             mainWindow.webViewWidget->setUrl(QUrl(startPage));
         } else {
-            QFile dynamicStartPageFile(
-                        applicationDirName + QDir::separator() + "index.pl");
-            if (dynamicStartPageFile.exists()) {
-                startPage =
-                        "http://" +
-                        QString(application.property("pseudoDomain")
-                                .toString()) +
-                        "/index.pl";
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/error.html"));
+            QString htmlErrorContents = resourceReader->fileContents;
 
-                application.setProperty("startPage", startPage);
+            QString errorMessage = "No start page is found.";
+            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+            mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-                mainWindow.webViewWidget->setUrl(QUrl(startPage));
-            } else {
-                QFileReader *resourceReader =
-                        new QFileReader(QString(":/html/error.html"));
-                QString htmlErrorContents = resourceReader->fileContents;
-
-                QString errorMessage = "No start page is found.";
-                htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-                mainWindow.webViewWidget->setHtml(htmlErrorContents);
-
-                qDebug() << "No start page is found.";
-            }
+            qDebug() << "No start page is found.";
         }
     }
 
