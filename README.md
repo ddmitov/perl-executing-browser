@@ -169,7 +169,18 @@ The following compile-time variable can tighten further the security of PEB.
 * [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
 ## Non-interactive Perl Scripts
-They can not receive any user input once they are started and are divided into the following two subtypes:  
+  <a name="feeding-from-forms"></a>
+  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path with no special naming convention. If a relative path is used, the PEB pseudo-domain is added automatically. The following code is an example of a POST request to a local non-interactive Perl script from an HTML form:
+
+  ```html
+  <form action="http://local-pseudodomain/perl/test.pl" method="post">
+      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
+      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
+      <input type="submit" value="Submit">
+  </form>
+  ```
+
+  Non-interactive scripts are either **page-producing scripts** or **data-only scripts**:  
 
 * **Page-producing scripts:**  
   They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
@@ -184,17 +195,6 @@ They can not receive any user input once they are started and are divided into t
   Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
   **Windows caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
-
-  <a name="feeding-from-forms"></a>
-  There is no special naming convention for non-interactive scripts. They can be called from hyperlinks or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path. If a relative path is used, the PEB pseudo-domain will be added automatically. The following code is an example of a POST request to a local Perl script from an HTML form with no use of JavaScript:
-
-  ```html
-  <form action="http://local-pseudodomain/perl/test.pl" method="post">
-      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
-      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
-      <input type="submit" value="Submit">
-  </form>
-  ```
 
 ## Interactive Perl Scripts
 Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
@@ -296,7 +296,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Application directory:**  
   Application directory is ``{PEB_binary_directory}/resources/app``. All files used by PEB, with the exception of data files, must be located within this folder.  
 
-  Application directory is hard-coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework. [Epigraphista](https://github.com/ddmitov/epigraphista) provides an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
+  Application directory is hard-coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework. [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
 
   Note, however, that to achieve [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/) compatibility a PEB-based program must fit into the single-page application paradigm and no frames or iframes should be used.
 * **Data directory:**  
