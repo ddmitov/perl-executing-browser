@@ -107,14 +107,12 @@ Compiled and tested successfully using:
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
 * [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
 
-To compile PEB type in a terminal inside the ``src`` folder:
+To compile PEB type in a terminal started in the ``src`` folder:
 
 ```
-qmake
+qmake -qt=qt5
 make
 ```
-
-If you are using the Qt Creator IDE, go to 'Projects' and disable the 'Shadow Build' option to produce the binary in the root folder of the project and test the demo package.
 
 ## Compile-time Variables
 Changing PEB compile-time variables requires editing the ``src/peb.pro`` project file before compiling the binary.
@@ -135,12 +133,10 @@ Changing PEB compile-time variables requires editing the ``src/peb.pro`` project
   ```
 
 <a name="security-compile-time-variable"></a>
-The following compile-time variable can tighten further the security of PEB.
-
 * **Administrative privileges check:** ``ADMIN_PRIVILEGES_CHECK``  
   To disable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 0``  
-  By default administrative privileges check is disabled.  
   To enable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 1``  
+  By default administrative privileges check is disabled.  
   If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
 
 ## Runtime Requirements

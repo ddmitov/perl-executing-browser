@@ -213,6 +213,7 @@ http://okolovich.info/tag/code-snippets-c/
 http://www.opensource.apple.com/source/WebKit/WebKit-6531.9/qt/Api/qwebpage.cpp  
 http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/  
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
+https://unix.stackexchange.com/questions/116254/how-do-i-change-which-version-of-qt-is-used-for-qmake  
 
 ## Perl 5
 https://perlbrew.pl/  
