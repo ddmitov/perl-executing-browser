@@ -24,6 +24,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Interactive Perl Scripts](#interactive-perl-scripts)
 * [AJAX Perl Scripts](#ajax-perl-scripts)
 * [Linux Superuser Perl Scripts](#linux-superuser-perl-scripts)
+* [Hard Coded Files and Folders](#hard-coded-files-and-folders)
 * [Settings](#settings)
 * [Security](#security)
 * [Special URLs](#special-urls)
@@ -288,19 +289,30 @@ $(document).ready(function() {
 ## Linux Superuser Perl Scripts
 Linux superuser Perl scripts can be started using the special pseudo-user ``root``. So if PEB finds an URL like: ``http://root@local-pseudodomain/perl/root-open-directory.pl``, it will ask the user for the root password and then call ``sudo``, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other non-interactive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ``STDIN`` input or ``QUERY_STRING`` environment variable like in the user-level Perl scripts.
 
-## Settings
-**Settings based on the existence of certain files and folders:**  
-PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located, further labeled as ``{PEB_binary_directory}``.
-* **Name of the binary file:**  
-  The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
+## Hard Coded Files and Folders
 * **Application directory:**  
   Application directory is ``{PEB_binary_directory}/resources/app``. All files used by PEB, with the exception of data files, must be located within this folder.  
 
-  Application directory is hard-coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework. [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
+  Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework. [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
 
   Note, however, that to achieve [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/) compatibility a PEB-based program must fit into the single-page application paradigm and no frames or iframes should be used.
+
+* **Perl interpreter:**  
+  PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
+
+* **Start page:**  
+  PEB starts with an HTML page located at ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
+  Note that start page pathname is case sensitive.
+
+## Settings
+**Settings based on the existence of certain files and folders:**  
+PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located, further labeled as ``{PEB_binary_directory}``.
+
+* **Name of the binary file:**  
+  The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
+
 * **Data directory:**  
-  Data directory is not hard-coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
+  Data directory is not hard coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
 
   ```perl
   use Cwd;
@@ -309,26 +321,20 @@ PEB is designed to run from any directory without setting anything beforehand an
   my $data_directory = "$current_working_directory/resources/data";
   ```
 
-* **Perl interpreter:**  
-  PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
-* **Start page:**  
-  PEB starts with an HTML page located at ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
-  Note that start page pathname is case sensitive.
 * **Icon:**
 <a name="icon"></a>  
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
+
 * **Trusted domains:**  
   If PEB is able to read ``{PEB_binary_directory}/resources/app/trusted-domains.json``, all domains listed in this file are considered trusted. Only the local pseudo-domain ``http://local-pseudodomain/`` is trusted if ``trusted-domains.json`` is missing. This setting should be used with care - see section [Security](#security).
+
 * **Log files:**
 <a name="log-files"></a>  
   If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
 
 **Settings based on JavaScript code:**  
-They have two functions:  
-**1.** to facilitate the development of fully translated and multilanguage applications by providing labels for the context menu and JavaScript dialog boxes with no dependency on compiled Qt translation files and  
-**2.** to prevent data loss when user tries to close a local page containing unsaved data in an HTML form.
-* **Custom or translated context menu labels:**
 <a name="custom-or-translated-context-menu-labels"></a>  
+* **Custom or translated context menu labels:**
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ``contextmenu`` event is not already intercepted):  
 
   ```javascript
@@ -347,8 +353,8 @@ They have two functions:
   }
   ```
 
-* **Custom or translated labels for JavaScript dialog boxes:**
 <a name="custom-or-translated-labels-for-javascript-dialog-boxes"></a>  
+* **Custom or translated labels for JavaScript dialog boxes:**
   Using the following code any local HTML page can have custom labels on the default JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes:
 
   ```javascript
@@ -368,8 +374,8 @@ They have two functions:
   }
   ```
 
-* **Warning for unsaved user input before closing a window:**
 <a name="warning-for-unsaved-user-input-before-closing-a-window"></a>  
+* **Warning for unsaved user input before closing a window:**
   PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
 
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
@@ -411,7 +417,7 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
   Trusted content is any content originating from the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content and has to be manually created by a developer of a PEB-based application if needed.  
   Untrusted content is any content not coming from the local pseudo-domain or from a domain listed in the ``trusted-domains.json`` file.
 
-**Hard-coded security features:**
+**Hard coded security features:**
 * PEB can not execute Perl scripts from remote locations.
 * If untrusted page is called from a trusted one,  
   it is automatically displayed in a separate browser window.
