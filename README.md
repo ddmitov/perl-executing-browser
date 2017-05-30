@@ -299,7 +299,6 @@ Linux superuser Perl scripts can be started using the special pseudo-user ``root
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
-
   Note, however, that to achieve [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/) compatibility a PEB-based program must fit into the single-page application paradigm and no frames or iframes should be used.
 
 * **Perl interpreter:**  
