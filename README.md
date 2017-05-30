@@ -42,18 +42,16 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 ## Quick Start
   These are the basic steps for building your first PEB-based application:
 
-* **1.** Write your local HTML file(s) that will serve as a GUI for your application.
+* **1.** Write HTML file(s) that will serve as a GUI for your application.  
+  If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
+  If your users will have to open local files or folders, see [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. ``filesystem.html`` file within the PEB demo package is an appropriate example.
 
-* **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
-
-* **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ``filesystem.html`` file within the PEB demo package.
-
-* **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
-
-* **2.** Write your Perl scripts.  
-    Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file within the PEB demo package.  
+* **2.** Write your Perl script(s).  
+  Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. Use the ``get-post-test.pl`` file within the PEB demo package as an example.  
 
   Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory - see section [Settings](#settings).  
+
+* **3.** Connect your HTML file(s) to your Perl 5 script(s). See section [Supported Perl Script Types](#supported-perl-script-types).
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
