@@ -6,7 +6,7 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudo-domain.  
+Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudodomain.  
 
 Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content in different browser windows.
 
@@ -27,7 +27,9 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
 * [Settings](#settings)
 * [Security](#security)
-* [Special URLs](#special-urls)
+* [PEB Pseudodomain](#peb-pseudodomain)
+* [Special URLs for Opening Files and Folders](#special-urls-for-opening-files-and-folders)
+* [Other Special URLs](#other-special-urls)
 * [Local File Types](#local-file-types)
 * [Keyboard Shortcuts](#keyboard-shortcuts)
 * [What PEB Is Not](#what-peb-is-not)
@@ -68,7 +70,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * DevOps people in need of custom Perl-based GUI monitoring and administration solutions
 
 ## Features
-* [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudo-domain.](#feeding-from-forms)
+* [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudodomain.](#feeding-from-forms)
 * [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
 * [Perl script output can be seamlessly inserted into the calling local page.](#data-only-scripts)
@@ -93,7 +95,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
   ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
   Compiling ``QtWebKit`` for a recent Qt version is possible, but not trivial or tested with PEB.  
 
-The implementation of the local pseudo-domain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
+The implementation of the local pseudodomain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -171,7 +173,7 @@ The following compile-time variable can tighten further the security of PEB.
 
 ## Non-interactive Perl Scripts
   <a name="feeding-from-forms"></a>
-  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudo-domain or a relative path with no special naming convention. If a relative path is used, the PEB pseudo-domain is added automatically. The following code is an example of a POST request to a local non-interactive Perl script from an HTML form:
+  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudodomain or a relative path with no special naming convention. If a relative path is used, the PEB pseudodomain is added automatically. The following code is an example of a POST request to a local non-interactive Perl script from an HTML form:
 
   ```html
   <form action="http://local-pseudodomain/perl/test.pl" method="post">
@@ -293,7 +295,8 @@ Linux superuser Perl scripts can be started using the special pseudo-user ``root
 * **Application directory:**  
   Application directory is ``{PEB_binary_directory}/resources/app``. All files used by PEB, with the exception of data files, must be located within this folder.  
 
-  Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework. [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
+  Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
+  [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
 
   Note, however, that to achieve [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/) compatibility a PEB-based program must fit into the single-page application paradigm and no frames or iframes should be used.
 
@@ -326,7 +329,7 @@ PEB is designed to run from any directory without setting anything beforehand an
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
 * **Trusted domains:**  
-  If PEB is able to read ``{PEB_binary_directory}/resources/app/trusted-domains.json``, all domains listed in this file are considered trusted. Only the local pseudo-domain ``http://local-pseudodomain/`` is trusted if ``trusted-domains.json`` is missing. This setting should be used with care - see section [Security](#security).
+  If PEB is able to read ``{PEB_binary_directory}/resources/app/trusted-domains.json``, all domains listed in this file are considered trusted. Only the local pseudodomain ``http://local-pseudodomain/`` is trusted if ``trusted-domains.json`` is missing. This setting should be used with care - see section [Security](#security).
 
 * **Log files:**
 <a name="log-files"></a>  
@@ -414,8 +417,8 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 * Users have full access to their local data using PEB.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from the local pseudo-domain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content and has to be manually created by a developer of a PEB-based application if needed.  
-  Untrusted content is any content not coming from the local pseudo-domain or from a domain listed in the ``trusted-domains.json`` file.
+  Trusted content is any content originating from the local pseudodomain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content and has to be manually created by a developer of a PEB-based application if needed.  
+  Untrusted content is any content not coming from the local pseudodomain or from a domain listed in the ``trusted-domains.json`` file.
 
 **Hard coded security features:**
 * PEB can not execute Perl scripts from remote locations.
@@ -429,13 +432,14 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 
 **[Optional security feature based on compile-time variable](#security-compile-time-variable)**
 
-## Special URLs
-* **PEB pseudo-domain:** ``http://local-pseudodomain/``  
-  The  pseudo-domain is used to call all local files and all special URLs representing browser functions.  
-  It is intercepted inside PEB and is not passed to the underlying operating system.  
+## PEB Pseudodomain
+``http://local-pseudodomain/``  
+The  pseudodomain is used to call all local files and all special URLs representing browser functions.  
+It is intercepted inside PEB and is not passed to the underlying operating system.  
 
-* **Select single file:** ``http://local-pseudodomain/open-file.function?target=DOM_element``
+## Special URLs for Opening Files and Folders
 <a name="select-single-file"></a>  
+* **Select single file:** ``http://local-pseudodomain/open-file.function?target=DOM_element``
   The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
@@ -458,27 +462,28 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
   }
   ```
 
-* **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=DOM_element``
 <a name="select-multiple-files"></a>  
+* **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=DOM_element``
   The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   Different file names are separated by a semicolon - ``;``  
 
-* **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=DOM_element``
 <a name="select-new-file-name"></a>  
+* **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=DOM_element``
   The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
 
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
 
-* **Select directory:** ``http://local-pseudodomain/open-directory.function?target=DOM_element``
 <a name="select-directory"></a>  
+* **Select directory:** ``http://local-pseudodomain/open-directory.function?target=DOM_element``
   The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
 
   Please note that if you choose to create a new directory, it will be created immediately by PEB.  
   It will be already existing when passed to a local Perl script.  
 
+## Other Special URLs
 <a name="browser-functions"></a>
 * **Print:** ``http://local-pseudodomain/print.function?action=print``  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.  
@@ -496,7 +501,7 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 ## Local File Types
   All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  
 
-  PEB is case-insensitive for all local filename extensions with the exception of the start page filename extensions.  
+  PEB is case-insensitive for all local filename extensions with the exception of the start page.  
   All local files can have multi-dotted names.  
 
   Perl scripts are usually recognized by PEB using the ``.pl`` filename extension.  
