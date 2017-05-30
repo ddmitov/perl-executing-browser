@@ -171,8 +171,8 @@ The following compile-time variable can tighten further the security of PEB.
 * [**AJAX scripts**](#ajax-perl-scripts)
 * [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
+<a name="feeding-from-forms"></a>
 ## Non-interactive Perl Scripts
-  <a name="feeding-from-forms"></a>
   Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudodomain or a relative path with no special naming convention. If a relative path is used, the PEB pseudodomain is added automatically. The following code is an example of a POST request to a local non-interactive Perl script from an HTML form:
 
   ```html
@@ -188,7 +188,8 @@ The following compile-time variable can tighten further the security of PEB.
 * **Page-producing scripts:**  
   They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
 
-* **Data-only scripts:**<a name="data-only-scripts"></a>  
+<a name="data-only-scripts"></a>  
+* **Data-only scripts:**
   They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``stdout`` should be added to the script URL in this case.  
 
   Example: ``http://local-pseudodomain/perl/counter.pl?stdout=script-results``  
@@ -324,15 +325,15 @@ PEB is designed to run from any directory without setting anything beforehand an
   my $data_directory = "$current_working_directory/resources/data";
   ```
 
-* **Icon:**
 <a name="icon"></a>  
+* **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
 * **Trusted domains:**  
   If PEB is able to read ``{PEB_binary_directory}/resources/app/trusted-domains.json``, all domains listed in this file are considered trusted. Only the local pseudodomain ``http://local-pseudodomain/`` is trusted if ``trusted-domains.json`` is missing. This setting should be used with care - see section [Security](#security).
 
-* **Log files:**
 <a name="log-files"></a>  
+* **Log files:**
   If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
 
 **Settings based on JavaScript code:**  
@@ -437,6 +438,7 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 The  pseudodomain is used to call all local files and all special URLs representing browser functions.  
 It is intercepted inside PEB and is not passed to the underlying operating system.  
 
+<a name="browser-functions"></a>
 ## Special URLs for Opening Files and Folders
 <a name="select-single-file"></a>  
 * **Select single file:** ``http://local-pseudodomain/open-file.function?target=DOM_element``
@@ -484,7 +486,6 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
   It will be already existing when passed to a local Perl script.  
 
 ## Other Special URLs
-<a name="browser-functions"></a>
 * **Print:** ``http://local-pseudodomain/print.function?action=print``  
   Printing is not immediately performed, but a native printer selection dialog is displayed first.  
   If no printer is configured, no dialog is displayed and no action is taken.
