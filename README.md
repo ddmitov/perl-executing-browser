@@ -41,10 +41,15 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 
 ## Quick Start
   These are the basic steps for building your first PEB-based application:
-* **1.** Write your local HTML file(s) that will serve as a GUI for your application.  
+
+* **1.** Write your local HTML file(s) that will serve as a GUI for your application.
+
 * **1.1.** If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
+
 * **1.2.** If your users will have to open local files or folders, see section *Special URLs for Users* for information on [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. You may also see the ``filesystem.html`` file within the PEB demo package.
+
 * **1.3.** Connect your local HTML file(s) to your Perl 5 scripts. See section [Supported Perl Script Types](#supported-perl-script-types).
+
 * **2.** Write your Perl scripts.  
     Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. You may see the ``get-post-test.pl`` file within the PEB demo package.  
 
@@ -306,7 +311,7 @@ Linux superuser Perl scripts can be started using the special pseudo-user ``root
 
 ## Settings
 **Settings based on the existence of certain files and folders:**  
-PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located, further labeled as ``{PEB_binary_directory}``.
+PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located.
 
 * **Name of the binary file:**  
   The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
@@ -333,6 +338,7 @@ PEB is designed to run from any directory without setting anything beforehand an
   If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
 
 **Settings based on JavaScript code:**  
+
 <a name="custom-or-translated-context-menu-labels"></a>  
 * **Custom or translated context menu labels:**
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ``contextmenu`` event is not already intercepted):  
@@ -397,7 +403,7 @@ PEB is designed to run from any directory without setting anything beforehand an
   }
 
   function pebCloseConfirmationAsync() {
-      alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
+      alertify.set({labels: {ok : "Ok", cancel , further labeled as ``{PEB_binary_directory}``, further labeled as ``{PEB_binary_directory}``: "Cancel"}});
       alertify.set({buttonFocus: "cancel"});
       alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
           if (confirmation) {
@@ -437,7 +443,7 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 <a name="browser-functions"></a>
 ## Special URLs for Opening Files and Folders
 <a name="select-single-file"></a>  
-* **Select single file:** ``http://local-pseudodomain/open-file.function?target=DOM_element``
+* **Select single file:** ``http://local-pseudodomain/open-file.function?target=example``  
   The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
@@ -461,20 +467,20 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
   ```
 
 <a name="select-multiple-files"></a>  
-* **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=DOM_element``
+* **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=example``  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   Different file names are separated by a semicolon - ``;``  
 
 <a name="select-new-file-name"></a>  
-* **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=DOM_element``
+* **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=example``  
   The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
 
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
 
 <a name="select-directory"></a>  
-* **Select directory:** ``http://local-pseudodomain/open-directory.function?target=DOM_element``
+* **Select directory:** ``http://local-pseudodomain/open-directory.function?target=example``  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
 

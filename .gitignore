@@ -1,17 +1,19 @@
 archive/
-qt/
+build-peb-*/
 logs/
 perl/bin
 perl/lib
+qt/
 tmp/
 
-*.qm
 *.autosave
-test.db
+*.qm
 Makefile
 peb
 peb.exe
-peb.pro.user
-peb.pro.user*
+peb.pro.*
+
+test.db
+
 gdrive
 upgit
