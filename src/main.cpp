@@ -246,42 +246,6 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // Trusted domains:
-    // ==============================
-    QString trustedDomainsFilePath =
-            applicationDirName + QDir::separator() + "trusted-domains.json";
-    QFile trustedDomainsFile(trustedDomainsFilePath);
-    QStringList trustedDomainsList;
-
-    if (trustedDomainsFile.exists()) {
-        QFileReader *resourceReader =
-                new QFileReader(QString(trustedDomainsFilePath));
-        QString trustedDomainsContents = resourceReader->fileContents;
-
-        QJsonDocument trustedDomainsJsonDocument =
-                QJsonDocument::fromJson(trustedDomainsContents.toUtf8());
-
-        if (!trustedDomainsJsonDocument.isNull()) {
-            QJsonObject trustedDomainsJsonObject =
-                    trustedDomainsJsonDocument.object();
-
-            if (!trustedDomainsJsonObject.isEmpty()) {
-                QJsonArray trustedDomainsArray =
-                        trustedDomainsJsonObject["trusted-domains"].toArray();
-
-                if (!trustedDomainsArray.isEmpty()) {
-                    foreach (QVariant trustedDomain, trustedDomainsArray) {
-                        trustedDomainsList.append(trustedDomain.toString());
-                    }
-                }
-            }
-        }
-    }
-
-    trustedDomainsList.append(application.property("pseudoDomain").toString());
-    application.setProperty("trustedDomains", trustedDomainsList);
-
-    // ==============================
     // Logging:
     // ==============================
     // If 'logs' directory is found in the directory of the browser binary,
@@ -385,8 +349,8 @@ int main(int argc, char **argv)
         // Logging basic program information:
         // ==============================
         qDebug() << application.applicationName().toLatin1().constData()
-                << application.applicationVersion().toLatin1().constData()
-                << "started.";
+                 << application.applicationVersion().toLatin1().constData()
+                 << "started.";
         qDebug() << "Qt version:" << QT_VERSION_STR;
         qDebug() << "Executable:" << application.applicationFilePath();
         qDebug() << "PID:" << application.applicationPid();
@@ -400,15 +364,8 @@ int main(int argc, char **argv)
 #endif
 
         qDebug() << "Perl interpreter:" << perlInterpreter;
-        qDebug()  <<"Local pseudo-domain:"
-                << application.property("pseudoDomain").toString();
-
-        foreach (QString trustedDomain, trustedDomainsList) {
-            if (trustedDomain !=
-                    application.property("pseudoDomain").toString()) {
-                qDebug() << "Trusted domain:" << trustedDomain;
-            }
-        }
+        qDebug() <<"Local pseudo-domain:"
+                 << application.property("pseudoDomain").toString();
 
         // ==============================
         // Start page loading:

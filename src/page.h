@@ -238,9 +238,6 @@ public slots:
 
     void qNetworkReply(QNetworkReply *reply)
     {
-        QStringList trustedDomains =
-                qApp->property("trustedDomains").toStringList();
-
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "Network error:" << reply->errorString();
 
@@ -258,25 +255,29 @@ public slots:
         }
 
         if (reply->error() == QNetworkReply::NoError) {
-            if (reply->url() == qApp->property("startPage").toString()) {
+            if (reply->url().toString() ==
+                    qApp->property("startPage").toString()) {
                 pageStatus = "trusted";
                 emit pageStatusSignal(pageStatus);
             }
 
             if (pageStatus.length() == 0) {
-                if (trustedDomains.contains(reply->url().host())) {
+                if (reply->url().toString()
+                        .contains(qApp->property("pseudoDomain").toString())) {
                     pageStatus = "trusted";
                     emit pageStatusSignal(pageStatus);
                 }
 
-                if (!trustedDomains.contains(reply->url().host())) {
+                if (!reply->url().toString()
+                        .contains(qApp->property("pseudoDomain").toString())) {
                     pageStatus = "untrusted";
                     emit pageStatusSignal(pageStatus);
                 }
             }
 
             if (pageStatus == "trusted") {
-                if (!trustedDomains.contains(reply->url().host())) {
+                if (!reply->url().toString()
+                        .contains(qApp->property("pseudoDomain").toString())) {
                     qMixedContentWarning(reply->url());
                 }
             }
@@ -528,11 +529,9 @@ protected:
         // Untrusted domains called from a trusted page
         // are loaded in new browser windows:
         // ==============================
-        QStringList trustedDomains =
-                qApp->property("trustedDomains").toStringList();
-
         if (pageStatus == "trusted" and
-                (!trustedDomains.contains(request.url().authority())) and
+                (!request.url().toString().contains(
+                     qApp->property("pseudoDomain").toString())) and
                 (request.url().fileName().length() == 0 or
                  request.url().fileName()
                  .contains(htmlFileNameExtensionMarker))) {

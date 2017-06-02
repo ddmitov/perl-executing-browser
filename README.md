@@ -8,7 +8,7 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudodomain.  
 
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between trusted and untrusted content in different browser windows.
+Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between local and web content in different browser windows.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -43,7 +43,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
   These are the basic steps for building your first PEB-based application:
 
 * **1.** Write HTML file(s) that will serve as a GUI for your application.  
-  If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.
+  If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.  
   If your users will have to open local files or folders, see [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. ``filesystem.html`` file within the PEB demo package is an appropriate example.
 
 * **2.** Write your Perl script(s).  
@@ -328,9 +328,6 @@ PEB is designed to run from any directory without setting anything beforehand an
 * **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
-* **Trusted domains:**  
-  If PEB is able to read ``{PEB_binary_directory}/resources/app/trusted-domains.json``, all domains listed in this file are considered trusted. Only the local pseudodomain ``http://local-pseudodomain/`` is trusted if ``trusted-domains.json`` is missing. This setting should be used with care - see section [Security](#security).
-
 <a name="log-files"></a>  
 * **Log files:**
   If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
@@ -418,8 +415,8 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 * Users have full access to their local data using PEB.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from the local pseudodomain ``http://local-pseudodomain/`` or from a trusted domain listed in ``{PEB_binary_directory}/resources/app/trusted-domains.json``. This file is read only once at application startup and can not be manipulated remotely. It allows mixing local and remote content and has to be manually created by a developer of a PEB-based application if needed.  
-  Untrusted content is any content not coming from the local pseudodomain or from a domain listed in the ``trusted-domains.json`` file.
+  Trusted content is any content originating from the local pseudodomain ``http://local-pseudodomain/``.  
+  Untrusted content is any content not coming from the local pseudodomain.
 
 **Hard coded security features:**
 * PEB can not execute Perl scripts from remote locations.
