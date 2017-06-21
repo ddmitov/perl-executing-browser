@@ -669,6 +669,12 @@ protected:
     // ==============================
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
+
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
@@ -708,6 +714,12 @@ protected:
     // ==============================
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
+
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 
@@ -758,6 +770,12 @@ protected:
                                   const QString &defaultValue,
                                   QString *result)
     {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/peb.js"));
+        QString pebJavaScript = resourceReader->fileContents;
+
+        frame->evaluateJavaScript(pebJavaScript);
+
         QVariant messageBoxElementsJsResult =
                 frame->evaluateJavaScript("pebFindMessageBoxElements()");
 

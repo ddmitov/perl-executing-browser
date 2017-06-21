@@ -252,17 +252,10 @@ http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
 http://stackoverflow.com/questions/9436534/ajax-tutorial-for-post-and-get  
 http://stackoverflow.com/questions/6395720/get-data-from-php-array-ajax-jquery  
 http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj  
-http://stackoverflow.com/questions/13362/scrolling-overflowed-divs-with-javascript  
-http://stackoverflow.com/questions/24134084/how-to-set-iframe-heightauto-in-html5  
-http://stackoverflow.com/questions/24299990/can-percentage-be-provided-in-iframe-tag-of-html5-tag-for-height-and-width  
-http://stackoverflow.com/questions/4622086/widthauto-for-input-fields  
 http://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascript  
 http://stackoverflow.com/questions/10328102/how-to-detect-content-change-event-on-a-div  
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
-http://stackoverflow.com/questions/1955265/how-do-i-load-a-page-in-javascript-from-its-source-string  
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
-http://stackoverflow.com/questions/5113246/make-div-invisible-in-css-and-javascript  
-http://stackoverflow.com/questions/1992114/how-do-you-create-a-hidden-div-that-doesnt-create-a-line-break-or-horizontal-space  
 http://stackoverflow.com/questions/588040/window-onload-vs-document-onload  
 http://stackoverflow.com/questions/8064691/how-do-i-pass-along-variables-with-xmlhttprequest  
 http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string  
@@ -270,7 +263,6 @@ http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-w
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
 http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  
 http://www.w3schools.com/cssref/css_websafe_fonts.asp  
-http://www.w3schools.com/html/html_iframe.asp  
 http://www.w3schools.com/html/html_lists.asp  
 http://www.w3schools.com/jquery/html_html.asp  
 http://www.w3schools.com/jquery/ajax_get.asp  
@@ -279,6 +271,7 @@ http://www.w3schools.com/js/js_popup.asp
 http://www.w3schools.com/jsref/event_onclick.asp  
 http://www.w3schools.com/jsref/prop_html_innerhtml.asp  
 http://www.w3schools.com/jsref/event_onsubmit.asp  
+https://www.w3schools.com/xml/ajax_xmlhttprequest_send.asp
 
 http://getbootstrap.com/components/#dropdowns  
 http://getbootstrap.com/javascript/#tooltips-methods  
@@ -288,14 +281,10 @@ http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.p
 http://www.tutorialspoint.com/bootstrap/bootstrap_dropdown_plugin.htm  
 http://twitter-bootstrap.node1.zygote.cc/javascript.html  
 
-http://www.sourcetricks.com/2010/07/javascript-scroll-to-bottom-of-page.html  
-https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollIntoView  
-http://www.bymichaellancaster.com/blog/fluid-iframe-and-images-without-javascript-plugins/  
 http://css3buttongenerator.com/  
 http://callmenick.com/post/various-css-input-text-styles  
 http://www.raymondcamden.com/2015/03/06/warning-a-user-before-they-leave-a-form/  
 https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calling/  
-http://bradsknutson.com/blog/css-quick-tip-center-div-horizontally-vertically/  
 http://youmightnotneedjquery.com/  
 
 ## Markdown

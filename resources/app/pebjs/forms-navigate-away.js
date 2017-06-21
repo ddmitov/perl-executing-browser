@@ -1,4 +1,3 @@
-// These functions are usefull only inside Perl Executing Browser.
 
 var formSubmitted = false;
 
@@ -13,20 +12,20 @@ $(window).on("beforeunload", function() {
   if (formSubmitted == false) {
     var textEntered = "";
 
-    var textFields = new Array();
+    var textFields = [];
     textFields = document.getElementsByTagName("textarea");
 
-    for (i = 0; i < textFields.length; i++) {
+    for (index = 0; index < textFields.length; index++) {
       if (textFields[i].value.length > 0) {
         textEntered = "yes";
       }
     }
 
-    var inputBoxes = new Array();
+    var inputBoxes = [];
     inputBoxes = document.querySelectorAll("input[type=text]");
 
-    for (i = 0; i < inputBoxes.length; i++) {
-      if (inputBoxes[i].value.length > 0) {
+    for (index = 0; index < inputBoxes.length; index++) {
+      if (inputBoxes[index].value.length > 0) {
         textEntered = "yes";
       }
     }

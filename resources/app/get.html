@@ -2,7 +2,7 @@
 <html>
 
   <head>
-    <title>Perl Executing Browser - GET Form</title>
+    <title>Perl Executing Browser - Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 
@@ -16,11 +16,21 @@
     <script type="text/javascript" src="pebjs/dialogs.js"></script>
     <script type="text/javascript" src="pebjs/forms-close-window.js"></script>
     <script type="text/javascript" src="pebjs/forms-navigate-away.js"></script>
+
+    <style type='text/css'>
+      pre {
+        text-align: left;
+        font-size: 14px;
+        font-family: monospace;
+      }
+    </style>
   </head>
 
   <body>
-    <form action="perl/get-post-test.pl" method="get" onsubmit="submitFunction()">
-      <div class="col-lg-10 col-lg-offset-1">
+    <br>
+    <div id="container" class="col-lg-10 col-lg-offset-1">
+      <form action="perl/get-post-test.pl" method="get" onsubmit="submitFunction()">
+        <input type="hidden" name="stdout" value="container">
         <fieldset>
           <legend>GET Form</legend>
 
@@ -37,18 +47,18 @@
             <input type="reset" value="Reset" class="btn btn-default">
             <input type="submit" value="Submit" class="btn btn-primary">
           </div>
-
-          <div>
-            <button type="button" onclick="location.reload();" class="btn btn-default">
-              Reload
-            </button>
-            <button type="button" onclick="window.history.back();" class="btn btn-default">
-              Back
-            </button>
-          </div>
         </fieldset>
-      </div>
-    </form>
+      </form>
+    </div>
+
+    <div class="col-lg-10 col-lg-offset-1">
+      <button type="button" onclick="location.reload();" class="btn btn-default">
+        Reload
+      </button>
+      <button type="button" onclick="window.history.back();" class="btn btn-default">
+        Back
+      </button>
+    </div>
   </body>
 
 </html>

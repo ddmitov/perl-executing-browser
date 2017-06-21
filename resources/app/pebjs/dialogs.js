@@ -1,7 +1,7 @@
 // This function is usefull only inside Perl Executing Browser.
 
 function pebMessageBoxElements() {
-  var messageBoxElementsObject = new Object();
+  var messageBoxElementsObject = {};
 
   messageBoxElementsObject.alertTitle = "- Alert -";
   messageBoxElementsObject.confirmTitle = "- Confirmation -";

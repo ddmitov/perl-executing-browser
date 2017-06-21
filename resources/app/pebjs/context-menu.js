@@ -1,7 +1,7 @@
 // This function is usefull only inside Perl Executing Browser.
 
 function pebContextMenu() {
-  var contextMenuObject = new Object();
+  var contextMenuObject = {};
 
   contextMenuObject.printPreview = "- Print Preview -";
   contextMenuObject.print = "- Print -";

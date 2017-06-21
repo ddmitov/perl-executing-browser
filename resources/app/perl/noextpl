@@ -3,30 +3,4 @@
 use strict;
 use warnings;
 
-print <<HTML
-<!DOCTYPE html>
-<html>
-
-  <head>
-    <title>Perl Exеcuting Browser - Extensionless Script</title>
-    <meta name='viewport' content='width=device-width, initial-scale=1'>
-    <meta charset='utf-8'>
-
-    <link rel='stylesheet' type='text/css' href='http://local-pseudodomain/bootstrap/css/themes/darkly-theme.css' media='all'>
-
-    <style type='text/css'>
-      body {
-        text-align: center;
-        font-size: 22px;
-        -webkit-text-size-adjust: 100%;
-      }
-    </style>
-  </head>
-
-  <body>
-    <p>Hello from a Perl script without a filename extension!</p>
-  </body>
-
-</html>
-HTML
-;
+print "<pre>Hello from a Perl script without a filename extension!</pre>";

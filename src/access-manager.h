@@ -293,7 +293,10 @@ protected:
                 QString htmlErrorContents = resourceReader->fileContents;
 
                 QString errorMessage =
-                        "<p>File not found:<br>" + fullFilePath + "</p>";
+                        "<div><br>File not found:<br>" +
+                        fullFilePath + "<br><br>" +
+                        "<a href='http://local-pseudodomain/'>start page</a>" +
+                        "</div>";
                 htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
                 QString mimeType = "text/html";
