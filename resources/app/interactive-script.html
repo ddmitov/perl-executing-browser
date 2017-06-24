@@ -25,7 +25,7 @@
   </head>
 
   <body>
-    <form action="http://interactive:one@local-pseudodomain/perl/interactive-script.pl" method="post">
+    <form action="http://interactive:one@local-pseudodomain/perl/interactive.pl" method="post">
       <br>
       <div class="col-lg-10 col-lg-offset-1">
         <div class="form-group">
@@ -45,7 +45,7 @@
       </div>
     </form>
 
-    <form action="http://interactive:two@local-pseudodomain/perl/interactive-script.pl" method="post">
+    <form action="http://interactive:two@local-pseudodomain/perl/interactive.pl" method="post">
       <br>
       <div class="col-lg-10 col-lg-offset-1">
         <div class="form-group">
@@ -74,7 +74,7 @@
           close_confirmation: "_closed_",
           mode: "unix-epoch"
         }
-        scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive-script.pl' +
+        scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive.pl' +
                 formatParameters(scriptOneParameters), true);
         scriptOneRequest.send();
 
@@ -85,7 +85,7 @@
           close_confirmation: "_closed_",
           mode: "local-time"
         }
-        scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive-script.pl' +
+        scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive.pl' +
                 formatParameters(scriptTwoParameters), true);
         scriptTwoRequest.send();
       });

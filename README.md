@@ -198,7 +198,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
         close_command: "_close_",
         close_confirmation: "_closed_"
     }
-    request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive-script.pl' +
+    request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive.pl' +
             formatParameters(parameters), true);
     request.send();
 });
@@ -223,7 +223,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     close_command: "_close_",
     close_confirmation: "_closed_"
   }
-  scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive-script.pl' +
+  scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive.pl' +
           formatParameters(scriptOneParameters), true);
   scriptOneRequest.send();
 
@@ -233,7 +233,7 @@ document.addEventListener("DOMContentLoaded", function(event) {
     close_command: "_close_",
     close_confirmation: "_closed_"
   }
-  scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive-script.pl' +
+  scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive.pl' +
           formatParameters(scriptTwoParameters), true);
   scriptTwoRequest.send();
 });
@@ -341,7 +341,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 
   If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
 
-  If a local HTML page going to be closed contains a JavaScript function called ``pebCloseConfirmationAsync()``, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ``pebCloseConfirmationSync()``. If none of the above functions is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
+  If a local HTML page going to be closed contains a JavaScript function called ``pebCloseConfirmationAsync()``, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ``pebCloseConfirmationSync()``. If no warning function is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
 
   What are the differences between the two routines?  
 
