@@ -22,7 +22,6 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Supported Perl Script Types](#supported-perl-script-types)
 * [Non-interactive Perl Scripts](#non-interactive-perl-scripts)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
-* [AJAX Perl Scripts](#ajax-perl-scripts)
 * [Linux Superuser Perl Scripts](#linux-superuser-perl-scripts)
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
 * [Settings](#settings)
@@ -44,7 +43,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 
 * **1.** Write HTML file(s) that will serve as a GUI for your application.  
   If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.  
-  If your users will have to open local files or folders, see [how to open single file](#select-single-file) or [multiple files](#select-multiple-files), [how to prompt for a new filename](#select-new-file-name) and [how to select an existing folder or create a new one](#select-directory) from PEB. ``filesystem.html`` file within the PEB demo package is an appropriate example.
+  You may also see how to [open local files or folders](#special-urls-for-opening-files-and-folders).  
 
 * **2.** Write your Perl script(s).  
   Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. Use the ``get-post-test.pl`` file within the PEB demo package as an example.  
@@ -73,18 +72,16 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * DevOps people in need of custom Perl-based GUI monitoring and administration solutions
 
 ## Features
-* [Perl scripts can be fed from HTML forms using GET and POST requests to a built-in pseudodomain.](#feeding-from-forms)
 * [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
-* [Perl script output can be seamlessly inserted into the calling local page.](#data-only-scripts)
+* [Perl script output is seamlessly inserted into the calling local page.](#non-interactive-perl-scripts)
 * [Untrusted web content is never mixed with trusted local content.](#security)
 * Cross-site scripting is disabled for all web and local pages.
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * [PEB can be started from any folder.](#settings)
-* PEB is useful for both single-page (including multi-frame) or multi-page applications.
-* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-users)  
+* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-opening-files-and-folders)  
   Their full paths are easily supplied to local Perl scripts.
-* [Browser functions are accessible from special URLs.](#browser-functions)
+* [Browser functions are accessible from special URLs.](#other-special-urls)
 * [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels)
 * [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes)
 * [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
@@ -164,32 +161,15 @@ Changing PEB compile-time variables requires editing the ``src/peb.pro`` project
   ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Supported Perl Script Types
-  PEB recognizes four main types of local Perl scripts and does not impose execution timeouts on them:  
+  PEB recognizes the following types of local Perl scripts and does not impose execution timeouts on them:  
 * [**non-interactive scripts**](#non-interactive-perl-scripts)
 * [**interactive scripts**](#interactive-perl-scripts)
-* [**AJAX scripts**](#ajax-perl-scripts)
 * [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
-<a name="feeding-from-forms"></a>
 ## Non-interactive Perl Scripts
-  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudodomain or a relative path with no special naming convention. If a relative path is used, the PEB pseudodomain is added automatically. The following code is an example of a POST request to a local non-interactive Perl script from an HTML form:
+  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudodomain or a relative path with no special naming convention. If a relative path is used, the PEB pseudodomain is added automatically.
 
-  ```html
-  <form action="http://local-pseudodomain/perl/test.pl" method="post">
-      <input type="text" id="value1" name="value1" placeholder="Value 1" title="Value 1">
-      <input type="text" id="value2" name="value2" placeholder="Value 2" title="Value 2">
-      <input type="submit" value="Submit">
-  </form>
-  ```
-
-  Non-interactive scripts are either **page-producing scripts** or **data-only scripts**:  
-
-* **Page-producing scripts:**  
-  They produce complete HTML pages and no special settings are necessary when they are called from a local page. There can be multiple chunks of output from such a script - PEB accumulates them all and displays everything when the script is finished.  
-
-<a name="data-only-scripts"></a>  
-* **Data-only scripts:**
-  They don't produce a complete HTML page, but only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``stdout`` should be added to the script URL in this case.  
+  Non-interactive Perl scripts produce only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``stdout`` must be added to the script URL.  
 
   Example: ``http://local-pseudodomain/perl/counter.pl?stdout=script-results``  
 
@@ -197,7 +177,7 @@ Changing PEB compile-time variables requires editing the ``src/peb.pro`` project
 
   Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
-  **Windows caveat:** All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+  All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
 
 ## Interactive Perl Scripts
 Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
@@ -268,26 +248,6 @@ function formatParameters(parameters) {
 }
 ```
 
-## AJAX Perl Scripts
-Local AJAX Perl scripts executed by PEB must have the pseudo-user ``ajax`` in their URLs so that PEB is able to distinguish between AJAX and all other scripts.  
-
-The following example based on [jQuery](https://jquery.com/) calls a local AJAX Perl script and inserts its output into the ``ajax-results`` HTML DOM element of the calling page:  
-
-```javascript
-$(document).ready(function() {
-    $('#ajax-button').click(function() {
-        $.ajax({
-            url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
-            method: 'GET',
-            dataType: 'text',
-            success: function(data) {
-                $('#ajax-results').html(data);
-            }
-        });
-    });
-});
-```
-
 ## Linux Superuser Perl Scripts
 Linux superuser Perl scripts can be started using the special pseudo-user ``root``. So if PEB finds an URL like: ``http://root@local-pseudodomain/perl/root-open-directory.pl``, it will ask the user for the root password and then call ``sudo``, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other non-interactive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ``STDIN`` input or ``QUERY_STRING`` environment variable like in the user-level Perl scripts.
 
@@ -340,7 +300,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 
   ```javascript
   function pebContextMenu() {
-      var contextMenuObject = new Object();
+      var contextMenuObject = {};
 
       contextMenuObject.printPreview = "Custom Print Preview Label";
       contextMenuObject.print = "Custom Print Label";
@@ -360,7 +320,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 
   ```javascript
   function pebMessageBoxElements() {
-      var messageBoxElementsObject = new Object();
+      var messageBoxElementsObject = {};
 
       messageBoxElementsObject.alertTitle = "Custom Alert Label";
       messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
@@ -398,7 +358,7 @@ PEB is designed to run from any directory without setting anything beforehand an
   }
 
   function pebCloseConfirmationAsync() {
-      alertify.set({labels: {ok : "Ok", cancel , further labeled as ``{PEB_binary_directory}``, further labeled as ``{PEB_binary_directory}``: "Cancel"}});
+      alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
       alertify.set({buttonFocus: "cancel"});
       alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
           if (confirmation) {
@@ -409,9 +369,8 @@ PEB is designed to run from any directory without setting anything beforehand an
   ```
 
 ## Security
-Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its application directory.
-
 **PEB security principles:**
+* PEB executes with no sandbox local Perl 5 scripts in its application directory.
 * Users have full access to their local data using PEB.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
 * Trusted and untrusted content are not mixed together in one browser window.  
@@ -435,9 +394,7 @@ Being a desktop GUI, PEB executes with no sandbox local Perl 5 scripts in its ap
 The  pseudodomain is used to call all local files and all special URLs representing browser functions.  
 It is intercepted inside PEB and is not passed to the underlying operating system.  
 
-<a name="browser-functions"></a>
 ## Special URLs for Opening Files and Folders
-<a name="select-single-file"></a>  
 * **Select single file:** ``http://local-pseudodomain/open-file.function?target=example``  
   The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
@@ -445,36 +402,38 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
 
-  The following code is an example of how to select a local file and transmit its full path to a local Perl script using [jQuery](https://jquery.com/):  
+  The following code is an example of how to select a local file and transmit its full path to a local Perl script:  
 
-  ```javascript
-  function fileSelection(file) {
-      $.ajax({
-          url: 'http://local-pseudodomain/perl/open-file.pl',
-          data: {filename: file},
-          method: 'POST',
-          dataType: 'text',
-          success: function(data) {
-              document.write(data);
-          }
-      });
-  }
+  ```html
+  <head>
+    <script>
+      function fileSelection(file) {
+          var scriptRequest = new XMLHttpRequest();
+          scriptRequest.open('POST', 'perl/open-file.pl?stdout=open-file', true);
+          scriptRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+          scriptRequest.send("file=" + file);
+      }
+    </script>
+  </head>
+
+  <body>
+    <a href="http://local-pseudodomain/open-file.function?target=fileSelection">
+      Open Single File
+    </a>
+  <body>
   ```
 
-<a name="select-multiple-files"></a>  
 * **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=example``  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
   Different file names are separated by a semicolon - ``;``  
 
-<a name="select-new-file-name"></a>  
 * **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=example``  
   The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
 
   The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
 
-<a name="select-directory"></a>  
 * **Select directory:** ``http://local-pseudodomain/open-directory.function?target=example``  
   The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  

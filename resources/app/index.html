@@ -82,13 +82,13 @@
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/nonexistent.html">
+              <a href="nonexistent.html">
                 Nonexistent File
               </a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/dummy.txt">
+              <a href="dummy.txt">
                 Unsupported File
               </a>
             </li>
@@ -132,13 +132,7 @@
             </li>
 
             <li>
-              <a href="javascript:ajaxTest();">
-                AJAX Test
-              </a>
-            </li>
-
-            <li>
-              <a href="http://local-pseudodomain/perl/noextpl?stdout=extensionless">
+              <a href="perl/noextpl?stdout=extensionless">
                 Extensionless Script
               </a>
             </li>
@@ -180,12 +174,6 @@
             <li>
               <a href="https://html5test.com/">
                 HTML5test
-              </a>
-            </li>
-
-            <li>
-              <a href="http://www.perl.org/">
-                www.perl.org
               </a>
             </li>
 
@@ -277,8 +265,6 @@
 
       <div id="sqlite"></div>
 
-      <div id="ajax"></div>
-
       <div id="extensionless"></div>
 
       <h2>Perl Executing Browser</h2>
@@ -289,21 +275,6 @@
         <br>
       </div>
     </div>
-
-    <script>
-      function ajaxTest() {
-        $.ajax(
-          {
-            url: 'http://ajax@local-pseudodomain/perl/ajax-test.pl',
-            method: 'GET',
-            dataType: 'text',
-            success: function(data) {
-              $('#ajax').html("<pre>" + data + "</pre>");
-            }
-          }
-        );
-      };
-    </script>
   </body>
 
 </html>

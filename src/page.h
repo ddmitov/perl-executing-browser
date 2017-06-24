@@ -241,8 +241,7 @@ public slots:
         if (reply->error() != QNetworkReply::NoError) {
             qDebug() << "Network error:" << reply->errorString();
 
-            if (reply->url().fileName().length() == 0 or
-                    reply->url().userName() == "ajax") {
+            if (reply->url().fileName().length() == 0) {
                 QFileReader *resourceReader =
                         new QFileReader(QString(":/html/error.html"));
                 QString htmlErrorContents = resourceReader->fileContents;

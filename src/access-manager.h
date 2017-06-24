@@ -63,127 +63,11 @@ protected:
         }
 
         // ==============================
-        // Starting local AJAX Perl scripts is prohibited if
-        // untrusted content is loaded in the same window:
-        // ==============================
-        if ((operation == GetOperation or
-             operation == PostOperation) and
-                request.url().host() ==
-                qApp->property("pseudoDomain").toString() and
-                request.url().userName() == "ajax" and
-                pageStatus == "untrusted") {
-
-            QString errorMessage =
-                    "Calling local Perl scripts after "
-                    "untrusted content is loaded is prohibited.<br>"
-                    "Go to start page to unlock local Perl scripts.";
-            qDebug() << "Local AJAX Perl script called after"
-                    << "untrusted content is loaded:"
-                    << request.url().toString();
-
-            QLocalReply *reply = new QLocalReply(request.url(),
-                                                 errorMessage, emptyString);
-            return reply;
-        }
-
-        // ==============================
-        // Local AJAX GET and POST requests:
-        // ==============================
-        if ((operation == GetOperation or
-             operation == PostOperation) and
-                request.url().host() ==
-                qApp->property("pseudoDomain").toString() and
-                request.url().userName() == "ajax" and
-                pageStatus == "trusted") {
-
-            QString ajaxScriptFullFilePath = QDir::toNativeSeparators
-                    ((qApp->property("application").toString())
-                     + request.url().path());
-
-            QFile file(ajaxScriptFullFilePath);
-            if (file.exists()) {
-                QByteArray postDataArray;
-                if (outgoingData) {
-                    postDataArray = outgoingData->readAll();
-                }
-
-                QScriptHandler *ajaxScriptHandler =
-                        new QScriptHandler(
-                            request.url(), postDataArray);
-
-                // Non-blocking event loop waiting for
-                // AJAX script output and errors:
-                QEventLoop ajaxScriptHandlerWaitingLoop;
-
-                // Signal and slot for reading output and errors from
-                // all local AJAX Perl scripts:
-                QObject::connect(ajaxScriptHandler,
-                                 SIGNAL(scriptFinishedSignal(QString,
-                                                             QString,
-                                                             QString,
-                                                             QString,
-                                                             QString)),
-                                 &ajaxScriptHandlerWaitingLoop,
-                                 SLOT(quit()));
-
-                ajaxScriptHandlerWaitingLoop.exec();
-
-                QString ajaxScriptOutput =
-                        ajaxScriptHandler->scriptAccumulatedOutput;
-
-                QString ajaxScriptErrors =
-                        ajaxScriptHandler->scriptAccumulatedErrors;
-
-                if (ajaxScriptOutput.length() == 0 and
-                        ajaxScriptErrors == 0) {
-                    qDebug() << "AJAX script timed out or gave no output:"
-                             << ajaxScriptFullFilePath;
-                }
-
-                if (ajaxScriptErrors.length() > 0) {
-                    qDebug() << "AJAX script errors:";
-                    QStringList scriptErrors =
-                            ajaxScriptErrors.split("\n");
-                    foreach (QString scriptError, scriptErrors) {
-                        if (scriptError.length() > 0) {
-                            qDebug() << scriptError;
-                        }
-                    }
-                }
-
-                QLocalReply *reply = new QLocalReply(request.url(),
-                                                     ajaxScriptOutput,
-                                                     emptyString);
-                return reply;
-            } else {
-                qDebug() << "File not found:" << ajaxScriptFullFilePath;
-
-                QFileReader *resourceReader =
-                        new QFileReader(QString(":/html/error.html"));
-                QString htmlErrorContents = resourceReader->fileContents;
-
-                QString errorMessage =
-                        "<p>File not found:<br>"
-                        + ajaxScriptFullFilePath + "</p>";
-                htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-
-                QString mimeType = "text/html";
-
-                QLocalReply *reply = new QLocalReply(request.url(),
-                                                     htmlErrorContents,
-                                                     mimeType);
-                return reply;
-            }
-        }
-
-        // ==============================
         // GET requests to the browser pseudodomain:
-        // local files and non-AJAX scripts:
         // ==============================
         if (operation == GetOperation and
                 request.url().host() ==
                 qApp->property("pseudoDomain").toString() and
-                (request.url().userName() != "ajax") and
                 (!request.url().path().contains(".function"))) {
 
             // Compose the full file path:
@@ -310,12 +194,10 @@ protected:
 
         // ==============================
         // POST requests to the browser pseudodomain:
-        // non-AJAX scripts:
         // ==============================
         if (operation == PostOperation and
                 request.url().host() ==
-                qApp->property("pseudoDomain").toString() and
-                (request.url().userName() != "ajax")) {
+                qApp->property("pseudoDomain").toString()) {
 
             if (outgoingData) {
                 QByteArray postDataArray = outgoingData->readAll();
