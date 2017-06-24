@@ -6,7 +6,7 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts without server and with no timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using GET or POST requests to a built-in pseudodomain.  
+Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.  
 
 Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between local and web content in different browser windows.
 
@@ -72,18 +72,18 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * DevOps people in need of custom Perl-based GUI monitoring and administration solutions
 
 ## Features
+* [Perl script output is seamlessly inserted into the calling local page.](#non-interactive-perl-scripts)
 * [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
-* [Perl script output is seamlessly inserted into the calling local page.](#non-interactive-perl-scripts)
-* [Untrusted web content is never mixed with trusted local content.](#security)
+* [Web content is not mixed with local content.](#security)
 * Cross-site scripting is disabled for all web and local pages.
 * [Any version of Perl 5 can be used.](#runtime-requirements)
-* [PEB can be started from any folder.](#settings)
+* PEB can be started from any folder.
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-opening-files-and-folders)  
   Their full paths are easily supplied to local Perl scripts.
 * [Browser functions are accessible from special URLs.](#other-special-urls)
-* [Optional context menu translation using JavaScript ](#custom-or-translated-context-menu-labels)
-* [Optional translation of the JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-or-translated-labels-for-javascript-dialog-boxes)
+* [Custom context menu labels using JavaScript ](#custom-context-menu-labels)
+* [Custom labels of the *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-labels-for-javascript-dialog-boxes)
 * [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
 * [Any icon can be displayed on windows and message boxes.](#icon)
 * ``QWebInspector`` window can be invoked using <kbd>Ctrl</kbd> + <kbd>I</kbd> keyboard shortcut.
@@ -294,8 +294,8 @@ PEB is designed to run from any directory without setting anything beforehand an
 
 **Settings based on JavaScript code:**  
 
-<a name="custom-or-translated-context-menu-labels"></a>  
-* **Custom or translated context menu labels:**
+<a name="custom-context-menu-labels"></a>  
+* **Custom context menu labels:**
   Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ``contextmenu`` event is not already intercepted):  
 
   ```javascript
@@ -314,8 +314,8 @@ PEB is designed to run from any directory without setting anything beforehand an
   }
   ```
 
-<a name="custom-or-translated-labels-for-javascript-dialog-boxes"></a>  
-* **Custom or translated labels for JavaScript dialog boxes:**
+<a name="custom-labels-for-javascript-dialog-boxes"></a>  
+* **Custom labels for JavaScript dialog boxes:**
   Using the following code any local HTML page can have custom labels on the default JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes:
 
   ```javascript
@@ -426,6 +426,7 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 * **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=example``  
   The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
+
   Different file names are separated by a semicolon - ``;``  
 
 * **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=example``  
