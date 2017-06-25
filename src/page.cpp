@@ -71,10 +71,6 @@ QPage::QPage()
     mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAsNeeded);
     mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
 
-    // Regular expression for detection of HTML file extensions:
-    htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
-    htmlFileNameExtensionMarker.setCaseSensitivity(Qt::CaseInsensitive);
-
     // Default labels for JavaScript 'Alert', 'Confirm' and 'Prompt' dialogs:
     alertTitle = "Alert";
     confirmTitle = "Confirmation";

@@ -120,9 +120,7 @@ public slots:
         if (targetElement.length() > 0) {
             qOutputInserter(currentFrame(), targetElement, output);
         } else {
-            currentFrame()->setHtml(output,
-                                    QUrl(qApp->property("pseudoDomain")
-                                         .toString()));
+            qDebug() << "'stdout' query string item is not defined!";
         }
     }
 
@@ -134,46 +132,13 @@ public slots:
     {
         runningScripts.remove(scriptId);
 
-        // If script has no errors and
-        // no STDOUT target:
-        if (scriptAccumulatedOutput.length() > 0 and
-                scriptAccumulatedErrors.length() == 0 and
-                scriptTargetElement.length() == 0) {
-            qDisplayScriptOutputSlot(scriptAccumulatedOutput,
-                                     emptyString);
-        }
+        Q_UNUSED(scriptAccumulatedOutput);
+        Q_UNUSED(scriptTargetElement);
 
         if (scriptAccumulatedErrors.length() > 0) {
-            if (scriptAccumulatedOutput.length() == 0) {
-                if (scriptTargetElement.length() == 0) {
-                    // If script has no output and
-                    // only errors and
-                    // no STDOUT target is defined,
-                    // all HTML formatted errors will be displayed
-                    // in the same window:
-                    qFormatScriptErrors(scriptAccumulatedErrors,
-                                        scriptFullFilePath,
-                                        false);
-                } else {
-                    // If script has no output and
-                    // only errors and
-                    // a STDOUT target is defined,
-                    // all HTML formatted errors will be displayed
-                    // in a new window:
-                    qFormatScriptErrors(scriptAccumulatedErrors,
-                                        scriptFullFilePath,
-                                        true);
-                }
-            } else {
-                // If script has some output and errors,
-                // HTML formatted errors
-                // will be displayed in a new window:
-                qFormatScriptErrors(scriptAccumulatedErrors,
-                                    scriptFullFilePath,
-                                    true);
-                qDisplayScriptOutputSlot(emptyString,
-                                         scriptAccumulatedOutput);
-            }
+            qFormatScriptErrors(scriptAccumulatedErrors,
+                                scriptFullFilePath,
+                                true);
         }
 
         if (windowCloseRequested == true and runningScripts.isEmpty()) {
@@ -340,7 +305,6 @@ public slots:
 
             // JavaScript bridge back to
             // the local HTML page where request originated:
-
             QString inodeSelectedJavaScript =
                     "pebInodeSelection(\"" +
                     userSelectedInodesFormatted +
@@ -773,7 +737,6 @@ protected:
     }
 
 private:
-    QRegExp htmlFileNameExtensionMarker;
     QString emptyString;
     bool windowCloseRequested;
 
