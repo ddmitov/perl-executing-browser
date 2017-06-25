@@ -30,6 +30,8 @@
 #include <QWebPage>
 #include <QWebFrame>
 
+#include <QWebSecurityOrigin>
+
 #include "file-reader.h"
 #include "script-handler.h"
 
@@ -45,7 +47,6 @@ signals:
     void displayScriptErrorsSignal(QString errors);
     void printPreviewSignal();
     void printSignal();
-    void pageStatusSignal(QString pageStatus);
     void closeAllScriptsSignal();
     void closeWindowSignal();
 
@@ -127,47 +128,45 @@ public slots:
     {
         runningScripts.remove(scriptId);
 
-        if (pageStatus == "trusted") {
-            // If script has no errors and
-            // no STDOUT target:
-            if (scriptAccumulatedOutput.length() > 0 and
-                    scriptAccumulatedErrors.length() == 0 and
-                    scriptTargetElement.length() == 0) {
-                qDisplayScriptOutputSlot(scriptAccumulatedOutput,
-                                         emptyString);
-            }
+        // If script has no errors and
+        // no STDOUT target:
+        if (scriptAccumulatedOutput.length() > 0 and
+                scriptAccumulatedErrors.length() == 0 and
+                scriptTargetElement.length() == 0) {
+            qDisplayScriptOutputSlot(scriptAccumulatedOutput,
+                                     emptyString);
+        }
 
-            if (scriptAccumulatedErrors.length() > 0) {
-                if (scriptAccumulatedOutput.length() == 0) {
-                    if (scriptTargetElement.length() == 0) {
-                        // If script has no output and
-                        // only errors and
-                        // no STDOUT target is defined,
-                        // all HTML formatted errors will be displayed
-                        // in the same window:
-                        qFormatScriptErrors(scriptAccumulatedErrors,
-                                            scriptFullFilePath,
-                                            false);
-                    } else {
-                        // If script has no output and
-                        // only errors and
-                        // a STDOUT target is defined,
-                        // all HTML formatted errors will be displayed
-                        // in a new window:
-                        qFormatScriptErrors(scriptAccumulatedErrors,
-                                            scriptFullFilePath,
-                                            true);
-                    }
+        if (scriptAccumulatedErrors.length() > 0) {
+            if (scriptAccumulatedOutput.length() == 0) {
+                if (scriptTargetElement.length() == 0) {
+                    // If script has no output and
+                    // only errors and
+                    // no STDOUT target is defined,
+                    // all HTML formatted errors will be displayed
+                    // in the same window:
+                    qFormatScriptErrors(scriptAccumulatedErrors,
+                                        scriptFullFilePath,
+                                        false);
                 } else {
-                    // If script has some output and errors,
-                    // HTML formatted errors
-                    // will be displayed in a new window:
+                    // If script has no output and
+                    // only errors and
+                    // a STDOUT target is defined,
+                    // all HTML formatted errors will be displayed
+                    // in a new window:
                     qFormatScriptErrors(scriptAccumulatedErrors,
                                         scriptFullFilePath,
                                         true);
-                    qDisplayScriptOutputSlot(emptyString,
-                                             scriptAccumulatedOutput);
                 }
+            } else {
+                // If script has some output and errors,
+                // HTML formatted errors
+                // will be displayed in a new window:
+                qFormatScriptErrors(scriptAccumulatedErrors,
+                                    scriptFullFilePath,
+                                    true);
+                qDisplayScriptOutputSlot(emptyString,
+                                         scriptAccumulatedOutput);
             }
         }
 
@@ -254,31 +253,11 @@ public slots:
         }
 
         if (reply->error() == QNetworkReply::NoError) {
-            if (reply->url().toString() ==
-                    qApp->property("startPage").toString()) {
-                pageStatus = "trusted";
-                emit pageStatusSignal(pageStatus);
-            }
-
-            if (pageStatus.length() == 0) {
-                if (reply->url().toString()
-                        .contains(qApp->property("pseudoDomain").toString())) {
-                    pageStatus = "trusted";
-                    emit pageStatusSignal(pageStatus);
-                }
-
-                if (!reply->url().toString()
-                        .contains(qApp->property("pseudoDomain").toString())) {
-                    pageStatus = "untrusted";
-                    emit pageStatusSignal(pageStatus);
-                }
-            }
-
-            if (pageStatus == "trusted") {
-                if (!reply->url().toString()
-                        .contains(qApp->property("pseudoDomain").toString())) {
-                    qMixedContentWarning(reply->url());
-                }
+            if (mainFrame()->securityOrigin().scheme() == "file" and
+                    reply->url().scheme() != "file" and
+                    reply->url().authority() !=
+                    qApp->property("pseudoDomain").toString()) {
+                qMixedContentWarning(reply->url());
             }
         }
     }
@@ -525,15 +504,14 @@ protected:
                                  QWebPage::NavigationType navigationType)
     {
         // ==============================
-        // Untrusted domains called from a trusted page
-        // are loaded in new browser windows:
+        // Web page called from a local page
+        // is loaded in a new browser window:
         // ==============================
-        if (pageStatus == "trusted" and
-                (!request.url().toString().contains(
-                     qApp->property("pseudoDomain").toString())) and
-                (request.url().fileName().length() == 0 or
-                 request.url().fileName()
-                 .contains(htmlFileNameExtensionMarker))) {
+        if (mainFrame()->securityOrigin().scheme() == "file" and
+                request.url().scheme().contains("http") and
+                request.url().authority() !=
+                qApp->property("pseudoDomain").toString()) {
+
             QWebPage *page =
                     QPage::createWindow(QWebPage::WebBrowserWindow);
             page->mainFrame()->load(request.url());
@@ -543,118 +521,112 @@ protected:
 
         if (request.url().authority() ==
                 qApp->property("pseudoDomain").toString()) {
-            if (pageStatus == "trusted") {
-                // ==============================
-                // User selected single file:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "open-file.function") {
-                    if (request.url().query()
-                            .replace("target=", "").length() > 0) {
-                        qSelectInodesSlot(request);
-                    }
-
-                    return false;
+            // ==============================
+            // User selected single file:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-file.function") {
+                if (request.url().query()
+                        .replace("target=", "").length() > 0) {
+                    qSelectInodesSlot(request);
                 }
 
-                // ==============================
-                // User selected multiple files:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "open-files.function") {
-                    if (request.url().query()
-                            .replace("target=", "").length() > 0) {
-                        qSelectInodesSlot(request);
-                    }
-
-                    return false;
-                }
-
-                // ==============================
-                // User selected new file name:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "new-file-name.function") {
-                    if (request.url().query()
-                            .replace("target=", "").length() > 0) {
-                        qSelectInodesSlot(request);
-                    }
-
-                    return false;
-                }
-
-                // ==============================
-                // User selected directory:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "open-directory.function") {
-                    if (request.url().query()
-                            .replace("target=", "").length() > 0) {
-                        qSelectInodesSlot(request);
-                    }
-
-                    return false;
-                }
-
-#ifndef QT_NO_PRINTER
-                // ==============================
-                // Print preview from URL:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "print.function" and
-                        request.url().query() == "action=preview") {
-
-                    emit printPreviewSignal();
-
-                    return false;
-                }
-
-                // ==============================
-                // Print page from URL:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "print.function" and
-                        request.url().query() == "action=print") {
-                    emit printSignal();
-
-                    return false;
-                }
-#endif
-
-                // ==============================
-                // About browser dialog box:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "about.function" and
-                        request.url().query() == "type=browser") {
-                    QFileReader *resourceReader =
-                            new QFileReader(QString(":/html/about.html"));
-                    QString aboutPageContents = resourceReader->fileContents;
-
-                    aboutPageContents
-                            .replace("VERSION_STRING",
-                                     QApplication::applicationVersion()
-                                     .toLatin1());
-
-                    frame->setHtml(aboutPageContents);
-
-                    return false;
-                }
-
-                // ==============================
-                // About Qt dialog box:
-                // ==============================
-                if (navigationType == QWebPage::NavigationTypeLinkClicked and
-                        request.url().fileName() == "about.function" and
-                        request.url().query() == "type=qt") {
-                    QApplication::aboutQt();
-
-                    return false;
-                }
+                return false;
             }
 
-            if (pageStatus == "untrusted") {
-                qMixedContentWarning(request.url());
+            // ==============================
+            // User selected multiple files:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-files.function") {
+                if (request.url().query()
+                        .replace("target=", "").length() > 0) {
+                    qSelectInodesSlot(request);
+                }
+
+                return false;
+            }
+
+            // ==============================
+            // User selected new file name:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "new-file-name.function") {
+                if (request.url().query()
+                        .replace("target=", "").length() > 0) {
+                    qSelectInodesSlot(request);
+                }
+
+                return false;
+            }
+
+            // ==============================
+            // User selected directory:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "open-directory.function") {
+                if (request.url().query()
+                        .replace("target=", "").length() > 0) {
+                    qSelectInodesSlot(request);
+                }
+
+                return false;
+            }
+
+#ifndef QT_NO_PRINTER
+            // ==============================
+            // Print preview from URL:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "print.function" and
+                    request.url().query() == "action=preview") {
+
+                emit printPreviewSignal();
+
+                return false;
+            }
+
+            // ==============================
+            // Print page from URL:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "print.function" and
+                    request.url().query() == "action=print") {
+                emit printSignal();
+
+                return false;
+            }
+#endif
+
+            // ==============================
+            // About browser dialog box:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "about.function" and
+                    request.url().query() == "type=browser") {
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/html/about.html"));
+                QString aboutPageContents = resourceReader->fileContents;
+
+                aboutPageContents
+                        .replace("VERSION_STRING",
+                                 QApplication::applicationVersion()
+                                 .toLatin1());
+
+                frame->setHtml(aboutPageContents);
+
+                return false;
+            }
+
+            // ==============================
+            // About Qt dialog box:
+            // ==============================
+            if (navigationType == QWebPage::NavigationTypeLinkClicked and
+                    request.url().fileName() == "about.function" and
+                    request.url().query() == "type=qt") {
+                QApplication::aboutQt();
+
+                return false;
             }
         }
 
@@ -827,7 +799,6 @@ protected:
     }
 
 private:
-    QString pageStatus;
     QRegExp htmlFileNameExtensionMarker;
     QString emptyString;
     bool windowCloseRequested;

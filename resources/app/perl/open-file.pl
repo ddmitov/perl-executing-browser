@@ -4,13 +4,12 @@ use strict;
 use warnings;
 
 # Read input:
-my ($buffer, @pairs, $pair, $name, $value);
-read (STDIN, $buffer, $ENV{'CONTENT_LENGTH'});
+my (@pairs, $pair, $name, $value);
 
 my $file;
 
 # Split information into name/value pairs:
-@pairs = split(/&/, $buffer);
+@pairs = split(/&/, $ENV{'QUERY_STRING'});
 foreach $pair (@pairs) {
   ($name, $value) = split(/=/, $pair);
   $value =~ tr/+/ /;

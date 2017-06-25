@@ -161,32 +161,30 @@ Changing PEB compile-time variables requires editing the ``src/peb.pro`` project
   ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Supported Perl Script Types
-  PEB recognizes the following types of local Perl scripts and does not impose execution timeouts on them:  
+Perl scripts run by PEB are called from links or HTML forms using a full HTTP URL with the PEB pseudodomain. They produce pieces of data that are inserted into the HTML DOM of the calling page. The special query string item ``stdout`` must be added to the script URL.  
+
+Example: ``http://local-pseudodomain/perl/example.pl?stdout=script-results``  
+
+The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument.  
+
+Scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+
+PEB recognizes the following types of local Perl scripts and does not impose execution timeouts on them:  
 * [**non-interactive scripts**](#non-interactive-perl-scripts)
 * [**interactive scripts**](#interactive-perl-scripts)
 * [**Linux superuser scripts**](#linux-superuser-perl-scripts)
 
 ## Non-interactive Perl Scripts
-  Non-interactive Perl scripts can not receive any user input once they are started. They can be called from links or HTML forms using a full HTTP URL with the PEB pseudodomain or a relative path with no special naming convention. If a relative path is used, the PEB pseudodomain is added automatically.
+Non-interactive Perl scripts can not receive any user input once they are started.  
 
-  Non-interactive Perl scripts produce only pieces of data that are inserted one after the other into the HTML DOM of the calling page. The special query string item ``stdout`` must be added to the script URL.  
-
-  Example: ``http://local-pseudodomain/perl/counter.pl?stdout=script-results``  
-
-  The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
-
-  Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
-
-  All data-only scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script has its own event loop waiting constantly for new data on STDIN effectively creating a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
 
 The URL pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
 
-The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument. The calling page must not be reloaded during the script execution or no script output will be inserted.  
-
-The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or the unresponsive scripts will be killed and the window will be closed.  
+The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or all unresponsive scripts will be killed and the window will be closed.  
 
 The following JavaScript code demonstrates how to start an interactive Perl script immediately after its calling HTML page is loaded:
 
@@ -504,7 +502,8 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
 ## Applications Based on PEB
-* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator. It is a hybrid desktop or server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework.
+* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator.  
+  It is a hybrid desktop or server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework.
 * [Camel Doctor](https://github.com/ddmitov/camel-doctor) is a Linux and Mac serverless HTML user interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html).
 
 ## License

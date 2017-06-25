@@ -376,9 +376,8 @@ int main(int argc, char **argv)
 
         if (startPageFile.exists()) {
             startPage =
-                    "http://" +
-                    QString(application.property("pseudoDomain").toString()) +
-                    "/index.html";
+                    "file://" +
+                    applicationDirName + QDir::separator() + "index.html";
 
             application.setProperty("startPage", startPage);
 

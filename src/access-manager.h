@@ -51,8 +51,7 @@ protected:
         if ((operation == GetOperation) and
                 request.url().host() ==
                 qApp->property("pseudoDomain").toString() and
-                request.url().fileName().length() == 0 and
-                pageStatus == "trusted") {
+                request.url().fileName().length() == 0) {
             QNetworkRequest startPageRequest;
             startPageRequest
                     .setUrl(QUrl(qApp->property("startPage").toString()));
@@ -86,50 +85,14 @@ protected:
 
                 // Handle local Perl scripts:
                 if (mimeType == "application/x-perl") {
-                    // Start local Perl scripts only if
-                    // no untrusted content is loaded in the same window:
-                    if (pageStatus == "trusted") {
-                        QByteArray emptyPostDataArray;
-                        emit handleScriptSignal(
-                                    request.url(), emptyPostDataArray);
+                    QByteArray emptyPostDataArray;
+                    emit handleScriptSignal(
+                                request.url(), emptyPostDataArray);
 
-                        QLocalReply *reply = new QLocalReply(request.url(),
-                                                             emptyString,
-                                                             emptyString);
-                        return reply;
-                    }
-
-                    // If an attempt is made to start local Perl scripts after
-                    // untrusted content is loaded in the same window,
-                    //  an error page is displayed:
-                    if (pageStatus == "untrusted") {
-                        QString errorMessage =
-                                "<p>Calling local Perl scripts after "
-                                "untrusted content is loaded in "
-                                "the same window is prohibited.<br>"
-                                "Go to <a href='" +
-                                qApp->property("startPage").toString() +
-                                "'>start page</a> "
-                                "to unlock local Perl scripts.</p>";
-                        qDebug() << "Local Perl script called after"
-                                << "untrusted content was loaded:"
-                                << request.url().toString();
-
-                        QFileReader *resourceReader =
-                                new QFileReader(QString(":/html/error.html"));
-                        QString htmlErrorContents =
-                                resourceReader->fileContents;
-
-                        htmlErrorContents
-                                .replace("ERROR_MESSAGE", errorMessage);
-
-                        QString mimeType = "text/html";
-
-                        QLocalReply *reply = new QLocalReply(request.url(),
-                                                             htmlErrorContents,
-                                                             mimeType);
-                        return reply;
-                    }
+                    QLocalReply *reply = new QLocalReply(request.url(),
+                                                         emptyString,
+                                                         emptyString);
+                    return reply;
                 }
 
                 // Handle other supported local files:
@@ -214,8 +177,7 @@ protected:
         // Window closing URL:
         // ==============================
         if (operation == GetOperation and
-                request.url().fileName() == "close-window.function" and
-                pageStatus == "trusted") {
+                request.url().fileName() == "close-window.function") {
             emit closeWindowSignal();
 
             QLocalReply *reply = new QLocalReply(request.url(),
@@ -231,16 +193,8 @@ protected:
                  QNetworkRequest(request));
     }
 
-public slots:
-    void qPageStatusSlot(QString pageStatusTransmitted)
-    {
-        pageStatus = pageStatusTransmitted;
-    }
-
 private:
     QString emptyString;
-    QStringList trustedDomains;
-    QString pageStatus;
 };
 
 #endif // ACCESSMANAGER_H

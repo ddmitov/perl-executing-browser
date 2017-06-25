@@ -68,10 +68,8 @@ QPage::QPage()
     QWebSettings::setObjectCacheCapacities(0, 0, 0);
 
     // Scroll bars:
-    mainFrame()->setScrollBarPolicy(Qt::Horizontal,
-                                              Qt::ScrollBarAsNeeded);
-    mainFrame()->setScrollBarPolicy(Qt::Vertical,
-                                              Qt::ScrollBarAsNeeded);
+    mainFrame()->setScrollBarPolicy(Qt::Horizontal, Qt::ScrollBarAsNeeded);
+    mainFrame()->setScrollBarPolicy(Qt::Vertical, Qt::ScrollBarAsNeeded);
 
     // Regular expression for detection of HTML file extensions:
     htmlFileNameExtensionMarker.setPattern(".htm{0,1}");
@@ -108,12 +106,6 @@ QPage::QPage()
                      SIGNAL(finished(QNetworkReply *)),
                      this,
                      SLOT(qNetworkReply(QNetworkReply *)));
-
-    // Signal and slot for the detection of page status:
-    QObject::connect(this,
-                     SIGNAL(pageStatusSignal(QString)),
-                     networkAccessManager,
-                     SLOT(qPageStatusSlot(QString)));
 
     // Signal and slot for starting local scripts:
     QObject::connect(networkAccessManager,

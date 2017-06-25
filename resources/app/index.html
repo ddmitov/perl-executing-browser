@@ -6,14 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 
-    <script type="text/javascript" src="jquery/jquery-1.11.1.min.js"></script>
+    <script src="jquery/jquery-1.11.1.min.js"></script>
 
-    <script type="text/javascript" src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
     <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
     <script type="text/javascript" src="bootstrap/js/bootstrap-dropdown.js"></script>
 
-    <script type="text/javascript" src="pebjs/filesystem.js"></script>
+    <script src="pebjs/filesystem.js"></script>
 
     <style>
       pre {
@@ -82,13 +82,13 @@
             </li>
 
             <li>
-              <a href="nonexistent.html">
+              <a href="http://local-pseudodomain/nonexistent.html">
                 Nonexistent File
               </a>
             </li>
 
             <li>
-              <a href="dummy.txt">
+              <a href="http://local-pseudodomain/unsupported.txt">
                 Unsupported File
               </a>
             </li>
@@ -102,37 +102,37 @@
           </a>
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a href="interactive-script.html" target="_blank">
+              <a href="http://local-pseudodomain/interactive-script.html" target="_blank">
                 Interactive Script
               </a>
             </li>
 
             <li>
-              <a href="perl/counter.pl?stdout=data-one">
+              <a href="http://local-pseudodomain/perl/counter.pl?stdout=data-one">
                 Noninteractive Script - First Instance
               </a>
             </li>
 
             <li>
-              <a href="perl/counter.pl?stdout=data-two">
+              <a href="http://local-pseudodomain/perl/counter.pl?stdout=data-two">
                 Noninteractive Script - Second Instance
               </a>
             </li>
 
             <li>
-              <a href="perl/version-cwd-inc.pl?stdout=diag">
+              <a href="http://local-pseudodomain/perl/version-cwd-inc.pl?stdout=diag">
                 Perl Basic information
               </a>
             </li>
 
             <li>
-              <a href="perl/sqlite.pl?stdout=sqlite">
+              <a href="http://local-pseudodomain/perl/sqlite.pl?stdout=sqlite">
                 SQLite Test
               </a>
             </li>
 
             <li>
-              <a href="perl/noextpl?stdout=extensionless">
+              <a href="http://local-pseudodomain/perl/noextpl?stdout=extensionless">
                 Extensionless Script
               </a>
             </li>
@@ -174,12 +174,6 @@
             <li>
               <a href="https://html5test.com/">
                 HTML5test
-              </a>
-            </li>
-
-            <li>
-              <a href="http://www.nonexistent.com/">
-                Nonexistent Web Site
               </a>
             </li>
 
@@ -269,7 +263,7 @@
 
       <h2>Perl Executing Browser</h2>
       <div class="introduction">
-        <div><a href="https://github.com/ddmitov/perl-executing-browser" target="_blank">Perl Executing Browser (PEB)</a> is an HTML user interface for <a href="https://www.perl.org/">Perl 5</a> desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on <a href="https://www.qt.io/">Qt 5</a> and <a href="https://trac.webkit.org/wiki/QtWebKit" target="_blank">QtWebKit</a> libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.</div>
+        <div><a href="https://github.com/ddmitov/perl-executing-browser">Perl Executing Browser (PEB)</a> is an HTML user interface for <a href="https://www.perl.org/">Perl 5</a> desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on <a href="https://www.qt.io/">Qt 5</a> and <a href="https://trac.webkit.org/wiki/QtWebKit">QtWebKit</a> libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.</div>
         <br>
         <p>Inspired by <a href="http://nwjs.io/">NW.js</a> and <a href="http://electron.atom.io/">Electron</a>, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to NW.js and Electron, PEB enforces strict separation between local and web content in different browser windows.</p>
         <br>
