@@ -23,6 +23,7 @@ foreach $pair (@pairs) {
 my $number_of_lines;
 
 print "<pre>";
+print "Opening multiple files:<br>";
 
 foreach my $file (@files) {
   open my $filehandle, '<', $file or die "Unable to open file: $!";

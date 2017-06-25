@@ -35,6 +35,7 @@ if (scalar @$all_records < 4) {
 $all_records = $db->selectall_arrayref ("SELECT * FROM USER");
 
 print "<pre>";
+print "SQLite Test:<br>";
 
 foreach my $row (@$all_records) {
   my ($id, $name, $surname) = @$row;

@@ -26,4 +26,4 @@ close $filehandle;
 
 my $number_of_lines = scalar(@file_contents);
 
-print "<pre>File: $file Lines: $number_of_lines</pre>";
+print "<pre>Opening single file: $file Lines: $number_of_lines</pre>";

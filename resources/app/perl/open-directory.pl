@@ -31,7 +31,7 @@ foreach $pair (@pairs) {
 
 traverse ($directory_name);
 
-print "<pre>Directory: $directory_name<br><br>";
+print "<pre>Listing all files in the $directory_name directory:<br>";
 foreach my $file (@files) {
   print "$file<br>";
 }

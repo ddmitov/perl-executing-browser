@@ -1,18 +1,18 @@
 // These functions are usefull only inside Perl Executing Browser.
 
 function fileSelection(file) {
-  window.location.href = "http://local-pseudodomain/perl/open-file.pl?stdout=open-file&file=" + file;
+  window.location.href = "http://local-pseudodomain/perl/open-file.pl?stdout=tests&file=" + file;
 }
 
 function filesSelection(files) {
-  window.location.href = "http://local-pseudodomain/perl/open-files.pl?stdout=open-files&files=" + files;
+  window.location.href = "http://local-pseudodomain/perl/open-files.pl?stdout=tests&files=" + files;
 }
 
 function directorySelection(directory) {
-  window.location.href = "http://local-pseudodomain/perl/open-directory.pl?stdout=open-directory&directory=" + directory;
+  window.location.href = "http://local-pseudodomain/perl/open-directory.pl?stdout=tests&directory=" + directory;
 }
 
 function newFilenameSelection(filename) {
-  var container = document.getElementById('new-filename');
+  var container = document.getElementById('tests');
   container.innerHTML = "<pre>New filename: " + filename + "</pre>";
 }

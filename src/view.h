@@ -71,12 +71,6 @@ public slots:
         QString pasteLabel;
         QString selectAllLabel;
 
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        mainPage->currentFrame()->evaluateJavaScript(pebJavaScript);
-
         QVariant contextMenuJsResult =
                 mainPage->currentFrame()->
                 evaluateJavaScript("pebFindContextMenu()");

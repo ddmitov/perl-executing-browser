@@ -55,6 +55,12 @@ public slots:
     {
         if (ok) {
             emit changeTitleSignal();
+
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/peb.js"));
+            QString pebJavaScript = resourceReader->fileContents;
+
+            QPage::mainFrame()->evaluateJavaScript(pebJavaScript);
         }
     }
 
@@ -179,8 +185,6 @@ public slots:
                          QString targetElement,
                          QString data)
     {
-        qJavaScriptInjector(targetFrame);
-
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
                 data +
@@ -247,7 +251,10 @@ public slots:
 
                 htmlErrorContents
                         .replace("ERROR_MESSAGE",
-                                 "<p>" + reply->errorString() + "</p>");
+                                 "<br>" + reply->errorString() + "<br><br>" +
+                                 "<a href='" +
+                                 qApp->property("startPage").toString() +
+                                 "'>start page</a>");
                 QPage::currentFrame()->setHtml(htmlErrorContents);
             }
         }
@@ -255,6 +262,8 @@ public slots:
         if (reply->error() == QNetworkReply::NoError) {
             if (mainFrame()->securityOrigin().scheme() == "file" and
                     reply->url().scheme() != "file" and
+                    reply->url().userName().length() == 0 and
+                    reply->url().password().length() == 0 and
                     reply->url().authority() !=
                     qApp->property("pseudoDomain").toString()) {
                 qMixedContentWarning(reply->url());
@@ -265,14 +274,13 @@ public slots:
     void qMixedContentWarning(QUrl url)
     {
         QString errorMessage =
-                "<p>Mixed content is detected.<br>"
+                "<br>Mixed content is detected.<br>"
                 "Offending URL:<br>" +
                 url.toString() + "<br>"
-                "Mixing trusted and untrusted content is prohibited.<br>"
-                "Go to <a href='" +
+                "Mixing local and web content is prohibited.<br><br>"
+                "<a href='" +
                 qApp->property("startPage").toString() +
-                "'>start page</a> "
-                "to unlock local scripting.</p>";
+                "'>start page</a>";
         qWarning() << "Mixed content is detected. Offending URL:"
                    << url.toString();
 
@@ -331,8 +339,7 @@ public slots:
             userSelectedInodesFormatted.replace(QRegularExpression(";$"), "");
 
             // JavaScript bridge back to
-            // the local HTML frame where request originated:
-            qJavaScriptInjector(currentFrame());
+            // the local HTML page where request originated:
 
             QString inodeSelectedJavaScript =
                     "pebInodeSelection(\"" +
@@ -348,63 +355,28 @@ public slots:
     }
 
     // ==============================
-    // JavaScript-injecting routine:
-    // ==============================
-    void qJavaScriptInjector(QWebFrame *frame)
-    {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/peb.js"));
-        QString pebJavaScript = resourceReader->fileContents;
-
-        frame->evaluateJavaScript(pebJavaScript);
-    }
-
-    // ==============================
     // Page-closing routines:
     // ==============================
     void qInitiateWindowClosingSlot()
     {
-        if (mainFrame()->childFrames().length() > 0) {
-            foreach (QWebFrame *frame, mainFrame()->childFrames()) {
-                qUserInputFrameIterator(frame);
-            }
-        } else {
-            qCheckUserInputBeforeClose(mainFrame());
-        }
-    }
-
-    void qUserInputFrameIterator(QWebFrame *frame)
-    {
-        if (frame->childFrames().length() > 0) {
-            qCheckUserInputBeforeClose(frame);
-            foreach (QWebFrame *frame, frame->childFrames()) {
-                qUserInputFrameIterator(frame);
-            }
-        } else {
-            qCheckUserInputBeforeClose(frame);
-        }
-    }
-
-    void qCheckUserInputBeforeClose(QWebFrame *frame)
-    {
-        qJavaScriptInjector(frame);
-
         QVariant checkUserInputJsResult =
-                frame->evaluateJavaScript("pebCheckUserInputBeforeClose()");
+                mainFrame()->
+                evaluateJavaScript("pebCheckUserInputBeforeClose()");
         bool textIsEntered = checkUserInputJsResult.toBool();
 
         QVariant checkCloseWarningJsResult =
-                frame->evaluateJavaScript("pebCheckCloseWarning()");
+                mainFrame()->evaluateJavaScript("pebCheckCloseWarning()");
         QString closeWarning = checkCloseWarningJsResult.toString();
 
         if (textIsEntered == true) {
             if (closeWarning == "async") {
-                frame->evaluateJavaScript("pebCloseConfirmationAsync()");
+                mainFrame()->evaluateJavaScript("pebCloseConfirmationAsync()");
             }
 
             if (closeWarning == "sync") {
                 QVariant jsSyncResult =
-                        frame->evaluateJavaScript("pebCloseConfirmationSync()");
+                        mainFrame()->
+                        evaluateJavaScript("pebCloseConfirmationSync()");
 
                 bool jsCloseDecision;
                 if (jsSyncResult.toString().length() > 0) {
@@ -509,6 +481,8 @@ protected:
         // ==============================
         if (mainFrame()->securityOrigin().scheme() == "file" and
                 request.url().scheme().contains("http") and
+                request.url().userName().length() == 0 and
+                request.url().password().length() == 0 and
                 request.url().authority() !=
                 qApp->property("pseudoDomain").toString()) {
 

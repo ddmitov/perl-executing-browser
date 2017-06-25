@@ -10,6 +10,7 @@ my $path_separator = "/";
 traverse ($directory_name);
 
 print "<pre>";
+print "Listing all files in the /root directory:<br";
 
 foreach my $file (@files) {
   print "$file<br>";

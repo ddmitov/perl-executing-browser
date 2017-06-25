@@ -6,9 +6,9 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.  
+Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.  
 
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB enforces strict separation between local and web content in different browser windows.
+Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to NW.js and Electron, PEB enforces strict separation between local and web content in different browser windows.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -93,9 +93,10 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * GCC compiler
 * Qt 5.1 - 5.5 (including ``QtWebKit`` libraries and headers)  
   ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
-  Compiling ``QtWebKit`` for a recent Qt version is possible, but not trivial or tested with PEB.  
 
-The implementation of the local pseudodomain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``. If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
+  The implementation of the local pseudodomain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``.  
+
+  If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian Linux,
@@ -256,13 +257,12 @@ Linux superuser Perl scripts can be started using the special pseudo-user ``root
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
-  Note, however, that to achieve [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/) compatibility a PEB-based program must fit into the single-page application paradigm and no frames or iframes should be used.
 
 * **Perl interpreter:**  
   PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
 
 * **Start page:**  
-  PEB starts with an HTML page located at ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
+  PEB starts always with ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
   Note that start page pathname is case sensitive.
 
 ## Settings
@@ -368,21 +368,18 @@ PEB is designed to run from any directory without setting anything beforehand an
 
 ## Security
 **PEB security principles:**
-* PEB executes with no sandbox local Perl 5 scripts in its application directory.
-* Users have full access to their local data using PEB.
+* PEB executes with no sandbox local Perl 5 scripts in its application directory and
+  users have full access to their local data.
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
-* Trusted and untrusted content are not mixed together in one browser window.  
-  Trusted content is any content originating from the local pseudodomain ``http://local-pseudodomain/``.  
-  Untrusted content is any content not coming from the local pseudodomain.
+* Local and web content are not mixed together in one browser window.  
+  Local content is any content coming from the file:// protocol or the local pseudodomain.
 
 **Hard coded security features:**
 * PEB can not execute Perl scripts from remote locations.
-* If untrusted page is called from a trusted one,  
+* If web page is called from a local page,  
   it is automatically displayed in a separate browser window.
-* If untrusted JavaScript is called from a trusted page,  
-  a warning message blocks the entire browser window until user goes to the start page to restore local Perl scripting.
-* Local Perl scripts can not be started from untrusted pages.
-* Files or folders can not be selected with their full paths from untrusted pages.
+* Local Perl scripts can not be started from web pages.
+* Files or folders can not be selected with their full paths from web pages.
 * Cross-site scripting is disabled for all web and local pages.
 
 **[Optional security feature based on compile-time variable](#security-compile-time-variable)**
@@ -396,6 +393,7 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 * **Select single file:** ``http://local-pseudodomain/open-file.function?target=example``  
   The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
   Having a target query string item is mandatory when using this special URL.  
+
   The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
 
   Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
@@ -438,7 +436,7 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
   Having a target query string item is mandatory when using this special URL.  
 
   Please note that if you choose to create a new directory, it will be created immediately by PEB.  
-  It will be already existing when passed to a local Perl script.  
+  It will exist when its name will be passed to a local Perl script.  
 
 ## Other Special URLs
 * **Print:** ``http://local-pseudodomain/print.function?action=print``  
@@ -452,7 +450,7 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 * **About Qt dialog box:** ``http://local-pseudodomain/about.function?type=qt``
 
 * **Close current window:** ``http://local-pseudodomain/close-window.function``  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was implememented to enable asynchronous JavaScript routines for window closing confirmation - see section *Settings*, paragraph [Warning for unsaved user input before closing a window](#warning-for-unsaved-user-input-before-closing-a-window).  
+  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was created for [asynchronous window-closing JavaScript functions](#warning-for-unsaved-user-input-before-closing-a-window).  
 
 ## Local File Types
   All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  
@@ -463,7 +461,9 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
   Perl scripts are usually recognized by PEB using the ``.pl`` filename extension.  
   Perl scripts without filename extensions are recognized using a Perl shebang line like:  
   ``#!/usr/bin/perl`` or ``#!/usr/bin/env perl``  
+
   No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
+
   PEB finds Perl interpreter at application startup and uses shebang line only to detect Perl scripts without filename extension.  
 
   All other supported local file types are recognized using the following filename extensions:  
@@ -490,16 +490,13 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
 
 ## Limitations
-* No page produced by a local Perl script can be reloaded because no temporary files are written.  
-  Local static HTML pages, as well as web pages, can be reloaded using the JavaScript function ``location.reload()``.
-* JavaScript functions ``window.history.back()``, ``window.history.forward()`` and ``window.history.go()`` work only for local static HTML pages, as well as for web pages.  
-  No page produced by a local Perl script can use any of these functions.
-* No cache.
-* No file can be downloaded on hard disk.
-* No plugins and HTML 5 video.
+* No local Perl scripting inside frames.
+* No files can be downloaded on hard disk.
+* No plugin support and HTML5 video.
+* No page cache.
 
 ## History
-PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
+PEB was started as a simple GUI for a personal database in 2013 by Dimitar D. Mitov.
 
 ## Applications Based on PEB
 * [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator.  

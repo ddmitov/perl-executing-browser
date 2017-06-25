@@ -368,16 +368,15 @@ int main(int argc, char **argv)
                  << application.property("pseudoDomain").toString();
 
         // ==============================
-        // Start page loading:
+        // Start page:
         // ==============================
+        QString startPageFilePath =
+                applicationDirName + QDir::separator() + "index.html";
+        QFile startPageFile(startPageFilePath);
         QString startPage;
-        QFile startPageFile(
-                    applicationDirName + QDir::separator() + "index.html");
 
         if (startPageFile.exists()) {
-            startPage =
-                    "file://" +
-                    applicationDirName + QDir::separator() + "index.html";
+            startPage = "file://" + startPageFilePath;
 
             application.setProperty("startPage", startPage);
 
