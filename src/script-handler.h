@@ -34,11 +34,9 @@ class QScriptHandler : public QObject
 
 signals:
     void displayScriptOutputSignal(QString output, QString scriptStdoutTarget);
-    void scriptFinishedSignal(QString scriptAccumulatedOutput,
-                              QString scriptAccumulatedErrors,
+    void scriptFinishedSignal(QString scriptAccumulatedErrors,
                               QString scriptId,
-                              QString scriptFullFilePath,
-                              QString scriptStdoutTarget);
+                              QString scriptFullFilePath);
 
 public slots:
     void qScriptOutputSlot()
@@ -75,11 +73,9 @@ public slots:
 
     void qScriptFinishedSlot()
     {
-        emit scriptFinishedSignal(scriptAccumulatedOutput,
-                                  scriptAccumulatedErrors,
+        emit scriptFinishedSignal(scriptAccumulatedErrors,
                                   scriptId,
-                                  scriptFullFilePath,
-                                  scriptStdoutTarget);
+                                  scriptFullFilePath);
 
         scriptProcess.close();
 

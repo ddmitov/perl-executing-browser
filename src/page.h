@@ -86,13 +86,9 @@ public slots:
             QObject::connect(scriptHandler,
                              SIGNAL(scriptFinishedSignal(QString,
                                                          QString,
-                                                         QString,
-                                                         QString,
                                                          QString)),
                              this,
                              SLOT(qScriptFinishedSlot(QString,
-                                                      QString,
-                                                      QString,
                                                       QString,
                                                       QString)));
 
@@ -117,78 +113,47 @@ public slots:
     void qDisplayScriptOutputSlot(QString output,
                                   QString targetElement)
     {
-        if (targetElement.length() > 0) {
-            qOutputInserter(currentFrame(), targetElement, output);
-        } else {
-            qDebug() << "'stdout' query string item is not defined!";
-        }
-    }
-
-    void qScriptFinishedSlot(QString scriptAccumulatedOutput,
-                             QString scriptAccumulatedErrors,
-                             QString scriptId,
-                             QString scriptFullFilePath,
-                             QString scriptTargetElement)
-    {
-        runningScripts.remove(scriptId);
-
-        Q_UNUSED(scriptAccumulatedOutput);
-        Q_UNUSED(scriptTargetElement);
-
-        if (scriptAccumulatedErrors.length() > 0) {
-            qFormatScriptErrors(scriptAccumulatedErrors,
-                                scriptFullFilePath,
-                                true);
-        }
-
-        if (windowCloseRequested == true and runningScripts.isEmpty()) {
-            emit closeWindowSignal();
-        }
-    }
-
-    void qOutputInserter(QWebFrame *targetFrame,
-                         QString targetElement,
-                         QString data)
-    {
         QString outputInsertionJavaScript =
                 "pebOutputInsertion(\"" +
-                data +
+                output +
                 "\" , \"" +
                 targetElement +
                 "\"); null";
 
-        targetFrame->evaluateJavaScript(outputInsertionJavaScript);
+        mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
     }
 
-    void qFormatScriptErrors(QString errors,
-                             QString scriptFullFilePath,
-                             bool newWindow)
+    void qScriptFinishedSlot(QString scriptAccumulatedErrors,
+                             QString scriptId,
+                             QString scriptFullFilePath)
     {
-        QString scriptErrorTitle = "Errors were found during script execution:";
+        runningScripts.remove(scriptId);
 
-        errors.replace(QRegExp("\n\n$"), "\n");
+        if (scriptAccumulatedErrors.length() > 0) {
+            QString scriptErrorTitle =
+                    "Errors were found during script execution:";
 
-        QString scriptError = scriptErrorTitle +
-                "<br>" +
-                scriptFullFilePath +
-                "<br><br>" +
-                "<pre>" +
-                errors +
-                "</pre>";
+            scriptAccumulatedErrors.replace(QRegExp("\n\n$"), "\n");
 
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/html/error.html"));
-        QString scriptFormattedErrors = resourceReader->fileContents;
+            QString scriptError = scriptErrorTitle +
+                    "<br>" +
+                    scriptFullFilePath +
+                    "<br><br>" +
+                    "<pre>" +
+                    scriptAccumulatedErrors +
+                    "</pre>";
 
-        scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
+            QFileReader *resourceReader =
+                    new QFileReader(QString(":/html/error.html"));
+            QString scriptFormattedErrors = resourceReader->fileContents;
 
-        if (newWindow == false) {
-            qDisplayScriptOutputSlot(emptyString,
-                                     scriptFormattedErrors);
+            scriptFormattedErrors.replace("ERROR_MESSAGE", scriptError);
+
+            emit displayScriptErrorsSignal(scriptFormattedErrors);
         }
 
-        if (newWindow == true) {
-            emit displayScriptErrorsSignal(scriptFormattedErrors);
+        if (windowCloseRequested == true and runningScripts.isEmpty()) {
+            emit closeWindowSignal();
         }
     }
 
@@ -220,7 +185,7 @@ public slots:
                                  "<a href='" +
                                  qApp->property("startPage").toString() +
                                  "'>start page</a>");
-                QPage::currentFrame()->setHtml(htmlErrorContents);
+                QPage::mainFrame()->setHtml(htmlErrorContents);
             }
         }
 
@@ -312,7 +277,7 @@ public slots:
                     target +
                     "\"); null";
 
-            currentFrame()->evaluateJavaScript(inodeSelectedJavaScript);
+            mainFrame()->evaluateJavaScript(inodeSelectedJavaScript);
 
             qDebug() << "User selected inode:" << userSelectedInodesFormatted;
         }
