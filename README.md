@@ -94,9 +94,11 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * Qt 5.1 - 5.5 (including ``QtWebKit`` libraries and headers)  
   ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
 
-  The local pseudodomain is implement using the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``.  
+  The local pseudodomain of PEB is implemented using the ``QNetworkAccessManager`` class,  
+  which is incompatible with ``QtWebEngine``.  
 
-  If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
+  If you want to use the Blink web engine for your Perl desktop application,  
+  you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with the [camel-harness npm package](https://github.com/ddmitov/camel-harness).  
 
 Compiled and tested successfully using:
 * [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian Linux,
