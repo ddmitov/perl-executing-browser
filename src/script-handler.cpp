@@ -30,6 +30,16 @@
 QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
     : QObject(0)
 {
+    scriptFullFilePath = QDir::toNativeSeparators
+            ((qApp->property("application").toString()) + url.path());
+
+    QFile file(scriptFullFilePath);
+    if (!file.exists()) {
+        qDebug() << "File not found:" << scriptFullFilePath;
+
+        return;
+    }
+
     // Signals and slots for local long running Perl scripts:
     QObject::connect(&scriptProcess, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
@@ -42,14 +52,8 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
 
     QUrlQuery scriptQuery(url);
 
-    scriptFullFilePath = QDir::toNativeSeparators
-            ((qApp->property("application").toString()) + url.path());
-
     scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
     scriptQuery.removeQueryItem("stdout");
-    if (scriptStdoutTarget.length() > 0) {
-        qDebug() << "Script STDOUT target:" << scriptStdoutTarget;
-    }
 
     scriptUser = url.userName();
 
@@ -83,14 +87,12 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
     if (scriptQuery.toString().length() > 0) {
         scriptEnvironment.insert("REQUEST_METHOD", "GET");
         scriptEnvironment.insert("QUERY_STRING", scriptQuery.toString());
-        // qDebug() << "Query string:" << queryString;
     }
 
     if (postData.length() > 0) {
         scriptEnvironment.insert("REQUEST_METHOD", "POST");
         QString postDataSize = QString::number(postData.size());
         scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
-        // qDebug() << "POST data:" << postData;
     }
 
     scriptProcess.setProcessEnvironment(scriptEnvironment);
@@ -180,6 +182,8 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
 #endif
 #endif
 
-    qDebug() << QDateTime::currentMSecsSinceEpoch()
-            << "msecs from epoch: script started:" << scriptFullFilePath;
+    qDebug()
+            // << QDateTime::currentMSecsSinceEpoch()
+            // << "msecs from epoch:"
+            << "Script started:" << scriptFullFilePath;
 }

@@ -28,9 +28,7 @@ struct QLocalReplyPrivate
     int offset;
 };
 
-QLocalReply::QLocalReply(const QUrl &url,
-                         const QString &data,
-                         const QString &mime)
+QLocalReply::QLocalReply(const QUrl &url)
     : QNetworkReply()
 {
     setFinished(true);
@@ -41,23 +39,9 @@ QLocalReply::QLocalReply(const QUrl &url,
 
     setUrl(url);
 
-    if (data.length() > 0) {
-        setHeader(QNetworkRequest::ContentLengthHeader,
-                  QVariant(reply->data.size()));
-        setHeader(QNetworkRequest::LastModifiedHeader,
-                  QVariant(QDateTime::currentDateTimeUtc()));
-        setHeader(QNetworkRequest::ContentTypeHeader, mime);
-    }
-
     QTimer::singleShot(0, this, SIGNAL(metaDataChanged()));
 
-    if (data.length() > 0) {
-        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 200);
-        setAttribute(QNetworkRequest::HttpReasonPhraseAttribute, "OK");
-        reply->data = data.toUtf8();
-    } else {
-        setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 204);
-    }
+    setAttribute(QNetworkRequest::HttpStatusCodeAttribute, 204);
 
     QTimer::singleShot(0, this, SIGNAL(readyRead()));
     QTimer::singleShot(0, this, SIGNAL(finished()));

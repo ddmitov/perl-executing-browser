@@ -453,18 +453,14 @@ It is intercepted inside PEB and is not passed to the underlying operating syste
   Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was created for [asynchronous window-closing JavaScript functions](#warning-for-unsaved-user-input-before-closing-a-window).  
 
 ## Local File Types
-  All file types not listed here are unsupported. If they are linked from local pages, they will be opened using the default application of the operating system.  
-
   PEB is case-insensitive for all local filename extensions with the exception of the start page.  
   All local files can have multi-dotted names.  
 
   Perl scripts are usually recognized by PEB using the ``.pl`` filename extension.  
+
   Perl scripts without filename extensions are recognized using a Perl shebang line like:  
   ``#!/usr/bin/perl`` or ``#!/usr/bin/env perl``  
-
-  No shebang line can change the Perl distribution used by PEB. Shebang arguments are not honored by PEB.  
-
-  PEB finds Perl interpreter at application startup and uses shebang line only to detect Perl scripts without filename extension.  
+  Shebang interpreter path and arguments are not honored by PEB.  
 
   All other supported local file types are recognized using the following filename extensions:  
 * **CSS files:** ``.css``

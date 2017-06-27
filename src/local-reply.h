@@ -29,7 +29,7 @@ class QLocalReply : public QNetworkReply
 
 public:
     QLocalReply(
-            const QUrl &url, const QString &data, const QString &mime);
+            const QUrl &url);
     ~QLocalReply();
 
     void abort();

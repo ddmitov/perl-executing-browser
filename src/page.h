@@ -18,19 +18,21 @@
 #ifndef PAGE_H
 #define PAGE_H
 
-#include <QInputDialog>
+
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
-#include <QNetworkReply>
 #include <QRegularExpression>
 #include <QTimer>
 #include <QUrl>
 #include <QUrlQuery>
 #include <QWebPage>
 #include <QWebFrame>
-
 #include <QWebSecurityOrigin>
+
+#include <QInputDialog>
+
+#include <QNetworkReply>
 
 #include "file-reader.h"
 #include "script-handler.h"
@@ -278,8 +280,6 @@ public slots:
                     "\"); null";
 
             mainFrame()->evaluateJavaScript(inodeSelectedJavaScript);
-
-            qDebug() << "User selected inode:" << userSelectedInodesFormatted;
         }
     }
 
@@ -516,6 +516,10 @@ protected:
                                  QApplication::applicationVersion()
                                  .toLatin1());
 
+                aboutPageContents
+                        .replace("START_PAGE",
+                                 qApp->property("startPage").toString());
+
                 frame->setHtml(aboutPageContents);
 
                 return false;
@@ -702,7 +706,6 @@ protected:
     }
 
 private:
-    QString emptyString;
     bool windowCloseRequested;
 
     QString alertTitle;

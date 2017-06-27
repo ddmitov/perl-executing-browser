@@ -36,8 +36,6 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
-    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PluginsEnabled, false);
 
     QWebSettings::globalSettings()->
@@ -49,11 +47,13 @@ QPage::QPage()
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, true);
     QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LinksIncludedInFocusChain, true);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
+    QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PrivateBrowsingEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::SpatialNavigationEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LinksIncludedInFocusChain, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::XSSAuditingEnabled, true);
 
