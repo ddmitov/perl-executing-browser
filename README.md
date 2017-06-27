@@ -94,7 +94,7 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * Qt 5.1 - 5.5 (including ``QtWebKit`` libraries and headers)  
   ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
 
-  The implementation of the local pseudodomain and all requests to local content depend on the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``.  
+  The local pseudodomain is implement using the ``QNetworkAccessManager`` class, which is incompatible with ``QtWebEngine``.  
 
   If you want to render the HTML user interface of your Perl desktop application using the Blink web engine, you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with [camel-harness](https://github.com/ddmitov/camel-harness).  
 
@@ -288,7 +288,7 @@ PEB is designed to run from any directory without setting anything beforehand an
 
 <a name="log-files"></a>  
 * **Log files:**
-  If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that every requested link is logged and log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
+  If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
 
 **Settings based on JavaScript code:**  
 

@@ -19,12 +19,10 @@
 #define ACCESSMANAGER_H
 
 #include <QApplication>
-#include <QDesktopWidget>
 #include <QDir>
 #include <QMimeDatabase>
 #include <QtNetwork/QNetworkAccessManager>
 
-#include "file-reader.h"
 #include "local-reply.h"
 #include "script-handler.h"
 
@@ -44,9 +42,14 @@ protected:
                                          const QNetworkRequest &request,
                                          QIODevice *outgoingData = 0)
     {
-        if (request.url().host() ==
-                qApp->property("pseudoDomain").toString() and
-                (!request.url().path().contains(".function"))) {
+        if (request.url().host() == qApp->property("pseudoDomain").toString()) {
+            // Window closing URL:
+            if (request.url().fileName() == "close-window.function") {
+                emit closeWindowSignal();
+
+                QLocalReply *reply = new QLocalReply(request.url());
+                return reply;
+            }
 
             // Compose the full file path:
             QString fullFilePath = QDir::toNativeSeparators
@@ -82,15 +85,6 @@ protected:
                     return reply;
                 }
             }
-        }
-
-        // Window closing URL:
-        if (operation == GetOperation and
-                request.url().fileName() == "close-window.function") {
-            emit closeWindowSignal();
-
-            QLocalReply *reply = new QLocalReply(request.url());
-            return reply;
         }
 
         return QNetworkAccessManager::createRequest

@@ -72,7 +72,7 @@ public slots:
         QString selectAllLabel;
 
         QVariant contextMenuJsResult =
-                mainPage->currentFrame()->
+                mainPage->mainFrame()->
                 evaluateJavaScript("pebFindContextMenu()");
 
         QJsonDocument contextMenuJsonDocument =
@@ -315,8 +315,6 @@ public:
         window->setHtml(loadingContents);
         window->setGeometry(qApp->desktop()->availableGeometry());
         window->showMaximized();
-
-        qDebug() << "New window opened.";
 
         return window;
     }

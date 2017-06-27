@@ -18,7 +18,6 @@
 #ifndef PAGE_H
 #define PAGE_H
 
-
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -58,6 +57,7 @@ public slots:
         if (ok) {
             emit changeTitleSignal();
 
+            // Inject all browser-specific Javascript:
             QFileReader *resourceReader =
                     new QFileReader(QString(":/peb.js"));
             QString pebJavaScript = resourceReader->fileContents;
