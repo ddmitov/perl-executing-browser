@@ -67,7 +67,7 @@ Note that PEB is created to work from any folder without installation and all fi
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
-* [Perl script output is seamlessly inserted into the calling local page.](#api)
+* [Perl script output is seamlessly inserted into the calling local page.](#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * PEB can be started from any folder.

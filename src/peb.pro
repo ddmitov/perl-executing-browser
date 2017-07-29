@@ -81,7 +81,6 @@ greaterThan (QT_MAJOR_VERSION, 4) {
         SOURCES += \
             main.cpp \
             file-reader.cpp \
-            local-reply.cpp \
             main-window.cpp \
             script-handler.cpp \
             webkit-page.cpp \
@@ -89,9 +88,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
 
         # Header files:
         HEADERS += \
-            access-manager.h \
             file-reader.h \
-            local-reply.h \
             script-handler.h \
             webkit-main-window.h \
             webkit-page.h \
