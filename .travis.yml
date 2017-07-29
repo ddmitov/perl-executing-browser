@@ -18,7 +18,7 @@ install:
   - sudo apt-get -y install qt5-default qttools5-dev-tools
 
 script:
-  - qmake $TRAVIS_BUILD_DIR/src/peb.pro
+  - qmake -qt=qt5 $TRAVIS_BUILD_DIR/src/peb.pro
   - make
 
 notifications:

@@ -71,7 +71,7 @@ Note that PEB is created to work from any folder without installation and all fi
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * PEB can be started from any folder.
-* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#opening-files-and-folders)  
+* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#selecting-files-and-folders)  
 * [Optional warning for unsaved data in HTML forms](#page-settings)
 * [Custom labels for dialogs and context menu](#page-settings)
 * [Custom icon for windows and message boxes](#icon)
@@ -137,11 +137,11 @@ CONFIG += app_bundle
   PEB can also use any Perl on PATH.
 
 ## Preparing a Perl Distribution for PEB
-  Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. ``{PEB_binary_directory}/sdk/compactor.pl`` script is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``{PEB_binary_directory}/perl/bin-original`` and ``{PEB_binary_directory}/perl/lib-original`` respectively. These directories should be manually archived for future use or removed.  
+Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. ``{PEB_binary_directory}/sdk/compactor.pl`` script is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``{PEB_binary_directory}/perl/bin-original`` and ``{PEB_binary_directory}/perl/lib-original`` respectively. These directories should be manually archived for future use or removed.  
 
-  ``compactor.pl`` should be started using ``{PEB_binary_directory}/compactor.sh`` on a Linux or a Mac machine and ``{PEB_binary_directory}/compactor.cmd`` on a Windows machine to ensure that only the Perl distribution used by PEB is going to start ``compactor.pl``. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
+``compactor.pl`` should be started using ``{PEB_binary_directory}/compactor.sh`` on a Linux or a Mac machine and ``{PEB_binary_directory}/compactor.cmd`` on a Windows machine to ensure that only the Perl distribution used by PEB is going to start ``compactor.pl``. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
 
-  ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
+``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Perl Scripts API
 Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension. Perl data output is seamlessly inserted into the HTML DOM of the local page using JavaScript.  
@@ -152,11 +152,6 @@ A minimal example of a Perl script settings object:
 var perlScriptObject = {};
 perlScriptObject.path = '{app}/test/test.pl';
 perlScriptObject.stdout = 'test';
-perlScriptObject.requestMethod = 'POST';
-perlScriptObject.inputDataHarvester = function() {
-  var data = document.getElementById('input-box-id').value;
-  return data;
-}
 ```
 
 * **path:**  
@@ -195,10 +190,10 @@ perlScriptObject.inputDataHarvester = function() {
   }
   ```
 
-  * **close_command:**  
+* **close_command:**  
   The ``close_command`` object property designates the command used to gracefully shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
-  * **close_confirmation:**  
+* **close_confirmation:**  
   Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 5 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
@@ -286,7 +281,7 @@ The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe``
   Note that start page pathname is case sensitive.
 
   <a name="icon"></a>
-  * **Icon:**
+* **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
 ## Data Directory
@@ -320,10 +315,10 @@ pebSettings.closeConfirmation =
   'Are you sure you want to close the window?';
 ```
 
-  * ``autoStartScripts``  
+* ``autoStartScripts``  
   These are Perl scripts that will be started immediately after the local page is loaded.  
 
-  * ``closeConfirmation``  
+* ``closeConfirmation``  
   When user starts closing PEB, it checks for any unsaved data in all forms. If any user data in HTML forms is detected, PEB displays a warning using the text of ``pebSettings.closeConfirmation``. If no warning text is found, PEB assumes that no warning has to be displayed and exits immediately.
 
 ## Functional Pseudo Filenames
