@@ -32,7 +32,6 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
 * [History](#history)
-* [Applications Based on PEB](#applications-based-on-peb)
 * [License](#license)
 * [Authors](#authors)
 
@@ -87,10 +86,9 @@ Note that PEB is created to work from any folder without installation and all fi
 * Files or folders can not be selected with their full paths from web pages.
 
 ## Compiling
-The only compile-time requirement of PEB is a Qt development bundle version 5.0 or any later version.
+The only compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.
 
 Compiled and tested successfully using:
-* [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
 * [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5
 * [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
@@ -150,26 +148,26 @@ A minimal example of a Perl script settings object:
 
 ```javascript
 var perlScriptObject = {};
-perlScriptObject.path = '{app}/test/test.pl';
+perlScriptObject.path = '{app}/perl/test.pl';
 perlScriptObject.stdout = 'test';
 ```
 
-* **path:**  
+* ``path``  
   This is the path of the Perl script that is going to be executed.  
   The keyword ``{app}`` will be replaced by the the full path of the application directory.  
   *This object property is mandatory.*  
 
-* **stdout:**  
-  The ``stdout`` object property must be an unique name of a valid HTML DOM element or JavaScript function. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only argument.  
+* ``stdout``  
+  The ``stdout`` object property must be an id of a valid HTML DOM element or the name of a JavaScript function. Every piece of script output is immediately inserted into the DOM element or passed to the JavaScript function as its only argument.  
   *This object property is mandatory.*  
 
-* **requestMethod:**  
+* ``requestMethod``  
   Only ``GET`` or ``POST`` are recognized.  
 
-* **inputData:**  
+* ``inputData``  
   This object property is useless if ``requestMethod`` is not set.  
 
-* **inputDataHarvester:**  
+* ``inputDataHarvester``  
   This object property is a function that can get input data from an HTML form or other data source and supply it to PEB.  
 
   Single input box example with no dependencies:  
@@ -190,10 +188,10 @@ perlScriptObject.stdout = 'test';
   }
   ```
 
-* **close_command:**  
+* ``close_command``  
   The ``close_command`` object property designates the command used to gracefully shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
-* **close_confirmation:**  
+* ``close_confirmation``  
   Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 5 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
@@ -241,7 +239,7 @@ The following code shows how to start an interactive Perl script right after a l
 The ``index.htm`` file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
 
 ## Selecting Files and Folders
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted into the HTML DOM of the local page using the ``target`` object property. ``target`` must be an unique name of a valid HTML DOM element or JavaScript function. All selected files or folders are inserted into the specified DOM element or passed to the specified JavaScript function as its only argument.  
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page using the ``target`` object property. ``target`` must be an id of a valid HTML DOM element or the name of a JavaScript function which receives all selected files or folders as its only argument.  
 
 ```html
 <a href="select_file.dialog">Select existing file</a>
@@ -266,15 +264,15 @@ select_file.target = 'tests';
 The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
 
 ## Hard Coded Files and Folders
+* **Perl interpreter:**  
+  PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
+
 * **Application directory:**  
   Application directory is ``{PEB_binary_directory}/resources/app``.  
   All files used by PEB, with the exception of data files, should be located within this folder.  
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
-
-* **Perl interpreter:**  
-  PEB expects to find Perl interpreter in ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will try to find the first Perl interpreter on PATH. If no Perl interpreter is found, an error page is displayed instead of the start page. No Perl interpreter is a showstopper for PEB.
 
 * **Start page:**  
   PEB starts always with ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
@@ -316,10 +314,10 @@ pebSettings.closeConfirmation =
 ```
 
 * ``autoStartScripts``  
-  These are Perl scripts that will be started immediately after the local page is loaded.  
+  These are Perl scripts that are started immediately after a local page is loaded.  
 
 * ``closeConfirmation``  
-  When user starts closing PEB, it checks for any unsaved data in all forms. If any user data in HTML forms is detected, PEB displays a warning using the text of ``pebSettings.closeConfirmation``. If no warning text is found, PEB assumes that no warning has to be displayed and exits immediately.
+  This is the text displayed when user has pressed the close button, but unsaved data in local HTML forms is detected. If no warning text is found, PEB assumes that no warning has to be displayed and exits immediately.
 
 ## Functional Pseudo Filenames
 * **About PEB dialog:** ``about-browser.function``
@@ -346,11 +344,6 @@ pebSettings.closeConfirmation =
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
-
-## Applications Based on PEB
-* [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator.  
-  It is a hybrid desktop or server application using [Perl Executing Browser](https://github.com/ddmitov/perl-executing-browser), [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) as a desktop GUI framework.
-* [Camel Doctor](https://github.com/ddmitov/camel-doctor) is a Linux and Mac serverless HTML user interface for the [default Perl debugger](http://perldoc.perl.org/perldebug.html).
 
 ## License
 This program is free software;  

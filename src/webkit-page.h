@@ -20,6 +20,7 @@
 
 #include <QFileDialog>
 #include <QInputDialog>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
@@ -74,14 +75,13 @@ public slots:
         QJsonObject settingsJsonObject = settingsJsonDocument.object();
 
         // Get auto-start scripts:
-        QStringList autoStartScripts =
-                settingsJsonObject["autoStartScripts"]
-                .toVariant().toStringList();
+        QJsonArray autoStartScripts =
+                settingsJsonObject["autoStartScripts"].toArray();
 
-        if (!autoStartScripts.isEmpty()) {
-            foreach (QString autoStartScript, autoStartScripts) {
-                qHandleScripts(autoStartScript);
-            }
+        foreach (const QJsonValue &value, autoStartScripts) {
+            QString autoStartScript = value.toString();
+            qDebug() << "Auto-start script:" << autoStartScript;
+            qHandleScripts(autoStartScript);
         }
 
         // Get dialog and context menu labels:
