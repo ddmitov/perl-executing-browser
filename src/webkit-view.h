@@ -60,9 +60,7 @@ public slots:
         if (mainPage->mainFrame()->url().scheme() != "file") {
             page()->action(QWebPage::CopyImageToClipboard)->setVisible(false);
             page()->action(QWebPage::DownloadImageToDisk)->setVisible(false);
-            page()->action(QWebPage::DownloadImageToDisk)->setVisible(false);
             page()->action(QWebPage::DownloadLinkToDisk)->setVisible(false);
-            page()->action(QWebPage::DownloadMediaToDisk)->setVisible(false);
             page()->action(QWebPage::OpenFrameInNewWindow)->setVisible(false);
             page()->action(QWebPage::OpenImageInNewWindow)->setVisible(false);
             page()->action(QWebPage::OpenLinkInNewWindow)->setVisible(false);
