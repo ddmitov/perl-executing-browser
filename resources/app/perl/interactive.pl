@@ -19,21 +19,12 @@ $| = 1;
 
 # Global variables:
 my $input_text = "";
-my $mode = "";
+my $mode = "unix-epoch";
 
-# Detect the mode of the script
-# from a query string item when the script is started:
-my $query_string = "";
+# Detect the mode of the script from initial STDIN when the script is started:
 my (@pairs, $pair, $name, $value);
-
-if ($ENV{'REQUEST_METHOD'}) {
-  $ENV{'REQUEST_METHOD'} =~ tr/a-z/A-Z/;
-  if ($ENV{'REQUEST_METHOD'} eq "GET") {
-    $query_string = $ENV{'QUERY_STRING'};
-  }
-}
-
-@pairs = split(/&/, $query_string);
+my $stdin = <STDIN>;
+@pairs = split(/&/, $stdin);
 
 foreach $pair (@pairs) {
   ($name, $value) = split(/=/, $pair);
@@ -73,7 +64,7 @@ my $wait_for_input = AnyEvent->io (
         $value =~ s/%(..)/pack("C", hex($1))/eg;
       }
 
-      if ($name =~ "input") {
+      if ($name =~ "input" and length($value) > 0) {
         $input_text  = decode('UTF-8', $value);
       }
     }
@@ -82,14 +73,23 @@ my $wait_for_input = AnyEvent->io (
 
 my $wait_one_second = AnyEvent->timer (
   after => 0,
-  interval => 1,
+  interval => 0.5,
   cb => sub {
     if ($mode =~ "unix-epoch") {
-      print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
+      if (length($input_text) == 0) {
+        print "Seconds from the Unix epoch: ".time;
+      } else {
+        print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
+      }
     }
+
     if ($mode =~ "local-time") {
       my $formatted_time = strftime('%d %B %Y %H:%M:%S', localtime);
-      print "Local time: ".$formatted_time."<br>Last input: ".$input_text;
+      if (length($input_text) == 0) {
+        print "Local time: ".$formatted_time;
+      } else {
+        print "Local time: ".$formatted_time."<br>Last input: ".$input_text;
+      }
     }
   },
 );

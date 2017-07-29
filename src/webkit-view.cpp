@@ -17,19 +17,30 @@
 
 #include <QShortcut>
 
-#include <view.h>
+#include <webkit-view.h>
 
 // ==============================
 // VIEW CLASS CONSTRUCTOR:
+// (QTWEBKIT VERSION)
 // ==============================
 QViewWidget::QViewWidget()
     : QWebView(0)
 {
+    // Default labels for the context menu:
+    qApp->setProperty("cutLabel", "Cut");
+    qApp->setProperty("copyLabel", "Copy");
+    qApp->setProperty("pasteLabel", "Paste");
+    qApp->setProperty("selectAllLabel", "Select All");
+
     // Keyboard shortcuts:
 #ifndef QT_NO_PRINTER
     QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printShortcut, SIGNAL(activated()),
                      this, SLOT(qPrintSlot()));
+
+    QShortcut *printPreviewShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+    QObject::connect(printPreviewShortcut, SIGNAL(activated()),
+                     this, SLOT(qStartPrintPreviewSlot()));
 #endif
 
     QShortcut *qWebInspestorShortcut =
@@ -40,32 +51,17 @@ QViewWidget::QViewWidget()
     // Starting of a QPage instance:
     mainPage = new QPage();
 
-    // Signal and slot for displaying script errors:
-    QObject::connect(mainPage, SIGNAL(displayScriptErrorsSignal(QString)),
-                     this, SLOT(qDisplayScriptErrorsSlot(QString)));
-
-    // Signals and slots for printing:
-    QObject::connect(mainPage, SIGNAL(printPreviewSignal()),
-                     this, SLOT(qStartPrintPreviewSlot()));
-    QObject::connect(mainPage, SIGNAL(printSignal()),
-                     this, SLOT(qPrintSlot()));
-
     // Signal and slot for changing window title:
-    QObject::connect(mainPage, SIGNAL(changeTitleSignal()),
-                     this, SLOT(qChangeTitleSlot()));
+    QObject::connect(mainPage, SIGNAL(pageLoadedSignal()),
+                     this, SLOT(qPageLoadedSlot()));
 
     // Signals and slots for closing windows:
-    QObject::connect(this, SIGNAL(initiateWindowClosingSignal()),
-                     mainPage, SLOT(qInitiateWindowClosingSlot()));
+    QObject::connect(this, SIGNAL(startWindowClosingSignal()),
+                     mainPage, SLOT(qStartWindowClosingSlot()));
 
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowSlot()));
 
     // Installing of the started QPage instance:
     setPage(mainPage);
-
-    // Initialization of a variable necessary for
-    // user input check before closing a new window
-    // (any window opened after the initial one):
-    windowCloseRequested = false;
 }

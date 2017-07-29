@@ -21,8 +21,6 @@
 #include <QApplication>
 #include <QDateTime>
 #include <QDebug>
-#include <QFileDialog>
-#include <QInputDialog>
 #include <QProcess>
 
 // ==============================
@@ -33,9 +31,9 @@ class QScriptHandler : public QObject
     Q_OBJECT
 
 signals:
-    void displayScriptOutputSignal(QString output, QString scriptStdoutTarget);
+    void displayScriptOutputSignal(QString output, QString scriptStdout);
     void scriptFinishedSignal(QString scriptAccumulatedErrors,
-                              QString scriptId,
+                              QString scriptStdout,
                               QString scriptFullFilePath);
 
 public slots:
@@ -44,22 +42,19 @@ public slots:
         QString output = scriptProcess.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
 
-        qDebug()
+        // qDebug()
                 // << QDateTime::currentMSecsSinceEpoch()
                 // << "msecs from epoch:"
-                << "Output from:" << scriptFullFilePath;
+                // << "Output from:" << scriptFullFilePath;
 
-        // Handling 'script closed' confirmation:
         if (output == scriptCloseConfirmation) {
             qDebug()
                     // << QDateTime::currentMSecsSinceEpoch()
                     // << "msecs from epoch:"
-                    << "Interactive script terminated normally:"
+                    << "Interactive script is exiting normally:"
                     << scriptFullFilePath;
         } else {
-            if (scriptStdoutTarget.length() > 0) {
-                emit displayScriptOutputSignal(output, scriptStdoutTarget);
-            }
+            emit displayScriptOutputSignal(output, scriptStdout);
         }
     }
 
@@ -73,7 +68,7 @@ public slots:
     void qScriptFinishedSlot()
     {
         emit scriptFinishedSignal(scriptAccumulatedErrors,
-                                  scriptId,
+                                  scriptStdout,
                                   scriptFullFilePath);
 
         scriptProcess.close();
@@ -85,24 +80,15 @@ public slots:
                 << scriptFullFilePath;
     }
 
-    void qRootPasswordTimeoutSlot()
-    {
-        qApp->setProperty("rootPassword", "");
-    }
-
 public:
-    QScriptHandler(QUrl url, QByteArray postDataArray);
-    QString scriptId;
-    QString scriptFullFilePath;
+    QScriptHandler(QJsonObject);
     QProcess scriptProcess;
+    QString scriptFullFilePath;
+    QString scriptStdout;
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
     QString scriptCloseCommand;
     QString scriptCloseConfirmation;
-
-private:
-    QString scriptStdoutTarget;
-    QString scriptUser;
 };
 
 #endif // SCRIPTHANDLER_H

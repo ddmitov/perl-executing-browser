@@ -15,7 +15,13 @@
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#include "main-window.h"
+#include <QtGlobal>
+
+#if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
+#include "webkit-main-window.h"
+#else
+#include "webengine-main-window.h"
+#endif
 
 // ==============================
 // MAIN WINDOW CLASS CONSTRUCTOR:

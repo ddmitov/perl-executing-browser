@@ -1,91 +1,63 @@
+// PEB embedded JavaScript code:
+var peb = {};
 
-
-function pebFindContextMenu() {
-	if (typeof pebContextMenu === "function") {
-		var returnValue = pebContextMenu();
-		return returnValue;
-	}
+peb.getPageSettings = function() {
+  if (pebSettings !== null) {
+    return JSON.stringify(pebSettings);
+  }
 }
 
-
-function pebFindMessageBoxElements() {
-	if (typeof pebMessageBoxElements === "function") {
-		var returnValue = pebMessageBoxElements();
-		return returnValue;
-	}
+peb.getScriptSettings = function(scriptObject) {
+  if (window[scriptObject] !== null) {
+    if (typeof scriptObject.inputDataHarvester === 'function') {
+      scriptObject.inputData = scriptObject.inputDataHarvester();
+    }
+    return JSON.stringify(scriptObject);
+  }
 }
 
-
-function pebCheckUserInputBeforeClose() {
-	var textEntered = false;
-
-	var textFieldsArray = [];
-	textFieldsArray = document.getElementsByTagName("textarea");
-
-	for (index = 0; index < textFieldsArray.length; index++) { 
-		if (textFieldsArray[index].value.length > 0) {
-			textEntered = true;
-		}
-	}
-
-	var inputBoxesArray = [];
-	inputBoxesArray = document.querySelectorAll("input[type=text]");
-
-	for (index = 0; index < inputBoxesArray.length; index++) { 
-		if (inputBoxesArray[index].value.length > 0) {
-			textEntered = true;
-		}
-	}
-
-	return textEntered;
+peb.insertContent = function(content, target) {
+  if (typeof window[target] === 'function') {
+    window[target](content);
+  } else {
+    var element = document.getElementById(target);
+    if (element !== null) {
+      element.innerHTML = content;
+    }
+  }
 }
 
-
-function pebCheckCloseWarning() {
-	var closeWarning;
-
-	if (typeof pebCloseConfirmationAsync === "function") {
-		closeWarning = "async";
-	} else {
-		if (typeof pebCloseConfirmationSync === "function") {
-			closeWarning = "sync";
-		} else {
-			closeWarning = "none";
-		}
-	}
-
-	return closeWarning;
+peb.getDialogSettings = function(dialogObject) {
+  if (window[dialogObject] !== null) {
+    return JSON.stringify(dialogObject);
+  }
 }
 
+peb.checkUserInputBeforeClose = function() {
+  var textEntered = false;
+  var close = true;
 
-function pebInodeSelection(inodes, target) {
-	if (typeof window[target] === "function") {
-		var inodesTransmitted = inodes;
-		window[target](inodesTransmitted);
-	} else {
-		var element = document.getElementById(target);
-		if (element === null) {
-			console.error(
-				'PEB Embedded JavaScript: Target \'' + target +
-				'\' was not found!');
-		} else {
-			element.innerHTML = inodes;
-		}
-	}
-}
+  var textFieldsArray = [];
+  textFieldsArray = document.getElementsByTagName('textarea');
 
+  for (index = 0; index < textFieldsArray.length; index++) {
+    if (textFieldsArray[index].value.length > 0) {
+      textEntered = true;
+    }
+  }
 
-function pebOutputInsertion(output, target) {
-	if (typeof window[target] === "function") {
-		window[target](output);
-	} else {
-		var element = document.getElementById(target);
-		if (element === null) {
-			console.error(
-				'PEB Embedded JavaScript: Target \'' + target +
-				'\' was not found!');
-		} else {
-			element.innerHTML = output;
-		}
-	}
+  var inputBoxesArray = [];
+  inputBoxesArray = document.querySelectorAll('input[type=text]');
+
+  for (index = 0; index < inputBoxesArray.length; index++) {
+    if (inputBoxesArray[index].value.length > 0) {
+      textEntered = true;
+    }
+  }
+
+  if (textEntered === true && pebSettings.closeConfirmation !== null) {
+      close = confirm(pebSettings.closeConfirmation);
+  }
+
+  return close;
 }

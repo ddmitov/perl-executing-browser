@@ -3,30 +3,17 @@
 use strict;
 use warnings;
 
-my @files;
 my $directory_name;
+read (STDIN, $directory_name, $ENV{'CONTENT_LENGTH'});
+
 my $path_separator;
+my @files;
 
 # Determine the right path separator:
 if ($^O eq "MSWin32") {
   $path_separator = "\\";
 } else {
   $path_separator = "/";
-}
-
-# Read input:
-my (@pairs, $pair, $name, $value);
-
-# Split information into name/value pairs:
-@pairs = split(/&/, $ENV{'QUERY_STRING'});
-foreach $pair (@pairs) {
-  ($name, $value) = split(/=/, $pair);
-  $value =~ tr/+/ /;
-  $value =~ s/%(..)/pack("C", hex($1))/eg;
-
-  if ($name =~ "directory") {
-    $directory_name = $value;
-  }
 }
 
 traverse ($directory_name);

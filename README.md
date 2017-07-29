@@ -6,31 +6,29 @@ Perl Executing Browser
 [![Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)
 [![Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on [Qt 5](https://www.qt.io/) and [QtWebKit](https://trac.webkit.org/wiki/QtWebKit) libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.  
+Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries.  
 
-Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to NW.js and Electron, PEB enforces strict separation between local and web content in different browser windows.
+Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on Node.js, runs JavaScript in a sandbox and blocks cross-origin requests.
 
 ## Contents
 * [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
-* [Target Audience](#target-audience)
 * [Features](#features)
-* [Compile-time Requirements](#compile-time-requirements)
-* [Compile-time Variables](#compile-time-variables)
+* [Security](#security)
+* [Compiling](#compiling)
+* [Macintosh Binary Type](#macintosh-binary-type)
 * [Runtime Requirements](#runtime-requirements)
 * [Preparing a Perl Distribution for PEB](#preparing-a-perl-distribution-for-peb)
-* [Supported Perl Script Types](#supported-perl-script-types)
-* [Non-interactive Perl Scripts](#non-interactive-perl-scripts)
+* [Perl Scripts API](#perl-scripts-api)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
-* [Linux Superuser Perl Scripts](#linux-superuser-perl-scripts)
+* [Selecting Files and Folders](#selecting-files-and-folders)
+* [Application Filename](#application-filename)
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
-* [Settings](#settings)
-* [Security](#security)
-* [PEB Pseudodomain](#peb-pseudodomain)
-* [Special URLs for Opening Files and Folders](#special-urls-for-opening-files-and-folders)
-* [Other Special URLs](#other-special-urls)
-* [Local File Types](#local-file-types)
-* [Keyboard Shortcuts](#keyboard-shortcuts)
+* [Data Directory](#data-directory)
+* [Log Files](#log-files)
+* [Page Settings](#page-settings)
+* [Functional Pseudo Filenames](#functional-pseudo-filenames)
+* [Specific Keyboard Shortcuts](#specific-keyboard-shortcuts)
 * [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
 * [History](#history)
@@ -39,18 +37,19 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
 * [Authors](#authors)
 
 ## Quick Start
-  These are the basic steps for building your first PEB-based application:
+These are the basic steps for building your first PEB-based application:
 
-* **1.** Write HTML file(s) that will serve as a GUI for your application.  
-  If your users will have to enter data manually, don't forget to make appropriate HTML forms for them.  
-  You may also see how to [open local files or folders](#special-urls-for-opening-files-and-folders).  
+* **1.** Write your ``index.html`` with appropriate HTML forms for user data input.  
+  [Selecting files or folders with their full paths](#selecting-files-and-folders) is also possible.
 
-* **2.** Write your Perl script(s).  
-  Input from local HTML files is read just like reading POST or GET requests in a Perl CGI script. Use the ``get-post-test.pl`` file within the PEB demo package as an example.  
+* **2.** Write [a settings JavaScript object](#perl-scripts-api) for every Perl script you are going to run.
 
-  Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory - see section [Settings](#settings).  
+* **3.** Write your Perl scripts.  
+  Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script. Use the ``get-post-test.pl`` file within the PEB demo package as an example.
 
-* **3.** Connect your HTML file(s) to your Perl 5 script(s). See section [Supported Perl Script Types](#supported-perl-script-types).
+* **4.** Connect your Perl scripts using a link to ``name-of-script-configuration-object.settings``.  
+
+Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
 
 ## Design Objectives
 * **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
@@ -60,55 +59,44 @@ Inspired by [NW.js](http://nwjs.io/) and [Electron](http://electron.atom.io/), P
     run from any folder
 
 * **3. Cross-platform availability:**  
-    usable on every platform, where Perl 5, Qt 5 and QtWebKit are available
+    usable on every platform where Perl 5 and Qt 5 are available
 
 * **4. Secure serverless solution:**  
     no server of any kind is installed or started
 
 * **5. Maximal reuse of existing web technologies and standards**
 
-## Target Audience
-* Perl 5 enthusiasts and developers creating custom desktop applications including rich/thick/fat clients
-* DevOps people in need of custom Perl-based GUI monitoring and administration solutions
-
 ## Features
-* [Perl script output is seamlessly inserted into the calling local page.](#non-interactive-perl-scripts)
-* [Perl scripts featuring STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
-* [Linux superuser Perl scripts can be started.](#linux-superuser-perl-scripts)
-* [Web content is not mixed with local content.](#security)
-* Cross-site scripting is disabled for all web and local pages.
+* [Perl script output is seamlessly inserted into the calling local page.](#api)
+* [Perl scripts with STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * PEB can be started from any folder.
-* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#special-urls-for-opening-files-and-folders)  
-  Their full paths are easily supplied to local Perl scripts.
-* [Browser functions are accessible from special URLs.](#other-special-urls)
-* [Custom context menu labels using JavaScript ](#custom-context-menu-labels)
-* [Custom labels of the *Alert*, *Confirm* and *Prompt* dialog boxes using JavaScript](#custom-labels-for-javascript-dialog-boxes)
-* [Optional warning for unsaved data in HTML forms before closing a window to prevent accidental data loss](#warning-for-unsaved-user-input-before-closing-a-window)
-* [Any icon can be displayed on windows and message boxes.](#icon)
-* ``QWebInspector`` window can be invoked using <kbd>Ctrl</kbd> + <kbd>I</kbd> keyboard shortcut.
-* [Optional logging of all browser actions](#log-files)
+* [Single file or multiple files, new filename, existing or new directory can be selected by user.](#opening-files-and-folders)  
+* [Optional warning for unsaved data in HTML forms](#page-settings)
+* [Custom labels for dialogs and context menu](#page-settings)
+* [Custom icon for windows and message boxes](#icon)
+* [Optional logging](#log-files)
 
-## Compile-time Requirements
-* GCC compiler
-* Qt 5.1 - 5.5 (including ``QtWebKit`` libraries and headers)  
-  ``QtWebKit`` is deprecated and replaced by the Blink-based ``QtWebEngine`` in all later versions of Qt.  
+## Security
+* PEB does not need administrative privileges, but does not refuse to use them if needed.
+* PEB executes with no sandbox only local Perl 5 scripts and
+  users have full access to their local files.
+* Cross-origin requests and cross-site scripting are disabled.
+  Calling web scripts from a local page is blocked.  
+  Calling local Perl scripts from a web page is blocked.  
+* Files or folders can not be selected with their full paths from web pages.
 
-  The local pseudodomain of PEB is implemented using the ``QNetworkAccessManager`` class,  
-  which is incompatible with ``QtWebEngine``.  
-
-  If you want to use the Blink web engine for your Perl desktop application,  
-  you may use [Electron](http://electron.atom.io/) or [NW.js](http://nwjs.io/) combined with the [camel-harness npm package](https://github.com/ddmitov/camel-harness).  
+## Compiling
+The only compile-time requirement of PEB is a Qt development bundle version 5.0 or any later version.
 
 Compiled and tested successfully using:
-* [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian Linux,
-* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian Linux,
-* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Windows XP,
-* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5,
-* [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10 Linux,
-* [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 Linux,
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04 Linux.
+* [Qt Creator 2.8.1 and Qt 5.1.1](http://download.qt.io/archive/qt/5.1/5.1.1/) on 32-bit Debian
+* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
+* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5
+* [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
+* [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
+* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
+* [Qt Creator 4.2.1 and Qt 5.8.0](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04
 
 To compile PEB type in a terminal started in the ``src`` folder:
 
@@ -117,30 +105,22 @@ qmake -qt=qt5
 make
 ```
 
-## Compile-time Variables
-Changing PEB compile-time variables requires editing the ``src/peb.pro`` project file before compiling the binary.
+## Macintosh Binary Type
+To change the Macintosh binary type edit the ``src/peb.pro`` project file before compiling the binary.
 
-* **Macintosh binary type:** ``BUNDLE``  
-  To make a bundle-less binary, which is the default setting:  
+To make a bundle-less binary, which is the default setting:  
 
-  ```QMake
-  BUNDLE = 0
-  CONFIG -= app_bundle
-  ```
+```QMake
+BUNDLE = 0
+CONFIG -= app_bundle
+```
 
-  To make a bundled binary (peb.app):  
+To make a bundled binary (peb.app):  
 
-  ```QMake
-  BUNDLE = 1
-  CONFIG += app_bundle
-  ```
-
-<a name="security-compile-time-variable"></a>
-* **Administrative privileges check:** ``ADMIN_PRIVILEGES_CHECK``  
-  To disable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 0``  
-  To enable administrative privileges check: ``ADMIN_PRIVILEGES_CHECK = 1``  
-  By default administrative privileges check is disabled.  
-  If administrative privileges check is enabled and PEB is started with administrative privileges, a warning page is displayed and no scripts can be executed. Starting Linux superuser scripts is not possible in this scenario.  
+```QMake
+BUNDLE = 1
+CONFIG += app_bundle
+```
 
 ## Runtime Requirements
 * Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
@@ -163,99 +143,137 @@ Changing PEB compile-time variables requires editing the ``src/peb.pro`` project
 
   ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
-## Supported Perl Script Types
-Perl scripts run by PEB are called from links or HTML forms using a full HTTP URL with the PEB pseudodomain. They produce pieces of data that are inserted into the HTML DOM of the calling page. The special query string item ``stdout`` must be added to the script URL.  
+## Perl Scripts API
+Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension. Perl data output is seamlessly inserted into the HTML DOM of the local page using JavaScript.  
 
-Example: ``http://local-pseudodomain/perl/example.pl?stdout=script-results``  
+A minimal example of a Perl script settings object:  
 
-The ``stdout`` query string item should point to a valid HTML DOM element or JavaScript function of the calling page. It is removed from the query string before the script is started. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only function argument.  
+```javascript
+var perlScriptObject = {};
+perlScriptObject.path = '{app}/test/test.pl';
+perlScriptObject.stdout = 'test';
+perlScriptObject.requestMethod = 'POST';
+perlScriptObject.inputDataHarvester = function() {
+  var data = document.getElementById('input-box-id').value;
+  return data;
+}
+```
 
-Scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some Windows builds of Perl may not give any output until the script is finished when buffering is enabled.  
+* **path:**  
+  This is the path of the Perl script that is going to be executed.  
+  The keyword ``{app}`` will be replaced by the the full path of the application directory.  
+  *This object property is mandatory.*  
 
-PEB recognizes the following types of local Perl scripts and does not impose execution timeouts on them:  
-* [**non-interactive scripts**](#non-interactive-perl-scripts)
-* [**interactive scripts**](#interactive-perl-scripts)
-* [**Linux superuser scripts**](#linux-superuser-perl-scripts)
+* **stdout:**  
+  The ``stdout`` object property must be an unique name of a valid HTML DOM element or JavaScript function. Every piece of script output is immediately inserted into the specified DOM element or passed to the specified JavaScript function as its only argument.  
+  *This object property is mandatory.*  
 
-## Non-interactive Perl Scripts
-Non-interactive Perl scripts can not receive any user input once they are started.  
+* **requestMethod:**  
+  Only ``GET`` or ``POST`` are recognized.  
 
-Two or more non-interactive scripts can be started within a single page. They will be executed independently and their output will be updated in real time using different DOM elements or JavaScript functions. This could be convenient for all sorts of long-running monitoring scripts.  
+* **inputData:**  
+  This object property is useless if ``requestMethod`` is not set.  
+
+* **inputDataHarvester:**  
+  This object property is a function that can get input data from an HTML form or other data source and supply it to PEB.  
+
+  Single input box example with no dependencies:  
+
+  ```javascript
+  perlScriptObject.inputDataHarvester = function() {
+    var data = document.getElementById('input-box-id').value;
+    return data;
+  }
+  ```
+
+  Whole form example using [jQuery](https://jquery.com/):  
+
+  ```javascript
+  perlScriptObject.inputDataHarvester = function() {
+    var formData = $('#form-id').serialize();
+    return formData;
+  }
+  ```
+
+  * **close_command:**  
+  The ``close_command`` object property designates the command used to gracefully shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
+
+  * **close_confirmation:**  
+  Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 5 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
+
+Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, but each of them must have an unique identifier in the form of an URL pseudo-password. Interactive scripts must be started with the special pseudo-user ``interactive`` and with the query string items ``stdout``, ``close_command`` and ``close_confirmation``.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances provided that it has an unique JavaScript settings object with and unique ``stdout`` object property. Interactive scripts should also have the ``close_command`` and ``close_confirmation`` object properties.  
 
-The URL pseudo-user ``interactive`` is the token used by PEB to detect interactive scripts.  
+The following code shows how to start an interactive Perl script right after a local page is loaded:
 
-The ``close_command`` query string item designates the command used to shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure. Immediately before exiting, the interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed normally its shutdown. All interactive scripts in a window that is going to be closed must exit in 5 seconds after ``close_command`` is given or all unresponsive scripts will be killed and the window will be closed.  
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Interactive Script Demo</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta charset="utf-8">
 
-The following JavaScript code demonstrates how to start an interactive Perl script immediately after its calling HTML page is loaded:
+    <script>
+      var pebSettings = {};
+      pebSettings.autoStartScripts = ['interactive_script'];
 
-```javascript
-document.addEventListener("DOMContentLoaded", function(event) {
-    var request = new XMLHttpRequest();
-    var parameters = {
-        stdout: "output",
-        close_command: "_close_",
-        close_confirmation: "_closed_"
-    }
-    request.open('GET', 'http://interactive@local-pseudodomain/perl/interactive.pl' +
-            formatParameters(parameters), true);
-    request.send();
-});
+      var interactive_script = {};
+      interactive_script.path = '{app}/perl/interactive.pl';
+      interactive_script.stdout = 'interactive-script-output';
+      interactive_script.requestMethod = 'POST';
+      interactive_script.inputDataHarvester = function() {
+        return document.getElementById('interactive-script-input').value;
+      }
+      interactive_script.closeCommand = '_close_';
+      interactive_script.closeConfirmation = '_closed_';
+    </script>
+  </head>
 
-function formatParameters(parameters) {
-    return "?" + Object
-        .keys(parameters)
-        .map(function(key){
-            return key + "=" + parameters[key]
-        })
-    .join("&")
-}
+  <body>
+    <form action="interactive_script.settings">
+      <input type="text" name="input" id="interactive-script-input">
+      <input type="submit" value="Submit">
+    </form>
+
+    <div id="interactive-script-output"></div>
+  </body>
+</html>
 ```
 
-The following JavaScript code demonstrates how to start one script in two instances immediately after the calling HTML page is loaded:
+The ``index.htm`` file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
 
-```javascript
-document.addEventListener("DOMContentLoaded", function(event) {
-  var scriptOneRequest = new XMLHttpRequest();
-  var scriptOneParameters = {
-    stdout: "script-one-output",
-    close_command: "_close_",
-    close_confirmation: "_closed_"
-  }
-  scriptOneRequest.open('GET', 'http://interactive:one@local-pseudodomain/perl/interactive.pl' +
-          formatParameters(scriptOneParameters), true);
-  scriptOneRequest.send();
+## Selecting Files and Folders
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted into the HTML DOM of the local page using the ``target`` object property. ``target`` must be an unique name of a valid HTML DOM element or JavaScript function. All selected files or folders are inserted into the specified DOM element or passed to the specified JavaScript function as its only argument.  
 
-  var scriptTwoRequest = new XMLHttpRequest();
-  var scriptTwoParameters = {
-    stdout: "script-two-output",
-    close_command: "_close_",
-    close_confirmation: "_closed_"
-  }
-  scriptTwoRequest.open('GET', 'http://interactive:two@local-pseudodomain/perl/interactive.pl' +
-          formatParameters(scriptTwoParameters), true);
-  scriptTwoRequest.send();
-});
-
-function formatParameters(parameters) {
-  return "?" + Object
-    .keys(parameters)
-    .map(function(key){
-      return key + "=" + parameters[key]
-    })
-  .join("&")
-}
+```html
+<a href="select_file.dialog">Select existing file</a>
 ```
 
-## Linux Superuser Perl Scripts
-Linux superuser Perl scripts can be started using the special pseudo-user ``root``. So if PEB finds an URL like: ``http://root@local-pseudodomain/perl/root-open-directory.pl``, it will ask the user for the root password and then call ``sudo``, which will start the script. Root password is saved for 5 minutes inside the memory of the running PEB and is deleted afterwards. Output from superuser scripts is displayed inside PEB like the output from any other non-interactive Perl script. User data from HTML forms is supplied to superuser Perl scripts as the first command line argument without ``STDIN`` input or ``QUERY_STRING`` environment variable like in the user-level Perl scripts.
+```javascript
+var select_file = {};
+// Type of the dialog, one of the following:
+// 'single-file', 'multiple-files', 'new-file-name' or 'directory'.
+select_file.type = 'single-file';
+// Unique DOM element or JavaScript function:
+select_file.target = 'tests';
+```
+
+* The actual opening of any existing file is performed by a Perl script and not by PEB.  
+* The actual creation of any new file is performed by a Perl script and not by PEB.  
+* When multiple files are selected, different file names are separated by a semicolon - ``;``
+* When using the ``directory`` type of dialog, an existing or a new directory may be selected.  
+  Any new directory will be created immediately by PEB.
+
+## Application Filename
+The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
 
 ## Hard Coded Files and Folders
 * **Application directory:**  
   Application directory is ``{PEB_binary_directory}/resources/app``.  
-  All files used by PEB, with the exception of data files, must be located within this folder.  
+  All files used by PEB, with the exception of data files, should be located within this folder.  
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
@@ -267,234 +285,72 @@ Linux superuser Perl scripts can be started using the special pseudo-user ``root
   PEB starts always with ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
   Note that start page pathname is case sensitive.
 
-## Settings
-**Settings based on the existence of certain files and folders:**  
-PEB is designed to run from any directory without setting anything beforehand and every file or directory that is checked during program startup is relative to the directory where the PEB binary file is located.
-
-* **Name of the binary file:**  
-  The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
-
-* **Data directory:**  
-  Data directory is not hard coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
-
-  ```perl
-  use Cwd;
-
-  my $current_working_directory = cwd();
-  my $data_directory = "$current_working_directory/resources/data";
-  ```
-
-<a name="icon"></a>  
-* **Icon:**
+  <a name="icon"></a>
+  * **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
-<a name="log-files"></a>  
-* **Log files:**
-  If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written, which is the default behavior. Please note that log files can grow rapidly. If disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
+## Data Directory
+Data directory is not hard coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
 
-**Settings based on JavaScript code:**  
+```perl
+use Cwd;
 
-<a name="custom-context-menu-labels"></a>  
-* **Custom context menu labels:**
-  Using the following code any local HTML page can have custom labels on the default right-click context menu (if the ``contextmenu`` event is not already intercepted):  
+my $current_working_directory = cwd();
+my $data_directory = "$current_working_directory/resources/data";
+```
 
-  ```javascript
-  function pebContextMenu() {
-      var contextMenuObject = {};
+## Log Files
+If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing and no logs will be written. Please note that log files can grow rapidly and if disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
 
-      contextMenuObject.printPreview = "Custom Print Preview Label";
-      contextMenuObject.print = "Custom Print Label";
+## Page Settings
 
-      contextMenuObject.cut = "Custom Cut Label";
-      contextMenuObject.copy = "Custom Copy Label";
-      contextMenuObject.paste = "Custom Paste Label";
-      contextMenuObject.selectAll = "Custom Select All Label";
+```javascript
+var pebSettings = {}; // 'pebSettings' object name is hard-coded.
+pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+pebSettings.cutLabel = "Custom Cut Label";
+pebSettings.copyLabel = "Custom Copy Label";
+pebSettings.pasteLabel = "Custom Paste Label";
+pebSettings.selectAllLabel = "Custom Select All Label";
+pebSettings.okLabel = "Custom Ok Label";
+pebSettings.cancelLabel = "Custom Cancel Label";
+pebSettings.yesLabel = "Custom Yes Label";
+pebSettings.noLabel = "Custom No Label";
+pebSettings.closeConfirmation =
+  'Text was entered in a form and it is going to be lost!\n' +
+  'Are you sure you want to close the window?';
+```
 
-      return JSON.stringify(contextMenuObject);
-  }
-  ```
+  * ``autoStartScripts``  
+  These are Perl scripts that will be started immediately after the local page is loaded.  
 
-<a name="custom-labels-for-javascript-dialog-boxes"></a>  
-* **Custom labels for JavaScript dialog boxes:**
-  Using the following code any local HTML page can have custom labels on the default JavaScript *Alert*, *Confirm* and *Prompt* dialog boxes:
+  * ``closeConfirmation``  
+  When user starts closing PEB, it checks for any unsaved data in all forms. If any user data in HTML forms is detected, PEB displays a warning using the text of ``pebSettings.closeConfirmation``. If no warning text is found, PEB assumes that no warning has to be displayed and exits immediately.
 
-  ```javascript
-  function pebMessageBoxElements() {
-      var messageBoxElementsObject = {};
+## Functional Pseudo Filenames
+* **About PEB dialog:** ``about-browser.function``
 
-      messageBoxElementsObject.alertTitle = "Custom Alert Label";
-      messageBoxElementsObject.confirmTitle = "Custom Confirmation Label";
-      messageBoxElementsObject.promptTitle = "Custom Prompt Label";
+* **About Qt dialog:** ``about-qt.function``
 
-      messageBoxElementsObject.okLabel = "Custom Ok Label";
-      messageBoxElementsObject.cancelLabel = "Custom Cancel Label";
-      messageBoxElementsObject.yesLabel = "Custom Yes Label";
-      messageBoxElementsObject.noLabel = "Custom No Label";
-
-      return  JSON.stringify(messageBoxElementsObject);
-  }
-  ```
-
-<a name="warning-for-unsaved-user-input-before-closing-a-window"></a>  
-* **Warning for unsaved user input before closing a window:**
-  PEB users can enter a lot of data in local HTML forms and it is often important to safeguard this information from accidental deletion if PEB window is closed without first saving the user data. When user starts closing a PEB window, the browser checks for any unsaved data in all forms of the HTML page that is going to be closed. This is achieved using internal JavaScript code compiled in the resources of the browser binary.  
-
-  If any unsaved data is detected, PEB tries to determine what kind of JavaScript routine has to be displayed to warn the user and ask for final confirmation. Two types of JavaScript warning routines are possible in this scenario: **synchronous** and **asynchronous**.  
-
-  If a local HTML page going to be closed contains a JavaScript function called ``pebCloseConfirmationAsync()``, then this asynchronous routine is going to be executed. If it is not found, then the browser tries to find and execute a synchronous warning function called ``pebCloseConfirmationSync()``. If no warning function is found, then PEB assumes that no warning has to be displayed and closes the window immediately.  
-
-  What are the differences between the two routines?  
-
-  The synchronous warning function is implemented using standard JavaScript Confirm dialog, which stops the execution of all JavaScript code within the page and waits until 'Yes' or 'No' is finally pressed. The Confirm dialog looks like a normal native dialog.  
-
-  The asynchronous warning function does not rely on JavaScript Confirm dialog, does not stop the execution of any JavaScript code within the page and does not wait for the user's decision. If the user chooses to close the window, a special window-closing URL, ``http://local-pseudodomain/close-window.function``, has to be sent to the browser. Upon receiving this URL, PEB closes the window from where the window-closing URL was requested. The warning dialog can be styled to blend with the rest of the HTML interface or to attract attention and this is the main advantage of using an asynchronous warning dialog. Developers can implement it using any suitable JavaScript library or custom code.  
-
-  The following code is an example of both synchronous and asynchronous warning functions. It is expected that one of them will be present in a PEB-based application where user data is to be protected against accidental loss. If both functions are present, the asynchronous one will take precedence. The asynchronous function in the example code is implemented using [Alertify.js](http://alertifyjs.com/).  
-
-  ```javascript
-  function pebCloseConfirmationSync() {
-      var confirmation = confirm("Are you sure you want to close the window?");
-      return confirmation;
-  }
-
-  function pebCloseConfirmationAsync() {
-      alertify.set({labels: {ok : "Ok", cancel : "Cancel"}});
-      alertify.set({buttonFocus: "cancel"});
-      alertify.confirm("Are you sure you want to close the window?", function (confirmation) {
-          if (confirmation) {
-              window.location.href = "http://local-pseudodomain/close-window.function";
-          }
-      });
-  }
-  ```
-
-## Security
-**PEB security principles:**
-* PEB executes with no sandbox local Perl 5 scripts in its application directory and
-  users have full access to their local data.
-* PEB does not need administrative privileges, but does not refuse to use them if needed.
-* Local and web content are not mixed together in one browser window.  
-  Local content is any content coming from the file:// protocol or the local pseudodomain.
-
-**Hard coded security features:**
-* PEB can not execute Perl scripts from remote locations.
-* If web page is called from a local page,  
-  it is automatically displayed in a separate browser window.
-* Local Perl scripts can not be started from web pages.
-* Files or folders can not be selected with their full paths from web pages.
-* Cross-site scripting is disabled for all web and local pages.
-
-**[Optional security feature based on compile-time variable](#security-compile-time-variable)**
-
-## PEB Pseudodomain
-``http://local-pseudodomain/``  
-The  pseudodomain is used to call all local files and all special URLs representing browser functions.  
-It is intercepted inside PEB and is not passed to the underlying operating system.  
-
-## Special URLs for Opening Files and Folders
-* **Select single file:** ``http://local-pseudodomain/open-file.function?target=example``  
-  The full path of the selected file will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
-  Having a target query string item is mandatory when using this special URL.  
-
-  The actual opening of the selected file is performed by the designated Perl script and not by PEB itself.  
-
-  Please note that for security reasons full paths of local files or folders are inserted only inside local pages!  
-
-  The following code is an example of how to select a local file and transmit its full path to a local Perl script:  
-
-  ```html
-  <head>
-    <script>
-      function fileSelection(file) {
-          var scriptRequest = new XMLHttpRequest();
-          scriptRequest.open('POST', 'perl/open-file.pl?stdout=open-file', true);
-          scriptRequest.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
-          scriptRequest.send("file=" + file);
-      }
-    </script>
-  </head>
-
-  <body>
-    <a href="http://local-pseudodomain/open-file.function?target=fileSelection">
-      Open Single File
-    </a>
-  <body>
-  ```
-
-* **Select multiple files:** ``http://local-pseudodomain/open-files.function?target=example``  
-  The full paths of the selected files will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
-  Having a target query string item is mandatory when using this special URL.  
-
-  Different file names are separated by a semicolon - ``;``  
-
-* **Select new file name:** ``http://local-pseudodomain/new-file-name.function?target=example``  
-  The new file name will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
-  Having a target query string item is mandatory when using this special URL.  
-
-  The actual creation of the new file is performed by the designated Perl script and not by PEB itself.  
-
-* **Select directory:** ``http://local-pseudodomain/open-directory.function?target=example``  
-  The full path of the selected directory will be inserted in the target DOM element of the calling local page or passed to the target JavaScript function as its first and only function argument.  
-  Having a target query string item is mandatory when using this special URL.  
-
-  Please note that if you choose to create a new directory, it will be created immediately by PEB.  
-  It will exist when its name will be passed to a local Perl script.  
-
-## Other Special URLs
-* **Print:** ``http://local-pseudodomain/print.function?action=print``  
-  Printing is not immediately performed, but a native printer selection dialog is displayed first.  
+## Specific Keyboard Shortcuts
+* <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector (QtWebKit builds only)
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - print (QtWebKit builds only)  
+  Printing is started after a native printer selection dialog is displayed.  
   If no printer is configured, no dialog is displayed and no action is taken.
-
-* **Print Preview:** ``http://local-pseudodomain/print.function?action=preview``
-
-* **About PEB embedded page:** ``http://local-pseudodomain/about.function?type=browser``
-
-* **About Qt dialog box:** ``http://local-pseudodomain/about.function?type=qt``
-
-* **Close current window:** ``http://local-pseudodomain/close-window.function``  
-  Please note that the window from where this URL was called will be closed immediately without any check for unsaved user data in HTML forms. Window-closing URL was created for [asynchronous window-closing JavaScript functions](#warning-for-unsaved-user-input-before-closing-a-window).  
-
-## Local File Types
-  PEB is case-insensitive for all local filename extensions with the exception of the start page.  
-  All local files can have multi-dotted names.  
-
-  Perl scripts are usually recognized by PEB using the ``.pl`` filename extension.  
-
-  Perl scripts without filename extensions are recognized using a Perl shebang line like:  
-  ``#!/usr/bin/perl`` or ``#!/usr/bin/env perl``  
-  Shebang interpreter path and arguments are not honored by PEB.  
-
-  All other supported local file types are recognized using the following filename extensions:  
-* **CSS files:** ``.css``
-* **Font files:** ``.eot`` ``.otf`` ``.ttf`` ``.woff`` ``.woff2``
-* **HTML files:** ``.htm`` ``.html``
-* **Image files:** ``.gif`` ``.jpeg`` ``.jpg`` ``.png`` ``.svg``
-* **JavaScript files:** ``.js``
-* **JSON files:** ``.json``
-* **XML files:** ``.xml``
-
-## Keyboard Shortcuts
-* <kbd>Alt</kbd> + <kbd>F4</kbd> - Close window
-* <kbd>Ctrl</kbd> + <kbd>A</kbd> - Select All
-* <kbd>Ctrl</kbd> + <kbd>C</kbd> - Copy
-* <kbd>Ctrl</kbd> + <kbd>I</kbd> - debug current page using ``QWebInspector``
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - Print
-* <kbd>Ctrl</kbd> + <kbd>V</kbd> - Paste
-* <kbd>F11</kbd> - toggle Fullscreen
+* <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview (QtWebKit builds only)
 
 ## What PEB Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
-* PEB does not act as a server and is not an implementation of the CGI protocol. Only three environment variables are borrowed from the CGI protocol: ``REQUEST_METHOD``, ``QUERY_STRING`` and ``CONTENT_LENGTH`` and they are used for communication between local HTML forms and local Perl scripts in a purely local context without any attempt to communicate with the outside world.
-* PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.  
+* PEB is not a server and is not an implementation of the CGI protocol.  
+``REQUEST_METHOD``, ``QUERY_STRING`` and ``CONTENT_LENGTH`` environment variables are borrowed from the CGI protocol to start local Perl scripts as child processes without any exposure to other applications.
+* PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.
 
 ## Limitations
-* No local Perl scripting inside frames.
-* No files can be downloaded on hard disk.
-* No plugin support and HTML5 video.
-* No page cache.
+* No Perl scripting inside frames.
+* No files can be downloaded.
+* QtWebEngine builds do not support printing.
 
 ## History
-PEB was started as a simple GUI for a personal database in 2013 by Dimitar D. Mitov.
+PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
 ## Applications Based on PEB
 * [Epigraphista](https://github.com/ddmitov/epigraphista) is an [EpiDoc](https://sourceforge.net/p/epidoc/wiki/Home/) XML file creator.  

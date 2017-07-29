@@ -18,7 +18,6 @@ if ($ENV{'REQUEST_METHOD'}) {
 
 print "<pre>";
 print "REQUEST_METHOD: $ENV{'REQUEST_METHOD'}<br>";
-print "FORM DATA:<br>";
 
 # Split information into name/value pairs:
 @pairs = split(/&/, $input);

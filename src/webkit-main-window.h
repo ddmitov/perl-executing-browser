@@ -21,17 +21,18 @@
 #include <QApplication>
 #include <QMainWindow>
 
-#include "view.h"
+#include "webkit-view.h"
 
 // ==============================
 // MAIN WINDOW CLASS DEFINITION:
+// (QTWEBKIT VERSION)
 // ==============================
 class QMainBrowserWindow : public QMainWindow
 {
     Q_OBJECT
 
 signals:
-    void initiateMainWindowClosingSignal();
+    void startMainWindowClosingSignal();
 
 public slots:
     void setMainWindowTitleSlot(QString title)
@@ -41,19 +42,27 @@ public slots:
 
     void closeEvent(QCloseEvent *event)
     {
-        if (qApp->property("mainWindowCloseRequested").toBool() == false) {
+        if (qApp->property("windowCloseRequested").toBool() == false) {
             event->ignore();
-            emit initiateMainWindowClosingSignal();
+            emit startMainWindowClosingSignal();
         }
 
-        if (qApp->property("mainWindowCloseRequested").toBool() == true) {
+        if (qApp->property("windowCloseRequested").toBool() == true) {
             event->accept();
         }
     }
 
+    void qExitApplicationSlot()
+    {
+        qDebug() << "Application exited normally.";
+
+        QApplication::exit();
+    }
+
 public:
-    explicit QMainBrowserWindow(QWidget *parent = 0);
     QWebView *webViewWidget;
+    explicit QMainBrowserWindow(QWidget *parent = 0);
+
 };
 
 #endif // MAINWINDOW_H

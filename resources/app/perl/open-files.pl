@@ -3,22 +3,9 @@
 use strict;
 use warnings;
 
-# Read input:
-my (@pairs, $pair, $name, $value);
-
-my @files;
-
-# Split information into name/value pairs:
-@pairs = split(/&/, $ENV{'QUERY_STRING'});
-foreach $pair (@pairs) {
-  ($name, $value) = split(/=/, $pair);
-  $value =~ tr/+/ /;
-  $value =~ s/%(..)/pack("C", hex($1))/eg;
-
-  if ($name =~ "files") {
-    @files = split(/;/, $value);
-  }
-}
+my $input;
+read (STDIN, $input, $ENV{'CONTENT_LENGTH'});
+my @files = split(/;/, $input);
 
 my $number_of_lines;
 

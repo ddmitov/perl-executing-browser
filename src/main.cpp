@@ -15,54 +15,17 @@
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1
-#include <unistd.h> // geteuid()
-#endif
-#endif
-
-#ifdef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1
-#include <windows.h> // isUserAdmin()
-#endif
-#endif
-
-#include <qglobal.h>
 #include <QApplication>
 #include <QDateTime>
 #include <QDebug>
-#include <QJsonArray>
 #include <QTextCodec>
+#include <QtGlobal>
 #include <QtWidgets>
 
-#include "main-window.h"
-#include "exit-handler.h"
-
-// ==============================
-// WINDOWS USER PRIVILEGES DETECTION SUBROUTINE:
-// ==============================
-#ifdef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1
-BOOL isUserAdmin()
-{
-    if (ADMIN_PRIVILEGES_CHECK == 1) {
-        BOOL bResult;
-        SID_IDENTIFIER_AUTHORITY ntAuthority = SECURITY_NT_AUTHORITY;
-        PSID administratorsGroup;
-        bResult = AllocateAndInitializeSid(
-                    &ntAuthority, 2, SECURITY_BUILTIN_DOMAIN_RID,
-                    DOMAIN_ALIAS_RID_ADMINS, 0, 0, 0, 0, 0, 0,
-                    &administratorsGroup);
-        if (bResult) {
-            if (!CheckTokenMembership(NULL, administratorsGroup, &bResult)) {
-                bResult = FALSE;
-            }
-            FreeSid(administratorsGroup);
-        }
-        return(bResult);
-    }
-}
-#endif
+#if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
+#include "webkit-main-window.h"
+#else
+#include "webengine-main-window.h"
 #endif
 
 // ==============================
@@ -122,44 +85,22 @@ int main(int argc, char **argv)
     QApplication application(argc, argv);
 
     // ==============================
-    // Basic application properties:
+    // Application version:
     // ==============================
-    application.setApplicationName("Perl Executing Browser");
     application.setApplicationVersion("0.5.0");
-    bool startedAsRoot = false;
 
     // ==============================
-    // Pseudo-domain:
+    // Basic program information:
     // ==============================
-    application.setProperty("pseudoDomain", QString("local-pseudodomain"));
+    qDebug() << "Application started:" << application.applicationFilePath();
+    qDebug() << "Application version:"
+             << application.applicationVersion().toLatin1().constData();
+    qDebug() << "Qt version:" << QT_VERSION_STR;
 
     // ==============================
     // UTF-8 encoding application-wide:
     // ==============================
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
-
-    // ==============================
-    // User privileges detection:
-    // ==============================
-    // Linux and Mac:
-#ifndef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1
-    int userEuid = geteuid();
-
-    if (userEuid == 0) {
-        startedAsRoot = true;
-    }
-#endif
-#endif
-
-    // Windows:
-#ifdef Q_OS_WIN
-#if ADMIN_PRIVILEGES_CHECK == 1
-    if (isUserAdmin()) {
-        startedAsRoot = true;
-    }
-#endif
-#endif
 
     // ==============================
     // Binary file directory:
@@ -241,7 +182,7 @@ int main(int argc, char **argv)
     } else {
         // Set the embedded default icon
         // in case no external icon file is found:
-        icon.load(":/icons/camel.png");
+        icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
 
@@ -273,9 +214,9 @@ int main(int argc, char **argv)
     QMainBrowserWindow mainWindow;
 
     // Application property necessary when
-    // closing the main window is requested using
+    // closing the browser window is requested using
     // the special window closing URL.
-    qApp->setProperty("mainWindowCloseRequested", false);
+    qApp->setProperty("windowCloseRequested", false);
 
     // Signal and slot for setting the main window title:
     QObject::connect(mainWindow.webViewWidget,
@@ -283,43 +224,23 @@ int main(int argc, char **argv)
                      &mainWindow,
                      SLOT(setMainWindowTitleSlot(QString)));
 
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+    // Signal and slot for fullscreen video:
+    QObject::connect(mainWindow.webViewWidget->page(),
+                     SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
+                     &mainWindow,
+                     SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
+#endif
+
     // Signal and slot for closing the main window:
     QObject::connect(&mainWindow,
-                     SIGNAL(initiateMainWindowClosingSignal()),
+                     SIGNAL(startMainWindowClosingSignal()),
                      mainWindow.webViewWidget->page(),
-                     SLOT(qInitiateWindowClosingSlot()));
-
-    QExitHandler exitHandler;
+                     SLOT(qStartWindowClosingSlot()));
 
     // Signal and slot for actions taken before application exit:
     QObject::connect(qApp, SIGNAL(aboutToQuit()),
-                     &exitHandler, SLOT(qExitApplicationSlot()));
-
-    // ==============================
-    // Started with
-    // administrative privileges
-    // error message:
-    // ==============================
-#if ADMIN_PRIVILEGES_CHECK == 1
-    if (startedAsRoot == true) {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/html/error.html"));
-        QString htmlErrorContents = resourceReader->fileContents;
-
-        QString errorMessage = "Using "
-                + application.applicationName().toLatin1() + " "
-                + application.applicationVersion().toLatin1() + " "
-                + "with administrative privileges is not allowed.";
-        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-
-        mainWindow.webViewWidget->setHtml(htmlErrorContents);
-
-        qDebug() << "Using"
-                << application.applicationName().toLatin1().constData()
-                << application.applicationVersion().toLatin1().constData()
-                << "with administrative privileges is not allowed.";
-    }
-#endif
+                     &mainWindow, SLOT(qExitApplicationSlot()));
 
     // ==============================
     // Missing Perl interpreter error message:
@@ -344,28 +265,8 @@ int main(int argc, char **argv)
         qDebug() << "No Perl interpreter is found.";
     }
 
-    if (startedAsRoot == false and perlInterpreter.length() > 0) {
-        // ==============================
-        // Logging basic program information:
-        // ==============================
-        qDebug() << application.applicationName().toLatin1().constData()
-                 << application.applicationVersion().toLatin1().constData()
-                 << "started.";
-        qDebug() << "Qt version:" << QT_VERSION_STR;
-        qDebug() << "Executable:" << application.applicationFilePath();
-        qDebug() << "PID:" << application.applicationPid();
-
-#if ADMIN_PRIVILEGES_CHECK == 0
-        qDebug() << "Administrative privileges check is disabled.";
-#endif
-
-#if ADMIN_PRIVILEGES_CHECK == 1
-        qDebug() << "Administrative privileges check is enabled.";
-#endif
-
+    if (perlInterpreter.length() > 0) {
         qDebug() << "Perl interpreter:" << perlInterpreter;
-        qDebug() <<"Local pseudo-domain:"
-                 << application.property("pseudoDomain").toString();
 
         // ==============================
         // Start page:
@@ -373,13 +274,9 @@ int main(int argc, char **argv)
         QString startPageFilePath =
                 applicationDirName + QDir::separator() + "index.html";
         QFile startPageFile(startPageFilePath);
-        QString startPage;
 
         if (startPageFile.exists()) {
-            startPage = "file://" + startPageFilePath;
-
-            application.setProperty("startPage", startPage);
-
+            QString startPage = "file://" + startPageFilePath;
             mainWindow.webViewWidget->setUrl(QUrl(startPage));
         } else {
             QFileReader *resourceReader =

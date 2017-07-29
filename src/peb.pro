@@ -16,18 +16,10 @@
 message ("Going to configure Perl Executing Browser for Qt $$[QT_VERSION]")
 
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
+    error ("Perl Executing Browser requires Qt 5.")
 }
 
-equals (QT_MAJOR_VERSION, 5) {
-    lessThan (QT_MINOR_VERSION, 1) {
-        error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
-    }
-
-    greaterThan (QT_MINOR_VERSION, 5) {
-        error ("Perl Executing Browser requires Qt versions 5.1 to 5.5.")
-    }
-
+greaterThan (QT_MAJOR_VERSION, 4) {
     message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
@@ -58,26 +50,6 @@ equals (QT_MAJOR_VERSION, 5) {
     }
 
     ##########################################################
-    # ADMINISTRATIVE PRIVILEGES CHECK:
-    # To disable administrative privileges check:
-    # ADMIN_PRIVILEGES_CHECK = 0
-    # By default administrative privileges check is disabled.
-    # To enable administrative privileges check:
-    # ADMIN_PRIVILEGES_CHECK = 1
-    ##########################################################
-
-    ADMIN_PRIVILEGES_CHECK = 0
-
-    DEFINES += "ADMIN_PRIVILEGES_CHECK=$$ADMIN_PRIVILEGES_CHECK"
-
-    equals (ADMIN_PRIVILEGES_CHECK, 0) {
-        message ("Configured without administrative privileges check.")
-    }
-    equals (ADMIN_PRIVILEGES_CHECK, 1) {
-        message ("Configured with administrative privileges check.")
-    }
-
-    ##########################################################
 
     # Binary basics:
     CONFIG += release
@@ -90,38 +62,65 @@ equals (QT_MAJOR_VERSION, 5) {
     # HTTPS support:
     CONFIG += openssl-linked
 
-    # Webkit support:
-    QT += widgets webkitwidgets
+    # HTML engine:
+    lessThan (QT_MINOR_VERSION, 6) {
+        QT += widgets webkitwidgets
+    }
+
+    greaterThan (QT_MINOR_VERSION, 5) {
+        QT += widgets webenginewidgets
+    }
 
     # Printing support:
-    QT += printsupport
+    lessThan (QT_MINOR_VERSION, 6) {
+        QT += printsupport
+    }
 
-    # Source files:
-    SOURCES += \
-        main.cpp \
-        file-reader.cpp \
-        exit-handler.cpp \
-        local-reply.cpp \
-        main-window.cpp \
-        page.cpp \
-        script-handler.cpp \
-        view.cpp
+    lessThan (QT_MINOR_VERSION, 6) {
+        # Source files:
+        SOURCES += \
+            main.cpp \
+            file-reader.cpp \
+            local-reply.cpp \
+            main-window.cpp \
+            script-handler.cpp \
+            webkit-page.cpp \
+            webkit-view.cpp
 
-    # Header files:
-    HEADERS += \
-        access-manager.h \
-        file-reader.h \
-        exit-handler.h \
-        local-reply.h \
-        main-window.h \
-        page.h \
-        script-handler.h \
-        view.h
+        # Header files:
+        HEADERS += \
+            access-manager.h \
+            file-reader.h \
+            local-reply.h \
+            script-handler.h \
+            webkit-main-window.h \
+            webkit-page.h \
+            webkit-view.h
+    }
+
+    greaterThan (QT_MINOR_VERSION, 5) {
+        # Source files:
+        SOURCES += \
+            main.cpp \
+            file-reader.cpp \
+            main-window.cpp \
+            script-handler.cpp \
+            webengine-page.cpp \
+            webengine-view.cpp
+
+        # Header files:
+        HEADERS += \
+            file-reader.h \
+            script-handler.h \
+            webengine-main-window.h \
+            webengine-page.h \
+            webengine-view.h
+    }
 
     # Resources:
     RESOURCES += resources/peb.qrc
     win32 {
-        OTHER_FILES += resources/peb.rc resources/icons/camel.ico
+        OTHER_FILES += resources/peb.rc resources/icon/camel.ico
         RC_FILE = resources/peb.rc
     }
 

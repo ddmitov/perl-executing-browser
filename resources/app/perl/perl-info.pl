@@ -9,7 +9,7 @@ my $cwd = cwd();
 print "<pre>";
 
 print "Perl $^V<br>";
-print "Working Directory: $cwd<br>";
+print "Working Directory: $cwd<br><br>";
 
 print "\@INC Array:<br>";
 print join "<br>", @INC;

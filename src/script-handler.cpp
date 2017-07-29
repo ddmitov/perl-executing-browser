@@ -15,29 +15,60 @@
  https://github.com/ddmitov/perl-executing-browser
 */
 
+#include <QJsonObject>
 #include <QDir>
-#include <QInputDialog>
-#include <QLineEdit>
-#include <QTimer>
-#include <QUrl>
-#include <QUrlQuery>
 
 #include "script-handler.h"
 
 // ==============================
 // SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
-QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
+QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
-    scriptFullFilePath = QDir::toNativeSeparators
-            ((qApp->property("application").toString()) + url.path());
+    if (scriptJsonObject.length() == 0) {
+        qDebug() << "Script JSON data is empty!";
+        return;
+    }
+
+    if (scriptJsonObject["path"].toString().length() > 0) {
+        scriptFullFilePath = scriptJsonObject["path"].toString();
+        scriptFullFilePath.replace("{app}",
+                                   qApp->property("application").toString());
+        scriptFullFilePath = QDir::toNativeSeparators(scriptFullFilePath);
+    }
 
     QFile file(scriptFullFilePath);
     if (!file.exists()) {
         qDebug() << "File not found:" << scriptFullFilePath;
-
         return;
+    }
+
+    if (scriptJsonObject["stdout"].toString().length() > 0) {
+        scriptStdout = scriptJsonObject["stdout"].toString();
+    } else {
+        qDebug() << "STDOUT target is not defined for:"
+                 << scriptFullFilePath;
+        return;
+    }
+
+    QString requestMethod;
+    if (scriptJsonObject["requestMethod"].toString().length() > 0) {
+        requestMethod = scriptJsonObject["requestMethod"].toString();
+    }
+
+    QString inputData;
+    if (scriptJsonObject["inputData"].toString().length() > 0) {
+        inputData = scriptJsonObject["inputData"].toString();
+    }
+
+    if (scriptJsonObject["closeCommand"].toString().length() > 0) {
+        scriptCloseCommand = scriptJsonObject["closeCommand"].toString();
+    }
+
+    if (scriptJsonObject["closeConfirmation"].toString().length() > 0) {
+        scriptCloseConfirmation =
+                scriptJsonObject["closeConfirmation"].toString();
     }
 
     // Signals and slots for local long running Perl scripts:
@@ -50,137 +81,32 @@ QScriptHandler::QScriptHandler(QUrl url, QByteArray postDataArray)
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    QUrlQuery scriptQuery(url);
-
-    scriptStdoutTarget = scriptQuery.queryItemValue("stdout");
-    scriptQuery.removeQueryItem("stdout");
-
-    scriptUser = url.userName();
-
-    if (scriptUser.length() > 0) {
-        if (scriptUser == "interactive") {
-            scriptId = url.password() + "@" + url.path();
-
-            scriptCloseCommand =
-                    scriptQuery.queryItemValue("close_command");
-            if (scriptCloseCommand.length() == 0) {
-                qDebug() << "Close command is not defined"
-                         << "for interactive script:"
-                         << scriptFullFilePath;
-            }
-
-            scriptCloseConfirmation =
-                    scriptQuery.queryItemValue("close_confirmation");
-            if (scriptCloseConfirmation.length() == 0) {
-                qDebug() << "Close confirmation is not defined"
-                         << "for interactive script:"
-                         << scriptFullFilePath;
-            }
-        }
-    }
-
-    QString postData(postDataArray);
-
     QProcessEnvironment scriptEnvironment =
             QProcessEnvironment::systemEnvironment();
 
-    if (scriptQuery.toString().length() > 0) {
+    if (requestMethod == "GET") {
         scriptEnvironment.insert("REQUEST_METHOD", "GET");
-        scriptEnvironment.insert("QUERY_STRING", scriptQuery.toString());
+        scriptEnvironment.insert("QUERY_STRING", inputData);
     }
 
-    if (postData.length() > 0) {
+    if (requestMethod == "POST") {
         scriptEnvironment.insert("REQUEST_METHOD", "POST");
-        QString postDataSize = QString::number(postData.size());
-        scriptEnvironment.insert("CONTENT_LENGTH", postDataSize);
+        scriptEnvironment.insert("CONTENT_LENGTH",
+                                 QString::number(inputData.size()));
     }
 
     scriptProcess.setProcessEnvironment(scriptEnvironment);
 
-    if (scriptUser != "root") {
-        scriptProcess.start((qApp->property("perlInterpreter").toString()),
-                            QStringList()
-                            << scriptFullFilePath,
-                            QProcess::Unbuffered | QProcess::ReadWrite);
+    scriptProcess.start((qApp->property("perlInterpreter").toString()),
+                        QStringList()
+                        << scriptFullFilePath,
+                        QProcess::Unbuffered | QProcess::ReadWrite);
 
-        if (postData.length() > 0) {
-            scriptProcess.write(postDataArray);
-        }
+    if (requestMethod == "POST") {
+        QByteArray inputDataArray = inputData.toUtf8();
+        inputDataArray.append(QString("\n").toLatin1());
+        scriptProcess.write(inputDataArray);
     }
-
-#ifdef Q_OS_LINUX
-#if ADMIN_PRIVILEGES_CHECK == 0
-    if (scriptUser == "root") {
-        QString scriptCommadLineArgument;
-
-        if (postData.length() > 0) {
-            scriptCommadLineArgument = postData;
-        }
-
-        if (scriptQuery.toString().length() > 0) {
-            scriptCommadLineArgument = scriptQuery.toString();
-        }
-
-//        scriptHandler.start(QString("pkexec"),
-//                            QStringList()
-//                            << qApp->property("perlInterpreter").toString()
-//                            << scriptFullFilePath
-//                            << scriptCommadLineArgument,
-//                            QProcess::Unbuffered | QProcess::ReadWrite);
-
-//        scriptHandler.start(QString("gksudo"),
-//                            QStringList()
-//                            << "-D"
-//                            + qApp->applicationName().toLatin1()
-//                            << "--"
-//                            << qApp->property("perlInterpreter").toString()
-//                            << scriptFullFilePath
-//                            << scriptCommadLineArgument,
-//                            QProcess::Unbuffered | QProcess::ReadWrite);
-
-        if (qApp->property("rootPassword").toString().length() == 0) {
-            bool ok;
-            QString input =
-                    QInputDialog::getText(
-                        qApp->activeWindow(),
-                        "Root Password",
-                        "Please enter your Linux root password:",
-                        QLineEdit::Password,
-                        "",
-                        &ok);
-
-            if (ok && !input.isEmpty()) {
-                qApp->setProperty("rootPassword", input);
-
-                int maximumTimeMilliseconds = 300 * 1000 ;
-                QTimer::singleShot(maximumTimeMilliseconds,
-                                   this, SLOT(qRootPasswordTimeoutSlot()));
-            }
-        }
-
-        if (qApp->property("rootPassword").toString().length() > 0) {
-            QProcess echo;
-            echo.setStandardOutputProcess(&scriptProcess);
-            echo.start(QString("echo"),
-                       QStringList()
-                       << qApp->property("rootPassword").toString(),
-                       QProcess::Unbuffered | QProcess::ReadWrite);
-            echo.waitForFinished();
-            echo.close();
-
-            scriptProcess.start(QString("sudo"),
-                                QStringList()
-                                << "--stdin"
-                                << "--prompt="
-                                << "--"
-                                << qApp->property("perlInterpreter").toString()
-                                << scriptFullFilePath
-                                << scriptCommadLineArgument,
-                                QProcess::Unbuffered | QProcess::ReadWrite);
-        }
-    }
-#endif
-#endif
 
     qDebug()
             // << QDateTime::currentMSecsSinceEpoch()

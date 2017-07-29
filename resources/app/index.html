@@ -2,198 +2,241 @@
 <html>
 
   <head>
-    <title>Perl Executing Browser - Demo</title>
+    <title>Perl Executing Browser Demo</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset="utf-8">
 
-    <script src="jquery/jquery-1.11.1.min.js"></script>
+    <script>
+      // PEB page settings:
+      // 'pebSettings' object name is hard-coded.
+      var pebSettings = {};
+      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+      pebSettings.cutLabel = '- Cut -';
+      pebSettings.copyLabel = '- Copy -';
+      pebSettings.pasteLabel = '- Paste -';
+      pebSettings.selectAllLabel = '- Select All -';
+      pebSettings.okLabel = 'OK';
+      pebSettings.cancelLabel = 'CANCEL';
+      pebSettings.yesLabel = 'YES';
+      pebSettings.noLabel = 'NO';
+      pebSettings.closeConfirmation =
+        'Text was entered in a form and it is going to be lost!\n' +
+        'Are you sure you want to close the window?';
 
+      // Settings objects for the Perl scripts:
+      var interactive_one = {};
+      interactive_one.path = '{app}/perl/interactive.pl';
+      interactive_one.stdout = 'instance-one-output';
+      interactive_one.requestMethod = 'POST';
+      interactive_one.closeCommand = '_close_';
+      interactive_one.closeConfirmation = '_closed_';
+      interactive_one.inputDataHarvester = function() {
+        var data = $('#form-one').serialize();
+        $('#form-one').trigger('reset');
+        return data;
+      }
+
+      var interactive_two = {};
+      interactive_two.path = '{app}/perl/interactive.pl';
+      interactive_two.stdout = 'instance-two-output';
+      interactive_two.requestMethod = 'POST';
+      interactive_two.closeCommand = '_close_';
+      interactive_two.closeConfirmation = '_closed_';
+      interactive_two.inputDataHarvester = function() {
+        var data = $('#form-two').serialize();
+        $('#form-two').trigger('reset');
+        return data;
+      }
+
+      var get_test = {};
+      get_test.path = '{app}/perl/get-post-test.pl';
+      get_test.stdout = 'tests';
+      get_test.requestMethod = 'GET';
+      get_test.inputData = 'name=Mickey&species=mouse';
+
+      var post_test = {};
+      post_test.path = '{app}/perl/get-post-test.pl';
+      post_test.stdout = 'tests';
+      post_test.requestMethod = 'POST';
+      post_test.inputData = 'name=Geoffrey&species=giraffe';
+
+      var perl_info = {};
+      perl_info.path = '{app}/perl/perl-info.pl';
+      perl_info.stdout = 'tests';
+
+      var extensionless = {};
+      extensionless.path = '{app}/perl/extensionless';
+      extensionless.stdout = 'tests';
+
+      var sqlite = {};
+      sqlite.path = '{app}/perl/sqlite.pl';
+      sqlite.stdout = 'tests';
+
+      // Filesystem dilog boxes configuration objects:
+      var select_file = {};
+      select_file.type = 'single-file';
+      select_file.target = 'insertFileName';
+
+      function insertFileName(fileName) {
+        clearTargetElement();
+        var pre = document.createElement("pre");
+        pre.innerHTML = 'Selected existing file: ' + fileName;
+        document.getElementById('tests').appendChild(pre);
+      }
+
+      var new_file_name = {};
+      new_file_name.type = 'new-file-name';
+      new_file_name.target = 'insertNewFileName';
+
+      function insertNewFileName(fileName) {
+        clearTargetElement();
+        var pre = document.createElement("pre");
+        pre.innerHTML = 'Selected new file name: ' + fileName;
+        document.getElementById('tests').appendChild(pre);
+      }
+
+      var select_files = {};
+      select_files.type = 'multiple-files';
+      select_files.target = 'insertFileNames';
+
+      function insertFileNames(fileNames) {
+        clearTargetElement();
+        var pre = document.createElement("pre");
+        fileNames = fileNames.replace(/;/g, "<br>");
+        pre.innerHTML = 'Selected files:<br>' + fileNames;
+        document.getElementById('tests').appendChild(pre);
+      }
+
+      var select_directory = {};
+      select_directory.type = 'directory';
+      select_directory.target = 'insertDirectoryName';
+
+      function insertDirectoryName(directoryName) {
+        clearTargetElement();
+        var pre = document.createElement("pre");
+        pre.innerHTML = 'Selected directory: ' + directoryName;
+        document.getElementById('tests').appendChild(pre);
+      }
+
+      function clearTargetElement() {
+        var container = document.getElementById('tests');
+        while (container.firstChild) {
+          container.removeChild(container.firstChild);
+        }
+      }
+    </script>
+
+    <script src="jquery/jquery-1.12.4.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
     <script src="bootstrap/js/bootstrap-dropdown.js"></script>
 
-    <script src="pebjs/filesystem.js"></script>
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.min.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
 
-    <style>
+    <style type='text/css'>
       pre {
         margin: 4px;
         text-align: left;
         font-size: 14px;
-        font-family: monospace;
+        font-family: sans-serif;
       }
+
       .navbar .navbar-nav {
         display: inline-block;
         float: none;
         vertical-align: top;
       }
+
       .navbar .navbar-inverse {
         text-align: center;
       }
+
       .container {
-        text-align: center;
         font-size: 22px;
       }
+
       .introduction {
         text-align: left;
         font-size: 20px;
+      }
+
+      .interactive-output {
+        font-size: 20px;
+        margin-bottom: 20px;
       }
     </style>
   </head>
 
   <body>
     <div class="navbar navbar-inverse">
-
       <ul class="nav navbar-nav">
         <li>
           <a id="filesystem-menu" role="button" data-toggle="dropdown" data-target="#">
-            Filesystem
+            Dialogs
             <span class="caret"></span>
           </a>
+
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a href="http://local-pseudodomain/open-file.function?target=fileSelection">
-                Open Single File
-              </a>
+              <a href="select_file.dialog">Select Existing File</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/open-files.function?target=filesSelection">
-                Open Multiple Files
-              </a>
+              <a href="new_file_name.dialog">New File Name</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/open-directory.function?target=directorySelection">
-                Open Directory
-              </a>
+              <a href="select_files.dialog">Select Multiple Files</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/new-file-name.function?target=newFilenameSelection">
-                Enter New Filename
-              </a>
-            </li>
-
-            <li>
-              <a href="http://root@local-pseudodomain/perl/open-root-directory.pl?stdout=tests">
-                Open /root
-              </a>
+              <a href="select_directory.dialog">Select Directory</a>
             </li>
           </ul>
         </li>
 
         <li>
-          <a id="scripts-menu" role="button" data-toggle="dropdown" data-target="#">
-            Scripts
+          <a id="local-tests" role="button" data-toggle="dropdown" data-target="#">
+            Local Tests
             <span class="caret"></span>
           </a>
+
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a href="interactive.html" target="_blank">
-                Interactive Script
-              </a>
+              <a href="get_test.settings">GET Test</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/perl/counter.pl?stdout=data-one">
-                Noninteractive Script - First Instance
-              </a>
+              <a href="post_test.settings">POST Test</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/perl/counter.pl?stdout=data-two">
-                Noninteractive Script - Second Instance
-              </a>
+              <a href="perl_info.settings">Perl Basic information</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/perl/version-cwd-inc.pl?stdout=tests">
-                Perl Basic information
-              </a>
+              <a href="extensionless.settings">Extensionless Script</a>
             </li>
 
             <li>
-              <a href="http://local-pseudodomain/perl/sqlite.pl?stdout=tests">
-                SQLite Test
-              </a>
-            </li>
-
-            <li>
-              <a href="http://local-pseudodomain/perl/noextpl?stdout=tests">
-                Extensionless Script
-              </a>
+              <a href="sqlite.settings">SQLite Test</a>
             </li>
           </ul>
         </li>
 
         <li>
-          <a id="forms-menu" role="button" data-toggle="dropdown" data-target="#">
-            Forms
+          <a id="web-tests" role="button" data-toggle="dropdown" data-target="#">
+            Web Tests
             <span class="caret"></span>
           </a>
+
           <ul class="dropdown-menu" role="menu">
             <li>
-              <a href="get.html">
-                GET Form
-              </a>
+              <a href="https://www.google.com/">Google</a>
             </li>
 
             <li>
-              <a href="post.html">
-                POST Form
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <li>
-          <a id="web-menu" role="button" data-toggle="dropdown" data-target="#">
-            Web
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="https://www.google.com/">
-                Google
-              </a>
-            </li>
-
-            <li>
-              <a href="https://html5test.com/">
-                HTML5test
-              </a>
-            </li>
-
-            <li>
-              <a href="mixed-content.html">
-                Mixed Content</a>
-            </li>
-
-            <li>
-              <a href="http://www.nonexistent.com/">
-                Nonexistent Site
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <li>
-          <a id="printing-menu" role="button" data-toggle="dropdown" data-target="#">
-            Print
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="http://local-pseudodomain/print.function?action=preview">
-                Print Preview
-              </a>
-            </li>
-
-            <li>
-              <a href="http://local-pseudodomain/print.function?action=print">
-                Print
-              </a>
+              <a href="https://html5test.com/">HTML5test</a>
             </li>
           </ul>
         </li>
@@ -203,50 +246,84 @@
         </li>
 
         <li>
-          <a href="javascript:window.open('index.html');">Clone</a>
+          <a href="about-browser.function">About</a>
         </li>
 
         <li>
-          <a id="about-menu" role="button" data-toggle="dropdown" data-target="#">
-            About
-            <span class="caret"></span>
-          </a>
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="http://local-pseudodomain/about.function?type=browser">
-                About PEB
-              </a>
-            </li>
-
-            <li>
-              <a href="http://local-pseudodomain/about.function?type=qt">
-                About Qt
-              </a>
-            </li>
-          </ul>
-        </li>
-
-        <li>
-          <a href="http://local-pseudodomain/close-window.function">
-            Close
-          </a>
+          <a href="about-qt.function">About Qt</a>
         </li>
       </ul>
     </div>
 
     <div class="container">
-      <div id="data-one"></div>
-
-      <div id="data-two"></div>
-
       <div id="tests"></div>
 
       <h2>Perl Executing Browser</h2>
-      <div class="introduction">
-        <div><a href="https://github.com/ddmitov/perl-executing-browser">Perl Executing Browser (PEB)</a> is an HTML user interface for <a href="https://www.perl.org/">Perl 5</a> desktop applications. It runs local Perl 5 scripts with no server or timeout and is implemented as a C++ compiled executable based on <a href="https://www.qt.io/">Qt 5</a> and <a href="https://trac.webkit.org/wiki/QtWebKit">QtWebKit</a> libraries. PEB Perl scripts are fed from HTML forms using requests to a built-in pseudodomain.</div>
-        <br>
-        <p>Inspired by <a href="http://nwjs.io/">NW.js</a> and <a href="http://electron.atom.io/">Electron</a>, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to NW.js and Electron, PEB enforces strict separation between local and web content in different browser windows.</p>
-        <br>
+
+      <div class="row">
+        <div class="col-lg-12 introduction">
+          <a href="https://github.com/ddmitov/perl-executing-browser">Perl Executing Browser (PEB)</a> is an HTML5 user interface for <a href="https://www.perl.org/">Perl 5</a> desktop applications. It runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the <a href="https://www.qt.io/">Qt 5</a> libraries.
+        </div>
+      </div>
+
+      <br>
+
+      <div class="row">
+        <div class="col-lg-12 introduction">
+          Inspired by <a href="http://electron.atom.io/">Electron</a> and <a href="http://nwjs.io/">NW.js</a>, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on Node.js, runs JavaScript in a sandbox and blocks cross-origin requests.
+        </div>
+      </div>
+
+      <h3>Interactive Script Demo</h3>
+
+      <div class="row">
+        <div class="col-xs-12 form-group">
+          <form action="interactive_one.settings" id="form-one">
+            <div class="input-group">
+              <input type="hidden" name="mode" value="unix-epoch">
+
+              <input type="text" name="input" class="form-control"
+                placeholder="Press Enter to send data to the first interactive script instance">
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-one').trigger('reset');">
+                Reset
+              </span>
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-one').trigger('submit');">
+                Send
+              </span>
+            </div>
+          </form>
+        </div>
+
+        <div id="instance-one-output" class="interactive-output"></div>
+      </div>
+
+      <div class="row">
+        <div class="col-xs-12 form-group">
+          <form action="interactive_two.settings" id="form-two">
+            <div class="input-group">
+              <input type="hidden" name="mode" value="local-time">
+
+              <input type="text" name="input" class="form-control"
+                placeholder="Press Enter to send data to the second interactive script instance">
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-two').trigger('reset');">
+                Reset
+              </span>
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-two').trigger('submit');">
+                Send
+              </span>
+            </div>
+          </form>
+        </div>
+
+        <div id="instance-two-output" class="interactive-output"></div>
       </div>
     </div>
   </body>
