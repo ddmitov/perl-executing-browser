@@ -13,7 +13,7 @@ Special thanks to the staff of the
 where much of the development effort took place!  
 
 Special thanks to Stack Overflow users peppe, Piotr Dobrogost and Fèlix Galindo Allué.  
-Their example code is no more used in Perl Executing Browser,  
+Their example code is no longer used in Perl Executing Browser,  
 but their expertise and good will to help others are not forgotten!
 
 Thanks to Jennifer Maher-Bontrager, author of the Camel icon.  
@@ -84,6 +84,7 @@ https://wiki.qt.io/Open_Web_Page_in_QWebView
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file  
 https://forum.qt.io/topic/551/get-filename-without-extension  
 https://forum.qt.io/topic/45982/solved-is-there-a-problem-with-the-following-non-blocking-sleep-function  
+https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute
 
 http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only  
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  

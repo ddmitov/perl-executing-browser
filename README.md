@@ -325,11 +325,12 @@ pebSettings.closeConfirmation =
 * **About Qt dialog:** ``about-qt.function``
 
 ## Specific Keyboard Shortcuts
-* <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector (QtWebKit builds only)
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - print (QtWebKit builds only)  
+All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
+* <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - print  
   Printing is started after a native printer selection dialog is displayed.  
   If no printer is configured, no dialog is displayed and no action is taken.
-* <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview (QtWebKit builds only)
+* <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview
 
 ## What PEB Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.

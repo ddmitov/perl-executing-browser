@@ -28,6 +28,7 @@
 #include <QRegularExpression>
 #include <QTimer>
 #include <QUrl>
+#include <QWebElement>
 #include <QWebFrame>
 #include <QWebPage>
 
@@ -51,20 +52,26 @@ public slots:
     {
         if (ok) {
             if (QPage::mainFrame()->url().scheme() == "file") {
-            // Inject all browser-specific Javascript:
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/peb.js"));
-            QString pebJavaScript = resourceReader->fileContents;
+                // Inject all browser-specific Javascript:
+                QFileReader *resourceReader =
+                        new QFileReader(QString(":/peb.js"));
+                QString pebJavaScript = resourceReader->fileContents;
 
-            mainFrame()->evaluateJavaScript(pebJavaScript);
+                mainFrame()->evaluateJavaScript(pebJavaScript);
 
-            QVariant result =
-                    mainFrame()->
-                    evaluateJavaScript("peb.getPageSettings()");
-            qGetPageSettings(result);
+                // Start getting the page settings:
+                QVariant result = mainFrame()->
+                        evaluateJavaScript("peb.getPageSettings()");
+                qGetPageSettings(result);
 
-            // Send signal to the html-viewing class that a page is loaded:
-            emit pageLoadedSignal();
+                // Get the title of the page for use in dialog boxes:
+                QWebElement titleDomElement =
+                        QPage::currentFrame()->documentElement()
+                        .findFirst("title");
+                title = titleDomElement.toInnerXml().toLatin1();
+
+                // Send signal to the html-viewing class that a page is loaded:
+                emit pageLoadedSignal();
             }
         }
     }
@@ -483,7 +490,7 @@ protected:
 
         QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
         javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptAlertMessageBox.setWindowTitle("Alert");
+        javaScriptAlertMessageBox.setWindowTitle(title);
         javaScriptAlertMessageBox.setText(msg);
         javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
         javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
@@ -499,10 +506,11 @@ protected:
 
         QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
         javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptConfirmMessageBox.setWindowTitle("Confirm");
+        javaScriptConfirmMessageBox.setWindowTitle(title);
         javaScriptConfirmMessageBox.setText(msg);
         javaScriptConfirmMessageBox
                 .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        javaScriptConfirmMessageBox.setDefaultButton(QMessageBox::No);
         javaScriptConfirmMessageBox.setButtonText(QMessageBox::Yes, yesLabel);
         javaScriptConfirmMessageBox.setButtonText(QMessageBox::No, noLabel);
         return QMessageBox::Yes == javaScriptConfirmMessageBox.exec();
@@ -522,7 +530,7 @@ protected:
 
         QInputDialog dialog;
         dialog.setModal(true);
-        dialog.setWindowTitle("Prompt");
+        dialog.setWindowTitle(title);
         dialog.setLabelText(msg);
         dialog.setInputMode(QInputDialog::TextInput);
         dialog.setTextValue(defaultValue);
@@ -539,6 +547,8 @@ protected:
     }
 
 private:
+    QString title;
+
     QString okLabel;
     QString cancelLabel;
     QString yesLabel;
