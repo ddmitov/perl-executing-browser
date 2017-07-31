@@ -19,7 +19,6 @@
 #define SCRIPTHANDLER_H
 
 #include <QApplication>
-#include <QDateTime>
 #include <QDebug>
 #include <QProcess>
 
@@ -31,10 +30,11 @@ class QScriptHandler : public QObject
     Q_OBJECT
 
 signals:
-    void displayScriptOutputSignal(QString output, QString scriptStdout);
-    void scriptFinishedSignal(QString scriptAccumulatedErrors,
-                              QString scriptStdout,
-                              QString scriptFullFilePath);
+    void displayScriptOutputSignal(QString scriptId,
+                                   QString output);
+    void scriptFinishedSignal(QString scriptId,
+                              QString scriptFullFilePath,
+                              QString scriptAccumulatedErrors);
 
 public slots:
     void qScriptOutputSlot()
@@ -42,19 +42,11 @@ public slots:
         QString output = scriptProcess.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
 
-        // qDebug()
-                // << QDateTime::currentMSecsSinceEpoch()
-                // << "msecs from epoch:"
-                // << "Output from:" << scriptFullFilePath;
-
         if (output == scriptCloseConfirmation) {
-            qDebug()
-                    // << QDateTime::currentMSecsSinceEpoch()
-                    // << "msecs from epoch:"
-                    << "Interactive script is exiting normally:"
-                    << scriptFullFilePath;
+            qDebug() << "Interactive script is exiting normally:"
+                     << scriptFullFilePath;
         } else {
-            emit displayScriptOutputSignal(output, scriptStdout);
+            emit displayScriptOutputSignal(scriptId, output);
         }
     }
 
@@ -67,22 +59,19 @@ public slots:
 
     void qScriptFinishedSlot()
     {
-        emit scriptFinishedSignal(scriptAccumulatedErrors,
-                                  scriptStdout,
-                                  scriptFullFilePath);
+        emit scriptFinishedSignal(scriptId,
+                                  scriptFullFilePath,
+                                  scriptAccumulatedErrors);
 
         scriptProcess.close();
 
-        qDebug()
-                // << QDateTime::currentMSecsSinceEpoch()
-                // << "msecs from epoch:"
-                << "Script finished:"
-                << scriptFullFilePath;
+        qDebug() << "Script finished:" << scriptFullFilePath;
     }
 
 public:
     QScriptHandler(QJsonObject);
     QProcess scriptProcess;
+    QString scriptId;
     QString scriptFullFilePath;
     QString scriptStdout;
     QString scriptAccumulatedOutput;

@@ -149,7 +149,10 @@ A minimal example of a Perl script settings object:
 ```javascript
 var perlScriptObject = {};
 perlScriptObject.path = '{app}/perl/test.pl';
-perlScriptObject.stdout = 'test';
+perlScriptObject.stdout = function (stdout) {
+  var container = document.getElementById('tests');
+  container.innerHTML = stdout;
+}
 ```
 
 * ``path``  
@@ -158,7 +161,7 @@ perlScriptObject.stdout = 'test';
   *This object property is mandatory.*  
 
 * ``stdout``  
-  The ``stdout`` object property must be an id of a valid HTML DOM element or the name of a JavaScript function. Every piece of script output is immediately inserted into the DOM element or passed to the JavaScript function as its only argument.  
+  The ``stdout`` object property must be a JavaScript function. Every piece of script output is passed to this function as its only argument.  
   *This object property is mandatory.*  
 
 * ``requestMethod``  
@@ -192,7 +195,7 @@ perlScriptObject.stdout = 'test';
   The ``close_command`` object property designates the command used to gracefully shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
 * ``close_confirmation``  
-  Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 5 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
+  Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 3 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
 
@@ -239,7 +242,7 @@ The following code shows how to start an interactive Perl script right after a l
 The ``index.htm`` file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
 
 ## Selecting Files and Folders
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page using the ``target`` object property. ``target`` must be an id of a valid HTML DOM element or the name of a JavaScript function which receives all selected files or folders as its only argument.  
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page using the ``target`` object property. ``target`` must be a JavaScript function which receives all selected files or folders as its only argument.  
 
 ```html
 <a href="select_file.dialog">Select existing file</a>
@@ -250,8 +253,10 @@ var select_file = {};
 // Type of the dialog, one of the following:
 // 'single-file', 'multiple-files', 'new-file-name' or 'directory'.
 select_file.type = 'single-file';
-// Unique DOM element or JavaScript function:
-select_file.target = 'tests';
+select_file.target = function (stdout) {
+  var container = document.getElementById('tests');
+  container.innerHTML = stdout;
+}
 ```
 
 * The actual opening of any existing file is performed by a Perl script and not by PEB.  

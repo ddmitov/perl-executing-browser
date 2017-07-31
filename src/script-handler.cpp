@@ -27,9 +27,11 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
     if (scriptJsonObject.length() == 0) {
-        qDebug() << "Script JSON data is empty!";
+        qDebug() << "Script settings are empty!";
         return;
     }
+
+    scriptId = scriptJsonObject["id"].toString();
 
     if (scriptJsonObject["path"].toString().length() > 0) {
         scriptFullFilePath = scriptJsonObject["path"].toString();
@@ -41,14 +43,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     QFile file(scriptFullFilePath);
     if (!file.exists()) {
         qDebug() << "File not found:" << scriptFullFilePath;
-        return;
-    }
-
-    if (scriptJsonObject["stdout"].toString().length() > 0) {
-        scriptStdout = scriptJsonObject["stdout"].toString();
-    } else {
-        qDebug() << "STDOUT target is not defined for:"
-                 << scriptFullFilePath;
         return;
     }
 

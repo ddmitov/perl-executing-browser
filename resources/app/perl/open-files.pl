@@ -9,7 +9,6 @@ my @files = split(/;/, $input);
 
 my $number_of_lines;
 
-print "<pre>";
 print "Opening multiple files:<br>";
 
 foreach my $file (@files) {
@@ -20,5 +19,3 @@ foreach my $file (@files) {
   my $number_of_lines = scalar(@file_contents);
   print "File: $file Lines: $number_of_lines<br>";
 }
-
-print "</pre>";

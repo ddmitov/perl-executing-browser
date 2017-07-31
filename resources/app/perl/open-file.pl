@@ -12,4 +12,4 @@ close $filehandle;
 
 my $number_of_lines = scalar(@file_contents);
 
-print "<pre>Opening single file: $filename Lines: $number_of_lines</pre>";
+print "Opening single file: $filename Lines: $number_of_lines";

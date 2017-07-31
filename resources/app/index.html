@@ -26,7 +26,10 @@
       // Settings objects for the Perl scripts:
       var interactive_one = {};
       interactive_one.path = '{app}/perl/interactive.pl';
-      interactive_one.stdout = 'instance-one-output';
+      interactive_one.stdout = function (stdout) {
+        var target = document.getElementById('instance-one-output');
+        target.innerHTML = stdout;
+      }
       interactive_one.requestMethod = 'POST';
       interactive_one.closeCommand = '_close_';
       interactive_one.closeConfirmation = '_closed_';
@@ -38,7 +41,10 @@
 
       var interactive_two = {};
       interactive_two.path = '{app}/perl/interactive.pl';
-      interactive_two.stdout = 'instance-two-output';
+      interactive_two.stdout = function (stdout) {
+        var target = document.getElementById('instance-two-output');
+        target.innerHTML = stdout;
+      }
       interactive_two.requestMethod = 'POST';
       interactive_two.closeCommand = '_close_';
       interactive_two.closeConfirmation = '_closed_';
@@ -51,33 +57,42 @@
       var get_test = {};
       get_test.path = '{app}/perl/get-post-test.pl';
       get_test.stdout = 'tests';
+      get_test.stdout = function (stdout) {
+        displayTestResult(stdout);
+      }
       get_test.requestMethod = 'GET';
       get_test.inputData = 'name=Mickey&species=mouse';
 
       var post_test = {};
       post_test.path = '{app}/perl/get-post-test.pl';
-      post_test.stdout = 'tests';
+      post_test.stdout = function (stdout) {
+        displayTestResult(stdout);
+      }
       post_test.requestMethod = 'POST';
       post_test.inputData = 'name=Geoffrey&species=giraffe';
 
       var perl_info = {};
       perl_info.path = '{app}/perl/perl-info.pl';
-      perl_info.stdout = 'tests';
+      perl_info.stdout = function (stdout) {
+        displayTestResult(stdout);
+      }
 
       var extensionless = {};
       extensionless.path = '{app}/perl/extensionless';
-      extensionless.stdout = 'tests';
+      extensionless.stdout = function (stdout) {
+        displayTestResult(stdout);
+      }
 
       var sqlite = {};
       sqlite.path = '{app}/perl/sqlite.pl';
-      sqlite.stdout = 'tests';
+      sqlite.stdout = function (stdout) {
+        displayTestResult(stdout);
+      }
 
       // Filesystem dilog boxes configuration objects:
       var select_file = {};
       select_file.type = 'single-file';
-      select_file.target = 'insertFileName';
-
-      function insertFileName(fileName) {
+      select_file.target = function (fileName) {
         clearTargetElement();
         var pre = document.createElement("pre");
         pre.innerHTML = 'Selected existing file: ' + fileName;
@@ -86,9 +101,7 @@
 
       var new_file_name = {};
       new_file_name.type = 'new-file-name';
-      new_file_name.target = 'insertNewFileName';
-
-      function insertNewFileName(fileName) {
+      new_file_name.target = function (fileName) {
         clearTargetElement();
         var pre = document.createElement("pre");
         pre.innerHTML = 'Selected new file name: ' + fileName;
@@ -97,9 +110,7 @@
 
       var select_files = {};
       select_files.type = 'multiple-files';
-      select_files.target = 'insertFileNames';
-
-      function insertFileNames(fileNames) {
+      select_files.target = function (fileNames) {
         clearTargetElement();
         var pre = document.createElement("pre");
         fileNames = fileNames.replace(/;/g, "<br>");
@@ -109,9 +120,7 @@
 
       var select_directory = {};
       select_directory.type = 'directory';
-      select_directory.target = 'insertDirectoryName';
-
-      function insertDirectoryName(directoryName) {
+      select_directory.target = function (directoryName) {
         clearTargetElement();
         var pre = document.createElement("pre");
         pre.innerHTML = 'Selected directory: ' + directoryName;
@@ -123,6 +132,13 @@
         while (container.firstChild) {
           container.removeChild(container.firstChild);
         }
+      }
+
+      function displayTestResult(stdout) {
+        clearTargetElement();
+        var pre = document.createElement("pre");
+        pre.innerHTML = stdout;
+        document.getElementById('tests').appendChild(pre);
       }
     </script>
 

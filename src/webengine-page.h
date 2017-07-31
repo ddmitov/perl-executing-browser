@@ -133,17 +133,23 @@ public slots:
             QPage::runJavaScript(
                         QString("peb.getDialogSettings(" +
                                 dialogObjectName + ")"),
-                        [&](QVariant result){
-                qReadDialogSettings(result);
+                        [dialogObjectName, this](QVariant dialogSettings)
+            {
+                QJsonDocument dialogJsonDocument =
+                        QJsonDocument::fromJson(
+                            dialogSettings.toString().toUtf8());
+                QJsonObject dialogJsonObject = dialogJsonDocument.object();
+
+                dialogJsonObject["id"] = dialogObjectName;
+
+                qReadDialogSettings(dialogJsonObject);
             });
         }
     }
 
-    void qReadDialogSettings(QVariant dialogSettings)
+    void qReadDialogSettings(QJsonObject dialogJsonObject)
     {
-        QJsonDocument dialogJsonDocument =
-                QJsonDocument::fromJson(dialogSettings.toString().toUtf8());
-        QJsonObject dialogJsonObject = dialogJsonDocument.object();
+        QString id = dialogJsonObject["id"].toString();
 
         QString type = dialogJsonObject["type"].toString();
 
@@ -187,11 +193,8 @@ public slots:
             }
             inodesFormatted.replace(QRegularExpression(";$"), "");
 
-            QString target = dialogJsonObject["target"].toString();
-
             QString outputInsertionJavaScript =
-                    "peb.insertContent('" +
-                    inodesFormatted + "' , '" + target + "'); null";
+                    id + ".target('" + inodesFormatted + "'); null";
 
             QPage::runJavaScript(outputInsertionJavaScript);
         }
@@ -206,25 +209,29 @@ public slots:
             QPage::runJavaScript(
                         QString("peb.getScriptSettings(" +
                                 scriptObjectName + ")"),
-                        [&](QVariant result){
-                qReadScriptSettings(result);
+                        [scriptObjectName, this](QVariant scriptSettings)
+            {
+                QJsonDocument scriptJsonDocument =
+                        QJsonDocument::fromJson(
+                            scriptSettings.toString().toUtf8());
+                QJsonObject scriptJsonObject = scriptJsonDocument.object();
+
+                scriptJsonObject["id"] = scriptObjectName;
+
+                qScriptStartedCheck(scriptJsonObject);
             });
         }
     }
 
-    void qReadScriptSettings(QVariant scriptSettings)
+    void qScriptStartedCheck(QJsonObject scriptJsonObject)
     {
-        QJsonDocument scriptJsonDocument =
-                QJsonDocument::fromJson(scriptSettings.toString().toUtf8());
-        QJsonObject scriptJsonObject = scriptJsonDocument.object();
-
         // Start the script if it is not yet started:
-        if (!runningScripts.contains(scriptJsonObject["stdout"].toString())) {
+        if (!runningScripts.contains(scriptJsonObject["id"].toString())) {
             qStartScript(scriptJsonObject);
         }
 
         // Feed the script with data if it is already started:
-        if (runningScripts.contains(scriptJsonObject["stdout"].toString())) {
+        if (runningScripts.contains(scriptJsonObject["id"].toString())) {
             qFeedScript(scriptJsonObject);
         }
     }
@@ -248,9 +255,7 @@ public slots:
                                                   QString,
                                                   QString)));
 
-        runningScripts
-                .insert(
-                    scriptJsonObject["stdout"].toString(), scriptHandler);
+        runningScripts.insert(scriptJsonObject["id"].toString(), scriptHandler);
     }
 
     void qFeedScript(QJsonObject scriptJsonObject)
@@ -267,7 +272,7 @@ public slots:
 
         if (requestMethod == "POST") {
             QScriptHandler *handler =
-                    runningScripts.value(scriptJsonObject["stdout"].toString());
+                    runningScripts.value(scriptJsonObject["id"].toString());
             if (handler->scriptProcess.isOpen()) {
                 QByteArray inputDataArray = inputData.toUtf8();
                 inputDataArray.append(QString("\n").toLatin1());
@@ -276,22 +281,21 @@ public slots:
         }
     }
 
-    void qDisplayScriptOutputSlot(QString output, QString target)
+    void qDisplayScriptOutputSlot(QString id, QString output)
     {
         if (QPage::url().scheme() == "file") {
             QString outputInsertionJavaScript =
-                    "peb.insertContent('" +
-                    output + "' , '" + target + "'); null";
+                    id + ".stdout('" + output + "'); null";
 
             QPage::runJavaScript(outputInsertionJavaScript);
         }
     }
 
-    void qScriptFinishedSlot(QString scriptAccumulatedErrors,
-                             QString scriptStdout,
-                             QString scriptFullFilePath)
+    void qScriptFinishedSlot(QString scriptId,
+                             QString scriptFullFilePath,
+                             QString scriptAccumulatedErrors)
     {
-        runningScripts.remove(scriptStdout);
+        runningScripts.remove(scriptId);
 
         if (QPage::url().scheme() == "file") {
             if (scriptAccumulatedErrors.length() > 0) {
@@ -340,7 +344,7 @@ public slots:
         closeRequested = true;
 
         if (!runningScripts.isEmpty()) {
-            int maximumTimeMilliseconds = 5000;
+            int maximumTimeMilliseconds = 3000;
             QTimer::singleShot(maximumTimeMilliseconds,
                                this,
                                SLOT(qScriptsTimeoutSlot()));

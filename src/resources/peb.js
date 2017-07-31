@@ -2,7 +2,7 @@
 var peb = {};
 
 peb.getPageSettings = function() {
-  if (pebSettings !== null) {
+  if (window[pebSettings] !== null) {
     return JSON.stringify(pebSettings);
   }
 }
@@ -13,17 +13,6 @@ peb.getScriptSettings = function(scriptObject) {
       scriptObject.inputData = scriptObject.inputDataHarvester();
     }
     return JSON.stringify(scriptObject);
-  }
-}
-
-peb.insertContent = function(content, target) {
-  if (typeof window[target] === 'function') {
-    window[target](content);
-  } else {
-    var element = document.getElementById(target);
-    if (element !== null) {
-      element.innerHTML = content;
-    }
   }
 }
 

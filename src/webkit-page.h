@@ -68,7 +68,7 @@ public slots:
                 QWebElement titleDomElement =
                         QPage::currentFrame()->documentElement()
                         .findFirst("title");
-                title = titleDomElement.toInnerXml().toLatin1();
+                title = titleDomElement.toInnerXml();
 
                 // Send signal to the html-viewing class that a page is loaded:
                 emit pageLoadedSignal();
@@ -138,18 +138,23 @@ public slots:
     void qHandleDialogs(QString dialogObjectName)
     {
         if (QPage::mainFrame()->url().scheme() == "file") {
-            QVariant result =
+            QVariant dialogSettings =
                     mainFrame()->evaluateJavaScript(
                         "peb.getDialogSettings(" + dialogObjectName + ")");
-            qReadDialogSettings(result);
+
+            QJsonDocument dialogJsonDocument =
+                    QJsonDocument::fromJson(dialogSettings.toString().toUtf8());
+            QJsonObject dialogJsonObject = dialogJsonDocument.object();
+
+            dialogJsonObject["id"] = dialogObjectName;
+
+            qReadDialogSettings(dialogJsonObject);
         }
     }
 
-    void qReadDialogSettings(QVariant dialogSettings)
+    void qReadDialogSettings(QJsonObject dialogJsonObject)
     {
-        QJsonDocument dialogJsonDocument =
-                QJsonDocument::fromJson(dialogSettings.toString().toUtf8());
-        QJsonObject dialogJsonObject = dialogJsonDocument.object();
+        QString id = dialogJsonObject["id"].toString();
 
         QString type = dialogJsonObject["type"].toString();
 
@@ -193,11 +198,8 @@ public slots:
             }
             inodesFormatted.replace(QRegularExpression(";$"), "");
 
-            QString target = dialogJsonObject["target"].toString();
-
             QString outputInsertionJavaScript =
-                    "peb.insertContent('" +
-                    inodesFormatted + "' , '" + target + "'); null";
+                    id + ".target('" + inodesFormatted + "'); null";
 
             mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
         }
@@ -213,23 +215,26 @@ public slots:
                     mainFrame()->evaluateJavaScript("peb.getScriptSettings(" +
                                                     scriptObjectName + ")");
 
-            qReadScriptSettings(scriptSettings);
+            QJsonDocument scriptJsonDocument =
+                    QJsonDocument::fromJson(
+                        scriptSettings.toString().toUtf8());
+            QJsonObject scriptJsonObject = scriptJsonDocument.object();
+
+            scriptJsonObject["id"] = scriptObjectName;
+
+            qScriptStartedCheck(scriptJsonObject);
         }
     }
 
-    void qReadScriptSettings(QVariant scriptSettings)
+    void qScriptStartedCheck(QJsonObject scriptJsonObject)
     {
-        QJsonDocument scriptJsonDocument =
-                QJsonDocument::fromJson(scriptSettings.toString().toUtf8());
-        QJsonObject scriptJsonObject = scriptJsonDocument.object();
-
         // Start the script if it is not yet started:
-        if (!runningScripts.contains(scriptJsonObject["stdout"].toString())) {
+        if (!runningScripts.contains(scriptJsonObject["id"].toString())) {
             qStartScript(scriptJsonObject);
         }
 
         // Feed the script with data if it is already started:
-        if (runningScripts.contains(scriptJsonObject["stdout"].toString())) {
+        if (runningScripts.contains(scriptJsonObject["id"].toString())) {
             qFeedScript(scriptJsonObject);
         }
     }
@@ -253,9 +258,7 @@ public slots:
                                                   QString,
                                                   QString)));
 
-        runningScripts
-                .insert(
-                    scriptJsonObject["stdout"].toString(), scriptHandler);
+        runningScripts.insert(scriptJsonObject["id"].toString(), scriptHandler);
     }
 
     void qFeedScript(QJsonObject scriptJsonObject)
@@ -272,7 +275,7 @@ public slots:
 
         if (requestMethod == "POST") {
             QScriptHandler *handler =
-                    runningScripts.value(scriptJsonObject["stdout"].toString());
+                    runningScripts.value(scriptJsonObject["id"].toString());
             if (handler->scriptProcess.isOpen()) {
                 QByteArray inputDataArray = inputData.toUtf8();
                 inputDataArray.append(QString("\n").toLatin1());
@@ -281,22 +284,21 @@ public slots:
         }
     }
 
-    void qDisplayScriptOutputSlot(QString output, QString target)
+    void qDisplayScriptOutputSlot(QString id, QString output)
     {
         if (QPage::mainFrame()->url().scheme() == "file") {
             QString outputInsertionJavaScript =
-                    "peb.insertContent(\"" +
-                    output + "\" , \"" + target + "\"); null";
+                    id + ".stdout('" + output + "'); null";
 
             mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
         }
     }
 
-    void qScriptFinishedSlot(QString scriptAccumulatedErrors,
-                             QString scriptStdout,
-                             QString scriptFullFilePath)
+    void qScriptFinishedSlot(QString scriptId,
+                             QString scriptFullFilePath,
+                             QString scriptAccumulatedErrors)
     {
-        runningScripts.remove(scriptStdout);
+        runningScripts.remove(scriptId);
 
         if (QPage::mainFrame()->url().scheme() == "file") {
             if (scriptAccumulatedErrors.length() > 0) {
@@ -356,7 +358,7 @@ public slots:
         closeRequested = true;
 
         if (!runningScripts.isEmpty()) {
-            int maximumTimeMilliseconds = 5000;
+            int maximumTimeMilliseconds = 3000;
             QTimer::singleShot(maximumTimeMilliseconds,
                                this,
                                SLOT(qScriptsTimeoutSlot()));

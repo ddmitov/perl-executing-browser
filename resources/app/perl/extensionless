@@ -3,4 +3,4 @@
 use strict;
 use warnings;
 
-print "<pre>Hello from a Perl script without a filename extension!</pre>";
+print "Hello from a Perl script without a filename extension!";

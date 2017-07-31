@@ -16,7 +16,6 @@ if ($ENV{'REQUEST_METHOD'}) {
   }
 }
 
-print "<pre>";
 print "REQUEST_METHOD: $ENV{'REQUEST_METHOD'}<br>";
 
 # Split information into name/value pairs:
@@ -27,5 +26,3 @@ foreach $pair (@pairs) {
   $value =~ s/%(..)/pack("C", hex($1))/eg;
   print "$name = $value<br>";
 }
-
-print "</pre>";

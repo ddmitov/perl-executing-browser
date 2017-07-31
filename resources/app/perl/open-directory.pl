@@ -18,11 +18,10 @@ if ($^O eq "MSWin32") {
 
 traverse ($directory_name);
 
-print "<pre>Listing all files in the $directory_name directory:<br>";
+print "Listing all files in the $directory_name directory:<br>";
 foreach my $file (@files) {
   print "$file<br>";
 }
-print "</pre>";
 
 sub traverse {
   my ($entry) = @_;
