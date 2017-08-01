@@ -303,12 +303,12 @@ The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe``
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
 
 ## Data Directory
-Data directory is not hard coded in C++ code, but a separation of data files from code is generally a good practice. Data directory should contain any SQLite or flat file database or other data files, that a PEB-based application is going to use or produce. The recommended path for data directory is inside the ``{PEB_binary_directory}/resources`` directory. ``data`` is a good directory name, although not mandatory. Perl scripts can access this folder using the following code:
+Data directory is not hard coded in C++ code, but a separation of data files and code is generally a good practice. Data directory should contain any files, that a PEB-based application is going to use or produce. The recommended data directory is ``{PEB_binary_directory}/resources/data``. Perl scripts can access this folder using the following code:
 
 ```perl
 use Cwd;
 
-my $current_working_directory = cwd();
+my $current_working_directory = cwd(); // the directory of the browser binary by default
 my $data_directory = "$current_working_directory/resources/data";
 ```
 
@@ -347,8 +347,7 @@ pebSettings.closeConfirmation =
 ## Specific Keyboard Shortcuts
 All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
 * <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get printer selection dialog.  
-  If no printer is configured, no dialog is displayed.
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get printer selection dialog. If no printer is configured, no dialog is displayed.
 * <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview
 
 ## What PEB Is Not
