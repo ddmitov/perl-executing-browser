@@ -48,10 +48,10 @@ These are the basic steps for building your first PEB-based application:
 
 * **4.** Connect your Perl scripts using a link to ``name-of-script-configuration-object.settings``.  
 
-Note that PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
+PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
 
 ## Design Objectives
-* **1. Fast and easy and beautiful graphical user interface for Perl 5 desktop applications**  
+* **1. Fast, easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Zero installation**  
 * **3. Cross-platform availability**  
 * **4. Secure serverless solution**  
