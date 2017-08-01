@@ -48,7 +48,7 @@ These are the basic steps for building your first PEB-based application:
 
 * **4.** Connect your Perl scripts using a link to ``name-of-script-configuration-object.settings``.  
 
-PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
+PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located in the ``{PEB_binary_directory}/resources/app`` directory.  
 
 ## Design Objectives
 * **1. Fast, easy and beautiful graphical user interface for Perl 5 desktop applications**  
@@ -137,11 +137,7 @@ Sometimes it is important to minimize the size of the relocatable (or portable) 
 ## Perl Scripts API
 Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
 
-A minimal example of a Perl script settings object and a starting link:  
-
-```html
-<a href="perl_test.settings">Start Perl script</a>
-```
+A minimal example of a Perl script settings object:  
 
 ```javascript
 var perl_test = {};
@@ -150,6 +146,23 @@ perl_test.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
   container.innerHTML = stdout;
 }
+```
+
+Three methods to start a local Perl script:  
+
+```html
+<a href="perl_test.settings">Start Perl script</a>
+```
+
+```html
+<form action="perl_test.settings">
+  <input type="text" name="input" id="test-script-input">
+  <input type="submit" value="Start Perl script">
+</form>
+```
+
+```javascript
+peb.startScript('perl_test.settings');
 ```
 
 * ``scriptFullPath``  

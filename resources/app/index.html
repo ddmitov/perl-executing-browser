@@ -8,8 +8,7 @@
 
     <script>
       // PEB page settings:
-      // 'pebSettings' object name is hard-coded.
-      var pebSettings = {};
+      var pebSettings = {}; // 'pebSettings' object name is hard-coded.
       pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
       pebSettings.cutLabel = '- Cut -';
       pebSettings.copyLabel = '- Copy -';
@@ -54,6 +53,20 @@
       interactive_two.scriptExitCommand = '_close_';
       interactive_two.scriptExitConfirmation = '_closed_';
 
+      var open_files = {};
+      open_files.scriptFullPath = '{app}/perl/open-files.pl';
+      open_files.requestMethod = 'POST';
+      open_files.stdoutFunction = function (stdout) {
+        displayTestResult(stdout);
+      }
+
+      var open_directory = {};
+      open_directory.scriptFullPath = '{app}/perl/open-directory.pl';
+      open_directory.requestMethod = 'POST';
+      open_directory.stdoutFunction = function (stdout) {
+        displayTestResult(stdout);
+      }
+
       var get_test = {};
       get_test.scriptFullPath = '{app}/perl/get-post-test.pl';
       get_test.stdoutFunction = function (stdout) {
@@ -82,14 +95,12 @@
         displayTestResult(stdout);
       }
 
-      // Filesystem dilog boxes configuration objects:
+      // Settings objects for the filesystem dialogs:
       var select_file = {};
       select_file.type = 'single-file';
       select_file.receiverFunction = function (fileName) {
-        clearTargetElement();
-        var pre = document.createElement("pre");
-        pre.innerHTML = 'Selected existing file: ' + fileName;
-        document.getElementById('tests').appendChild(pre);
+        open_files.inputData = fileName;
+        peb.startScript('open_files.settings');
       }
 
       var new_file_name = {};
@@ -97,27 +108,22 @@
       new_file_name.receiverFunction = function (fileName) {
         clearTargetElement();
         var pre = document.createElement("pre");
-        pre.innerHTML = 'Selected new file name: ' + fileName;
+        pre.innerHTML = 'New file name: ' + fileName;
         document.getElementById('tests').appendChild(pre);
       }
 
       var select_files = {};
       select_files.type = 'multiple-files';
       select_files.receiverFunction = function (fileNames) {
-        clearTargetElement();
-        var pre = document.createElement("pre");
-        fileNames = fileNames.replace(/;/g, "<br>");
-        pre.innerHTML = 'Selected files:<br>' + fileNames;
-        document.getElementById('tests').appendChild(pre);
+        open_files.inputData = fileNames;
+        peb.startScript('open_files.settings');
       }
 
       var select_directory = {};
       select_directory.type = 'directory';
       select_directory.receiverFunction = function (directoryName) {
-        clearTargetElement();
-        var pre = document.createElement("pre");
-        pre.innerHTML = 'Selected directory: ' + directoryName;
-        document.getElementById('tests').appendChild(pre);
+        open_directory.inputData = directoryName;
+        peb.startScript('open_directory.settings');
       }
 
       function clearTargetElement() {
@@ -180,37 +186,28 @@
     <div class="navbar navbar-inverse">
       <ul class="nav navbar-nav">
         <li>
-          <a id="filesystem-menu" role="button" data-toggle="dropdown" data-target="#">
-            Dialogs
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="select_file.dialog">Select Existing File</a>
-            </li>
-
-            <li>
-              <a href="new_file_name.dialog">New File Name</a>
-            </li>
-
-            <li>
-              <a href="select_files.dialog">Select Multiple Files</a>
-            </li>
-
-            <li>
-              <a href="select_directory.dialog">Select Directory</a>
-            </li>
-          </ul>
-        </li>
-
-        <li>
           <a id="local-tests" role="button" data-toggle="dropdown" data-target="#">
             Local Tests
             <span class="caret"></span>
           </a>
 
           <ul class="dropdown-menu" role="menu">
+            <li>
+              <a href="select_file.dialog">Open Existing File</a>
+            </li>
+
+            <li>
+              <a href="new_file_name.dialog">Enter New File Name</a>
+            </li>
+
+            <li>
+              <a href="select_files.dialog">Open Multiple Files</a>
+            </li>
+
+            <li>
+              <a href="select_directory.dialog">Open Directory</a>
+            </li>
+
             <li>
               <a href="get_test.settings">GET Test</a>
             </li>
@@ -220,7 +217,7 @@
             </li>
 
             <li>
-              <a href="perl_info.settings">Perl Basic information</a>
+              <a href="perl_info.settings">Perl Basic Information</a>
             </li>
 
             <li>

@@ -9,8 +9,6 @@ my @files = split(/;/, $input);
 
 my $number_of_lines;
 
-print "Opening multiple files:<br>";
-
 foreach my $file (@files) {
   open my $filehandle, '<', $file or die "Unable to open file: $!";
   my @file_contents = <$filehandle>;

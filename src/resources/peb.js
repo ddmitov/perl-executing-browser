@@ -7,6 +7,12 @@ peb.getPageSettings = function() {
   }
 }
 
+peb.getDialogSettings = function(dialogObject) {
+  if (window[dialogObject] !== null) {
+    return JSON.stringify(dialogObject);
+  }
+}
+
 peb.getScriptSettings = function(scriptObject) {
   if (window[scriptObject] !== null) {
     if (typeof scriptObject.inputDataHarvester === 'function') {
@@ -16,10 +22,10 @@ peb.getScriptSettings = function(scriptObject) {
   }
 }
 
-peb.getDialogSettings = function(dialogObject) {
-  if (window[dialogObject] !== null) {
-    return JSON.stringify(dialogObject);
-  }
+peb.startScript = function(scriptObjectName) {
+  var form = document.createElement('form');
+  form.setAttribute('action', scriptObjectName);
+  form.submit();
 }
 
 peb.checkUserInputBeforeClose = function() {

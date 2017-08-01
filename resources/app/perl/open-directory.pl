@@ -18,7 +18,7 @@ if ($^O eq "MSWin32") {
 
 traverse ($directory_name);
 
-print "Listing all files in the $directory_name directory:<br>";
+print "Listing all files in $directory_name:<br>";
 foreach my $file (@files) {
   print "$file<br>";
 }
