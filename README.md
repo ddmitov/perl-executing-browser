@@ -168,8 +168,8 @@ peb.startScript('perl_test.settings');
 * ``scriptFullPath``  
   This is the path of the Perl script that is going to be executed.  
   The keyword ``{app}`` will be replaced by the the full path of the application directory.  
-  PEB does not check the file name extension or the shebang line of the supplied Perl script.  
-  Scripts without a file name extension can also be used.  
+  PEB does not check the filename extension or the shebang line of the supplied Perl script.  
+  Scripts without a filename extension can also be used.  
   *This object property is mandatory.*  
 
 * ``stdoutFunction``  
@@ -276,12 +276,12 @@ select_file.receiverFunction = function (file) {
 
 * The actual opening of any existing file is performed by a Perl script and not by PEB.  
 * The actual creation of any new file is performed by a Perl script and not by PEB.  
-* When multiple files are selected, different file names are separated by a semicolon - ``;``
+* When multiple files are selected, different filenames are separated by a semicolon - ``;``
 * When using the ``directory`` type of dialog, an existing or a new directory may be selected.  
   Any new directory will be created immediately by PEB.
 
 ## Application Filename
-The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed without restrictions. It can take the name of the PEB-based application it is going to run. No additional adjustments are necessary after renaming the binary. If log files are wanted, they will take the name of the binary file (without the filename extension), whatever the name may be.
+The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run. If log files are wanted, they will take the name of the binary file without the filename extension, whatever the name may be.
 
 ## Hard Coded Files and Folders
 * **Perl interpreter:**  
@@ -347,9 +347,8 @@ pebSettings.closeConfirmation =
 ## Specific Keyboard Shortcuts
 All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
 * <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - print  
-  Printing is started after a native printer selection dialog is displayed.  
-  If no printer is configured, no dialog is displayed and no action is taken.
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get printer selection dialog.  
+  If no printer is configured, no dialog is displayed.
 * <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview
 
 ## What PEB Is Not
@@ -359,9 +358,11 @@ All specific keyboard shortcuts are available only in the QtWebKit builds of PEB
 * PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.
 
 ## Limitations
-* No Perl scripting inside frames.
+* Only single-page applications are supported with no pop-up windows.
+* Local Perl scripting inside frames is not supported.
 * No files can be downloaded.
 * QtWebEngine builds do not support printing.
+* ``window.print()`` is not supported.
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
