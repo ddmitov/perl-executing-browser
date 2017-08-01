@@ -48,25 +48,17 @@ These are the basic steps for building your first PEB-based application:
 
 * **4.** Connect your Perl scripts using a link to ``name-of-script-configuration-object.settings``.  
 
-Note that PEB is created to work from any folder without installation and all files and directories used by PEB are relational to the directory where the PEB binary is located. All your local HTML files and Perl scripts must be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
+Note that PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located inside the ``{PEB_binary_directory}/resources/app`` directory.  
 
 ## Design Objectives
-* **1. Fast and easy graphical user interface for Perl 5 desktop applications:**  
-    use Perl 5, JavaScript, HTML and CSS to create beautiful desktop applications
-
-* **2. Zero installation:**  
-    run from any folder
-
-* **3. Cross-platform availability:**  
-    usable on every platform where Perl 5 and Qt 5 are available
-
-* **4. Secure serverless solution:**  
-    no server of any kind is installed or started
-
+* **1. Fast and easy and beautiful graphical user interface for Perl 5 desktop applications**  
+* **2. Zero installation**  
+* **3. Cross-platform availability**  
+* **4. Secure serverless solution**  
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
-* [Perl script output is seamlessly inserted into the calling local page.](#perl-scripts-api)
+* [Perl script output is seamlessly inserted in any local page.](#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * PEB can be started from any folder.
@@ -78,6 +70,7 @@ Note that PEB is created to work from any folder without installation and all fi
 
 ## Security
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
+* PEB does not install or start any kind of server.
 * PEB executes with no sandbox only local Perl 5 scripts and
   users have full access to their local files.
 * Cross-origin requests and cross-site scripting are disabled.
@@ -142,26 +135,32 @@ Sometimes it is important to minimize the size of the relocatable (or portable) 
 ``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are located in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Perl Scripts API
-Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension. Perl data output is seamlessly inserted into the HTML DOM of the local page using JavaScript.  
+Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
 
-A minimal example of a Perl script settings object:  
+A minimal example of a Perl script settings object and a starting link:  
+
+```html
+<a href="perl_test.settings">Start Perl script</a>
+```
 
 ```javascript
-var perlScriptObject = {};
-perlScriptObject.path = '{app}/perl/test.pl';
-perlScriptObject.stdout = function (stdout) {
+var perl_test = {};
+perl_test.scriptFullPath = '{app}/perl/test.pl';
+perl_test.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
   container.innerHTML = stdout;
 }
 ```
 
-* ``path``  
+* ``scriptFullPath``  
   This is the path of the Perl script that is going to be executed.  
   The keyword ``{app}`` will be replaced by the the full path of the application directory.  
+  PEB does not check the file name extension or the shebang line of the supplied Perl script.  
+  Scripts without a file name extension can also be used.  
   *This object property is mandatory.*  
 
-* ``stdout``  
-  The ``stdout`` object property must be a JavaScript function. Every piece of script output is passed to this function as its only argument.  
+* ``stdoutFunction``  
+  The ``stdoutFunction`` object property must be a JavaScript function. Every piece of script output is passed to this function as its only argument.  
   *This object property is mandatory.*  
 
 * ``requestMethod``  
@@ -191,16 +190,16 @@ perlScriptObject.stdout = function (stdout) {
   }
   ```
 
-* ``close_command``  
-  The ``close_command`` object property designates the command used to gracefully shut down an interactive script when the containing PEB window is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
+* ``scriptExitCommand``  
+  The ``scriptExitCommand`` object property designates the command used to gracefully shut down an interactive script when PEB is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
-* ``close_confirmation``  
-  Just before exiting an interactive script must print on STDOUT its ``close_confirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 3 seconds after ``close_command`` is given or any unresponsive scripts will be killed and PEB will exit.
+* ``scriptExitConfirmation``  
+  Just before exiting an interactive script must print on STDOUT its ``scriptExitConfirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances provided that it has an unique JavaScript settings object with and unique ``stdout`` object property. Interactive scripts should also have the ``close_command`` and ``close_confirmation`` object properties.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances provided that it has an unique JavaScript settings object with and unique ``stdoutFunction`` object property. Interactive scripts should also have the ``scriptExitCommand`` and ``scriptExitConfirmation`` object properties.  
 
 The following code shows how to start an interactive Perl script right after a local page is loaded:
 
@@ -217,14 +216,17 @@ The following code shows how to start an interactive Perl script right after a l
       pebSettings.autoStartScripts = ['interactive_script'];
 
       var interactive_script = {};
-      interactive_script.path = '{app}/perl/interactive.pl';
-      interactive_script.stdout = 'interactive-script-output';
+      interactive_script.scriptFullPath = '{app}/perl/interactive.pl';
       interactive_script.requestMethod = 'POST';
       interactive_script.inputDataHarvester = function() {
         return document.getElementById('interactive-script-input').value;
       }
-      interactive_script.closeCommand = '_close_';
-      interactive_script.closeConfirmation = '_closed_';
+      interactive_script.stdoutFunction = function (stdout) {
+        var container = document.getElementById('interactive-script-output');
+        container.innerHTML = stdout;
+      }
+      interactive_script.scriptExitCommand = '_close_';
+      interactive_script.scriptExitConfirmation = '_closed_';
     </script>
   </head>
 
@@ -242,7 +244,7 @@ The following code shows how to start an interactive Perl script right after a l
 The ``index.htm`` file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
 
 ## Selecting Files and Folders
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page using the ``target`` object property. ``target`` must be a JavaScript function which receives all selected files or folders as its only argument.  
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page by the ``receiverFunction`` taking all selected files or folders as its only argument.  
 
 ```html
 <a href="select_file.dialog">Select existing file</a>
@@ -253,9 +255,9 @@ var select_file = {};
 // Type of the dialog, one of the following:
 // 'single-file', 'multiple-files', 'new-file-name' or 'directory'.
 select_file.type = 'single-file';
-select_file.target = function (stdout) {
-  var container = document.getElementById('tests');
-  container.innerHTML = stdout;
+select_file.receiverFunction = function (file) {
+  var container = document.getElementById('single-file-test');
+  container.innerHTML = file;
 }
 ```
 
@@ -298,7 +300,7 @@ my $data_directory = "$current_working_directory/resources/data";
 ```
 
 ## Log Files
-If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing and no logs will be written. Please note that log files can grow rapidly and if disc space is an issue, writing log files can be turned off by simply removing or renaming ``{PEB_binary_directory}/logs``.
+If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing no logs will be written.
 
 ## Page Settings
 
@@ -322,7 +324,7 @@ pebSettings.closeConfirmation =
   These are Perl scripts that are started immediately after a local page is loaded.  
 
 * ``closeConfirmation``  
-  This is the text displayed when user has pressed the close button, but unsaved data in local HTML forms is detected. If no warning text is found, PEB assumes that no warning has to be displayed and exits immediately.
+  This text is displayed when the close button is pressed, but unsaved data in local HTML forms is detected. If no warning text is found, PEB exits immediately.
 
 ## Functional Pseudo Filenames
 * **About PEB dialog:** ``about-browser.function``

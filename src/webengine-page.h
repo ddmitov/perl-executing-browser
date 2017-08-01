@@ -79,7 +79,6 @@ public slots:
 
         foreach (const QJsonValue &value, autoStartScripts) {
             QString autoStartScript = value.toString();
-            qDebug() << "Auto-start script:" << autoStartScript;
             qHandleScripts(autoStartScript);
         }
 
@@ -194,7 +193,7 @@ public slots:
             inodesFormatted.replace(QRegularExpression(";$"), "");
 
             QString outputInsertionJavaScript =
-                    id + ".target('" + inodesFormatted + "'); null";
+                    id + ".receiverFunction('" + inodesFormatted + "'); null";
 
             QPage::runJavaScript(outputInsertionJavaScript);
         }
@@ -285,7 +284,7 @@ public slots:
     {
         if (QPage::url().scheme() == "file") {
             QString outputInsertionJavaScript =
-                    id + ".stdout('" + output + "'); null";
+                    id + ".stdoutFunction('" + output + "'); null";
 
             QPage::runJavaScript(outputInsertionJavaScript);
         }
@@ -358,7 +357,7 @@ public slots:
                 QByteArray scriptCloseCommandArray;
                 scriptCloseCommandArray
                         .append(
-                            QString(handler->scriptCloseCommand).toLatin1());
+                            QString(handler->scriptExitCommand).toLatin1());
                 scriptCloseCommandArray.append(QString("\n").toLatin1());
 
                 if (handler->scriptProcess.isOpen()) {

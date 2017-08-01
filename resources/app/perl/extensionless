@@ -1,6 +1,0 @@
-#!/usr/bin/perl
-
-use strict;
-use warnings;
-
-print "Hello from a Perl script without a filename extension!";

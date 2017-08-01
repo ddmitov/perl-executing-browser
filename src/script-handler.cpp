@@ -26,15 +26,15 @@
 QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
-    if (scriptJsonObject.length() == 0) {
-        qDebug() << "Script settings are empty!";
+    if (scriptJsonObject.length() == 1) {
+        qDebug() << "No script settings!";
         return;
     }
 
     scriptId = scriptJsonObject["id"].toString();
 
-    if (scriptJsonObject["path"].toString().length() > 0) {
-        scriptFullFilePath = scriptJsonObject["path"].toString();
+    if (scriptJsonObject["scriptFullPath"].toString().length() > 0) {
+        scriptFullFilePath = scriptJsonObject["scriptFullPath"].toString();
         scriptFullFilePath.replace("{app}",
                                    qApp->property("application").toString());
         scriptFullFilePath = QDir::toNativeSeparators(scriptFullFilePath);
@@ -56,13 +56,13 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         inputData = scriptJsonObject["inputData"].toString();
     }
 
-    if (scriptJsonObject["closeCommand"].toString().length() > 0) {
-        scriptCloseCommand = scriptJsonObject["closeCommand"].toString();
+    if (scriptJsonObject["scriptExitCommand"].toString().length() > 0) {
+        scriptExitCommand = scriptJsonObject["scriptExitCommand"].toString();
     }
 
-    if (scriptJsonObject["closeConfirmation"].toString().length() > 0) {
-        scriptCloseConfirmation =
-                scriptJsonObject["closeConfirmation"].toString();
+    if (scriptJsonObject["scriptExitConfirmation"].toString().length() > 0) {
+        scriptExitConfirmation =
+                scriptJsonObject["scriptExitConfirmation"].toString();
     }
 
     // Signals and slots for local long running Perl scripts:
