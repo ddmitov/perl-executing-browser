@@ -308,7 +308,7 @@ Data directory is not hard coded in C++ code, but a separation of data files and
 ```perl
 use Cwd;
 
-my $current_working_directory = cwd(); // the directory of the browser binary by default
+my $current_working_directory = cwd(); # the directory of the browser binary by default
 my $data_directory = "$current_working_directory/resources/data";
 ```
 
