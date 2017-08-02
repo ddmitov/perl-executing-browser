@@ -87,7 +87,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application version:
     // ==============================
-    application.setApplicationVersion("0.5.0");
+    application.setApplicationVersion("0.6.0");
 
     // ==============================
     // Basic program information:

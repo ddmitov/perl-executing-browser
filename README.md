@@ -50,11 +50,11 @@ These are the basic steps for building your first PEB-based application:
 
 * **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](#perl-scripts-api).  
 
-PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located in the ``{PEB_binary_directory}/resources/app`` directory.  
+PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located in the ``{PEB_binary_directory}/resources/app`` folder.  
 
 ## Design Objectives
-* **1. Fast, easy and beautiful graphical user interface for Perl 5 desktop applications**  
-* **2. Zero installation**  
+* **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
+* **2. Fast, zero-installation software**  
 * **3. Cross-platform availability**  
 * **4. Secure serverless solution**  
 * **5. Maximal reuse of existing web technologies and standards**
@@ -140,7 +140,7 @@ Perl Distribution Compactor should be started from the directory of the browser 
 Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Perl Scripts API
-Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
+Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed of the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
 
 A minimal example of a Perl script settings object:  
 
