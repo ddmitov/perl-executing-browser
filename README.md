@@ -47,7 +47,7 @@ These are the basic steps for building your first PEB-based application:
 * **3.** Write your Perl scripts.  
   Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script. Use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
 
-* **4.** Connect your Perl scripts using a link to ``name-of-script-configuration-object.settings``.  
+* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](#perl-scripts-api).  
 
 PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located in the ``{PEB_binary_directory}/resources/app`` directory.  
 
@@ -116,7 +116,7 @@ CONFIG += app_bundle
 
 ## Runtime Requirements
 * Qt 5 libraries.  
-  Their full list for a QtWebKit Linux build of PEB can be found inside the ``start-peb-webkit.sh`` script.
+  Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
 
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
 
@@ -131,11 +131,11 @@ CONFIG += app_bundle
   PEB can also use any Perl on PATH.
 
 ## Preparing a Perl Distribution for PEB
-Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. [{PEB_binary_directory}/sdk/compactor.pl](sdk/compactor.pl) script is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``{PEB_binary_directory}/perl/bin-original`` and ``{PEB_binary_directory}/perl/lib-original`` respectively. These directories should be manually archived for future use or removed.  
+Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. [Perl Distribution Compactor](sdk/compactor.pl) is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``bin-original`` and ``lib-original`` respectively. These directories should be manually archived for future use or removed.  
 
-``compactor.pl`` should be started using [{PEB_binary_directory}/compactor.sh](compactor.sh) on a Linux or a Mac machine or [{PEB_binary_directory}/compactor.cmd](compactor.cmd) on a Windows machine to ensure that only the Perl distribution used by PEB is going to start ``compactor.pl``. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
+Perl Distribution Compactor should be started from the directory of the browser binary using [compactor.sh](compactor.sh) on a Linux or a Mac machine or [compactor.cmd](compactor.cmd) on a Windows machine to ensure that only the Perl distribution of PEB is used. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
 
-``compactor.pl`` relies on ``Module::ScanDeps`` and ``File::Copy::Recursive`` CPAN modules, which are included in the ``{PEB_binary_directory}/sdk/lib`` folder.  
+Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_binary_directory}/sdk/lib`` folder.  
 
 ## Perl Scripts API
 Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed from the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
@@ -311,9 +311,11 @@ Data directory is not hard coded in C++ code, but a separation of data files and
 ```perl
 use Cwd;
 
-my $current_working_directory = cwd(); # the directory of the browser binary by default
+my $current_working_directory = cwd();
 my $data_directory = "$current_working_directory/resources/data";
 ```
+
+Note that by default the working directory of all Perl scripts run by PEB is the directory of the browser binary.
 
 ## Log Files
 If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing no logs will be written.
