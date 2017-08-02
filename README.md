@@ -9,7 +9,7 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries.  
 
-Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on Node.js, runs JavaScript in a sandbox and blocks cross-origin requests.
+Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on [Node.js](https://nodejs.org/en/), always runs JavaScript in a sandbox and blocks cross-origin requests.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -45,7 +45,8 @@ These are the basic steps for building your first PEB-based application:
 * **2.** Write [a settings JavaScript object](#perl-scripts-api) for every Perl script you are going to run.
 
 * **3.** Write your Perl scripts.  
-  Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script. Use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
+  Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script.  
+  You may use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
 
 * **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](#perl-scripts-api).  
 
@@ -117,6 +118,7 @@ CONFIG += app_bundle
 ## Runtime Requirements
 * Qt 5 libraries.  
   Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
+  Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
 
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
 

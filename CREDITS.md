@@ -26,12 +26,17 @@ for being welcoming host of the first public presentation of Perl Executing Brow
 on the 2nd of March 2014 and for their helpful proposals.  
 http://hackafe.org/  
 
+Thanks to Roderich Schupp and all contributors of the [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) CPAN module.
+
+Thanks to Daniel Muey and all contributors of the [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN module.
+
 ## Qt
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
 https://github.com/rsdn/avalon/blob/master/web_view.cpp  
 https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
+https://github.com/NixOS/nixpkgs/issues/16327  
 
 http://qt-project.org/doc/qt-4.8/qwebhistory.html  
 http://qt-project.org/doc/qt-4.8/qdir.html  
@@ -120,7 +125,6 @@ http://developer.nokia.com/community/wiki/How_to_write_data_to_a_file_in_Qt (def
 http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html (defunct)  
 http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html (defunct)  
 http://harmattan-dev.nokia.com/docs/library/html/qt4/qtglobal.html (defunct)  
-http://harmattan-dev.nokia.com/docs/library/html/qtwebkit/qwebpage.html (defunct)  
 
 http://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage  
 http://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
@@ -211,9 +215,6 @@ http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
 http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj  
 http://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascript  
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
-http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
-http://stackoverflow.com/questions/588040/window-onload-vs-document-onload  
-http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string  
 https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via-javascript  
 https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-with-reset-method  
 https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
@@ -225,10 +226,7 @@ http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.p
 http://www.tutorialspoint.com/bootstrap/bootstrap_dropdown_plugin.htm  
 http://twitter-bootstrap.node1.zygote.cc/javascript.html  
 
-http://css3buttongenerator.com/  
-http://callmenick.com/post/various-css-input-text-styles  
 http://www.raymondcamden.com/2015/03/06/warning-a-user-before-they-leave-a-form/  
-https://css-tricks.com/snippets/javascript/check-if-function-exists-before-calling/  
 http://youmightnotneedjquery.com/  
 
 ## Markdown
@@ -241,10 +239,6 @@ http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown
 ## Bash
 http://tldp.org/LDP/abs/html/fto.html  
 https://www.shellhacks.com/bash-test-if-file-exists/  
-https://www.shellcheck.net/  
-
-## Linux
-http://askubuntu.com/questions/501812/how-do-i-provide-arguments-to-a-command-run-from-gksudo  
 
 ## Mac
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html  

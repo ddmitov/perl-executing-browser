@@ -17,7 +17,10 @@ make
 ```
 
 ## Runtime Requirements
-* Qt 5 libraries - their full Linux list can be found inside the ``start-peb.sh`` script,
+* Qt 5 libraries.  
+  Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
+  Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
+
 * Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
 
   Tested successfully using the following Perl distributions:  
