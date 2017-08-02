@@ -117,6 +117,7 @@ CONFIG += app_bundle
 
 ## Runtime Requirements
 * Qt 5 libraries.  
+
   Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
   Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
 
@@ -305,7 +306,7 @@ The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe``
 
   <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it will be used as the icon of all windows and dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary will be used.
+  A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it is used as the icon of the application and all dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary is used.
 
 ## Data Directory
 Data directory is not hard coded in C++ code, but a separation of data files and code is generally a good practice. Data directory should contain any files, that a PEB-based application is going to use or produce. The recommended data directory is ``{PEB_binary_directory}/resources/data``. Perl scripts can access this folder using the following code:
