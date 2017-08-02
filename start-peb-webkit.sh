@@ -1,7 +1,7 @@
 #! /bin/sh
 
-# Sometimes the Qt libraries, that PEB depends on, are not available on PATH.
-# This script can start PEB with no Qt libraries on PATH,
+# Sometimes the Qt libraries that PEB depends on are not available on PATH.
+# This script can start a QtWebKit build of PEB with no Qt libraries on PATH,
 # if the following libraries are placed in a folder named 'qt'
 # inside the folder of PEB binary and this script:
 

@@ -30,6 +30,8 @@ http://hackafe.org/
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
 https://github.com/rsdn/avalon/blob/master/web_view.cpp  
 https://github.com/ariya/phantomjs/blob/master/src/qt/src/3rdparty/webkit/Source/WebKit/qt/Api/qwebpage.cpp  
+https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
+https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 
 http://qt-project.org/doc/qt-4.8/qwebhistory.html  
 http://qt-project.org/doc/qt-4.8/qdir.html  
@@ -63,7 +65,9 @@ http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)
 http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())  
 
 http://doc.qt.digia.com/qtcreator-extending/coding-style.html  
+
 https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html  
+http://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
 
 http://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
 http://doc.qt.io/qt-4.8/qwebframe.html  
@@ -77,6 +81,12 @@ http://doc.qt.io/qt-5/qhash.html
 http://doc.qt.io/qt-5/qhash-iterator.html  
 http://doc.qt.io/qt-5/qdesktopwidget.html  
 http://doc.qt.io/archives/qt-5.5/qwebview.html  
+http://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html  
+http://doc.qt.io/qt-5/qwebenginepage.html#runJavaScript  
+http://doc.qt.io/qt-5/qwebenginepage.html#fullScreenRequested  
+http://doc.qt.io/qt-5/qwebenginepage.html#windowCloseRequested  
+http://doc.qt.io/qt-5/qtwebengine-webenginewidgets-simplebrowser-example.html#adding-context-menu-items  
+http://doc.qt.io/qt-5/qwebenginefullscreenrequest.html  
 
 https://wiki.qt.io/Qt_Coding_Style  
 https://wiki.qt.io/Open_Web_Page_in_QWebView  
@@ -138,11 +148,9 @@ http://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-
 http://stackoverflow.com/questions/25254043/is-it-possible-to-compare-ifdef-values-for-conditional-use  
 http://stackoverflow.com/questions/10701504/command-working-in-terminal-but-not-via-qprocess  
 http://stackoverflow.com/questions/17680207/qhash-iterator-example-no-match-for-operator  
-
-http://www.codeprogress.com/cpp/libraries/qt/showQtExample.php?index=598&key=QWebViewCustomContextMenu  
-
-http://comments.gmane.org/gmane.comp.lib.qt.user/960 (QString to QByteArray conversion)  
-http://comments.gmane.org/gmane.comp.lib.qt.general/35521 (webkit - how to prevent alert popups)  
+https://stackoverflow.com/questions/23174393/parse-jsonarray  
+https://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-different-header  
+https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
 
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
 http://webkit.sed.hu/content/disabling-cache  
@@ -155,6 +163,8 @@ http://habrahabr.ru/post/150329/ (Qt Coding Style)
 http://www.freehackers.org/thomas/2009/03/10/fixing-qmake-missing-rule-for-ts-qm/  
 http://lemirep.wordpress.com/2013/06/01/deploying-qt-applications-on-linux-and-windows-3/  
 https://unix.stackexchange.com/questions/116254/how-do-i-change-which-version-of-qt-is-used-for-qmake  
+https://www.developpez.net/forums/d1549582/c-cpp/bibliotheques/qt/moteurs-web/runjavascript-fonction-lambda-plante/  
+https://medium.com/genymobile/how-c-lambda-expressions-can-improve-your-qt-code-8cd524f4ed9f  
 
 ## Perl 5
 https://perlbrew.pl/  
@@ -192,10 +202,10 @@ http://www.tizag.com/perlT/perlhashes.php
 http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
 http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  
 http://www.w3schools.com/cssref/css_websafe_fonts.asp  
-http://www.w3schools.com/html/html_lists.asp  
-http://www.w3schools.com/jquery/html_html.asp  
+http://www.w3schools.com/html/html_lists.asp    
 http://www.w3schools.com/js/js_loop_for.asp  
 http://www.w3schools.com/jsref/prop_html_innerhtml.asp  
+https://www.w3schools.com/jsref/met_form_submit.asp  
 
 http://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
 http://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj  
@@ -204,6 +214,9 @@ http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 http://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
 http://stackoverflow.com/questions/588040/window-onload-vs-document-onload  
 http://stackoverflow.com/questions/359788/how-to-execute-a-javascript-function-when-i-have-its-name-as-a-string  
+https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via-javascript  
+https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-with-reset-method  
+https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
 
 http://getbootstrap.com/components/#dropdowns  
 
