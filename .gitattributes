@@ -1,3 +1,3 @@
-resources/app/bootstrap* linguist-vendored
-resources/app/jquery* linguist-vendored
-sdk/lib* linguist-vendored
+resources/app/bootstrap/* linguist-vendored
+resources/app/jquery/* linguist-vendored
+sdk/lib/* linguist-vendored
