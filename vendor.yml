@@ -4,17 +4,14 @@
 # Lines in this file are Regexps that are matched against the file
 # pathname.
 
-# Minified JavaScript and CSS
-- (\.|-)min\.(js|css)$
-
 # Bootstrap
-- (^|/)bootstrap/
+- /bootstrap/
 
 # jQuery
-- (^|/)jquery/
+- /jquery/
 
 # Perl modules
-- (^|/)lib/
+- /lib/
 
 # git config files
 - gitattributes$
