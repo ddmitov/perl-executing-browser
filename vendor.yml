@@ -9,16 +9,16 @@
 - (\.|-)min\.(js|css)$
 
 # Bootstrap css and js
-- \/bootstrap\/
+- .*bootstrap.*
 
-# Other web fonts
+# Web fonts
 - \.(svg|ttf|eot|woff2|woff)$
 
 # jQuery
-- \/jquery\/
+- .*jquery.*
 
 # Perl modules
-- pm$
+- .*pm$
 
 # git config files
 - gitattributes$
