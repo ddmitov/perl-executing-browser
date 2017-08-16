@@ -9,20 +9,17 @@
 - (\.|-)min\.(js|css)$
 
 # Bootstrap css and js
-- (^|/)bootstrap([^.]*)\.(js|css|less|scss|styl)$
-
-# Font Awesome
-- (^|/)font-awesome\.(css|less|scss|styl)$
+- /bootstrap/([^.]*)\.(js|css|less|scss|styl)$
 
 # Other web fonts
-- (^|/)fonts\.(svg|ttf|eot|woff2|woff)$
+- \.(svg|ttf|eot|woff2|woff)$
 
 # jQuery
 - (^|/)jquery([^.]*)\.js$
 - (^|/)jquery\-\d\.\d+(\.\d+)?\.js$
 
 # Perl modules
-- (^|/)lib([^.]*)\.pm$
+- /lib/([^.]*)\.pm$
 
 # git config files
 - gitattributes$
