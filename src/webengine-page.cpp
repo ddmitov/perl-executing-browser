@@ -16,6 +16,7 @@
 */
 
 #include <QWebEngineSettings>
+#include <QWebEngineProfile>
 
 #include "webengine-page.h"
 
@@ -46,6 +47,12 @@ QPage::QPage()
             setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::XSSAuditingEnabled, true);
+
+    // Signal and slot for file downloads:
+//    QObject::connect(QWebEngineProfile::defaultProfile(),
+//                     SIGNAL(downloadRequested(QWebEngineDownloadItem*)),
+//                     this,
+//                     SLOT(qDownloadRequestedSlot(QWebEngineDownloadItem*)));
 
     // Signal and slot for actions taken after page is loaded:
     QObject::connect(this, SIGNAL(loadFinished(bool)),

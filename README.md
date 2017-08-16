@@ -25,7 +25,6 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Selecting Files and Folders](#selecting-files-and-folders)
 * [Application Filename](#application-filename)
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
-* [Data Directory](#data-directory)
 * [Log Files](#log-files)
 * [Page Settings](#page-settings)
 * [Functional Pseudo Filenames](#functional-pseudo-filenames)
@@ -300,6 +299,17 @@ The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe``
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
 
+  By default the working directory of all Perl scripts run by PEB is the application directory.
+
+* **Data Directory:**
+  Data directory should contain any files used or produced by a PEB-based application.  
+  The data directory path is ``{PEB_binary_directory}/resources/data``.  
+  Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
+
+  ```perl
+  my $data_directory = $ENV{'PEB_DATA_DIR'};
+  ```
+
 * **Start page:**  
   PEB starts always with ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
   Note that start page pathname is case sensitive.
@@ -307,18 +317,6 @@ The binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe``
   <a name="icon"></a>
 * **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it is used as the icon of the application and all dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary is used.
-
-## Data Directory
-Data directory is not hard coded in C++ code, but a separation of data files and code is generally a good practice. Data directory should contain any files, that a PEB-based application is going to use or produce. The recommended data directory is ``{PEB_binary_directory}/resources/data``. Perl scripts can access this folder using the following code:
-
-```perl
-use Cwd;
-
-my $current_working_directory = cwd();
-my $data_directory = "$current_working_directory/resources/data";
-```
-
-Note that by default the working directory of all Perl scripts run by PEB is the directory of the browser binary.
 
 ## Log Files
 If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/logs``. If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing no logs will be written.

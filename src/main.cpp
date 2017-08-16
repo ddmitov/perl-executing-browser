@@ -92,7 +92,7 @@ int main(int argc, char **argv)
     // ==============================
     // Basic program information:
     // ==============================
-    qDebug() << "Application started:" << application.applicationFilePath();
+    qDebug() << "Application path:" << application.applicationFilePath();
     qDebug() << "Application version:"
              << application.applicationVersion().toLatin1().constData();
     qDebug() << "Qt version:" << QT_VERSION_STR;
@@ -146,16 +146,6 @@ int main(int argc, char **argv)
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // ==============================
-    // Application directory:
-    // ==============================
-    QString applicationDirName = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "resources" + QDir::separator()
-                + "app");
-
-    application.setProperty("application", applicationDirName);
-
-    // ==============================
     // PERL5LIB directory:
     // ==============================
     QString perlLibDirString = QDir::toNativeSeparators(
@@ -185,6 +175,27 @@ int main(int argc, char **argv)
         icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
+
+    // ==============================
+    // Application directory:
+    // ==============================
+    QString applicationDirName = QDir::toNativeSeparators(
+                binaryDirName + QDir::separator()
+                + "resources" + QDir::separator()
+                + "app");
+
+    application.setProperty("application", applicationDirName);
+
+    // ==============================
+    // Data directory:
+    // ==============================
+    QString dataDirName = QDir::toNativeSeparators(
+                binaryDirName + QDir::separator()
+                + "resources" + QDir::separator()
+                + "data");
+    QByteArray dataDirNameArray = dataDirName.toLatin1();
+
+    qputenv("PEB_DATA_DIR", dataDirNameArray);
 
     // ==============================
     // Logging:
@@ -257,11 +268,6 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
-        qDebug() << application.applicationName().toLatin1().constData()
-                << application.applicationVersion().toLatin1().constData()
-                << "started.";
-        qDebug() << "Qt version:" << QT_VERSION_STR;
-        qDebug() << "Executable:" << application.applicationFilePath();
         qDebug() << "No Perl interpreter is found.";
     }
 
@@ -285,6 +291,7 @@ int main(int argc, char **argv)
 
             QString errorMessage = "No start page is found.";
             htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+
             mainWindow.webViewWidget->setHtml(htmlErrorContents);
 
             qDebug() << "No start page is found.";

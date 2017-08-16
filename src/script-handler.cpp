@@ -91,6 +91,8 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
 
     scriptProcess.setProcessEnvironment(scriptEnvironment);
 
+    scriptProcess.setWorkingDirectory(qApp->property("application").toString());
+
     scriptProcess.start((qApp->property("perlInterpreter").toString()),
                         QStringList()
                         << scriptFullFilePath,
