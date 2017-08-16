@@ -1,0 +1,30 @@
+# Vendored files and directories are excluded from language
+# statistics.
+#
+# Lines in this file are Regexps that are matched against the file
+# pathname.
+
+
+# Minified JavaScript and CSS
+- (\.|-)min\.(js|css)$
+
+# Bootstrap css and js
+- (^|/)bootstrap([^.]*)\.(js|css|less|scss|styl)$
+
+# Font Awesome
+- (^|/)font-awesome\.(css|less|scss|styl)$
+
+# Other web fonts
+- (^|/)fonts\.(svg|ttf|eot|woff2|woff)$
+
+# jQuery
+- (^|/)jquery([^.]*)\.js$
+- (^|/)jquery\-\d\.\d+(\.\d+)?\.js$
+
+# Perl modules
+- (^|/)lib([^.]*)\.pm$
+
+# git config files
+- gitattributes$
+- gitignore$
+- gitmodules$
