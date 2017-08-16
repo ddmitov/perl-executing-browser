@@ -5,13 +5,13 @@
 # pathname.
 
 # Bootstrap
-- /bootstrap/
+- bootstrap
 
 # jQuery
-- /jquery/
+- jquery
 
 # Perl modules
-- /lib/
+- \.pm$
 
 # git config files
 - gitattributes$
