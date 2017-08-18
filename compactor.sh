@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
 relocatable_perl="./perl/bin/perl"
 

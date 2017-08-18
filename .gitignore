@@ -4,10 +4,8 @@ logs/
 perl/bin
 perl/lib
 qt/
-tmp/
 
 *.autosave
-*.qm
 Makefile
 peb
 peb.exe

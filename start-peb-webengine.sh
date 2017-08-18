@@ -1,4 +1,4 @@
-#! /bin/sh
+#!/usr/bin/env bash
 
 # Sometimes the Qt libraries that PEB depends on are not available on PATH.
 # This script can start a QtWebEngine build of PEB with no Qt libraries on PATH,

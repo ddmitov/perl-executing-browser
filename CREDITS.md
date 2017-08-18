@@ -177,6 +177,7 @@ http://strawberryperl.com/
 
 http://perldoc.perl.org/Encode.html  
 http://perldoc.perl.org/File/Basename.html  
+https://perldoc.perl.org/File/Path.html  
 
 https://metacpan.org/pod/File::Copy::Recursive  
 https://metacpan.org/pod/Module::ScanDeps  
@@ -203,10 +204,7 @@ http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/
 http://www.tizag.com/perlT/perlhashes.php  
 
 ## HTML, CSS & JavaScript
-http://www.w3schools.com/bootstrap/bootstrap_tooltip.asp  
-http://www.w3schools.com/bootstrap/bootstrap_ref_js_tooltip.asp  
 http://www.w3schools.com/cssref/css_websafe_fonts.asp  
-http://www.w3schools.com/html/html_lists.asp    
 http://www.w3schools.com/js/js_loop_for.asp  
 http://www.w3schools.com/jsref/prop_html_innerhtml.asp  
 https://www.w3schools.com/jsref/met_form_submit.asp  
@@ -231,14 +229,29 @@ http://youmightnotneedjquery.com/
 
 ## Markdown
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
-https://github.com/sindresorhus/awesome  
 https://github.com/IQAndreas/markdown-licenses  
 http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
 
+## GitHub
+https://github.com/github/linguist#overrides  
+
 ## Bash
 http://tldp.org/LDP/abs/html/fto.html  
+http://tldp.org/LDP/abs/html/functions.html  
+
+https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script  
+https://stackoverflow.com/questions/4181703/how-to-concatenate-string-variables-in-bash  
+https://stackoverflow.com/questions/638975/how-do-i-tell-if-a-regular-file-does-not-exist-in-bash  
+https://stackoverflow.com/questions/10319652/check-if-a-file-is-executable  
+https://stackoverflow.com/questions/10376206/what-is-the-preferred-bash-shebang  
+
+https://unix.stackexchange.com/questions/312280/split-string-by-delimiter-and-get-n-th-element  
+
 https://www.shellhacks.com/bash-test-if-file-exists/  
+https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-command-output/  
+https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
+http://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
 
 ## Mac
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html  
