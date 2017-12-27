@@ -117,15 +117,6 @@ http://www.qtforum.org/article/33749/convert-string-to-int-and-int-to-string.htm
 http://www.qtforum.org/article/18224/get-directory-path.html  
 http://www.qtforum.org/article/15030/passing-parameters-to-the-constructor.html  
 
-http://developer.nokia.com/Community/Wiki/Archived:How_to_create_a_message_box_in_Qt (defunct)  
-http://developer.nokia.com/Community/Wiki/Get_current_Date_and_Time_in_Qt (defunct)  
-http://developer.nokia.com/community/wiki/How_to_redirect_qDebug_output_to_a_file (defunct)  
-http://developer.nokia.com/community/wiki/How_to_write_data_to_a_file_in_Qt (defunct)  
-
-http://harmattan-dev.nokia.com/docs/library/html/qt4/qkeysequence.html (defunct)  
-http://harmattan-dev.nokia.com/docs/library/html/qt4/qdir.html (defunct)  
-http://harmattan-dev.nokia.com/docs/library/html/qt4/qtglobal.html (defunct)  
-
 http://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage  
 http://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
 http://stackoverflow.com/questions/8026101/correct-way-to-quit-a-qt-program  

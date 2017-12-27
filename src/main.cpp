@@ -275,16 +275,132 @@ int main(int argc, char **argv)
         qDebug() << "Perl interpreter:" << perlInterpreter;
 
         // ==============================
-        // Start page:
+        // Entry point:
         // ==============================
+        mainWindow.setWindowIcon(icon);
+        mainWindow.setCentralWidget(mainWindow.webViewWidget);
+
+        bool startFileFound = false;
+
         QString startPageFilePath =
                 applicationDirName + QDir::separator() + "index.html";
-        QFile startPageFile(startPageFilePath);
+        QString localServerSettingsFilePath =
+                applicationDirName + QDir::separator() + "local-server.json";
 
+        QFile startPageFile(startPageFilePath);
+        QFile localServerSettingsFile(localServerSettingsFilePath);
+
+        // Static start page:
         if (startPageFile.exists()) {
+            startFileFound = true;
             QString startPage = "file://" + startPageFilePath;
+
             mainWindow.webViewWidget->setUrl(QUrl(startPage));
-        } else {
+            mainWindow.showMaximized();
+        }
+
+        // Local server:
+        if (localServerSettingsFile.exists()) {
+            startFileFound = true;
+
+            QString localServerFullPath;
+            QString port;
+            QStringList localServerCommandLine;
+
+            QFileReader *localServerSettingsReader =
+                    new QFileReader(localServerSettingsFilePath);
+            QString localServerSettings =
+                    localServerSettingsReader->fileContents;
+
+            QJsonDocument localServerJsonDocument =
+                QJsonDocument::fromJson(localServerSettings.toUtf8());
+
+            if (!localServerJsonDocument.isNull()) {
+                QJsonObject localServerJson =
+                    localServerJsonDocument.object();
+
+                if (!localServerJson.isEmpty()) {
+                    // Local server full path:
+                    localServerFullPath =
+                            applicationDirName + QDir::separator() +
+                            localServerJson["filename"].toString();
+                    localServerCommandLine.append(localServerFullPath);
+
+                    qDebug() << "Local server full path:"
+                             << localServerFullPath;
+
+                    // Local server port:
+                    QString localServerPortSetting =
+                        localServerJson["port"].toString();
+
+                    if (localServerPortSetting.contains("-")) {
+                        QStringList ports = localServerPortSetting.split("-");
+                        qint16 firstAvailablePort = ports.takeFirst().toInt();
+                        qint16 endPort = ports.takeLast().toInt();
+
+                        QTcpSocket *socket = new QTcpSocket();
+                        while(!socket->bind(firstAvailablePort,
+                                            QAbstractSocket::DontShareAddress)) {
+                            if (firstAvailablePort < endPort) {
+                                firstAvailablePort++;
+                            }
+                        }
+                        socket->close();
+                        socket->deleteLater();
+
+                        port = QString::number(firstAvailablePort);
+                    }
+
+                    if (!localServerPortSetting.contains("-")) {
+                        port = localServerPortSetting;
+                    }
+
+                    application.setProperty("port", port);
+
+                    qDebug() << "Local server port:" << port;
+
+                    // Local server command line arguments.
+                    // Local server port must be already defined at this point!
+                    QJsonArray commandLineArgumentsArray =
+                            localServerJson["command-line-arguments"]
+                            .toArray();
+                    foreach (QVariant argument, commandLineArgumentsArray) {
+                        QString argumentString = argument.toString();
+                        argumentString.replace("#PORT#", port);
+                        localServerCommandLine.append(argumentString);
+                    }
+
+                    // Local server shutdown command:
+                    QString shutdownCommand =
+                            localServerJson["shutdown_command"].toString();
+                    if (shutdownCommand.length() > 0) {;
+                        application.setProperty("shutdown_command",
+                                                shutdownCommand);
+
+                        qDebug() << "Local server shutdown command:"
+                                 << shutdownCommand;
+                    }
+                }
+            }
+
+            // Local web server has to be started as
+            // a detached process for its proper operation:
+            QProcess localServer;
+            localServer.startDetached (
+                        qApp->property("perlInterpreter").toString(),
+                        localServerCommandLine);
+
+            // Local server is pinged until ready.
+            // Local server index page is loaded
+            // only after local server is up and running.
+            mainWindow.localServerTimer = new QTimer();
+            QObject::connect(mainWindow.localServerTimer, SIGNAL (timeout()),
+                             &mainWindow, SLOT(qLocalServerPingSlot()));
+            mainWindow.localServerTimer->start(1000);
+        }
+
+        // No entry point:
+        if (startFileFound == false) {
             QFileReader *resourceReader =
                     new QFileReader(QString(":/html/error.html"));
             QString htmlErrorContents = resourceReader->fileContents;
@@ -293,14 +409,11 @@ int main(int argc, char **argv)
             htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
 
             mainWindow.webViewWidget->setHtml(htmlErrorContents);
+            mainWindow.showMaximized();
 
             qDebug() << "No start page is found.";
         }
     }
-
-    mainWindow.setCentralWidget(mainWindow.webViewWidget);
-    mainWindow.setWindowIcon(icon);
-    mainWindow.showMaximized();
 
     return application.exec();
 }

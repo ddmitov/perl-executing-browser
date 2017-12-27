@@ -48,8 +48,8 @@ QPage::QPage()
             setAttribute(QWebSettings::JavascriptEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::XSSAuditingEnabled, true);
+   QWebSettings::globalSettings()->
+           setAttribute(QWebSettings::XSSAuditingEnabled, true);
 
     // Signal and slot for actions taken after page is loaded:
     QObject::connect(this, SIGNAL(loadFinished(bool)),

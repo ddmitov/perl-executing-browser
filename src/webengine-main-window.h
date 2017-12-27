@@ -36,6 +36,22 @@ signals:
     void startMainWindowClosingSignal();
 
 public slots:
+    void qLocalServerPingSlot()
+    {
+        QTcpSocket localWebServerPing;
+        localWebServerPing.connectToHost ("127.0.0.1",
+                                          qApp->property("port").toInt());
+
+        // Local server is pinged every second until ready:
+        if (localWebServerPing.waitForConnected (1000)) {
+            localServerTimer->stop();
+            localServerBaseUrl = "http://localhost:" +
+                    qApp->property("port").toString() + "/";
+            webViewWidget->load(QUrl(localServerBaseUrl));
+            showMaximized();
+        }
+    }
+
     void setMainWindowTitleSlot(QString title)
     {
         setWindowTitle(title);
@@ -54,6 +70,13 @@ public slots:
         }
 
         if (qApp->property("windowCloseRequested").toBool() == true) {
+            if (qApp->property("shutdown_command").toString().length() > 0) {
+                QString shutdownUrl = localServerBaseUrl +
+                        qApp->property("shutdown_command").toString();
+
+                webViewWidget->setUrl(QUrl(shutdownUrl));
+            }
+
             event->accept();
         }
     }
@@ -66,9 +89,11 @@ public slots:
     }
 
 public:
+    QTimer *localServerTimer;
+    QString localServerBaseUrl;
+
     QWebEngineView *webViewWidget;
     explicit QMainBrowserWindow(QWidget *parent = 0);
-
 };
 
 #endif // MAINWINDOW_H

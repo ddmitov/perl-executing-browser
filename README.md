@@ -7,7 +7,7 @@ Perl Executing Browser
 [![AppVeyor Build Status](https://ci.appveyor.com/api/projects/status/github/ddmitov/perl-executing-browser?branch=master&svg=true)](https://ci.appveyor.com/project/ddmitov/perl-executing-browser)
 [![Coverity Scan Build Status](https://scan.coverity.com/projects/11334/badge.svg)](https://scan.coverity.com/projects/ddmitov-perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries.  
+Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. By default it runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries.  
 
 Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on [Node.js](https://nodejs.org/en/), always runs JavaScript in a sandbox and blocks cross-origin requests.
 
@@ -55,7 +55,7 @@ PEB is created to work from any folder without installation and all your local H
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Fast, zero-installation software**  
 * **3. Cross-platform availability**  
-* **4. Secure serverless solution**  
+* **4. Secure solution, serverless by default**  
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
@@ -71,7 +71,7 @@ PEB is created to work from any folder without installation and all your local H
 
 ## Security
 * PEB does not need administrative privileges, but does not refuse to use them if needed.
-* PEB does not use any kind of server.
+* PEB does not need any kind of server, but will start one if so configured.
 * PEB executes with no sandbox only local Perl 5 scripts and
   users have full access to their local files.
 * Cross-origin requests and cross-site scripting are disabled.
