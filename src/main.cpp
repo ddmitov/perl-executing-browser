@@ -335,24 +335,40 @@ int main(int argc, char **argv)
 
                     if (localServerPortSetting.contains("-")) {
                         QStringList ports = localServerPortSetting.split("-");
-                        qint16 firstAvailablePort = ports.takeFirst().toInt();
+
+                        qint16 currentPort = ports.takeFirst().toInt();
                         qint16 endPort = ports.takeLast().toInt();
 
+                        // Enforce only Google Chrome safe ports:
+                        if (currentPort < 7000) {
+                            currentPort = 7000;
+                        }
+
+                        if (endPort < 7001) {
+                            endPort = 10000;
+                        }
+
+                        // Find the first available port:
                         QTcpSocket *socket = new QTcpSocket();
-                        while(!socket->bind(firstAvailablePort,
+                        while(!socket->bind(currentPort,
                                             QAbstractSocket::DontShareAddress)) {
-                            if (firstAvailablePort < endPort) {
-                                firstAvailablePort++;
+                            if (currentPort < endPort) {
+                                currentPort++;
                             }
                         }
                         socket->close();
                         socket->deleteLater();
 
-                        port = QString::number(firstAvailablePort);
+                        port = QString::number(currentPort);
                     }
 
                     if (!localServerPortSetting.contains("-")) {
                         port = localServerPortSetting;
+
+                        // Enforce only Google Chrome safe ports:
+                        if (port.toInt() < 7000) {
+                            port = QString::number(7000);
+                        }
                     }
 
                     application.setProperty("port", port);
