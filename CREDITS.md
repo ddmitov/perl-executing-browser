@@ -224,9 +224,6 @@ https://github.com/IQAndreas/markdown-licenses
 http://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
 
-## GitHub
-https://github.com/github/linguist#overrides  
-
 ## Bash
 http://tldp.org/LDP/abs/html/fto.html  
 http://tldp.org/LDP/abs/html/functions.html  
@@ -244,10 +241,16 @@ https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-comma
 https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
 http://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
 
+## Linux
+https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chrome  
+
 ## Mac
 http://www.zestymeta.com/2013/02/qt-osx-app-bundles-and-you.html  
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 http://iconverticons.com/online/  
+
+## GitHub
+https://github.com/github/linguist#overrides  
 
 ## Travis CI
 http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  

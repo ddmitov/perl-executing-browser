@@ -333,41 +333,55 @@ int main(int argc, char **argv)
                     QString localServerPortSetting =
                         localServerJson["port"].toString();
 
+                    // Google Chrome unsafe ports:
+                    QHash<qint16, QString> unsafePorts;
+                    unsafePorts.insert(2049, "nfs");
+                    unsafePorts.insert(3659, "apple-sasl / PasswordServer");
+                    unsafePorts.insert(4045, "lockd");
+                    unsafePorts.insert(6000, "X11");
+                    unsafePorts.insert(6665, "Alternate IRC [Apple addition]");
+                    unsafePorts.insert(6666, "Alternate IRC [Apple addition]");
+                    unsafePorts.insert(6667, "Standard IRC [Apple addition]");
+                    unsafePorts.insert(6668, "Alternate IRC [Apple addition]");
+                    unsafePorts.insert(6669, "Alternate IRC [Apple addition]");
+
                     if (localServerPortSetting.contains("-")) {
                         QStringList ports = localServerPortSetting.split("-");
 
-                        qint16 currentPort = ports.takeFirst().toInt();
+                        qint16 startPort = ports.takeFirst().toInt();
                         qint16 endPort = ports.takeLast().toInt();
 
-                        // Enforce only Google Chrome safe ports:
-                        if (currentPort < 7000) {
-                            currentPort = 7000;
-                        }
-
-                        if (endPort < 7001) {
-                            endPort = 10000;
-                        }
-
-                        // Find the first available port:
-                        QTcpSocket *socket = new QTcpSocket();
-                        while(!socket->bind(currentPort,
-                                            QAbstractSocket::DontShareAddress)) {
-                            if (currentPort < endPort) {
-                                currentPort++;
+                        QList<qint16> safePorts;
+                        for (quint16 testedPort = startPort;
+                             testedPort <= endPort;
+                             testedPort++) {
+                            if (!unsafePorts.contains(testedPort)) {
+                                safePorts.append(testedPort);
                             }
                         }
-                        socket->close();
-                        socket->deleteLater();
 
-                        port = QString::number(currentPort);
+                        QTcpSocket *socket = new QTcpSocket();
+                        foreach (qint16 safePort, safePorts) {
+                            socket->bind(safePort,
+                                         QAbstractSocket::DontShareAddress);
+                            qint16 localPort = socket->localPort();
+                            if (localPort == safePort) {
+                                port = QString::number(safePort);
+                                socket->close();
+                                socket->deleteLater();
+                                break;
+                            }
+                            socket->close();
+                            socket->deleteLater();
+                        }
                     }
 
                     if (!localServerPortSetting.contains("-")) {
                         port = localServerPortSetting;
 
-                        // Enforce only Google Chrome safe ports:
-                        if (port.toInt() < 7000) {
-                            port = QString::number(7000);
+                        // Any unsafe port is replaced by port 3000:
+                        if (unsafePorts.contains(port.toInt())) {
+                            port = QString::number(3000);
                         }
                     }
 
