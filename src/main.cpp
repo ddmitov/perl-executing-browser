@@ -22,6 +22,8 @@
 #include <QtGlobal>
 #include <QtWidgets>
 
+#include "port-scanner.h"
+
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include "webkit-main-window.h"
 #else
@@ -333,55 +335,27 @@ int main(int argc, char **argv)
                     QString localServerPortSetting =
                         localServerJson["port"].toString();
 
-                    // Google Chrome unsafe ports:
-                    QHash<qint16, QString> unsafePorts;
-                    unsafePorts.insert(2049, "nfs");
-                    unsafePorts.insert(3659, "apple-sasl / PasswordServer");
-                    unsafePorts.insert(4045, "lockd");
-                    unsafePorts.insert(6000, "X11");
-                    unsafePorts.insert(6665, "Alternate IRC [Apple addition]");
-                    unsafePorts.insert(6666, "Alternate IRC [Apple addition]");
-                    unsafePorts.insert(6667, "Standard IRC [Apple addition]");
-                    unsafePorts.insert(6668, "Alternate IRC [Apple addition]");
-                    unsafePorts.insert(6669, "Alternate IRC [Apple addition]");
-
+                    // Port range:
                     if (localServerPortSetting.contains("-")) {
                         QStringList ports = localServerPortSetting.split("-");
 
                         qint16 startPort = ports.takeFirst().toInt();
                         qint16 endPort = ports.takeLast().toInt();
 
-                        QList<qint16> safePorts;
-                        for (quint16 testedPort = startPort;
-                             testedPort <= endPort;
-                             testedPort++) {
-                            if (!unsafePorts.contains(testedPort)) {
-                                safePorts.append(testedPort);
-                            }
-                        }
-
-                        QTcpSocket *socket = new QTcpSocket();
-                        foreach (qint16 safePort, safePorts) {
-                            socket->bind(safePort,
-                                         QAbstractSocket::DontShareAddress);
-                            qint16 localPort = socket->localPort();
-                            if (localPort == safePort) {
-                                port = QString::number(safePort);
-                                socket->close();
-                                socket->deleteLater();
-                                break;
-                            }
-                            socket->close();
-                            socket->deleteLater();
+                        QPortScanner *portScanner =
+                                new QPortScanner(startPort, endPort);
+                        if (portScanner->portScannerErrors.length() == 0) {
+                            port = QString::number(portScanner->port);
                         }
                     }
 
+                    // Single port:
                     if (!localServerPortSetting.contains("-")) {
-                        port = localServerPortSetting;
-
-                        // Any unsafe port is replaced by port 3000:
-                        if (unsafePorts.contains(port.toInt())) {
-                            port = QString::number(3000);
+                        QPortScanner *portScanner =
+                                new QPortScanner(localServerPortSetting.toInt(),
+                                                 localServerPortSetting.toInt());
+                        if (portScanner->portScannerErrors.length() == 0) {
+                            port = QString::number(portScanner->port);
                         }
                     }
 
