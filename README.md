@@ -381,5 +381,5 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## Authors
-Dimitar D. Mitov, 2013 - 2017,  
+Dimitar D. Mitov, 2013 - 2018,  
 Valcho Nedelchev, 2014 - 2016.  
