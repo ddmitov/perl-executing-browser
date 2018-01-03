@@ -22,6 +22,7 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Preparing a Perl Distribution for PEB](#preparing-a-perl-distribution-for-peb)
 * [Perl Scripts API](#perl-scripts-api)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
+* [Starting Local Web Servers](#starting-local-web-server)
 * [Selecting Files and Folders](#selecting-files-and-folders)
 * [Application Filename](#application-filename)
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
@@ -61,6 +62,7 @@ PEB is created to work from any folder without installation and all your local H
 ## Features
 * [Perl script output is seamlessly inserted in any local page.](#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](#interactive-perl-scripts)
+* [Perl scripts implementing local servers can be started](#starting-local-server)
 * [Any version of Perl 5 can be used.](#runtime-requirements)
 * PEB can be started from any folder.
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](#selecting-files-and-folders)  
@@ -194,8 +196,8 @@ peb.startScript('perl_test.settings');
 
   ```javascript
   perlScriptObject.inputDataHarvester = function() {
-    var data = document.getElementById('input-box-id').value;
-    return data;
+  var data = document.getElementById('input-box-id').value;
+  return data;
   }
   ```
 
@@ -203,8 +205,8 @@ peb.startScript('perl_test.settings');
 
   ```javascript
   perlScriptObject.inputDataHarvester = function() {
-    var formData = $('#form-id').serialize();
-    return formData;
+  var formData = $('#form-id').serialize();
+  return formData;
   }
   ```
 
@@ -237,15 +239,15 @@ The following code shows how to start an interactive Perl script right after a l
       interactive_script.scriptFullPath = '{app}/perl/interactive.pl';
       interactive_script.requestMethod = 'POST';
       interactive_script.inputDataHarvester = function() {
-        return document.getElementById('interactive-script-input').value;
+      return document.getElementById('interactive-script-input').value;
       }
       interactive_script.stdoutFunction = function (stdout) {
-        var container = document.getElementById('interactive-script-output');
-        container.innerHTML = stdout;
+      var container = document.getElementById('interactive-script-output');
+      container.innerHTML = stdout;
       }
       interactive_script.scriptExitCommand = '_close_';
       interactive_script.scriptExitConfirmation = '_closed_';
-    </script>
+      </script>
   </head>
 
   <body>
@@ -260,6 +262,29 @@ The following code shows how to start an interactive Perl script right after a l
 ```
 
 The [index.htm](resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
+
+## Starting Local Server
+A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_binary_directory}/resources/app/local-server.json`` file is found instead of ``index.html`` with the following structure:
+
+```json
+{
+  "filename" : "tabula",
+  "port" : "6000-9000",
+  "command-line-arguments" : [
+    "--browser=none",
+    "--port=#PORT#",
+    "--no-port-test"
+  ],
+  "shutdown_command" : "shutdown"
+}
+```
+
+* ``filename`` and ``port`` are mandatory elements.  
+
+* ``port`` could be given as a single port or as a port range.  
+First port and last port in a port range are always separated by a single hyphen ``-`` with no spaces.
+
+* The ``#PORT#`` keyword within the command line arguments is substituted with the first available safe port when a port range is given for the ``port`` element.  
 
 ## Selecting Files and Folders
 Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page by the ``receiverFunction`` taking all selected files or folders as its only argument.  
@@ -279,9 +304,12 @@ select_file.receiverFunction = function (file) {
 }
 ```
 
-* The actual opening of any existing file is performed by a Perl script and not by PEB.  
-* The actual creation of any new file is performed by a Perl script and not by PEB.  
-* When multiple files are selected, different filenames are separated by a semicolon - ``;``
+* The actual opening of any existing file is performed by a Perl script and not by PEB.
+
+* The actual creation of any new file is performed by a Perl script and not by PEB.
+
+* When multiple files are selected, different filenames are separated by a semicolon ``;``
+
 * When using the ``directory`` type of dialog, an existing or a new directory may be selected.  
   Any new directory will be created immediately by PEB.
 
