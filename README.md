@@ -22,7 +22,7 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Preparing a Perl Distribution for PEB](#preparing-a-perl-distribution-for-peb)
 * [Perl Scripts API](#perl-scripts-api)
 * [Interactive Perl Scripts](#interactive-perl-scripts)
-* [Starting Local Web Servers](#starting-local-web-server)
+* [Starting Local Server](#starting-local-server)
 * [Selecting Files and Folders](#selecting-files-and-folders)
 * [Application Filename](#application-filename)
 * [Hard Coded Files and Folders](#hard-coded-files-and-folders)
