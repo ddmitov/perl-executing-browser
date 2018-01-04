@@ -35,8 +35,8 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
   * [Minimal Portable Perl Distribution for PEB](./SETTINGS.md#minimal-portable-perl-distribution-for-peb)
   * [Log Files](./SETTINGS.md#log-files)
 * [History](#history)
-* [License](#license)
-* [Thanks and Credits](#thanks-and-credits)
+* [License](./LICENSE.md)
+* [Thanks and Credits](./CREDITS.md)
 * [Authors](#authors)
 
 ## Quick Start
