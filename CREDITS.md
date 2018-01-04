@@ -1,4 +1,4 @@
-Thanks and Credits
+Perl Executing Browser - Thanks and Credits
 --------------------------------------------------------------------------------
 Amata mea Argeia - gratiam magnam tibi ago!  
 Patientia tua in studiis meis computatoriis auxilium meum maximum!  

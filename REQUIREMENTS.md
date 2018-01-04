@@ -1,4 +1,7 @@
-## Compile-time Requirements
+Perl Executing Browser
+--------------------------------------------------------------------------------
+
+## Compile-Time Requirements
 The only compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.
 
 Compiled and tested successfully using:
@@ -16,8 +19,25 @@ qmake -qt=qt5
 make
 ```
 
+If you want to change the Macintosh binary type, edit the ``src/peb.pro`` project file before compiling the binary.
+
+To make a bundle-less binary, which is the default setting:  
+
+```QMake
+BUNDLE = 0
+CONFIG -= app_bundle
+```
+
+To make a bundled binary (peb.app):  
+
+```QMake
+BUNDLE = 1
+CONFIG += app_bundle
+```
+
 ## Runtime Requirements
 * Qt 5 libraries.  
+
   Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
   Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
 
