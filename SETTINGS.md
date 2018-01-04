@@ -1,4 +1,4 @@
-Perl Executing Browser
+Perl Executing Browser - Settings
 --------------------------------------------------------------------------------
 
 ## Application Filename

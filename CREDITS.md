@@ -61,12 +61,12 @@ http://qt-project.org/doc/qt-5/qmake-test-function-reference.html
 http://qt-project.org/wiki/How_to_Use_QSettings
 http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2
 
-http://qt-project.org/forums/viewthread/8270 (Find length of QString text)
-http://qt-project.org/forums/viewthread/6102 (WebView Clear history)
-http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)
-http://qt-project.org/forums/viewthread/25533 (#ifdef condition)
-http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)
-http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())
+http://qt-project.org/forums/viewthread/8270 (Find length of QString text)  
+http://qt-project.org/forums/viewthread/6102 (WebView Clear history)  
+http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)  
+http://qt-project.org/forums/viewthread/25533 (#ifdef condition)  
+http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)  
+http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())  
 
 https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html
 http://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested
@@ -168,9 +168,9 @@ https://metacpan.org/pod/Module::ScanDeps
 
 http://www.perl.com/pub/2002/05/14/mod_perl.html
 
-http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"
-http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"
-http://www.perlmonks.org/?node_id=982572 "ScanDeps usage"
+http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
+http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
+http://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
 
 http://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab
 http://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web
