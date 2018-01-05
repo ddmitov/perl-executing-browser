@@ -83,8 +83,8 @@ peb.startScript('perl_test.settings');
 
   ```javascript
   perlScriptObject.inputDataHarvester = function() {
-  var data = document.getElementById('input-box-id').value;
-  return data;
+    var data = document.getElementById('input-box-id').value;
+    return data;
   }
   ```
 
@@ -92,8 +92,8 @@ peb.startScript('perl_test.settings');
 
   ```javascript
   perlScriptObject.inputDataHarvester = function() {
-  var formData = $('#form-id').serialize();
-  return formData;
+    var formData = $('#form-id').serialize();
+    return formData;
   }
   ```
 
@@ -173,7 +173,7 @@ First port and last port in a port range are always separated by a single hyphen
 
 * The ``#PORT#`` keyword within the command line arguments is substituted with the first available safe port when a port range is given for the ``port`` element.
 
-* ``shutdown_command`` is appended to the base URL of the local server. This URL is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed only if the local server can detect that PEB is disconnected and shut down on its own. This could be achieved by using a WebSocket connection between the server and its index page as an indicator.
+* ``shutdown_command`` is appended to the base URL of the local server to make a special URL, which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed only if the local server can detect that PEB is disconnected and shut down on its own. This could be achieved by a WebSocket connection between the server and its HTML page in a single-page application, provided that the only page is not reloaded.
 
 ## Selecting Files and Folders
 Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page by the ``receiverFunction`` taking all selected files or folders as its only argument.  
