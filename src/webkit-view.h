@@ -57,7 +57,8 @@ public slots:
     // ==============================
     void contextMenuEvent(QContextMenuEvent *event)
     {
-        if (mainPage->mainFrame()->url().scheme() != "file") {
+        if (mainPage->mainFrame()->url().scheme() != "file" and
+                mainPage->mainFrame()->url().host() != "localhost") {
             page()->action(QWebPage::CopyImageToClipboard)->setVisible(false);
             page()->action(QWebPage::DownloadImageToDisk)->setVisible(false);
             page()->action(QWebPage::DownloadLinkToDisk)->setVisible(false);
@@ -71,7 +72,8 @@ public slots:
             menu->popup(event->globalPos());
         }
 
-        if (mainPage->mainFrame()->url().scheme() == "file") {
+        if (mainPage->mainFrame()->url().scheme() == "file" or
+                mainPage->mainFrame()->url().host() == "localhost") {
             QWebHitTestResult contextMenuTest =
                     mainPage->mainFrame()->hitTestContent(event->pos());
 

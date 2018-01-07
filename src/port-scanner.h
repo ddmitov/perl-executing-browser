@@ -32,7 +32,7 @@ class QPortScanner : public QObject
 public:
     explicit QPortScanner(qint16 startPort, qint16 endPort);
     qint16 port;
-    QString portScannerErrors;
+    QString portScannerError;
 };
 
 #endif // PORTSCANNER_H

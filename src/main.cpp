@@ -302,7 +302,7 @@ int main(int argc, char **argv)
         }
 
         // Local server:
-        if (localServerSettingsFile.exists()) {
+        if ((!startPageFile.exists()) and localServerSettingsFile.exists()) {
             startFileFound = true;
 
             QString localServerFullPath;
@@ -323,17 +323,68 @@ int main(int argc, char **argv)
 
                 if (!localServerJson.isEmpty()) {
                     // Local server full path:
-                    localServerFullPath =
+                    QString localServerFullPathSetting =
                             applicationDirName + QDir::separator() +
                             localServerJson["filename"].toString();
-                    localServerCommandLine.append(localServerFullPath);
 
-                    qDebug() << "Local server full path:"
-                             << localServerFullPath;
+                    QFile localServerFile(localServerFullPathSetting);
+
+                    if (!localServerFile.exists()) {
+                        QFileReader *resourceReader =
+                                new QFileReader(
+                                    QString(":/html/error.html"));
+                        QString htmlErrorContents =
+                                resourceReader->fileContents;
+                        htmlErrorContents
+                                .replace("ERROR_MESSAGE",
+                                         "Local server file is not found.");
+                        qDebug() << "Local server file is not found.";
+
+                        mainWindow.webViewWidget->setHtml(htmlErrorContents);
+                        mainWindow.showMaximized();
+                    }
+
+                    if (localServerFile.exists()) {
+                        localServerFullPath = localServerFullPathSetting;
+                        localServerCommandLine.append(localServerFullPath);
+                        qDebug() << "Local server full path:"
+                                 << localServerFullPath;
+                    }
+
 
                     // Local server port:
                     QString localServerPortSetting =
                         localServerJson["port"].toString();
+
+                    // Single port:
+                    if (!localServerPortSetting.contains("-")) {
+                        QPortScanner *portScanner =
+                                new QPortScanner(
+                                    localServerPortSetting.toInt(),
+                                    localServerPortSetting.toInt());
+
+                        if (portScanner->portScannerError.length() == 0) {
+                            port = QString::number(portScanner->port);
+                            application.setProperty("port", port);
+                            qDebug() << "Local server port:" << port;
+                        }
+
+                        if (portScanner->portScannerError.length() > 0) {
+                            QFileReader *resourceReader =
+                                    new QFileReader(
+                                        QString(":/html/error.html"));
+                            QString htmlErrorContents =
+                                    resourceReader->fileContents;
+                            htmlErrorContents
+                                    .replace("ERROR_MESSAGE",
+                                             portScanner->portScannerError);
+                            qDebug() << "Port error:"
+                                     << portScanner->portScannerError;
+
+                            mainWindow.webViewWidget->setHtml(htmlErrorContents);
+                            mainWindow.showMaximized();
+                        }
+                    }
 
                     // Port range:
                     if (localServerPortSetting.contains("-")) {
@@ -344,63 +395,72 @@ int main(int argc, char **argv)
 
                         QPortScanner *portScanner =
                                 new QPortScanner(startPort, endPort);
-                        if (portScanner->portScannerErrors.length() == 0) {
+
+                        if (portScanner->portScannerError.length() == 0) {
                             port = QString::number(portScanner->port);
+                            application.setProperty("port", port);
+                            qDebug() << "Local server port:" << port;
+                        }
+
+                        if (portScanner->portScannerError.length() > 0) {
+                            QFileReader *resourceReader =
+                                    new QFileReader(
+                                        QString(":/html/error.html"));
+                            QString htmlErrorContents =
+                                    resourceReader->fileContents;
+                            htmlErrorContents
+                                    .replace("ERROR_MESSAGE",
+                                             portScanner->portScannerError);
+                            qDebug() << "Port error:"
+                                     << portScanner->portScannerError;
+
+                            mainWindow.webViewWidget->setHtml(htmlErrorContents);
+                            mainWindow.showMaximized();
                         }
                     }
 
-                    // Single port:
-                    if (!localServerPortSetting.contains("-")) {
-                        QPortScanner *portScanner =
-                                new QPortScanner(localServerPortSetting.toInt(),
-                                                 localServerPortSetting.toInt());
-                        if (portScanner->portScannerErrors.length() == 0) {
-                            port = QString::number(portScanner->port);
+                    if (port.length() > 0) {
+                        // Local server command line arguments.
+                        // Local server port must be defined at this point!
+                        QJsonArray commandLineArgumentsArray =
+                                localServerJson["command-line-arguments"]
+                                .toArray();
+                        foreach (QVariant argument, commandLineArgumentsArray) {
+                            QString argumentString = argument.toString();
+                            argumentString.replace("#PORT#", port);
+                            localServerCommandLine.append(argumentString);
                         }
-                    }
 
-                    application.setProperty("port", port);
+                        // Local server shutdown command:
+                        QString shutdownCommand =
+                                localServerJson["shutdown_command"].toString();
+                        if (shutdownCommand.length() > 0) {;
+                            application.setProperty("shutdown_command",
+                                                    shutdownCommand);
 
-                    qDebug() << "Local server port:" << port;
-
-                    // Local server command line arguments.
-                    // Local server port must be already defined at this point!
-                    QJsonArray commandLineArgumentsArray =
-                            localServerJson["command-line-arguments"]
-                            .toArray();
-                    foreach (QVariant argument, commandLineArgumentsArray) {
-                        QString argumentString = argument.toString();
-                        argumentString.replace("#PORT#", port);
-                        localServerCommandLine.append(argumentString);
-                    }
-
-                    // Local server shutdown command:
-                    QString shutdownCommand =
-                            localServerJson["shutdown_command"].toString();
-                    if (shutdownCommand.length() > 0) {;
-                        application.setProperty("shutdown_command",
-                                                shutdownCommand);
-
-                        qDebug() << "Local server shutdown command:"
-                                 << shutdownCommand;
+                            qDebug() << "Local server shutdown command:"
+                                     << shutdownCommand;
+                        }
                     }
                 }
             }
 
-            // Local web server has to be started as
+            // Local server has to be started as
             // a detached process for its proper operation:
-            QProcess localServer;
-            localServer.startDetached (
-                        qApp->property("perlInterpreter").toString(),
-                        localServerCommandLine);
+            if (localServerFullPath.length() > 0 and port.length() > 0) {
+                QProcess localServer;
+                localServer.startDetached (
+                            qApp->property("perlInterpreter").toString(),
+                            localServerCommandLine);
 
-            // Local server is pinged until ready.
-            // Local server index page is loaded
-            // only after local server is up and running.
-            mainWindow.localServerTimer = new QTimer();
-            QObject::connect(mainWindow.localServerTimer, SIGNAL (timeout()),
-                             &mainWindow, SLOT(qLocalServerPingSlot()));
-            mainWindow.localServerTimer->start(1000);
+                // Local server is pinged until ready.
+                // Local server index page is loaded
+                // only after local server is up and running.
+                mainWindow.localServerTimer = new QTimer();
+                QObject::connect(mainWindow.localServerTimer, SIGNAL (timeout()),
+                                 &mainWindow, SLOT(qLocalServerPingSlot()));
+                mainWindow.localServerTimer->start(1000);
+            }
         }
 
         // No entry point:

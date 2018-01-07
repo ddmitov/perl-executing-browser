@@ -24,6 +24,8 @@
 QPortScanner::QPortScanner(qint16 startPort, qint16 endPort)
     : QObject(0)
 {
+    port = 0;
+
     // Google Chrome unsafe ports:
     QHash<qint16, QString> unsafePorts;
     unsafePorts.insert(2049, "nfs");
@@ -36,33 +38,52 @@ QPortScanner::QPortScanner(qint16 startPort, qint16 endPort)
     unsafePorts.insert(6668, "Alternate IRC [Apple addition]");
     unsafePorts.insert(6669, "Alternate IRC [Apple addition]");
 
-    if (startPort <= 1024) {
-        startPort = 1025;
-    }
+    if (startPort == endPort) {
+        if (startPort <= 1024) {
+            portScannerError = "Privileged ports (1 - 1024) can not be used.";
+        }
 
-    if (endPort <= 1024) {
-        endPort = 1025;
-    }
-
-    QList<qint16> safePorts;
-    for (quint16 testedPort = startPort;
-         testedPort <= endPort;
-         testedPort++) {
-        if (!unsafePorts.contains(testedPort)) {
-            safePorts.append(testedPort);
+        if (unsafePorts.contains(startPort)) {
+            portScannerError =
+                    "Port " + QString::number(startPort) +
+                    " is considered unsafe.<br>" +
+                    "It is used for " + unsafePorts[startPort] + ".";
         }
     }
 
-    QTcpSocket *socket = new QTcpSocket();
-    foreach (qint16 safePort, safePorts) {
-        socket->bind(safePort, QAbstractSocket::DontShareAddress);
-        qint16 localPort = socket->localPort();
-        socket->close();
-        socket->deleteLater();
+    if (startPort < endPort) {
+        if (startPort <= 1024) {
+            startPort = 1025;
+        }
+    }
 
-        if (localPort == safePort) {
-            port = safePort;
-            break;
+    if (portScannerError.length() == 0) {
+        QList<qint16> safePorts;
+        for (quint16 testedPort = startPort;
+             testedPort <= endPort;
+             testedPort++) {
+            if (!unsafePorts.contains(testedPort)) {
+                safePorts.append(testedPort);
+            }
+        }
+
+        QTcpSocket *socket = new QTcpSocket();
+        foreach (qint16 safePort, safePorts) {
+            socket->bind(safePort, QAbstractSocket::DontShareAddress);
+            qint16 localPort = socket->localPort();
+            socket->close();
+            socket->deleteLater();
+
+            if (localPort == safePort) {
+                port = safePort;
+                break;
+            }
+        }
+
+        if (port == 0) {
+            portScannerError =
+                    "The specified port " +
+                    QString::number(startPort) + " is in use.";
         }
     }
 }
