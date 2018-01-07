@@ -35,6 +35,17 @@ signals:
     void startMainWindowClosingSignal();
 
 public slots:
+    void qDisplayError(QString errorMessage)
+    {
+        QFileReader *resourceReader =
+                new QFileReader(QString(":/html/error.html"));
+        QString htmlErrorContents = resourceReader->fileContents;
+        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
+
+        webViewWidget->setHtml(htmlErrorContents);
+        showMaximized();
+    }
+
     void qLocalServerPingSlot()
     {
         QTcpSocket localWebServerPing;

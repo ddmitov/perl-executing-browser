@@ -330,18 +330,9 @@ int main(int argc, char **argv)
                     QFile localServerFile(localServerFullPathSetting);
 
                     if (!localServerFile.exists()) {
-                        QFileReader *resourceReader =
-                                new QFileReader(
-                                    QString(":/html/error.html"));
-                        QString htmlErrorContents =
-                                resourceReader->fileContents;
-                        htmlErrorContents
-                                .replace("ERROR_MESSAGE",
-                                         "Local server file is not found.");
+                        mainWindow.qDisplayError(
+                                    QString("Local server file is not found."));
                         qDebug() << "Local server file is not found.";
-
-                        mainWindow.webViewWidget->setHtml(htmlErrorContents);
-                        mainWindow.showMaximized();
                     }
 
                     if (localServerFile.exists()) {
@@ -370,19 +361,10 @@ int main(int argc, char **argv)
                         }
 
                         if (portScanner->portScannerError.length() > 0) {
-                            QFileReader *resourceReader =
-                                    new QFileReader(
-                                        QString(":/html/error.html"));
-                            QString htmlErrorContents =
-                                    resourceReader->fileContents;
-                            htmlErrorContents
-                                    .replace("ERROR_MESSAGE",
-                                             portScanner->portScannerError);
+                            mainWindow.qDisplayError(
+                                        portScanner->portScannerError);
                             qDebug() << "Port error:"
                                      << portScanner->portScannerError;
-
-                            mainWindow.webViewWidget->setHtml(htmlErrorContents);
-                            mainWindow.showMaximized();
                         }
                     }
 
@@ -403,19 +385,10 @@ int main(int argc, char **argv)
                         }
 
                         if (portScanner->portScannerError.length() > 0) {
-                            QFileReader *resourceReader =
-                                    new QFileReader(
-                                        QString(":/html/error.html"));
-                            QString htmlErrorContents =
-                                    resourceReader->fileContents;
-                            htmlErrorContents
-                                    .replace("ERROR_MESSAGE",
-                                             portScanner->portScannerError);
+                            mainWindow.qDisplayError(
+                                        portScanner->portScannerError);
                             qDebug() << "Port error:"
                                      << portScanner->portScannerError;
-
-                            mainWindow.webViewWidget->setHtml(htmlErrorContents);
-                            mainWindow.showMaximized();
                         }
                     }
 
@@ -465,16 +438,7 @@ int main(int argc, char **argv)
 
         // No entry point:
         if (startFileFound == false) {
-            QFileReader *resourceReader =
-                    new QFileReader(QString(":/html/error.html"));
-            QString htmlErrorContents = resourceReader->fileContents;
-
-            QString errorMessage = "No start page is found.";
-            htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-
-            mainWindow.webViewWidget->setHtml(htmlErrorContents);
-            mainWindow.showMaximized();
-
+            mainWindow.qDisplayError(QString("No start page is found."));
             qDebug() << "No start page is found.";
         }
     }
