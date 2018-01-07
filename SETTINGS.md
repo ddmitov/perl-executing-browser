@@ -169,7 +169,20 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 * ``filename`` and ``port`` are mandatory elements.  
 
 * ``port`` is a single port or a port range.  
-First port and last port in a port range are always separated by a single hyphen ``-`` with no spaces.
+  First port and last port in a port range are always separated by a single hyphen ``-`` with no spaces.  
+  Privileged ports below or equal to port 1024 are not allowed.  
+  The following Google Chrome unsafe ports used by various services are also not allowed:  
+  ```
+  2049 - nfs
+  3659 - apple-sasl / PasswordServer
+  4045 - lockd
+  6000 - X11
+  6665 - Alternate IRC [Apple addition]
+  6666 - Alternate IRC [Apple addition]
+  6667 - Standard IRC [Apple addition]
+  6668 - Alternate IRC [Apple addition]
+  6669 - Alternate IRC [Apple addition]
+  ```
 
 * The ``#PORT#`` keyword within the command line arguments is substituted with the first available safe port when a port range is given for the ``port`` element.
 
