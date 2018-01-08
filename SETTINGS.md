@@ -168,7 +168,7 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 
 * ``filename`` and ``port`` are mandatory elements.
 
-* ``filename`` is resolved to a full pathname using the ``{PEB_binary_directory}/resources/app/local-server.json`` folder.
+* ``filename`` is resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder.
 
 * ``port`` is a single port or a port range.  
   First port and last port in a port range are always separated by a single hyphen ``-`` with no spaces.  
