@@ -56,8 +56,8 @@ These are the basic steps for building your first PEB-based application using a 
 * **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./SETTINGS.md#starting-local-server) for your local Perl server.  
 
 PEB is created to work from any directory without installation meaning that:
-* All application files must be located in the ``{PEB_binary_directory}/resources/app`` folder.  
-* All data files must be located in the ``{PEB_binary_directory}/resources/data`` folder.  
+* All application files must be located in the ``{PEB_binary_directory}/resources/app`` folder.
+* All data files must be located in the ``{PEB_binary_directory}/resources/data`` folder.
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
