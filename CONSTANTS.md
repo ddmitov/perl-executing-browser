@@ -24,7 +24,13 @@ Perl Executing Browser - Constants
   ```
 
 * **Entry point:**  
-  PEB starts with either ``{PEB_binary_directory}/resources/app/index.html`` or ``{PEB_binary_directory}/resources/app/local-server.json``. If both entry files are missing, an error message is displayed. If both entry files are present, ``index.html`` takes precedence.  
+  PEB starts with one of the following entry files:  
+  ``{PEB_binary_directory}/resources/app/index.html`` or ``{PEB_binary_directory}/resources/app/local-server.json``.  
+
+  If both entry files are present, ``index.html`` takes precedence.  
+  If ``index.html`` is missing, ``local-server.json`` is used, if available.  
+  If both entry files are missing, an error message is displayed.  
+
   Note that entry files pathnames are case sensitive.
 
   <a name="icon"></a>

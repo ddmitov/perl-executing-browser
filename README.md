@@ -50,9 +50,9 @@ These are the basic steps for building your first PEB-based serverless applicati
   You may use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
 * **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./SETTINGS.md#perl-scripts-api).  
 
-These are the basic steps for building your first PEB-based application using a local Perl server.  
+These are the basic steps for building your first PEB-based application using a local Perl server:  
 
-* **1.** Write your Perl server-based application with an appropriate HTML user interface.  
+* **1.** Write your Perl server-based application with an appropriate HTML page.  
 * **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./SETTINGS.md#starting-local-server) for your local Perl server.  
 
 PEB is created to work from any directory without installation meaning that:
