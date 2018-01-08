@@ -342,17 +342,13 @@ int main(int argc, char **argv)
                                  << localServerFullPath;
                     }
 
-
-                    // Local server port:
-                    QString localServerPortSetting =
-                        localServerJson["port"].toString();
-
+                    // Local server port
                     // Single port:
-                    if (!localServerPortSetting.contains("-")) {
+                    if (!localServerJson["port"].toString().contains("-")) {
                         QPortScanner *portScanner =
                                 new QPortScanner(
-                                    localServerPortSetting.toInt(),
-                                    localServerPortSetting.toInt());
+                                    localServerJson["port"].toInt(),
+                                    localServerJson["port"].toInt());
 
                         if (portScanner->portScannerError.length() == 0) {
                             port = QString::number(portScanner->port);
@@ -369,8 +365,9 @@ int main(int argc, char **argv)
                     }
 
                     // Port range:
-                    if (localServerPortSetting.contains("-")) {
-                        QStringList ports = localServerPortSetting.split("-");
+                    if (localServerJson["port"].toString().contains("-")) {
+                        QStringList ports =
+                                localServerJson["port"].toString().split("-");
 
                         qint16 startPort = ports.takeFirst().toInt();
                         qint16 endPort = ports.takeLast().toInt();
@@ -416,6 +413,22 @@ int main(int argc, char **argv)
                         }
                     }
                 }
+
+                if (localServerJson.isEmpty()) {
+                    mainWindow.qDisplayError(
+                                localServerSettingsFilePath + "<br>" +
+                                "is malformed.");
+                    qDebug() << localServerSettingsFilePath << "<br>"
+                             << "is malformed.";
+                }
+            }
+
+            if (localServerJsonDocument.isNull()) {
+                mainWindow.qDisplayError(
+                            localServerSettingsFilePath + "<br>" +
+                            "is empty.");
+                qDebug() << localServerSettingsFilePath << "<br>"
+                         << "is empty.";
             }
 
             // Local server has to be started as

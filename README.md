@@ -40,17 +40,24 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Authors](#authors)
 
 ## Quick Start
-These are the basic steps for building your first PEB-based application:
+These are the basic steps for building your first PEB-based serverless application:  
 
-* **1.** Write your ``index.html`` with appropriate HTML forms for user data input.  
-  [Selecting files or folders with their full paths](#selecting-files-and-folders) is also possible.
-* **2.** Write [a settings JavaScript object](#perl-scripts-api) for every Perl script you are going to run.
+* **1.** Write ``{PEB_binary_directory}/resources/app/index.html`` file with appropriate HTML forms for user data input.  
+  [Selecting files or folders with their full paths](./SETTINGS.md#selecting-files-and-folders) is also possible.
+* **2.** Write [a settings JavaScript object](./SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
 * **3.** Write your Perl scripts.  
   Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script.  
   You may use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
-* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](#perl-scripts-api).  
+* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./SETTINGS.md#perl-scripts-api).  
 
-PEB is created to work from any folder without installation and all your local HTML files and Perl scripts should be located in the ``{PEB_binary_directory}/resources/app`` folder.  
+These are the basic steps for building your first PEB-based application using a local Perl server.  
+
+* **1.** Write your Perl server-based application with an appropriate HTML user interface.  
+* **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./SETTINGS.md#starting-local-server) for your local Perl server.  
+
+PEB is created to work from any directory without installation meaning that:
+* All application files must be located in the ``{PEB_binary_directory}/resources/app`` folder.  
+* All data files must be located in the ``{PEB_binary_directory}/resources/data`` folder.  
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  

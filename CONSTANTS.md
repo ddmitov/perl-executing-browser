@@ -23,9 +23,9 @@ Perl Executing Browser - Constants
   my $data_directory = $ENV{'PEB_DATA_DIR'};
   ```
 
-* **Start page:**  
-  PEB starts always with ``{PEB_binary_directory}/resources/app/index.html``. If this file is missing, an error message is displayed. No start page is a showstopper for PEB.  
-  Note that start page pathname is case sensitive.
+* **Entry point:**  
+  PEB starts with either ``{PEB_binary_directory}/resources/app/index.html`` or ``{PEB_binary_directory}/resources/app/local-server.json``. If both entry files are missing, an error message is displayed. If both entry files are present, ``index.html`` takes precedence.  
+  Note that entry files pathnames are case sensitive.
 
   <a name="icon"></a>
 * **Icon:**
