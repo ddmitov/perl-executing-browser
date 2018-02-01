@@ -9,7 +9,7 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. By default it runs local Perl 5 scripts as child processes with no server or execution timeout and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries.  
 
-Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on [Node.js](https://nodejs.org/en/), always runs JavaScript in a sandbox and blocks cross-origin requests.
+Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on [Node.js](https://nodejs.org/en/) and always runs JavaScript in a sandbox.
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -83,7 +83,7 @@ PEB is created to work from any directory without installation meaning that:
 * PEB does not need and does not implement any kind of server, but will start one if so configured.
 * PEB executes with no sandbox only local Perl 5 scripts and
   users have full access to their local files.
-* Cross-origin requests and cross-site scripting are disabled.
+* Cross-origin requests and cross-site scripting are disabled.  
   Calling web scripts from a local page is blocked.  
   Calling local Perl scripts from a web page is blocked.  
 * Files or folders can not be selected with their full paths from web pages.
