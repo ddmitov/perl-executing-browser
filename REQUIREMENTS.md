@@ -41,7 +41,7 @@ CONFIG += app_bundle
   Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
   Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
 
-* Perl 5 distribution - any Linux, Mac or Windows Perl distribution.  
+* Perl 5 distribution - any Linux, Mac or Windows Perl standard or relocatable distribution.  
 
   Tested successfully using the following Perl distributions:  
   Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  

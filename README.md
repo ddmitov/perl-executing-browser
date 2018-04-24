@@ -74,30 +74,29 @@ PEB is created to work from any directory without installation meaning that:
 * PEB can be started from any folder.
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./SETTINGS.md#selecting-files-and-folders)  
 * [Optional warning for unsaved data in HTML forms](./SETTINGS.md#html-page-api)
-* [Custom labels for dialogs and context menu](./SETTINGS.md#html-page-api)
-* [Custom icon for windows and message boxes](./CONSTANTS.md#icon)
+* [Custom dialog and context menu labels](./SETTINGS.md#html-page-api)
+* [Custom window and message box icon](./CONSTANTS.md#icon)
 * [Optional logging](./SETTINGS.md#html-page-api#log-files)
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.
-* PEB does not need and does not implement any kind of server, but will start one if so configured.
-* PEB executes with no sandbox only local Perl 5 scripts and
-  users have full access to their local files.
-* Cross-site scripting are disabled.  
-  Calling local Perl scripts from a web page is blocked.  
+* PEB does not need and does not implement any server, but will start one if so configured.
+* Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
+* Cross-site scripting is disabled.  
+* Calling local Perl scripts from a web page is blocked.  
 * Files or folders can not be selected with their full paths from web pages.
 
 ## What PEB Is Not
 * PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
 * PEB is not a server and is not an implementation of the CGI protocol.  
 ``REQUEST_METHOD``, ``QUERY_STRING`` and ``CONTENT_LENGTH`` environment variables are borrowed from the CGI protocol to start local Perl scripts as child processes without any exposure to other applications.
-* PEB does not embed any Perl interpreter in itself and relies on an external Perl distribution, which could be easily changed or upgraded independently.
+* PEB does not embed any Perl interpreter in itself and depends on a standard or relocatable Perl distribution.
 
 ## Limitations
 * Only single-page applications are supported with no pop-up windows.
 * Local Perl scripting inside frames is not supported.
 * No files can be downloaded.
-* QtWebEngine builds do not support printing.
+* ``QtWebEngine`` builds do not support printing.
 * ``window.print()`` is not supported.
 
 ## History
