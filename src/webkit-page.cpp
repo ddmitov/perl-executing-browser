@@ -37,8 +37,6 @@ QPage::QPage()
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
 
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);
@@ -46,6 +44,8 @@ QPage::QPage()
             setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptEnabled, true);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::PluginsEnabled, true);
     QWebSettings::globalSettings()->

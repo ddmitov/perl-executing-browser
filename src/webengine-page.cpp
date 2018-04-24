@@ -33,9 +33,6 @@ QPage::QPage()
 
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, false);
-    QWebEngineSettings::globalSettings()->
-            setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,
-                         false);
 
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::AutoLoadImages, true);
@@ -43,6 +40,9 @@ QPage::QPage()
             setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::JavascriptEnabled, true);
+    QWebEngineSettings::globalSettings()->
+            setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,
+                         true);
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::globalSettings()->

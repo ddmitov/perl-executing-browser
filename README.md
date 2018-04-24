@@ -83,8 +83,7 @@ PEB is created to work from any directory without installation meaning that:
 * PEB does not need and does not implement any kind of server, but will start one if so configured.
 * PEB executes with no sandbox only local Perl 5 scripts and
   users have full access to their local files.
-* Cross-origin requests and cross-site scripting are disabled.  
-  Calling web scripts from a local page is blocked.  
+* Cross-site scripting are disabled.  
   Calling local Perl scripts from a web page is blocked.  
 * Files or folders can not be selected with their full paths from web pages.
 
