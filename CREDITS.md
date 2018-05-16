@@ -217,6 +217,8 @@ http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown
 http://tldp.org/LDP/abs/html/fto.html  
 http://tldp.org/LDP/abs/html/functions.html  
 
+https://www.shellcheck.net/  
+
 https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script  
 https://stackoverflow.com/questions/4181703/how-to-concatenate-string-variables-in-bash  
 https://stackoverflow.com/questions/638975/how-do-i-tell-if-a-regular-file-does-not-exist-in-bash  

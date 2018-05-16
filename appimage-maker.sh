@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 
 make_appimage() {
-  printf "\nGoing to create an AppImage from this copy of Perl Executing Browser.\n\n"
-  ./linuxdeployqt-continuous-x86_64.AppImage ./peb.app/peb -qmake=${qmake} -no-translations
-  ./linuxdeployqt-continuous-x86_64.AppImage ./peb.app/peb -qmake=${qmake} -no-translations -appimage
+  printf "\\nGoing to create an AppImage from this copy of Perl Executing Browser.\\n\\n"
+  ./linuxdeployqt-continuous-x86_64.AppImage ./peb.app/peb -qmake="${qmake}" -no-translations
+  ./linuxdeployqt-continuous-x86_64.AppImage ./peb.app/peb -qmake="${qmake}" -no-translations -appimage
 }
 
 mkdir peb.app
@@ -16,14 +16,14 @@ cp sdk/peb.desktop peb.app/peb.desktop
 cp src/resources/icon/camel.png peb.app/peb.png
 
 cp -r sdk peb.app/sdk
-cd peb.app
+cd peb.app || printf "\\nCan not enter 'peb.app' directory!\\n" && exit
 
 relocatable_perl="./perl/bin/perl"
 if [ -e "$relocatable_perl" ]; then
-  printf "\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\n"
+  printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"
   $relocatable_perl ./sdk/compactor.pl --nobackup
 else
-  printf "\nRelocatable Perl is not found for this copy of Perl Executing Browser.\n"
+  printf "\\nRelocatable Perl is not found for this copy of Perl Executing Browser.\\n"
 fi
 
 rm -rf sdk
