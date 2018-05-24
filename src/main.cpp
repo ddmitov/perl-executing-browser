@@ -109,6 +109,15 @@ int main(int argc, char **argv)
     // ==============================
     QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
 
+#ifdef Q_OS_LINUX
+    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
+    if (appImageEnvVariable.length() > 0) {
+        QFileInfo appImageFileInfo =
+                QFileInfo(QString::fromLatin1(appImageEnvVariable));
+        binaryDir = appImageFileInfo.path();
+    }
+#endif
+
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
         binaryDir.cdUp();
