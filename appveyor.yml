@@ -1,5 +1,5 @@
 before_build:
-  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.8\mingw53_32\bin;%PATH%
+  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.9.5\mingw53_32\bin;%PATH%
 
 build_script:
   - chdir %APPVEYOR_BUILD_FOLDER%\src
