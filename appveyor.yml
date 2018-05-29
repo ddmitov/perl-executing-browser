@@ -1,6 +1,30 @@
-install:
-  - set QTDIR=C:\Qt\5.8\mingw53_32
-  - set PATH=%PATH%;%QTDIR%\bin;C:\Qt\Tools\mingw530_32\bin
+environment:
+  matrix:
+  - QT5: C:\Qt\5.5\mingw492_32
+    MINGW: C:\Qt\Tools\mingw492_32
+    use_cmake: "false"
+  - QT5: C:\Qt\5.6\mingw49_32
+    MINGW: C:\Qt\Tools\mingw492_32
+    use_cmake: "false"
+  - QT5: C:\Qt\5.7\mingw53_32
+    MINGW: C:\Qt\Tools\mingw530_32
+    use_cmake: "false"
+  - QT5: C:\Qt\5.8\mingw53_32
+    MINGW: C:\Qt\Tools\mingw530_32
+    use_cmake: "false"
+  - QT5: C:\Qt\5.9\mingw53_32
+    MINGW: C:\Qt\Tools\mingw530_32
+    use_cmake: "false"
+  - QT5: C:\Qt\5.10.1\mingw53_32
+    MINGW: C:\Qt\Tools\mingw530_32
+    use_cmake: "false"
+
+matrix:
+  fast_finish: true
+
+before_build:
+  - set PATH=%MINGW%\bin;%QT5%\bin;%PATH%
+
 build_script:
   - chdir %APPVEYOR_BUILD_FOLDER%\src
   - qmake peb.pro
