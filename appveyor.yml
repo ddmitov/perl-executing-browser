@@ -1,6 +1,7 @@
+before_build:
+  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.9.5\mingw53_32\bin;%PATH%
 
 build_script:
-  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.6.3\bin;%PATH%
   - chdir %APPVEYOR_BUILD_FOLDER%\src
   - qmake peb.pro
   - mingw32-make
