@@ -1,17 +1,5 @@
-environment:
-  matrix:
-  - QT5: C:\Qt\5.8\mingw53_32
-    MINGW: C:\Qt\Tools\mingw530_32
-  - QT5: C:\Qt\5.9\mingw53_32
-    MINGW: C:\Qt\Tools\mingw530_32
-  - QT5: C:\Qt\5.10.1\mingw53_32
-    MINGW: C:\Qt\Tools\mingw530_32
-
-matrix:
-  fast_finish: true
-
 before_build:
-  - set PATH=%MINGW%\bin;%QT5%\bin;%PATH%
+  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.8\mingw53_32\bin;%PATH%
 
 build_script:
   - chdir %APPVEYOR_BUILD_FOLDER%\src
