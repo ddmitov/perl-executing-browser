@@ -1,11 +1,5 @@
 environment:
   matrix:
-  - QT5: C:\Qt\5.5\mingw492_32
-    MINGW: C:\Qt\Tools\mingw492_32
-  - QT5: C:\Qt\5.6\mingw49_32
-    MINGW: C:\Qt\Tools\mingw492_32
-  - QT5: C:\Qt\5.7\mingw53_32
-    MINGW: C:\Qt\Tools\mingw530_32
   - QT5: C:\Qt\5.8\mingw53_32
     MINGW: C:\Qt\Tools\mingw530_32
   - QT5: C:\Qt\5.9\mingw53_32
