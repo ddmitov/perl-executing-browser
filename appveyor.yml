@@ -1,7 +1,8 @@
 before_build:
-  - set PATH=C:\Qt\Tools\mingw530_32\bin;C:\Qt\5.9.5\msvc2015\bin;%PATH%
+  - set PATH=C:\Qt\5.9.5\msvc2015\bin;%PATH%
+  - "C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Auxiliary\Build\vcvarsall.bat" amd64
 
 build_script:
   - chdir %APPVEYOR_BUILD_FOLDER%\src
-  - qmake peb.pro
+  - qmake -tp vc peb.pro
   - nmake
