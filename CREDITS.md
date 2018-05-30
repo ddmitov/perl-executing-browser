@@ -37,6 +37,7 @@ https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 https://github.com/NixOS/nixpkgs/issues/16327  
+https://github.com/OSGeo/proj.4/blob/master/appveyor.yml  
 
 http://qt-project.org/doc/qt-4.8/qwebhistory.html  
 http://qt-project.org/doc/qt-4.8/qdir.html  

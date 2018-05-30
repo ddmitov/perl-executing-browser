@@ -314,7 +314,7 @@ public slots:
             }
         }
 
-        if (closeRequested == true and runningScripts.isEmpty()) {
+        if ((closeRequested == true) and (runningScripts.isEmpty())) {
             emit closeWindowSignal();
         }
     }
