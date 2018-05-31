@@ -5,4 +5,4 @@ before_build:
 build_script:
   - chdir %APPVEYOR_BUILD_FOLDER%\src
   - qmake peb.pro
-  - nmake
+  - nmake /I
