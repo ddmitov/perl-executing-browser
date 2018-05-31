@@ -22,7 +22,7 @@
 #include <QDesktopWidget>
 #include <QMenu>
 #include <QWebEngineView>
-#include <QtWebEngineWidgets/QWebEngineContextMenuData>
+#include <QtWebEngineWidgets>
 
 #include "webengine-page.h"
 
