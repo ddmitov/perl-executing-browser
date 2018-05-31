@@ -245,5 +245,5 @@ https://github.com/github/linguist#overrides
 http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
 
 ## AppVeyor
-https://www.appveyor.com/docs/  
-http://stackoverflow.com/questions/26586006/build-qt-project-from-appveyor  
+https://www.appveyor.com/docs/build-environment/#qt  
+https://docs.microsoft.com/en-us/cpp/error-messages/tool-errors/nmake-fatal-error-u1077  
