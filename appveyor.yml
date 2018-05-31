@@ -1,5 +1,5 @@
 before_build:
-  - set PATH=C:\Qt\5.9.5\msvc2015\bin;%PATH%
+  - set PATH=C:\Qt\5.6.3\msvc2013\bin;%PATH%
   - call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat"
 
 build_script:
