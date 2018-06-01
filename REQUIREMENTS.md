@@ -2,7 +2,7 @@ Perl Executing Browser - Requirements
 --------------------------------------------------------------------------------
 
 ## Compile-Time Requirements
-The only compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.
+The only compile-time requirement of PEB is a GCC-based Qt development bundle version 5.2 or any later version.
 
 Compiled and tested successfully using:
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP

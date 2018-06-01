@@ -1,8 +1,0 @@
-before_build:
-  - set PATH=C:\Qt\5.10.1\msvc2015\bin;%PATH%
-  - call "%VS120COMNTOOLS%\..\..\VC\vcvarsall.bat"
-
-build_script:
-  - chdir %APPVEYOR_BUILD_FOLDER%\src
-  - qmake peb.pro
-  - nmake /I
