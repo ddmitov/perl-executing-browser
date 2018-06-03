@@ -37,7 +37,7 @@ https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 https://github.com/NixOS/nixpkgs/issues/16327  
-https://github.com/OSGeo/proj.4/blob/master/appveyor.yml  
+https://github.com/annulen/webkit  
 
 http://qt-project.org/doc/qt-4.8/qwebhistory.html  
 http://qt-project.org/doc/qt-4.8/qdir.html  
@@ -243,7 +243,3 @@ https://github.com/github/linguist#overrides
 
 ## Travis CI
 http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
-
-## AppVeyor
-https://www.appveyor.com/docs/build-environment/#qt  
-https://docs.microsoft.com/en-us/cpp/error-messages/tool-errors/nmake-fatal-error-u1077  

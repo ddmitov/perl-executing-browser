@@ -19,8 +19,16 @@
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include "webkit-main-window.h"
-#else
+#endif
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
+#if ANNULEN_QTWEBKIT == 0
 #include "webengine-main-window.h"
+#endif
+
+#if ANNULEN_QTWEBKIT == 1
+#include "webkit-main-window.h"
+#endif
 #endif
 
 // ==============================

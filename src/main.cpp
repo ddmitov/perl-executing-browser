@@ -26,8 +26,16 @@
 
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include "webkit-main-window.h"
-#else
+#endif
+
+#if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
+#if ANNULEN_QTWEBKIT == 0
 #include "webengine-main-window.h"
+#endif
+
+#if ANNULEN_QTWEBKIT == 1
+#include "webkit-main-window.h"
+#endif
 #endif
 
 // ==============================
@@ -247,11 +255,13 @@ int main(int argc, char **argv)
                      SLOT(setMainWindowTitleSlot(QString)));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    // Signal and slot for fullscreen video:
-    QObject::connect(mainWindow.webViewWidget->page(),
-                     SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
-                     &mainWindow,
-                     SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
+    if (ANNULEN_QTWEBKIT == 0) {
+        // Signal and slot for fullscreen video:
+        QObject::connect(mainWindow.webViewWidget->page(),
+                         SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
+                         &mainWindow,
+                         SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
+    }
 #endif
 
     // Signal and slot for closing the main window:

@@ -2,7 +2,14 @@ Perl Executing Browser - Requirements
 --------------------------------------------------------------------------------
 
 ## Compile-Time Requirements
-The only compile-time requirement of PEB is a GCC-based Qt development bundle version 5.2 or any later version.
+The only Linux and Macintosh compile-time requirement of PEB is a GCC-based Qt development bundle version 5.2 or any later version.  
+
+The source code of PEB is not MSVC-compatible and PEB can not be compiled using any MSVC-based Windows version of Qt.   This means that:  
+1. PEB Windows binaries can be compiled only by a GCC-based Qt development bundle.  
+2. Only ``QtWebKit`` can be used by a Windows binary of PEB.  
+  ``QtWebEngine`` is included only in the MSVC-based Qt development bundles.  
+3. Updated ``QtWebKit`` headers and libraries have to be manually added from the  
+  [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) for all Qt versions higher than 5.5.  
 
 Compiled and tested successfully using:
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
@@ -19,8 +26,28 @@ qmake -qt=qt5
 make
 ```
 
-If you want to change the Macintosh binary type, edit the ``src/peb.pro`` project file before compiling the binary.
+## Compile-Time Settings
+All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  
 
+* QtWebKit Use
+To use ```QtWebKit``` or ```QtWebEngine``` depending on the Qt version, which is the default setting:  
+
+```QMake
+ANNULEN_QTWEBKIT = 0
+```
+
+The default web engine for Qt versions up to 5.5.x is ```QtWebKit```.  
+The default web engine for Qt versions 5.6.x or higher is ```QtWebEngine```.
+
+To use [an updated QtWebKit version from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version higher than 5.5:
+
+```QMake
+# ANNULEN_QTWEBKIT = 1
+```
+
+Setting ```ANNULEN_QTWEBKIT``` to ```1``` has no effect on Qt versions 5.5 or lower.  
+
+* Macintosh Bundle
 To make a bundle-less binary, which is the default setting:  
 
 ```QMake
