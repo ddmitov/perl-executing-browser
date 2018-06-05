@@ -9,7 +9,7 @@ The source code of PEB is not MSVC-compatible and PEB can not be compiled using 
 * Only ```QtWebKit``` can be used by a Windows binary of PEB.  
   Windows GCC-based Qt development bundles version 5.6.x or higher have neither ```QtWebEngine```, nor ```QtWebKit```.  
 * Updated ``QtWebKit`` headers and libraries have to be manually added from the  
-  [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) to all Windows GCC-based Qt development bundles version 5.6 or later.
+  [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) to all Windows GCC-based Qt development bundles version 5.6.x or higher.
 
 Compiled and tested successfully using:
 * [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
@@ -39,7 +39,7 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   The default web engine for Qt versions up to 5.5.x is ```QtWebKit```.  
   The default web engine for Qt versions 5.6.x or higher is ```QtWebEngine```.
 
-  To use [an updated QtWebKit version from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version higher than 5.5:
+  To use [an updated QtWebKit version from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version 5.6.x or higher:
 
   ```QMake
   ANNULEN_QTWEBKIT = 1
