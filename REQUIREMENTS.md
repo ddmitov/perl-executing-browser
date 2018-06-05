@@ -4,11 +4,11 @@ Perl Executing Browser - Requirements
 ## Compile-Time Requirements
 The only Linux and Macintosh compile-time requirement of PEB is a GCC-based Qt development bundle version 5.2 or any later version.  
 
-The source code of PEB is not MSVC-compatible and PEB can not be compiled using any MSVC-based Windows version of Qt.   This means that:  
-* PEB Windows binaries can be compiled only by a GCC-based Qt development bundle.
-* Only ```QtWebKit``` can be used by a Windows binary of PEB.  
-  Windows GCC-based Qt development bundles version 5.6.x or higher have neither ```QtWebEngine```, nor ```QtWebKit```.  
-* Updated ``QtWebKit`` headers and libraries have to be manually added from the  
+The source code of PEB is not MSVC-compatible and PEB can not be compiled using any MSVC-based Windows version of Qt. Only applications build for a MSVC-based Qt version 5.6.x or higher can use ```QtWebEngine``` on the Windows platform. Windows GCC-based Qt development bundles version 5.6.x or higher have neither ```QtWebEngine```, nor ```QtWebKit```.  
+This means that:  
+* Windows builds of PEB can only be compiled by a GCC-based Qt development bundle.
+* Windows builds of PEB can only use ```QtWebKit``` web engine.  
+* Updated ``QtWebKit`` have to be manually added from the  
   [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) to all Windows GCC-based Qt development bundles version 5.6.x or higher.
 
 Compiled and tested successfully using:
