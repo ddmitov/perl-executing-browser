@@ -24,25 +24,26 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
 
     ##########################################################
-    # QTWEBKIT USE
+    # ANNULEN QTWEBKIT
     # Updated QtWebKit headers and libraries for
-    # Qt versions 5.6 or higher can be downloaded from:
+    # Qt versions 5.6.x or higher can be downloaded from:
     # https://github.com/annulen/webkit/releases
 
-    # To use QtWebKit or QtWebEngine depending on the Qt version:
+    # To use QtWebKit or QtWebEngine depending on the Qt version,
+    # which is the default setting:
     # ANNULEN_QTWEBKIT = 0
     # QtWebKit is the default web engine for Qt versions up to 5.5.x and
     # QtWebEngine is the default web engine for Qt versions 5.6.x or higher
 
-    # To use the updated QtWebKit version of Konstantin Tokarev (annulen) with
-    # a Qt version higher than 5.5:
+    # To use an updated QtWebKit version from
+    # the repository of Konstantin Tokarev (annulen) with
+    # a Qt version 5.6.x or higher:
     # ANNULEN_QTWEBKIT = 1
 
-    # ANNULEN_QTWEBKIT = 1
-    # has no effect on Qt versions 5.5 or lower.
+    # This setting has no effect on Qt versions 5.5 or lower.
     ##########################################################
 
-    ANNULEN_QTWEBKIT = 1
+    ANNULEN_QTWEBKIT = 0
 
     DEFINES += "ANNULEN_QTWEBKIT=$$ANNULEN_QTWEBKIT"
 

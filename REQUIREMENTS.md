@@ -7,7 +7,7 @@ The only Linux and Macintosh compile-time requirement of PEB is a GCC-based Qt d
 The source code of PEB is not MSVC-compatible and PEB can not be compiled using any MSVC-based Windows version of Qt.   This means that:  
 * PEB Windows binaries can be compiled only by a GCC-based Qt development bundle.
 * Only ```QtWebKit``` can be used by a Windows binary of PEB.  
-  Windows GCC-based Qt development bundles version 5.6 or later have neither ```QtWebEngine```, nor ```QtWebKit```.  
+  Windows GCC-based Qt development bundles version 5.6.x or higher have neither ```QtWebEngine```, nor ```QtWebKit```.  
 * Updated ``QtWebKit`` headers and libraries have to be manually added from the  
   [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) to all Windows GCC-based Qt development bundles version 5.6 or later.
 
@@ -29,7 +29,7 @@ make
 ## Compile-Time Settings
 All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  
 
-* QtWebKit Use  
+* Updated QtWebKit  
   To use ```QtWebKit``` or ```QtWebEngine``` depending on the Qt version, which is the default setting:  
 
   ```QMake
