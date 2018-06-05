@@ -19,6 +19,7 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Limitations](#limitations)
 * [REQUIREMENTS](./REQUIREMENTS.md)
   * [Compile-Time Requirements](./REQUIREMENTS.md#compile-time-requirements)
+  * [Compile-Time Settings](./REQUIREMENTS.md#compile-time-settings)
   * [Runtime Requirements](./REQUIREMENTS.md#runtime-requirements)
 * [CONSTANTS](./CONSTANTS.md)
   * [Hard Coded Files and Folders](./CONSTANTS.md#hard-coded-files-and-folders)
