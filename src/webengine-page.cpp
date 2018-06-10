@@ -48,12 +48,6 @@ QPage::QPage()
     QWebEngineSettings::globalSettings()->
             setAttribute(QWebEngineSettings::XSSAuditingEnabled, true);
 
-    // Signal and slot for file downloads:
-//    QObject::connect(QWebEngineProfile::defaultProfile(),
-//                     SIGNAL(downloadRequested(QWebEngineDownloadItem*)),
-//                     this,
-//                     SLOT(qDownloadRequestedSlot(QWebEngineDownloadItem*)));
-
     // Signal and slot for actions taken after page is loaded:
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));

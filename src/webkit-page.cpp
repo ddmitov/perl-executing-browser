@@ -30,9 +30,9 @@ QPage::QPage()
 {
     // QWebPage settings:
     QNetworkProxyFactory::setUseSystemConfiguration(true);
+
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
-
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->

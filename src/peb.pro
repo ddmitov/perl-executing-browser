@@ -135,7 +135,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        equals (QTWEBKIT, 0) {
+        equals (ANNULEN_QTWEBKIT, 0) {
             # Source files:
             SOURCES += \
                 main.cpp \
@@ -156,7 +156,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
                 webengine-view.h
         }
 
-        equals (QTWEBKIT, 1) {
+        equals (ANNULEN_QTWEBKIT, 1) {
             # Source files:
             SOURCES += \
                 main.cpp \

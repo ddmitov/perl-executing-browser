@@ -69,14 +69,6 @@ public slots:
     }
 
     // ==============================
-    // Downloads handling:
-    // ==============================
-//    void qDownloadRequestedSlot(QWebEngineDownloadItem* download) {
-//        qDebug() << "Path: " << download->path();
-//        download->accept();
-//    }
-
-    // ==============================
     // Page settings handling:
     // ==============================
     void qGetPageSettings(QVariant settingsJsResult) {

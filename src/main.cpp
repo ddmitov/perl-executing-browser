@@ -437,8 +437,8 @@ int main(int argc, char **argv)
                     mainWindow.qDisplayError(
                                 localServerSettingsFilePath + "<br>" +
                                 "is malformed.");
-                    qDebug() << localServerSettingsFilePath << "<br>"
-                             << "is malformed.";
+                    qDebug() << localServerSettingsFilePath
+                             << " is malformed.";
                 }
             }
 
@@ -446,8 +446,8 @@ int main(int argc, char **argv)
                 mainWindow.qDisplayError(
                             localServerSettingsFilePath + "<br>" +
                             "is empty.");
-                qDebug() << localServerSettingsFilePath << "<br>"
-                         << "is empty.";
+                qDebug() << localServerSettingsFilePath
+                         << " is empty.";
             }
 
             // Local server has to be started as
