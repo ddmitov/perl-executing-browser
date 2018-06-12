@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+cd .. || exit
+
 relocatable_perl="./perl/bin/perl"
 
 if [ -e "$relocatable_perl" ]; then

@@ -1,5 +1,7 @@
 #!/bin/sh
 
+cd .. || exit 1
+
 makedmg_version='v0.3'
 macdeployqt_bin=$(which macdeployqt)
 peb_bundle=$1
@@ -12,7 +14,7 @@ require_bundle_config() {
     echo "Please, set BUNDLE=1 in $peb_pro file and rebuild project."
     echo
     echo "Here is one liner to update your configuration: "
-    echo "   perl -pi -e s,BUNDLE=0,BUNDLE=1,g $peb_pro"
+    echo "perl -pi -e s,BUNDLE=0,BUNDLE=1,g $peb_pro"
     echo
     exit 1
   fi
@@ -35,7 +37,7 @@ require_bundle_config
 
 if [ -z "$macdeployqt_bin" ]
   then
-  echo "No macdeployqt found in PATH"
+  echo "No macdeployqt found in PATH."
   if [ -z "$QTDIR" ]
     then
     echo "Need to set QTDIR environment variable."
@@ -44,8 +46,8 @@ if [ -z "$macdeployqt_bin" ]
     set QTDIR = $qtdirname
     if [ -z "$QTDIR" ]
       then
-      echo "No QTDIR was set. I have quit now."
-      exit
+      echo "No QTDIR was set. I have to quit now."
+      exit 1
     fi
     echo ""
   fi

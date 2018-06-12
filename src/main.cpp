@@ -97,15 +97,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application version:
     // ==============================
-    application.setApplicationVersion("0.6.0");
-
-    // ==============================
-    // Basic program information:
-    // ==============================
-    qDebug() << "Application path:" << application.applicationFilePath();
-    qDebug() << "Application version:"
-             << application.applicationVersion().toLatin1().constData();
-    qDebug() << "Qt version:" << QT_VERSION_STR;
+    application.setApplicationVersion("0.7.0");
 
     // ==============================
     // UTF-8 encoding application-wide:
@@ -113,27 +105,27 @@ int main(int argc, char **argv)
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 
     // ==============================
-    // Binary file directory:
+    // Directory of the browser executable:
     // ==============================
-    QDir binaryDir = QDir::toNativeSeparators(application.applicationDirPath());
-
-#ifdef Q_OS_LINUX
-    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
-    if (appImageEnvVariable.length() > 0) {
-        QFileInfo appImageFileInfo =
-                QFileInfo(QString::fromLatin1(appImageEnvVariable));
-        binaryDir = appImageFileInfo.path();
-    }
-#endif
+    QDir executableDirectory =
+            QDir::toNativeSeparators(application.applicationDirPath());
 
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
-        binaryDir.cdUp();
-        binaryDir.cdUp();
+        executableDirectory.cdUp();
+        executableDirectory.cdUp();
     }
 #endif
 
-    QString binaryDirName = binaryDir.absolutePath().toLatin1();
+    QString browserDirectory = executableDirectory.absolutePath().toLatin1();
+
+    // ==============================
+    // Perl directory:
+    // ==============================
+
+    QString perlDirectory =
+            QDir::toNativeSeparators(
+                browserDirectory + QDir::separator() + "perl");
 
     // ==============================
     // Perl interpreter:
@@ -149,17 +141,17 @@ int main(int argc, char **argv)
 #endif
 
     QString perlInterpreter;
+
     QString privatePerlInterpreterFullPath = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "perl" + QDir::separator()
+                perlDirectory + QDir::separator()
                 + "bin" + QDir::separator()
                 + perlExecutable);
 
-    QFile privatePerlInterpreterFile(privatePerlInterpreterFullPath);
-    if (!privatePerlInterpreterFile.exists()) {
-        perlInterpreter = "perl";
-    } else {
+    if (QFile(privatePerlInterpreterFullPath).exists()) {
         perlInterpreter = privatePerlInterpreterFullPath;
+    } else {
+        // Perl on PATH is used if no private Perl interpreter is found:
+        perlInterpreter = "perl";
     }
 
     application.setProperty("perlInterpreter", perlInterpreter);
@@ -168,19 +160,43 @@ int main(int argc, char **argv)
     // PERL5LIB directory:
     // ==============================
     QString perlLibDirString = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "perl" + QDir::separator()
-                + "lib");
+                perlDirectory + QDir::separator() + "lib");
     QByteArray perlLibDirArray = perlLibDirString.toLatin1();
 
     qputenv("PERL5LIB", perlLibDirArray);
 
     // ==============================
+    // Resources directory:
+    // ==============================
+
+    QString resourcesDirectory =
+            QDir::toNativeSeparators(
+                browserDirectory + QDir::separator() + "resources");
+
+    // ==============================
+    // Application directory:
+    // ==============================
+    QString applicationDirName = QDir::toNativeSeparators(
+                resourcesDirectory + QDir::separator()
+                + "app");
+
+    application.setProperty("application", applicationDirName);
+
+    // ==============================
+    // Data directory:
+    // ==============================
+    QString dataDirName = QDir::toNativeSeparators(
+                resourcesDirectory + QDir::separator()
+                + "data");
+    QByteArray dataDirNameArray = dataDirName.toLatin1();
+
+    qputenv("PEB_DATA_DIR", dataDirNameArray);
+
+    // ==============================
     // Application icon:
     // ==============================
     QString iconPathName = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "resources" + QDir::separator()
+                resourcesDirectory + QDir::separator()
                 + "app.png");
 
     QPixmap icon(32, 32);
@@ -196,34 +212,13 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // Application directory:
-    // ==============================
-    QString applicationDirName = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "resources" + QDir::separator()
-                + "app");
-
-    application.setProperty("application", applicationDirName);
-
-    // ==============================
-    // Data directory:
-    // ==============================
-    QString dataDirName = QDir::toNativeSeparators(
-                binaryDirName + QDir::separator()
-                + "resources" + QDir::separator()
-                + "data");
-    QByteArray dataDirNameArray = dataDirName.toLatin1();
-
-    qputenv("PEB_DATA_DIR", dataDirNameArray);
-
-    // ==============================
     // Logging:
     // ==============================
     // If 'logs' directory is found in the directory of the browser binary,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
     // program messages could be seen inside Qt Creator.
-    QString logDirFullPath = binaryDirName + QDir::separator() + "logs";
+    QString logDirFullPath = browserDirectory + QDir::separator() + "logs";
     QDir logDir(logDirFullPath);
     if (logDir.exists()) {
         application.setProperty("logDirFullPath", logDirFullPath);
@@ -275,22 +270,12 @@ int main(int argc, char **argv)
                      &mainWindow, SLOT(qExitApplicationSlot()));
 
     // ==============================
-    // Missing Perl interpreter error message:
+    // Basic program information:
     // ==============================
-    if (perlInterpreter.length() == 0) {
-        QFileReader *resourceReader =
-                new QFileReader(QString(":/html/error.html"));
-        QString htmlErrorContents = resourceReader->fileContents;
-
-        QString errorMessage = privatePerlInterpreterFullPath + "<br>"
-                + "is not found and "
-                + "no Perl interpreter is available on PATH.";
-        htmlErrorContents.replace("ERROR_MESSAGE", errorMessage);
-
-        mainWindow.webViewWidget->setHtml(htmlErrorContents);
-
-        qDebug() << "No Perl interpreter is found.";
-    }
+    qDebug() << "Application path:" << application.applicationFilePath();
+    qDebug() << "Application version:"
+             << application.applicationVersion().toLatin1().constData();
+    qDebug() << "Qt version:" << QT_VERSION_STR;
 
     if (perlInterpreter.length() > 0) {
         qDebug() << "Perl interpreter:" << perlInterpreter;

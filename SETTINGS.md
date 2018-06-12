@@ -216,9 +216,9 @@ select_file.receiverFunction = function (file) {
   Any new directory will be created immediately by PEB.
 
 ## Minimal Portable Perl Distribution for PEB
-Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. [Perl Distribution Compactor](sdk/compactor.pl) is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders are saved as ``bin-original`` and ``lib-original`` respectively. These directories should be manually archived for future use or removed.  
+Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. [Perl Distribution Compactor](sdk/compactor.pl) is one solution to this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders may be saved as ``bin-original`` and ``lib-original`` respectively.  
 
-Perl Distribution Compactor should be started from the directory of the browser binary using [compactor.sh](compactor.sh) on a Linux or a Mac machine or [compactor.cmd](compactor.cmd) on a Windows machine to ensure that only the Perl distribution of PEB is used. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
+Perl Distribution Compactor should be started using [compactor.sh](sdk/compactor.sh) on a Linux or a Mac machine or [compactor.cmd](sdk/compactor.cmd) on a Windows machine to ensure that only the Perl distribution of PEB is used. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
 
 Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_binary_directory}/sdk/lib`` folder.
 

@@ -144,6 +144,7 @@ http://stackoverflow.com/questions/17680207/qhash-iterator-example-no-match-for-
 https://stackoverflow.com/questions/23174393/parse-jsonarray  
 https://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-different-header  
 https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
+https://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c  
 
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
 http://webkit.sed.hu/content/disabling-cache  
@@ -227,6 +228,8 @@ https://stackoverflow.com/questions/10319652/check-if-a-file-is-executable
 https://stackoverflow.com/questions/10376206/what-is-the-preferred-bash-shebang  
 
 https://unix.stackexchange.com/questions/312280/split-string-by-delimiter-and-get-n-th-element  
+https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-architecture  
+
 https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-command-output/  
 https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
 http://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  

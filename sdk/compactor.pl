@@ -27,9 +27,18 @@ my $root = getcwd;
 my $app_directory = catdir($root, "resources", "app");
 my $perl_directory = catdir($root, "perl");
 my $bin_original = catdir($perl_directory, "bin");
-my $bin_compacted = catdir($perl_directory, "bin-compacted");
 my $lib_original = catdir($perl_directory, "lib");
-my $lib_compacted = catdir($perl_directory, "lib-compacted");
+
+my $bin_compacted;
+my $lib_compacted;
+
+if ($ARGV[0] and $ARGV[0] =~ /^--AppImage$/) {
+  $bin_compacted = catdir($root, "peb.app", "perl", "bin");
+  $lib_compacted = catdir($root, "peb.app", "perl", "lib");
+} else {
+  $bin_compacted = catdir($perl_directory, "bin-compacted");
+  $lib_compacted = catdir($perl_directory, "lib-compacted");
+}
 
 # Copying the Perl interpreter:
 if ($Config{osname} !~ "MSWin32") {
@@ -57,7 +66,8 @@ foreach my $script (@scripts) {
   print "Script Nr. $script_counter: $script\n";
 
   my $dependencies_hashref =
-    scan_deps (files => [$script], recurse => 3, compile => 'true');
+    scan_deps(files => [$script], recurse => 3,
+              compile => 'true', warn_missing => 1);
 
   my $module_counter;
   while (my($partial_path, $module_name) = each(%{$dependencies_hashref})) {
@@ -77,16 +87,18 @@ foreach my $script (@scripts) {
 }
 
 # Rename Perl directories:
-rename $bin_original, catdir($perl_directory, "bin-original");
-rename $bin_compacted, catdir($perl_directory, "bin");
+if ($ARGV[0] and $ARGV[0] !~ /^--AppImage$/) {
+  rename $bin_original, catdir($perl_directory, "bin-original");
+  rename $bin_compacted, catdir($perl_directory, "bin");
 
-rename $lib_original, catdir($perl_directory, "lib-original");
-rename $lib_compacted, catdir($perl_directory, "lib");
+  rename $lib_original, catdir($perl_directory, "lib-original");
+  rename $lib_compacted, catdir($perl_directory, "lib");
 
-# Remove backup directories if the script is started with the '--nobackup' flag.
-if ($ARGV[0] and $ARGV[0] =~ /^--nobackup$/) {
-  rmtree(catdir($perl_directory, "bin-original"));
-  rmtree(catdir($perl_directory, "lib-original"));
+  # Remove backup directories if the script is started with the '--no-backup' flag.
+  if ($ARGV[0] and $ARGV[0] =~ /^--no-backup$/) {
+    rmtree(catdir($perl_directory, "bin-original"));
+    rmtree(catdir($perl_directory, "lib-original"));
+  }
 }
 
 # Perl scripts recursive lister subroutine:

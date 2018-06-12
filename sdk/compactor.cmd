@@ -1,3 +1,4 @@
+cd ..
 
 IF EXIST ./perl/bin/perl.exe (
   ECHO Going to compact the relocatable Perl for this copy of Perl Executing Browser.
