@@ -19,7 +19,7 @@ else
 fi
 
 cp ./sdk/peb.desktop ./peb.app/peb.desktop
-cp ./src/resources/icon/camel.png ./peb.app/peb.png
+cp ./resources/app.png ./peb.app/peb.png
 
 cp -rf ./resources ./peb.app/resources
 

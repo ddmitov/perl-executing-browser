@@ -93,11 +93,11 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        equals (QTWEBKIT, 0) {
+        equals (ANNULEN_QTWEBKIT, 0) {
             QT += widgets webenginewidgets
         }
 
-        equals (QTWEBKIT, 1) {
+        equals (ANNULEN_QTWEBKIT, 1) {
             QT += widgets webkitwidgets
         }
     }
@@ -108,7 +108,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        equals (QTWEBKIT, 1) {
+        equals (ANNULEN_QTWEBKIT, 1) {
             QT += printsupport
         }
     }

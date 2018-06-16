@@ -145,6 +145,7 @@ https://stackoverflow.com/questions/23174393/parse-jsonarray
 https://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-different-header  
 https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
 https://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c  
+https://stackoverflow.com/questions/9641807/qdir-mkdir-with-absolutepath  
 
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
 http://webkit.sed.hu/content/disabling-cache  

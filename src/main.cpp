@@ -15,12 +15,11 @@
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#include <QApplication>
+#include <QtWidgets/QApplication>
 #include <QDateTime>
 #include <QDebug>
 #include <QTextCodec>
 #include <QtGlobal>
-#include <QtWidgets>
 
 #include "port-scanner.h"
 
@@ -173,6 +172,23 @@ int main(int argc, char **argv)
             QDir::toNativeSeparators(
                 browserDirectory + QDir::separator() + "resources");
 
+#ifdef Q_OS_LINUX
+    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
+    QString appImageResourcesDirectory;
+
+    if (appImageEnvVariable.length() > 0) {
+        QFileInfo appImageFileInfo =
+                QFileInfo(QString::fromLatin1(appImageEnvVariable));
+
+        QString appImageDirectory = appImageFileInfo.path();
+        QString appImageName = appImageFileInfo.baseName();
+
+        appImageResourcesDirectory =
+                appImageDirectory + QDir::separator()
+                + appImageName + "-resources";
+    }
+#endif
+
     // ==============================
     // Application directory:
     // ==============================
@@ -185,12 +201,24 @@ int main(int argc, char **argv)
     // ==============================
     // Data directory:
     // ==============================
-    QString dataDirName = QDir::toNativeSeparators(
-                resourcesDirectory + QDir::separator()
-                + "data");
-    QByteArray dataDirNameArray = dataDirName.toLatin1();
+    QString dataDirName =
+            QDir::toNativeSeparators(
+                resourcesDirectory + QDir::separator() + "data");
 
-    qputenv("PEB_DATA_DIR", dataDirNameArray);
+#ifdef Q_OS_LINUX
+    if (appImageEnvVariable.length() > 0) {
+        dataDirName =
+                appImageResourcesDirectory + QDir::separator() + "data";
+
+        QDir dataDir(dataDirName);
+
+        if (!dataDir.exists()) {
+            dataDir.mkpath(dataDirName);
+        }
+    }
+#endif
+
+    qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
 
     // ==============================
     // Application icon:
@@ -214,11 +242,20 @@ int main(int argc, char **argv)
     // ==============================
     // Logging:
     // ==============================
-    // If 'logs' directory is found in the directory of the browser binary,
+    // If 'logs' directory is found in the resources directory,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
-    // program messages could be seen inside Qt Creator.
-    QString logDirFullPath = browserDirectory + QDir::separator() + "logs";
+    // program messages could be seen inside Qt Creator during development.
+
+    QString logDirFullPath = resourcesDirectory + QDir::separator() + "logs";
+
+#ifdef Q_OS_LINUX
+    if (appImageEnvVariable.length() > 0) {
+        logDirFullPath =
+                appImageResourcesDirectory + QDir::separator() + "logs";
+    }
+#endif
+
     QDir logDir(logDirFullPath);
     if (logDir.exists()) {
         application.setProperty("logDirFullPath", logDirFullPath);

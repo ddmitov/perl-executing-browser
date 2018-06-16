@@ -71,7 +71,7 @@ my $wait_for_input = AnyEvent->io (
   }
 );
 
-my $wait_one_second = AnyEvent->timer (
+my $half_second_wait = AnyEvent->timer (
   after => 0,
   interval => 0.5,
   cb => sub {

@@ -2,22 +2,25 @@ Perl Executing Browser - Requirements
 --------------------------------------------------------------------------------
 
 ## Compile-Time Requirements
-The only Linux and Macintosh compile-time requirement of PEB is a GCC-based Qt development bundle version 5.2 or any later version.  
+The only Linux and Macintosh compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.  
 
-The source code of PEB is not MSVC-compatible and PEB can not be compiled using any MSVC-based Windows version of Qt. Only applications build for a MSVC-based Qt version 5.6.x or higher can use ```QtWebEngine``` on the Windows platform. Windows GCC-based Qt development bundles version 5.6.x or higher have neither ```QtWebEngine```, nor ```QtWebKit```.  
-This means that:  
-* Windows builds of PEB can only be compiled by a GCC-based Qt development bundle.
-* Windows builds of PEB can only use ```QtWebKit``` web engine.  
-* Updated ``QtWebKit`` have to be manually added from the  
-  [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) to all Windows GCC-based Qt development bundles version 5.6.x or higher.
+PEB Windows binary can be compiled using any MinGW (GCC-based) Qt development bundle version 5.2.x - 5.8.x.  
+
+Compiling Windows binaries of PEB is subject to the following restrictions:  
+
+* The source code of PEB is not MSVC-compatible and Windows builds of PEB can only be compiled by a MinGW (GCC-based) Qt development bundle.
+*  Only MSVC-based Qt development bundles version 5.6.x or higher include the ```QtWebEngine``` on the Windows platform and Windows builds of PEB can only use the ```QtWebKit``` web engine.
+* Windows MinGW Qt development bundles version 5.6.x - 5.8.x have neither ```QtWebEngine```, nor ```QtWebKit``` and an updated ``QtWebKit`` has to be manually added from the [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
+* There are no MinGW Qt development bundles for any version 5.9.x or higher.
 
 Compiled and tested successfully using:
-* [Qt Creator 3.0.0 and Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
-* [Qt Creator 3.0.1 and Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5
-* [Qt Creator 3.1.1 and Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
-* [Qt Creator 3.1.1 and Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
-* [Qt Creator 3.5.1 and Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
-* [Qt Creator 4.2.1 and Qt 5.8.0](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 16.04
+* [Qt 5.2.0 and Qt Creator 3.0.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
+* [Qt 5.2.1 and Qt Creator 3.0.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5
+* [Qt 5.3.0 and Qt Creator 3.1.1](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
+* [Qt 5.4.1 and Qt Creator 3.1.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
+* [Qt 5.5.1 and Qt Creator 3.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
+* [Qt 5.8.0 and Qt Creator 4.2.1](http://download.qt.io/archive/qt/5.8/5.8.0/) on 64-bit Lubuntu 16.04
+* [Qt 5.9.1 and Qt Creator 4.3.1](http://download.qt.io/archive/qt/5.9/5.9.1/) on 64-bit Lubuntu 16.04
 
 To compile PEB type in a terminal started in the ``src`` folder:
 
@@ -62,11 +65,10 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   CONFIG += app_bundle
   ```
 
-## Runtime Requirements
-* Qt 5 libraries.  
+  To make automatically a bundled binary (peb.app) use the [dmg-maker.sh](sdk/dmg-maker.sh) script by Valcho Nedelchev.
 
-  Their full list for a QtWebKit Linux build of PEB can be found inside the [start-peb-webkit.sh](start-peb-webkit.sh) script.  
-  Their full list for a QtWebEngine Linux build of PEB can be found inside the [start-peb-webengine.sh](start-peb-webengine.sh) script.  
+## Runtime Requirements
+* Qt 5 libraries.
 
 * Perl 5 distribution - any Linux, Mac or Windows Perl standard or relocatable distribution.  
 

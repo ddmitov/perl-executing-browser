@@ -18,8 +18,8 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QApplication>
-#include <QMainWindow>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QMainWindow>
 #include <QWebEngineFullScreenRequest>
 
 #include "webengine-view.h"

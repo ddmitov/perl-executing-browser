@@ -33,6 +33,7 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
   * [Starting Local Server](./SETTINGS.md#starting-local-server)
   * [Selecting Files and Folders](./SETTINGS.md#selecting-files-and-folders)
   * [Minimal Portable Perl Distribution for PEB](./SETTINGS.md#minimal-portable-perl-distribution-for-peb)
+  * [AppImage Support](./SETTINGS.md#appimage-support)
   * [Log Files](./SETTINGS.md#log-files)
 * [History](#history)
 * [License](./LICENSE.md)
