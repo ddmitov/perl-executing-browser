@@ -247,3 +247,7 @@ https://github.com/github/linguist#overrides
 
 ## Travis CI
 http://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
+
+## AppImage
+https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
+https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  

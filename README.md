@@ -10,6 +10,12 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 
 Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting. In contrast to Electron and NW.js, PEB does not depend on [Node.js](https://nodejs.org/en/) and always runs JavaScript in a sandbox.
 
+## Screenshots
+
+![PEB Main Window](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-main.png "PEB Main Window")  
+
+![Reading Local Files](https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-local-files.png "Reading Local Files")  
+
 ## Contents
 * [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)

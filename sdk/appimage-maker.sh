@@ -20,6 +20,8 @@ fi
 
 cp ./sdk/peb.desktop ./peb.app/peb.desktop
 cp ./resources/app.png ./peb.app/peb.png
+mkdir -p ./peb.app/usr/share
+cp ./sdk/metainfo ./peb.app/usr/share/metainfo
 
 cp -rf ./resources ./peb.app/resources
 
