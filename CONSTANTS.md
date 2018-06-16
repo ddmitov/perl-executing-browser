@@ -19,7 +19,9 @@ Perl Executing Browser - Constants
 
 * **Data Directory:**
   Data directory must contain any writable files used or produced by a PEB-based application.  
-  The data directory path is ``{PEB_binary_directory}/resources/data`` or ``{AppImage_binary_directory}/resources/data`` if a PEB-based application is packed as an [AppImage](https://appimage.org/). Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
+  The data directory path is ``{PEB_binary_directory}/resources/data`` or ``{AppImage_binary_directory}/resources/data`` if a PEB-based application is packed as an [AppImage](https://appimage.org/).  
+
+  Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
 
   ```perl
   my $data_directory = $ENV{'PEB_DATA_DIR'};

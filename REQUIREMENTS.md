@@ -68,11 +68,14 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   To make automatically a bundled binary (peb.app) use the [dmg-maker.sh](sdk/dmg-maker.sh) script by Valcho Nedelchev.
 
 ## Runtime Requirements
-* Qt 5 libraries.
+* Qt 5 libraries.  
+
+  The ``ldd`` Linux command can show all dependencies of a PEB executable.  
 
 * Perl 5 distribution - any Linux, Mac or Windows Perl standard or relocatable distribution.  
 
   Tested successfully using the following Perl distributions:  
+
   Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
   Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) version 5.24.1  
   Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
