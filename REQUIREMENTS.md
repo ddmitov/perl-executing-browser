@@ -14,13 +14,13 @@ Compiling Windows binaries of PEB is subject to the following restrictions:
 * There are no MinGW Qt development bundles for any version 5.9.x or higher.
 
 Compiled and tested successfully using:
-* [Qt 5.2.0 and Qt Creator 3.0.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian and 32-bit Windows XP
-* [Qt 5.2.1 and Qt Creator 3.0.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit OS X 10.9.1, i5
-* [Qt 5.3.0 and Qt Creator 3.1.1](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
-* [Qt 5.4.1 and Qt Creator 3.1.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
-* [Qt 5.5.1 and Qt Creator 3.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
-* [Qt 5.8.0 and Qt Creator 4.2.1](http://download.qt.io/archive/qt/5.8/5.8.0/) on 64-bit Lubuntu 16.04
-* [Qt 5.9.1 and Qt Creator 4.3.1](http://download.qt.io/archive/qt/5.9/5.9.1/) on 64-bit Lubuntu 16.04
+* [Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian 7 and 32-bit Windows XP
+* [Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit Ubuntu 14.04 and 64-bit OS X 10.9.1, i5
+* [Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
+* [Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
+* [Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
+* [Qt 5.8.0](http://download.qt.io/archive/qt/5.8/5.8.0/) on 64-bit Lubuntu 16.04
+* [Qt 5.9.1](http://download.qt.io/archive/qt/5.9/5.9.1/) on 64-bit Lubuntu 16.04
 
 To compile PEB type in a terminal started in the ``src`` folder:
 

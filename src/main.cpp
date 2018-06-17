@@ -96,7 +96,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application version:
     // ==============================
-    application.setApplicationVersion("0.7.1");
+    application.setApplicationVersion("0.7.2");
 
     // ==============================
     // UTF-8 encoding application-wide:
