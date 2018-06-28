@@ -54,11 +54,22 @@ public slots:
 
         // Local server is pinged every second until ready:
         if (localWebServerPing.waitForConnected (1000)) {
-            localServerTimer->stop();
+            localServerTester->stop();
+
             localServerBaseUrl = "http://localhost:" +
                     qApp->property("port").toString() + "/";
             webViewWidget->load(QUrl(localServerBaseUrl));
+
             showMaximized();
+        }
+
+        localServerWait++;
+
+        if (localServerWait > 5) {
+            localServerTester->stop();
+
+            qDisplayError(QString("Local server timed out."));
+            qDebug() << "Local server timed out.";
         }
     }
 
@@ -94,8 +105,9 @@ public slots:
     }
 
 public:
-    QTimer *localServerTimer;
+    QTimer *localServerTester;
     QString localServerBaseUrl;
+    int localServerWait;
 
     QWebView *webViewWidget;
     explicit QMainBrowserWindow(QWidget *parent = 0);

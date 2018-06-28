@@ -23,48 +23,49 @@ Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), P
 * [Security](#security)
 * [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
-* [REQUIREMENTS](./REQUIREMENTS.md)
-  * [Compile-Time Requirements](./REQUIREMENTS.md#compile-time-requirements)
-  * [Compile-Time Settings](./REQUIREMENTS.md#compile-time-settings)
-  * [Runtime Requirements](./REQUIREMENTS.md#runtime-requirements)
-* [CONSTANTS](./CONSTANTS.md)
-  * [Hard Coded Files and Folders](./CONSTANTS.md#hard-coded-files-and-folders)
-  * [Functional Pseudo Filenames](./CONSTANTS.md#functional-pseudo-filenames)
-  * [Specific Keyboard Shortcuts](./CONSTANTS.md#specific-keyboard-shortcuts)
-* [SETTINGS](./SETTINGS.md)
-  * [Application Filename](./SETTINGS.md#application-filename)
-  * [HTML Page API](./SETTINGS.md#html-page-api)
-  * [Perl Scripts API](./SETTINGS.md#perl-scripts-api)
-  * [Interactive Perl Scripts](./SETTINGS.md#interactive-perl-scripts)
-  * [Starting Local Server](./SETTINGS.md#starting-local-server)
-  * [Selecting Files and Folders](./SETTINGS.md#selecting-files-and-folders)
-  * [Minimal Portable Perl Distribution for PEB](./SETTINGS.md#minimal-portable-perl-distribution-for-peb)
-  * [AppImage Support](./SETTINGS.md#appimage-support)
-  * [Log Files](./SETTINGS.md#log-files)
+* [REQUIREMENTS](./doc/REQUIREMENTS.md)
+  * [Compile-Time Requirements](./doc/REQUIREMENTS.md#compile-time-requirements)
+  * [Compile-Time Settings](./doc/REQUIREMENTS.md#compile-time-settings)
+  * [Runtime Requirements](./doc/REQUIREMENTS.md#runtime-requirements)
+* [CONSTANTS](./doc/CONSTANTS.md)
+  * [Hard Coded Files and Folders](./doc/CONSTANTS.md#hard-coded-files-and-folders)
+  * [Functional Pseudo Filenames](./doc/CONSTANTS.md#functional-pseudo-filenames)
+  * [Specific Keyboard Shortcuts](./doc/CONSTANTS.md#specific-keyboard-shortcuts)
+* [SETTINGS](./doc/SETTINGS.md)
+  * [Application Filename](./doc/SETTINGS.md#application-filename)
+  * [HTML Page API](./doc/SETTINGS.md#html-page-api)
+  * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
+  * [Interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts)
+  * [Starting Local Server](./doc/SETTINGS.md#starting-local-server)
+  * [Selecting Files and Folders](./doc/SETTINGS.md#selecting-files-and-folders)
+  * [Minimal Portable Perl Distribution for PEB](./doc/SETTINGS.md#minimal-portable-perl-distribution-for-peb)
+  * [AppImage Support](./doc/SETTINGS.md#appimage-support)
+  * [Log Files](./doc/SETTINGS.md#log-files)
 * [History](#history)
 * [License](./LICENSE.md)
-* [Thanks and Credits](./CREDITS.md)
+* [Thanks and Credits](./doc/CREDITS.md)
 * [Authors](#authors)
 
 ## Quick Start
 These are the basic steps for building your first PEB-based serverless application:  
 
 * **1.** Write ``{PEB_binary_directory}/resources/app/index.html`` file with appropriate HTML forms for user data input.  
-  [Selecting files or folders with their full paths](./SETTINGS.md#selecting-files-and-folders) is also possible.
-* **2.** Write [a settings JavaScript object](./SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
+  [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
+* **2.** Write [a settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
 * **3.** Write your Perl scripts.  
   Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script.  
-  You may use the [get-post-test.pl](resources/app/perl/get-post-test.pl) file as an example.
-* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./SETTINGS.md#perl-scripts-api).  
+  You may use the [get-post-test.pl](./resources/app/perl/get-post-test.pl) file as an example.
+* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
 
 * **1.** Write your Perl server-based application with an appropriate HTML page.  
-* **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./SETTINGS.md#starting-local-server) for your local Perl server.  
+* **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
 
 PEB is created to work from any directory without installation meaning that:
 * All application files must be located in the ``{PEB_binary_directory}/resources/app`` folder.
-* All data files must be located in the ``{PEB_binary_directory}/resources/data`` folder.
+* All writable data files must be located in the ``{PEB_binary_directory}/resources/data`` folder or  
+  in the ``{AppImage_binary_directory}/resources/data`` folder if a PEB-based application is packed as an Linux [AppImage](https://appimage.org/) single executable.
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
@@ -74,16 +75,16 @@ PEB is created to work from any directory without installation meaning that:
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
-* [Perl script output is seamlessly inserted in any local page.](./SETTINGS.md#perl-scripts-api)
-* [Perl scripts with STDIN event loops can be repeatedly fed with data.](./SETTINGS.md#interactive-perl-scripts)
-* [Perl scripts implementing local servers can be started](./SETTINGS.md#starting-local-server)
-* [Any version of Perl 5 can be used.](./REQUIREMENTS.md#runtime-requirements)
+* [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
+* [Perl scripts with STDIN event loops can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
+* [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
+* [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * PEB can be started from any folder.
-* [Single file or multiple files, new filename, existing or new directory can be selected by user.](./SETTINGS.md#selecting-files-and-folders)  
-* [Optional warning for unsaved data in HTML forms](./SETTINGS.md#html-page-api)
-* [Custom dialog and context menu labels](./SETTINGS.md#html-page-api)
-* [Custom window and message box icon](./CONSTANTS.md#icon)
-* [Optional logging](./SETTINGS.md#html-page-api#log-files)
+* [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
+* [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
+* [Custom dialog and context menu labels](./doc/SETTINGS.md#html-page-api)
+* [Custom window and message box icon](./doc/CONSTANTS.md#icon)
+* [Optional logging](./doc/SETTINGS.md#html-page-api#log-files)
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.
@@ -109,7 +110,7 @@ PEB is created to work from any directory without installation meaning that:
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
-## [Thanks and Credits](./CREDITS.md)
+## [Thanks and Credits](./doc/CREDITS.md)
 
 ## [License](./LICENSE.md)
 This program is free software;  

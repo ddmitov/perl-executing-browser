@@ -155,23 +155,27 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 
 ```json
 {
-  "filename" : "tabula",
-  "port" : "6000-9000",
+  "file" : "tabula",
+  "ports" : [
+    3000 ,
+    6000
+  ] ,
   "command-line-arguments" : [
-    "--browser=none",
-    "--port=#PORT#",
+    "--browser=none" ,
+    "--port=#PORT#" ,
     "--no-port-test"
-  ],
+  ] ,
   "shutdown_command" : "shutdown"
 }
 ```
 
-* ``filename`` and ``port`` are mandatory elements.
+* ``file`` is a string resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder.  
+  All Perl servers started by PEB must be up and running within 5 seconds from being launched or PEB will display a timeout message. Servers being unable to start will also timeout.  
+  *This element is mandatory.*
 
-* ``filename`` is resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder.
+* ``ports`` is an array holding a single port or the lowest and the highest ports in a port range.  
+  *This element is mandatory.*
 
-* ``port`` is a single port or a port range.  
-  First port and last port in a port range are always separated by a single hyphen ``-`` with no spaces.  
   Privileged ports below or equal to port 1024 are not allowed.  
   The following Google Chrome unsafe ports used by various services are also not allowed:  
 
@@ -187,9 +191,9 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
   6669 - Alternate IRC [Apple addition]
   ```
 
-* The ``#PORT#`` keyword within the command line arguments is substituted with the first available safe port when a port range is given for the ``port`` element. It is not possible to supply the first available safe port from a port range to the local server application if the ``#PORT#`` keyword is missing within the command line arguments.
+* ``command-line-arguments`` is an array holding all command-line arguments that have to be passed to a local Perl server. The ``#PORT#`` keyword within the command-line arguments is substituted with the first available safe port when a port range is given. It is not possible to supply the first available safe port to the local server application if the ``#PORT#`` keyword is missing within the command line arguments.
 
-* ``shutdown_command`` is appended to the base URL of the local server to make a special URL, which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed only if the local server can detect that PEB is disconnected and shut down on its own. This could be achieved by a WebSocket connection between the server and its HTML page - see [Tabula](https://github.com/ddmitov/tabula) as an example.
+* ``shutdown_command`` is a string appended to the base URL of the local server to make a special URL which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see [Tabula](https://github.com/ddmitov/tabula) as an example.
 
 ## Selecting Files and Folders
 Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page by the ``receiverFunction`` taking all selected files or folders as its only argument.  
