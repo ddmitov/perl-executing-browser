@@ -86,9 +86,9 @@ my $half_second_wait = AnyEvent->timer (
     if ($mode =~ "local-time") {
       my $formatted_time = strftime('%d %B %Y %H:%M:%S', localtime);
       if (length($input_text) == 0) {
-        print "Local time: ".$formatted_time;
+        print "Local date and time: ".$formatted_time;
       } else {
-        print "Local time: ".$formatted_time."<br>Last input: ".$input_text;
+        print "Local date and time: ".$formatted_time."<br>Last input: ".$input_text;
       }
     }
   },

@@ -74,13 +74,12 @@ void customMessageHandler(QtMsgType type,
 
     // A separate log file is created for every browser session.
     // Application start date and time are appended to the binary file name.
-    QFile logFile(QDir::toNativeSeparators
-                  (qApp->property("logDirFullPath").toString()
-                   + QDir::separator()
-                   + QFileInfo(QApplication::applicationFilePath()).baseName()
-                   + "-started-at-"
-                   + qApp->property("applicationStartDateAndTime").toString()
-                   + ".log"));
+    QFile logFile(qApp->property("logDirFullPath").toString()
+                  + "/"
+                  + QFileInfo(QApplication::applicationFilePath()).baseName()
+                  + "-started-at-"
+                  + qApp->property("applicationStartDateAndTime").toString()
+                  + ".log");
     logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
     QTextStream textStream(&logFile);
     textStream << text << endl;
@@ -106,8 +105,7 @@ int main(int argc, char **argv)
     // ==============================
     // Directory of the browser executable:
     // ==============================
-    QDir executableDirectory =
-            QDir::toNativeSeparators(application.applicationDirPath());
+    QDir executableDirectory = application.applicationDirPath();
 
 #ifdef Q_OS_MAC
     if (BUNDLE == 1) {
@@ -122,9 +120,7 @@ int main(int argc, char **argv)
     // Perl directory:
     // ==============================
 
-    QString perlDirectory =
-            QDir::toNativeSeparators(
-                browserDirectory + QDir::separator() + "perl");
+    QString perlDirectory = browserDirectory + "/perl";
 
     // ==============================
     // Perl interpreter:
@@ -141,10 +137,8 @@ int main(int argc, char **argv)
 
     QString perlInterpreter;
 
-    QString privatePerlInterpreterFullPath = QDir::toNativeSeparators(
-                perlDirectory + QDir::separator()
-                + "bin" + QDir::separator()
-                + perlExecutable);
+    QString privatePerlInterpreterFullPath =
+                perlDirectory + "/bin/" + perlExecutable;
 
     if (QFile(privatePerlInterpreterFullPath).exists()) {
         perlInterpreter = privatePerlInterpreterFullPath;
@@ -158,8 +152,7 @@ int main(int argc, char **argv)
     // ==============================
     // PERL5LIB directory:
     // ==============================
-    QString perlLibDirString = QDir::toNativeSeparators(
-                perlDirectory + QDir::separator() + "lib");
+    QString perlLibDirString = perlDirectory + "/lib";
     QByteArray perlLibDirArray = perlLibDirString.toLatin1();
 
     qputenv("PERL5LIB", perlLibDirArray);
@@ -168,9 +161,7 @@ int main(int argc, char **argv)
     // Resources directory:
     // ==============================
 
-    QString resourcesDirectory =
-            QDir::toNativeSeparators(
-                browserDirectory + QDir::separator() + "resources");
+    QString resourcesDirectory = browserDirectory + "/resources";
 
 #ifdef Q_OS_LINUX
     QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
@@ -184,7 +175,7 @@ int main(int argc, char **argv)
         QString appImageName = appImageFileInfo.baseName();
 
         appImageResourcesDirectory =
-                appImageDirectory + QDir::separator()
+                appImageDirectory + "/"
                 + appImageName + "-resources";
     }
 #endif
@@ -192,23 +183,18 @@ int main(int argc, char **argv)
     // ==============================
     // Application directory:
     // ==============================
-    QString applicationDirName = QDir::toNativeSeparators(
-                resourcesDirectory + QDir::separator()
-                + "app");
+    QString applicationDirName = resourcesDirectory + "/app";
 
     application.setProperty("application", applicationDirName);
 
     // ==============================
     // Data directory:
     // ==============================
-    QString dataDirName =
-            QDir::toNativeSeparators(
-                resourcesDirectory + QDir::separator() + "data");
+    QString dataDirName = resourcesDirectory + "/data";
 
 #ifdef Q_OS_LINUX
     if (appImageEnvVariable.length() > 0) {
-        dataDirName =
-                appImageResourcesDirectory + QDir::separator() + "data";
+        dataDirName = appImageResourcesDirectory + "/data";
 
         QDir dataDir(dataDirName);
 
@@ -223,9 +209,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application icon:
     // ==============================
-    QString iconPathName = QDir::toNativeSeparators(
-                resourcesDirectory + QDir::separator()
-                + "app.png");
+    QString iconPathName = resourcesDirectory + "/app.png";
 
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
@@ -247,12 +231,11 @@ int main(int argc, char **argv)
     // otherwise no log files will be created and
     // program messages could be seen inside Qt Creator during development.
 
-    QString logDirFullPath = resourcesDirectory + QDir::separator() + "logs";
+    QString logDirFullPath = resourcesDirectory + "/logs";
 
 #ifdef Q_OS_LINUX
     if (appImageEnvVariable.length() > 0) {
-        logDirFullPath =
-                appImageResourcesDirectory + QDir::separator() + "logs";
+        logDirFullPath = appImageResourcesDirectory + "/logs";
     }
 #endif
 
@@ -326,10 +309,10 @@ int main(int argc, char **argv)
     // ==============================
     bool startFileFound = false;
 
-    QString startPageFilePath =
-            applicationDirName + QDir::separator() + "index.html";
+    QString startPageFilePath = applicationDirName + "/index.html";
+
     QString localServerSettingsFilePath =
-            applicationDirName + QDir::separator() + "local-server.json";
+             applicationDirName + "/local-server.json";
 
     QFile startPageFile(startPageFilePath);
     QFile localServerSettingsFile(localServerSettingsFilePath);
@@ -337,9 +320,9 @@ int main(int argc, char **argv)
     // Static start page:
     if (startPageFile.exists()) {
         startFileFound = true;
-        QString startPage = "file://" + startPageFilePath;
 
-        mainWindow.webViewWidget->setUrl(QUrl(startPage));
+        mainWindow.webViewWidget->setUrl(
+                    QUrl::fromLocalFile(startPageFilePath));
         mainWindow.showMaximized();
     }
 
@@ -372,7 +355,7 @@ int main(int argc, char **argv)
         if (localServerSettingsCorrect == true) {
             // Local server full path:
             QString localServerFullPathSetting =
-                    applicationDirName + QDir::separator() +
+                    applicationDirName + "/" +
                     localServerJson["file"].toString();
 
             QFile localServerFile(localServerFullPathSetting);

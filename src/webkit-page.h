@@ -368,14 +368,20 @@ public slots:
                  ++iterator) {
                 QScriptHandler *handler = iterator.value();
 
-                QByteArray scriptCloseCommandArray;
-                scriptCloseCommandArray
-                        .append(
-                            QString(handler->scriptExitCommand).toLatin1());
-                scriptCloseCommandArray.append(QString("\n").toLatin1());
+                if (handler->scriptExitCommand.length() == 0 and
+                        handler->scriptProcess.isOpen()) {
+                    handler->scriptProcess.kill();
+                }
 
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess.write(scriptCloseCommandArray);
+                if (handler->scriptExitCommand.length() > 0) {
+                    QByteArray scriptExitCommand;
+                    scriptExitCommand.append(
+                                QString(handler->scriptExitCommand).toLatin1());
+                    scriptExitCommand.append(QString("\n").toLatin1());
+
+                    if (handler->scriptProcess.isOpen()) {
+                        handler->scriptProcess.write(scriptExitCommand);
+                    }
                 }
             }
         }

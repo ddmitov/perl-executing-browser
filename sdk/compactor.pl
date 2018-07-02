@@ -43,13 +43,15 @@ if ($ARGV[0] and $ARGV[0] =~ /^--AppImage$/) {
 # Copying the Perl interpreter:
 if ($Config{osname} !~ "MSWin32") {
   fcopy(catdir($bin_original, "perl"), catdir($bin_compacted, "perl"));
-} else {
-  fcopy(catdir($bin_original, "perl.exe"), catdir($bin_compacted, "perl.exe"));
+}
+
+if ($Config{osname} =~ "MSWin32") {
+  fcopy(catdir($bin_original, "wperl.exe"), catdir($bin_compacted, "perl.exe"));
 
   my @libraries = traverse_directory($bin_original, ".dll");
   foreach my $library (@libraries) {
-    my $filename = basename ($library, ".dll");
-    fcopy($library, catdir($bin_compacted, $filename));
+    my $filename = basename($library, ".dll");
+    fcopy($library, catdir($bin_compacted, $filename.".dll"));
   }
 }
 

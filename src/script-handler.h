@@ -42,10 +42,7 @@ public slots:
         QString output = scriptProcess.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
 
-        if (output == scriptExitConfirmation) {
-            qDebug() << "Interactive script is exiting normally:"
-                     << scriptFullFilePath;
-        } else {
+        if (output != scriptExitConfirmation) {
             emit displayScriptOutputSignal(scriptId, output);
         }
     }

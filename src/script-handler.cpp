@@ -37,7 +37,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         scriptFullFilePath = scriptJsonObject["scriptFullPath"].toString();
         scriptFullFilePath.replace("{app}",
                                    qApp->property("application").toString());
-        scriptFullFilePath = QDir::toNativeSeparators(scriptFullFilePath);
     }
 
     QFile file(scriptFullFilePath);

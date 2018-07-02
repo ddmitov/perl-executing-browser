@@ -148,7 +148,7 @@ The following code shows how to start an interactive Perl script right after a l
 </html>
 ```
 
-The [index.htm](resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
+The [index.htm](./resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
 
 ## Starting Local Server
 A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_binary_directory}/resources/app/local-server.json`` file is found instead of ``{PEB_binary_directory}/resources/app/index.html`` with the following structure:

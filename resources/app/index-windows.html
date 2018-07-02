@@ -9,49 +9,30 @@
     <script>
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
-      pebSettings.cutLabel = '- Cut -';
-      pebSettings.copyLabel = '- Copy -';
-      pebSettings.pasteLabel = '- Paste -';
-      pebSettings.selectAllLabel = '- Select All -';
-      pebSettings.okLabel = 'OK';
-      pebSettings.cancelLabel = 'CANCEL';
-      pebSettings.yesLabel = 'YES';
-      pebSettings.noLabel = 'NO';
-      pebSettings.closeConfirmation =
-        'Text was entered in a form and it is going to be lost!\n' +
-        'Are you sure you want to close the application?';
+      pebSettings.autoStartScripts = ['clock_one', 'clock_two'];
 
       // Settings objects for the Perl scripts:
-      var interactive_one = {};
-      interactive_one.scriptFullPath = '{app}/perl/interactive.pl';
-      interactive_one.requestMethod = 'POST';
-      interactive_one.inputDataHarvester = function() {
-        var data = $('#form-one').serialize();
-        $('#form-one').trigger('reset');
-        return data;
+      var clock_one = {};
+      clock_one.scriptFullPath = '{app}/perl/clock.pl';
+      clock_one.requestMethod = 'POST';
+      clock_one.inputDataHarvester = function() {
+        return "unix-epoch";
       }
-      interactive_one.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-one-output');
+      clock_one.stdoutFunction = function (stdout) {
+        var target = document.getElementById('clock-one-output');
         target.innerHTML = stdout;
       }
-      interactive_one.scriptExitCommand = '_close_';
-      interactive_one.scriptExitConfirmation = '_closed_';
 
-      var interactive_two = {};
-      interactive_two.scriptFullPath = '{app}/perl/interactive.pl';
-      interactive_two.requestMethod = 'POST';
-      interactive_two.inputDataHarvester = function() {
-        var data = $('#form-two').serialize();
-        $('#form-two').trigger('reset');
-        return data;
+      var clock_two = {};
+      clock_two.scriptFullPath = '{app}/perl/clock.pl';
+      clock_two.requestMethod = 'POST';
+      clock_two.inputDataHarvester = function() {
+        return "local-time";
       }
-      interactive_two.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-two-output');
+      clock_two.stdoutFunction = function (stdout) {
+        var target = document.getElementById('clock-two-output');
         target.innerHTML = stdout;
       }
-      interactive_two.scriptExitCommand = '_close_';
-      interactive_two.scriptExitConfirmation = '_closed_';
 
       var open_files = {};
       open_files.scriptFullPath = '{app}/perl/open-files.pl';
@@ -175,9 +156,8 @@
         font-size: 20px;
       }
 
-      .interactive-output {
+      .clock-output {
         font-size: 20px;
-        margin-bottom: 20px;
       }
     </style>
   </head>
@@ -277,57 +257,10 @@
         </div>
       </div>
 
-      <h3>Interactive Script Demo</h3>
+	  <br>
 
-      <div class="row">
-        <div class="col-xs-12 form-group">
-          <form action="interactive_one.settings" id="form-one">
-            <div class="input-group">
-              <input type="hidden" name="mode" value="unix-epoch">
-
-              <input type="text" name="input" class="form-control"
-                placeholder="Press Enter to send data to the first interactive script instance">
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-one').trigger('reset');">
-                Reset
-              </span>
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-one').trigger('submit');">
-                Send
-              </span>
-            </div>
-          </form>
-        </div>
-
-        <div id="instance-one-output" class="interactive-output"></div>
-      </div>
-
-      <div class="row">
-        <div class="col-xs-12 form-group">
-          <form action="interactive_two.settings" id="form-two">
-            <div class="input-group">
-              <input type="hidden" name="mode" value="local-time">
-
-              <input type="text" name="input" class="form-control"
-                placeholder="Press Enter to send data to the second interactive script instance">
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-two').trigger('reset');">
-                Reset
-              </span>
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-two').trigger('submit');">
-                Send
-              </span>
-            </div>
-          </form>
-        </div>
-
-        <div id="instance-two-output" class="interactive-output"></div>
-      </div>
+	  <div id="clock-one-output" class="clock-output"></div>
+	  <div id="clock-two-output" class="clock-output"></div>
     </div>
   </body>
 
