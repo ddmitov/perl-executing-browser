@@ -2,6 +2,11 @@
 
 cd .. || exit
 
+if [ ! "$(arch)" == "x86_64" ]; then
+  printf "\\nAppImage executable can be created only on and for 64-bit Linux distributions.\\n"
+  exit 1
+fi
+
 if [ ! -e ./peb.app ]; then
   mkdir ./peb.app
 fi
@@ -38,7 +43,7 @@ fi
 linuxdeployqt="linuxdeployqt-continuous-$(arch).AppImage"
 
 if [ ! -x "$linuxdeployqt" ]; then
-  wget --tries=5 --unlink "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/$linuxdeployqt"
+  wget --tries=5 --unlink "https://github.com/probonopd/linuxdeployqt/releases/download/continuous/linuxdeployqt-continuous-x86_64.AppImage"
   chmod -v a+x "$linuxdeployqt"
 fi
 
