@@ -20,13 +20,8 @@
 ​
 ​  <screenshots>
 ​    <screenshot type="default">
-​      <caption>PEB Main Window</caption>
-​      <image>https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-main.png</image>
-​    </screenshot>
-
-​    <screenshot>
-      <caption>Reading Local Files</caption>
-​      <image>https://github.com/ddmitov/perl-executing-browser/raw/master/screenshots/peb-local-files.png</image>
+​      <caption>PEB Screenshot</caption>
+​      <image>https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png</image>
 ​    </screenshot>
 ​  </screenshots>
 ​
@@ -37,7 +32,7 @@
 ​  </provides>
 ​
 ​  <releases>
-​    <release version="0.7.1" date="2018-06-16">
+​    <release version="0.7.2" date="2018-06-16">
 ​      <description>
 ​        <p>better AppImage support</p>
 ​      </description>

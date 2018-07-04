@@ -46,7 +46,7 @@ if ($Config{osname} !~ "MSWin32") {
 }
 
 if ($Config{osname} =~ "MSWin32") {
-  fcopy(catdir($bin_original, "wperl.exe"), catdir($bin_compacted, "perl.exe"));
+  fcopy(catdir($bin_original, "wperl.exe"), catdir($bin_compacted, "wperl.exe"));
 
   my @libraries = traverse_directory($bin_original, ".dll");
   foreach my $library (@libraries) {

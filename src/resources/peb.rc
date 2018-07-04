@@ -21,7 +21,7 @@ VS_VERSION_INFO VERSIONINFO
    BEGIN
     VALUE "CompanyName", "PEB Dev Team\0"
     VALUE "FileDescription", "Perl Executing Browser\0"
-    VALUE "FileVersion", "0.6.0.0\0"
+    VALUE "FileVersion", "0.7.2.0\0"
     VALUE "LegalCopyright", "LGPL v.3\0"
     VALUE "OriginalFilename", "peb.exe\0"
     VALUE "ProductName", "Perl Executing Browser\0"

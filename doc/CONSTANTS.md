@@ -3,7 +3,7 @@ Perl Executing Browser - Constants
 
 ## Hard Coded Files and Folders
 * **Perl interpreter:**  
-  PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``perl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
+  PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
 
 * **Resources directory:**  
   Resources directory is ``{PEB_binary_directory}/resources`` or ``{AppImage_binary_directory}/resources`` if a PEB-based application is packed as an [AppImage](https://appimage.org/). Application, data and logs directories, as well as icon file of a PEB application must be located in this folder.  

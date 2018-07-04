@@ -10,9 +10,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 
 ## Screenshots
 
-![PEB Main Window](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshots/peb-main.png "PEB Main Window")  
-
-![Reading Local Files](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshots/peb-local-files.png "Reading Local Files")  
+![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
 ## Contents
 * [Quick Start](#quick-start)
@@ -36,9 +34,10 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts)
   * [Starting Local Server](./doc/SETTINGS.md#starting-local-server)
   * [Selecting Files and Folders](./doc/SETTINGS.md#selecting-files-and-folders)
-  * [Minimal Portable Perl Distribution for PEB](./doc/SETTINGS.md#minimal-portable-perl-distribution-for-peb)
-  * [AppImage Support](./doc/SETTINGS.md#appimage-support)
   * [Log Files](./doc/SETTINGS.md#log-files)
+* [PACKAGING](./doc/PACKAGING.md)
+  * [Minimal Portable Perl Distribution for PEB](./doc/PACKAGING.md#minimal-portable-perl-distribution-for-peb)
+  * [AppImage Support](./doc/PACKAGING.md#appimage-support)
 * [History](#history)
 * [License](./LICENSE.md)
 * [Thanks and Credits](./doc/CREDITS.md)

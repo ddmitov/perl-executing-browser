@@ -148,7 +148,7 @@ The following code shows how to start an interactive Perl script right after a l
 </html>
 ```
 
-The [index.htm](./resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after a page is loaded.
+The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after local page is loaded.
 
 ## Starting Local Server
 A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_binary_directory}/resources/app/local-server.json`` file is found instead of ``{PEB_binary_directory}/resources/app/index.html`` with the following structure:
@@ -218,16 +218,6 @@ select_file.receiverFunction = function (file) {
 * When multiple files are selected, different filenames are separated by a semicolon ``;``
 * When using the ``directory`` type of dialog, an existing or a new directory may be selected.  
   Any new directory will be created immediately by PEB.
-
-## Minimal Portable Perl Distribution for PEB
-Sometimes it is important to minimize the size of the relocatable (or portable) Perl distribution used by a PEB-based application. [Perl Distribution Compactor](sdk/compactor.pl) is one solution for this problem. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies them in a new ``{PEB_binary_directory}/perl/lib`` folder; a new ``{PEB_binary_directory}/perl/bin`` is also created. The original ``bin`` and ``lib`` folders may be saved as ``bin-original`` and ``lib-original`` respectively.  
-
-Perl Distribution Compactor should be started using [compactor.sh](sdk/compactor.sh) on a Linux machine or [compactor.cmd](sdk/compactor.cmd) on a Windows machine to ensure that only the Perl distribution of PEB is used. This is necessary to avoid dependency mismatches with any other Perl on PATH.  
-
-Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_binary_directory}/sdk/lib`` folder.
-
-## AppImage Support
-Any PEB-based application can be easily packed as a single executable Linux [AppImage](https://appimage.org/) file including the PEB binary, all necessary Qt libraries, relocatable Perl distribution and all application files. This can be easily achieved by the [AppImage Maker](sdk/appimage-maker.sh) script. It finds all dependencies of all Perl scripts in the ``{PEB_binary_directory}/resources/app`` directory and copies only the necessary Perl modules using the [Perl Distribution Compactor](sdk/compactor.pl). All Qt dependencies are detected and the final image is built using a special version of the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) binary.
 
 ## Log Files
 If log files are needed for debugging of PEB or a PEB-based application, they can easily be turned on by manually creating ``{PEB_binary_directory}/resources/logs`` or ``{AppImage_binary_directory}/resources/logs`` if a PEB-based application is packed as an [AppImage](https://appimage.org/). If this directory is found during application startup, the browser assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create ``{PEB_binary_directory}/logs`` on its own and if this directory is missing, no logs will be written.

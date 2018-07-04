@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 #endif
 
 #ifdef Q_OS_WIN
-    perlExecutable = "perl.exe";
+    perlExecutable = "wperl.exe";
 #endif
 
     QString perlInterpreter;
