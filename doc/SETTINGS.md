@@ -35,7 +35,7 @@ A minimal example of a Perl script settings object:
 
 ```javascript
 var perl_test = {};
-perl_test.scriptFullPath = '{app}/perl/test.pl';
+perl_test.scriptRelativePath = 'perl/test.pl';
 perl_test.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
   container.innerHTML = stdout;
@@ -59,10 +59,9 @@ Three methods to start a local Perl script:
 peb.startScript('perl_test.settings');
 ```
 
-* ``scriptFullPath``  
-  This is the path of the Perl script that is going to be executed.  
-  The keyword ``{app}`` will be replaced by the the full path of the application directory.  
-  PEB does not check the filename extension or the shebang line of the supplied Perl script.  
+* ``scriptRelativePath``  
+  This path is relative to the application directory and it is converted to a full file path at runtime.  
+  PEB does not check filename extensions or shebang line of Perl scripts.  
   Scripts without a filename extension can also be used.  
   *This object property is mandatory.*  
 
@@ -77,7 +76,7 @@ peb.startScript('perl_test.settings');
   This object property is useless if ``requestMethod`` is not set.  
 
 * ``inputDataHarvester``  
-  This object property is a function that can get input data from an HTML form and supply it to PEB.  
+  This object property is a function that can supply input data to a Perl script run by PEB.  
 
   Single input box example with no dependencies:  
 
@@ -98,7 +97,7 @@ peb.startScript('perl_test.settings');
   ```
 
 * ``scriptExitCommand``  
-  The ``scriptExitCommand`` object property designates the command used to gracefully shut down an interactive script when PEB is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
+  This object property designates the command used to gracefully shut down an interactive script when PEB is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
 * ``scriptExitConfirmation``  
   Just before exiting an interactive script must print on STDOUT its ``scriptExitConfirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
@@ -123,7 +122,7 @@ The following code shows how to start an interactive Perl script right after a l
       pebSettings.autoStartScripts = ['interactive_script'];
 
       var interactive_script = {};
-      interactive_script.scriptFullPath = '{app}/perl/interactive.pl';
+      interactive_script.scriptRelativePath = 'perl/interactive.pl';
       interactive_script.requestMethod = 'POST';
       interactive_script.inputDataHarvester = function() {
         return document.getElementById('interactive-script-input').value;
@@ -156,11 +155,13 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 ```json
 {
   "file" : "tabula",
-  "ports" : [
+  "ports" :
+  [
     3000 ,
     6000
   ] ,
-  "command-line-arguments" : [
+  "command-line-arguments" :
+  [
     "--browser=none" ,
     "--port=#PORT#" ,
     "--no-port-test"

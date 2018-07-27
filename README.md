@@ -72,23 +72,24 @@ PEB is created to work from any directory without installation meaning that:
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
+* PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
-* PEB can be started from any folder.
+* [Optional Perl scripts error logging](./doc/SETTINGS.md#html-page-api#log-files)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Custom dialog and context menu labels](./doc/SETTINGS.md#html-page-api)
 * [Custom window and message box icon](./doc/CONSTANTS.md#icon)
-* [Optional logging](./doc/SETTINGS.md#html-page-api#log-files)
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.
 * PEB does not need and does not implement any server, but will start one if so configured.
 * Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
-* Cross-site scripting is disabled.  
-* Calling local Perl scripts from a web page is blocked.  
+* PEB starts Perl scripts only from its application directory.
+* Cross-site scripting is disabled.
+* Calling local Perl scripts from a web page is blocked.
 * Files or folders can not be selected with their full paths from web pages.
 
 ## What PEB Is Not

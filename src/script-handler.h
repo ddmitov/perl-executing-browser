@@ -19,7 +19,6 @@
 #define SCRIPTHANDLER_H
 
 #include <QApplication>
-#include <QDebug>
 #include <QProcess>
 
 // ==============================
@@ -61,8 +60,6 @@ public slots:
                                   scriptAccumulatedErrors);
 
         scriptProcess.close();
-
-        qDebug() << "Script finished:" << scriptFullFilePath;
     }
 
 public:

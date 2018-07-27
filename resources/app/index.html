@@ -24,7 +24,7 @@
 
       // Settings objects for the Perl scripts:
       var interactive_one = {};
-      interactive_one.scriptFullPath = '{app}/perl/interactive.pl';
+      interactive_one.scriptRelativePath = 'perl/interactive.pl';
       interactive_one.requestMethod = 'POST';
       interactive_one.inputDataHarvester = function() {
         var data = $('#form-one').serialize();
@@ -39,7 +39,7 @@
       interactive_one.scriptExitConfirmation = '_closed_';
 
       var interactive_two = {};
-      interactive_two.scriptFullPath = '{app}/perl/interactive.pl';
+      interactive_two.scriptRelativePath = 'perl/interactive.pl';
       interactive_two.requestMethod = 'POST';
       interactive_two.inputDataHarvester = function() {
         var data = $('#form-two').serialize();
@@ -54,21 +54,21 @@
       interactive_two.scriptExitConfirmation = '_closed_';
 
       var open_files = {};
-      open_files.scriptFullPath = '{app}/perl/open-files.pl';
+      open_files.scriptRelativePath = 'perl/open-files.pl';
       open_files.requestMethod = 'POST';
       open_files.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var open_directory = {};
-      open_directory.scriptFullPath = '{app}/perl/open-directory.pl';
+      open_directory.scriptRelativePath = 'perl/open-directory.pl';
       open_directory.requestMethod = 'POST';
       open_directory.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var get_test = {};
-      get_test.scriptFullPath = '{app}/perl/get-post-test.pl';
+      get_test.scriptRelativePath = 'perl/get-post-test.pl';
       get_test.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
@@ -76,7 +76,7 @@
       get_test.inputData = 'name=Mickey&species=mouse';
 
       var post_test = {};
-      post_test.scriptFullPath = '{app}/perl/get-post-test.pl';
+      post_test.scriptRelativePath = 'perl/get-post-test.pl';
       post_test.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
@@ -84,13 +84,13 @@
       post_test.inputData = 'name=Geoffrey&species=giraffe';
 
       var perl_info = {};
-      perl_info.scriptFullPath = '{app}/perl/perl-info.pl';
+      perl_info.scriptRelativePath = 'perl/perl-info.pl';
       perl_info.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var sqlite = {};
-      sqlite.scriptFullPath = '{app}/perl/sqlite.pl';
+      sqlite.scriptRelativePath = 'perl/sqlite.pl';
       sqlite.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }

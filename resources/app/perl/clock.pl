@@ -27,8 +27,8 @@ my $half_second_wait = AnyEvent->timer (
   interval => 0.5,
   cb => sub {
     if ($mode =~ "unix-epoch") {
-	  print "Seconds from the Unix epoch: ".time;
-	}
+      print "Seconds from the Unix epoch: ".time;
+    }
 
     if ($mode =~ "local-time") {
       my $formatted_time = strftime('%d.%m.%Y %H:%M:%S', localtime);

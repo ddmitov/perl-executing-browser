@@ -16,6 +16,7 @@
 */
 
 #include <QJsonObject>
+#include <QDebug>
 #include <QDir>
 
 #include "script-handler.h"
@@ -33,10 +34,11 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
 
     scriptId = scriptJsonObject["id"].toString();
 
-    if (scriptJsonObject["scriptFullPath"].toString().length() > 0) {
-        scriptFullFilePath = scriptJsonObject["scriptFullPath"].toString();
-        scriptFullFilePath.replace("{app}",
-                                   qApp->property("application").toString());
+    if (scriptJsonObject["scriptRelativePath"].toString().length() > 0) {
+        scriptFullFilePath =
+                qApp->property("application").toString() +
+                "/" +
+                scriptJsonObject["scriptRelativePath"].toString();
     }
 
     QFile file(scriptFullFilePath);
@@ -102,9 +104,4 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         inputDataArray.append(QString("\n").toLatin1());
         scriptProcess.write(inputDataArray);
     }
-
-    qDebug()
-            // << QDateTime::currentMSecsSinceEpoch()
-            // << "msecs from epoch:"
-            << "Script started:" << scriptFullFilePath;
 }
