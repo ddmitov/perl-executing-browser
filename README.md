@@ -77,7 +77,7 @@ PEB is created to work from any directory without installation meaning that:
 * [Perl scripts with STDIN event loops can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
-* [Optional Perl scripts error logging](./doc/SETTINGS.md#html-page-api#log-files)
+* [Optional Perl scripts error logging](./doc/SETTINGS.md#log-files)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Custom dialog and context menu labels](./doc/SETTINGS.md#html-page-api)
