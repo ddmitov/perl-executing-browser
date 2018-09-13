@@ -93,17 +93,17 @@ PEB is created to work from any directory without installation meaning that:
 * Files or folders can not be selected with their full paths from web pages.
 
 ## What PEB Is Not
-* PEB is not a general purpose web browser and does not have all traditional features of general purpose web browsers.
+* PEB is not a general-purpose web browser and does not have all traditional features of general-purpose web browsers.
 * PEB is not a server and is not an implementation of the CGI protocol.  
 ``REQUEST_METHOD``, ``QUERY_STRING`` and ``CONTENT_LENGTH`` environment variables are borrowed from the CGI protocol to start local Perl scripts as child processes without any exposure to other applications.
-* PEB does not embed any Perl interpreter in itself and depends on a standard or relocatable Perl distribution.
+* PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable Perl distribution.
 
 ## Limitations
-* Only single-page local applications are supported with no pop-up windows and Perl scripting inside frames.
+* Only single-page local applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
 * ``QtWebEngine`` builds do not support printing.
 * ``window.print()`` is not supported.
-* Windows builds of PEB do no support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
+* Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
