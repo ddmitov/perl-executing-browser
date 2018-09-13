@@ -105,7 +105,11 @@ peb.startScript('perl_test.settings');
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances provided that it has an unique JavaScript settings object with and unique ``stdoutFunction`` object property. Interactive scripts should also have the ``scriptExitCommand`` and ``scriptExitConfirmation`` object properties.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with a unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
+
+Please note, that interactive Perl scripts are not supported on all Windows versions.  
+
+Please also note, that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! The use of interactive scripts should be carefully considered, because even during normal operation they use more memory than "fire-and-forget" type of scripts.
 
 The following code shows how to start an interactive Perl script right after a local page is loaded:
 
@@ -147,7 +151,9 @@ The following code shows how to start an interactive Perl script right after a l
 </html>
 ```
 
-The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file of the demo package demonstrates how to start one script in two instances immediately after local page is loaded.
+The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) page of the demo package demonstrates how to start one script in two instances immediately after local page is loaded.  
+
+The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
 A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_binary_directory}/resources/app/local-server.json`` file is found instead of ``{PEB_binary_directory}/resources/app/index.html`` with the following structure:

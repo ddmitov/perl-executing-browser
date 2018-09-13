@@ -99,11 +99,11 @@ PEB is created to work from any directory without installation meaning that:
 * PEB does not embed any Perl interpreter in itself and depends on a standard or relocatable Perl distribution.
 
 ## Limitations
-* Only single-page applications are supported with no pop-up windows.
-* Local Perl scripting inside frames is not supported.
+* Only single-page local applications are supported with no pop-up windows and Perl scripting inside frames.
 * No files can be downloaded.
 * ``QtWebEngine`` builds do not support printing.
 * ``window.print()`` is not supported.
+* Windows builds of PEB do no support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
