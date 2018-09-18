@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-my $directory_name;
-read (STDIN, $directory_name, $ENV{'CONTENT_LENGTH'});
+my $directory_name = <STDIN>;
+chomp $directory_name;
 
 my @files;
 

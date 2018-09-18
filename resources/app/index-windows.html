@@ -14,7 +14,6 @@
       // Settings objects for the Perl scripts:
       var clock_one = {};
       clock_one.scriptRelativePath = 'perl/clock.pl';
-      clock_one.requestMethod = 'POST';
       clock_one.inputDataHarvester = function() {
         return "unix-epoch";
       }
@@ -25,7 +24,6 @@
 
       var clock_two = {};
       clock_two.scriptRelativePath = 'perl/clock.pl';
-      clock_two.requestMethod = 'POST';
       clock_two.inputDataHarvester = function() {
         return "local-time";
       }
@@ -36,33 +34,15 @@
 
       var open_files = {};
       open_files.scriptRelativePath = 'perl/open-files.pl';
-      open_files.requestMethod = 'POST';
       open_files.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var open_directory = {};
       open_directory.scriptRelativePath = 'perl/open-directory.pl';
-      open_directory.requestMethod = 'POST';
       open_directory.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
-
-      var get_test = {};
-      get_test.scriptRelativePath = 'perl/get-post-test.pl';
-      get_test.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
-      }
-      get_test.requestMethod = 'GET';
-      get_test.inputData = 'name=Mickey&species=mouse';
-
-      var post_test = {};
-      post_test.scriptRelativePath = 'perl/get-post-test.pl';
-      post_test.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
-      }
-      post_test.requestMethod = 'POST';
-      post_test.inputData = 'name=Geoffrey&species=giraffe';
 
       var perl_info = {};
       perl_info.scriptRelativePath = 'perl/perl-info.pl';
@@ -186,14 +166,6 @@
 
             <li>
               <a href="select_directory.dialog">Open Directory</a>
-            </li>
-
-            <li>
-              <a href="get_test.settings">GET Test</a>
-            </li>
-
-            <li>
-              <a href="post_test.settings">POST Test</a>
             </li>
 
             <li>

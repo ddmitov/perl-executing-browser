@@ -69,14 +69,11 @@ peb.startScript('perl_test.settings');
   Every piece of script output is passed to this function as its only argument.  
   *This object property is mandatory.*  
 
-* ``requestMethod``  
-  Only ``GET`` or ``POST`` are recognized.  
-
 * ``inputData``  
-  This object property is useless if ``requestMethod`` is not set.  
+  This object property holds user input data. Input data is written on script STDIN.  
 
 * ``inputDataHarvester``  
-  This object property is a function that can supply input data to a Perl script run by PEB.  
+  This object property is a function that can supply user input data to a Perl script run by PEB.  
 
   Single input box example with no dependencies:  
 
@@ -84,15 +81,6 @@ peb.startScript('perl_test.settings');
   perlScriptObject.inputDataHarvester = function() {
     var data = document.getElementById('input-box-id').value;
     return data;
-  }
-  ```
-
-  Whole form example using [jQuery](https://jquery.com/):  
-
-  ```javascript
-  perlScriptObject.inputDataHarvester = function() {
-    var formData = $('#form-id').serialize();
-    return formData;
   }
   ```
 
@@ -127,7 +115,6 @@ The following code shows how to start an interactive Perl script right after a l
 
       var interactive_script = {};
       interactive_script.scriptRelativePath = 'perl/interactive.pl';
-      interactive_script.requestMethod = 'POST';
       interactive_script.inputDataHarvester = function() {
         return document.getElementById('interactive-script-input').value;
       }

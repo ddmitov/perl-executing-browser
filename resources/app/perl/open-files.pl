@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-my $input;
-read (STDIN, $input, $ENV{'CONTENT_LENGTH'});
+my $input = <STDIN>;
+chomp $input;
 my @files = split(/;/, $input);
 
 my $number_of_lines;

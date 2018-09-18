@@ -36,8 +36,7 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
 
     if (scriptJsonObject["scriptRelativePath"].toString().length() > 0) {
         scriptFullFilePath =
-                qApp->property("application").toString() +
-                "/" +
+                qApp->property("application").toString() + "/" +
                 scriptJsonObject["scriptRelativePath"].toString();
     }
 
@@ -45,11 +44,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     if (!file.exists()) {
         qDebug() << "File not found:" << scriptFullFilePath;
         return;
-    }
-
-    QString requestMethod;
-    if (scriptJsonObject["requestMethod"].toString().length() > 0) {
-        requestMethod = scriptJsonObject["requestMethod"].toString();
     }
 
     QString inputData;
@@ -76,32 +70,10 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    QProcessEnvironment scriptEnvironment =
-            QProcessEnvironment::systemEnvironment();
-
-    if (requestMethod == "GET") {
-        scriptEnvironment.insert("REQUEST_METHOD", "GET");
-        scriptEnvironment.insert("QUERY_STRING", inputData);
-    }
-
-    if (requestMethod == "POST") {
-        scriptEnvironment.insert("REQUEST_METHOD", "POST");
-        scriptEnvironment.insert("CONTENT_LENGTH",
-                                 QString::number(inputData.size()));
-    }
-
-    scriptProcess.setProcessEnvironment(scriptEnvironment);
-
     scriptProcess.setWorkingDirectory(qApp->property("application").toString());
 
     scriptProcess.start((qApp->property("perlInterpreter").toString()),
                         QStringList()
                         << scriptFullFilePath,
                         QProcess::Unbuffered | QProcess::ReadWrite);
-
-    if (requestMethod == "POST") {
-        QByteArray inputDataArray = inputData.toUtf8();
-        inputDataArray.append(QString("\n").toLatin1());
-        scriptProcess.write(inputDataArray);
-    }
 }

@@ -50,8 +50,13 @@ These are the basic steps for building your first PEB-based serverless applicati
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 * **2.** Write [a settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
 * **3.** Write your Perl scripts.  
-  Input from local HTML forms is read just like reading POST or GET requests in a Perl CGI script.  
-  You may use the [get-post-test.pl](./resources/app/perl/get-post-test.pl) file as an example.
+  User input is written on script STDIN.  
+
+  ```perl
+  my $input = <STDIN>;
+  chomp $input;
+  ```
+
 * **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
@@ -74,7 +79,7 @@ PEB is created to work from any directory without installation meaning that:
 ## Features
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
-* [Perl scripts with STDIN event loops can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
+* [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Macintosh builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Optional Perl scripts error logging](./doc/SETTINGS.md#log-files)
@@ -85,7 +90,7 @@ PEB is created to work from any directory without installation meaning that:
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.
-* PEB does not need and does not implement any server, but will start one if so configured.
+* PEB does not need and does not implement any server, but will start one if so configured.  
 * Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
 * PEB starts Perl scripts only from its application directory.
 * Cross-site scripting is disabled.
@@ -94,16 +99,14 @@ PEB is created to work from any directory without installation meaning that:
 
 ## What PEB Is Not
 * PEB is not a general-purpose web browser and does not have all traditional features of general-purpose web browsers.
-* PEB is not a server and is not an implementation of the CGI protocol.  
-``REQUEST_METHOD``, ``QUERY_STRING`` and ``CONTENT_LENGTH`` environment variables are borrowed from the CGI protocol to start local Perl scripts as child processes without any exposure to other applications.
-* PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable Perl distribution.
+* PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable, Perl distribution.
 
 ## Limitations
 * Only single-page local applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
 * ``QtWebEngine`` builds do not support printing.
 * ``window.print()`` is not supported.
-* Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
+* Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.

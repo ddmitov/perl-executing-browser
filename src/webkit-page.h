@@ -262,17 +262,12 @@ public slots:
 
     void qFeedScript(QJsonObject scriptJsonObject)
     {
-        QString requestMethod;
-        if (scriptJsonObject["requestMethod"].toString().length() > 0) {
-            requestMethod = scriptJsonObject["requestMethod"].toString();
-        }
-
         QString inputData;
         if (scriptJsonObject["inputData"].toString().length() > 0) {
             inputData = scriptJsonObject["inputData"].toString();
         }
 
-        if (requestMethod == "POST") {
+        if (inputData.length() > 0) {
             QScriptHandler *handler =
                     runningScripts.value(scriptJsonObject["id"].toString());
             if (handler->scriptProcess.isOpen()) {
