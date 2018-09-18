@@ -22,11 +22,11 @@ pebSettings.closeConfirmation =
   'Are you sure you want to close the window?';
 ```
 
-* ``autoStartScripts``  
-  These are Perl scripts that are started immediately after a local page is loaded.  
+* **autoStartScripts**  
+  ``Array`` for Perl scripts that are started immediately after a local page is loaded.  
 
-* ``closeConfirmation``  
-  This text is displayed when the close button is pressed, but unsaved data in local HTML forms is detected. If no warning text is found, PEB exits immediately.
+* **closeConfirmation**  
+  ``String`` for text, which is displayed when the close button is pressed, but unsaved data in local HTML forms is detected. If no warning text is found, PEB exits immediately.
 
 ## Perl Scripts API
 Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed of the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
@@ -34,9 +34,9 @@ Every Perl script run by PEB is called by clicking a link or submitting a form t
 A minimal example of a Perl script settings object:  
 
 ```javascript
-var perl_test = {};
-perl_test.scriptRelativePath = 'perl/test.pl';
-perl_test.stdoutFunction = function (stdout) {
+var perl_script = {};
+perl_script.scriptRelativePath = 'perl/test.pl';
+perl_script.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
   container.innerHTML = stdout;
 }
@@ -45,50 +45,60 @@ perl_test.stdoutFunction = function (stdout) {
 Three methods to start a local Perl script:  
 
 ```html
-<a href="perl_test.settings">Start Perl script</a>
+<a href="perl_script.settings">Start Perl script</a>
 ```
 
 ```html
-<form action="perl_test.settings">
+<form action="perl_script.settings">
   <input type="text" name="input" id="test-script-input">
   <input type="submit" value="Start Perl script">
 </form>
 ```
 
 ```javascript
-peb.startScript('perl_test.settings');
+peb.startScript('perl_script.settings');
 ```
 
-* ``scriptRelativePath``  
-  This path is relative to the application directory and it is converted to a full file path at runtime.  
-  PEB does not check filename extensions or shebang line of Perl scripts.  
-  Scripts without a filename extension can also be used.  
+* **script**  
+  ``String`` for the relative path of a Perl script run by PEB  
+  The script relative path is converted to a full path using the PEB application directory as a root folder.  
+  PEB does not check filename extensions or shebang lines of Perl scripts.  
+  Scripts without filename extensions can also be used.  
   *This object property is mandatory.*  
-
-* ``stdoutFunction``  
-  Every piece of script output is passed to this function as its only argument.  
-  *This object property is mandatory.*  
-
-* ``inputData``  
-  This object property holds user input data. Input data is written on script STDIN.  
-
-* ``inputDataHarvester``  
-  This object property is a function that can supply user input data to a Perl script run by PEB.  
-
-  Single input box example with no dependencies:  
 
   ```javascript
-  perlScriptObject.inputDataHarvester = function() {
-    var data = document.getElementById('input-box-id').value;
+  perl_script.script = "relative/path/to/script.pl";
+  ```
+
+* **stdoutFunction**  
+  will be executed every time data is available on STDOUT  
+  The only parameter passed to the ``stdoutFunction`` is the STDOUT ``String``.  
+  *This object property is mandatory.*  
+
+  ```javascript
+  perl_script.stdoutFunction = function (stdout) {
+    document.getElementById("DOM-element-id").textContent = stdout;
+  };
+  ```
+
+* **inputData**  
+  ``String`` or ``Function`` supplying user data as its return value.  
+  ``inputData`` is written on script STDIN.  
+
+  ``inputData`` function with no dependencies:  
+
+  ```javascript
+  perl_script.inputData = function () {
+    var data = document.getElementById("input-box-id").value;
     return data;
   }
   ```
 
-* ``scriptExitCommand``  
-  This object property designates the command used to gracefully shut down an interactive script when PEB is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
+* **scriptExitCommand**  
+  ``String`` designating the command used to gracefully shut down an interactive script when PEB is going to be closed. Upon receiving it, the interactive script must start its shutdown procedure.
 
-* ``scriptExitConfirmation``  
-  Just before exiting an interactive script must print on STDOUT its ``scriptExitConfirmation`` to signal PEB that it completed its shutdown. All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
+* **scriptExitConfirmation**  
+  ``String`` used to signal PEB that an interactive Perl script completed its shutdown. All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
 
@@ -97,7 +107,7 @@ Each PEB interactive Perl script must have its own event loop waiting constantly
 
 Please note, that interactive Perl scripts are not supported on all Windows versions.  
 
-Please also note, that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! The use of interactive scripts should be carefully considered, because even during normal operation they use more memory than "fire-and-forget" type of scripts.
+Please also note, that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! The use of interactive scripts should be carefully considered, because even during normal operation they use more memory than non-interactive scripts.
 
 The following code shows how to start an interactive Perl script right after a local page is loaded:
 
@@ -115,7 +125,7 @@ The following code shows how to start an interactive Perl script right after a l
 
       var interactive_script = {};
       interactive_script.scriptRelativePath = 'perl/interactive.pl';
-      interactive_script.inputDataHarvester = function() {
+      interactive_script.inputData = function() {
         return document.getElementById('interactive-script-input').value;
       }
       interactive_script.stdoutFunction = function (stdout) {
@@ -147,27 +157,27 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 
 ```json
 {
-  "file" : "tabula",
-  "ports" :
+  "file": "tabula",
+  "ports":
   [
-    3000 ,
+    3000,
     6000
-  ] ,
-  "command-line-arguments" :
+  ],
+  "command-line-arguments":
   [
-    "--browser=none" ,
-    "--port=#PORT#" ,
+    "--browser=none",
+    "--port=#PORT#",
     "--no-port-test"
-  ] ,
-  "shutdown_command" : "shutdown"
+  ],
+  "shutdown_command": "shutdown"
 }
 ```
 
-* ``file`` is a string resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder.  
+* **file** is a ``String`` resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder.  
   All Perl servers started by PEB must be up and running within 5 seconds from being launched or PEB will display a timeout message. Servers being unable to start will also timeout.  
   *This element is mandatory.*
 
-* ``ports`` is an array holding a single port or the lowest and the highest ports in a port range.  
+* **ports** is an ``Array`` holding a single port or the lowest and the highest ports in a port range.  
   *This element is mandatory.*
 
   Privileged ports below or equal to port 1024 are not allowed.  
@@ -185,9 +195,9 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
   6669 - Alternate IRC [Apple addition]
   ```
 
-* ``command-line-arguments`` is an array holding all command-line arguments that have to be passed to a local Perl server. The ``#PORT#`` keyword within the command-line arguments is substituted with the first available safe port when a port range is given. It is not possible to supply the first available safe port to the local server application if the ``#PORT#`` keyword is missing within the command line arguments.
+* **command-line-arguments** is an ``Array`` holding all command-line arguments that have to be passed to a local Perl server. The ``#PORT#`` keyword within the command-line arguments is substituted with the first available safe port when a port range is given. It is not possible to supply the first available safe port to the local server application if the ``#PORT#`` keyword is missing within the command line arguments.
 
-* ``shutdown_command`` is a string appended to the base URL of the local server to make a special URL which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see [Tabula](https://github.com/ddmitov/tabula) as an example.
+* **shutdown_command** is a ``String`` appended to the base URL of the local server to make a special URL which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process. ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see the [Tabula](https://github.com/ddmitov/tabula) application as an example.
 
 ## Selecting Files and Folders
 Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension. Selected files or folders are seamlessly inserted in any local page by the ``receiverFunction`` taking all selected files or folders as its only argument.  

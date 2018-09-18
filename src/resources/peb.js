@@ -7,24 +7,27 @@ peb.getPageSettings = function() {
   }
 }
 
-peb.getDialogSettings = function(dialogObject) {
-  if (window[dialogObject] !== null) {
-    return JSON.stringify(dialogObject);
+peb.getDialogSettings = function(dialogSettings) {
+  if (window[dialogSettings] !== null) {
+    return JSON.stringify(dialogSettings);
   }
 }
 
-peb.getScriptSettings = function(scriptObject) {
-  if (window[scriptObject] !== null) {
-    if (typeof scriptObject.inputDataHarvester === 'function') {
-      scriptObject.inputData = scriptObject.inputDataHarvester();
+peb.getScriptSettings = function(scriptSettings) {
+  if (window[scriptSettings] !== null) {
+    if (typeof scriptSettings.inputData === 'function') {
+      scriptSettings.scriptInput = scriptSettings.inputData();
+    } else {
+      scriptSettings.scriptInput = scriptSettings.inputData;
     }
-    return JSON.stringify(scriptObject);
+
+    return JSON.stringify(scriptSettings);
   }
 }
 
-peb.startScript = function(scriptObjectName) {
+peb.startScript = function(scriptSettings) {
   var form = document.createElement('form');
-  form.setAttribute('action', scriptObjectName);
+  form.setAttribute('action', scriptSettings);
   form.submit();
 }
 
@@ -32,20 +35,20 @@ peb.checkUserInputBeforeClose = function() {
   var textEntered = false;
   var close = true;
 
-  var textFieldsArray = [];
-  textFieldsArray = document.getElementsByTagName('textarea');
+  var textFields = [];
+  textFields = document.getElementsByTagName('textarea');
 
-  for (index = 0; index < textFieldsArray.length; index++) {
-    if (textFieldsArray[index].value.length > 0) {
+  for (index = 0; index < textFields.length; index++) {
+    if (textFields[index].value.length > 0) {
       textEntered = true;
     }
   }
 
-  var inputBoxesArray = [];
-  inputBoxesArray = document.querySelectorAll('input[type=text]');
+  var inputBoxes = [];
+  inputBoxes = document.querySelectorAll('input[type=text]');
 
-  for (index = 0; index < inputBoxesArray.length; index++) {
-    if (inputBoxesArray[index].value.length > 0) {
+  for (index = 0; index < inputBoxes.length; index++) {
+    if (inputBoxes[index].value.length > 0) {
       textEntered = true;
     }
   }

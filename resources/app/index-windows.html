@@ -14,7 +14,7 @@
       // Settings objects for the Perl scripts:
       var clock_one = {};
       clock_one.scriptRelativePath = 'perl/clock.pl';
-      clock_one.inputDataHarvester = function() {
+      clock_one.inputData = function() {
         return "unix-epoch";
       }
       clock_one.stdoutFunction = function (stdout) {
@@ -24,7 +24,7 @@
 
       var clock_two = {};
       clock_two.scriptRelativePath = 'perl/clock.pl';
-      clock_two.inputDataHarvester = function() {
+      clock_two.inputData = function() {
         return "local-time";
       }
       clock_two.stdoutFunction = function (stdout) {

@@ -46,9 +46,9 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         return;
     }
 
-    QString inputData;
-    if (scriptJsonObject["inputData"].toString().length() > 0) {
-        inputData = scriptJsonObject["inputData"].toString();
+    QString scriptInput;
+    if (scriptJsonObject["scriptInput"].toString().length() > 0) {
+        scriptInput = scriptJsonObject["scriptInput"].toString();
     }
 
     if (scriptJsonObject["scriptExitCommand"].toString().length() > 0) {

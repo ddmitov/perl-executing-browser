@@ -25,7 +25,7 @@
       // Settings objects for the Perl scripts:
       var interactive_one = {};
       interactive_one.scriptRelativePath = 'perl/interactive.pl';
-      interactive_one.inputDataHarvester = function() {
+      interactive_one.inputData = function() {
         var data = $('#form-one').serialize();
         $('#form-one').trigger('reset');
         return data;
@@ -39,7 +39,7 @@
 
       var interactive_two = {};
       interactive_two.scriptRelativePath = 'perl/interactive.pl';
-      interactive_two.inputDataHarvester = function() {
+      interactive_two.inputData = function() {
         var data = $('#form-two').serialize();
         $('#form-two').trigger('reset');
         return data;
