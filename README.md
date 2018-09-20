@@ -102,10 +102,9 @@ PEB is created to work from any directory without installation meaning that:
 * PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable, Perl distribution.
 
 ## Limitations
-* Only single-page local applications are supported with no pop-up windows and no Perl scripting inside frames.
+* Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
-* ``QtWebEngine`` builds do not support printing.
-* ``window.print()`` is not supported.
+* ``QtWebEngine`` builds do not support printing and ``window.print()`` is not supported.
 * Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
