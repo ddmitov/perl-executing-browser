@@ -213,8 +213,8 @@ Selecting files or folders with their full paths is performed by clicking a link
 
 A JavaScript settings object for a filesystem dialog takes only two arguments:
 
-* **type**
-``String`` with one of the following:
+* **type**  
+``String`` containing one of the following:
   * ``single-file``  
   The actual opening of any existing file is performed by a Perl script and not by PEB.  
 
