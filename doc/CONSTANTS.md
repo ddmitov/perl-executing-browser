@@ -13,7 +13,7 @@ Perl Executing Browser - Constants
   All files used by PEB, with the exception of data files, must be located within this folder.  
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
-  [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/).  
+  [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/).  
 
   By default the working directory of all Perl scripts run by PEB is the application directory.
 

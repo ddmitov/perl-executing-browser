@@ -50,7 +50,7 @@ These are the basic steps for building your first PEB-based serverless applicati
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 * **2.** Write [a settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
 * **3.** Write your Perl scripts.  
-  User input is written on script STDIN.  
+  User input is written on script STDIN and can be read using the following simple code:  
 
   ```perl
   my $input = <STDIN>;
