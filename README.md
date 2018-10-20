@@ -49,9 +49,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 These are the basic steps for building your first PEB-based serverless application:  
 
 * **1.** Write your Perl application with an appropriate HTML interface.  
-
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.  
-
   User input is written on script STDIN and can be read using the following simple code:  
 
   ```perl
