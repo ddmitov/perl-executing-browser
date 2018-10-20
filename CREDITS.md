@@ -10,7 +10,7 @@ I thank them all! Their expertise, effort and good will are highly appreciated!
 
 Special thanks to the staff of the Library of the New Bulgarian University,
 where much of the development effort took place!  
-http://www.nbu.bg/en/library/library  
+https://www.nbu.bg/en/library/library  
 
 Special thanks to Stack Overflow users peppe, Piotr Dobrogost and Fèlix Galindo Allué.  
 Their example code is no longer used in Perl Executing Browser,  
@@ -18,13 +18,12 @@ but their expertise and good will to help others are not forgotten!
 
 Thanks to Jennifer Maher-Bontrager, author of the Camel icon.  
 http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html  
-http://www.totoro.org/jen/  
+https://www.totoro.org/jen/  
 
 Thanks to Leon Anavi, Valentin Alexiev, Stefan Chekanov, Rangel Ivanov, Philip Georgiev,  
 karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,  
 for being welcoming host of the first public presentation of Perl Executing Browser  
 on the 2nd of March 2014 and for their helpful proposals.  
-http://hackafe.org/  
 
 Thanks to Roderich Schupp and all contributors of the Module::ScanDeps CPAN module.
 https://metacpan.org/pod/Module::ScanDeps  
@@ -39,35 +38,35 @@ https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/w
 https://github.com/NixOS/nixpkgs/issues/16327  
 https://github.com/annulen/webkit  
 
-http://qt-project.org/doc/qt-4.8/qwebhistory.html  
-http://qt-project.org/doc/qt-4.8/qdir.html  
-http://qt-project.org/doc/qt-4.8/qfileinfo.html  
-http://qt-project.org/doc/qt-4.8/qdir.html  
-http://qt-project.org/doc/qt-4.8/qregexp.html  
-http://qt-project.org/doc/qt-4.8/qfile.html  
-http://qt-project.org/doc/qt-4.8/qtextstream.html  
-http://qt-project.org/doc/qt-4.8/qiodevice.html  
-http://qt-project.org/doc/qt-4.8/qwebframe.html  
-http://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets  
-http://qt-project.org/doc/qt-5.0/qtcore/qsettings.html  
-http://qt-project.org/doc/qt-5.0/qtcore/qprocess.html  
-http://qt-project.org/doc/qt-5.0/qtcore/qurl.html  
-http://qt-project.org/doc/qt-5.0/qtcore/qstring.html  
-http://qt-project.org/doc/qt-5.0/qtcore/qfile.html  
-http://qt-project.org/doc/qt-5.0/qtwidgets/qapplication.html  
-http://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html  
-http://qt-project.org/doc/qt-5/qtnetwork-module.html  
-http://qt-project.org/doc/qt-5/qmake-test-function-reference.html  
+https://qt-project.org/doc/qt-4.8/qwebhistory.html  
+https://qt-project.org/doc/qt-4.8/qdir.html  
+https://qt-project.org/doc/qt-4.8/qfileinfo.html  
+https://qt-project.org/doc/qt-4.8/qdir.html  
+https://qt-project.org/doc/qt-4.8/qregexp.html  
+https://qt-project.org/doc/qt-4.8/qfile.html  
+https://qt-project.org/doc/qt-4.8/qtextstream.html  
+https://qt-project.org/doc/qt-4.8/qiodevice.html  
+https://qt-project.org/doc/qt-4.8/qwebframe.html  
+https://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets  
+https://qt-project.org/doc/qt-5.0/qtcore/qsettings.html  
+https://qt-project.org/doc/qt-5.0/qtcore/qprocess.html  
+https://qt-project.org/doc/qt-5.0/qtcore/qurl.html  
+https://qt-project.org/doc/qt-5.0/qtcore/qstring.html  
+https://qt-project.org/doc/qt-5.0/qtcore/qfile.html  
+https://qt-project.org/doc/qt-5.0/qtwidgets/qapplication.html  
+https://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html  
+https://qt-project.org/doc/qt-5/qtnetwork-module.html  
+https://qt-project.org/doc/qt-5/qmake-test-function-reference.html  
 
-http://qt-project.org/wiki/How_to_Use_QSettings  
-http://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2  
+https://qt-project.org/wiki/How_to_Use_QSettings  
+https://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2  
 
-http://qt-project.org/forums/viewthread/8270 (Find length of QString text)  
-http://qt-project.org/forums/viewthread/6102 (WebView Clear history)  
-http://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)  
-http://qt-project.org/forums/viewthread/25533 (#ifdef condition)  
-http://qt-project.org/forums/viewthread/15487 (How to list foreach from array)  
-http://qt-project.org/forums/viewthread/8876 (Setting global variable in main())  
+https://qt-project.org/forums/viewthread/8270 (Find length of QString text)  
+https://qt-project.org/forums/viewthread/6102 (WebView Clear history)  
+https://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)  
+https://qt-project.org/forums/viewthread/25533 (#ifdef condition)  
+https://qt-project.org/forums/viewthread/15487 (How to list foreach from array)  
+https://qt-project.org/forums/viewthread/8876 (Setting global variable in main())  
 
 https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html  
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
@@ -153,18 +152,18 @@ https://perlbrew.pl/
 https://github.com/skaji/relocatable-perl  
 http://strawberryperl.com/  
 
-http://perldoc.perl.org/Encode.html  
-http://perldoc.perl.org/File/Basename.html  
+https://perldoc.perl.org/Encode.html  
+https://perldoc.perl.org/File/Basename.html  
 https://perldoc.perl.org/File/Path.html  
 
 https://metacpan.org/pod/File::Copy::Recursive  
 https://metacpan.org/pod/Module::ScanDeps  
 
-http://www.perl.com/pub/2002/05/14/mod_perl.html  
+https://www.perl.com/pub/2002/05/14/mod_perl.html  
 
-http://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
-http://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
-http://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
+https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
+https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
+https://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
 
 https://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
 https://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
@@ -173,15 +172,15 @@ https://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in
 https://stackoverflow.com/questions/787899/how-do-i-use-a-perl-module-from-a-relative-location  
 https://stackoverflow.com/questions/229357/what-is-the-best-way-in-perl-to-copy-files-into-a-yet-to-be-created-directory-tr  
 
-http://perlmaven.com/manipulating-perl-arrays  
-http://perlmaven.com/how-to-sort-a-hash-in-perl  
-http://perlmaven.com/recursive-subroutines  
+https://perlmaven.com/manipulating-perl-arrays  
+https://perlmaven.com/how-to-sort-a-hash-in-perl  
+https://perlmaven.com/recursive-subroutines  
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
 
 ## HTML, CSS & JavaScript
-http://www.w3schools.com/js/js_loop_for.asp  
-http://www.w3schools.com/jsref/prop_html_innerhtml.asp  
+https://www.w3schools.com/js/js_loop_for.asp  
+https://www.w3schools.com/jsref/prop_html_innerhtml.asp  
 https://www.w3schools.com/jsref/met_form_submit.asp  
 
 https://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
@@ -205,7 +204,7 @@ http://youmightnotneedjquery.com/
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/IQAndreas/markdown-licenses  
 https://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
-http://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
+https://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
 
 ## Bash
 http://tldp.org/LDP/abs/html/fto.html  
@@ -224,11 +223,11 @@ https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-arc
 
 https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-command-output/  
 https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
-http://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
+https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
 
 ## Mac
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
-http://iconverticons.com/online/  
+https://iconverticons.com/online/  
 
 ## Google Chrome Unsafe Ports
 https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chrome  
