@@ -6,7 +6,7 @@ The only Linux and Macintosh compile-time requirement of PEB is a Qt development
 
 Compiling Windows binaries of PEB is subject to the following restrictions:  
 
-* Windows builds of PEB can only be compiled by a MinGW (GCC-based) Qt using the ``QtWebKit`` web engine,  
+* Windows builds of PEB can only be compiled by a GCC-based MinGW Qt using the ``QtWebKit`` web engine,  
   but only MSVC-based Qt versions 5.6.x or higher include the ``QtWebEngine`` on the Windows platform.
 * The source code of PEB is not MSVC-compatible and can not use the ``QtWebEngine``.
 * Windows MinGW Qt versions 5.6.x - 5.8.x have neither ``QtWebEngine``, nor ``QtWebKit`` and an updated ``QtWebKit`` has to be manually added from the [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).

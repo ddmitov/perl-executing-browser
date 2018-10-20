@@ -2,13 +2,16 @@ Perl Executing Browser - Constants
 --------------------------------------------------------------------------------
 
 ## Hard Coded Files and Folders
+
+All names of PEB hard coded files and folders are case-sensitive!  
+
 * **Perl interpreter:**  
   PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder.  
   The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
   If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
 
 * **Resources directory:**  
-  Resources directory must contain the ``application`` subdirectory containing all Perl application files.  
+  Resources directory must contain the ``application`` subdirectory with all necessary application files.  
   ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
 
   The resources directory path is:
@@ -16,7 +19,7 @@ Perl Executing Browser - Constants
   * ``{PEB_binary_directory}/resources`` for all other PEB builds.
 
 * **Application directory:**  
-  All Perl application files used by PEB must be located within this folder.  
+  All Perl application files must be located within this folder.  
 
   The application directory path is:
   * ``{AppImage_binary_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
@@ -27,7 +30,7 @@ Perl Executing Browser - Constants
 
   By default the working directory of all Perl scripts run by PEB is the application directory.
 
-* **Data Directory:**
+* **Data Directory:**  
   Data directory must contain any writable files used or produced by a PEB-based application.  
 
   The data directory path is:
@@ -48,8 +51,6 @@ Perl Executing Browser - Constants
   If both entry files are present, ``index.html`` takes precedence.  
   If ``index.html`` is missing, ``local-server.json`` is used, if available.  
   If both entry files are missing, an error message is displayed.  
-
-  Note that entry files pathnames are case sensitive.
 
   <a name="icon"></a>
 * **Icon:**
