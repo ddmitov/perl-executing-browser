@@ -3,14 +3,24 @@ Perl Executing Browser - Constants
 
 ## Hard Coded Files and Folders
 * **Perl interpreter:**  
-  PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder. The interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines. If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
+  PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder.  
+  The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
+  If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
 
 * **Resources directory:**  
-  Resources directory is ``{PEB_binary_directory}/resources`` or ``{AppImage_binary_directory}/resources`` if a PEB-based application is packed as an [AppImage](https://appimage.org/). Application, data and logs directories, as well as icon file of a PEB application must be located in this folder.  
+  Resources directory must contain the ``application`` subdirectory containing all Perl application files.  
+  ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
+
+  The resources directory path is:
+  * ``{AppImage_binary_directory}/resources`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_binary_directory}/resources`` for all other PEB builds.
 
 * **Application directory:**  
-  Application directory is ``{PEB_binary_directory}/resources/app``.  
-  All files used by PEB, with the exception of data files, must be located within this folder.  
+  All Perl application files used by PEB, with the exception of data files, must be located within this folder.  
+
+  The application directory path is:
+  * ``{AppImage_binary_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_binary_directory}/resources/app`` for all other PEB builds.
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application compatible with [Electron](http://electron.atom.io/).  
@@ -19,6 +29,7 @@ Perl Executing Browser - Constants
 
 * **Data Directory:**
   Data directory must contain any writable files used or produced by a PEB-based application.  
+
   The data directory path is:
   * ``{AppImage_binary_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
   * ``{PEB_binary_directory}/resources/data`` for all other PEB builds.
