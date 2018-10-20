@@ -111,7 +111,6 @@ http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width
 http://www.qtcentre.org/threads/29104-QMake-DEFINES  
 http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit  
 
-
 https://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage  
 https://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
 https://stackoverflow.com/questions/8026101/correct-way-to-quit-a-qt-program  
@@ -193,11 +192,13 @@ https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via
 https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-with-reset-method  
 https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
 
+http://getbootstrap.com/  
 http://getbootstrap.com/components/#dropdowns  
 
 http://bootswatch.com/  
 http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php  
 
+https://jquery.com/
 http://youmightnotneedjquery.com/  
 
 ## Markdown
@@ -229,7 +230,7 @@ http://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 http://iconverticons.com/online/  
 
-## Google Chrome
+## Google Chrome Unsafe Ports
 https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chrome  
 
 ## GitHub

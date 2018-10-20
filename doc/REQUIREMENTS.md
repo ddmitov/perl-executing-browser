@@ -21,12 +21,14 @@ Compiled and tested successfully using:
 * [Qt 5.8.0](http://download.qt.io/archive/qt/5.8/5.8.0/) on 64-bit Lubuntu 16.04
 * [Qt 5.9.1](http://download.qt.io/archive/qt/5.9/5.9.1/) on 64-bit Lubuntu 16.04
 
-To compile PEB type in a terminal started in the ``src`` folder:
+To compile PEB type in a terminal started in the ```src``` folder:
 
 ```
 qmake -qt=qt5
 make
 ```
+
+Please note that PEB builds using the ```QtWebKit``` web engine are single-process applications consuming less memory than PEB builds using the ```QtWebEngine```, which are multiprocess applications.  
 
 ## Compile-Time Settings
 All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  

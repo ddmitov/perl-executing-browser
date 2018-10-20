@@ -110,7 +110,7 @@ PEB is created to work from any directory without installation meaning that:
 ## History
 PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
 
-## [Thanks and Credits](./doc/CREDITS.md)
+## [Thanks and Credits](CREDITS.md)
 
 ## [License](./LICENSE.md)
 This program is free software;  

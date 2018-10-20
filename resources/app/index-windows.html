@@ -10,8 +10,31 @@
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
       pebSettings.autoStartScripts = ['clock_one', 'clock_two'];
+      pebSettings.cutLabel = '- Cut -';
+      pebSettings.copyLabel = '- Copy -';
+      pebSettings.pasteLabel = '- Paste -';
+      pebSettings.selectAllLabel = '- Select All -';
+      pebSettings.okLabel = 'OK';
+      pebSettings.cancelLabel = 'CANCEL';
+      pebSettings.yesLabel = 'YES';
+      pebSettings.noLabel = 'NO';
+      pebSettings.closeConfirmation =
+        'Text was entered in a form and it is going to be lost!\n' +
+        'Are you sure you want to close the application?';
 
       // Settings objects for the Perl scripts:
+      var perl_input = {};
+      perl_input.scriptRelativePath = 'perl/input.pl';
+      perl_input.inputData = function() {
+        var data = document.getElementById('perl-input-box').value;
+        $('#perl-input').trigger('reset');
+        return data;
+      }
+      perl_input.stdoutFunction = function (stdout) {
+        var target = document.getElementById('user-data-perl-output');
+        target.innerText = 'Last user input: ' + stdout;
+      }
+
       var clock_one = {};
       clock_one.scriptRelativePath = 'perl/clock.pl';
       clock_one.inputData = function() {
@@ -134,9 +157,10 @@
       .introduction {
         text-align: left;
         font-size: 20px;
+        margin-bottom: 20px;
       }
 
-      .clock-output {
+      .output {
         font-size: 20px;
       }
     </style>
@@ -224,15 +248,38 @@
       <h2>Perl Executing Browser</h2>
 
       <div class="row">
-        <div class="col-lg-12 introduction">
+        <div class="col-xs-12 introduction">
           <a href="https://github.com/ddmitov/perl-executing-browser">Perl Executing Browser (PEB)</a> is an HTML5 user interface for <a href="https://www.perl.org/">Perl 5</a> desktop applications. By default it runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the <a href="https://www.qt.io/">Qt 5</a> libraries. Inspired by <a href="http://electron.atom.io/">Electron</a> and <a href="http://nwjs.io/">NW.js</a>, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of <a href="https://nodejs.org/en/">Node.js</a>.
         </div>
       </div>
 
-	  <br>
+      <div class="row">
+        <div class="col-xs-12 form-group">
+          <form action="perl_input.settings" id="perl-input">
+            <div class="input-group">
+              <input type="text" id="perl-input-box" class="form-control"
+                placeholder="Press Enter to send data to Perl script">
 
-	  <div id="clock-one-output" class="clock-output"></div>
-	  <div id="clock-two-output" class="clock-output"></div>
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#perl-input').trigger('reset');">
+                Reset
+              </span>
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#perl-input').trigger('submit');">
+                Send
+              </span>
+            </div>
+          </form>
+        </div>
+
+        <div id="user-data-perl-output" class="output"></div>
+      </div>
+
+      <div class="row">
+        <div id="clock-one-output" class="output"></div>
+        <div id="clock-two-output" class="output"></div>
+      </div>
     </div>
   </body>
 
