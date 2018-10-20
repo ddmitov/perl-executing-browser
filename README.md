@@ -43,7 +43,9 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 * [Thanks and Credits](./doc/CREDITS.md)
 * [Authors](#authors)
 
-The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in the documentation of this project are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
+The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",  
+"RECOMMENDED", "MAY" and "OPTIONAL" in the documentation of this project  
+are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
 
 ## Quick Start
 These are the basic steps for building your first PEB-based serverless application:  
