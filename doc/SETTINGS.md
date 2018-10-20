@@ -156,7 +156,7 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
-A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_binary_directory}/resources/app/local-server.json`` file is found instead of ``{PEB_binary_directory}/resources/app/index.html`` with the following structure:
+A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_resources_directory}/app/local-server.json`` file is found instead of ``{PEB_resources_directory}/app/index.html`` with the following structure:
 
 ```json
 {
@@ -177,7 +177,7 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 ```
 
 * **file**  
-  ``String`` resolved to a full pathname using the ``{PEB_binary_directory}/resources/app`` folder  
+  ``String`` resolved to a full pathname using the ``{PEB_resources_directory}/app`` folder  
   All Perl servers started by PEB must be up and running within 5 seconds from being launched or PEB will display a timeout message. Servers being unable to start will also timeout.  
   *This element is mandatory.*
 
@@ -245,4 +245,4 @@ select_file.receiverFunction = function (file) {
 ```
 
 ## Log Files
-If log files are needed for debugging of PEB or a PEB-based application, they can be easily turned on by manually creating logging directory - ``{PEB_binary_directory}/resources/logs`` or ``{AppImage_binary_directory}/resources/logs`` for a PEB-based application packed as an [AppImage](https://appimage.org/). When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create logging directory on its own and if it is missing, no logs will be written.
+If log files are needed for debugging of PEB or a PEB-based application, they can be easily turned on by manually creating the logging directory ``{PEB_resources_directory}/logs``. When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention: ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``. PEB will not create logging directory on its own and if it is missing, no logs will be written.
