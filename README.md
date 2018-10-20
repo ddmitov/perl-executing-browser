@@ -108,7 +108,7 @@ PEB is created to work from any directory without installation meaning that:
 * Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
-PEB was started as a simple GUI for personal databases in 2013 by Dimitar D. Mitov.
+PEB was started as a simple GUI for personal database applications in 2013 by Dimitar D. Mitov.
 
 ## [Thanks and Credits](CREDITS.md)
 

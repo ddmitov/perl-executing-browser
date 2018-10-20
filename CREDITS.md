@@ -198,7 +198,7 @@ http://getbootstrap.com/components/#dropdowns
 http://bootswatch.com/  
 http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php  
 
-https://jquery.com/
+https://jquery.com/  
 http://youmightnotneedjquery.com/  
 
 ## Markdown
