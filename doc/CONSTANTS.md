@@ -13,13 +13,15 @@ Perl Executing Browser - Constants
   All files used by PEB, with the exception of data files, must be located within this folder.  
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
-  [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application, that is also compatible with [Electron](http://electron.atom.io/).  
+  [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application compatible with [Electron](http://electron.atom.io/).  
 
   By default the working directory of all Perl scripts run by PEB is the application directory.
 
 * **Data Directory:**
   Data directory must contain any writable files used or produced by a PEB-based application.  
-  The data directory path is ``{PEB_binary_directory}/resources/data`` or ``{AppImage_binary_directory}/resources/data`` if a PEB-based application is packed as an Linux [AppImage](https://appimage.org/) single executable.  
+  The data directory path is:
+  * ``{AppImage_binary_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_binary_directory}/resources/data`` for all other PEB builds.
 
   Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
 
