@@ -229,7 +229,7 @@ int main(int argc, char **argv)
     // If 'logs' directory is found in the resources directory,
     // all program messages will be redirected to log files,
     // otherwise no log files will be created and
-    // program messages could be seen inside Qt Creator during development.
+    // program messages may be seen inside Qt Creator during development.
 
     QString logDirFullPath = resourcesDirectory + "/logs";
 

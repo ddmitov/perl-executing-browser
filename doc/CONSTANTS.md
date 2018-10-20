@@ -16,7 +16,7 @@ Perl Executing Browser - Constants
   * ``{PEB_binary_directory}/resources`` for all other PEB builds.
 
 * **Application directory:**  
-  All Perl application files used by PEB, with the exception of data files, must be located within this folder.  
+  All Perl application files used by PEB must be located within this folder.  
 
   The application directory path is:
   * ``{AppImage_binary_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
