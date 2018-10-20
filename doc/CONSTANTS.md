@@ -40,7 +40,9 @@ Perl Executing Browser - Constants
 
   <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``. If this file is found during application startup, it is used as the icon of the application and all dialog boxes. If this file is not found, the default icon embedded into the resources of the browser binary is used.
+  A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``.  
+  If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
+  If this file is not found, the default icon embedded in the resources of the browser binary is used.
 
 ## Functional Pseudo Filenames
 * **About PEB dialog:** ``about-browser.function``
