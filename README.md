@@ -48,10 +48,10 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Quick Start
 These are the basic steps for building your first PEB-based serverless application:  
 
-* **1.** Write ``{PEB_binary_directory}/resources/app/index.html`` file with appropriate HTML forms for user data input.  
-  [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
-* **2.** Write [a settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you are going to run.
-* **3.** Write your Perl scripts.  
+* **1.** Write your Perl application with an appropriate HTML interface.  
+
+  [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.  
+
   User input is written on script STDIN and can be read using the following simple code:  
 
   ```perl
@@ -59,7 +59,7 @@ These are the basic steps for building your first PEB-based serverless applicati
   chomp $input;
   ```
 
-* **4.** Connect your Perl scripts to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+* **2.** Write [settings JavaScript objects](./doc/SETTINGS.md#perl-scripts-api) for your Perl scripts and connect them to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
 
