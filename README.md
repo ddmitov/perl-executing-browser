@@ -8,8 +8,6 @@ Perl Executing Browser
 
 Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. By default it runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
 
-## Screenshots
-
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
 ## Contents
@@ -44,8 +42,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 * [Authors](#authors)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT", "SHOULD", "SHOULD NOT",  
-"RECOMMENDED", "MAY" and "OPTIONAL" in the documentation of this project  
-are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
+"RECOMMENDED", "MAY" and "OPTIONAL" in the documentation of this project are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
 
 ## Quick Start
 These are the basic steps for building your first PEB-based serverless application:  
@@ -68,10 +65,7 @@ These are the basic steps for building your first PEB-based application using a 
 * **1.** Write your Perl server-based application with an appropriate HTML page.  
 * **2.** Write [{PEB_binary_directory}/resources/app/local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
 
-PEB is created to work from any directory without installation meaning that:
-* All application files must be located in the ``{PEB_binary_directory}/resources/app`` folder.
-* All writable data files must be located in the ``{PEB_binary_directory}/resources/data`` folder or  
-  in the ``{AppImage_binary_directory}/resources/data`` folder if a PEB-based application is packed as an Linux [AppImage](https://appimage.org/) single executable.
+PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable.  
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  

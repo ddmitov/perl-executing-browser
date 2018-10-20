@@ -144,7 +144,7 @@ int main(int argc, char **argv)
         perlInterpreter = privatePerlInterpreterFullPath;
     } else {
         // Perl on PATH is used if no private Perl interpreter is found:
-        perlInterpreter = "perl";
+        perlInterpreter = perlExecutable;
     }
 
     application.setProperty("perlInterpreter", perlInterpreter);
