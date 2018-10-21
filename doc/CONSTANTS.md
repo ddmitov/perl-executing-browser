@@ -6,7 +6,7 @@ Perl Executing Browser - Constants
 All names of PEB hard coded files and folders are case-sensitive!  
 
 * **Perl interpreter:**  
-  PEB expects to find a Perl interpreter in the ``{PEB_binary_directory}/perl/bin`` folder.  
+  PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
   The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
   If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
 
@@ -15,15 +15,15 @@ All names of PEB hard coded files and folders are case-sensitive!
   ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
 
   The resources directory path is:
-  * ``{AppImage_binary_directory}/resources`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_binary_directory}/resources`` for all other PEB builds.
+  * ``{AppImage_executable_directory}/resources`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_executable_directory}/resources`` for all other PEB builds.
 
 * **Application directory:**  
   All Perl application files must be located within this folder.  
 
   The application directory path is:
-  * ``{AppImage_binary_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_binary_directory}/resources/app`` for all other PEB builds.
+  * ``{AppImage_executable_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_executable_directory}/resources/app`` for all other PEB builds.
 
   Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application compatible with [Electron](http://electron.atom.io/).  
@@ -34,8 +34,8 @@ All names of PEB hard coded files and folders are case-sensitive!
   Data directory must contain any writable files used or produced by a PEB-based application.  
 
   The data directory path is:
-  * ``{AppImage_binary_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_binary_directory}/resources/data`` for all other PEB builds.
+  * ``{AppImage_executable_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_executable_directory}/resources/data`` for all other PEB builds.
 
   Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
 
@@ -45,8 +45,8 @@ All names of PEB hard coded files and folders are case-sensitive!
 
 * **Entry point:**  
   PEB starts with one of the following entry files:  
-  ``{PEB_binary_directory}/resources/app/index.html`` or  
-  ``{PEB_binary_directory}/resources/app/local-server.json``.  
+  ``{PEB_executable_directory}/resources/app/index.html`` or  
+  ``{PEB_executable_directory}/resources/app/local-server.json``.  
 
   If both entry files are present, ``index.html`` takes precedence.  
   If ``index.html`` is missing, ``local-server.json`` is used, if available.  
@@ -54,7 +54,7 @@ All names of PEB hard coded files and folders are case-sensitive!
 
   <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and it must be located at ``{PEB_binary_directory}/resources/app/app.png``.  
+  A PEB-based application can have its own icon and it must be located at ``{PEB_executable_directory}/resources/app/app.png``.  
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
   If this file is not found, the default icon embedded in the resources of the browser binary is used.
 

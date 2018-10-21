@@ -82,6 +82,6 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
 
   To use a Perlbrew Perl with PEB create a symlink to the wanted Perl interpreter named:  
-  ``{PEB_binary_directory}/perl/bin/perl``  
+  ``{PEB_executable_directory}/perl/bin/perl``  
 
   PEB can also use any Perl on PATH.
