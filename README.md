@@ -22,7 +22,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Compile-Time Settings](./doc/REQUIREMENTS.md#compile-time-settings)
   * [Runtime Requirements](./doc/REQUIREMENTS.md#runtime-requirements)
 * [CONSTANTS](./doc/CONSTANTS.md)
-  * [Hard Coded Files and Folders](./doc/CONSTANTS.md#hard-coded-files-and-folders)
+  * [Files and Folders](./doc/CONSTANTS.md#files-and-folders)
   * [Functional Pseudo Filenames](./doc/CONSTANTS.md#functional-pseudo-filenames)
   * [Specific Keyboard Shortcuts](./doc/CONSTANTS.md#specific-keyboard-shortcuts)
 * [SETTINGS](./doc/SETTINGS.md)
@@ -32,9 +32,8 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts)
   * [Starting Local Server](./doc/SETTINGS.md#starting-local-server)
   * [Selecting Files and Folders](./doc/SETTINGS.md#selecting-files-and-folders)
-  * [Log Files](./doc/SETTINGS.md#log-files)
 * [PACKAGING](./doc/PACKAGING.md)
-  * [Minimal Portable Perl Distribution for PEB](./doc/PACKAGING.md#minimal-portable-perl-distribution-for-peb)
+  * [Minimal Relocatable Perl Distribution for PEB](./doc/PACKAGING.md#minimal-relocatable-perl-distribution-for-peb)
   * [AppImage Support](./doc/PACKAGING.md#appimage-support)
 * [History](#history)
 * [License](./LICENSE.md)
@@ -64,8 +63,6 @@ These are the basic steps for building your first PEB-based application using a 
 * **1.** Write your Perl server-based application with an appropriate HTML interface.  
 * **2.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
 
-PEB is created to work from any directory and all file paths are relative to the directory of the PEB executable.  
-
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Fast, zero-installation software**  
@@ -79,11 +76,11 @@ PEB is created to work from any directory and all file paths are relative to the
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Macintosh builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
-* [Optional Perl scripts error logging](./doc/SETTINGS.md#log-files)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
-* [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Custom dialog and context menu labels](./doc/SETTINGS.md#html-page-api)
 * [Custom window and message box icon](./doc/CONSTANTS.md#icon)
+* [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
+* [Optional Perl scripts error logging](./doc/CONSTANTS.md#log-files-directory)
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.

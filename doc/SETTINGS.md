@@ -243,7 +243,3 @@ select_file.receiverFunction = function (file) {
   container.innerHTML = file;
 }
 ```
-
-## Log Files
-If log files are needed for debugging of PEB or a PEB-based application, they can be easily turned on by manually creating the logging directory ``{PEB_resources_directory}/logs``. When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  ``{application_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``.  
-PEB will not create logging directory on its own and if it is missing, no logs will be written.

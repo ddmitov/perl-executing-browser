@@ -1,9 +1,10 @@
 Perl Executing Browser - Constants
 --------------------------------------------------------------------------------
 
-## Hard Coded Files and Folders
+## Files and Folders
 
-All names of PEB hard coded files and folders are case-sensitive!  
+PEB is created to work from any directory and all file paths are relative to the directory of the PEB executable.  
+All names of PEB files and folders are case-sensitive!  
 
 * **Perl interpreter:**  
   PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
@@ -14,14 +15,14 @@ All names of PEB hard coded files and folders are case-sensitive!
   Resources directory must contain the ``application`` subdirectory with all necessary application files.  
   ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
 
-  The resources directory path is:
+  The resources directory path must be:
   * ``{AppImage_executable_directory}/resources`` for Linux [AppImage](https://appimage.org/) single executable builds or
   * ``{PEB_executable_directory}/resources`` for all other PEB builds.
 
 * **Application directory:**  
   All Perl application files must be located within this folder.  
 
-  The application directory path is:
+  The application directory path must be:
   * ``{AppImage_executable_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
   * ``{PEB_executable_directory}/resources/app`` for all other PEB builds.
 
@@ -33,7 +34,7 @@ All names of PEB hard coded files and folders are case-sensitive!
 * **Data Directory:**  
   Data directory must contain any writable files used or produced by a PEB-based application.  
 
-  The data directory path is:
+  The data directory path must be:
   * ``{AppImage_executable_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
   * ``{PEB_executable_directory}/resources/data`` for all other PEB builds.
 
@@ -42,6 +43,16 @@ All names of PEB hard coded files and folders are case-sensitive!
   ```perl
   my $data_directory = $ENV{'PEB_DATA_DIR'};
   ```
+<a name="log-files-directory"></a>
+* **Log Files Directory:**  
+  When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  
+  ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``.  
+
+  The log files directory path must be:
+  * ``{AppImage_executable_directory}/resources/logs`` for Linux [AppImage](https://appimage.org/) single executable builds or
+  * ``{PEB_executable_directory}/resources/logs`` for all other PEB builds.
+
+  PEB will not create logging directory on its own and if it is missing, no logs will be written.
 
 * **Entry point:**  
   PEB starts with one of the following entry files:  
@@ -52,7 +63,7 @@ All names of PEB hard coded files and folders are case-sensitive!
   If ``index.html`` is missing, ``local-server.json`` is used, if available.  
   If both entry files are missing, an error message is displayed.  
 
-  <a name="icon"></a>
+<a name="icon"></a>
 * **Icon:**
   A PEB-based application can have its own icon and it must be located at ``{PEB_executable_directory}/resources/app/app.png``.  
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
