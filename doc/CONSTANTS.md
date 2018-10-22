@@ -3,8 +3,8 @@ Perl Executing Browser - Constants
 
 ## Files and Folders
 
-PEB is created to work from any directory and all file paths are relative to the directory of the PEB executable.  
-All names of PEB files and folders are case-sensitive!  
+PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. It may contain only a C++ PEB binary or a Linux [AppImage](https://appimage.org/) executable with a C++ PEB executable, all necessary Qt libraries and a Perl distribution packed inside it.  
+All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
 
 * **Perl interpreter:**  
   PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
@@ -12,31 +12,25 @@ All names of PEB files and folders are case-sensitive!
   If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
 
 * **Resources directory:**  
-  Resources directory must contain the ``application`` subdirectory with all necessary application files.  
+  Resources directory must contain the ``app`` subdirectory with all necessary application files.  
   ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
 
-  The resources directory path must be:
-  * ``{AppImage_executable_directory}/resources`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_executable_directory}/resources`` for all other PEB builds.
+  The resources directory path must be: ``{PEB_executable_directory}/resources``  
 
 * **Application directory:**  
   All Perl application files must be located within this folder.  
 
-  The application directory path must be:
-  * ``{AppImage_executable_directory}/resources/app`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_executable_directory}/resources/app`` for all other PEB builds.
+  The application directory path must be: ``{PEB_executable_directory}/resources/app``  
 
-  Application directory is hard coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
+  PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an example of a PEB-based application compatible with [Electron](http://electron.atom.io/).  
 
-  By default the working directory of all Perl scripts run by PEB is the application directory.
+  By default the working directory of all Perl scripts run by PEB is the application directory.  
 
 * **Data Directory:**  
   Data directory must contain any writable files used or produced by a PEB-based application.  
 
-  The data directory path must be:
-  * ``{AppImage_executable_directory}/resources/data`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_executable_directory}/resources/data`` for all other PEB builds.
+  The data directory path must be: ``{PEB_executable_directory}/resources/data``  
 
   Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
 
@@ -48,24 +42,23 @@ All names of PEB files and folders are case-sensitive!
   When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  
   ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``.  
 
-  The log files directory path must be:
-  * ``{AppImage_executable_directory}/resources/logs`` for Linux [AppImage](https://appimage.org/) single executable builds or
-  * ``{PEB_executable_directory}/resources/logs`` for all other PEB builds.
+  The log files directory path must be: ``{PEB_executable_directory}/resources/logs``  
 
   PEB will not create logging directory on its own and if it is missing, no logs will be written.
 
 * **Entry point:**  
-  PEB starts with one of the following entry files:  
+  PEB starts with one of the following files:  
   ``{PEB_executable_directory}/resources/app/index.html`` or  
   ``{PEB_executable_directory}/resources/app/local-server.json``.  
 
-  If both entry files are present, ``index.html`` takes precedence.  
-  If ``index.html`` is missing, ``local-server.json`` is used, if available.  
+  If both files are present, ``index.html`` takes precedence.  
+  If ``index.html`` is missing, ``local-server.json`` is used if available.  
   If both entry files are missing, an error message is displayed.  
 
 <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and it must be located at ``{PEB_executable_directory}/resources/app/app.png``.  
+  A PEB-based application can have its own icon and it must be located at  
+  ``{PEB_executable_directory}/resources/app/app.png``.  
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
   If this file is not found, the default icon embedded in the resources of the browser binary is used.
 

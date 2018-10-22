@@ -56,7 +56,8 @@ These are the basic steps for building your first PEB-based serverless applicati
   chomp $input;
   ```
 
-* **2.** Write [settings JavaScript objects](./doc/SETTINGS.md#perl-scripts-api) for your Perl scripts and connect them to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+* **2.** Write [settings JavaScript objects](./doc/SETTINGS.md#perl-scripts-api) for your Perl scripts and  
+connect them to your local HTML page using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
 
