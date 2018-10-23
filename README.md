@@ -54,7 +54,8 @@ These are the basic steps for building your first PEB-based serverless applicati
   chomp $input;
   ```
 
-* **2.** Write an appropriate HTML interface with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application. Triggering a Perl script from a local HTML page is configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+* **2.** Write an appropriate HTML interface with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
+  Triggering a Perl script from a local HTML page is configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  

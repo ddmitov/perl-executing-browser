@@ -37,15 +37,15 @@ PEB is created to work from any directory without installation and all file path
 <a name="log-files-directory"></a>
 * **Log Files Directory:**  
   When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  
-  ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``.  
+  ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``  
 
   The log files directory path must be: ``{PEB_executable_directory}/resources/logs``  
   PEB will not create logging directory on its own and if it is missing, no logs will be written.
 
 * **Entry point:**  
   PEB starts with one of the following files:  
-  ``{PEB_executable_directory}/resources/app/index.html`` or  
-  ``{PEB_executable_directory}/resources/app/local-server.json``.  
+  * ``{PEB_executable_directory}/resources/app/index.html``  
+  * ``{PEB_executable_directory}/resources/app/local-server.json``  
 
   If both files are present, ``index.html`` takes precedence.  
   If ``index.html`` is missing, ``local-server.json`` is used if available.  
