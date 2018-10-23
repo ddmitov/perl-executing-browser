@@ -3,7 +3,7 @@ Perl Executing Browser - Constants
 
 ## Files and Folders
 
-PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. It may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable, all necessary Qt libraries, a Perl distribution and a Perl application packed inside it. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
+PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. ``{PEB_executable_directory}`` may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable, Qt libraries, a Perl distribution and a Perl application all packed inside it. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
 
 * **Perl interpreter:**  
   PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
@@ -24,7 +24,7 @@ PEB is created to work from any directory without installation and all file path
   By default the working directory of all Perl scripts run by PEB is the application directory.  
 
   PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
-  [Epigraphista](https://github.com/ddmitov/epigraphista) is an application, which is runnable by both PEB and [Electron](http://electron.atom.io/).  
+  [Epigraphista](https://github.com/ddmitov/epigraphista) is an application which is runnable by both PEB and [Electron](http://electron.atom.io/).  
 
 * **Data Directory:**  
   Data directory must contain any writable files used or produced by a PEB-based application.  
