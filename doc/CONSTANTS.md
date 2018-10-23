@@ -21,6 +21,7 @@ PEB is created to work from any directory without installation and all file path
 * **Application directory:**  
   All Perl application files must be located within this folder.  
   The application directory path must be: ``{PEB_executable_directory}/resources/app``  
+  PEB application directory is labeled as ``{PEB_app_directory}`` within this documentation.  
   By default the working directory of all Perl scripts run by PEB is the application directory.  
 
   PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  

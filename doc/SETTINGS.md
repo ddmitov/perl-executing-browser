@@ -60,9 +60,9 @@ Three methods to start a local Perl script:
 peb.startScript('perl_script.settings');
 ```
 
-* **script**  
+* **scriptRelativePath**  
   ``String`` for the relative path of a Perl script run by PEB  
-  The script relative path is converted to a full path using the PEB application directory as a root folder.  
+  The script relative path is converted to a full path using the ``{PEB_app_directory}`` as a root folder.  
   PEB does not check filename extensions or shebang lines of Perl scripts.  
   Scripts without filename extensions can also be used.  
   *This object property is mandatory.*  
@@ -96,14 +96,14 @@ peb.startScript('perl_script.settings');
   ```
 
 * **scriptExitCommand**  
-  ``String`` containing the command used to gracefully shut down an interactive Perl script when PEB is closed  
+  ``String`` containing the command used to gracefully shut down [an interactive Perl script](#interactive_perl_scripts) when PEB is closed  
   Upon receiving it, an interactive script must start its shutdown procedure.
 
 * **scriptExitConfirmation**  
-  ``String`` used to signal PEB that an interactive Perl script completed its shutdown  
+  ``String`` used to signal PEB that [an interactive Perl script](#interactive_perl_scripts) completed its shutdown  
   All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
 
-Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script is finished when buffering is enabled.
+Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script has ended when buffering is enabled.
 
 ## Interactive Perl Scripts
 Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with a unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
