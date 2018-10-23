@@ -28,7 +28,7 @@ qmake -qt=qt5
 make
 ```
 
-Please note that PEB builds using the ``QtWebKit`` web engine are single-process applications consuming less memory than PEB builds using the ``QtWebEngine``, which are multiprocess applications.  
+Please note that PEB builds using the ``QtWebKit`` web engine are single-process applications consuming less memory than PEB builds using the ``QtWebEngine`` which are multiprocess applications.  
 
 ## Compile-Time Settings
 All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  

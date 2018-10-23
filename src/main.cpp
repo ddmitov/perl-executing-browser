@@ -116,6 +116,18 @@ int main(int argc, char **argv)
 
     QString browserDirectory = executableDirectory.absolutePath().toLatin1();
 
+#ifdef Q_OS_LINUX
+    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
+
+    if (appImageEnvVariable.length() > 0) {
+        QFileInfo appImageFileInfo =
+                QFileInfo(QString::fromLatin1(appImageEnvVariable));
+        QString appImageDirectory = appImageFileInfo.path();
+
+        browserDirectory = appImageDirectory;
+    }
+#endif
+
     // ==============================
     // Perl directory:
     // ==============================
@@ -163,23 +175,6 @@ int main(int argc, char **argv)
 
     QString resourcesDirectory = browserDirectory + "/resources";
 
-#ifdef Q_OS_LINUX
-    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
-    QString appImageResourcesDirectory;
-
-    if (appImageEnvVariable.length() > 0) {
-        QFileInfo appImageFileInfo =
-                QFileInfo(QString::fromLatin1(appImageEnvVariable));
-
-        QString appImageDirectory = appImageFileInfo.path();
-        QString appImageName = appImageFileInfo.baseName();
-
-        appImageResourcesDirectory =
-                appImageDirectory + "/"
-                + appImageName + "-resources";
-    }
-#endif
-
     // ==============================
     // Application directory:
     // ==============================
@@ -191,18 +186,6 @@ int main(int argc, char **argv)
     // Data directory:
     // ==============================
     QString dataDirName = resourcesDirectory + "/data";
-
-#ifdef Q_OS_LINUX
-    if (appImageEnvVariable.length() > 0) {
-        dataDirName = appImageResourcesDirectory + "/data";
-
-        QDir dataDir(dataDirName);
-
-        if (!dataDir.exists()) {
-            dataDir.mkpath(dataDirName);
-        }
-    }
-#endif
 
     qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
 
@@ -232,12 +215,6 @@ int main(int argc, char **argv)
     // program messages may be seen inside Qt Creator during development.
 
     QString logDirFullPath = resourcesDirectory + "/logs";
-
-#ifdef Q_OS_LINUX
-    if (appImageEnvVariable.length() > 0) {
-        logDirFullPath = appImageResourcesDirectory + "/logs";
-    }
-#endif
 
     QDir logDir(logDirFullPath);
     if (logDir.exists()) {
