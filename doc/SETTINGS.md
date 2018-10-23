@@ -96,11 +96,11 @@ peb.startScript('perl_script.settings');
   ```
 
 * **scriptExitCommand**  
-  ``String`` containing the command used to gracefully shut down [an interactive Perl script](#interactive_perl_scripts) when PEB is closed  
+  ``String`` containing the command used to gracefully shut down [an interactive Perl script](#interactive-perl-scripts) when PEB is closed  
   Upon receiving it, an interactive script must start its shutdown procedure.
 
 * **scriptExitConfirmation**  
-  ``String`` used to signal PEB that [an interactive Perl script](#interactive_perl_scripts) completed its shutdown  
+  ``String`` used to signal PEB that [an interactive Perl script](#interactive-perl-scripts) completed its shutdown  
   All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
 
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script has ended when buffering is enabled.
