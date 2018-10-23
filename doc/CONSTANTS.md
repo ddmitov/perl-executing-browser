@@ -3,12 +3,15 @@ Perl Executing Browser - Constants
 
 ## Files and Folders
 
-PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. It may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable, all necessary Qt libraries and a Perl distribution packed inside it. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
+PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. It may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable, all necessary Qt libraries, a Perl distribution and a Perl application packed inside it. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
 
 * **Perl interpreter:**  
   PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
   The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
   If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
+
+* **PERL5LIB:**  
+  All Perl modules found in the ``{PEB_executable_directory}/perl/lib`` folder are accessible via the ``PERL5LIB`` environment variable for all PEB Perl scripts.  
 
 * **Resources directory:**  
   Resources directory must contain the ``app`` subdirectory with all necessary application files.  
@@ -50,8 +53,8 @@ PEB is created to work from any directory without installation and all file path
 
 <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and it must be located at  
-  ``{PEB_executable_directory}/resources/app/app.png``.  
+  A PEB-based application can have its own icon and the pathname must be:  
+  ``{PEB_executable_directory}/resources/app/app.png``  
 
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
   If this file is not found, the default icon embedded in the resources of the browser binary is used.
