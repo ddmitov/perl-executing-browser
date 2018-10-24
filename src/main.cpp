@@ -117,22 +117,27 @@ int main(int argc, char **argv)
     QString browserDirectory = executableDirectory.absolutePath().toLatin1();
 
 #ifdef Q_OS_LINUX
+    QString appImageDirectory;
     QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
 
     if (appImageEnvVariable.length() > 0) {
-        QFileInfo appImageFileInfo =
-                QFileInfo(QString::fromLatin1(appImageEnvVariable));
-        QString appImageDirectory = appImageFileInfo.path();
-
-        browserDirectory = appImageDirectory;
+        appImageDirectory =
+                QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
     }
 #endif
 
     // ==============================
     // Perl directory:
     // ==============================
-
     QString perlDirectory = browserDirectory + "/perl";
+
+#ifdef Q_OS_LINUX
+    // Embedded in an AppImage 'perl' directory
+    // takes precedence over external 'perl' directory:
+    if (QDir(appImageDirectory + "/perl").exists()) {
+        perlDirectory = appImageDirectory + "/perl";
+    }
+#endif
 
     // ==============================
     // Perl interpreter:
@@ -172,8 +177,15 @@ int main(int argc, char **argv)
     // ==============================
     // Resources directory:
     // ==============================
-
     QString resourcesDirectory = browserDirectory + "/resources";
+
+#ifdef Q_OS_LINUX
+    // Embedded in an AppImage 'resources' directory
+    // takes precedence over external 'resources' directory:
+    if (QDir(appImageDirectory + "/resources").exists()) {
+        resourcesDirectory = appImageDirectory + "/resources";
+    }
+#endif
 
     // ==============================
     // Application directory:
