@@ -108,7 +108,7 @@ Perl scripts running for a long time should have ``$|=1;`` among their first lin
 ## Interactive Perl Scripts
 Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with a unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
 
-Please note that interactive Perl scripts are not supported by all Windows builds of PEB.  
+Please note that interactive Perl scripts are not supported on any Windows build of PEB.  
 
 Please also note that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! Even during normal operation interactive scripts use more memory than non-interactive scripts and their use should be carefully considered.
 

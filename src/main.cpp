@@ -132,9 +132,9 @@ int main(int argc, char **argv)
     QString perlDirectory = browserDirectory + "/perl";
 
 #ifdef Q_OS_LINUX
-    // Embedded in an AppImage 'perl' directory
-    // takes precedence over external 'perl' directory:
-    if (QDir(appImageDirectory + "/perl").exists()) {
+    // External 'perl' directory, if any,
+    // takes precedence over embedded in an AppImage 'perl' directory:
+    if (appImageDirectory.length() > 0) {
         perlDirectory = appImageDirectory + "/perl";
     }
 #endif
@@ -180,9 +180,9 @@ int main(int argc, char **argv)
     QString resourcesDirectory = browserDirectory + "/resources";
 
 #ifdef Q_OS_LINUX
-    // Embedded in an AppImage 'resources' directory
-    // takes precedence over external 'resources' directory:
-    if (QDir(appImageDirectory + "/resources").exists()) {
+    // External 'resources' directory, if any,
+    // takes precedence over embedded in an AppImage 'resources' directory:
+    if (appImageDirectory.length() > 0) {
         resourcesDirectory = appImageDirectory + "/resources";
     }
 #endif

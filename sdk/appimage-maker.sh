@@ -24,21 +24,29 @@ else
 fi
 
 cp ./sdk/peb.desktop ./peb.app/peb.desktop
-cp ./resources/app.png ./peb.app/peb.png
+cp ./sdk/camel.png ./peb.app/peb.png
 mkdir -p ./peb.app/usr/share
 cp ./sdk/metainfo ./peb.app/usr/share/metainfo
 
-cp -rf ./resources ./peb.app/resources
+for i in "$@"
+  do
+  case $i in
+    --include-resources)
+      cp -rf ./resources ./peb.app/resources
+      cp ./resources/app.png ./peb.app/peb.png
 
-relocatable_perl="$(pwd)/perl/bin/perl"
-compactor_script="$(pwd)/sdk/compactor.pl"
+      relocatable_perl="$(pwd)/perl/bin/perl"
+      compactor_script="$(pwd)/sdk/compactor.pl"
 
-if [ -e "$relocatable_perl" ]; then
-  printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"
-  "$relocatable_perl" "$compactor_script" "--AppImage"
-else
-  printf "\\nRelocatable Perl is not found for this copy of Perl Executing Browser.\\n"
-fi
+      if [ -e "$relocatable_perl" ]; then
+        printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"
+        "$relocatable_perl" "$compactor_script" "--AppImage"
+      else
+        printf "\\nRelocatable Perl is not found for this copy of Perl Executing Browser.\\n"
+      fi
+    ;;
+  esac
+done
 
 linuxdeployqt="linuxdeployqt-continuous-$(arch).AppImage"
 
