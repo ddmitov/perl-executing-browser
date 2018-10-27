@@ -20,7 +20,7 @@ A typical ``{PEB_executable_directory}`` looks like this:
     │   └── index.html
     ├── app.png
     ├── data
-    |   └── {application_data}
+    │   └── {application_data}
     └── logs
         └── {application_logs}
 ```
@@ -30,12 +30,12 @@ A typical ``{PEB_executable_directory}`` looks like this:
   The ``bin`` subdirectory must contain the Perl interpreter.  
   The ``lib`` subdirectory must contain all Perl modules used by PEB Perl applications.  
 
-* **Perl interpreter:**  
+* **Perl Interpreter:**  
   Relocatable Perl interpreter, if present, must be located in the ``{PEB_executable_directory}/perl/bin`` folder.  
   The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
   If a relocatable Perl interpreter is not found, PEB will use the first Perl interpreter on PATH.  
 
-* **PERL5LIB:**  
+* **Perl Modules Directory:**  
   All Perl modules found in the ``{PEB_executable_directory}/perl/lib`` folder are accessible via the ``PERL5LIB`` environment variable for all Perl applications executed by PEB.  
 
 * **Resources Directory:**  
