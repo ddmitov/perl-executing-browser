@@ -64,7 +64,7 @@ A typical ``{PEB_executable_directory}`` looks like this:
 <a name="icon"></a>
 * **Icon:**
   A PEB-based application may have its own icon and the pathname must be:  
-  ``{PEB_executable_directory}/resources/app/app.png``  
+  ``{PEB_executable_directory}/resources/app.png``  
 
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
   If this file is not found, the default icon embedded in the resources of the browser binary is used.
