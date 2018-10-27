@@ -11,17 +11,17 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
 ## AppImage Support
 PEB or any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
 
-* packing a PEB Perl application together with a PEB binary, its Qt libraries and a relocatable Perl distribution:  
+* packing a Perl application together with a PEB executable, its Qt libraries and a relocatable Perl distribution:  
 
-  ```
+  ```bash
   appimage-maker.sh --include-resources
   ```
 
   In this case the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
 
-* packing only a PEB binary with its Qt libraries:  
+* packing only a PEB executable with its Qt libraries:  
 
-  ```
+  ```bash
   appimage-maker.sh
   ```
 

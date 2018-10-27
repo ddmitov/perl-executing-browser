@@ -23,7 +23,7 @@ Compiled and tested successfully using:
 
 To compile PEB type in a terminal started in the ``src`` folder:
 
-```
+```bash
 qmake -qt=qt5
 make
 ```

@@ -5,6 +5,26 @@ Perl Executing Browser - Constants
 
 PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. ``{PEB_executable_directory}`` may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable and its Qt libraries all packed in a single file. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
 
+A typical ``{PEB_executable_directory}`` looks like this:
+
+```bash
+.
+├── {PEB_executable}
+├── perl
+│   ├── bin
+│   │   └── {perl_interpreter}
+│   └── lib
+│       └── {perl_modules}
+└── resources
+    ├── app
+    │   └── index.html
+    ├── app.png
+    ├── data
+    |   └── {application_data}
+    └── logs
+        └── {application_logs}
+```
+
 * **Perl Directory:**  
   The Perl directory, if present, must contain the ``bin`` and ``lib`` subdirectories.  
   The ``bin`` subdirectory must contain the Perl interpreter.  
@@ -32,22 +52,6 @@ PEB is created to work from any directory without installation and all file path
   PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
   [Epigraphista](https://github.com/ddmitov/epigraphista) is an application which is runnable by both PEB and [Electron](http://electron.atom.io/).  
 
-* **Data Directory:**  
-  Data directory must contain any writable files used or produced by a PEB-based application.  
-  The data directory path must be: ``{PEB_executable_directory}/resources/data``  
-  Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
-
-  ```perl
-  my $data_directory = $ENV{'PEB_DATA_DIR'};
-  ```
-<a name="log-files-directory"></a>
-* **Log Files Directory:**  
-  When logging directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  
-  ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``  
-
-  The log files directory path must be: ``{PEB_executable_directory}/resources/logs``  
-  PEB will not create logging directory on its own and if it is missing, no logs will be written.
-
 * **Entry File:**  
   PEB starts with one of the following files:  
   * ``{PEB_executable_directory}/resources/app/index.html``  
@@ -59,11 +63,27 @@ PEB is created to work from any directory without installation and all file path
 
 <a name="icon"></a>
 * **Icon:**
-  A PEB-based application can have its own icon and the pathname must be:  
+  A PEB-based application may have its own icon and the pathname must be:  
   ``{PEB_executable_directory}/resources/app/app.png``  
 
   If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
   If this file is not found, the default icon embedded in the resources of the browser binary is used.
+
+* **Data Directory:**  
+  Data directory may contain any writable files used or produced by a PEB-based application.  
+  The data directory path must be: ``{PEB_executable_directory}/resources/data``  
+  Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:
+
+  ```perl
+  my $data_directory = $ENV{'PEB_DATA_DIR'};
+  ```
+<a name="log-files-directory"></a>
+* **Log Files Directory:**  
+  When log files directory is found during application startup, PEB assumes that logging is required and a separate log file is created for every browser session following the naming convention:  
+  ``{executable_name}-started-at-{four_digit_year}-{month}-{day}--{hour}-{minute}-{second}.log``  
+
+  The log files directory path must be: ``{PEB_executable_directory}/resources/logs``  
+  PEB will not create log files directory on its own and if it is missing, no logs will be written.
 
 ## Functional Pseudo Filenames
 * **About PEB dialog:** ``about-browser.function``
