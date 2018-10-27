@@ -3,22 +3,27 @@ Perl Executing Browser - Constants
 
 ## Files and Folders
 
-PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. ``{PEB_executable_directory}`` may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable, Qt libraries, a Perl distribution and a Perl application all packed inside it. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
+PEB is created to work from any directory without installation and all file paths are relative to the directory of the PEB executable, which is labeled as ``{PEB_executable_directory}`` within this documentation. ``{PEB_executable_directory}`` may contain only a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a C++ PEB executable and its Qt libraries all packed in a single file. All names of PEB files and folders are hard coded in C++ code and they are case-sensitive!  
+
+* **Perl Directory:**  
+  The Perl directory, if present, must contain the ``bin`` and ``lib`` subdirectories.  
+  The ``bin`` subdirectory must contain the Perl interpreter.  
+  The ``lib`` subdirectory must contain all Perl modules used by PEB Perl applications.  
 
 * **Perl interpreter:**  
-  PEB expects to find a Perl interpreter in the ``{PEB_executable_directory}/perl/bin`` folder.  
+  Relocatable Perl interpreter, if present, must be located in the ``{PEB_executable_directory}/perl/bin`` folder.  
   The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
-  If Perl interpreter is not found in the above location, PEB will use the first Perl interpreter on PATH.  
+  If a relocatable Perl interpreter is not found, PEB will use the first Perl interpreter on PATH.  
 
 * **PERL5LIB:**  
-  All Perl modules found in the ``{PEB_executable_directory}/perl/lib`` folder are accessible via the ``PERL5LIB`` environment variable for all PEB Perl scripts.  
+  All Perl modules found in the ``{PEB_executable_directory}/perl/lib`` folder are accessible via the ``PERL5LIB`` environment variable for all Perl applications executed by PEB.  
 
-* **Resources directory:**  
-  Resources directory must contain the ``app`` subdirectory with all necessary application files.  
-  ``data`` and ``logs`` subdirectories are optional, as well as the application icon file - ``app.png``.  
+* **Resources Directory:**  
+  The resources directory must contain the ``app`` subdirectory with all necessary application files.  
+  ``data`` and ``logs`` subdirectories are optional, as well as the application icon file: ``app.png``  
   The resources directory path must be: ``{PEB_executable_directory}/resources``  
 
-* **Application directory:**  
+* **Application Directory:**  
   All Perl application files must be located within this folder.  
   The application directory path must be: ``{PEB_executable_directory}/resources/app``  
   PEB application directory is labeled as ``{PEB_app_directory}`` within this documentation.  
@@ -43,7 +48,7 @@ PEB is created to work from any directory without installation and all file path
   The log files directory path must be: ``{PEB_executable_directory}/resources/logs``  
   PEB will not create logging directory on its own and if it is missing, no logs will be written.
 
-* **Entry point:**  
+* **Entry File:**  
   PEB starts with one of the following files:  
   * ``{PEB_executable_directory}/resources/app/index.html``  
   * ``{PEB_executable_directory}/resources/app/local-server.json``  

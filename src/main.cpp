@@ -129,13 +129,23 @@ int main(int argc, char **argv)
     // ==============================
     // Perl directory:
     // ==============================
-    QString perlDirectory = browserDirectory + "/perl";
+    QString perlDirectory;
+
+#ifndef Q_OS_LINUX
+    perlDirectory = browserDirectory + "/perl";
+#endif
 
 #ifdef Q_OS_LINUX
-    // External 'perl' directory, if any,
-    // takes precedence over embedded in an AppImage 'perl' directory:
+    if (appImageDirectory.length() == 0) {
+        perlDirectory = browserDirectory + "/perl";
+    }
+
     if (appImageDirectory.length() > 0) {
-        perlDirectory = appImageDirectory + "/perl";
+        if (QDir(browserDirectory + "/perl").exists()) {
+            perlDirectory = browserDirectory + "/perl";
+        } else {
+            perlDirectory = appImageDirectory + "/perl";
+        }
     }
 #endif
 
@@ -177,13 +187,23 @@ int main(int argc, char **argv)
     // ==============================
     // Resources directory:
     // ==============================
-    QString resourcesDirectory = browserDirectory + "/resources";
+    QString resourcesDirectory;
+
+#ifndef Q_OS_LINUX
+    resourcesDirectory = browserDirectory + "/resources";
+#endif
 
 #ifdef Q_OS_LINUX
-    // External 'resources' directory, if any,
-    // takes precedence over embedded in an AppImage 'resources' directory:
+    if (appImageDirectory.length() == 0) {
+        resourcesDirectory = browserDirectory + "/resources";
+    }
+
     if (appImageDirectory.length() > 0) {
-        resourcesDirectory = appImageDirectory + "/resources";
+        if (QDir(browserDirectory + "/resources").exists()) {
+            resourcesDirectory = browserDirectory + "/resources";
+        } else {
+            resourcesDirectory = appImageDirectory + "/resources";
+        }
     }
 #endif
 

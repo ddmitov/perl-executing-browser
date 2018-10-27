@@ -9,6 +9,24 @@ Perl Distribution Compactor must be started from the ``{PEB_executable_directory
 Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_executable_directory}/sdk/lib`` folder.
 
 ## AppImage Support
-Any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable including the PEB binary, all necessary Qt libraries, relocatable Perl distribution and all application files. This can be easily achieved by the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script. It finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules using the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl). All Qt dependencies are detected and the final image is built using the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool.  
+PEB or any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
+
+* packing a PEB Perl application together with a PEB binary, its Qt libraries and a relocatable Perl distribution:  
+
+  ```
+  appimage-maker.sh --include-resources
+  ```
+
+  In this case the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
+
+* packing only a PEB binary with its Qt libraries:  
+
+  ```
+  appimage-maker.sh
+  ```
+
+  In this case a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
+
+In both modes of operation of the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script all Qt dependencies of PEB are detected and the final image is built by the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool.  
 
 [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script must be started from the ``{PEB_executable_directory}/sdk`` directory.
