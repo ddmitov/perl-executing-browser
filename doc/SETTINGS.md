@@ -2,11 +2,11 @@ Perl Executing Browser - Settings
 --------------------------------------------------------------------------------
 
 ## Application Filename
-The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run. If log files are wanted, they will take the name of the binary file without the filename extension, whatever the name may be.
+The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run. If log files are wanted, they will take the name of the executable file without the filename extension, whatever the name may be.
 
 ## HTML Page API
 
-All local HTML page settings for PEB are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript popup boxes and no warning is displayed for unsaved data in local HTML forms.
+All local HTML page settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript popup boxes and no warning is displayed for unsaved data in local HTML forms.
 
 ```javascript
 var pebSettings = {};
@@ -23,6 +23,8 @@ pebSettings.closeConfirmation =
   'Text was entered in a form and it is going to be lost!\n' +
   'Are you sure you want to close the window?';
 ```
+
+The ``pebSettings`` JavaScript object may have the following properties:
 
 * **autoStartScripts**  
   ``Array`` of Perl scripts that are started immediately after a local page is loaded  
@@ -93,6 +95,8 @@ perl_script.stdoutFunction = function (stdout) {
 }
 ```
 
+A JavaScript settings object for a Perl script run by PEB may have the following properties:
+
 * **scriptRelativePath**  
   ``String`` for the relative path of a Perl script run by PEB  
   The script relative path is converted to a full path using the ``{PEB_app_directory}`` as a root folder.  
@@ -135,8 +139,6 @@ perl_script.stdoutFunction = function (stdout) {
 * **scriptExitConfirmation**  
   ``String`` used to signal PEB that [an interactive Perl script](#interactive-perl-scripts) completed its shutdown  
   All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
-
-Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script has ended when buffering is enabled.
 
 ## Interactive Perl Scripts
 Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
