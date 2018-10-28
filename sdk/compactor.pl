@@ -8,7 +8,6 @@ use Config;
 use Cwd qw(getcwd);
 use File::Basename qw(basename);
 use File::Copy;
-use File::Path qw(rmtree);
 use File::Spec;
 use File::Spec::Functions qw(catdir);
 use FindBin qw($Bin);
@@ -95,12 +94,6 @@ if ($ARGV[0] and $ARGV[0] !~ /^--AppImage$/) {
 
   rename $lib_original, catdir($perl_directory, "lib-original");
   rename $lib_compacted, catdir($perl_directory, "lib");
-
-  # Remove backup directories if the script is started with the '--no-backup' flag.
-  if ($ARGV[0] and $ARGV[0] =~ /^--no-backup$/) {
-    rmtree(catdir($perl_directory, "bin-original"));
-    rmtree(catdir($perl_directory, "lib-original"));
-  }
 }
 
 # Perl scripts recursive lister subroutine:

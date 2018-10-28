@@ -6,8 +6,10 @@ The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or 
 
 ## HTML Page API
 
+All local HTML page settings for PEB are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript popup boxes and no warning is displayed for unsaved data in local HTML forms.
+
 ```javascript
-var pebSettings = {}; // 'pebSettings' object name is hard-coded.
+var pebSettings = {};
 pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
 pebSettings.cutLabel = "Custom Cut Label";
 pebSettings.copyLabel = "Custom Copy Label";
@@ -25,39 +27,70 @@ pebSettings.closeConfirmation =
 * **autoStartScripts**  
   ``Array`` of Perl scripts that are started immediately after a local page is loaded  
 
+* **cutLabel**  
+  ``String`` displayed as a label for the 'Cut' action on context menus.
+
+* **copyLabel**  
+  ``String`` displayed as a label for the 'Copy' action on context menus.
+
+* **pasteLabel**  
+  ``String`` displayed as a label for the 'Paste' action on context menus.
+
+* **selectAllLabel**  
+  ``String`` displayed as a label for the 'Select All' action on context menus.
+
+* **okLabel**  
+  ``String`` displayed as a label for the 'Ok' button on JavaScript Alert and Prompt popup boxes.
+
+* **cancelLabel**  
+  ``String`` displayed as a label for the 'Cancel' button on JavaScript Prompt popup box.
+
+* **yesLabel**  
+  ``String`` displayed as a label for the 'Yes' button on JavaScript Confirm popup box.
+
+* **noLabel**  
+  ``String`` displayed as a label for the 'No' button on JavaScript Confirm popup box.
+
 * **closeConfirmation**  
-  ``String`` displayed when the close button is pressed, but unsaved data in local HTML forms is detected.  
-  If no warning text is found, PEB exits immediately.
+  ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB exits immediately.
 
 ## Perl Scripts API
-Every Perl script run by PEB is called by clicking a link or submitting a form to a pseudo filename composed of the name of the JavaScript object with the settings of the Perl script and a ``.settings`` extension.  
+Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.settings`` extension forms pseudo filename used to start the Perl script.  
 
-A minimal example of a Perl script settings object:  
+There are three methods to start a local Perl script:  
+
+* **Clicking a link to a settings pseudo filename:**  
+
+  ```html
+  <a href="perl_script.settings">Start Perl script</a>
+  ```
+
+* **Submitting a form to a settings pseudo filename:**  
+
+  ```html
+  <form action="perl_script.settings">
+    <input type="text" name="input" id="test-script-input">
+    <input type="submit" value="Start Perl script">
+  </form>
+  ```
+
+* **Calling a JavaScript function with a settings pseudo filename:**  
+
+  ```javascript
+  peb.startScript('perl_script.settings');
+  ```
+
+  This method creates an invisible form and submits it to the settings pseudo filename.  
+
+A minimal example of a JavaScript settings object for a Perl script run by PEB:  
 
 ```javascript
 var perl_script = {};
 perl_script.scriptRelativePath = 'perl/test.pl';
 perl_script.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
-  container.innerHTML = stdout;
+  container.innerText = stdout;
 }
-```
-
-Three methods to start a local Perl script:  
-
-```html
-<a href="perl_script.settings">Start Perl script</a>
-```
-
-```html
-<form action="perl_script.settings">
-  <input type="text" name="input" id="test-script-input">
-  <input type="submit" value="Start Perl script">
-</form>
-```
-
-```javascript
-peb.startScript('perl_script.settings');
 ```
 
 * **scriptRelativePath**  
@@ -106,9 +139,9 @@ peb.startScript('perl_script.settings');
 Perl scripts running for a long time should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter. Some builds of Perl may not give any output until the script has ended when buffering is enabled.
 
 ## Interactive Perl Scripts
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with a unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
 
-Please note that interactive Perl scripts are not supported on any Windows build of PEB.  
+Please note that interactive Perl scripts are not supported by the Windows builds of PEB.  
 
 Please also note that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! Even during normal operation interactive scripts use more memory than non-interactive scripts and their use should be carefully considered.
 
@@ -133,7 +166,7 @@ The following code shows how to start an interactive Perl script right after a l
       }
       interactive_script.stdoutFunction = function (stdout) {
         var container = document.getElementById('interactive-script-output');
-        container.innerHTML = stdout;
+        container.innerText = stdout;
       }
       interactive_script.scriptExitCommand = '_close_';
       interactive_script.scriptExitConfirmation = '_closed_';
@@ -156,7 +189,7 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
-A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_resources_directory}/app/local-server.json`` file is found instead of ``{PEB_resources_directory}/app/index.html`` with the following structure:
+A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html`` with the following structure:
 
 ```json
 {
@@ -177,7 +210,7 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 ```
 
 * **file**  
-  ``String`` resolved to a full pathname using the ``{PEB_resources_directory}/app`` folder  
+  ``String`` resolved to a full pathname using the ``{PEB_app_directory}``  
   All Perl servers started by PEB must be up and running within 5 seconds from being launched or PEB will display a timeout message. Servers being unable to start will also timeout.  
   *This element is mandatory.*
 
@@ -209,27 +242,30 @@ The ``#PORT#`` keyword within the command-line arguments is substituted with the
 ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see the [Tabula](https://github.com/ddmitov/tabula) application for an example.
 
 ## Selecting Files and Folders
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed from the name of the JavaScript object with the settings of the wanted dialog and a ``.dialog`` extension.  
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed of the name of the JavaScript settings object for the wanted dialog and a ``.dialog`` extension.  
 
-A JavaScript settings object for a filesystem dialog takes only two arguments:
+A JavaScript settings object for a filesystem dialog has only two object properties:
 
 * **type**  
-``String`` containing one of the following:
+  ``String`` containing one of the following:
+
   * ``single-file``  
-  The actual opening of any existing file is performed by a Perl script and not by PEB.  
+  The actual opening of an existing file is performed by a Perl script and not by PEB.  
 
   * ``multiple-files``  
   When multiple files are selected, different filenames are separated by a semicolon ``;``  
 
   * ``new-file-name``  
-  The actual creation of any new file is performed by a Perl script and not by PEB.  
+  The actual creation of a new file is performed by a Perl script and not by PEB.  
 
   * ``directory``  
-  When using the ``directory`` type of dialog, an existing or a new directory may be selected.  
-  Any new directory will be created immediately by PEB.
+  When ``directory`` type of dialog is used, an existing or a new directory may be selected.  
+  Any new directory will be immediately created by PEB.
 
 * **receiverFunction**  
-executed by PEB after the user has selected files or folders, takes selected files or folders as its only argument  
+  It is executed by PEB after the user has selected files or folders and takes them as its only argument.  
+
+An example code of a dialog for selecting a single file:  
 
 ```html
 <a href="select_file.dialog">Select existing file</a>
@@ -240,6 +276,6 @@ var select_file = {};
 select_file.type = 'single-file';
 select_file.receiverFunction = function (file) {
   var container = document.getElementById('single-file-test');
-  container.innerHTML = file;
+  container.innerText = file;
 }
 ```
