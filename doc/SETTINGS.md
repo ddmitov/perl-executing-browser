@@ -95,7 +95,7 @@ perl_script.stdoutFunction = function (stdout) {
 }
 ```
 
-A JavaScript settings object for a Perl script run by PEB may have the following properties:
+A JavaScript settings object for a Perl script run by PEB has the following properties:
 
 * **scriptRelativePath**  
   ``String`` for the relative path of a Perl script run by PEB  
@@ -191,7 +191,8 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
-A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a ``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html`` with the following structure:
+A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a  
+``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html`` with the following structure:
 
 ```json
 {

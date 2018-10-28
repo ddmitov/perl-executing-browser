@@ -60,9 +60,9 @@ These are the basic steps for building your first PEB-based serverless applicati
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
 
-* **1.** Write your Perl server-based application.  
+* **1.** Write your Perl server application.  
 * **2.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
-* **3.** Write an appropriate HTML interface connected to your server-based application by traditional web connection technologies - POST or GET requests, WebSocket etc.
+* **3.** Write an appropriate HTML interface and connect it to your server application by traditional web  communication protocols.
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
@@ -78,8 +78,8 @@ These are the basic steps for building your first PEB-based application using a 
 * [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
-* [Custom dialog and context menu labels](./doc/SETTINGS.md#html-page-api)
-* [Custom window and message box icon](./doc/CONSTANTS.md#icon)
+* [Custom labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
+* [Custom icon for the main window and all dialog boxes](./doc/CONSTANTS.md#icon)
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Optional Perl scripts error logging](./doc/CONSTANTS.md#log-files-directory)
 
@@ -103,7 +103,7 @@ These are the basic steps for building your first PEB-based application using a 
 * Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
-PEB was started as a simple GUI for personal database applications in 2013 by Dimitar D. Mitov.
+PEB was started in 2013 by Dimitar D. Mitov as a simple GUI for personal database applications.
 
 ## [Thanks and Credits](CREDITS.md)
 
