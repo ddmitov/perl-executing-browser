@@ -422,9 +422,9 @@ protected:
         if (request.url().scheme() == "file") {
             // Local forms submission:
             if (navigationType == QWebPage::NavigationTypeFormSubmitted) {
-                if (request.url().fileName().contains(".settings")) {
+                if (request.url().fileName().contains(".script")) {
                     qHandleScripts(request.url().fileName()
-                                   .replace(".settings", ""));
+                                   .replace(".script", ""));
                     return false;
                 } else {
                     return false;
@@ -440,9 +440,9 @@ protected:
                 }
 
                 // Handle local Perl scripts:
-                if (request.url().fileName().contains(".settings")) {
+                if (request.url().fileName().contains(".script")) {
                     qHandleScripts(request.url().fileName()
-                                   .replace(".settings", ""));
+                                   .replace(".script", ""));
                     return false;
                 }
 

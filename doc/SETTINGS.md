@@ -57,21 +57,20 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB exits immediately.
 
 ## Perl Scripts API
-Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.settings`` extension forms pseudo filename used to start the Perl script.  
+Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms pseudo filename used to start the Perl script.  
 
 There are three methods to start a local Perl script:  
 
 * **Clicking a link to a settings pseudo filename:**  
 
   ```html
-  <a href="perl_script.settings">Start Perl script</a>
+  <a href="test.script">Start Perl script</a>
   ```
 
 * **Submitting a form to a settings pseudo filename:**  
 
   ```html
-  <form action="perl_script.settings">
-    <input type="text" name="input" id="test-script-input">
+  <form action="test.script">
     <input type="submit" value="Start Perl script">
   </form>
   ```
@@ -79,7 +78,7 @@ There are three methods to start a local Perl script:
 * **Calling a JavaScript function with a settings pseudo filename:**  
 
   ```javascript
-  peb.startScript('perl_script.settings');
+  peb.startScript('test.script');
   ```
 
   This method creates an invisible form and submits it to the settings pseudo filename.  
@@ -176,7 +175,7 @@ The following code shows how to start an interactive Perl script right after a l
   </head>
 
   <body>
-    <form action="interactive_script.settings">
+    <form action="interactive_script.script">
       <input type="text" name="input" id="interactive-script-input">
       <input type="submit" value="Submit">
     </form>
@@ -191,8 +190,9 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
-A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that a  
-``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html`` with the following structure:
+A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that  
+a ``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html``  
+with the following structure:
 
 ```json
 {
@@ -245,7 +245,7 @@ The ``#PORT#`` keyword within the command-line arguments is substituted with the
 ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see the [Tabula](https://github.com/ddmitov/tabula) application for an example.
 
 ## Selecting Files and Folders
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed of the name of the JavaScript settings object for the wanted dialog and a ``.dialog`` extension.  
+Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed of the name of a JavaScript settings object for the wanted dialog and a ``.dialog`` extension.  
 
 A JavaScript settings object for a filesystem dialog has only two object properties:
 

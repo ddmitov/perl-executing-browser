@@ -80,7 +80,7 @@
       select_file.type = 'single-file';
       select_file.receiverFunction = function (fileName) {
         open_files.inputData = fileName;
-        peb.startScript('open_files.settings');
+        peb.startScript('open_files.script');
       }
 
       var new_file_name = {};
@@ -96,14 +96,14 @@
       select_files.type = 'multiple-files';
       select_files.receiverFunction = function (fileNames) {
         open_files.inputData = fileNames;
-        peb.startScript('open_files.settings');
+        peb.startScript('open_files.script');
       }
 
       var select_directory = {};
       select_directory.type = 'directory';
       select_directory.receiverFunction = function (directoryName) {
         open_directory.inputData = directoryName;
-        peb.startScript('open_directory.settings');
+        peb.startScript('open_directory.script');
       }
 
       function clearTargetElement() {
@@ -189,11 +189,11 @@
             </li>
 
             <li>
-              <a href="perl_info.settings">Perl Basic Information</a>
+              <a href="perl_info.script">Perl Basic Information</a>
             </li>
 
             <li>
-              <a href="sqlite.settings">SQLite Test</a>
+              <a href="sqlite.script">SQLite Test</a>
             </li>
 
             <li>
@@ -253,7 +253,7 @@
 
       <div class="row">
         <div class="col-xs-12 form-group">
-          <form action="interactive_one.settings" id="form-one">
+          <form action="interactive_one.script" id="form-one">
             <div class="input-group">
               <input type="hidden" name="mode" value="unix-epoch">
 
@@ -278,7 +278,7 @@
 
       <div class="row">
         <div class="col-xs-12 form-group">
-          <form action="interactive_two.settings" id="form-two">
+          <form action="interactive_two.script" id="form-two">
             <div class="input-group">
               <input type="hidden" name="mode" value="local-time">
 

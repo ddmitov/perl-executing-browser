@@ -76,8 +76,8 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
     if (url.scheme() == "file" and isMainFrame == true) {
         // Local forms submission:
         if (type == QWebEnginePage::NavigationTypeFormSubmitted) {
-            if (url.fileName().contains(".settings")) {
-                qHandleScripts(url.fileName().replace(".settings", ""));
+            if (url.fileName().contains(".script")) {
+                qHandleScripts(url.fileName().replace(".script", ""));
                 return false;
             } else {
                 return false;
@@ -92,8 +92,8 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
             }
 
             // Handle local Perl scripts:
-            if (url.fileName().contains(".settings")) {
-                qHandleScripts(url.fileName().replace(".settings", ""));
+            if (url.fileName().contains(".script")) {
+                qHandleScripts(url.fileName().replace(".script", ""));
                 return false;
             }
 
