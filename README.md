@@ -75,7 +75,7 @@ These are the basic steps for building your first PEB-based application using a 
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Macintosh builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
-* [Perl scripts implementing local servers can be started](./doc/SETTINGS.md#starting-local-server)
+* [Perl local servers can be started.](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Custom labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
