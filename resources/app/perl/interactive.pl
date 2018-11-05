@@ -77,18 +77,18 @@ my $half_second_wait = AnyEvent->timer (
   cb => sub {
     if ($mode =~ "unix-epoch") {
       if (length($input_text) == 0) {
-        print "Seconds from the Unix epoch: ".time;
+        print "Seconds from the Unix epoch: ".time or die;
       } else {
-        print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
+        print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text or die;
       }
     }
 
     if ($mode =~ "local-time") {
       my $formatted_time = strftime('%d %B %Y %H:%M:%S', localtime);
       if (length($input_text) == 0) {
-        print "Local date and time: ".$formatted_time;
+        print "Local date and time: ".$formatted_time or die;
       } else {
-        print "Local date and time: ".$formatted_time."<br>Last input: ".$input_text;
+        print "Local date and time: ".$formatted_time."<br>Last input: ".$input_text or die;
       }
     }
   },
