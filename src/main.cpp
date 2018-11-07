@@ -314,7 +314,7 @@ int main(int argc, char **argv)
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
 
     // ==============================
-    // Entry point:
+    // Entry file:
     // ==============================
     bool startFileFound = false;
 
@@ -326,7 +326,7 @@ int main(int argc, char **argv)
     QFile startPageFile(startPageFilePath);
     QFile localServerSettingsFile(localServerSettingsFilePath);
 
-    // Static start page:
+    // Local file:
     if (startPageFile.exists()) {
         startFileFound = true;
 

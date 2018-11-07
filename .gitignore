@@ -1,9 +1,8 @@
 archive/
 build-peb-*/
-logs/
 perl/bin
 perl/lib
-qt/
+resources/logs/
 
 *.autosave
 Makefile

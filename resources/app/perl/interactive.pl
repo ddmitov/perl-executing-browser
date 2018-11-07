@@ -49,7 +49,7 @@ my $wait_for_input = AnyEvent->io (
     # but first print a confirmation for a normal exit.
     if ($stdin =~ "_close_") {
       print "_closed_";
-      exit();
+      shutdown_procedure();
     }
 
     # Read input text from STDIN:
@@ -76,22 +76,41 @@ my $half_second_wait = AnyEvent->timer (
   interval => 0.5,
   cb => sub {
     if ($mode =~ "unix-epoch") {
+      my $output_string;
+
       if (length($input_text) == 0) {
-        print "Seconds from the Unix epoch: ".time or die;
+        $output_string = "Seconds from the Unix epoch: ".time;
       } else {
-        print "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text or die;
+        $output_string =
+          "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
       }
+
+      print $output_string or shutdown_procedure();
     }
 
     if ($mode =~ "local-time") {
+      my $output_string;
       my $formatted_time = strftime('%d %B %Y %H:%M:%S', localtime);
+
       if (length($input_text) == 0) {
-        print "Local date and time: ".$formatted_time or die;
+        $output_string = "Local date and time: ".$formatted_time;
       } else {
-        print "Local date and time: ".$formatted_time."<br>Last input: ".$input_text or die;
+        $output_string =
+          "Local date and time: ".$formatted_time."<br>Last input: ".$input_text;
       }
+
+      print $output_string or shutdown_procedure();
     }
   },
 );
 
 $event_loop->recv;
+
+# Using a function one can implement a much complex shutdown procedure,
+# called when a shutdown command is received from PEB or
+# when PEB unexpectedly crashes and script loses its STDOUT stream.
+# This function must not be named 'shutdown' -
+# this is a reserved name for a Perl prototype function!
+sub shutdown_procedure {
+  exit();
+}
