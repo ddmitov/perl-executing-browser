@@ -47,22 +47,26 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Quick Start
 These are the basic steps for building your first PEB-based serverless application:  
 
-* **1.** Write your Perl application reading user input on STDIN:  
+* **1.** Download PEB.  
+* **2.** Select your Perl distribution.  
+* **3.** Write your Perl application reading user input on STDIN:  
 
   ```perl
   my $input = <STDIN>;
   chomp $input;
   ```
 
-* **2.** Write an appropriate HTML interface with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
+* **4.** Write an appropriate HTML interface with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
   Triggering a Perl script from a local HTML page is configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.  
 
 These are the basic steps for building your first PEB-based application using a local Perl server:  
 
-* **1.** Write your Perl server application.  
-* **2.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
-* **3.** Write an appropriate HTML interface and connect it to your server application by traditional web  communication protocols.
+* **1.** Download PEB.  
+* **2.** Select your Perl distribution.  
+* **3.** Write your Perl server application.  
+* **4.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.  
+* **5.** Write an appropriate HTML interface and connect it to your server application by traditional web  communication protocols.
 
 ## Design Objectives
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  

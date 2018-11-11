@@ -1,1 +1,1 @@
-This folder should contain any data files.
+This directory may contain any writable files used or produced by a PEB-based application.

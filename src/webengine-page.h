@@ -341,33 +341,28 @@ public slots:
         closeRequested = true;
 
         if (!runningScripts.isEmpty()) {
-            int maximumTimeMilliseconds = 3000;
-            QTimer::singleShot(maximumTimeMilliseconds,
-                               this,
-                               SLOT(qScriptsTimeoutSlot()));
-
             QHash<QString, QScriptHandler*>::iterator iterator;
             for (iterator = runningScripts.begin();
                  iterator != runningScripts.end();
                  ++iterator) {
                 QScriptHandler *handler = iterator.value();
 
-                if (handler->scriptExitCommand.length() == 0 and
-                        handler->scriptProcess.isOpen()) {
+                if (handler->scriptProcess.isOpen()) {
+#ifndef Q_OS_WIN
+                    handler->scriptProcess.terminate();
+#endif
+
+#ifdef Q_OS_WIN
                     handler->scriptProcess.kill();
-                }
-
-                if (handler->scriptExitCommand.length() > 0) {
-                    QByteArray scriptExitCommand;
-                    scriptExitCommand.append(
-                                QString(handler->scriptExitCommand).toLatin1());
-                    scriptExitCommand.append(QString("\n").toLatin1());
-
-                    if (handler->scriptProcess.isOpen()) {
-                        handler->scriptProcess.write(scriptExitCommand);
-                    }
+#endif
                 }
             }
+
+#ifndef Q_OS_WIN
+            int maximumTimeMilliseconds = 3000;
+            QTimer::singleShot(maximumTimeMilliseconds,
+                               this, SLOT(qScriptsTimeoutSlot()));
+#endif
         }
 
         if (runningScripts.isEmpty()) {
@@ -377,6 +372,7 @@ public slots:
 
     void qScriptsTimeoutSlot()
     {
+#ifndef Q_OS_WIN
         if (!runningScripts.isEmpty()) {
             QHash<QString, QScriptHandler*>::iterator iterator;
             for (iterator = runningScripts.begin();
@@ -387,15 +383,14 @@ public slots:
                 if (handler->scriptProcess.isOpen()) {
                     handler->scriptProcess.kill();
 
-                    qDebug() << "Interactive script"
-                             << "timed out after close command and"
-                             << "was killed:"
+                    qDebug() << "Unresponsive script was killed:"
                              << handler->scriptFullFilePath;
                 }
             }
         }
 
         emit closeWindowSignal();
+#endif
     }
 
 protected:

@@ -14,6 +14,13 @@ if (eval("require AnyEvent;")) {
   exit 0;
 }
 
+# This code was used to test handling of the SIGTERM signal from a Perl script:
+# $SIG{TERM} = sub {
+#   print "Terminating interactive script...";
+#   sleep(2);
+#   exit();
+# };
+
 # Disable built-in buffering:
 $| = 1;
 
@@ -44,13 +51,6 @@ my $wait_for_input = AnyEvent->io (
   cb => sub {
     my $stdin = <STDIN>;
     chomp $stdin;
-
-    # Close after close commmand is received,
-    # but first print a confirmation for a normal exit.
-    if ($stdin =~ "_close_") {
-      print "_closed_";
-      shutdown_procedure();
-    }
 
     # Read input text from STDIN:
     my (@pairs, $pair, $name, $value);

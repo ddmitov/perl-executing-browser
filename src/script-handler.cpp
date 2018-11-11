@@ -51,15 +51,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         scriptInput = scriptJsonObject["scriptInput"].toString();
     }
 
-    if (scriptJsonObject["scriptExitCommand"].toString().length() > 0) {
-        scriptExitCommand = scriptJsonObject["scriptExitCommand"].toString();
-    }
-
-    if (scriptJsonObject["scriptExitConfirmation"].toString().length() > 0) {
-        scriptExitConfirmation =
-                scriptJsonObject["scriptExitConfirmation"].toString();
-    }
-
     // Signals and slots for local long running Perl scripts:
     QObject::connect(&scriptProcess, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));

@@ -61,13 +61,13 @@ Every Perl script run by PEB has a JavaScript settings object with an arbitrary 
 
 There are three methods to start a local Perl script:  
 
-* **Clicking a link to a settings pseudo filename:**  
+* **Clicking a link to a script settings pseudo filename:**  
 
   ```html
   <a href="test.script">Start Perl script</a>
   ```
 
-* **Submitting a form to a settings pseudo filename:**  
+* **Submitting a form to a script settings pseudo filename:**  
 
   ```html
   <form action="test.script">
@@ -75,13 +75,13 @@ There are three methods to start a local Perl script:
   </form>
   ```
 
-* **Calling a JavaScript function with a settings pseudo filename:**  
+* **Calling a JavaScript function with a script settings pseudo filename:**  
 
   ```javascript
   peb.startScript('test.script');
   ```
 
-  This method creates an invisible form and submits it to the settings pseudo filename.  
+  This method creates an invisible form and submits it to the script settings pseudo filename.  
 
 A minimal example of a JavaScript settings object for a Perl script run by PEB:  
 
@@ -131,20 +131,32 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   }
   ```
 
-* **scriptExitCommand**  
-  ``String`` containing the command used to gracefully shut down [an interactive Perl script](#interactive-perl-scripts) when PEB is closed  
-  Upon receiving it, an interactive script must start its shutdown procedure.
-
-* **scriptExitConfirmation**  
-  ``String`` used to signal PEB that [an interactive Perl script](#interactive-perl-scripts) completed its shutdown  
-  All interactive scripts must exit in 3 seconds after ``scriptExitCommand`` is given or any unresponsive scripts will be killed and PEB will exit.
-
 ## Interactive Perl Scripts
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name. Interactive scripts must also have the ``scriptExitCommand`` object property. The ``scriptExitConfirmation`` object property is not mandatory, but highly recommended for a quick shutdown of PEB.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name.  
 
 Please note that interactive Perl scripts are not supported by the Windows builds of PEB.  
 
-Please also note that if a PEB instance crashes, it will leave its interactive scripts as zombie processes and they will start consuming large amounts of memory! Exhaustive stability testing has to be done when interactive scripts are selected for use with PEB! Even during normal operation interactive scripts use more memory than non-interactive scripts and their use should be carefully considered.
+PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.  
+
+When PEB is closing, it sends the ``SIGTERM`` signal to all interactive scripts to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB.  
+All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
+
+```perl
+$SIG{TERM} = sub {
+  # your shutdown code goes here...
+  exit();
+};
+```
+
+If a PEB instance crashes, it can still leave its interactive scripts as zombie processes consuming large amounts of memory. To prevent this scenario, all interactive scripts should test for a successful ``print`` on the STDOUT. This could be implemented using the following code:
+
+```perl
+print "output string" or shutdown_procedure();
+
+sub shutdown_procedure {
+  exit();
+}
+```
 
 The following code shows how to start an interactive Perl script right after a local page is loaded:
 
@@ -169,8 +181,6 @@ The following code shows how to start an interactive Perl script right after a l
         var container = document.getElementById('interactive-script-output');
         container.innerText = stdout;
       }
-      interactive_script.scriptExitCommand = '_close_';
-      interactive_script.scriptExitConfirmation = '_closed_';
     </script>
   </head>
 

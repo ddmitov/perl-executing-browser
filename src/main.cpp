@@ -301,7 +301,6 @@ int main(int argc, char **argv)
     // ==============================
     // Basic program information:
     // ==============================
-    qDebug() << "Application path:" << application.applicationFilePath();
     qDebug() << "Application version:"
              << application.applicationVersion().toLatin1().constData();
     qDebug() << "Qt version:" << QT_VERSION_STR;
@@ -314,7 +313,7 @@ int main(int argc, char **argv)
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
 
     // ==============================
-    // Entry file:
+    // Start file:
     // ==============================
     bool startFileFound = false;
 
@@ -372,8 +371,6 @@ int main(int argc, char **argv)
             if (localServerFile.exists()) {
                 localServerFullPath = localServerFullPathSetting;
                 localServerCommandLine.append(localServerFullPath);
-                qDebug() << "Local server full path:"
-                         << localServerFullPath;
             } else {
                 mainWindow.qDisplayError(
                             QString("Local server file is not found."));
@@ -404,7 +401,6 @@ int main(int argc, char **argv)
                 if (portScanner->portScannerError.length() == 0) {
                     port = QString::number(portScanner->port);
                     application.setProperty("port", port);
-                    qDebug() << "Local server port:" << port;
                 }
 
                 if (portScanner->portScannerError.length() > 0) {
@@ -430,7 +426,6 @@ int main(int argc, char **argv)
                     localServerJson["shutdown_command"].toString();
             if (shutdownCommand.length() > 0) {;
                 application.setProperty("shutdown_command", shutdownCommand);
-                qDebug() << "Local server shutdown command:" << shutdownCommand;
             }
         }
 
@@ -462,7 +457,7 @@ int main(int argc, char **argv)
         }
     }
 
-    // No entry point:
+    // No start file:
     if (startFileFound == false) {
         mainWindow.qDisplayError(
                     QString("No start page or local server is found."));

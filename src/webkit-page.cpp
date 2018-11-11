@@ -33,6 +33,7 @@ QPage::QPage()
 
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
+
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->

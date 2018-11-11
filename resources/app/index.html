@@ -34,8 +34,6 @@
         var target = document.getElementById('instance-one-output');
         target.innerHTML = stdout;
       }
-      interactive_one.scriptExitCommand = '_close_';
-      interactive_one.scriptExitConfirmation = '_closed_';
 
       var interactive_two = {};
       interactive_two.scriptRelativePath = 'perl/interactive.pl';
@@ -48,8 +46,6 @@
         var target = document.getElementById('instance-two-output');
         target.innerHTML = stdout;
       }
-      interactive_two.scriptExitCommand = '_close_';
-      interactive_two.scriptExitConfirmation = '_closed_';
 
       var open_files = {};
       open_files.scriptRelativePath = 'perl/open-files.pl';

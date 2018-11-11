@@ -41,9 +41,7 @@ public slots:
         QString output = scriptProcess.readAllStandardOutput();
         scriptAccumulatedOutput.append(output);
 
-        if (output != scriptExitConfirmation) {
-            emit displayScriptOutputSignal(scriptId, output);
-        }
+        emit displayScriptOutputSignal(scriptId, output);
     }
 
     void qScriptErrorsSlot()
@@ -67,11 +65,8 @@ public:
     QProcess scriptProcess;
     QString scriptId;
     QString scriptFullFilePath;
-    QString scriptStdout;
     QString scriptAccumulatedOutput;
     QString scriptAccumulatedErrors;
-    QString scriptExitCommand;
-    QString scriptExitConfirmation;
 };
 
 #endif // SCRIPTHANDLER_H
