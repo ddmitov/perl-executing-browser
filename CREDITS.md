@@ -89,6 +89,7 @@ http://doc.qt.io/qt-5/qwebenginepage.html#fullScreenRequested
 http://doc.qt.io/qt-5/qwebenginepage.html#windowCloseRequested  
 http://doc.qt.io/qt-5/qtwebengine-webenginewidgets-simplebrowser-example.html#adding-context-menu-items  
 http://doc.qt.io/qt-5/qwebenginefullscreenrequest.html  
+http://doc.qt.io/qt-5/qprocess.html#terminate  
 
 https://wiki.qt.io/Qt_Coding_Style  
 https://wiki.qt.io/Open_Web_Page_in_QWebView  
@@ -159,7 +160,7 @@ https://perldoc.perl.org/File/Path.html
 https://metacpan.org/pod/File::Copy::Recursive  
 https://metacpan.org/pod/Module::ScanDeps  
 
-https://www.perl.com/pub/2002/05/14/mod_perl.html  
+https://www.perl.com/article/37/2013/8/18/Catch-and-Handle-Signals-in-Perl/
 
 https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  

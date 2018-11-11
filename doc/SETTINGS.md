@@ -57,7 +57,7 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB exits immediately.
 
 ## Perl Scripts API
-Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms pseudo filename used to start the Perl script.  
+Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms settings pseudo filename used to start the Perl script.  
 
 There are three methods to start a local Perl script:  
 
@@ -138,8 +138,7 @@ Please note that interactive Perl scripts are not supported by the Windows build
 
 PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.  
 
-When PEB is closing, it sends the ``SIGTERM`` signal to all interactive scripts to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB.  
-All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
+When PEB is closing, it sends the ``SIGTERM`` signal to all interactive scripts to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB. All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
 
 ```perl
 $SIG{TERM} = sub {
