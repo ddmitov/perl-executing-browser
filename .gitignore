@@ -2,6 +2,7 @@ archive/
 build-peb-*/
 perl/bin
 perl/lib
+src/tmp
 resources/logs/
 
 *.autosave

@@ -38,7 +38,8 @@ QViewWidget::QViewWidget()
     QObject::connect(printShortcut, SIGNAL(activated()),
                      this, SLOT(qPrintSlot()));
 
-    QShortcut *printPreviewShortcut = new QShortcut(QKeySequence("Ctrl+R"), this);
+    QShortcut *printPreviewShortcut =
+            new QShortcut(QKeySequence("Ctrl+R"), this);
     QObject::connect(printPreviewShortcut, SIGNAL(activated()),
                      this, SLOT(qStartPrintPreviewSlot()));
 #endif
