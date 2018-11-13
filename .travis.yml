@@ -7,15 +7,15 @@ compiler:
   - gcc
 
 sudo: required
-dist: trusty
+dist: xenial
 
 before_install:
   - sudo add-apt-repository --yes ppa:ubuntu-sdk-team/ppa
-  - sudo apt-get update -qq
+  - sudo apt update -qq
 
 install:
-  - sudo apt-get -y install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
-  - sudo apt-get -y install qt5-default qttools5-dev-tools
+  - sudo apt -y install qtbase5-dev qtdeclarative5-dev libqt5webkit5-dev libsqlite3-dev
+  - sudo apt -y install qt5-default qttools5-dev-tools
 
 script:
   - qmake -qt=qt5 $TRAVIS_BUILD_DIR/src/peb.pro
