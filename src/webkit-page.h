@@ -72,6 +72,22 @@ public slots:
 
                 // Send signal to the html-viewing class that a page is loaded:
                 emit pageLoadedSignal();
+
+                // Log basic program information on the JavaScript console:
+                QString applicationVersionMessage =
+                        "console.log('Application version: " +
+                        qApp->applicationVersion().toLatin1() + "');";
+                mainFrame()->evaluateJavaScript(applicationVersionMessage);
+
+                QString qtVersionMessage =
+                        "console.log('Qt version: " +
+                        QString(QT_VERSION_STR) + "');";
+                mainFrame()->evaluateJavaScript(qtVersionMessage);
+
+                QString perlInterpreterMessage =
+                        "console.log('Perl interpreter: " +
+                        qApp->property("perlInterpreter").toString() + "');";
+                mainFrame()->evaluateJavaScript(perlInterpreterMessage);
             }
         }
     }
@@ -250,11 +266,9 @@ public slots:
                                                        QString)));
         QObject::connect(scriptHandler,
                          SIGNAL(scriptFinishedSignal(QString,
-                                                     QString,
                                                      QString)),
                          this,
                          SLOT(qScriptFinishedSlot(QString,
-                                                  QString,
                                                   QString)));
 
         runningScripts.insert(scriptJsonObject["id"].toString(), scriptHandler);
@@ -289,15 +303,21 @@ public slots:
     }
 
     void qScriptFinishedSlot(QString scriptId,
-                             QString scriptFullFilePath,
                              QString scriptAccumulatedErrors)
     {
         runningScripts.remove(scriptId);
 
         if (QPage::mainFrame()->url().scheme() == "file") {
             if (scriptAccumulatedErrors.length() > 0) {
-                qDebug() << scriptFullFilePath << "errors:"
-                         << scriptAccumulatedErrors;
+                scriptAccumulatedErrors.replace("\"", "\\\"");
+                scriptAccumulatedErrors.replace("\'", "\\'");
+                scriptAccumulatedErrors.replace("\n", "\\n");
+                scriptAccumulatedErrors.replace("\r", "");
+
+                QString perlScriptErrorsMessage =
+                        "console.log('" + scriptAccumulatedErrors + "'); null";
+
+                mainFrame()->evaluateJavaScript(perlScriptErrorsMessage);
             }
         }
 
@@ -312,10 +332,6 @@ public slots:
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
         reply->ignoreSslErrors();
-
-        foreach (QSslError error, errors) {
-            qDebug() << "SSL error:" << error;
-        }
     }
 
     // ==============================
@@ -393,9 +409,6 @@ public slots:
 
                 if (handler->scriptProcess.isOpen()) {
                     handler->scriptProcess.kill();
-
-                    qDebug() << "Unresponsive script was killed:"
-                             << handler->scriptFullFilePath;
                 }
             }
         }

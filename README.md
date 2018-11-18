@@ -35,6 +35,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 * [PACKAGING](./doc/PACKAGING.md)
   * [Minimal Relocatable Perl Distribution for PEB](./doc/PACKAGING.md#minimal-relocatable-perl-distribution-for-peb)
   * [AppImage Support](./doc/PACKAGING.md#appimage-support)
+* [DEBUGGING](./doc/DEBUGGING.md)
 * [History](#history)
 * [License](./LICENSE.md)
 * [Thanks and Credits](./doc/CREDITS.md)
@@ -82,10 +83,10 @@ These are the basic steps for building your first PEB-based application using a 
 * [Perl local servers can be started.](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
-* [Custom labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
-* [Custom icon for the main window and all dialog boxes](./doc/CONSTANTS.md#icon)
+* Unified logging of Perl scripts and JavaScript in the JavaScript console  
+* [Optional labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
+* [Optional icon for the main window and all dialog boxes](./doc/CONSTANTS.md#icon)
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
-* [Optional Perl scripts error logging](./doc/CONSTANTS.md#log-files-directory)
 
 ## Security
 * PEB does not need administrative privileges, but will not refuse to use them if needed.

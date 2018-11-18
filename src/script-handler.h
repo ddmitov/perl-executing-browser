@@ -32,7 +32,6 @@ signals:
     void displayScriptOutputSignal(QString scriptId,
                                    QString output);
     void scriptFinishedSignal(QString scriptId,
-                              QString scriptFullFilePath,
                               QString scriptAccumulatedErrors);
 
 public slots:
@@ -48,13 +47,11 @@ public slots:
     {
         QString scriptErrors = scriptProcess.readAllStandardError();
         scriptAccumulatedErrors.append(scriptErrors);
-        scriptAccumulatedErrors.append("\n");
     }
 
     void qScriptFinishedSlot()
     {
         emit scriptFinishedSignal(scriptId,
-                                  scriptFullFilePath,
                                   scriptAccumulatedErrors);
 
         scriptProcess.close();

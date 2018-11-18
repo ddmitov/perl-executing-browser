@@ -16,8 +16,6 @@
 */
 
 #include <QJsonObject>
-#include <QDebug>
-#include <QDir>
 
 #include "script-handler.h"
 
@@ -27,10 +25,6 @@
 QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
-    if (scriptJsonObject.length() == 1) {
-        qDebug() << "No script settings!";
-        return;
-    }
 
     scriptId = scriptJsonObject["id"].toString();
 
@@ -38,12 +32,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
         scriptFullFilePath =
                 qApp->property("application").toString() + "/" +
                 scriptJsonObject["scriptRelativePath"].toString();
-    }
-
-    QFile file(scriptFullFilePath);
-    if (!file.exists()) {
-        qDebug() << "File not found:" << scriptFullFilePath;
-        return;
     }
 
     QString scriptInput;

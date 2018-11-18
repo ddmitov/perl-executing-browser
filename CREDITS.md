@@ -241,6 +241,7 @@ https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chro
 https://github.com/github/linguist#overrides  
 
 ## Travis CI
+https://docs.travis-ci.com/user/reference/xenial/  
 https://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
 
 ## AppImage

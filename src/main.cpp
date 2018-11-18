@@ -16,8 +16,6 @@
 */
 
 #include <QtWidgets/QApplication>
-#include <QDateTime>
-#include <QDebug>
 #include <QTextCodec>
 #include <QtGlobal>
 
@@ -36,54 +34,6 @@
 #include "webkit-main-window.h"
 #endif
 #endif
-
-// ==============================
-// MESSAGE HANDLER FOR REDIRECTING
-// PROGRAM MESSAGES TO A LOG FILE:
-// ==============================
-// Implementation of an idea proposed by Valcho Nedelchev.
-void customMessageHandler(QtMsgType type,
-                          const QMessageLogContext &context,
-                          const QString &message)
-{
-    Q_UNUSED(context);
-    QString dateAndTime =
-            QDateTime::currentDateTime().toString("dd/MM/yyyy hh:mm:ss");
-    QString text = QString("[%1] ").arg(dateAndTime);
-
-    switch (type) {
-#if QT_VERSION >= 0x050500
-    case QtInfoMsg:
-        text += QString("{Log} %1").arg(message);
-        break;
-#endif
-    case QtDebugMsg:
-        text += QString("{Log} %1").arg(message);
-        break;
-    case QtWarningMsg:
-        text += QString("{Warning} %1").arg(message);
-        break;
-    case QtCriticalMsg:
-        text += QString("{Critical} %1").arg(message);
-        break;
-    case QtFatalMsg:
-        text += QString("{Fatal} %1").arg(message);
-        abort();
-        break;
-    }
-
-    // A separate log file is created for every browser session.
-    // Application start date and time are appended to the binary file name.
-    QFile logFile(qApp->property("logDirFullPath").toString()
-                  + "/"
-                  + QFileInfo(QApplication::applicationFilePath()).baseName()
-                  + "-started-at-"
-                  + qApp->property("applicationStartDateAndTime").toString()
-                  + ".log");
-    logFile.open(QIODevice::WriteOnly | QIODevice::Append | QIODevice::Text);
-    QTextStream textStream(&logFile);
-    textStream << text << endl;
-}
 
 // ==============================
 // MAIN APPLICATION DEFINITION:
@@ -239,39 +189,18 @@ int main(int argc, char **argv)
     }
 
     // ==============================
-    // Logging:
-    // ==============================
-    // If 'logs' directory is found in the resources directory,
-    // all program messages will be redirected to log files,
-    // otherwise no log files will be created and
-    // program messages may be seen inside Qt Creator during development.
-
-    QString logDirFullPath = resourcesDirectory + "/logs";
-
-    QDir logDir(logDirFullPath);
-    if (logDir.exists()) {
-        application.setProperty("logDirFullPath", logDirFullPath);
-
-        // Application start date and time for logging:
-        QString applicationStartDateAndTime =
-                QDateTime::currentDateTime().toString("yyyy-MM-dd--hh-mm-ss");
-        application.setProperty("applicationStartDateAndTime",
-                                applicationStartDateAndTime);
-
-        // Install message handler for redirecting all messages to a log file:
-        qInstallMessageHandler(customMessageHandler);
-    }
-
-    // ==============================
     // MAIN WINDOW INITIALIZATION:
     // ==============================
     QMainBrowserWindow mainWindow;
+    mainWindow.setWindowIcon(icon);
+    mainWindow.setCentralWidget(mainWindow.webViewWidget);
 
-    // Application property necessary when
-    // closing the browser window is requested using
-    // the special window closing URL.
+    // Application property used when closing the browser window is requested:
     qApp->setProperty("windowCloseRequested", false);
 
+    // ==============================
+    // Signals and slots:
+    // ==============================
     // Signal and slot for setting the main window title:
     QObject::connect(mainWindow.webViewWidget,
                      SIGNAL(titleChanged(QString)),
@@ -297,20 +226,6 @@ int main(int argc, char **argv)
     // Signal and slot for actions taken before application exit:
     QObject::connect(qApp, SIGNAL(aboutToQuit()),
                      &mainWindow, SLOT(qExitApplicationSlot()));
-
-    // ==============================
-    // Basic program information:
-    // ==============================
-    qDebug() << "Application version:"
-             << application.applicationVersion().toLatin1().constData();
-    qDebug() << "Qt version:" << QT_VERSION_STR;
-    qDebug() << "Perl interpreter:" << perlInterpreter;
-
-    // ==============================
-    // Window initialization:
-    // ==============================
-    mainWindow.setWindowIcon(icon);
-    mainWindow.setCentralWidget(mainWindow.webViewWidget);
 
     // ==============================
     // Start file:
@@ -374,7 +289,6 @@ int main(int argc, char **argv)
             } else {
                 mainWindow.qDisplayError(
                             QString("Local server file is not found."));
-                qDebug() << "Local server file is not found.";
             }
 
             // Local server port:
@@ -387,7 +301,6 @@ int main(int argc, char **argv)
                 localServerSettingsCorrect = false;
                 mainWindow.qDisplayError(
                             QString("No local server port is set."));
-                qDebug() << "No local server port is set.";
             }
 
             if (firstPort > 0) {
@@ -406,8 +319,6 @@ int main(int argc, char **argv)
                 if (portScanner->portScannerError.length() > 0) {
                     mainWindow.qDisplayError(
                                 portScanner->portScannerError);
-                    qDebug() << "Port error:"
-                             << portScanner->portScannerError;
                 }
             }
 
@@ -433,8 +344,6 @@ int main(int argc, char **argv)
             mainWindow.qDisplayError(
                         localServerSettingsFilePath + "<br>" +
                         "is empty or malformed.");
-            qDebug() << localServerSettingsFilePath
-                     << " is empty or malformed.";
         }
 
         // Local server has to be started as
@@ -461,7 +370,6 @@ int main(int argc, char **argv)
     if (startFileFound == false) {
         mainWindow.qDisplayError(
                     QString("No start page or local server is found."));
-        qDebug() << "No start page or local server is found.";
     }
 
     return application.exec();

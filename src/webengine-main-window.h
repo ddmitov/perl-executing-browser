@@ -70,7 +70,6 @@ public slots:
             localServerTester->stop();
 
             qDisplayError(QString("Local server timed out."));
-            qDebug() << "Local server timed out.";
         }
     }
 
@@ -105,8 +104,6 @@ public slots:
 
     void qExitApplicationSlot()
     {
-        qDebug() << "Application exited normally.";
-
         QApplication::exit();
     }
 
