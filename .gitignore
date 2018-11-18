@@ -1,14 +1,15 @@
 archive/
 build-peb-*/
-perl/bin
-perl/lib
+resources/app/perl
 src/tmp
 
+.qmake.stash
 *.autosave
 Makefile
+peb.pro.*
+
 peb
 peb.exe
-peb.pro.*
 
 test.db
 

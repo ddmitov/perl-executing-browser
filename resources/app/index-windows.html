@@ -24,7 +24,7 @@
 
       // Settings objects for the Perl scripts:
       var perl_input = {};
-      perl_input.scriptRelativePath = 'perl/input.pl';
+      perl_input.scriptRelativePath = 'perl-scripts/input.pl';
       perl_input.inputData = function() {
         var data = document.getElementById('perl-input-box').value;
         $('#perl-input').trigger('reset');
@@ -36,7 +36,7 @@
       }
 
       var clock_one = {};
-      clock_one.scriptRelativePath = 'perl/clock.pl';
+      clock_one.scriptRelativePath = 'perl-scripts/clock.pl';
       clock_one.inputData = function() {
         return "unix-epoch";
       }
@@ -46,7 +46,7 @@
       }
 
       var clock_two = {};
-      clock_two.scriptRelativePath = 'perl/clock.pl';
+      clock_two.scriptRelativePath = 'perl-scripts/clock.pl';
       clock_two.inputData = function() {
         return "local-time";
       }
@@ -56,25 +56,25 @@
       }
 
       var open_files = {};
-      open_files.scriptRelativePath = 'perl/open-files.pl';
+      open_files.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_files.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var open_directory = {};
-      open_directory.scriptRelativePath = 'perl/open-directory.pl';
+      open_directory.scriptRelativePath = 'perl-scripts/open-directory.pl';
       open_directory.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var perl_info = {};
-      perl_info.scriptRelativePath = 'perl/perl-info.pl';
+      perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
       perl_info.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var sqlite = {};
-      sqlite.scriptRelativePath = 'perl/sqlite.pl';
+      sqlite.scriptRelativePath = 'perl-scripts/sqlite.pl';
       sqlite.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }

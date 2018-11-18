@@ -1,4 +1,3 @@
-#!././perl/bin/perl
 
 use strict;
 use warnings;
@@ -24,7 +23,7 @@ print "\nPerl Distribution Compactor for Perl Executing Browser version 0.1.\n\n
 # Directory paths:
 my $root = getcwd;
 my $app_directory = catdir($root, "resources", "app");
-my $perl_directory = catdir($root, "perl");
+my $perl_directory = catdir($app_directory, "perl");
 my $bin_original = catdir($perl_directory, "bin");
 my $lib_original = catdir($perl_directory, "lib");
 
@@ -106,7 +105,9 @@ sub traverse_directory {
   while (my $subentry = readdir $directory_handle) {
     next if $subentry eq '.' or $subentry eq '..';
     my $full_path = catdir($entry, $subentry);
-    if (-f $full_path and $full_path =~ $file_extension) {
+    if (-f $full_path and
+      $full_path =~ $file_extension and
+      $full_path !~ "bin/" and $full_path !~ "lib/") {
       push @files, $full_path;
     } else {
       my @subdirectory_files =

@@ -35,7 +35,7 @@ for i in "$@"
       cp -rf ./resources ./peb.app/resources
       cp ./resources/app.png ./peb.app/peb.png
 
-      relocatable_perl="$(pwd)/perl/bin/perl"
+      relocatable_perl="$(pwd)/resources/app/perl/bin/perl"
       compactor_script="$(pwd)/sdk/compactor.pl"
 
       if [ -e "$relocatable_perl" ]; then

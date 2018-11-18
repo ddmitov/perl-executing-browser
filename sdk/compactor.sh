@@ -2,7 +2,7 @@
 
 cd .. || exit
 
-relocatable_perl="./perl/bin/perl"
+relocatable_perl="./resources/app/perl/bin/perl"
 
 if [ -e "$relocatable_perl" ]; then
   printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"

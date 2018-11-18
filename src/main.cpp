@@ -77,64 +77,6 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // Perl directory:
-    // ==============================
-    QString perlDirectory;
-
-#ifndef Q_OS_LINUX
-    perlDirectory = browserDirectory + "/perl";
-#endif
-
-#ifdef Q_OS_LINUX
-    if (appImageDirectory.length() == 0) {
-        perlDirectory = browserDirectory + "/perl";
-    }
-
-    if (appImageDirectory.length() > 0) {
-        if (QDir(browserDirectory + "/perl").exists()) {
-            perlDirectory = browserDirectory + "/perl";
-        } else {
-            perlDirectory = appImageDirectory + "/perl";
-        }
-    }
-#endif
-
-    // ==============================
-    // Perl interpreter:
-    // ==============================
-    QString perlExecutable;
-
-#ifndef Q_OS_WIN
-    perlExecutable = "perl";
-#endif
-
-#ifdef Q_OS_WIN
-    perlExecutable = "wperl.exe";
-#endif
-
-    QString perlInterpreter;
-
-    QString privatePerlInterpreterFullPath =
-                perlDirectory + "/bin/" + perlExecutable;
-
-    if (QFile(privatePerlInterpreterFullPath).exists()) {
-        perlInterpreter = privatePerlInterpreterFullPath;
-    } else {
-        // Perl on PATH is used if no private Perl interpreter is found:
-        perlInterpreter = perlExecutable;
-    }
-
-    application.setProperty("perlInterpreter", perlInterpreter);
-
-    // ==============================
-    // PERL5LIB directory:
-    // ==============================
-    QString perlLibDirString = perlDirectory + "/lib";
-    QByteArray perlLibDirArray = perlLibDirString.toLatin1();
-
-    qputenv("PERL5LIB", perlLibDirArray);
-
-    // ==============================
     // Resources directory:
     // ==============================
     QString resourcesDirectory;
@@ -170,6 +112,46 @@ int main(int argc, char **argv)
     QString dataDirName = resourcesDirectory + "/data";
 
     qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
+
+    // ==============================
+    // Perl directory:
+    // ==============================
+    QString perlDirectory = applicationDirName + "/perl";
+
+    // ==============================
+    // Perl interpreter:
+    // ==============================
+    QString perlExecutable;
+
+#ifndef Q_OS_WIN
+    perlExecutable = "perl";
+#endif
+
+#ifdef Q_OS_WIN
+    perlExecutable = "wperl.exe";
+#endif
+
+    QString perlInterpreter;
+
+    QString privatePerlInterpreterFullPath =
+                perlDirectory + "/bin/" + perlExecutable;
+
+    if (QFile(privatePerlInterpreterFullPath).exists()) {
+        perlInterpreter = privatePerlInterpreterFullPath;
+    } else {
+        // Perl on PATH is used if no private Perl interpreter is found:
+        perlInterpreter = perlExecutable;
+    }
+
+    application.setProperty("perlInterpreter", perlInterpreter);
+
+    // ==============================
+    // PERL5LIB directory:
+    // ==============================
+    QString perlLibDirString = perlDirectory + "/lib";
+    QByteArray perlLibDirArray = perlLibDirString.toLatin1();
+
+    qputenv("PERL5LIB", perlLibDirArray);
 
     // ==============================
     // Application icon:

@@ -1,2 +1,2 @@
 cd ..
-perl\bin\perl.exe sdk\compactor.pl
+resources\app\perl\bin\wperl.exe sdk\compactor.pl

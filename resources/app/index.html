@@ -24,7 +24,7 @@
 
       // Settings objects for the Perl scripts:
       var interactive_one = {};
-      interactive_one.scriptRelativePath = 'perl/interactive.pl';
+      interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
       interactive_one.inputData = function() {
         var data = $('#form-one').serialize();
         $('#form-one').trigger('reset');
@@ -36,7 +36,7 @@
       }
 
       var interactive_two = {};
-      interactive_two.scriptRelativePath = 'perl/interactive.pl';
+      interactive_two.scriptRelativePath = 'perl-scripts/interactive.pl';
       interactive_two.inputData = function() {
         var data = $('#form-two').serialize();
         $('#form-two').trigger('reset');
@@ -48,25 +48,25 @@
       }
 
       var open_files = {};
-      open_files.scriptRelativePath = 'perl/open-files.pl';
+      open_files.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_files.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var open_directory = {};
-      open_directory.scriptRelativePath = 'perl/open-directory.pl';
+      open_directory.scriptRelativePath = 'perl-scripts/open-directory.pl';
       open_directory.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var perl_info = {};
-      perl_info.scriptRelativePath = 'perl/perl-info.pl';
+      perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
       perl_info.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }
 
       var sqlite = {};
-      sqlite.scriptRelativePath = 'perl/sqlite.pl';
+      sqlite.scriptRelativePath = 'perl-scripts/sqlite.pl';
       sqlite.stdoutFunction = function (stdout) {
         displayTestResult(stdout);
       }

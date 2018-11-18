@@ -331,6 +331,7 @@ public slots:
     // ==============================
     void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
     {
+        Q_UNUSED(errors);
         reply->ignoreSslErrors();
     }
 
