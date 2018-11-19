@@ -6,7 +6,8 @@ Patientia tua in studiis meis computatoriis auxilium meum maximum!
 Being in debt to each and every one,  
 who prepared the official Perl and Qt documentation or  
 shared useful knowledge on a variety of forums, blogs and other sites,  
-I thank them all! Their expertise, effort and good will are highly appreciated!  
+I thank them all!  
+Their expertise, effort and good will are highly appreciated!  
 
 Special thanks to the staff of the Library of the New Bulgarian University,
 where much of the development effort took place!  
@@ -70,26 +71,26 @@ https://qt-project.org/forums/viewthread/8876 (Setting global variable in main()
 
 https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html  
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
-
-http://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
-http://doc.qt.io/qt-4.8/qwebframe.html  
-http://doc.qt.io/qt-4.8/signalsandslots.html  
-http://doc.qt.io/qt-4.8/qfileinfo.html  
-http://doc.qt.io/qt-4.8/qwebinspector.html  
-http://doc.qt.io/qt-4.8/qinputdialog.html  
-http://doc.qt.io/qt-5/qtglobal.html  
-http://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
-http://doc.qt.io/qt-5/qhash.html  
-http://doc.qt.io/qt-5/qhash-iterator.html  
-http://doc.qt.io/qt-5/qdesktopwidget.html  
-http://doc.qt.io/archives/qt-5.5/qwebview.html  
-http://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html  
-http://doc.qt.io/qt-5/qwebenginepage.html#runJavaScript  
-http://doc.qt.io/qt-5/qwebenginepage.html#fullScreenRequested  
-http://doc.qt.io/qt-5/qwebenginepage.html#windowCloseRequested  
-http://doc.qt.io/qt-5/qtwebengine-webenginewidgets-simplebrowser-example.html#adding-context-menu-items  
-http://doc.qt.io/qt-5/qwebenginefullscreenrequest.html  
-http://doc.qt.io/qt-5/qprocess.html#terminate  
+https://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
+https://doc.qt.io/qt-4.8/qwebframe.html  
+https://doc.qt.io/qt-4.8/signalsandslots.html  
+https://doc.qt.io/qt-4.8/qfileinfo.html  
+https://doc.qt.io/qt-4.8/qwebinspector.html  
+https://doc.qt.io/qt-4.8/qinputdialog.html  
+https://doc.qt.io/qt-5/qtglobal.html  
+https://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
+https://doc.qt.io/qt-5/qhash.html  
+https://doc.qt.io/qt-5/qhash-iterator.html  
+https://doc.qt.io/qt-5/qdesktopwidget.html  
+https://doc.qt.io/archives/qt-5.5/qwebview.html  
+https://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html  
+https://doc.qt.io/qt-5/qwebenginepage.html#runJavaScript  
+https://doc.qt.io/qt-5/qwebenginepage.html#fullScreenRequested  
+https://doc.qt.io/qt-5/qwebenginepage.html#windowCloseRequested  
+https://doc.qt.io/qt-5/qtwebengine-webenginewidgets-simplebrowser-example.html#adding-context-menu-items  
+https://doc.qt.io/qt-5/qwebenginefullscreenrequest.html  
+https://doc.qt.io/qt-5/qprocess.html#terminate  
+https://doc.qt.io/qt-5.11/qtwebengine-debugging.html  
 
 https://wiki.qt.io/Qt_Coding_Style  
 https://wiki.qt.io/Open_Web_Page_in_QWebView  
