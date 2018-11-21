@@ -1,5 +1,5 @@
-Perl Executing Browser - Thanks and Credits
---------------------------------------------------------------------------------
+# Perl Executing Browser - Thanks and Credits
+
 Amata mea Argeia - gratiam magnam tibi ago!  
 Patientia tua in studiis meis computatoriis auxilium meum maximum!  
 
@@ -33,6 +33,7 @@ Thanks to Daniel Muey and all contributors of the File::Copy::Recursive CPAN mod
 https://metacpan.org/pod/File::Copy::Recursive  
 
 ## Qt
+
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
@@ -150,6 +151,7 @@ https://unix.stackexchange.com/questions/116254/how-do-i-change-which-version-of
 https://www.developpez.net/forums/d1549582/c-cpp/bibliotheques/qt/moteurs-web/runjavascript-fonction-lambda-plante/  
 
 ## Perl 5
+
 https://perlbrew.pl/  
 https://github.com/skaji/relocatable-perl  
 http://strawberryperl.com/  
@@ -181,6 +183,7 @@ https://perlmaven.com/recursive-subroutines
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
 
 ## HTML, CSS & JavaScript
+
 https://www.w3schools.com/js/js_loop_for.asp  
 https://www.w3schools.com/jsref/prop_html_innerhtml.asp  
 https://www.w3schools.com/jsref/met_form_submit.asp  
@@ -205,6 +208,10 @@ https://jquery.com/
 http://youmightnotneedjquery.com/  
 
 ## Markdown
+
+https://github.com/DavidAnson/markdownlint  
+https://dlaa.me/markdownlint/  
+
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/IQAndreas/markdown-licenses  
 
@@ -214,6 +221,7 @@ https://stackoverflow.com/questions/23989232/is-there-a-way-to-represent-a-direc
 https://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown  
 
 ## Bash
+
 http://tldp.org/LDP/abs/html/fto.html  
 http://tldp.org/LDP/abs/html/functions.html  
 
@@ -233,20 +241,25 @@ https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-comma
 https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
 https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
 
-## Mac
+## AppImage
+
+https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
+https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  
+
+## Macintosh
+
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 https://iconverticons.com/online/  
 
 ## Google Chrome Unsafe Ports
+
 https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chrome  
 
 ## GitHub
+
 https://github.com/github/linguist#overrides  
 
 ## Travis CI
+
 https://docs.travis-ci.com/user/reference/xenial/  
 https://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  
-
-## AppImage
-https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
-https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  

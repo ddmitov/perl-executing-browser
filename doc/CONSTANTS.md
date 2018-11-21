@@ -1,5 +1,4 @@
-Perl Executing Browser - Constants
---------------------------------------------------------------------------------
+# Perl Executing Browser - Constants
 
 ## Files and Folders
 
@@ -80,12 +79,14 @@ A typical ``{PEB_executable_directory}`` looks like this:
     If this file is not found, the default icon embedded in the resources of the browser binary is used.
 
 ## Functional Pseudo Filenames
-* **About PEB dialog:** ``about-browser.function``
 
+* **About PEB dialog:** ``about-browser.function``
 * **About Qt dialog:** ``about-qt.function``
 
 ## Specific Keyboard Shortcuts
+
 All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
+
 * <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
 * <kbd>Ctrl</kbd> + <kbd>P</kbd> - get printer selection dialog. If no printer is configured, no dialog is displayed.
 * <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview

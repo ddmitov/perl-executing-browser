@@ -1,7 +1,7 @@
-Perl Executing Browser - Requirements
---------------------------------------------------------------------------------
+# Perl Executing Browser - Requirements
 
 ## Compile-Time Requirements
+
 The only Linux and Macintosh compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.  
 
 Compiling Windows binaries of PEB is subject to the following restrictions:  
@@ -13,6 +13,7 @@ Compiling Windows binaries of PEB is subject to the following restrictions:
 * Windows builds of PEB do no support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 Compiled and tested successfully using:
+
 * [Qt 5.2.0](http://download.qt.io/archive/qt/5.2/5.2.0/) on 32-bit Debian 7 and 32-bit Windows XP
 * [Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit Ubuntu 14.04 and 64-bit OS X 10.9.1, i5
 * [Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
@@ -31,6 +32,7 @@ make
 Please note that PEB builds using the ``QtWebKit`` web engine are single-process applications consuming less memory than PEB builds using the ``QtWebEngine`` which are multiprocess applications.  
 
 ## Compile-Time Settings
+
 All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  
 
 * Updated QtWebKit  
@@ -69,6 +71,7 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   To make automatically a bundled binary (peb.app) use the [dmg-maker.sh](sdk/dmg-maker.sh) script by Valcho Nedelchev.
 
 ## Runtime Requirements
+
 * Qt 5 libraries.  
 
   The ``ldd`` Linux command can show all dependencies of a PEB executable.  

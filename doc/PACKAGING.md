@@ -1,7 +1,7 @@
-Perl Executing Browser - Packaging
---------------------------------------------------------------------------------
+# Perl Executing Browser - Packaging
 
 ## Minimal Relocatable Perl Distribution for PEB
+
 Minimizing the size of a relocatable (or portable) Perl distribution used by a PEB-based application is vital for reducing the size of its distribution package. [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl) is one solution for this problem. It finds all dependencies of all Perl scripts run by PEB and copies them in a new ``{PEB_executable_directory}/resources/app/perl/lib`` folder. Any unnecessary modules are left behind and the original ``bin`` and ``lib`` folders are saved as ``bin-original`` and ``lib-original``.  
 
 Perl Distribution Compactor must be started from the ``{PEB_executable_directory}/sdk/lib`` folder using [compactor.sh](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.sh) on a Linux machine or [compactor.cmd](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.cmd) on a Windows machine to make sure that only a relocatable Perl distribution is used.  
@@ -9,6 +9,7 @@ Perl Distribution Compactor must be started from the ``{PEB_executable_directory
 Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_executable_directory}/sdk/lib`` directory.
 
 ## AppImage Support
+
 PEB or any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
 
 * packing a Perl application together with a PEB executable, its Qt libraries and a relocatable Perl distribution:  

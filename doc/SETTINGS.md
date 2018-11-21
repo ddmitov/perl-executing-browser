@@ -1,7 +1,7 @@
-Perl Executing Browser - Settings
---------------------------------------------------------------------------------
+# Perl Executing Browser - Settings
 
 ## Application Filename
+
 The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run. If log files are wanted, they will take the name of the executable file without the filename extension, whatever the name may be.
 
 ## HTML Page API
@@ -57,6 +57,7 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB exits immediately.
 
 ## Perl Scripts API
+
 Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms settings pseudo filename used to start the Perl script.  
 
 There are three methods to start a local Perl script:  
@@ -132,6 +133,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   ```
 
 ## Interactive Perl Scripts
+
 Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name.  
 
 Please note that interactive Perl scripts are not supported by the Windows builds of PEB.  
@@ -200,6 +202,7 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 
 ## Starting Local Server
+
 A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that  
 a ``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html``  
 with the following structure:
@@ -234,17 +237,15 @@ with the following structure:
   Privileged ports below or equal to port 1024 are not allowed.  
   The following Google Chrome unsafe ports used by various services are also not allowed:  
 
-  ```
-  2049 - nfs
-  3659 - apple-sasl / PasswordServer
-  4045 - lockd
-  6000 - X11
-  6665 - Alternate IRC [Apple addition]
-  6666 - Alternate IRC [Apple addition]
-  6667 - Standard IRC [Apple addition]
-  6668 - Alternate IRC [Apple addition]
-  6669 - Alternate IRC [Apple addition]
-  ```
+  2049 - nfs  
+  3659 - apple-sasl / PasswordServer  
+  4045 - lockd  
+  6000 - X11  
+  6665 - Alternate IRC [Apple addition]  
+  6666 - Alternate IRC [Apple addition]  
+  6667 - Standard IRC [Apple addition]  
+  6668 - Alternate IRC [Apple addition]  
+  6669 - Alternate IRC [Apple addition]  
 
 * **command-line-arguments**  
 ``Array`` holding all command-line arguments that have to be passed to a local Perl server  
@@ -255,6 +256,7 @@ The ``#PORT#`` keyword within the command-line arguments is substituted with the
 ``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see the [Tabula](https://github.com/ddmitov/tabula) application for an example.
 
 ## Selecting Files and Folders
+
 Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed of the name of a JavaScript settings object for the wanted dialog and a ``.dialog`` extension.  
 
 A JavaScript settings object for a filesystem dialog has only two object properties:

@@ -1,5 +1,4 @@
-Perl Executing Browser
---------------------------------------------------------------------------------
+# Perl Executing Browser
 
 [![GitHub Version](https://img.shields.io/github/release/ddmitov/perl-executing-browser.svg)](https://github.com/ddmitov/perl-executing-browser/releases)
 [![GitHub License](http://img.shields.io/badge/License-LGPL%20v3-blue.svg)](./LICENSE.md)
@@ -11,6 +10,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
 ## Contents
+
 * [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
 * [Features](#features)
@@ -46,6 +46,7 @@ The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
 in the documentation of this project are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
 
 ## Quick Start
+
 * Common Steps:
   * **1.** Download PEB.
   * **2.** Select your Perl distribution.
@@ -68,6 +69,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
   * **5.** Write an appropriate HTML interface and connect it to your server application by traditional web  communication protocols.
 
 ## Design Objectives
+
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Fast, zero-installation software**  
 * **3. Cross-platform availability**  
@@ -75,6 +77,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
+
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Macintosh builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
@@ -87,6 +90,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 
 ## Security
+
 * PEB does not need administrative privileges, but will not refuse to use them if needed.
 * PEB does not need and does not implement any server, but will start one if so configured.  
 * Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
@@ -96,21 +100,25 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * Files or folders can not be selected with their full paths from web pages.
 
 ## What PEB Is Not
+
 * PEB is not a general-purpose web browser and does not have all traditional features of general-purpose web browsers.
 * PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable, Perl distribution.
 
 ## Limitations
+
 * Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
 * ``QtWebEngine`` builds do not support printing and ``window.print()`` is not supported.
 * Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
+
 PEB was started in 2013 by Dimitar D. Mitov as a simple GUI for personal database applications.
 
 ## [Thanks and Credits](CREDITS.md)
 
 ## [License](./LICENSE.md)
+
 This program is free software;  
 you can redistribute it and/or modify it under the terms of the GNU Lesser General Public License,  
 as published by the Free Software Foundation;  
@@ -119,5 +127,6 @@ This program is distributed in the hope that it will be useful, but WITHOUT ANY 
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 ## Authors
+
 Dimitar D. Mitov, 2013 - 2018  
 Valcho Nedelchev, 2014 - 2016  
