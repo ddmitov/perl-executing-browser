@@ -153,6 +153,7 @@ If a PEB instance crashes, it can still leave its interactive scripts as zombie 
 print "output string" or shutdown_procedure();
 
 sub shutdown_procedure {
+  # your shutdown code goes here...
   exit();
 }
 ```

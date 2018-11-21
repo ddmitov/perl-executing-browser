@@ -264,12 +264,14 @@ public slots:
                          this,
                          SLOT(qDisplayScriptOutputSlot(QString,
                                                        QString)));
+
         QObject::connect(scriptHandler,
-                         SIGNAL(scriptFinishedSignal(QString,
-                                                     QString)),
+                         SIGNAL(displayScriptErrorsSignal(QString)),
                          this,
-                         SLOT(qScriptFinishedSlot(QString,
-                                                  QString)));
+                         SLOT(qDisplayScriptErrorsSlot(QString)));
+
+        QObject::connect(scriptHandler, SIGNAL(scriptFinishedSignal(QString)),
+                         this, SLOT(qScriptFinishedSlot(QString)));
 
         runningScripts.insert(scriptJsonObject["id"].toString(), scriptHandler);
     }
@@ -285,9 +287,8 @@ public slots:
             QScriptHandler *handler =
                     runningScripts.value(scriptJsonObject["id"].toString());
             if (handler->scriptProcess.isOpen()) {
-                QByteArray scriptInputArray = scriptInput.toUtf8();
-                scriptInputArray.append(QString("\n").toLatin1());
-                handler->scriptProcess.write(scriptInputArray);
+                handler->scriptProcess.write(scriptInput.toUtf8());
+                handler->scriptProcess.write(QString("\n").toLatin1());
             }
         }
     }
@@ -302,24 +303,26 @@ public slots:
         }
     }
 
-    void qScriptFinishedSlot(QString scriptId,
-                             QString scriptAccumulatedErrors)
+    void qDisplayScriptErrorsSlot(QString errors)
     {
-        runningScripts.remove(scriptId);
-
         if (QPage::url().scheme() == "file") {
-            if (scriptAccumulatedErrors.length() > 0) {
-                scriptAccumulatedErrors.replace("\"", "\\\"");
-                scriptAccumulatedErrors.replace("\'", "\\'");
-                scriptAccumulatedErrors.replace("\n", "\\n");
-                scriptAccumulatedErrors.replace("\r", "");
+            if (errors.length() > 0) {
+                errors.replace("\"", "\\\"");
+                errors.replace("\'", "\\'");
+                errors.replace("\n", "\\n");
+                errors.replace("\r", "");
 
                 QString perlScriptErrorsMessage =
-                        "console.log('" + scriptAccumulatedErrors + "'); null";
+                        "console.log('" + errors + "'); null";
 
                 QPage::runJavaScript(perlScriptErrorsMessage);
             }
         }
+    }
+
+    void qScriptFinishedSlot(QString scriptId)
+    {
+        runningScripts.remove(scriptId);
 
         if (closeRequested == true and runningScripts.isEmpty()) {
             emit closeWindowSignal();
@@ -374,16 +377,23 @@ public slots:
 
 #ifdef Q_OS_WIN
                     handler->scriptProcess.kill();
+                    runningScripts.remove(iterator.key());
 #endif
                 }
+
+                if (!handler->scriptProcess.isOpen()) {
+                    runningScripts.remove(iterator.key());
+                }
             }
+        }
 
 #ifndef Q_OS_WIN
+        if (!runningScripts.isEmpty()) {
             int maximumTimeMilliseconds = 3000;
             QTimer::singleShot(maximumTimeMilliseconds,
                                this, SLOT(qScriptsTimeoutSlot()));
-#endif
         }
+#endif
 
         if (runningScripts.isEmpty()) {
             emit closeWindowSignal();

@@ -25,25 +25,19 @@
 QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
-
     scriptId = scriptJsonObject["id"].toString();
 
-    if (scriptJsonObject["scriptRelativePath"].toString().length() > 0) {
-        scriptFullFilePath =
-                qApp->property("application").toString() + "/" +
-                scriptJsonObject["scriptRelativePath"].toString();
-    }
+    scriptFullFilePath =
+            qApp->property("application").toString() + "/" +
+            scriptJsonObject["scriptRelativePath"].toString();
 
-    QString scriptInput;
-    if (scriptJsonObject["scriptInput"].toString().length() > 0) {
-        scriptInput = scriptJsonObject["scriptInput"].toString();
-    }
-
-    // Signals and slots for local long running Perl scripts:
+    // Signals and slots for local Perl scripts:
     QObject::connect(&scriptProcess, SIGNAL(readyReadStandardOutput()),
                      this, SLOT(qScriptOutputSlot()));
+
     QObject::connect(&scriptProcess, SIGNAL(readyReadStandardError()),
                      this, SLOT(qScriptErrorsSlot()));
+
     QObject::connect(&scriptProcess,
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
@@ -52,7 +46,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     scriptProcess.setWorkingDirectory(qApp->property("application").toString());
 
     scriptProcess.start((qApp->property("perlInterpreter").toString()),
-                        QStringList()
-                        << scriptFullFilePath,
+                        QStringList() << scriptFullFilePath,
                         QProcess::Unbuffered | QProcess::ReadWrite);
 }

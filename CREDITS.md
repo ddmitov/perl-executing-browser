@@ -192,6 +192,8 @@ https://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form
 https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via-javascript  
 https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-with-reset-method  
 https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
+https://stackoverflow.com/questions/11478324/syntaxerror-unexpected-eof-when-evaluating-javascript-in-ios-uiwebview  
+https://stackoverflow.com/questions/42053775/getting-error-form-submission-canceled-because-the-form-is-not-connected  
 
 http://getbootstrap.com/  
 http://getbootstrap.com/components/#dropdowns  

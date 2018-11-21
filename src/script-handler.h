@@ -29,32 +29,27 @@ class QScriptHandler : public QObject
     Q_OBJECT
 
 signals:
-    void displayScriptOutputSignal(QString scriptId,
-                                   QString output);
-    void scriptFinishedSignal(QString scriptId,
-                              QString scriptAccumulatedErrors);
+    void displayScriptOutputSignal(QString scriptId, QString output);
+    void displayScriptErrorsSignal(QString errors);
+    void scriptFinishedSignal(QString scriptId);
 
 public slots:
     void qScriptOutputSlot()
     {
-        QString output = scriptProcess.readAllStandardOutput();
-        scriptAccumulatedOutput.append(output);
-
-        emit displayScriptOutputSignal(scriptId, output);
+        QString scriptOutput = scriptProcess.readAllStandardOutput();
+        emit displayScriptOutputSignal(scriptId, scriptOutput);
     }
 
     void qScriptErrorsSlot()
     {
         QString scriptErrors = scriptProcess.readAllStandardError();
-        scriptAccumulatedErrors.append(scriptErrors);
+        emit displayScriptErrorsSignal(scriptErrors);
     }
 
     void qScriptFinishedSlot()
     {
-        emit scriptFinishedSignal(scriptId,
-                                  scriptAccumulatedErrors);
-
         scriptProcess.close();
+        emit scriptFinishedSignal(scriptId);
     }
 
 public:
@@ -62,8 +57,6 @@ public:
     QProcess scriptProcess;
     QString scriptId;
     QString scriptFullFilePath;
-    QString scriptAccumulatedOutput;
-    QString scriptAccumulatedErrors;
 };
 
 #endif // SCRIPTHANDLER_H
