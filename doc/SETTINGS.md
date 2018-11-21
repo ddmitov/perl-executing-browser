@@ -138,27 +138,32 @@ Each PEB interactive Perl script must have its own event loop waiting constantly
 
 Please note that interactive Perl scripts are not supported by the Windows builds of PEB.  
 
-PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.  
+PEB interactive Perl script should also have the following features:
 
-When PEB is closing, it sends the ``SIGTERM`` signal to all interactive scripts to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB. All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
+* **No buffering**  
+  PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.
 
-```perl
-$SIG{TERM} = sub {
-  # your shutdown code goes here...
-  exit();
-};
-```
+* **SIGTERM handling**  
+  PEB sends the ``SIGTERM`` signal to all interactive scripts on exit for a graceful shutdown and to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB. All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
 
-If a PEB instance crashes, it can still leave its interactive scripts as zombie processes consuming large amounts of memory. To prevent this scenario, all interactive scripts should test for a successful ``print`` on the STDOUT. This could be implemented using the following code:
+  ```perl
+  $SIG{TERM} = sub {
+    # your shutdown code goes here...
+    exit();
+  };
+  ```
 
-```perl
-print "output string" or shutdown_procedure();
+* **Failsafe print**  
+  If a PEB instance crashes, it can still leave its interactive scripts as zombie processes consuming large amounts of memory. To prevent this scenario, all interactive scripts should test for a successful ``print`` on the STDOUT. This could be implemented using the following code:
 
-sub shutdown_procedure {
-  # your shutdown code goes here...
-  exit();
-}
-```
+  ```perl
+  print "output string" or shutdown_procedure();
+
+  sub shutdown_procedure {
+    # your shutdown code goes here...
+    exit();
+  }
+  ```
 
 The following code shows how to start an interactive Perl script right after a local page is loaded:
 
