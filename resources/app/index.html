@@ -102,18 +102,22 @@
         peb.startScript('open_directory.script');
       }
 
-      function clearTargetElement() {
-        var container = document.getElementById('tests');
+      function clearTargetElement(target) {
+        var container = document.getElementById(target);
         while (container.firstChild) {
           container.removeChild(container.firstChild);
         }
       }
 
-      function displayTestResult(stdout) {
-        clearTargetElement();
-        var pre = document.createElement("pre");
-        pre.innerHTML = stdout;
-        document.getElementById('tests').appendChild(pre);
+      function displayTestResult(target, stdout) {
+        if (document.getElementById(target)) {
+          var element = document.getElementById(target);
+          element.innerHTML = element.innerHTML + stdout;
+        } else {
+          var pre = document.createElement("pre");
+          pre.innerHTML = stdout;
+          document.getElementById('tests').appendChild(pre);
+        }
       }
     </script>
 

@@ -228,7 +228,6 @@ int main(int argc, char **argv)
 
         mainWindow.webViewWidget->setUrl(
                     QUrl::fromLocalFile(startPageFilePath));
-        mainWindow.showMaximized();
     }
 
     // Local server:

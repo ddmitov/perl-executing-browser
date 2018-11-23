@@ -59,8 +59,6 @@ public slots:
             localServerBaseUrl = "http://localhost:" +
                     qApp->property("port").toString() + "/";
             webViewWidget->load(QUrl(localServerBaseUrl));
-
-            showMaximized();
         }
 
         localServerWait++;
@@ -75,6 +73,7 @@ public slots:
     void setMainWindowTitleSlot(QString title)
     {
         setWindowTitle(title);
+        showMaximized();
     }
 
     void closeEvent(QCloseEvent *event)
