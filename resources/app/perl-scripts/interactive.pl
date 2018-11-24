@@ -82,7 +82,7 @@ my $half_second_wait = AnyEvent->timer (
         $output_string = "Seconds from the Unix epoch: ".time;
       } else {
         $output_string =
-          "Seconds from the Unix epoch: ".time."<br>Last input: ".$input_text;
+          "Seconds from the Unix epoch: ".time."<br>Last user input: ".$input_text;
       }
 
       print $output_string or shutdown_procedure();
@@ -96,7 +96,7 @@ my $half_second_wait = AnyEvent->timer (
         $output_string = "Local date and time: ".$formatted_time;
       } else {
         $output_string =
-          "Local date and time: ".$formatted_time."<br>Last input: ".$input_text;
+          "Local date and time: ".$formatted_time."<br>Last user input: ".$input_text;
       }
 
       print $output_string or shutdown_procedure();

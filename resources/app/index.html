@@ -47,42 +47,47 @@
         target.innerHTML = stdout;
       }
 
+      var open_file = {};
+      open_file.scriptRelativePath = 'perl-scripts/open-files.pl';
+      open_file.stdoutFunction = function (stdout) {
+        displayTestResult('open-file', stdout);
+      }
+
       var open_files = {};
       open_files.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_files.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
+        displayTestResult('open-files', stdout);
       }
 
       var open_directory = {};
       open_directory.scriptRelativePath = 'perl-scripts/open-directory.pl';
       open_directory.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
+        displayTestResult('open-directory', stdout);
       }
 
       var perl_info = {};
       perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
       perl_info.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
+        displayTestResult('perl-info', stdout);
       }
 
       var sqlite = {};
       sqlite.scriptRelativePath = 'perl-scripts/sqlite.pl';
       sqlite.stdoutFunction = function (stdout) {
-        displayTestResult(stdout);
+        displayTestResult('sqlite-test', stdout);
       }
 
       // Settings objects for the filesystem dialogs:
       var select_file = {};
       select_file.type = 'single-file';
       select_file.receiverFunction = function (fileName) {
-        open_files.inputData = fileName;
-        peb.startScript('open_files.script');
+        open_file.inputData = fileName;
+        peb.startScript('open_file.script');
       }
 
       var new_file_name = {};
       new_file_name.type = 'new-file-name';
       new_file_name.receiverFunction = function (fileName) {
-        clearTargetElement();
         var pre = document.createElement("pre");
         pre.innerHTML = 'New file name: ' + fileName;
         document.getElementById('tests').appendChild(pre);
@@ -102,21 +107,30 @@
         peb.startScript('open_directory.script');
       }
 
-      function clearTargetElement(target) {
-        var container = document.getElementById(target);
+      function startPerlInfo() {
+        peb.startScript('perl_info.script');
+      }
+
+      function startSqlite() {
+        peb.startScript('sqlite.script');
+      }
+
+      function clearTestData() {
+        var container = document.getElementById('tests');
         while (container.firstChild) {
           container.removeChild(container.firstChild);
         }
       }
 
-      function displayTestResult(target, stdout) {
-        if (document.getElementById(target)) {
-          var element = document.getElementById(target);
-          element.innerHTML = element.innerHTML + stdout;
+      function displayTestResult(id, stdout) {
+        var existingElement = document.getElementById(id);
+        if (existingElement === null) {
+          var newElement = document.createElement("pre");
+          newElement.id = id;
+          newElement.innerHTML = stdout;
+          document.getElementById('tests').appendChild(newElement);
         } else {
-          var pre = document.createElement("pre");
-          pre.innerHTML = stdout;
-          document.getElementById('tests').appendChild(pre);
+          existingElement.innerHTML = existingElement.innerHTML + stdout;
         }
       }
     </script>
@@ -193,11 +207,15 @@
             </li>
 
             <li>
-              <a href="perl_info.script">Perl Basic Information</a>
+              <a href="javascript:startPerlInfo();">Perl Basic Information</a>
             </li>
 
             <li>
-              <a href="sqlite.script">SQLite Test</a>
+              <a href="javascript:startSqlite();">SQLite Test</a>
+            </li>
+
+            <li>
+              <a href="javascript:clearTestData();">Clear Test Data</a>
             </li>
 
             <li>
@@ -264,7 +282,7 @@
           </form>
         </div>
 
-        <div id="instance-one-output" class="interactive-output"></div>
+        <div id="instance-one-output" class="interactive-output">&nbsp;</div>
       </div>
 
       <div class="row">
@@ -289,7 +307,7 @@
           </form>
         </div>
 
-        <div id="instance-two-output" class="interactive-output"></div>
+        <div id="instance-two-output" class="interactive-output">&nbsp;</div>
       </div>
     </div>
   </body>

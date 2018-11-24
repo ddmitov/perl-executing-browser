@@ -15,6 +15,9 @@ foreach my $file (@files) {
   print "$file<br>";
 }
 
+my $number_of_files = scalar @files;
+print "$number_of_files files<br>";
+
 sub traverse {
   my ($entry) = @_;
 
@@ -22,10 +25,13 @@ sub traverse {
   opendir (my $directory_handle, $entry) or die $!;
   while (my $subentry = readdir $directory_handle) {
     next if $subentry eq '.' or $subentry eq '..';
+
     my $full_path = $entry."/".$subentry;
+
     if (-f $full_path) {
       push @files, $full_path;
     }
+
     traverse ("$entry/$subentry");
   }
   close $directory_handle;
