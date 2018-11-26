@@ -58,17 +58,17 @@ The ``pebSettings`` JavaScript object may have the following properties:
 
 ## Perl Scripts API
 
-Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms settings pseudo filename used to start the Perl script.  
+Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms settings pseudo link used to start the Perl script.  
 
 There are three methods to start a local Perl script:  
 
-* **Clicking a link to a script settings pseudo filename:**  
+* **Clicking a link to a script settings pseudo link:**  
 
   ```html
   <a href="test.script">Start Perl script</a>
   ```
 
-* **Submitting a form to a script settings pseudo filename:**  
+* **Submitting a form to a script settings pseudo link:**  
 
   ```html
   <form action="test.script">
@@ -76,13 +76,13 @@ There are three methods to start a local Perl script:
   </form>
   ```
 
-* **Calling a JavaScript function with a script settings pseudo filename:**  
+* **Calling a JavaScript function with a script settings pseudo link:**  
 
   ```javascript
   peb.startScript('test.script');
   ```
 
-  This method creates an invisible form and submits it to the script settings pseudo filename.  
+  This method creates an invisible form and submits it to the script settings pseudo link.  
 
 A minimal example of a JavaScript settings object for a Perl script run by PEB:  
 
@@ -262,7 +262,9 @@ The ``#PORT#`` keyword within the command-line arguments is substituted with the
 
 ## Selecting Files and Folders
 
-Selecting files or folders with their full paths is performed by clicking a link to a pseudo filename composed of the name of a JavaScript settings object for the wanted dialog and a ``.dialog`` extension.  
+Selecting files or folders with their full paths is performed by clicking a pseudo link composed of the name of a JavaScript settings object and a ``.dialog`` extension.  
+
+Selecting files or folders with their full paths is possible only from local HTML files or localhost pages.  
 
 A JavaScript settings object for a filesystem dialog has only two object properties:
 

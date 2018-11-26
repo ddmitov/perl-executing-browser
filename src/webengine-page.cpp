@@ -73,8 +73,18 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
                                     QWebEnginePage::NavigationType type,
                                     bool isMainFrame)
 {
+    // Handle filesystem dialogs:
+    if ((url.scheme() == "file" or url.authority() == "localhost") and
+            type == QWebEnginePage::NavigationTypeLinkClicked and
+            url.fileName().contains(".dialog") and
+            isMainFrame == true) {
+        qHandleDialogs(url.fileName().replace(".dialog", ""));
+        return false;
+    }
+
+    // Handle local Perl scripts and functional pseudo filenames:
     if (url.scheme() == "file" and isMainFrame == true) {
-        // Local forms submission:
+        // Submitting special forms is a method to start local Perl scripts:
         if (type == QWebEnginePage::NavigationTypeFormSubmitted) {
             if (url.fileName().contains(".script")) {
                 qHandleScripts(url.fileName().replace(".script", ""));
@@ -85,13 +95,8 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
         }
 
         if (type == QWebEnginePage::NavigationTypeLinkClicked) {
-            // Handle filesystem dialogs:
-            if (url.fileName().contains(".dialog")) {
-                qHandleDialogs(url.fileName().replace(".dialog", ""));
-                return false;
-            }
-
-            // Handle local Perl scripts:
+            // Clicking special links is
+            // another method to start local Perl scripts:
             if (url.fileName().contains(".script")) {
                 qHandleScripts(url.fileName().replace(".script", ""));
                 return false;

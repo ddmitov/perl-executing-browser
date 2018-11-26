@@ -438,27 +438,27 @@ protected:
     {
         Q_UNUSED(frame);
 
+        // Handle filesystem dialogs:
+        if ((request.url().scheme() == "file" or
+             request.url().authority() == "localhost") and
+                navigationType == QWebPage::NavigationTypeLinkClicked and
+                request.url().fileName().contains(".dialog")) {
+            qHandleDialogs(request.url().fileName().replace(".dialog", ""));
+            return false;
+        }
+
+        // Handle local Perl scripts and functional pseudo filenames:
         if (request.url().scheme() == "file") {
-            // Local forms submission:
-            if (navigationType == QWebPage::NavigationTypeFormSubmitted) {
-                if (request.url().fileName().contains(".script")) {
-                    qHandleScripts(request.url().fileName()
-                                   .replace(".script", ""));
-                    return false;
-                } else {
-                    return false;
-                }
+            // Submitting special forms is a method to start local Perl scripts:
+            if (navigationType == QWebPage::NavigationTypeFormSubmitted and
+                    request.url().fileName().contains(".script")) {
+                qHandleScripts(request.url().fileName().replace(".script", ""));
+                return false;
             }
 
             if (navigationType == QWebPage::NavigationTypeLinkClicked) {
-                // Handle filesystem dialogs:
-                if (request.url().fileName().contains(".dialog")) {
-                    qHandleDialogs(request.url().fileName()
-                                   .replace(".dialog", ""));
-                    return false;
-                }
-
-                // Handle local Perl scripts:
+                // Clicking special links is
+                // another method to start local Perl scripts:
                 if (request.url().fileName().contains(".script")) {
                     qHandleScripts(request.url().fileName()
                                    .replace(".script", ""));

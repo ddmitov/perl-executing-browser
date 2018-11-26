@@ -60,7 +60,6 @@ public slots:
             localServerBaseUrl = "http://localhost:" +
                     qApp->property("port").toString() + "/";
             webViewWidget->load(QUrl(localServerBaseUrl));
-
             showMaximized();
         }
 
@@ -70,12 +69,14 @@ public slots:
             localServerTester->stop();
 
             qDisplayError(QString("Local server timed out."));
+            showMaximized();
         }
     }
 
     void setMainWindowTitleSlot(QString title)
     {
         setWindowTitle(title);
+        showMaximized();
     }
 
     void qGoFullscreen(QWebEngineFullScreenRequest request) {

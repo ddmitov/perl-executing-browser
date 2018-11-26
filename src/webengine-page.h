@@ -147,22 +147,20 @@ public slots:
     // ==============================
     void qHandleDialogs(QString dialogObjectName)
     {
-        if (QPage::url().scheme() == "file") {
-            QPage::runJavaScript(
-                        QString("peb.getDialogSettings(" +
-                                dialogObjectName + ")"),
-                        [dialogObjectName, this](QVariant dialogSettings)
-            {
-                QJsonDocument dialogJsonDocument =
-                        QJsonDocument::fromJson(
-                            dialogSettings.toString().toUtf8());
-                QJsonObject dialogJsonObject = dialogJsonDocument.object();
+        QPage::runJavaScript(
+                    QString("peb.getDialogSettings(" +
+                            dialogObjectName + ")"),
+                    [dialogObjectName, this](QVariant dialogSettings)
+        {
+            QJsonDocument dialogJsonDocument =
+                    QJsonDocument::fromJson(
+                        dialogSettings.toString().toUtf8());
+            QJsonObject dialogJsonObject = dialogJsonDocument.object();
 
-                dialogJsonObject["id"] = dialogObjectName;
+            dialogJsonObject["id"] = dialogObjectName;
 
-                qReadDialogSettings(dialogJsonObject);
-            });
-        }
+            qReadDialogSettings(dialogJsonObject);
+        });
     }
 
     void qReadDialogSettings(QJsonObject dialogJsonObject)
