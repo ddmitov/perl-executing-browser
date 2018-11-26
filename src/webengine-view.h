@@ -80,21 +80,12 @@ public slots:
 
             QMenu menu;
 
-            if (!contextMenuTest.isContentEditable()) {
-                if (contextMenuTest.selectedText().length() == 0) {
-                    QAction *selectAllAct = menu
-                            .addAction(
-                                qApp->property("selectAllLabel").toString());
-                    QObject::connect(selectAllAct, SIGNAL(triggered()),
-                                     this, SLOT(qSelectAllAction()));
-                }
-
-                if (contextMenuTest.selectedText().length() > 0) {
-                    QAction *copyAct = menu
-                            .addAction(qApp->property("copyLabel").toString());
-                    QObject::connect(copyAct, SIGNAL(triggered()),
-                                     this, SLOT(qCopyAction()));
-                }
+            if (!contextMenuTest.isContentEditable() and
+                    contextMenuTest.selectedText().length() > 0) {
+                QAction *copyAct = menu
+                        .addAction(qApp->property("copyLabel").toString());
+                QObject::connect(copyAct, SIGNAL(triggered()),
+                                 this, SLOT(qCopyAction()));
             }
 
             if (contextMenuTest.isContentEditable()) {

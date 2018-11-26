@@ -79,40 +79,27 @@ public slots:
 
             QMenu menu;
 
-            if (!contextMenuTest.isContentEditable()) {
-                if (!contextMenuTest.isContentSelected()) {
-                    QAction *selectAllAct =
-                            menu.addAction(
-                                qApp->property("selectAllLabel").toString());
-                    QObject::connect(selectAllAct, SIGNAL(triggered()),
-                                     this, SLOT(qSelectAllAction()));
-                }
-
-                if (contextMenuTest.isContentSelected()) {
-                    QAction *copyAct =
-                            menu.addAction(
-                                qApp->property("copyLabel").toString());
-                    QObject::connect(copyAct, SIGNAL(triggered()),
-                                     this, SLOT(qCopyAction()));
-                }
+            if (!contextMenuTest.isContentEditable() and
+                    contextMenuTest.isContentSelected()) {
+                QAction *copyAct =
+                        menu.addAction(qApp->property("copyLabel").toString());
+                QObject::connect(copyAct, SIGNAL(triggered()),
+                                 this, SLOT(qCopyAction()));
             }
 
             if (contextMenuTest.isContentEditable()) {
                 QAction *cutAct =
-                        menu.addAction(
-                            qApp->property("cutLabel").toString());
+                        menu.addAction(qApp->property("cutLabel").toString());
                 QObject::connect(cutAct, SIGNAL(triggered()),
                                  this, SLOT(qCutAction()));
 
                 QAction *copyAct =
-                        menu.addAction(
-                            qApp->property("copyLabel").toString());
+                        menu.addAction(qApp->property("copyLabel").toString());
                 QObject::connect(copyAct, SIGNAL(triggered()),
                                  this, SLOT(qCopyAction()));
 
                 QAction *pasteAct =
-                        menu.addAction(
-                            qApp->property("pasteLabel").toString());
+                        menu.addAction(qApp->property("pasteLabel").toString());
                 QObject::connect(pasteAct, SIGNAL(triggered()),
                                  this, SLOT(qPasteAction()));
 

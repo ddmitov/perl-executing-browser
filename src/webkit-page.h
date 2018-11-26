@@ -440,7 +440,7 @@ protected:
 
         // Handle filesystem dialogs:
         if ((request.url().scheme() == "file" or
-             request.url().authority() == "localhost") and
+             request.url().host() == "localhost") and
                 navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName().contains(".dialog")) {
             qHandleDialogs(request.url().fileName().replace(".dialog", ""));
