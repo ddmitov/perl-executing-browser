@@ -58,30 +58,35 @@
       var open_file = {};
       open_file.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_file.stdoutFunction = function (stdout) {
+        clearTestData();
         displayTestResult('open-file', stdout);
       }
 
       var open_files = {};
       open_files.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_files.stdoutFunction = function (stdout) {
+        clearTestData();
         displayTestResult('open-files', stdout);
       }
 
       var open_directory = {};
       open_directory.scriptRelativePath = 'perl-scripts/open-directory.pl';
       open_directory.stdoutFunction = function (stdout) {
+        clearTestData();
         displayTestResult('open-directory', stdout);
       }
 
       var perl_info = {};
       perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
       perl_info.stdoutFunction = function (stdout) {
+        clearTestData();
         displayTestResult('perl-info', stdout);
       }
 
       var sqlite = {};
       sqlite.scriptRelativePath = 'perl-scripts/sqlite.pl';
       sqlite.stdoutFunction = function (stdout) {
+        clearTestData();
         displayTestResult('sqlite-test', stdout);
       }
 
@@ -133,6 +138,7 @@
       function displayTestResult(id, stdout) {
         var existingElement = document.getElementById(id);
         if (existingElement === null) {
+          clearTestData();
           var newElement = document.createElement("pre");
           newElement.id = id;
           newElement.innerHTML = stdout;
