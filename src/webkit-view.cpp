@@ -34,12 +34,8 @@ QViewWidget::QViewWidget()
 
     // Keyboard shortcuts:
 #ifndef QT_NO_PRINTER
-    QShortcut *printShortcut = new QShortcut(QKeySequence("Ctrl+P"), this);
-    QObject::connect(printShortcut, SIGNAL(activated()),
-                     this, SLOT(qPrintSlot()));
-
     QShortcut *printPreviewShortcut =
-            new QShortcut(QKeySequence("Ctrl+R"), this);
+            new QShortcut(QKeySequence("Ctrl+P"), this);
     QObject::connect(printPreviewShortcut, SIGNAL(activated()),
                      this, SLOT(qStartPrintPreviewSlot()));
 #endif

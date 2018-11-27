@@ -88,5 +88,4 @@ A typical ``{PEB_executable_directory}`` looks like this:
 All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
 
 * <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get printer selection dialog. If no printer is configured, no dialog is displayed.
-* <kbd>Ctrl</kbd> + <kbd>R</kbd> - get print preview
+* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get Print Preview

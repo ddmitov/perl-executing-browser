@@ -145,8 +145,8 @@ public slots:
                                .screen()->rect().width() * 0.8,
                                QDesktopWidget()
                                .screen()->rect().height() * 0.8);
-        connect(&preview, SIGNAL(paintRequested(QPrinter*)),
-                SLOT(qPrintPreviewSlot(QPrinter*)));
+        QObject::connect(&preview, SIGNAL(paintRequested(QPrinter*)),
+                         SLOT(qPrintPreviewSlot(QPrinter*)));
         preview.exec();
 #endif
     }
@@ -157,26 +157,6 @@ public slots:
         Q_UNUSED(printer);
 #else
         QViewWidget::print(printer);
-#endif
-    }
-
-    void qPrintSlot()
-    {
-#ifndef QT_NO_PRINTER
-        QPrinter printer;
-        QPrintDialog *printDialog = new QPrintDialog(&printer);
-        printDialog->setWindowModality(Qt::WindowModal);
-        QSize dialogSize = printDialog->sizeHint();
-        QRect screenRect = QDesktopWidget().screen()->rect();
-        printDialog->move(QPoint((screenRect.width() / 2)
-                                 - (dialogSize.width() / 2),
-                                 (screenRect.height() / 2)
-                                 - (dialogSize.height() / 2)));
-        if (printDialog->exec() == QDialog::Accepted) {
-            QViewWidget::print(&printer);
-        }
-        printDialog->close();
-        printDialog->deleteLater();
 #endif
     }
 
