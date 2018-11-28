@@ -116,7 +116,7 @@ public slots:
             }
 
             if (settingsJsonObject["noLabel"].toString().length() > 0) {
-                noLabel =settingsJsonObject["noLabel"].toString();
+                noLabel = settingsJsonObject["noLabel"].toString();
             }
 
             if (settingsJsonObject["cutLabel"].toString().length() > 0) {
@@ -230,11 +230,12 @@ public slots:
                 QJsonDocument scriptJsonDocument =
                         QJsonDocument::fromJson(
                             scriptSettings.toString().toUtf8());
-                QJsonObject scriptJsonObject = scriptJsonDocument.object();
 
-                scriptJsonObject["id"] = scriptObjectName;
-
-                qScriptStartedCheck(scriptJsonObject);
+                if (!scriptJsonDocument.isEmpty()) {
+                    QJsonObject scriptJsonObject = scriptJsonDocument.object();
+                    scriptJsonObject["id"] = scriptObjectName;
+                    qScriptStartedCheck(scriptJsonObject);
+                }
             });
         }
     }

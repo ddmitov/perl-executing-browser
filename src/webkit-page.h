@@ -92,6 +92,10 @@ public slots:
         }
     }
 
+    // ==============================
+    // Page settings handling:
+    // ==============================
+
     void qGetPageSettings(QVariant settingsJsResult) {
         QJsonDocument settingsJsonDocument =
                 QJsonDocument::fromJson(settingsJsResult.toString().toUtf8());
@@ -121,7 +125,7 @@ public slots:
             }
 
             if (settingsJsonObject["noLabel"].toString().length() > 0) {
-                noLabel =settingsJsonObject["noLabel"].toString();
+                noLabel = settingsJsonObject["noLabel"].toString();
             }
 
             if (settingsJsonObject["cutLabel"].toString().length() > 0) {
@@ -227,17 +231,17 @@ public slots:
     {
         if (QPage::mainFrame()->url().scheme() == "file") {
             QVariant scriptSettings =
-                    mainFrame()->evaluateJavaScript("peb.getScriptSettings(" +
-                                                    scriptObjectName + ")");
+                    mainFrame()->evaluateJavaScript(
+                        "peb.getScriptSettings(" + scriptObjectName + ")");
 
             QJsonDocument scriptJsonDocument =
-                    QJsonDocument::fromJson(
-                        scriptSettings.toString().toUtf8());
-            QJsonObject scriptJsonObject = scriptJsonDocument.object();
+                    QJsonDocument::fromJson(scriptSettings.toString().toUtf8());
 
-            scriptJsonObject["id"] = scriptObjectName;
-
-            qScriptStartedCheck(scriptJsonObject);
+            if (!scriptJsonDocument.isEmpty()) {
+                QJsonObject scriptJsonObject = scriptJsonDocument.object();
+                scriptJsonObject["id"] = scriptObjectName;
+                qScriptStartedCheck(scriptJsonObject);
+            }
         }
     }
 

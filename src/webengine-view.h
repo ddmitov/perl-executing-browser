@@ -78,17 +78,22 @@ public slots:
                     QWebEngineView::page()->contextMenuData();
             Q_ASSERT(contextMenuTest.isValid());
 
-            QMenu menu;
-
             if (!contextMenuTest.isContentEditable() and
                     contextMenuTest.selectedText().length() > 0) {
+                QMenu menu;
+
                 QAction *copyAct = menu
                         .addAction(qApp->property("copyLabel").toString());
                 QObject::connect(copyAct, SIGNAL(triggered()),
                                  this, SLOT(qCopyAction()));
+
+                menu.exec(mapToGlobal(event->pos()));
+                this->focusWidget();
             }
 
             if (contextMenuTest.isContentEditable()) {
+                QMenu menu;
+
                 QAction *cutAct = menu
                         .addAction(qApp->property("cutLabel").toString());
                 QObject::connect(cutAct, SIGNAL(triggered()),
@@ -108,10 +113,10 @@ public slots:
                         .addAction(qApp->property("selectAllLabel").toString());
                 QObject::connect(selectAllAct, SIGNAL(triggered()),
                                  this, SLOT(qSelectAllAction()));
-            }
 
-            menu.exec(mapToGlobal(event->pos()));
-            this->focusWidget();
+                menu.exec(mapToGlobal(event->pos()));
+                this->focusWidget();
+            }
         }
     }
 
