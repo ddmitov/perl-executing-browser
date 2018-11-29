@@ -85,24 +85,25 @@ public slots:
     }
 
     // ==============================
-    // Page settings handling:
+    // Page settings:
     // ==============================
     void qGetPageSettings(QVariant settingsJsResult) {
         QJsonDocument settingsJsonDocument =
                 QJsonDocument::fromJson(settingsJsResult.toString().toUtf8());
-        QJsonObject settingsJsonObject = settingsJsonDocument.object();
 
-        // Get auto-start scripts:
-        QJsonArray autoStartScripts =
-                settingsJsonObject["autoStartScripts"].toArray();
+        if (!settingsJsonDocument.isEmpty()) {
+            QJsonObject settingsJsonObject = settingsJsonDocument.object();
 
-        foreach (const QJsonValue &value, autoStartScripts) {
-            QString autoStartScript = value.toString();
-            qHandleScripts(autoStartScript);
-        }
+            // Get auto-start scripts:
+            QJsonArray autoStartScripts =
+                    settingsJsonObject["autoStartScripts"].toArray();
 
-        // Get dialog and context menu labels:
-        if (settingsJsonObject.length() > 0) {
+            foreach (const QJsonValue &value, autoStartScripts) {
+                QString autoStartScript = value.toString();
+                qHandleScripts(autoStartScript);
+            }
+
+            // Get dialog and context menu labels:
             if (settingsJsonObject["okLabel"].toString().length() > 0) {
                 okLabel = settingsJsonObject["okLabel"].toString();
             }
@@ -143,7 +144,7 @@ public slots:
     }
 
     // ==============================
-    // Filesystem dialogs handling:
+    // Filesystem dialogs:
     // ==============================
     void qHandleDialogs(QString dialogObjectName)
     {
@@ -155,11 +156,12 @@ public slots:
             QJsonDocument dialogJsonDocument =
                     QJsonDocument::fromJson(
                         dialogSettings.toString().toUtf8());
-            QJsonObject dialogJsonObject = dialogJsonDocument.object();
 
-            dialogJsonObject["id"] = dialogObjectName;
-
-            qReadDialogSettings(dialogJsonObject);
+            if (!dialogJsonDocument.isEmpty()) {
+                QJsonObject dialogJsonObject = dialogJsonDocument.object();
+                dialogJsonObject["id"] = dialogObjectName;
+                qReadDialogSettings(dialogJsonObject);
+            }
         });
     }
 
@@ -217,7 +219,7 @@ public slots:
     }
 
     // ==============================
-    // Scripts handling:
+    // Perl scripts:
     // ==============================
     void qHandleScripts(QString scriptObjectName)
     {
