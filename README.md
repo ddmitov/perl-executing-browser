@@ -48,8 +48,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Quick Start
 
 * Common Steps:
-  * **1.** Download PEB.
-  * **2.** Select your Perl distribution.
+  * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).
+  * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).
 
 * Serverless Application:
   * **3.** Write your Perl application reading user input on STDIN:
