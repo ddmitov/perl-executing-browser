@@ -52,13 +52,13 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
   * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
 
-  Place your relocatable Perl distribution in:  
-  ``{PEB_executable_directory}/resources/app/perl``  
-  Your relocatable Perl interpreter must be:  
-  ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
-  ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
-  Your relocatable PERL5LIB folder must be:  
-  ``{PEB_executable_directory}/resources/perl/lib``  
+    Place your relocatable Perl distribution in:  
+    ``{PEB_executable_directory}/resources/app/perl``  
+    Your relocatable Perl interpreter must be:  
+    ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
+    ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
+    Your relocatable PERL5LIB folder must be:  
+    ``{PEB_executable_directory}/resources/perl/lib``  
 
 * Serverless Application:
   * **3.** Write your Perl application reading user input on STDIN:

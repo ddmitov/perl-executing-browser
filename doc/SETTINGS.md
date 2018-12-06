@@ -209,8 +209,8 @@ The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/mast
 ## Starting Local Server
 
 A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that  
-a ``{PEB_app_directory}/local-server.json`` file is found instead of ``{PEB_app_directory}/index.html``  
-with the following structure:
+``{PEB_executable_directory}/resources/app/index.html`` is missing and
+``{PEB_executable_directory}/resources/app/local-server.json`` is found with the following structure:  
 
 ```json
 {
