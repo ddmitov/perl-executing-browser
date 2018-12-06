@@ -231,8 +231,8 @@ A [Mojolicious](http://mojolicious.org/) application or other local Perl server 
 ```
 
 * **file**  
-  ``String`` resolved to a full pathname using the ``{PEB_app_directory}``  
-  All Perl servers started by PEB must be up and running within 5 seconds from being launched or PEB will display a timeout message. Servers being unable to start will also timeout.  
+  ``String`` resolved to a full pathname using the ``{PEB_executable_directory}/resources/app`` folder  
+  A Perl server started by PEB must be up and running within 5 seconds or PEB will display a timeout message.  
   *This element is mandatory.*
 
 * **ports**  
