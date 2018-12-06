@@ -16,7 +16,7 @@ A typical ``{PEB_executable_directory}`` looks like this:
     │   └── {application_data}
     ├── perl
     │   ├── bin
-    │   │   └── {perl_interpreter}
+    │   │   └── perl || wperl.exe
     │   └── lib
     │       └── {perl_modules}
     └── app.png

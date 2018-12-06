@@ -2,7 +2,7 @@
 
 ## Compile-Time Requirements
 
-The only Linux and Macintosh compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.  
+The only Linux and Mac compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.  
 
 Compiling Windows binaries of PEB is subject to the following restrictions:  
 
@@ -53,7 +53,7 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
 
   Setting ``ANNULEN_QTWEBKIT`` to ``1`` has no effect on Qt versions 5.5 or lower.  
 
-* Macintosh Bundle  
+* Mac Bundle  
   To make a bundle-less binary, which is the default setting:  
 
   ```QMake
@@ -81,10 +81,10 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   Tested successfully using the following Perl distributions:  
 
   Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
-  Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) version 5.24.1  
+  Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) versions 5.24.1, 5.26.1  
   Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
 
-  To use a Perlbrew Perl with PEB create a symlink to the wanted Perl interpreter named:  
-  ``{PEB_executable_directory}/perl/bin/perl``  
+  To use a Perlbrew Perl with PEB create a symlink at:  
+  ``{PEB_executable_directory}/resources/perl/bin/perl``  
 
   PEB can also use any Perl on PATH.

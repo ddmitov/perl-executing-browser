@@ -48,7 +48,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     DEFINES += "ANNULEN_QTWEBKIT=$$ANNULEN_QTWEBKIT"
 
     ##########################################################
-    # MACINTOSH BUNDLE
+    # MAC BUNDLE
 
     # To make a bundle-less binary:
     # BUNDLE = 0

@@ -49,7 +49,15 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * Common Steps:
   * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).
-  * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).
+
+  * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
+  Place your Perl relocatable distribution in:  
+  ``{PEB_executable_directory}/resources/app/perl``  
+  Your relocatable Perl interpreter must be:  
+  ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
+  ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
+  Your relocatable PERL5LIB folder must be:  
+  ``{PEB_executable_directory}/resources/perl/lib``  
 
 * Serverless Application:
   * **3.** Write your Perl application reading user input on STDIN:
@@ -59,14 +67,14 @@ in the documentation of this project are to be interpreted as described in [RFC 
     chomp $input;
     ```
 
-  * **4.** Write an appropriate HTML interface with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
-    Triggering a Perl script from a local HTML page is configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+  * **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
+    Triggering a Perl script from a local HTML page can be configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
     [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 
 * Local Server Application:
   * **3.** Write your Perl server application.
   * **4.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.
-  * **5.** Write an appropriate HTML interface and connect it to your server application by traditional web  communication protocols.
+  * **5.** Write a start page.
 
 ## Design Objectives
 
@@ -80,7 +88,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
-* [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Macintosh builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
+* [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Mac builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Perl local servers can be started.](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  

@@ -247,7 +247,7 @@ https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php
 https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
 https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  
 
-## Macintosh
+## Mac
 
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 https://iconverticons.com/online/  
