@@ -51,7 +51,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
   * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).
 
   * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
-  Place your Perl relocatable distribution in:  
+
+  Place your relocatable Perl distribution in:  
   ``{PEB_executable_directory}/resources/app/perl``  
   Your relocatable Perl interpreter must be:  
   ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
@@ -67,7 +68,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
     chomp $input;
     ```
 
-  * **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
+  * **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with  
+    a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
     Triggering a Perl script from a local HTML page can be configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
     [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 

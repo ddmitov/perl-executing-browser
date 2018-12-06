@@ -80,11 +80,12 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
 
   Tested successfully using the following Perl distributions:  
 
-  Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
   Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) versions 5.24.1, 5.26.1  
+  Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
   Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
 
   To use a Perlbrew Perl with PEB create a symlink at:  
   ``{PEB_executable_directory}/resources/perl/bin/perl``  
 
-  PEB can also use any Perl on PATH.
+  PEB can also use any Perl on PATH if a relocatable Perl distribution is not found in the  
+  ``{PEB_executable_directory}/resources/app/perl`` folder.
