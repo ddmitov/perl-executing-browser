@@ -74,14 +74,14 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
 
 * Qt 5 libraries.  
 
-  The ``ldd`` Linux command can show all dependencies of a PEB executable.  
+  The ``ldd`` Linux command shows all dependencies of a PEB executable.  
 
-* Perl 5 distribution - any Linux, Mac or Windows Perl standard or relocatable distribution.  
+* Perl 5 distribution - any Linux, Mac or Windows Perl relocatable or standard distribution.  
 
-  Tested successfully using the following Perl distributions:  
-
+  Tested successfully using:  
   Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) versions 5.24.1, 5.26.1  
   Linux 64-bit [Perlbrew](https://perlbrew.pl/) Perl versions 5.18.4, 5.23.7  
+  Linux 64-bit Perl version 5.22.1  
   Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP versions 5.12.2.0, 5.16.1.1, 5.20.2.1  
 
   To use a Perlbrew Perl with PEB create a symlink at:  
