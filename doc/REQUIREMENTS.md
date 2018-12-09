@@ -10,7 +10,7 @@ Compiling Windows binaries of PEB is subject to the following restrictions:
   but only MSVC-based Qt versions 5.6.x or higher include the ``QtWebEngine`` on the Windows platform.
 * The source code of PEB is not MSVC-compatible and can not use the ``QtWebEngine``.
 * Windows MinGW Qt versions 5.6.x - 5.8.x have neither ``QtWebEngine``, nor ``QtWebKit`` and an updated ``QtWebKit`` has to be manually added from the [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
-* Windows builds of PEB do no support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
+* Windows builds of PEB do not support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 Compiled and tested successfully using:
 
@@ -87,5 +87,5 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   To use a Perlbrew Perl with PEB create a symlink at:  
   ``{PEB_executable_directory}/resources/perl/bin/perl``  
 
-  PEB can also use any Perl on PATH if a relocatable Perl distribution is not found in the  
+  PEB will use the first Perl on PATH if a relocatable Perl distribution is not found in the  
   ``{PEB_executable_directory}/resources/app/perl`` folder.

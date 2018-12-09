@@ -113,9 +113,23 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   The only parameter passed to the ``stdoutFunction`` is the STDOUT ``String``.  
   *This object property is mandatory.*  
 
+  An example of an immediate STDOUT data display without accumulation:
+
   ```javascript
   perl_script.stdoutFunction = function (stdout) {
     document.getElementById("DOM-element-id").textContent = stdout;
+  };
+  ```
+
+  Please note that many Perl scripts do not give their STDOUT data in a single shot.  
+  If several chunks of output have to be combined, this should also be done at JavaScript level:  
+
+  ```javascript
+  var accumulatedOutput;
+
+  perl_script.stdoutFunction = function (stdout) {
+    accumulatedOutput = accumulatedOutput + stdout;
+    document.getElementById("DOM-element-id").textContent = accumulatedOutput;
   };
   ```
 
@@ -205,6 +219,12 @@ The following code shows how to start an interactive Perl script right after a l
 The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) page of the demo package demonstrates how to start one script in two instances immediately after local page is loaded.  
 
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
+
+## Long-Running Windows Perl Scripts
+
+Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts), but long-running Windows Perl scripts are supported provided that they also have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter.  
+
+Long-running Windows Perl scripts can not receive the ``SIGTERM`` signal and if they are still running when PEB is closed, they can only be killed with no mechanism for a graceful shutdown.
 
 ## Starting Local Server
 

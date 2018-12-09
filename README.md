@@ -30,6 +30,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [HTML Page API](./doc/SETTINGS.md#html-page-api)
   * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
   * [Interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts)
+  * [Long-Running Windows Perl Scripts](./doc/SETTINGS.md#long-running-windows-perl-scripts)
   * [Starting Local Server](./doc/SETTINGS.md#starting-local-server)
   * [Selecting Files and Folders](./doc/SETTINGS.md#selecting-files-and-folders)
 * [LOGGING](./doc/LOGGING.md)
@@ -48,9 +49,14 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Quick Start
 
 * Common Steps:
-  * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).
+  * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
+    Linux 64-bit single-file [AppImage](https://appimage.org/) executable and  
+    Windows 32-bit zipped executable with its Qt libraries are available.  
 
   * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
+    You can choose between a relocatable Perl distribution and the first Perl on PATH.  
+    Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) or  
+    Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP distributions are available by third-party vendors.  
 
     Place your relocatable Perl distribution in:  
     ``{PEB_executable_directory}/resources/app/perl``  
@@ -119,7 +125,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
 * ``QtWebEngine`` builds do not support printing and ``window.print()`` is not supported.
-* Windows builds of PEB do no support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
+* Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
 
