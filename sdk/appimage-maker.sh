@@ -23,10 +23,10 @@ else
   cp -f ./peb ./peb.app/peb
 fi
 
-cp ./sdk/peb.desktop ./peb.app/peb.desktop
-cp ./sdk/camel.png ./peb.app/peb.png
-mkdir -p ./peb.app/usr/share
-cp ./sdk/metainfo ./peb.app/usr/share/metainfo
+cp ./sdk/appimage/peb.desktop ./peb.app/peb.desktop
+cp ./sdk/appimage/camel.png ./peb.app/peb.png
+mkdir -p ./peb.app/usr/share/metainfo
+cp ./sdk/appimage/peb.appdata.xml ./peb.app/usr/share/metainfo/peb.appdata.xml
 
 for i in "$@"
   do
