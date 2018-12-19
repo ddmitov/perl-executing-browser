@@ -32,6 +32,12 @@ https://metacpan.org/pod/Module::ScanDeps
 Thanks to Daniel Muey and all contributors of the File::Copy::Recursive CPAN module.
 https://metacpan.org/pod/File::Copy::Recursive  
 
+Thanks to [probonopd](https://github.com/probonopd) for his  
+knowledgeable instructions and patient cooperation  
+in the preparation and testing of Perl Executing Browser AppImages.  
+His tool [linuxdeployqt](https://github.com/probonopd) is used to generate all released AppImages.  
+The [AppImageHub page of Perl Executing Browser](https://appimage.github.io/perl-executing-browser/) wouldn't be created without his assistance.  
+
 ## Qt
 
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
@@ -246,6 +252,8 @@ https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php
 
 https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
 https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  
+https://github.com/probonopd/linuxdeployqt  
+http://output.jsbin.com/qoqukof  
 
 ## Mac
 
