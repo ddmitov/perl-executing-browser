@@ -24,7 +24,7 @@ else
 fi
 
 cp ./sdk/appimage/peb.desktop ./peb.app/peb.desktop
-cp ./sdk/appimage/camel.png ./peb.app/peb.png
+cp ./src/resources/icon/camel.png ./peb.app/peb.png
 mkdir -p ./peb.app/usr/share/metainfo
 cp ./sdk/appimage/peb.appdata.xml ./peb.app/usr/share/metainfo/peb.appdata.xml
 
