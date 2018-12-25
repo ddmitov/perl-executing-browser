@@ -1,8 +1,8 @@
 [Desktop Entry]
 Version=1.0
 Type=Application
-Name=peb
+Name=peb-demo
 Comment=HTML5 user interface for Perl 5 desktop applications
-Exec=peb
+Exec=peb-demo
 Icon=app
 Categories=Development;

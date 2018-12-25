@@ -31,8 +31,8 @@ my $bin_compacted;
 my $lib_compacted;
 
 if ($ARGV[0] and $ARGV[0] =~ /^--AppImage$/) {
-  $bin_compacted = catdir($root, "peb.app", "perl", "bin");
-  $lib_compacted = catdir($root, "peb.app", "perl", "lib");
+  $bin_compacted = catdir($root, "peb.app", "resources", "app", "perl", "bin");
+  $lib_compacted = catdir($root, "peb.app", "resources", "app", "perl", "lib");
 } else {
   $bin_compacted = catdir($perl_directory, "bin-compacted");
   $lib_compacted = catdir($perl_directory, "lib-compacted");

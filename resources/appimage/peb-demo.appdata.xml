@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-  <id>peb</id>
+  <id>peb-demo</id>
   <metadata_license>FSFAP</metadata_license>
   <project_license>LGPL-3.0</project_license>
-  <name>PEB</name>
-  <summary>HTML interface for Perl 5 desktop applications</summary>
+  <name>PEB Demo</name>
+  <summary>Perl Executing Browser Demo Package</summary>
   <description>
     <p>Perl Executing Browser (PEB) is an HTML5 user interface for Perl 5 desktop applications. By default it runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the Qt 5 libraries. Inspired by Electron and NW.js, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of Node.js.</p>
   </description>

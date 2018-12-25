@@ -23,11 +23,11 @@ PEB or any PEB-based application can be easily packed as a 64-bit single-file Li
 * packing only a PEB executable with its Qt libraries:  
 
   ```bash
-  appimage-maker.sh
+  appimage-maker.sh --no-resources
   ```
 
   In this case a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
 
-In both modes of operation the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
+In both modes of operation, the [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
 
 [AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script must be started from the ``{PEB_executable_directory}/sdk`` directory.

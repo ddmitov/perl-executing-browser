@@ -240,6 +240,7 @@ https://stackoverflow.com/questions/638975/how-do-i-tell-if-a-regular-file-does-
 https://stackoverflow.com/questions/10319652/check-if-a-file-is-executable  
 https://stackoverflow.com/questions/10376206/what-is-the-preferred-bash-shebang  
 https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash  
+https://stackoverflow.com/questions/2664740/extract-file-basename-without-path-and-extension-in-bash  
 
 https://unix.stackexchange.com/questions/312280/split-string-by-delimiter-and-get-n-th-element  
 https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-architecture  
