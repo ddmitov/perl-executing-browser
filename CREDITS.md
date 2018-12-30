@@ -188,13 +188,12 @@ https://perlmaven.com/recursive-subroutines
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
 
-## HTML, CSS & JavaScript
+## JavaScript
 
 https://www.w3schools.com/js/js_loop_for.asp  
 https://www.w3schools.com/jsref/prop_html_innerhtml.asp  
 https://www.w3schools.com/jsref/met_form_submit.asp  
 
-https://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
 https://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj  
 https://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascript  
 https://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
@@ -204,15 +203,18 @@ https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-n
 https://stackoverflow.com/questions/11478324/syntaxerror-unexpected-eof-when-evaluating-javascript-in-ios-uiwebview  
 https://stackoverflow.com/questions/42053775/getting-error-form-submission-canceled-because-the-form-is-not-connected  
 
+https://jquery.com/  
+http://youmightnotneedjquery.com/  
+
+## Bootstrap
+
 http://getbootstrap.com/  
 http://getbootstrap.com/components/#dropdowns  
 https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/  
 
 http://bootswatch.com/  
 http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php  
-
-https://jquery.com/  
-http://youmightnotneedjquery.com/  
+https://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
 
 ## Markdown
 
@@ -259,7 +261,6 @@ http://output.jsbin.com/qoqukof
 ## Mac
 
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
-https://iconverticons.com/online/  
 
 ## Google Chrome Unsafe Ports
 

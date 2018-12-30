@@ -147,11 +147,11 @@
     <script src="bootstrap/js/bootstrap-dropdown.js"></script>
 
     <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/themes/darkly-theme.css" media="all">
+    <link rel="stylesheet" type="text/css" href="bootstrap/css/darkly-theme.css" media="all">
 
     <style type='text/css'>
       body {
-        padding-top: 70px;
+        padding-top: 65px;
       }
 
       pre {
@@ -161,22 +161,23 @@
         font-family: sans-serif;
       }
 
+      .navbar .navbar-header {
+        text-align: center;
+        vertical-align: middle;
+      }
+
       .navbar .navbar-nav {
         display: inline-block;
-        float: none;
-        vertical-align: top;
+        float: center;
       }
 
-      .navbar .navbar-inverse {
-        text-align: center;
-      }
-
-      .container {
-        font-size: 22px;
+      .navbar-toggle {
+        float: center;
+        margin: 10px;
+        vertical-align: middle;
       }
 
       .introduction {
-        text-align: left;
         font-size: 20px;
       }
 
@@ -188,71 +189,71 @@
   </head>
 
   <body>
-    <div class="navbar navbar-inverse navbar-fixed-top">
-      <ul class="nav navbar-nav">
-        <li>
-          <a id="local-tests" role="button" data-toggle="dropdown" data-target="#">
-            Tests
-            <span class="caret"></span>
-          </a>
+    <nav class="navbar navbar-default navbar-fixed-top">
+      <div class="container">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+        </div>
 
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="select_file.dialog">Open Existing File</a>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav">
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Tests<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="select_file.dialog">Open Existing File</a>
+                </li>
+
+                <li>
+                  <a href="new_file_name.dialog">Enter New File Name</a>
+                </li>
+
+                <li>
+                  <a href="select_files.dialog">Open Multiple Files</a>
+                </li>
+
+                <li>
+                  <a href="select_directory.dialog">Open Directory</a>
+                </li>
+
+                <li>
+                  <a href="javascript:startPerlInfo();">Perl Basic Information</a>
+                </li>
+
+                <li>
+                  <a href="javascript:startSqlite();">SQLite Test</a>
+                </li>
+
+                <li>
+                  <a href="javascript:clearTestData();">Clear Test Data</a>
+                </li>
+              </ul>
             </li>
 
-            <li>
-              <a href="new_file_name.dialog">Enter New File Name</a>
-            </li>
+            <li><a href="javascript:location.reload();">Reload</a></li>
 
-            <li>
-              <a href="select_files.dialog">Open Multiple Files</a>
-            </li>
+            <li><a href="https://www.google.com/">Google</a></li>
 
-            <li>
-              <a href="select_directory.dialog">Open Directory</a>
-            </li>
+            <li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">About<span class="caret"></span></a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="about-browser.function">About PEB</a>
+                </li>
 
-            <li>
-              <a href="javascript:startPerlInfo();">Perl Basic Information</a>
-            </li>
-
-            <li>
-              <a href="javascript:startSqlite();">SQLite Test</a>
-            </li>
-
-            <li>
-              <a href="javascript:clearTestData();">Clear Test Data</a>
-            </li>
-
-            <li>
-              <a href="javascript:location.reload();">Reload</a>
+                <li>
+                  <a href="about-qt.function">About Qt</a>
+                </li>
             </li>
           </ul>
-        </li>
-
-        <li>
-          <a href="https://www.google.com/">Google</a>
-        </li>
-
-        <li>
-          <a id="about" role="button" data-toggle="dropdown" data-target="#">
-            About
-            <span class="caret"></span>
-          </a>
-
-          <ul class="dropdown-menu" role="menu">
-            <li>
-              <a href="about-browser.function">About PEB</a>
-            </li>
-
-            <li>
-              <a href="about-qt.function">About Qt</a>
-            </li>
-          </ul>
-        </li>
-      </ul>
-    </div>
+        </div><!--/.nav-collapse -->
+      </div>
+    </nav>
 
     <div class="container">
       <div id="tests"></div>
