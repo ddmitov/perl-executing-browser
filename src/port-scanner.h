@@ -15,12 +15,11 @@
  https://github.com/ddmitov/perl-executing-browser
 */
 
+#include <QObject>
 #include <QTcpSocket>
 
 #ifndef PORTSCANNER_H
 #define PORTSCANNER_H
-
-#include <QObject>
 
 // ==============================
 // PORT SCANNER CLASS DEFINITION:

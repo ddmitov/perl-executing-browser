@@ -120,6 +120,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
             file-reader.cpp \
             main-window.cpp \
             port-scanner.cpp \
+            server-starter.cpp \
             script-handler.cpp \
             webkit-page.cpp \
             webkit-view.cpp
@@ -128,6 +129,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
         HEADERS += \
             file-reader.h \
             port-scanner.h \
+            server-starter.h \
             script-handler.h \
             webkit-main-window.h \
             webkit-page.h \
@@ -142,6 +144,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
                 file-reader.cpp \
                 main-window.cpp \
                 port-scanner.cpp \
+                server-starter.cpp \
                 script-handler.cpp \
                 webengine-page.cpp \
                 webengine-view.cpp
@@ -150,6 +153,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
             HEADERS += \
                 file-reader.h \
                 port-scanner.h \
+                server-starter.h \
                 script-handler.h \
                 webengine-main-window.h \
                 webengine-page.h \
@@ -163,6 +167,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
                 file-reader.cpp \
                 main-window.cpp \
                 port-scanner.cpp \
+                server-starter.cpp \
                 script-handler.cpp \
                 webkit-page.cpp \
                 webkit-view.cpp
@@ -171,6 +176,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
             HEADERS += \
                 file-reader.h \
                 port-scanner.h \
+                server-starter.h \
                 script-handler.h \
                 webkit-main-window.h \
                 webkit-page.h \

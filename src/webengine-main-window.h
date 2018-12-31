@@ -36,7 +36,12 @@ signals:
     void startMainWindowClosingSignal();
 
 public slots:
-    void qDisplayError(QString errorMessage)
+    void qLoadUrlSlot(QUrl url)
+    {
+        webViewWidget->load(url);
+    }
+
+    void qDisplayErrorSlot(QString errorMessage)
     {
         QFileReader *resourceReader =
                 new QFileReader(QString(":/html/error.html"));
@@ -45,32 +50,6 @@ public slots:
 
         webViewWidget->setHtml(htmlErrorContents);
         showMaximized();
-    }
-
-    void qLocalServerPingSlot()
-    {
-        QTcpSocket localWebServerPing;
-        localWebServerPing.connectToHost ("127.0.0.1",
-                                          qApp->property("port").toInt());
-
-        // Local server is pinged every second until ready:
-        if (localWebServerPing.waitForConnected (1000)) {
-            localServerTester->stop();
-
-            localServerBaseUrl = "http://localhost:" +
-                    qApp->property("port").toString() + "/";
-            webViewWidget->load(QUrl(localServerBaseUrl));
-            showMaximized();
-        }
-
-        localServerWait++;
-
-        if (localServerWait > 5) {
-            localServerTester->stop();
-
-            qDisplayError(QString("Local server timed out."));
-            showMaximized();
-        }
     }
 
     void setMainWindowTitleSlot(QString title)
@@ -109,10 +88,6 @@ public slots:
     }
 
 public:
-    QTimer *localServerTester;
-    QString localServerBaseUrl;
-    int localServerWait;
-
     QWebEngineView *webViewWidget;
     explicit QMainBrowserWindow(QWidget *parent = 0);
 };
