@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2018
+ Dimitar D. Mitov, 2013 - 2019
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -18,8 +18,8 @@
 #include <QObject>
 #include <QTcpSocket>
 
-#ifndef PORTSCANNER_H
-#define PORTSCANNER_H
+#ifndef PORT_SCANNER_H
+#define PORT_SCANNER_H
 
 // ==============================
 // PORT SCANNER CLASS DEFINITION:
@@ -34,4 +34,4 @@ public:
     QString portScannerError;
 };
 
-#endif // PORTSCANNER_H
+#endif // PORT_SCANNER_H

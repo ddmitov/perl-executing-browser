@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2018
+ Dimitar D. Mitov, 2013 - 2019
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -21,8 +21,8 @@
 #include <QTcpSocket>
 #include <QUrl>
 
-#ifndef SERVERSTARTER_H
-#define SERVERSTARTER_H
+#ifndef SERVER_STARTER_H
+#define SERVER_STARTER_H
 
 // ==============================
 // SERVER STARTER CLASS DEFINITION:
@@ -68,4 +68,4 @@ public:
     explicit QServerStarter(QString localServerSettingsFilePath);
 };
 
-#endif // SERVERSTARTER_H
+#endif // SERVER_STARTER_H

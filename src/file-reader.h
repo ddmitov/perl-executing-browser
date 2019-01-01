@@ -10,13 +10,13 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2018
+ Dimitar D. Mitov, 2013 - 2019
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef FILEREADER_H
-#define FILEREADER_H
+#ifndef FILE_READER_H
+#define FILE_READER_H
 
 #include <QObject>
 
@@ -33,4 +33,4 @@ public:
     QString fileContents;
 };
 
-#endif // FILEREADER_H
+#endif // FILE_READER_H

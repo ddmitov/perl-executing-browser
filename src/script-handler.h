@@ -10,13 +10,13 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2018
+ Dimitar D. Mitov, 2013 - 2019
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef SCRIPTHANDLER_H
-#define SCRIPTHANDLER_H
+#ifndef SCRIPT_HANDLER_H
+#define SCRIPT_HANDLER_H
 
 #include <QApplication>
 #include <QProcess>
@@ -59,4 +59,4 @@ public:
     QString scriptFullFilePath;
 };
 
-#endif // SCRIPTHANDLER_H
+#endif // SCRIPT_HANDLER_H

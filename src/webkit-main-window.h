@@ -10,13 +10,13 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2018
+ Dimitar D. Mitov, 2013 - 2019
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef MAINWINDOW_H
-#define MAINWINDOW_H
+#ifndef MAIN_WINDOW_H
+#define MAIN_WINDOW_H
 
 #include <QApplication>
 #include <QMainWindow>
@@ -87,4 +87,4 @@ public:
     explicit QMainBrowserWindow(QWidget *parent = 0);
 };
 
-#endif // MAINWINDOW_H
+#endif // MAIN_WINDOW_H
