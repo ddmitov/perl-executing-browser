@@ -10,6 +10,7 @@ use File::Copy;
 use File::Spec;
 use File::Spec::Functions qw(catdir);
 use FindBin qw($Bin);
+use Getopt::Long qw(GetOptions);
 use lib catdir($Bin, "lib");
 
 # Non-core CPAN modules:
@@ -18,7 +19,13 @@ use lib catdir($Bin, "lib");
 use File::Copy::Recursive qw(fcopy);
 use Module::ScanDeps;
 
-print "\nPerl Distribution Compactor for Perl Executing Browser version 0.1.\n\n";
+print "\nPerl Distribution Compactor for Perl Executing Browser\n\n";
+
+# Command-line argument:
+my $appimage_name = "";
+GetOptions(
+  "appimage_name=s" => \$appimage_name
+);
 
 # Directory paths:
 my $root = getcwd;
@@ -30,9 +37,11 @@ my $lib_original = catdir($perl_directory, "lib");
 my $bin_compacted;
 my $lib_compacted;
 
-if ($ARGV[0] and $ARGV[0] =~ /^--AppImage$/) {
-  $bin_compacted = catdir($root, "peb.app", "resources", "app", "perl", "bin");
-  $lib_compacted = catdir($root, "peb.app", "resources", "app", "perl", "lib");
+if (length($appimage_name) > 0) {
+  $bin_compacted = catdir(
+    $root, $appimage_name.".app", "resources", "app", "perl", "bin");
+  $lib_compacted = catdir(
+    $root, $appimage_name.".app", "resources", "app", "perl", "lib");
 } else {
   $bin_compacted = catdir($perl_directory, "bin-compacted");
   $lib_compacted = catdir($perl_directory, "lib-compacted");
@@ -87,7 +96,7 @@ foreach my $script (@scripts) {
 }
 
 # Rename Perl directories:
-if ($ARGV[0] and $ARGV[0] !~ /^--AppImage$/) {
+if (length($appimage_name) == 0) {
   rename $bin_original, catdir($perl_directory, "bin-original");
   rename $bin_compacted, catdir($perl_directory, "bin");
 

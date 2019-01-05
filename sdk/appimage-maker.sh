@@ -25,10 +25,10 @@ for i in "$@"
 done
 
 if [ $mode == "none" ]; then
-  printf "\\nappimage-maker --include-resources\\n"
-  printf "\\nto pack a PEB-based application or\\n"
-  printf "\\nappimage-maker --no-resources\\n"
-  printf "\\nto pack only a PEB executable\\n"
+  printf "appimage-maker --include-resources\\n"
+  printf " to pack a PEB-based application or\\n"
+  printf "appimage-maker --no-resources\\n"
+  printf " to pack only a PEB executable\\n"
   exit 1
 fi
 
@@ -59,9 +59,11 @@ if [ $mode == "no-resources" ]; then
   mkdir -p "$(pwd)/peb.app/usr/share/metainfo"
   cp "$(pwd)/sdk/appimage/peb.appdata.xml" "$(pwd)/peb.app/usr/share/metainfo/peb.appdata.xml"
 
-  "$(pwd)/$linuxdeployqt" "$(pwd)/peb.app/peb" -qmake='qmake -qt=qt5' -no-translations -appimage
+  "$(pwd)/$linuxdeployqt" "--appimage-extract"
+  "$(pwd)/squashfs-root/AppRun" "$(pwd)/peb.app/peb" -qmake='qmake -qt=qt5' -no-translations -appimage
 
   rm -rf "$(pwd)/peb.app"
+  rm -rf "$(pwd)/squashfs-root"
 fi
 
 if [ $mode == "include-resources" ]; then
@@ -71,37 +73,39 @@ if [ $mode == "include-resources" ]; then
     exit 1
   fi
 
-  package_name="$(basename "$package_desktop_file" .desktop)"
+  appimage_name="$(basename "$package_desktop_file" .desktop)"
 
-  rm -rf "$(pwd)/$package_name.app"
-  mkdir "$(pwd)/$package_name.app"
+  rm -rf "$(pwd)/$appimage_name.app"
+  mkdir "$(pwd)/$appimage_name.app"
 
-  cp -f "$(pwd)/peb" "$(pwd)/$package_name.app/$package_name"
-  cp -f "$package_desktop_file" "$(pwd)/$package_name.app/$package_name.desktop"
-  cp -r "$(pwd)/resources" "$(pwd)/$package_name.app/resources"
+  cp -f "$(pwd)/peb" "$(pwd)/$appimage_name.app/$appimage_name"
+  cp -f "$package_desktop_file" "$(pwd)/$appimage_name.app/$appimage_name.desktop"
+  cp -r "$(pwd)/resources" "$(pwd)/$appimage_name.app/resources"
 
   if [ -e "$(pwd)/resources/app.png" ]; then
-    cp -f "$(pwd)/resources/app.png" "$(pwd)/$package_name.app/app.png"
+    cp -f "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/app.png"
   fi
 
-  if [ -e "$(pwd)/resources/appimage/$package_name.appdata.xml" ]; then
-    mkdir -p "$(pwd)/$package_name.app/usr/share/metainfo"
-    cp -f "$(pwd)/resources/appimage/$package_name.appdata.xml" "$(pwd)/$package_name.app/usr/share/metainfo/$package_name.appdata.xml"
+  if [ -e "$(pwd)/resources/appimage/$appimage_name.appdata.xml" ]; then
+    mkdir -p "$(pwd)/$appimage_name.app/usr/share/metainfo"
+    cp -f "$(pwd)/resources/appimage/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
   fi
 
-  rm -rf "$(pwd)/$package_name.app/resources/appimage"
+  rm -rf "$(pwd)/$appimage_name.app/resources/appimage"
 
   relocatable_perl="$(pwd)/resources/app/perl/bin/perl"
   compactor_script="$(pwd)/sdk/compactor.pl"
 
   if [ -e "$relocatable_perl" ]; then
     printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"
-    "$relocatable_perl" "$compactor_script" "--AppImage"
+    "$relocatable_perl" "$compactor_script" "--appimage=$appimage_name"
   else
     printf "\\nRelocatable Perl is not found for this copy of Perl Executing Browser.\\n"
   fi
 
-  "$(pwd)/$linuxdeployqt" "$(pwd)/$package_name.app/$package_name" -qmake='qmake -qt=qt5' -no-translations -appimage
+  "$(pwd)/$linuxdeployqt" "--appimage-extract"
+  "$(pwd)/squashfs-root/AppRun" "$(pwd)/$appimage_name.app/$appimage_name" -qmake='qmake -qt=qt5' -no-translations -appimage
 
-  rm -rf "$(pwd)/$package_name.app"
+  rm -rf "$(pwd)/squashfs-root"
+  rm -rf "$(pwd)/$appimage_name.app"
 fi

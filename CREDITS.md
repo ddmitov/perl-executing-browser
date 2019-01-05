@@ -258,6 +258,13 @@ https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html
 https://github.com/probonopd/linuxdeployqt  
 http://output.jsbin.com/qoqukof  
 
+## Docker Containers
+
+https://perlmaven.com/dancer-in-docker  
+https://github.com/AppImage/AppImageKit/wiki/FUSE  
+https://medium.com/redbubble/running-a-docker-container-as-a-non-root-user-7d2e00f8ee15  
+https://docs.docker.com/engine/reference/builder/  
+
 ## Mac
 
 http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
@@ -266,9 +273,10 @@ http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x
 
 https://superuser.com/questions/188058/which-ports-are-considered-unsafe-on-chrome  
 
-## GitHub
+## Git and GitHub
 
 https://github.com/github/linguist#overrides  
+https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-commits-in-git  
 
 ## Travis CI
 
