@@ -18,7 +18,7 @@ PEB or any PEB-based application can be easily packed as a 64-bit single-file Li
   ./appimage-maker.sh --include-resources
   ```
 
-  In this case the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
+  In this case the PEB AppImage invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
 
 * packing only a PEB executable with its Qt libraries:  
 
@@ -28,9 +28,9 @@ PEB or any PEB-based application can be easily packed as a 64-bit single-file Li
 
   In this case a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
 
-In both modes of operation, the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
+In both modes of operation, the PEB AppImage uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
 
-The [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script must be started from the ``{PEB_executable_directory}/sdk`` directory.  
+The PEB AppImage Maker script must be started from the ``{PEB_executable_directory}/sdk`` directory.  
 
 An easy building environment for PEB AppImage executables is the provided [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
 To build it, type the following command in the PEB project root directory (the directory of the README.md):  
@@ -39,19 +39,19 @@ To build it, type the following command in the PEB project root directory (the d
 sudo docker build -t peb-appimage-builder .
 ```
 
-To start the PEB AppImage Builder Docker Container, type the following command in the PEB project root directory (the directory of the README.md):  
+To start the PEB AppImage Builder Docker Container, type the following command in the PEB project root directory:  
 
 ```bash
 sudo docker container run --rm -it -v $(pwd):/opt --user $(id -u):$(id -g) peb-appimage-builder
 ```
 
-When [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile) is running, type:
+When PEB AppImage Builder Docker Container is running, type:
 
 ```bash
 cd /opt/sdk
 ```
 
-To start the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh), type either:
+To start the PEB AppImage Maker, type either:
 
 ```bash
 ./appimage-maker.sh --no-resources
