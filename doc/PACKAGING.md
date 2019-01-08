@@ -14,13 +14,13 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
 
   PEB or any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
 
-  * packing a Perl application together with a PEB executable, its Qt libraries and a relocatable Perl distribution:  
+  * packing a Perl application together with a PEB executable, Qt libraries and a relocatable Perl distribution:  
 
     ```bash
     ./appimage-maker.sh --include-resources
     ```
 
-    In this case the PEB AppImage invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
+    In this case, the PEB AppImage Maker invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
 
   * packing only a PEB executable with its Qt libraries:  
 
@@ -40,16 +40,17 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
   ``{PEB_executable_directory}/resources/app/{application_name}.appdata.xml``  
 
   ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
-  is mandatory for any PEB-based application, that is going to be packed as an AppImage using the PEB AppImage Maker. A minimal example of ``{application_name}.desktop`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
-  ``Icon=app`` inside ``{application_name}.desktop`` must not be changed for the proper display of the application icon.  
-  All registered categories in an ``{application_name}.desktop`` are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
-  Any ``{application_name}.desktop`` file can be validated using the ``desktop-file-validate`` tool from the  ``desktop-file-utils`` package in all major Linux distributions.  
+  is mandatory for any PEB-based application going to be packed by the PEB AppImage Maker.  
+  A minimal example of ``.desktop`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
+  ``Icon=app`` inside ``.desktop`` must not be changed for the proper display of the application icon.  
+  All registered categories in an ``.desktop`` are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
+  Any ``.desktop`` file can be validated using the ``desktop-file-validate`` tool from  
+  the  ``desktop-file-utils`` package in all major Linux distributions.  
 
-  The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream (.appdata.xml) files for PEB-based applications.  
-  An example of ``{aplication_name}.appdata.xml`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml).  
-  ``{application_name}.appdata.xml`` is not mandatory, but is highly recommended.  
+  The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream ``.appdata.xml`` files for PEB-based applications. An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml).  
+  An AppStream file is not mandatory, but is highly recommended.  
 
-  Both PEB AppImage configuration files are copied on their proper places in the AppImage directory tree structure by the PEB AppImage Maker script.  
+  Both PEB AppImage configuration files are put on their places in the AppImage directory tree structure by the PEB AppImage Maker script.  
 
 * **PEB AppImage Builder Docker Container**
 
