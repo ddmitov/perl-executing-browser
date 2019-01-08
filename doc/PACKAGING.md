@@ -40,21 +40,19 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
   ``{PEB_executable_directory}/resources/app/{application_name}.appdata.xml``  
 
   ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
-  is mandatory for any PEB-based application going to be packed by the PEB AppImage Maker.  
-  A minimal example of ``.desktop`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
-  ``Icon=app`` inside ``.desktop`` must not be changed for the proper display of the application icon.  
-  All registered categories in an ``.desktop`` are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
-  Any ``.desktop`` file can be validated using the ``desktop-file-validate`` tool from  
-  the  ``desktop-file-utils`` package in all major Linux distributions.  
+  is mandatory for any PEB-based application which will be packed by the PEB AppImage Maker.  
+  A minimal example of а ``.desktop`` file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
+  ``Icon=app`` inside a ``.desktop`` file must not be changed for the proper display of the application icon.  
+  All registered categories in a ``.desktop`` file are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
+  Any ``.desktop`` file can be validated using the ``desktop-file-validate`` tool from the  ``desktop-file-utils`` package in all major Linux distributions.  
 
-  The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream ``.appdata.xml`` files for PEB-based applications. An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml).  
-  An AppStream file is not mandatory, but is highly recommended.  
+  The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream ``.appdata.xml`` files for PEB-based applications. An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml). An AppStream file is not mandatory, but is highly recommended.  
 
   Both PEB AppImage configuration files are put on their places in the AppImage directory tree structure by the PEB AppImage Maker script.  
 
 * **PEB AppImage Builder Docker Container**
 
-  An easy building environment for PEB AppImage executables is the provided [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
+  An easy building environment for PEB AppImage executables is the [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
   To build it, type the following command in the PEB project root directory (the directory of the README.md):  
 
   ```bash
