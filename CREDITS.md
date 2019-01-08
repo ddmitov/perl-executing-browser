@@ -35,7 +35,7 @@ https://metacpan.org/pod/File::Copy::Recursive
 Thanks to [probonopd](https://github.com/probonopd) for his  
 knowledgeable instructions and patient cooperation  
 in the preparation and testing of Perl Executing Browser AppImages.  
-His tool [linuxdeployqt](https://github.com/probonopd) is used to generate all released AppImages.  
+His tool [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) is used to generate all released AppImages.  
 The [AppImageHub page of Perl Executing Browser](https://appimage.github.io/perl-executing-browser/) wouldn't be created without his assistance.  
 
 ## Qt
@@ -253,10 +253,10 @@ https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php
 
 ## AppImage
 
-https://www.freedesktop.org/software/appstream/docs/chap-Quickstart.html  
-https://specifications.freedesktop.org/desktop-entry-spec/1.1/apa.html  
+https://standards.freedesktop.org/menu-spec/latest/apa.html  
 https://github.com/probonopd/linuxdeployqt  
 http://output.jsbin.com/qoqukof  
+https://unix.stackexchange.com/questions/156892/how-to-validate-verify-desktop-files  
 
 ## Docker Containers
 

@@ -34,6 +34,23 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
 
   The PEB AppImage Maker script must be started from the ``{PEB_executable_directory}/sdk`` directory.  
 
+* **PEB AppImage Configuration Files**
+
+  ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
+  ``{PEB_executable_directory}/resources/app/{application_name}.appdata.xml``  
+
+  ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
+  is mandatory for any PEB-based application, that is going to be packed as an AppImage using the PEB AppImage Maker. A minimal example of ``{application_name}.desktop`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
+  ``Icon=app`` inside ``{application_name}.desktop`` must not be changed for the proper display of the application icon.  
+  All registered categories in an ``{application_name}.desktop`` are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
+  Any ``{application_name}.desktop`` file can be validated using the ``desktop-file-validate`` tool from the  ``desktop-file-utils`` package in all major Linux distributions.  
+
+  The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream (.appdata.xml) files for PEB-based applications.  
+  An example of ``{aplication_name}.appdata.xml`` is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml).  
+  ``{application_name}.appdata.xml`` is not mandatory, but is highly recommended.  
+
+  Both PEB AppImage configuration files are copied on their proper places in the AppImage directory tree structure by the PEB AppImage Maker script.  
+
 * **PEB AppImage Builder Docker Container**
 
   An easy building environment for PEB AppImage executables is the provided [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
