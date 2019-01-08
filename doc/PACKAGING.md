@@ -22,13 +22,13 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
 
     In this case, the PEB AppImage Maker invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
 
-  * packing only a PEB executable with its Qt libraries:  
+  * packing only a PEB executable and its Qt libraries:  
 
     ```bash
     ./appimage-maker.sh --no-resources
     ```
 
-    In this case a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
+    In this case, a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
 
   In both modes of operation, the PEB AppImage uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
 
