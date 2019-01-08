@@ -59,6 +59,11 @@ if [ $mode == "no-resources" ]; then
   mkdir -p "$(pwd)/peb.app/usr/share/metainfo"
   cp "$(pwd)/sdk/appimage/peb.appdata.xml" "$(pwd)/peb.app/usr/share/metainfo/peb.appdata.xml"
 
+  cp -r "$(pwd)/doc" "$(pwd)/peb.app/doc"
+  cp "$(pwd)/CREDITS.md" "$(pwd)/peb.app/CREDITS.md"
+  cp "$(pwd)/LICENSE.md" "$(pwd)/peb.app/LICENSE.md"
+  cp "$(pwd)/README.md" "$(pwd)/peb.app/README.md"
+
   "$(pwd)/$linuxdeployqt" "--appimage-extract"
   "$(pwd)/squashfs-root/AppRun" "$(pwd)/peb.app/peb" -qmake='qmake -qt=qt5' -no-translations -appimage
 
@@ -93,6 +98,11 @@ if [ $mode == "include-resources" ]; then
 
   rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.desktop"
   rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.appdata.xml"
+
+  cp -r "$(pwd)/doc" "$(pwd)/$appimage_name.app/doc"
+  cp "$(pwd)/CREDITS.md" "$(pwd)/$appimage_name.app/CREDITS.md"
+  cp "$(pwd)/LICENSE.md" "$(pwd)/$appimage_name.app/LICENSE.md"
+  cp "$(pwd)/README.md" "$(pwd)/$appimage_name.app/README.md"
 
   if [ $appimage_name == "peb-demo" ]; then
     rm -f "$(pwd)/$appimage_name.app/resources/app/index-windows.html"
