@@ -67,7 +67,7 @@ if [ $mode == "no-resources" ]; then
 fi
 
 if [ $mode == "include-resources" ]; then
-  package_desktop_file="$(ls ./resources/appimage/*.desktop)"
+  package_desktop_file="$(ls ./resources/app/*.desktop)"
   if [ ! -e "$package_desktop_file" ]; then
     printf "\\nPackage .desktop file is missing!\\n"
     exit 1
@@ -86,12 +86,19 @@ if [ $mode == "include-resources" ]; then
     cp -f "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/app.png"
   fi
 
-  if [ -e "$(pwd)/resources/appimage/$appimage_name.appdata.xml" ]; then
+  if [ -e "$(pwd)/resources/app/$appimage_name.appdata.xml" ]; then
     mkdir -p "$(pwd)/$appimage_name.app/usr/share/metainfo"
-    cp -f "$(pwd)/resources/appimage/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
+    cp -f "$(pwd)/resources/app/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
   fi
 
-  rm -rf "$(pwd)/$appimage_name.app/resources/appimage"
+  rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.desktop"
+  rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.appdata.xml"
+
+  if [ $appimage_name == "peb-demo" ]; then
+    rm -f "$(pwd)/$appimage_name.app/resources/app/index-windows.html"
+    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/clock.pl"
+    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/input.pl"
+  fi
 
   relocatable_perl="$(pwd)/resources/app/perl/bin/perl"
   compactor_script="$(pwd)/sdk/compactor.pl"
