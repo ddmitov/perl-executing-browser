@@ -82,3 +82,6 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
   ```bash
   ./appimage-maker.sh --include-resources
   ```
+
+Perl Executing Browser is also listed at the [AppImageHub](https://appimage.github.io/perl-executing-browser/).  
+Any authors of PEB-based Linux applications are encouraged to list their AppImage executables in the same manner.
