@@ -2,7 +2,7 @@
 
 ## Application Filename
 
-The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run. If log files are wanted, they will take the name of the executable file without the filename extension, whatever the name may be.
+The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run.
 
 ## HTML Page API
 
@@ -148,11 +148,11 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 ## Interactive Perl Scripts
 
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one browser window. One script may be started in many instances, provided that it has a JavaScript settings object with an unique name.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has a uniquely named JavaScript settings object.  
 
 Please note that interactive Perl scripts are not supported by the Windows builds of PEB.  
 
-PEB interactive Perl script should also have the following features:
+A PEB interactive Perl script should have the following features:
 
 * **No buffering**  
   PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.
@@ -179,7 +179,7 @@ PEB interactive Perl script should also have the following features:
   }
   ```
 
-The following code shows how to start an interactive Perl script right after a local page is loaded:
+The following code shows how to start a PEB interactive Perl script right after a local page is loaded:
 
 ```html
 <!DOCTYPE html>
