@@ -6,10 +6,10 @@ Patientia tua in studiis meis computatoriis auxilium meum maximum!
 Being in debt to each and every one,  
 who prepared the official Perl and Qt documentation or  
 shared useful knowledge on a variety of forums, blogs and other sites,  
-I thank them all!  
+I THANK THEM ALL!  
 Their expertise, effort and good will are highly appreciated!  
 
-Special thanks to the staff of the Library of the New Bulgarian University,
+Special thanks to the staff of the Library of the New Bulgarian University,  
 where much of the development effort took place!  
 https://www.nbu.bg/en/library/library  
 
@@ -75,8 +75,6 @@ https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute
 
 http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only  
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  
-http://www.qtcentre.org/threads/17948-QDir-separator%28%29-and-QFileDialog-not-consistent-with-slash-character  
-http://www.qtcentre.org/threads/31264-How-to-use-QProcess-to-write-multiple-commands-to-external-console-based-program  
 http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout  
 http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()  
 http://www.qtcentre.org/threads/10661-QByteArray-to-QString  
@@ -89,7 +87,6 @@ https://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage
 https://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
 https://stackoverflow.com/questions/8026101/correct-way-to-quit-a-qt-program  
 https://stackoverflow.com/questions/8122094/qtwebkit-printing-issue-no-images-on-printed-page  
-https://stackoverflow.com/questions/2029272/how-to-declare-a-global-variable-that-could-be-used-in-the-entire-program  
 https://stackoverflow.com/questions/12571895/save-open-dialog-localization-in-qt  
 https://stackoverflow.com/questions/6955281/how-to-stop-qhttp-qtwebkit-from-caching-pages  
 https://stackoverflow.com/questions/3211771/how-to-convert-int-to-qstring  
