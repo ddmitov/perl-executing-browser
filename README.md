@@ -38,7 +38,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [AppImage Support](./doc/PACKAGING.md#appimage-support)
 * [History](#history)
 * [License](./LICENSE.md)
-* [Thanks and Credits](./doc/CREDITS.md)
+* [Thanks and Credits](./CREDITS.md)
 * [Authors](#authors)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",  
