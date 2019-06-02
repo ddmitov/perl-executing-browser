@@ -19,7 +19,6 @@ but their expertise and good will to help others are not forgotten!
 
 Thanks to Jennifer Maher-Bontrager, author of the Camel icon.  
 http://www.iconarchive.com/show/animal-icons-by-jen/Camel-icon.html  
-https://www.totoro.org/jen/  
 
 Thanks to Leon Anavi, Valentin Alexiev, Stefan Chekanov, Rangel Ivanov, Philip Georgiev,  
 karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,  
@@ -32,11 +31,8 @@ https://metacpan.org/pod/Module::ScanDeps
 Thanks to Daniel Muey and all contributors of the File::Copy::Recursive CPAN module.
 https://metacpan.org/pod/File::Copy::Recursive  
 
-Thanks to [probonopd](https://github.com/probonopd) for his  
 knowledgeable instructions and patient cooperation  
 in the preparation and testing of Perl Executing Browser AppImages.  
-His tool [linuxdeployqt](https://github.com/probonopd/linuxdeployqt) is used to generate all released AppImages.  
-The [AppImageHub page of Perl Executing Browser](https://appimage.github.io/perl-executing-browser/) wouldn't be created without his assistance.  
 
 ## Qt
 
@@ -45,36 +41,6 @@ https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/w
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 https://github.com/NixOS/nixpkgs/issues/16327  
 https://github.com/annulen/webkit  
-
-https://qt-project.org/doc/qt-4.8/qwebhistory.html  
-https://qt-project.org/doc/qt-4.8/qdir.html  
-https://qt-project.org/doc/qt-4.8/qfileinfo.html  
-https://qt-project.org/doc/qt-4.8/qdir.html  
-https://qt-project.org/doc/qt-4.8/qregexp.html  
-https://qt-project.org/doc/qt-4.8/qfile.html  
-https://qt-project.org/doc/qt-4.8/qtextstream.html  
-https://qt-project.org/doc/qt-4.8/qiodevice.html  
-https://qt-project.org/doc/qt-4.8/qwebframe.html  
-https://qt-project.org/doc/qt-4.8/qapplication.html#topLevelWidgets  
-https://qt-project.org/doc/qt-5.0/qtcore/qsettings.html  
-https://qt-project.org/doc/qt-5.0/qtcore/qprocess.html  
-https://qt-project.org/doc/qt-5.0/qtcore/qurl.html  
-https://qt-project.org/doc/qt-5.0/qtcore/qstring.html  
-https://qt-project.org/doc/qt-5.0/qtcore/qfile.html  
-https://qt-project.org/doc/qt-5.0/qtwidgets/qapplication.html  
-https://qt-project.org/doc/qt-5.0/qtgui/qguiapplication.html  
-https://qt-project.org/doc/qt-5/qtnetwork-module.html  
-https://qt-project.org/doc/qt-5/qmake-test-function-reference.html  
-
-https://qt-project.org/wiki/How_to_Use_QSettings  
-https://qt-project.org/wiki/Qt_for_beginners_Signals_and_slots_2  
-
-https://qt-project.org/forums/viewthread/8270 (Find length of QString text)  
-https://qt-project.org/forums/viewthread/6102 (WebView Clear history)  
-https://qt-project.org/forums/viewthread/4433 (Convert QString into QByteArray as either UTF-8 or Latin1)  
-https://qt-project.org/forums/viewthread/25533 (#ifdef condition)  
-https://qt-project.org/forums/viewthread/15487 (How to list foreach from array)  
-https://qt-project.org/forums/viewthread/8876 (Setting global variable in main())  
 
 https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html  
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
@@ -169,7 +135,7 @@ https://perldoc.perl.org/File/Path.html
 https://metacpan.org/pod/File::Copy::Recursive  
 https://metacpan.org/pod/Module::ScanDeps  
 
-https://www.perl.com/article/37/2013/8/18/Catch-and-Handle-Signals-in-Perl/
+https://www.perl.com/article/37/2013/8/18/Catch-and-Handle-Signals-in-Perl/  
 
 https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
@@ -208,8 +174,8 @@ http://youmightnotneedjquery.com/
 
 ## Bootstrap
 
-http://getbootstrap.com/  
-http://getbootstrap.com/components/#dropdowns  
+https://getbootstrap.com/  
+https://getbootstrap.com/components/#dropdowns  
 https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/  
 
 http://bootswatch.com/  
@@ -219,10 +185,10 @@ https://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu
 ## Markdown
 
 https://github.com/DavidAnson/markdownlint  
-https://dlaa.me/markdownlint/  
-
 https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet  
 https://github.com/IQAndreas/markdown-licenses  
+
+https://dlaa.me/markdownlint/  
 
 https://stackoverflow.com/questions/6695439/how-to-link-to-a-named-anchor-in-multimarkdown  
 https://stackoverflow.com/questions/23989232/is-there-a-way-to-represent-a-directory-tree-in-a-github-readme-md  
@@ -249,13 +215,11 @@ https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-arc
 
 https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-command-output/  
 https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
-https://ryanstutorials.net/bash-scripting-tutorial/bash-functions.php  
 
 ## AppImage
 
 https://standards.freedesktop.org/menu-spec/latest/apa.html  
 https://github.com/probonopd/linuxdeployqt  
-http://output.jsbin.com/qoqukof  
 https://unix.stackexchange.com/questions/156892/how-to-validate-verify-desktop-files  
 
 ## Docker Containers
@@ -264,6 +228,7 @@ https://perlmaven.com/dancer-in-docker
 https://github.com/AppImage/AppImageKit/wiki/FUSE  
 https://medium.com/redbubble/running-a-docker-container-as-a-non-root-user-7d2e00f8ee15  
 https://docs.docker.com/engine/reference/builder/  
+https://vsupalov.com/exit-docker-container/  
 
 ## Mac
 

@@ -83,5 +83,8 @@ Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/p
   ./appimage-maker.sh --include-resources
   ```
 
+  To stop the PEB AppImage Builder Docker Container when AppImage building is complete:  
+  <kbd>Ctrl</kbd> + <kbd>D</kbd>
+
 Perl Executing Browser is also listed at the [AppImageHub](https://appimage.github.io/perl-executing-browser/).  
 Any authors of PEB-based Linux applications are encouraged to list their AppImage executables in the same manner.
