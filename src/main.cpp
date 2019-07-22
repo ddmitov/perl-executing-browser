@@ -19,8 +19,6 @@
 #include <QTextCodec>
 #include <QtGlobal>
 
-#include "server-starter.h"
-
 #if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include "webkit-main-window.h"
 #endif
@@ -210,45 +208,19 @@ int main(int argc, char **argv)
                      &mainWindow, SLOT(qExitApplicationSlot()));
 
     // ==============================
-    // Start file:
+    // Start page:
     // ==============================
-    bool startFileFound = false;
-
     QString startPageFilePath = applicationDirName + "/index.html";
-    QString localServerSettingsFilePath =
-             applicationDirName + "/local-server.json";
-
     QFile startPageFile(startPageFilePath);
-    QFile localServerSettingsFile(localServerSettingsFilePath);
 
-    // Local file:
     if (startPageFile.exists()) {
-        startFileFound = true;
-
         mainWindow.webViewWidget->setUrl(
                     QUrl::fromLocalFile(startPageFilePath));
     }
 
-    // Local server:
-    if ((!startPageFile.exists()) and localServerSettingsFile.exists()) {
-        startFileFound = true;
-
-        QServerStarter *serverStarter =
-                new QServerStarter(localServerSettingsFilePath);
-
-        // Signal and slot for loading of the local server URL:
-        QObject::connect(serverStarter, SIGNAL(loadUrlSignal(QUrl)),
-                         &mainWindow, SLOT(qLoadUrlSlot(QUrl)));
-
-        // Signal and slot for displaying local server configuration errors:
-        QObject::connect(serverStarter, SIGNAL(displayErrorSignal(QString)),
-                         &mainWindow, SLOT(qDisplayErrorSlot(QString)));
-    }
-
-    // No start file:
-    if (startFileFound == false) {
+    if (!startPageFile.exists()) {
         mainWindow.qDisplayErrorSlot(
-                    QString("No start page or local server is found."));
+                    QString("No start page is found."));
     }
 
     return application.exec();

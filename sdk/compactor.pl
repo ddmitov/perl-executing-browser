@@ -75,8 +75,7 @@ foreach my $script (@scripts) {
   print "Script Nr. $script_counter: $script\n";
 
   my $dependencies_hashref =
-    scan_deps(files => [$script], recurse => 3,
-              compile => 'true', warn_missing => 1);
+    scan_deps(files => [$script], recurse => 3, compile => 'true', warn_missing => 0);
 
   my $module_counter;
   while (my($partial_path, $module_name) = each(%{$dependencies_hashref})) {

@@ -38,14 +38,10 @@ A typical ``{PEB_executable_directory}`` looks like this:
     PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
     [Epigraphista](https://github.com/ddmitov/epigraphista) is an application which is runnable by both PEB and [Electron](http://electron.atom.io/).  
 
-    * **Start File:**  
-      PEB starts with one of the following files:  
-      * ``{PEB_executable_directory}/resources/app/index.html``  
-      * ``{PEB_executable_directory}/resources/app/local-server.json``  
+    * **Start Page:**  
+      ``{PEB_executable_directory}/resources/app/index.html``  
 
-      If both files are present, ``index.html`` takes precedence.  
-      If ``index.html`` is missing, ``local-server.json`` is used if available.  
-      If both entry files are missing, an error message is displayed.  
+      If start page is missing, an error message is displayed.  
 
   * **Data Directory:**  
     Data directory may contain any writable files used or produced by a PEB-based application.  

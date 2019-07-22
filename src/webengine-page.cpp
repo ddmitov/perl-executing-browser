@@ -74,7 +74,7 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
                                     bool isMainFrame)
 {
     // Handle filesystem dialogs:
-    if ((url.scheme() == "file" or url.host() == "localhost") and
+    if ((url.scheme() == "file") and
             type == QWebEnginePage::NavigationTypeLinkClicked and
             url.fileName().contains(".dialog") and
             isMainFrame == true) {

@@ -51,8 +51,7 @@ public slots:
     // ==============================
     void contextMenuEvent(QContextMenuEvent *event)
     {
-        if (QWebEngineView::page()->url().scheme() != "file" and
-                QWebEngineView::page()->url().host() != "localhost") {
+        if (QWebEngineView::page()->url().scheme() != "file") {
             page()->action(QWebEnginePage::CopyImageToClipboard)->
                     setVisible(false);
             page()->action(QWebEnginePage::DownloadImageToDisk)->
@@ -72,8 +71,7 @@ public slots:
             menu->popup(event->globalPos());
         }
 
-        if (QWebEngineView::page()->url().scheme() == "file" or
-                QWebEngineView::page()->url().host() == "localhost") {
+        if (QWebEngineView::page()->url().scheme() == "file") {
             QWebEngineContextMenuData contextMenuTest =
                     QWebEngineView::page()->contextMenuData();
             Q_ASSERT(contextMenuTest.isValid());

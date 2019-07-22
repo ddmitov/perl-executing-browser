@@ -226,65 +226,11 @@ Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.m
 
 Long-running Windows Perl scripts can not receive the ``SIGTERM`` signal and if they are still running when PEB is closed, they can only be killed with no mechanism for a graceful shutdown.
 
-## Starting Local Server
-
-A [Mojolicious](http://mojolicious.org/) application or other local Perl server can be started by PEB provided that  
-``{PEB_executable_directory}/resources/app/index.html`` is missing and
-``{PEB_executable_directory}/resources/app/local-server.json`` is found with the following structure:  
-
-```json
-{
-  "file": "tabula",
-  "ports":
-  [
-    3000,
-    6000
-  ],
-  "command-line-arguments":
-  [
-    "--browser=none",
-    "--port=#PORT#",
-    "--no-port-test"
-  ],
-  "shutdown_command": "shutdown"
-}
-```
-
-* **file**  
-  ``String`` resolved to a full pathname using the ``{PEB_executable_directory}/resources/app`` folder  
-  A Perl server started by PEB must be up and running within 5 seconds or PEB will display a timeout message.  
-  *This element is mandatory.*
-
-* **ports**  
-  ``Array`` holding a single port or the lowest and the highest ports in a port range  
-  *This element is mandatory.*
-
-  Privileged ports below or equal to port 1024 are not allowed.  
-  The following Google Chrome unsafe ports used by various services are also not allowed:  
-
-  2049 - nfs  
-  3659 - apple-sasl / PasswordServer  
-  4045 - lockd  
-  6000 - X11  
-  6665 - Alternate IRC [Apple addition]  
-  6666 - Alternate IRC [Apple addition]  
-  6667 - Standard IRC [Apple addition]  
-  6668 - Alternate IRC [Apple addition]  
-  6669 - Alternate IRC [Apple addition]  
-
-* **command-line-arguments**  
-``Array`` holding all command-line arguments that have to be passed to a local Perl server  
-The ``#PORT#`` keyword within the command-line arguments is substituted with the first available safe port when a port range is given. It is not possible to supply the first available safe port to the local server application if the ``#PORT#`` keyword is missing within the command line arguments.
-
-* **shutdown_command**  
-``String`` appended to the base URL of the local server to make a special URL which is invoked just before PEB is closed to shut down the local server and prevent it from becoming a zombie process  
-``shutdown_command`` is not needed if the local server uses a WebSocket connection to detect when PEB is disconnected and shut down on its own - see the [Tabula](https://github.com/ddmitov/tabula) application for an example.
-
 ## Selecting Files and Folders
 
 Selecting files or folders with their full paths is performed by clicking a pseudo link composed of the name of a JavaScript settings object and a ``.dialog`` extension.  
 
-Selecting files or folders with their full paths is possible only from local HTML files or localhost pages.  
+Selecting files or folders with their full paths is possible only from local HTML files.  
 
 A JavaScript settings object for a filesystem dialog has only two object properties:
 

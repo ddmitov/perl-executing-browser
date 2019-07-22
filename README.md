@@ -4,7 +4,7 @@
 [![GitHub License](http://img.shields.io/badge/License-LGPL%20v3-blue.svg)](./LICENSE.md)
 [![Travis CI Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. By default it runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
+Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the [Qt 5](https://www.qt.io/) libraries. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
 
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
@@ -30,7 +30,6 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
   * [Interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts)
   * [Long-Running Windows Perl Scripts](./doc/SETTINGS.md#long-running-windows-perl-scripts)
-  * [Starting Local Server](./doc/SETTINGS.md#starting-local-server)
   * [Selecting Files and Folders](./doc/SETTINGS.md#selecting-files-and-folders)
 * [LOGGING](./doc/LOGGING.md)
 * [PACKAGING](./doc/PACKAGING.md)
@@ -47,48 +46,41 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Quick Start
 
-* Common Steps:
-  * **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
-    Linux 64-bit single-file [AppImage](https://appimage.org/) executable and  
-    Windows 32-bit zipped executable with its Qt libraries are available.  
+* **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
+  Linux 64-bit single-file [AppImage](https://appimage.org/) executable and  
+  Windows 32-bit zipped executable with its Qt libraries are available.  
 
-  * **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
-    You can choose between a relocatable Perl distribution and the first Perl on PATH.  
-    Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) or  
-    Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP distributions are available by third-party vendors.  
+* **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
+  You can choose between a relocatable Perl distribution and the first Perl on PATH.  
+  Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) or  
+  Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP distributions are available by third-party vendors.  
 
-    Place your relocatable Perl distribution in:  
-    ``{PEB_executable_directory}/resources/app/perl``  
-    Your relocatable Perl interpreter must be:  
-    ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
-    ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
-    Your relocatable PERL5LIB folder must be:  
-    ``{PEB_executable_directory}/resources/perl/lib``  
+  Place your relocatable Perl distribution in:  
+  ``{PEB_executable_directory}/resources/app/perl``  
+  Your relocatable Perl interpreter must be:  
+  ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
+  ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
+  Your relocatable PERL5LIB folder must be:  
+  ``{PEB_executable_directory}/resources/perl/lib``  
 
-* Serverless Application:
-  * **3.** Write your Perl application reading user input on STDIN:
+* **3.** Write your Perl application reading user input on STDIN:
 
-    ```perl
-    my $input = <STDIN>;
-    chomp $input;
-    ```
+  ```perl
+  my $input = <STDIN>;
+  chomp $input;
+  ```
 
-  * **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with  
-    a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
-    Triggering a Perl script from a local HTML page can be configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
-    [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
-
-* Local Server Application:
-  * **3.** Write your Perl server application.
-  * **4.** Write [local-server.json](./doc/SETTINGS.md#starting-local-server) for your local Perl server.
-  * **5.** Write a start page.
+* **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with  
+  a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
+  Triggering a Perl script from a local HTML page can be configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+  [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 
 ## Design Objectives
 
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Fast, zero-installation software**  
 * **3. Cross-platform availability**  
-* **4. Secure solution, serverless by default**  
+* **4. Secure solution with no server**  
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
@@ -96,7 +88,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in any local page.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Mac builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
-* [Perl local servers can be started.](./doc/SETTINGS.md#starting-local-server)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
@@ -106,13 +97,13 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Security
 
-* PEB does not need administrative privileges, but will not refuse to use them if needed.
-* PEB does not need and does not implement any server, but will start one if so configured.  
+* PEB does not need administrative privileges or installation procedure.
+* PEB does not need and does not implement any server.
 * Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
 * PEB starts Perl scripts only from its application directory.
-* Cross-site scripting is disabled.
 * Calling local Perl scripts from a web page is blocked.
 * Files or folders can not be selected with their full paths from web pages.
+* Cross-site scripting is disabled.
 
 ## What PEB Is Not
 

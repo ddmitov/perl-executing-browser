@@ -36,11 +36,6 @@ signals:
     void startMainWindowClosingSignal();
 
 public slots:
-    void qLoadUrlSlot(QUrl url)
-    {
-        webViewWidget->load(url);
-    }
-
     void qDisplayErrorSlot(QString errorMessage)
     {
         QFileReader *resourceReader =
@@ -68,18 +63,6 @@ public slots:
         if (qApp->property("windowCloseRequested").toBool() == false) {
             event->ignore();
             emit startMainWindowClosingSignal();
-        }
-
-        if (qApp->property("windowCloseRequested").toBool() == true) {
-            if (qApp->property("shutdown_command").toString().length() > 0) {
-                QString shutdownUrl =
-                        qApp->property("local_server_base_url").toString() +
-                        qApp->property("shutdown_command").toString();
-
-                webViewWidget->setUrl(QUrl(shutdownUrl));
-            }
-
-            event->accept();
         }
     }
 

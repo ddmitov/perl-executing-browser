@@ -445,8 +445,7 @@ protected:
         Q_UNUSED(frame);
 
         // Handle filesystem dialogs:
-        if ((request.url().scheme() == "file" or
-             request.url().host() == "localhost") and
+        if (request.url().scheme() == "file" and
                 navigationType == QWebPage::NavigationTypeLinkClicked and
                 request.url().fileName().contains(".dialog")) {
             qHandleDialogs(request.url().fileName().replace(".dialog", ""));

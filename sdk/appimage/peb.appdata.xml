@@ -6,7 +6,7 @@
   <name>PEB</name>
   <summary>HTML interface for Perl 5 desktop applications</summary>
   <description>
-    <p>Perl Executing Browser (PEB) is an HTML5 user interface for Perl 5 desktop applications. By default it runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the Qt 5 libraries. Inspired by Electron and NW.js, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of Node.js.</p>
+    <p>Perl Executing Browser (PEB) is an HTML5 user interface for Perl 5 desktop applications. It runs local Perl 5 scripts as child processes with no server and is implemented as a C++ executable based on the Qt 5 libraries. Inspired by Electron and NW.js, PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of Node.js.</p>
   </description>
   <launchable type="desktop-id">peb.desktop</launchable>
   <url type="homepage">https://github.com/ddmitov/perl-executing-browser</url>
