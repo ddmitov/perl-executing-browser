@@ -79,9 +79,6 @@ A typical ``{PEB_executable_directory}`` looks like this:
 * **About PEB dialog:** ``about-browser.function``
 * **About Qt dialog:** ``about-qt.function``
 
-## Specific Keyboard Shortcuts
+## Specific Keyboard Shortcut
 
-All specific keyboard shortcuts are available only in the QtWebKit builds of PEB.
-
-* <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector
-* <kbd>Ctrl</kbd> + <kbd>P</kbd> - get Print Preview
+* <kbd>Ctrl</kbd> + <kbd>I</kbd> - start QWebInspector (QtWebKit builds only)

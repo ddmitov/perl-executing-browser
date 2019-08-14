@@ -107,14 +107,14 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## What PEB Is Not
 
-* PEB is not a general-purpose web browser and does not have all traditional features of general-purpose web browsers.
+* PEB is not a general-purpose web browser and does not have all the traditional features of general-purpose web browsers.
 * PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable, Perl distribution.
 
 ## Limitations
 
 * Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
-* ``QtWebEngine`` builds do not support printing and ``window.print()`` is not supported.
+* Printing is not supported.
 * Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History

@@ -8,7 +8,7 @@ Compiling Windows binaries of PEB is subject to the following restrictions:
 
 * PEB source code is not MSVC-compatible and can not use the ``QtWebEngine``.
 * Windows builds of PEB can only be compiled by a GCC-based MinGW Qt using the ``QtWebKit`` web engine.
-* Windows MinGW Qt versions 5.6.x - 5.8.x have neither ``QtWebEngine``, nor ``QtWebKit`` and an updated ``QtWebKit`` has to be manually added from the [QtWebKit repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
+* Windows MinGW Qt versions 5.6.x or higher have no ``QtWebKit`` and it has to be manually added from the [repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
 * Windows builds of PEB do not support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 Compiled and tested successfully using:
@@ -17,7 +17,7 @@ Compiled and tested successfully using:
 * [Qt 5.2.1](http://download.qt.io/archive/qt/5.2/5.2.1/) on 64-bit Ubuntu 14.04 and 64-bit OS X 10.9.1, i5
 * [Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
 * [Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
-* [Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04 and 16.04
+* [Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04/16.04 and 32-bit Windows 10
 * [Qt 5.8.0](http://download.qt.io/archive/qt/5.8/5.8.0/) on 64-bit Lubuntu 16.04
 * [Qt 5.9.1](http://download.qt.io/archive/qt/5.9/5.9.1/) on 64-bit Lubuntu 16.04
 
@@ -44,7 +44,7 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   The default web engine for Qt versions up to 5.5.x is ``QtWebKit``.  
   The default web engine for Qt versions 5.6.x or higher is ``QtWebEngine``.
 
-  To use [an updated QtWebKit version from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version 5.6.x or higher:
+  To use [an updated QtWebKit from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version 5.6.x or higher:
 
   ```QMake
   ANNULEN_QTWEBKIT = 1

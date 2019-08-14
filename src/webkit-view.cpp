@@ -32,14 +32,7 @@ QViewWidget::QViewWidget()
     qApp->setProperty("pasteLabel", "Paste");
     qApp->setProperty("selectAllLabel", "Select All");
 
-    // Keyboard shortcuts:
-#ifndef QT_NO_PRINTER
-    QShortcut *printPreviewShortcut =
-            new QShortcut(QKeySequence("Ctrl+P"), this);
-    QObject::connect(printPreviewShortcut, SIGNAL(activated()),
-                     this, SLOT(qStartPrintPreviewSlot()));
-#endif
-
+    // Keyboard shortcut:
     QShortcut *qWebInspestorShortcut =
             new QShortcut(QKeySequence("Ctrl+I"), this);
     QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),

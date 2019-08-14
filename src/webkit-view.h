@@ -26,12 +26,6 @@
 
 #include "webkit-page.h"
 
-#ifndef QT_NO_PRINTER
-#include <QPrintPreviewDialog>
-#include <QtPrintSupport/QPrinter>
-#include <QtPrintSupport/QPrintDialog>
-#endif
-
 // ==============================
 // VIEW CLASS DEFINITION:
 // (QTWEBKIT VERSION)
@@ -136,31 +130,6 @@ public slots:
     void qSelectAllAction()
     {
         QViewWidget::triggerPageAction(QWebPage::SelectAll);
-    }
-
-    void qStartPrintPreviewSlot()
-    {
-#ifndef QT_NO_PRINTER
-        QPrinter printer(QPrinter::HighResolution);
-        QPrintPreviewDialog preview(&printer, this);
-        preview.setWindowModality(Qt::WindowModal);
-        preview.setMinimumSize(QDesktopWidget()
-                               .screen()->rect().width() * 0.8,
-                               QDesktopWidget()
-                               .screen()->rect().height() * 0.8);
-        QObject::connect(&preview, SIGNAL(paintRequested(QPrinter*)),
-                         SLOT(qPrintPreviewSlot(QPrinter*)));
-        preview.exec();
-#endif
-    }
-
-    void qPrintPreviewSlot(QPrinter *printer)
-    {
-#ifdef QT_NO_PRINTER
-        Q_UNUSED(printer);
-#else
-        QViewWidget::print(printer);
-#endif
     }
 
     // ==============================
