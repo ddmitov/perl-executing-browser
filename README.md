@@ -14,7 +14,6 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 * [Design Objectives](#design-objectives)
 * [Features](#features)
 * [Security](#security)
-* [What PEB Is Not](#what-peb-is-not)
 * [Limitations](#limitations)
 * [REQUIREMENTS](./doc/REQUIREMENTS.md)
   * [Compile-Time Requirements](./doc/REQUIREMENTS.md#compile-time-requirements)
@@ -104,11 +103,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * Calling local Perl scripts from a web page is blocked.
 * Files or folders can not be selected with their full paths from web pages.
 * Cross-site scripting is disabled.
-
-## What PEB Is Not
-
-* PEB is not a general-purpose web browser and does not have all the traditional features of general-purpose web browsers.
-* PEB does not embed any Perl interpreter in itself and depends on an external, supposedly relocatable, Perl distribution.
 
 ## Limitations
 

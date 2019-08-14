@@ -8,7 +8,7 @@ Compiling Windows binaries of PEB is subject to the following restrictions:
 
 * PEB source code is not MSVC-compatible and can not use the ``QtWebEngine``.
 * Windows builds of PEB can only be compiled by a GCC-based MinGW Qt using the ``QtWebKit`` web engine.
-* Windows MinGW Qt versions 5.6.x or higher have no ``QtWebKit`` and it has to be manually added from the [repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
+* ``QtWebKit`` has to be manually added from the [repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) for all Windows MinGW Qt versions 5.6.x or higher.
 * Windows builds of PEB do not support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts) with STDIN event loops.
 
 Compiled and tested successfully using:
