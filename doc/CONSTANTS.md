@@ -23,8 +23,8 @@ A typical ``{PEB_executable_directory}`` looks like this:
 ```
 
 * **Resources Directory:**  
-  The resources directory must contain the ``app`` subdirectory with all necessary application files.  
-  ``data`` and ``perl`` subdirectories, as well as the application icon file ``app.png`` are optional.  
+  The resources directory must contain the ``app`` subdirectory with all PEB application files.  
+  ``data`` and ``perl`` subdirectories, as well as the PEB application icon file ``app.png`` are optional.  
 
   The resources directory path must be: ``{PEB_executable_directory}/resources``  
 

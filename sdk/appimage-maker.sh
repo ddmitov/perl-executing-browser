@@ -85,7 +85,11 @@ if [ $mode == "include-resources" ]; then
 
   cp -f "$(pwd)/peb" "$(pwd)/$appimage_name.app/$appimage_name"
   cp -f "$package_desktop_file" "$(pwd)/$appimage_name.app/$appimage_name.desktop"
-  cp -r "$(pwd)/resources" "$(pwd)/$appimage_name.app/resources"
+
+  mkdir "$(pwd)/$appimage_name.app/resources/"
+  cp -r "$(pwd)/resources/app" "$(pwd)/$appimage_name.app/resources/app"
+  cp -r "$(pwd)/resources/data" "$(pwd)/$appimage_name.app/resources/data"
+  cp "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/resources/app.png"
 
   if [ -e "$(pwd)/resources/app.png" ]; then
     cp -f "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/app.png"
@@ -105,12 +109,13 @@ if [ $mode == "include-resources" ]; then
   cp "$(pwd)/README.md" "$(pwd)/$appimage_name.app/README.md"
 
   if [ $appimage_name == "peb-demo" ]; then
+    export VERSION="1.0.0"
     rm -f "$(pwd)/$appimage_name.app/resources/app/index-windows.html"
     rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/clock.pl"
     rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/input.pl"
   fi
 
-  relocatable_perl="$(pwd)/resources/app/perl/bin/perl"
+  relocatable_perl="$(pwd)/resources/perl/bin/perl"
   compactor_script="$(pwd)/sdk/compactor.pl"
 
   if [ -e "$relocatable_perl" ]; then
@@ -123,6 +128,6 @@ if [ $mode == "include-resources" ]; then
   "$(pwd)/$linuxdeployqt" "--appimage-extract"
   "$(pwd)/squashfs-root/AppRun" "$(pwd)/$appimage_name.app/$appimage_name" -qmake='qmake -qt=qt5' -no-translations -appimage
 
-  rm -rf "$(pwd)/squashfs-root"
-  rm -rf "$(pwd)/$appimage_name.app"
+  # rm -rf "$(pwd)/squashfs-root"
+  # rm -rf "$(pwd)/$appimage_name.app"
 fi

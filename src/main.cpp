@@ -98,23 +98,9 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // Application directory:
-    // ==============================
-    QString applicationDirName = resourcesDirectory + "/app";
-
-    application.setProperty("application", applicationDirName);
-
-    // ==============================
-    // Data directory:
-    // ==============================
-    QString dataDirName = resourcesDirectory + "/data";
-
-    qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
-
-    // ==============================
     // Perl directory:
     // ==============================
-    QString perlDirectory = applicationDirName + "/perl";
+    QString perlDirectory = resourcesDirectory + "/perl";
 
     // ==============================
     // Perl interpreter:
@@ -131,11 +117,11 @@ int main(int argc, char **argv)
 
     QString perlInterpreter;
 
-    QString privatePerlInterpreterFullPath =
+    QString relocatablePerlInterpreterFullPath =
                 perlDirectory + "/bin/" + perlExecutable;
 
-    if (QFile(privatePerlInterpreterFullPath).exists()) {
-        perlInterpreter = privatePerlInterpreterFullPath;
+    if (QFile(relocatablePerlInterpreterFullPath).exists()) {
+        perlInterpreter = relocatablePerlInterpreterFullPath;
     } else {
         // Perl on PATH is used if no private Perl interpreter is found:
         perlInterpreter = perlExecutable;
@@ -150,6 +136,13 @@ int main(int argc, char **argv)
     QByteArray perlLibDirArray = perlLibDirString.toLatin1();
 
     qputenv("PERL5LIB", perlLibDirArray);
+
+    // ==============================
+    // Application directory:
+    // ==============================
+    QString applicationDirName = resourcesDirectory + "/app";
+
+    application.setProperty("application", applicationDirName);
 
     // ==============================
     // Application icon:
@@ -167,6 +160,13 @@ int main(int argc, char **argv)
         icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
+
+    // ==============================
+    // Data directory:
+    // ==============================
+    QString dataDirName = resourcesDirectory + "/data";
+
+    qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
 
     // ==============================
     // MAIN WINDOW INITIALIZATION:
