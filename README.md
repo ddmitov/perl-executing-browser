@@ -57,8 +57,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
   Your relocatable Perl interpreter must be:  
   ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
   ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
-  Your relocatable PERL5LIB folder must be:  
-  ``{PEB_executable_directory}/resources/perl/lib``  
 
 * **3.** Write your Perl application reading user input on STDIN:
 
@@ -67,9 +65,9 @@ in the documentation of this project are to be interpreted as described in [RFC 
   chomp $input;
   ```
 
-* **4.** Write ``{PEB_executable_directory}/resources/app/index.html`` with  
+* **4.** Write a ``{PEB_executable_directory}/resources/app/index.html`` with  
   a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
-  Triggering a Perl script from your HTML page can be configured using [one of the three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
+  Local Perl scripts can be called from your HTML page by [three methods](./doc/SETTINGS.md#perl-scripts-api).  
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 
 ## Design Objectives
@@ -83,7 +81,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Features
 
 * PEB can be started from any folder without installation procedure.
-* [Perl script output is seamlessly inserted.](./doc/SETTINGS.md#perl-scripts-api)
+* [Perl script output is seamlessly inserted in an HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Mac builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  

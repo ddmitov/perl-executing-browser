@@ -130,14 +130,6 @@ int main(int argc, char **argv)
     application.setProperty("perlInterpreter", perlInterpreter);
 
     // ==============================
-    // PERL5LIB directory:
-    // ==============================
-    QString perlLibDirString = perlDirectory + "/lib";
-    QByteArray perlLibDirArray = perlLibDirString.toLatin1();
-
-    qputenv("PERL5LIB", perlLibDirArray);
-
-    // ==============================
     // Application directory:
     // ==============================
     QString applicationDirName = resourcesDirectory + "/app";

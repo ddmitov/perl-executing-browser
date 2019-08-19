@@ -54,7 +54,6 @@ public slots:
     }
 
     void qGoFullscreen(QWebEngineFullScreenRequest request) {
-        QMainWindow::showFullScreen();
         request.accept();
     }
 

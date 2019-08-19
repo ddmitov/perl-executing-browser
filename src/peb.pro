@@ -13,16 +13,11 @@
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
-message ("Going to configure Perl Executing Browser for Qt $$[QT_VERSION]")
-
 lessThan (QT_MAJOR_VERSION, 5) {
     error ("Perl Executing Browser requires Qt 5.")
 }
 
 greaterThan (QT_MAJOR_VERSION, 4) {
-    message ("Qt Header files: $$[QT_INSTALL_HEADERS]")
-    message ("Qt Libraries: $$[QT_INSTALL_LIBS]")
-
     ##########################################################
     # ANNULEN QTWEBKIT
     # Updated QtWebKit headers and libraries for
@@ -67,10 +62,10 @@ greaterThan (QT_MAJOR_VERSION, 4) {
         DEFINES += "BUNDLE=$$BUNDLE"
 
         equals (BUNDLE, 0) {
-            message ("Configured without Mac OSX bundle support.")
+            message ("PEB is configured without Mac OSX bundle support.")
         }
         equals (BUNDLE, 1) {
-            message ("Configured with Mac OSX bundle support.")
+            message ("PEB is configured with Mac OSX bundle support.")
         }
 
         ICON = resources/icons/camel.icns

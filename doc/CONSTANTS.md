@@ -17,8 +17,6 @@ A typical ``{PEB_executable_directory}`` looks like this:
     ├── perl
     │   ├── bin
     │   │   └── perl || wperl.exe
-    │   └── lib
-    │       └── {perl_modules}
     └── app.png
 ```
 
@@ -29,7 +27,7 @@ A typical ``{PEB_executable_directory}`` looks like this:
   The resources directory path must be: ``{PEB_executable_directory}/resources``  
 
   * **Application Directory:**  
-    All Perl application files must be located within this folder.  
+    PEB application files are located within this folder.  
     PEB application directory is labeled as ``{PEB_app_directory}`` within this documentation.  
     By default the working directory of all Perl scripts run by PEB is the application directory.  
 
@@ -53,18 +51,10 @@ A typical ``{PEB_executable_directory}`` looks like this:
     my $data_directory = $ENV{'PEB_DATA_DIR'};
     ```
 
-  * **Perl Directory:**  
-    The Perl directory, if present, must contain the ``bin`` and ``lib`` subdirectories.  
-    The ``bin`` subdirectory must contain the Perl interpreter.  
-    The ``lib`` subdirectory must contain all Perl modules used by PEB Perl applications.  
-
-    * **Perl Interpreter:**  
-      Relocatable Perl interpreter, if present, must be located in the ``{PEB_executable_directory}/resources/perl/bin`` folder.  
-      The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
-      If a relocatable Perl interpreter is not found, PEB will use the first Perl interpreter on PATH.  
-
-    * **Perl Modules Directory:**  
-      All Perl modules found in the ``{PEB_executable_directory}/resources/perl/lib`` folder are accessible via the ``PERL5LIB`` environment variable for all Perl applications executed by PEB.  
+  * **Perl Interpreter:**  
+    Relocatable Perl interpreter, if any, must be located in the ``{PEB_executable_directory}/resources/perl/bin`` folder.  
+    The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
+    If a relocatable Perl interpreter is not found, PEB will use the first Perl interpreter on PATH.  
 
   <a name="icon"></a>
   * **Icon:**

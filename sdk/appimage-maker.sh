@@ -128,6 +128,6 @@ if [ $mode == "include-resources" ]; then
   "$(pwd)/$linuxdeployqt" "--appimage-extract"
   "$(pwd)/squashfs-root/AppRun" "$(pwd)/$appimage_name.app/$appimage_name" -qmake='qmake -qt=qt5' -no-translations -appimage
 
-  # rm -rf "$(pwd)/squashfs-root"
-  # rm -rf "$(pwd)/$appimage_name.app"
+  rm -rf "$(pwd)/squashfs-root"
+  rm -rf "$(pwd)/$appimage_name.app"
 fi

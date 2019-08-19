@@ -27,12 +27,8 @@ GetOptions("appimage_name=s" => \$appimage_name);
 # Directory paths:
 my $root = getcwd;
 my $app_directory = catdir($root, "resources", "app");
-my $bin_original = catdir($root, "resources", "perl", "bin");
-my $lib_original = catdir($root, "resources", "perl", "lib");
-my $bin_compacted = catdir(
-  $root, $appimage_name.".app", "resources", "perl", "bin");
-my $lib_compacted = catdir(
-  $root, $appimage_name.".app", "resources", "perl", "lib");
+my $perl_original = catdir($root, "resources", "perl");
+my $perl_compacted = catdir($root, $appimage_name.".app", "resources", "perl");
 
 # Get all PEB Perl scripts from the 'index.html' file:
 my $index_filepath = catdir($app_directory, "index.html");
@@ -53,28 +49,33 @@ foreach my $line (@index_data) {
 }
 
 # Copy the Perl interpreter:
-fcopy(catdir($bin_original, "perl"), catdir($bin_compacted, "perl"));
+fcopy(
+  catdir($perl_original, "bin", "perl"),
+  catdir($perl_compacted, "bin", "perl")
+);
 
 # Get all dependencies from all Perl scripts:
 my $script_counter;
 foreach my $script (@scripts) {
-  $script_counter++;
-  print "Script Nr. $script_counter: $script\n";
+  if (-e $script) {
+    $script_counter++;
+    print "Script Nr. $script_counter: $script\n";
 
-  my $dependencies_hashref =
-    scan_deps(
-      files => [$script],
-      recurse => 3,
-      compile => 'false',
-      warn_missing => 1
-    );
+    my $dependencies_hashref =
+      scan_deps(
+        files => [$script],
+        recurse => 3,
+        compile => 'false',
+        warn_missing => 1
+      );
 
-  my $module_counter;
-  while (my($module_relative_path, $module) = each(%{$dependencies_hashref})) {
-    if (-e $module->{file}) {
+    my $module_counter;
+    while (my($module_relative_path, $module) = each(%{$dependencies_hashref})) {
       $module_counter++;
-      print "Dependency Nr. $module_counter: $module->{file}\n";
-      fcopy($module->{file}, catdir($lib_compacted, $module_relative_path));
+      print "Dependency Nr. $module_counter: $module_relative_path\n";
+
+      (my $destination = $module->{file}) =~ s/$perl_original/$perl_compacted/g;
+      fcopy($module->{file}, $destination);
     }
   }
 
