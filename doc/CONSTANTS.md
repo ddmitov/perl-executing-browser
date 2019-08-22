@@ -12,8 +12,6 @@ A typical ``{PEB_executable_directory}`` looks like this:
 └── resources
     ├── app
     │   └── index.html
-    ├── data
-    │   └── {application_data}
     ├── perl
     │   ├── bin
     │   │   └── perl || wperl.exe
@@ -21,16 +19,15 @@ A typical ``{PEB_executable_directory}`` looks like this:
 ```
 
 * **Resources Directory:**  
-  The resources directory must contain the ``app`` subdirectory with all PEB application files.  
-  ``data`` and ``perl`` subdirectories, as well as the PEB application icon file ``app.png`` are optional.  
+  The resources directory must contain the ``app`` subdirectory containing PEB application files.  
+  ``perl`` subdirectory and the PEB application icon file ``app.png`` are optional.  
 
   The resources directory path must be: ``{PEB_executable_directory}/resources``  
 
   * **Application Directory:**  
-    PEB application files are located within this folder.  
+    PEB application files should be located within this folder.  
     PEB application directory is labeled as ``{PEB_app_directory}`` within this documentation.  
-    By default the working directory of all Perl scripts run by PEB is the application directory.  
-
+    
     The application directory path must be: ``{PEB_executable_directory}/resources/app``  
 
     PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
@@ -40,16 +37,6 @@ A typical ``{PEB_executable_directory}`` looks like this:
       ``{PEB_executable_directory}/resources/app/index.html``  
 
       If start page is missing, an error message is displayed.  
-
-  * **Data Directory:**  
-    Data directory may contain any writable files used or produced by a PEB-based application.  
-    Perl scripts can access this folder using the environment variable ``PEB_DATA_DIR``:  
-
-    The data directory path must be: ``{PEB_executable_directory}/resources/data``  
-
-    ```perl
-    my $data_directory = $ENV{'PEB_DATA_DIR'};
-    ```
 
   * **Perl Interpreter:**  
     Relocatable Perl interpreter, if any, must be located in the ``{PEB_executable_directory}/resources/perl/bin`` folder.  

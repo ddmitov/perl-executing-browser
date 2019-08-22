@@ -98,11 +98,6 @@ int main(int argc, char **argv)
 #endif
 
     // ==============================
-    // Perl directory:
-    // ==============================
-    QString perlDirectory = resourcesDirectory + "/perl";
-
-    // ==============================
     // Perl interpreter:
     // ==============================
     QString perlExecutable;
@@ -118,7 +113,7 @@ int main(int argc, char **argv)
     QString perlInterpreter;
 
     QString relocatablePerlInterpreterFullPath =
-                perlDirectory + "/bin/" + perlExecutable;
+                resourcesDirectory + "/perl/bin/" + perlExecutable;
 
     if (QFile(relocatablePerlInterpreterFullPath).exists()) {
         perlInterpreter = relocatablePerlInterpreterFullPath;
@@ -152,13 +147,6 @@ int main(int argc, char **argv)
         icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
-
-    // ==============================
-    // Data directory:
-    // ==============================
-    QString dataDirName = resourcesDirectory + "/data";
-
-    qputenv("PEB_DATA_DIR", dataDirName.toLatin1());
 
     // ==============================
     // MAIN WINDOW INITIALIZATION:

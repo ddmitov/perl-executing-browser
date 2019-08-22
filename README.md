@@ -4,7 +4,7 @@
 [![GitHub License](http://img.shields.io/badge/License-LGPL%20v3-blue.svg)](./LICENSE.md)
 [![Travis CI Build Status](https://travis-ci.org/ddmitov/perl-executing-browser.svg?branch=master)](https://travis-ci.org/ddmitov/perl-executing-browser)  
 
-Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It is a C++ executable based on the [Qt 5](https://www.qt.io/) libraries running local Perl 5 scripts as child processes without server. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
+Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It is a C++ [Qt 5](https://www.qt.io/) application running local Perl 5 scripts as child processes without server. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
 
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
@@ -65,9 +65,11 @@ in the documentation of this project are to be interpreted as described in [RFC 
   chomp $input;
   ```
 
+  By default the working directory of all PEB Perl scripts is the directory of the PEB binary.  
+
 * **4.** Write a ``{PEB_executable_directory}/resources/app/index.html`` with  
-  a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for your Perl application.  
-  Local Perl scripts can be called from your HTML page by [three methods](./doc/SETTINGS.md#perl-scripts-api).  
+  a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you want to use.  
+  Local Perl scripts can be called from your HTML page by one of the [three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
   [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
 
 ## Design Objectives
@@ -81,7 +83,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Features
 
 * PEB can be started from any folder without installation procedure.
-* [Perl script output is seamlessly inserted in an HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
+* [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
 * [Perl scripts with STDIN event loops can be repeatedly fed with data (Linux and Mac builds only).](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
@@ -94,7 +96,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * PEB does not need administrative privileges or installation procedure.
 * PEB does not need and does not implement any server.
-* Local Perl 5 scripts are executed with no sandbox and they have direct access to local files.
+* Local Perl 5 scripts are executed with no sandbox and they have access to full file paths.
 * PEB starts Perl scripts only from its application directory.
 * Calling local Perl scripts from web pages is blocked.
 * Files or folders can not be selected with their full paths from web pages.

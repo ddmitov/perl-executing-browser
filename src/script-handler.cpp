@@ -43,8 +43,6 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
                      this,
                      SLOT(qScriptFinishedSlot()));
 
-    scriptProcess.setWorkingDirectory(qApp->property("application").toString());
-
     scriptProcess.start((qApp->property("perlInterpreter").toString()),
                         QStringList() << scriptFullFilePath,
                         QProcess::Unbuffered | QProcess::ReadWrite);

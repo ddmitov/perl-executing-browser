@@ -87,9 +87,13 @@ if [ $mode == "include-resources" ]; then
   cp -f "$package_desktop_file" "$(pwd)/$appimage_name.app/$appimage_name.desktop"
 
   mkdir "$(pwd)/$appimage_name.app/resources/"
-  cp -r "$(pwd)/resources/app" "$(pwd)/$appimage_name.app/resources/app"
-  cp -r "$(pwd)/resources/data" "$(pwd)/$appimage_name.app/resources/data"
-  cp "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/resources/app.png"
+
+  declare -a RESOURCES
+  RESOURCES=($(ls --ignore=perl "$(pwd)/resources"))
+
+  for RESOURCE in "${RESOURCES[@]}"; do
+  	cp -r "$(pwd)/resources/${RESOURCE}" "$(pwd)/$appimage_name.app/resources/${RESOURCE}";
+  done
 
   if [ -e "$(pwd)/resources/app.png" ]; then
     cp -f "$(pwd)/resources/app.png" "$(pwd)/$appimage_name.app/app.png"

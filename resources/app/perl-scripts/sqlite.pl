@@ -7,6 +7,9 @@ use warnings;
 use utf8;
 use open ':std', ':encoding(UTF-8)';
 
+use Cwd;
+use File::Spec::Functions qw(catdir);
+
 if (eval("require DBI;")) {
   require DBI;
   DBI->import();
@@ -15,7 +18,8 @@ if (eval("require DBI;")) {
   exit 0;
 }
 
-my $db = DBI->connect ("dbi:SQLite:$ENV{'PEB_DATA_DIR'}/test.db","","", {sqlite_unicode => 1}) or
+my $sqlite_file = catdir(getcwd, "resources", "data", "test.db");
+my $db = DBI->connect ("dbi:SQLite:$sqlite_file","","", {sqlite_unicode => 1}) or
   die "Could not connect to database";
 
 $db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
