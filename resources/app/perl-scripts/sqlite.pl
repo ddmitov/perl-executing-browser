@@ -19,21 +19,21 @@ if (eval("require DBI;")) {
 }
 
 my $sqlite_file = catdir(getcwd, "resources", "data", "test.db");
-my $db = DBI->connect ("dbi:SQLite:$sqlite_file","","", {sqlite_unicode => 1}) or
+my $db = DBI->connect("dbi:SQLite:$sqlite_file","","", {sqlite_unicode => 1}) or
   die "Could not connect to database";
 
-$db->do ("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
+$db->do("CREATE TABLE IF NOT EXISTS user (id INTEGER PRIMARY KEY, name TEXT, surname TEXT)");
 
 my $all_records = $db->selectall_arrayref ("SELECT * FROM USER");
 
 if (scalar @$all_records < 4) {
-  $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Linus', 'Torvalds')");
-  $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Richard', 'Stallman')");
-  $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Линус', 'Торвалдс')");
-  $db->do ("INSERT INTO user\(name, surname) VALUES ( 'Ричард', 'Столман')");
+  $db->do("INSERT INTO user(name, surname) VALUES('Linus', 'Torvalds')");
+  $db->do("INSERT INTO user(name, surname) VALUES('Richard', 'Stallman')");
+  $db->do("INSERT INTO user(name, surname) VALUES('Линус', 'Торвалдс')");
+  $db->do("INSERT INTO user(name, surname) VALUES('Ричард', 'Столман')");
 }
 
-$all_records = $db->selectall_arrayref ("SELECT * FROM USER");
+$all_records = $db->selectall_arrayref("SELECT * FROM USER");
 
 print "SQLite Test:<br>";
 

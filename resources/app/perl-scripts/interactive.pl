@@ -14,13 +14,6 @@ if (eval("require AnyEvent;")) {
   exit 0;
 }
 
-# This code was used to test handling of the SIGTERM signal from a Perl script:
-# $SIG{TERM} = sub {
-#   print "Terminating interactive script...";
-#   sleep(2);
-#   exit();
-# };
-
 # Disable built-in buffering:
 $| = 1;
 
@@ -35,8 +28,6 @@ my $stdin = <STDIN>;
 
 foreach $pair (@pairs) {
   ($name, $value) = split(/=/, $pair);
-  $value =~ tr/+/ /;
-  $value =~ s/%(..)/pack("C", hex($1))/eg;
   if ($name =~ "mode") {
     $mode = $value;
   }
@@ -106,11 +97,16 @@ my $half_second_wait = AnyEvent->timer (
 
 $event_loop->recv;
 
-# Using a function one can implement a much complex shutdown procedure,
-# called when a shutdown command is received from PEB or
+# Using a function one can implement a much complex shutdown procedure
+# called when a PEB is closed by user or
 # when PEB unexpectedly crashes and script loses its STDOUT stream.
 # This function must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!
 sub shutdown_procedure {
   exit();
 }
+
+# Exit on SIGTERM signal from PEB:
+$SIG{TERM} = sub {
+  exit();
+};

@@ -11,6 +11,7 @@ my @files;
 traverse ($directory_name);
 
 print "Listing all files in $directory_name:<br>";
+
 foreach my $file (@files) {
   print "$file<br>";
 }

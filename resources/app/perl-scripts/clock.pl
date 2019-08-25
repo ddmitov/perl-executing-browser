@@ -15,14 +15,14 @@ if (eval("require AnyEvent;")) {
 # Disable built-in buffering:
 $| = 1;
 
-# Detect the mode of the script from initial STDIN when the script is started:
+# Detect the mode of the script from STDIN when the script is started:
 my $mode = <STDIN>;
 chomp $mode;
 
 # Set the event loop:
 my $event_loop = AnyEvent->condvar;
 
-my $half_second_wait = AnyEvent->timer (
+my $clock = AnyEvent->timer (
   after => 0,
   interval => 0.5,
   cb => sub {
