@@ -6,7 +6,7 @@ The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or 
 
 ## HTML Page API
 
-All local HTML page settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript popup boxes and no warning is displayed for unsaved data in local HTML forms.
+All local HTML page settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript pop-up boxes and no warning is displayed for unsaved data in local HTML forms.
 
 ```javascript
 var pebSettings = {};
