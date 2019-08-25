@@ -9,7 +9,6 @@ Compiling PEB on Windows is subject to the following restrictions:
 * PEB source code is not MSVC-compatible and PEB can not be linked against ``QtWebEngine``.
 * Windows builds of PEB can only be compiled by a GCC-based MinGW Qt using the ``QtWebKit`` web engine.
 * ``QtWebKit`` can be added to MinGW Qt versions 5.6.x or higher from the [repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
-* Windows builds of PEB do not support [interactive Perl Scripts](SETTINGS.md#interactive-perl-scripts).
 
 Compiled and tested successfully using:
 
@@ -32,7 +31,7 @@ Please note that PEB builds using the standard ``QtWebKit`` web engine are singl
 
 ## Compile-Time Settings
 
-All compile-time settings require editing the ``src/peb.pro`` project file according to the following instructions.  
+PEB compile-time settings can be changed by editing the ``src/peb.pro`` project file according to the following instructions.  
 
 * Updated QtWebKit  
   To use ``QtWebKit`` or ``QtWebEngine`` depending on the Qt version, which is the default setting:  
@@ -50,7 +49,7 @@ All compile-time settings require editing the ``src/peb.pro`` project file accor
   ANNULEN_QTWEBKIT = 1
   ```
 
-  Setting ``ANNULEN_QTWEBKIT`` to ``1`` has no effect on Qt versions 5.5 or lower.  
+  Setting ``ANNULEN_QTWEBKIT`` to ``1`` has no effect on Qt versions 5.5.x or lower.  
 
 * Mac Bundle  
   To make a bundle-less binary, which is the default setting:  

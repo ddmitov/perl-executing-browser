@@ -19,17 +19,15 @@ A typical ``{PEB_executable_directory}`` looks like this:
 ```
 
 * **Resources Directory:**  
+  The resources directory path must be: ``{PEB_executable_directory}/resources``  
+
   The resources directory must contain the ``app`` subdirectory containing PEB application files.  
   ``perl`` subdirectory and the PEB application icon file ``app.png`` are optional.  
 
-  The resources directory path must be: ``{PEB_executable_directory}/resources``  
-
   * **Application Directory:**  
-    All Perl scripts executed by PEB must be located within this directory and its subdirectories.  
-    PEB application directory is labeled as ``{PEB_app_directory}`` within this documentation.  
-
     The application directory path must be: ``{PEB_executable_directory}/resources/app``  
 
+    All Perl scripts executed by PEB must be located within this directory and its subdirectories.  
     PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
     [Epigraphista](https://github.com/ddmitov/epigraphista) is an application which is runnable by both PEB and [Electron](http://electron.atom.io/).  
 
@@ -39,7 +37,8 @@ A typical ``{PEB_executable_directory}`` looks like this:
       If start page is missing, an error message is displayed.  
 
   * **Perl Interpreter:**  
-    Relocatable Perl interpreter, if any, must be located in the ``{PEB_executable_directory}/resources/perl/bin`` folder.  
+    Relocatable Perl interpreter, if any, must be located in the directory:  
+    ``{PEB_executable_directory}/resources/perl/bin`` folder.  
     The Perl interpreter must be named ``perl`` on Linux and Mac machines and ``wperl.exe`` on Windows machines.  
     If a relocatable Perl interpreter is not found, PEB will use the first Perl interpreter on PATH.  
 
