@@ -15,8 +15,8 @@ Start PEB with the following command-line argument supplying an arbitrary privat
 peb --remote-debugging-port=8080
 ```
 
-and open the following URL using any browser:
+and open the following URL using another browser:
 
 ``http://localhost:8080``
 
-to access the ``QtWebEngine Developer Tools`` and go to the ``Console`` tab.  
+to access the ``QtWebEngine Developer Tools``, then go to the ``Console`` tab.  
