@@ -27,9 +27,8 @@ A typical ``{PEB_executable_directory}`` looks like this:
   * **Application Directory:**  
     The application directory path must be: ``{PEB_executable_directory}/resources/app``  
 
-    All Perl scripts executed by PEB must be located within this directory and its subdirectories.  
+    All Perl scripts started by PEB must be located within this directory and its subdirectories.  
     PEB application directory pathname is compatible with the [Electron](http://electron.atom.io/) framework.  
-    [Epigraphista](https://github.com/ddmitov/epigraphista) is an application which is runnable by both PEB and [Electron](http://electron.atom.io/).  
 
     * **Start Page:**  
       Start page pathname must be: ``{PEB_executable_directory}/resources/app/index.html``  

@@ -97,7 +97,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * PEB does not need administrative privileges or installation procedure.
 * PEB does not need and does not implement any server.
 * Local Perl 5 scripts are executed with no sandbox and they have access to full file paths.
-* PEB starts Perl scripts only from its application directory.
 * Calling local Perl scripts from web pages is blocked.
 * Files or folders can not be selected with their full paths from web pages.
 * Cross-site scripting is disabled.

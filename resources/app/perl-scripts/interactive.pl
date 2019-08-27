@@ -4,98 +4,74 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 use Encode qw(decode);
-binmode STDOUT, ":utf8";
 
-if (eval("require AnyEvent;")) {
-  require AnyEvent;
-  AnyEvent->import();
-} else {
-  print "AnyEvent module is missing in this Perl distribution.";
-  exit 0;
-}
+use AnyEvent;
+use JSON::PP;
 
 # Disable built-in buffering:
 $| = 1;
 
-# Global variables:
-my $input_text = "";
+# Defaults:
 my $mode = "unix-epoch";
+my $user_input = "";
 
-# Detect the mode of the script from initial STDIN when the script is started:
-my (@pairs, $pair, $name, $value);
+# Detect mode from initial STDIN:
 my $stdin = <STDIN>;
-@pairs = split(/&/, $stdin);
+chomp $stdin;
 
-foreach $pair (@pairs) {
-  ($name, $value) = split(/=/, $pair);
-  if ($name =~ "mode") {
-    $mode = $value;
-  }
-}
+my $initial_input = get_input($stdin);
+$mode = $initial_input->{mode};
 
 # Set the event loop:
 my $event_loop = AnyEvent->condvar;
 
-my $wait_for_input = AnyEvent->io (
+my $input = AnyEvent->io(
   fh => \*STDIN,
   poll => "r",
   cb => sub {
     my $stdin = <STDIN>;
     chomp $stdin;
 
-    # Read input text from STDIN:
-    my (@pairs, $pair, $name, $value);
-    @pairs = split(/&/, $stdin);
-
-    foreach $pair (@pairs) {
-      ($name, $value) = split(/=/, $pair);
-
-      if ($value) {
-        $value =~ tr/+/ /;
-        $value =~ s/%(..)/pack("C", hex($1))/eg;
-      }
-
-      if ($name =~ "input" and length($value) > 0) {
-        $input_text  = decode('UTF-8', $value);
-      }
-    }
+    my $input = get_input($stdin);
+    $user_input  = decode('UTF-8', $input->{user});
   }
 );
 
-my $half_second_wait = AnyEvent->timer (
+my $clock = AnyEvent->timer(
   after => 0,
   interval => 0.5,
   cb => sub {
+    my $time;
+
     if ($mode =~ "unix-epoch") {
-      my $output_string;
-
-      if (length($input_text) == 0) {
-        $output_string = "Seconds from the Unix epoch: ".time;
-      } else {
-        $output_string =
-          "Seconds from the Unix epoch: ".time."<br>Last user input: ".$input_text;
-      }
-
-      print $output_string or shutdown_procedure();
+      $time = "Seconds from the Unix epoch: ".time;
     }
 
     if ($mode =~ "local-time") {
-      my $output_string;
-      my $formatted_time = strftime('%d %B %Y %H:%M:%S', localtime);
-
-      if (length($input_text) == 0) {
-        $output_string = "Local date and time: ".$formatted_time;
-      } else {
-        $output_string =
-          "Local date and time: ".$formatted_time."<br>Last user input: ".$input_text;
-      }
-
-      print $output_string or shutdown_procedure();
+      my $time_string = strftime('%d %B %Y %H:%M:%S', localtime);
+      $time = "Local date and time: ".$time_string;
     }
+
+    my $output = {
+      time => $time,
+      user => $user_input
+    };
+
+    # my $output_json = encode_json $output; JSON->new->utf8->encode
+    my $output_json = JSON::PP->new->utf8->encode($output);
+    print $output_json or shutdown_procedure();
   },
 );
 
 $event_loop->recv;
+
+# Get JSON input:
+sub get_input {
+  my ($stdin) = @_;
+  my $json_object = new JSON::PP;
+  my $input = $json_object->decode($stdin);
+  return $input;
+}
 
 # Using a function one can implement a much complex shutdown procedure
 # called when a PEB is closed by user or
@@ -103,10 +79,10 @@ $event_loop->recv;
 # This function must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!
 sub shutdown_procedure {
-  exit();
+  exit(0);
 }
 
 # Exit on SIGTERM signal from PEB:
 $SIG{TERM} = sub {
-  exit();
+  exit(0);
 };

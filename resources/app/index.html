@@ -26,25 +26,43 @@
       var interactive_one = {};
       interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
       interactive_one.inputData = function() {
-        var data = $('#form-one').serialize();
+        var input = {}
+        input.mode = "unix-epoch";
+        input.user = document.getElementById("interactive-one-input").value;
         $('#form-one').trigger('reset');
-        return data;
+        return JSON.stringify(input);
       }
       interactive_one.stdoutFunction = function (stdout) {
         var target = document.getElementById('instance-one-output');
-        target.innerHTML = stdout;
+        var output = JSON.parse(stdout);
+        var html;
+        if(("user" in output)) {
+          html = output.time + '<br>' + output.user;
+        } else {
+          html = output.time;
+        };
+        target.innerHTML = html;
       }
 
       var interactive_two = {};
       interactive_two.scriptRelativePath = 'perl-scripts/interactive.pl';
       interactive_two.inputData = function() {
-        var data = $('#form-two').serialize();
-        $('#form-two').trigger('reset');
-        return data;
+        var input = {}
+        input.mode = "local-time";
+        input.user = document.getElementById("interactive-two-input").value;
+        $('#form-one').trigger('reset');
+        return JSON.stringify(input);
       }
       interactive_two.stdoutFunction = function (stdout) {
         var target = document.getElementById('instance-two-output');
-        target.innerHTML = stdout;
+        var output = JSON.parse(stdout);
+        var html;
+        if(("user" in output)) {
+          html = output.time + '<br>' + output.user;
+        } else {
+          html = output.time;
+        };
+        target.innerHTML = html;
       }
 
       var open_file = {};
@@ -274,9 +292,7 @@
         <div class="col-xs-12 form-group">
           <form action="interactive_one.script" id="form-one">
             <div class="input-group">
-              <input type="hidden" name="mode" value="unix-epoch">
-
-              <input type="text" name="input" class="form-control"
+              <input type="text" id="interactive-one-input" name="input" class="form-control"
                 placeholder="Press Enter to send data to the first interactive script instance">
 
               <span class="input-group-addon btn btn-primary"
@@ -299,9 +315,7 @@
         <div class="col-xs-12 form-group">
           <form action="interactive_two.script" id="form-two">
             <div class="input-group">
-              <input type="hidden" name="mode" value="local-time">
-
-              <input type="text" name="input" class="form-control"
+              <input type="text" id="interactive-two-input" name="input" class="form-control"
                 placeholder="Press Enter to send data to the second interactive script instance">
 
               <span class="input-group-addon btn btn-primary"
