@@ -7,54 +7,92 @@
     <meta charset="utf-8">
 
     <script>
-    // PEB page settings:
-    var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-    pebSettings.autoStartScripts = ['clock_one', 'clock_two'];
-    pebSettings.cutLabel = '- Cut -';
-    pebSettings.copyLabel = '- Copy -';
-    pebSettings.pasteLabel = '- Paste -';
-    pebSettings.selectAllLabel = '- Select All -';
-    pebSettings.okLabel = 'OK';
-    pebSettings.cancelLabel = 'CANCEL';
-    pebSettings.yesLabel = 'YES';
-    pebSettings.noLabel = 'NO';
-    pebSettings.closeConfirmation =
-      'Text was entered in a form and it is going to be lost!\n' +
-      'Are you sure you want to close the application?';
+      // PEB page settings:
+      var pebSettings = {}; // 'pebSettings' object name is hard-coded.
+      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+      pebSettings.cutLabel = '- Cut -';
+      pebSettings.copyLabel = '- Copy -';
+      pebSettings.pasteLabel = '- Paste -';
+      pebSettings.selectAllLabel = '- Select All -';
+      pebSettings.okLabel = 'OK';
+      pebSettings.cancelLabel = 'CANCEL';
+      pebSettings.yesLabel = 'YES';
+      pebSettings.noLabel = 'NO';
+      pebSettings.closeConfirmation =
+        'Text was entered in a form and it is going to be lost!\n' +
+        'Are you sure you want to close the application?';
 
-      // Settings objects for the Perl scripts:
-      var perl_input = {};
-      perl_input.scriptRelativePath = 'perl-scripts/input.pl';
-      perl_input.inputData = function() {
-        var data = document.getElementById('perl-input-box').value;
-        $('#perl-input').trigger('reset');
-        return data;
-      }
-      perl_input.stdoutFunction = function (stdout) {
-        var target = document.getElementById('user-data-perl-output');
-        target.innerText = 'Last user input: ' + stdout;
-      }
-
-      var clock_one = {};
-      clock_one.scriptRelativePath = 'perl-scripts/clock.pl';
-      clock_one.inputData = function() {
-        return "unix-epoch";
-      }
-      clock_one.stdoutFunction = function (stdout) {
-        var target = document.getElementById('clock-one-output');
-        target.innerHTML = stdout;
+      // Settings objects for Perl scripts
+      // Interactive script:
+      var messenger_one = {};
+      messenger_one.scriptRelativePath = 'perl-scripts/messenger.pl';
+      messenger_one.inputData = function() {
+        var message = {};
+        if(("tempfile" in messenger_one)) {
+          message.tempfile = messenger_one.tempfile;
+        }
+        message.user_input = document.getElementById("interactive-one-input").value;
+        $('#form-one').trigger('reset');
+        return JSON.stringify(message);
       }
 
-      var clock_two = {};
-      clock_two.scriptRelativePath = 'perl-scripts/clock.pl';
-      clock_two.inputData = function() {
-        return "local-time";
-      }
-      clock_two.stdoutFunction = function (stdout) {
-        var target = document.getElementById('clock-two-output');
-        target.innerHTML = stdout;
+      var messenger_two = {};
+      messenger_two.scriptRelativePath = 'perl-scripts/messenger.pl';
+      messenger_two.inputData = function() {
+        var message = {};
+        if(("tempfile" in messenger_two)) {
+          message.tempfile = messenger_two.tempfile;
+        }
+        message.user_input = document.getElementById("interactive-two-input").value;
+        $('#form-two').trigger('reset');
+        return JSON.stringify(message);
       }
 
+      var interactive_one = {};
+      interactive_one.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
+      interactive_one.inputData = function() {
+        var input = {};
+        input.mode = "unix-epoch";
+        return JSON.stringify(input);
+      }
+      interactive_one.stdoutFunction = function (stdout) {
+        var target = document.getElementById('instance-one-output');
+        var output = JSON.parse(stdout);
+        var html;
+        messenger_one.tempfile = output.tempfile;
+        if(("user_input" in output)) {
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
+        };
+      }
+
+      var interactive_two = {};
+      interactive_two.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
+      interactive_two.inputData = function() {
+        var input = {};
+        input.mode = "local-time";
+        return JSON.stringify(input);
+      }
+      interactive_two.stdoutFunction = function (stdout) {
+        var target = document.getElementById('instance-two-output');
+        var output = JSON.parse(stdout);
+        var html;
+        messenger_two.tempfile = output.tempfile;
+        if(("user_input" in output)) {
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
+        };
+      }
+
+      // Other PEB tests:
       var open_file = {};
       open_file.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_file.stdoutFunction = function (stdout) {
@@ -189,8 +227,9 @@
         font-size: 20px;
       }
 
-      .output {
+      .interactive-output {
         font-size: 20px;
+        margin-bottom: 20px;
       }
     </style>
   </head>
@@ -246,8 +285,6 @@
               </ul>
             </li>
 
-            <li><a href="javascript:location.reload();">Reload</a></li>
-
             <li><a href="https://www.google.com/">Google</a></li>
 
             <li class="dropdown">
@@ -277,40 +314,52 @@
         </div>
       </div>
 
-      <div class="row">
-        &nbsp;
-      </div>
+      <h3>Interactive Script Demo</h3>
 
       <div class="row">
         <div class="col-xs-12 form-group">
-          <form action="perl_input.script" id="perl-input">
+          <form action="messenger_one.script" id="form-one">
             <div class="input-group">
-              <input type="text" id="perl-input-box" class="form-control"
-                placeholder="Press Enter to send data to Perl script">
+              <input type="text" id="interactive-one-input" name="input" class="form-control"
+                placeholder="Press Enter to send data to the first interactive script instance">
 
               <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#perl-input').trigger('reset');">
+                onclick="javascript:$('#form-one').trigger('reset');">
                 Reset
               </span>
 
               <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#perl-input').trigger('submit');">
+                onclick="javascript:$('#form-one').trigger('submit');">
                 Send
               </span>
             </div>
           </form>
         </div>
 
-        <div id="user-data-perl-output" class="output">Last user input: none</div>
+        <div id="instance-one-output" class="interactive-output">&nbsp;</div>
       </div>
 
       <div class="row">
-        &nbsp;
-      </div>
+        <div class="col-xs-12 form-group">
+          <form action="messenger_two.script" id="form-two">
+            <div class="input-group">
+              <input type="text" id="interactive-two-input" name="input" class="form-control"
+                placeholder="Press Enter to send data to the second interactive script instance">
 
-      <div class="row">
-        <div id="clock-one-output" class="output">&nbsp;</div>
-        <div id="clock-two-output" class="output">&nbsp;</div>
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-two').trigger('reset');">
+                Reset
+              </span>
+
+              <span class="input-group-addon btn btn-primary"
+                onclick="javascript:$('#form-two').trigger('submit');">
+                Send
+              </span>
+            </div>
+          </form>
+        </div>
+
+        <div id="instance-two-output" class="interactive-output">&nbsp;</div>
       </div>
     </div>
   </body>

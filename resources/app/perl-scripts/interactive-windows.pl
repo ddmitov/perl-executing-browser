@@ -6,12 +6,13 @@ use POSIX qw(strftime);
 use Encode qw(decode);
 
 use AnyEvent;
+use File::Temp qw(tempfile tempdir);
 use JSON::PP;
 
 # Disable built-in buffering:
 $| = 1;
 
-# Defaults:
+# Global defaults:
 my $mode = "unix-epoch";
 my $user_input = "";
 
@@ -20,27 +21,42 @@ my $stdin = <STDIN>;
 chomp $stdin;
 
 my $initial_input = get_input($stdin);
-$mode = $initial_input->{mode};
+eval{
+  $mode = $initial_input->{mode};
+} or do {
+  1;
+};
+
+# Temporary file:
+my $tempfile_handle = File::Temp->new(UNLINK => 0);
+my $tempfile = $tempfile_handle->filename;
 
 # Set the event loop:
 my $event_loop = AnyEvent->condvar;
 
-my $input = AnyEvent->io(
-  fh => \*STDIN,
-  poll => "r",
-  cb => sub {
-    my $stdin = <STDIN>;
-    chomp $stdin;
-
-    my $input = get_input($stdin);
-    $user_input  = decode('UTF-8', $input->{user_input});
-  }
-);
-
-my $clock = AnyEvent->timer(
+my $timer = AnyEvent->timer(
   after => 0,
   interval => 0.5,
   cb => sub {
+    my $data;
+
+    if (-e $tempfile) {
+      eval{
+        open $tempfile_handle, '<', $tempfile;
+        $data = <$tempfile_handle>;
+        close $tempfile_handle;
+      } or do {
+        1;
+      }
+    }
+
+    my $input = get_input($data);
+    eval{
+      $user_input = decode('UTF-8', $input->{user_input});
+    } or do {
+      1;
+    };
+
     my $time;
 
     if ($mode =~ "unix-epoch") {
@@ -53,11 +69,11 @@ my $clock = AnyEvent->timer(
     }
 
     my $output = {
+      tempfile => "$tempfile",
       time => $time,
       user_input => $user_input
     };
 
-    # my $output_json = encode_json $output; JSON->new->utf8->encode
     my $output_json = JSON::PP->new->utf8->encode($output);
     print $output_json or shutdown_procedure();
   },
@@ -67,9 +83,14 @@ $event_loop->recv;
 
 # Get JSON input:
 sub get_input {
-  my ($stdin) = @_;
+  my ($data) = @_;
   my $json_object = new JSON::PP;
-  my $input = $json_object->decode($stdin);
+  my $input;
+  eval{
+    $input = $json_object->decode($data);
+  } or do {
+    $input = "";
+  };
   return $input;
 }
 
@@ -78,6 +99,7 @@ sub get_input {
 # It must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!
 sub shutdown_procedure {
+  unlink $tempfile;
   exit(0);
 }
 

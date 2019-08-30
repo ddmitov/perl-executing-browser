@@ -22,13 +22,14 @@
         'Text was entered in a form and it is going to be lost!\n' +
         'Are you sure you want to close the application?';
 
-      // Settings objects for Perl scripts:
+      // Settings objects for Perl scripts
+      // Interactive script:
       var interactive_one = {};
       interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
       interactive_one.inputData = function() {
         var input = {}
         input.mode = "unix-epoch";
-        input.user = document.getElementById("interactive-one-input").value;
+        input.user_input = document.getElementById("interactive-one-input").value;
         $('#form-one').trigger('reset');
         return JSON.stringify(input);
       }
@@ -36,8 +37,8 @@
         var target = document.getElementById('instance-one-output');
         var output = JSON.parse(stdout);
         var html;
-        if(("user" in output)) {
-          html = output.time + '<br>' + output.user;
+        if(("user_input" in output)) {
+          html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;
         };
@@ -49,7 +50,7 @@
       interactive_two.inputData = function() {
         var input = {}
         input.mode = "local-time";
-        input.user = document.getElementById("interactive-two-input").value;
+        input.user_input = document.getElementById("interactive-two-input").value;
         $('#form-one').trigger('reset');
         return JSON.stringify(input);
       }
@@ -57,14 +58,15 @@
         var target = document.getElementById('instance-two-output');
         var output = JSON.parse(stdout);
         var html;
-        if(("user" in output)) {
-          html = output.time + '<br>' + output.user;
+        if(("user_input" in output)) {
+          html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;
         };
         target.innerHTML = html;
       }
 
+      // Other PEB tests:
       var open_file = {};
       open_file.scriptRelativePath = 'perl-scripts/open-files.pl';
       open_file.stdoutFunction = function (stdout) {

@@ -222,9 +222,9 @@ The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/mast
 
 ## Long-Running Windows Perl Scripts
 
-Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts), but long-running Windows Perl scripts are supported provided that they also have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter.  
+Long-running Windows Perl scripts are supported provided that they also have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter.  
 
-Long-running Windows Perl scripts can not receive the ``SIGTERM`` signal and if they are still running when PEB is closed, they can only be killed with no mechanism for a graceful shutdown.
+Windows Perl scripts can not receive the ``SIGTERM`` signal and if they are still running when PEB is closed, they can only be killed with no mechanism for a graceful shutdown.
 
 ## Selecting Files and Folders
 

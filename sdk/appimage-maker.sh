@@ -156,8 +156,8 @@ if [ $mode == "include-resources" ]; then
   if [ "$appimage_name" == "peb-demo" ]; then
     export VERSION="1.0.0"
     rm -f "$(pwd)/$appimage_name.app/resources/app/index-windows.html"
-    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/clock.pl"
-    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/input.pl"
+    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/messenger.pl"
+    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/interactive-windows.pl"
   fi
 
   # AppImage creation:

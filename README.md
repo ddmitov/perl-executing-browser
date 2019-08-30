@@ -84,7 +84,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * PEB can be started from any folder without installation procedure.
 * [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
-* [Linux and Mac Perl scripts with STDIN event loops can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
+* [Event-driven interactive Perl scripts can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
@@ -106,7 +106,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
 * No files can be downloaded.
 * Printing is not supported.
-* Windows builds of PEB do not support [interactive Perl Scripts](./doc/SETTINGS.md#interactive-perl-scripts).
 
 ## History
 
