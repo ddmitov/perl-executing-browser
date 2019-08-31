@@ -82,7 +82,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Features
 
-* PEB can be started from any folder without installation procedure.
+* [PEB can be started from any folder without installation procedure.](./doc/CONSTANTS.md)
 * [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
 * [Event-driven interactive Perl scripts can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)

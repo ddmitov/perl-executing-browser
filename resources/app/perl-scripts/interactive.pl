@@ -57,7 +57,6 @@ my $clock = AnyEvent->timer(
       user_input => $user_input
     };
 
-    # my $output_json = encode_json $output; JSON->new->utf8->encode
     my $output_json = JSON::PP->new->utf8->encode($output);
     print $output_json or shutdown_procedure();
   },
@@ -73,7 +72,7 @@ sub get_input {
   return $input;
 }
 
-# This function is called when PEB is closed by user or unexpectedly crashes and
+# This function is called when PEB unexpectedly crashes and
 # script loses its STDOUT stream.
 # It must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!

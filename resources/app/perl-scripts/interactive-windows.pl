@@ -102,8 +102,3 @@ sub shutdown_procedure {
   unlink $tempfile;
   exit(0);
 }
-
-# Exit on SIGTERM signal from PEB:
-$SIG{TERM} = sub {
-  exit(0);
-};

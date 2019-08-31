@@ -58,17 +58,17 @@ The ``pebSettings`` JavaScript object may have the following properties:
 
 ## Perl Scripts API
 
-Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms settings pseudo link used to start the Perl script.  
+Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms a pseudo link used to start the Perl script.  
 
 There are three methods to start a local Perl script:  
 
-* **Clicking a link to a script settings pseudo link:**  
+* **Clicking a link to a script pseudo link:**  
 
   ```html
   <a href="test.script">Start Perl script</a>
   ```
 
-* **Submitting a form to a script settings pseudo link:**  
+* **Submitting a form to a script pseudo link:**  
 
   ```html
   <form action="test.script">
@@ -76,15 +76,15 @@ There are three methods to start a local Perl script:
   </form>
   ```
 
-* **Calling a JavaScript function with a script settings pseudo link:**  
+* **Calling a JavaScript function with a script pseudo link:**  
 
   ```javascript
   peb.startScript('test.script');
   ```
 
-  This method creates an invisible form and submits it to the script settings pseudo link.  
+  This method creates an invisible form and submits it to the script pseudo link.  
 
-A minimal example of a JavaScript settings object for a Perl script run by PEB:  
+An example of a JavaScript settings object for a Perl script run by PEB:  
 
 ```javascript
 var perl_script = {};
@@ -99,7 +99,8 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 * **scriptRelativePath**  
   ``String`` for the relative path of a Perl script run by PEB  
-  The script relative path is converted to a full path using the ``{PEB_app_directory}`` as a root folder.  
+  The relative path of a script is converted to a full path using the  
+  ``{PEB_executable_directory}/resources/app`` as a root folder.  
   PEB does not check filename extensions or shebang lines of Perl scripts.  
   Scripts without filename extensions can also be used.  
   *This object property is mandatory.*  
@@ -111,7 +112,6 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 * **stdoutFunction**  
   executed every time data is available on STDOUT  
   The only parameter passed to the ``stdoutFunction`` is the STDOUT ``String``.  
-  *This object property is mandatory.*  
 
   An example of an immediate STDOUT data display without accumulation:
 

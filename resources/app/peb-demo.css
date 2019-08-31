@@ -1,0 +1,35 @@
+body {
+  padding-top: 65px;
+}
+
+pre {
+  margin: 4px;
+  text-align: left;
+  font-size: 14px;
+  font-family: sans-serif;
+}
+
+.navbar .navbar-header {
+  text-align: center;
+  vertical-align: middle;
+}
+
+.navbar .navbar-nav {
+  display: inline-block;
+  float: center;
+}
+
+.navbar-toggle {
+  float: center;
+  margin: 10px;
+  vertical-align: middle;
+}
+
+.introduction {
+  font-size: 20px;
+}
+
+.interactive-output {
+  font-size: 20px;
+  margin-bottom: 20px;
+}
