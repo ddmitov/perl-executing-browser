@@ -157,18 +157,10 @@ A PEB interactive Perl script should have the following features:
 * **No buffering**  
   PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.
 
-* **SIGTERM handling**  
-  PEB sends the ``SIGTERM`` signal to all interactive scripts on exit for a graceful shutdown and to prevent them from becoming zombie processes. All interactive scripts must exit in 3 seconds after the ``SIGTERM`` signal is given by PEB. All unresponsive scripts are killed before PEB exits. The  ``SIGTERM`` signal may be handled by any interactive script for a graceful shutdown using the following code:
-
-  ```perl
-  $SIG{TERM} = sub {
-    # your shutdown code goes here...
-    exit();
-  };
-  ```
-
 * **Failsafe print**  
-  If a PEB instance crashes, it can still leave its interactive scripts as zombie processes consuming large amounts of memory. To prevent this scenario, all interactive scripts should test for a successful ``print`` on the STDOUT. This could be implemented using the following code:
+  Failsafe print is necessary for a graceful shutdown of Perl scripts on normal PEB exit and when PEB unexpectedly crashes. PEB closes the STDOUT and STDERR channels of all running Perl scripts when the close button is pressed - they must exit in 3 seconds or any unresponsive scripts are killed.
+
+  Failsafe print could be implemented using the following code:
 
   ```perl
   print "output string" or shutdown_procedure();
@@ -198,6 +190,7 @@ The following code shows how to start a PEB interactive Perl script right after 
       interactive_script.inputData = function() {
         return document.getElementById('interactive-script-input').value;
       }
+
       interactive_script.stdoutFunction = function (stdout) {
         var container = document.getElementById('interactive-script-output');
         container.innerText = stdout;
@@ -216,7 +209,7 @@ The following code shows how to start a PEB interactive Perl script right after 
 </html>
 ```
 
-The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) page of the demo package demonstrates how to start one script in two instances immediately after local page is loaded.  
+The [index.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) shows how to start one Perl script in two instances right after the PEB index page is loaded.  
 
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl/interactive.pl) script of the demo package is an example of a Perl interactive script for PEB.
 

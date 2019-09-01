@@ -45,6 +45,7 @@ class QPage : public QWebPage
 
 signals:
     void pageLoadedSignal();
+    void hideWindowSignal();
     void closeWindowSignal();
 
 public slots:
@@ -385,14 +386,10 @@ public slots:
                 QScriptHandler *handler = iterator.value();
 
                 if (handler->scriptProcess.isOpen()) {
-#ifndef Q_OS_WIN
-                    handler->scriptProcess.terminate();
-#endif
-
-#ifdef Q_OS_WIN
-                    handler->scriptProcess.kill();
-                    runningScripts.remove(iterator.key());
-#endif
+                    handler->scriptProcess
+                            .closeReadChannel(QProcess::StandardOutput);
+                    handler->scriptProcess
+                            .closeReadChannel(QProcess::StandardError);
                 }
 
                 if (!handler->scriptProcess.isOpen()) {
@@ -401,22 +398,21 @@ public slots:
             }
         }
 
-#ifndef Q_OS_WIN
         if (!runningScripts.isEmpty()) {
             int maximumTimeMilliseconds = 3000;
             QTimer::singleShot(maximumTimeMilliseconds,
                                this, SLOT(qScriptsTimeoutSlot()));
         }
-#endif
 
         if (runningScripts.isEmpty()) {
             emit closeWindowSignal();
+        } else {
+            emit hideWindowSignal();
         }
     }
 
     void qScriptsTimeoutSlot()
     {
-#ifndef Q_OS_WIN
         if (!runningScripts.isEmpty()) {
             QHash<QString, QScriptHandler*>::iterator iterator;
             for (iterator = runningScripts.begin();
@@ -431,7 +427,6 @@ public slots:
         }
 
         emit closeWindowSignal();
-#endif
     }
 
 protected:
