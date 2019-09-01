@@ -363,7 +363,10 @@ public slots:
     void qCloseWindow(QVariant jsResult)
     {
         bool jsCloseDecision = true;
-        jsCloseDecision = jsResult.toBool();
+
+        if (jsResult.toByteArray().length() > 0) {
+            jsCloseDecision = jsResult.toBool();
+        }
 
         if (jsCloseDecision == true) {
             if (!runningScripts.isEmpty()){

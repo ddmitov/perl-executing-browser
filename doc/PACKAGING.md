@@ -30,8 +30,8 @@
 
 * **PEB AppImage Configuration Files**
 
-  ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
-  ``{PEB_executable_directory}/resources/app/{application_name}.appdata.xml``  
+  ``{PEB_executable_directory}/resources/app/appimage/{application_name}.desktop``  
+  ``{PEB_executable_directory}/resources/app/appimage/{application_name}.appdata.xml``  
 
   ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
   is mandatory for any PEB-based application which will be packed by the PEB AppImage Maker.  

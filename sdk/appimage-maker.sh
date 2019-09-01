@@ -90,7 +90,7 @@ fi
 # Pack PEB and include the 'resources' folder in the resulting AppImage:
 if [ $mode == "include-resources" ]; then
   # AppImage desktop file is mandatory:
-  package_desktop_file="$(ls ./resources/app/*.desktop)"
+  package_desktop_file="$(ls ./resources/app/appimage/*.desktop)"
   if [ ! -e "$package_desktop_file" ]; then
     printf "\\nPackage .desktop file is missing!\\n"
     exit 1
@@ -115,7 +115,7 @@ if [ $mode == "include-resources" ]; then
   fi
 
   # AppImage metadata file:
-  if [ -e "$(pwd)/resources/app/$appimage_name.appdata.xml" ]; then
+  if [ -e "$(pwd)/resources/app/appimage/$appimage_name.appdata.xml" ]; then
     mkdir -p "$(pwd)/$appimage_name.app/usr/share/metainfo"
     cp -f "$(pwd)/resources/app/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
   fi

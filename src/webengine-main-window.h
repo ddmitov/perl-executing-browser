@@ -63,11 +63,10 @@ public slots:
             event->ignore();
             emit startMainWindowClosingSignal();
         }
-    }
 
-    void qExitApplicationSlot()
-    {
-        QApplication::exit();
+        if (qApp->property("windowCloseRequested").toBool() == true) {
+            event->accept();
+        }
     }
 
 public:

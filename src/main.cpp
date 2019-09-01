@@ -169,7 +169,7 @@ int main(int argc, char **argv)
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
     if (ANNULEN_QTWEBKIT == 0) {
-        // Signal and slot for fullscreen video:
+        // Signal and slot for QtWebEngine fullscreen signal:
         QObject::connect(mainWindow.webViewWidget->page(),
                          SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
                          &mainWindow,
@@ -182,10 +182,6 @@ int main(int argc, char **argv)
                      SIGNAL(startMainWindowClosingSignal()),
                      mainWindow.webViewWidget->page(),
                      SLOT(qStartWindowClosingSlot()));
-
-    // Signal and slot for actions taken before application exit:
-    QObject::connect(qApp, SIGNAL(aboutToQuit()),
-                     &mainWindow, SLOT(qExitApplicationSlot()));
 
     // ==============================
     // Start page:
