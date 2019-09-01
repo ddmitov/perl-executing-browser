@@ -23,14 +23,34 @@
         'Are you sure you want to close the application?';
 
       // PEB settings objects for auto-started Perl interactive scripts:
+      var messenger_one = {};
+      messenger_one.scriptRelativePath = 'perl-scripts/messenger.pl';
+
+      messenger_one.message = {};
+      messenger_one.inputData = function() {
+        messenger_one.message.user_input =
+          document.getElementById("interactive-one-input").value;
+        $('#form-one').trigger('reset');
+        return JSON.stringify(messenger_one.message);
+      }
+
+      var messenger_two = {};
+      messenger_two.scriptRelativePath = 'perl-scripts/messenger.pl';
+
+      messenger_two.message = {};
+      messenger_two.inputData = function() {
+        messenger_two.message.user_input =
+          document.getElementById("interactive-two-input").value;
+        $('#form-two').trigger('reset');
+        return JSON.stringify(messenger_two.message);
+      }
+
       var interactive_one = {};
-      interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
+      interactive_one.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
 
       interactive_one.inputData = function() {
-        var input = {}
+        var input = {};
         input.mode = "unix-epoch";
-        input.user_input = document.getElementById("interactive-one-input").value;
-        $('#form-one').trigger('reset');
         return JSON.stringify(input);
       }
 
@@ -38,22 +58,23 @@
         var target = document.getElementById('instance-one-output');
         var output = JSON.parse(stdout);
         var html;
+        messenger_one.message.tempfile = output.tempfile;
         if(("user_input" in output)) {
-          html = output.time + '<br>' + output.user_input;
-        } else {
-          html = output.time;
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
         };
-        target.innerHTML = html;
       }
 
       var interactive_two = {};
-      interactive_two.scriptRelativePath = 'perl-scripts/interactive.pl';
+      interactive_two.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
 
       interactive_two.inputData = function() {
-        var input = {}
+        var input = {};
         input.mode = "local-time";
-        input.user_input = document.getElementById("interactive-two-input").value;
-        $('#form-one').trigger('reset');
         return JSON.stringify(input);
       }
 
@@ -61,12 +82,15 @@
         var target = document.getElementById('instance-two-output');
         var output = JSON.parse(stdout);
         var html;
+        messenger_two.message.tempfile = output.tempfile;
         if(("user_input" in output)) {
-          html = output.time + '<br>' + output.user_input;
-        } else {
-          html = output.time;
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
         };
-        target.innerHTML = html;
       }
     </script>
 
@@ -164,7 +188,7 @@
 
       <div class="row">
         <div class="col-xs-12 form-group">
-          <form action="interactive_one.script" id="form-one">
+          <form action="messenger_one.script" id="form-one">
             <div class="input-group">
               <input type="text" id="interactive-one-input" name="input" class="form-control"
                 placeholder="Press Enter to send data to the first interactive script instance">
@@ -187,7 +211,7 @@
 
       <div class="row">
         <div class="col-xs-12 form-group">
-          <form action="interactive_two.script" id="form-two">
+          <form action="messenger_two.script" id="form-two">
             <div class="input-group">
               <input type="text" id="interactive-two-input" name="input" class="form-control"
                 placeholder="Press Enter to send data to the second interactive script instance">

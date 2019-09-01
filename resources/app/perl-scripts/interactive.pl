@@ -4,12 +4,13 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 use Encode qw(decode);
+use English;
 
 use AnyEvent;
 use JSON::PP;
 
-# Disable built-in buffering:
-$| = 1;
+# Disable output buffering:
+$OUTPUT_AUTOFLUSH = 1;
 
 # Defaults:
 my $mode = "unix-epoch";

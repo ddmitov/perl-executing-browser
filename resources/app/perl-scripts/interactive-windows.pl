@@ -4,13 +4,14 @@ use strict;
 use warnings;
 use POSIX qw(strftime);
 use Encode qw(decode);
+use English;
 
 use AnyEvent;
-use File::Temp qw(tempfile tempdir);
+use File::Temp;
 use JSON::PP;
 
-# Disable built-in buffering:
-$| = 1;
+# Disable output buffering:
+$OUTPUT_AUTOFLUSH = 1;
 
 # Global defaults:
 my $mode = "unix-epoch";

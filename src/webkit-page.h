@@ -320,7 +320,7 @@ public slots:
                 errors.replace("\r", "");
 
                 QString perlScriptErrorsMessage =
-                        "console.log('" + errors + "'); null";
+                        "console.debug('" + errors + "'); null";
 
                 mainFrame()->evaluateJavaScript(perlScriptErrorsMessage);
             }

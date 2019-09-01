@@ -153,7 +153,15 @@ Each PEB interactive Perl script must have its own event loop waiting constantly
 A PEB interactive Perl script should have the following features:
 
 * **No buffering**  
-  PEB interactive scripts should have ``$|=1;`` among their first lines to disable the built-in buffering of the Perl interpreter, which prevents any output before the script has ended.
+  PEB interactive scripts should run with no output buffering preventing output before the script has ended.
+
+  Output buffering could be disabled using the following code:
+
+  ```perl
+  use English;
+
+  $OUTPUT_AUTOFLUSH = 1;
+  ```
 
 * **Failsafe print**  
   Failsafe print is necessary for a graceful shutdown of Perl scripts on normal PEB exit and when PEB unexpectedly crashes. When the close button is pressed, PEB closes the STDOUT and STDERR channels of all running Perl scripts and within 3 seconds they must detect their inability to print messages and exit or any unresponsive scripts will be killed.
