@@ -25,7 +25,6 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QRegularExpression>
-#include <QTimer>
 #include <QUrl>
 #include <QWebEnginePage>
 
@@ -42,7 +41,6 @@ class QPage : public QWebEnginePage
 
 signals:
     void pageLoadedSignal();
-    void hideWindowSignal();
     void closeWindowSignal();
 
 public slots:
@@ -366,62 +364,24 @@ public slots:
 
     void qCloseAllScriptsSlot()
     {
+        QHash<QString, QScriptHandler*>::iterator iterator;
+        for (iterator = runningScripts.begin();
+             iterator != runningScripts.end();
+             ++iterator) {
+            QScriptHandler *handler = iterator.value();
+
+            if (handler->scriptProcess.isOpen()) {
+                handler->scriptProcess.kill();
+            }
+        }
+
         closeRequested = true;
-
-        if (!runningScripts.isEmpty()) {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess
-                            .closeReadChannel(QProcess::StandardOutput);
-                    handler->scriptProcess
-                            .closeReadChannel(QProcess::StandardError);
-                }
-
-                if (!handler->scriptProcess.isOpen()) {
-                    runningScripts.remove(iterator.key());
-                }
-            }
-        }
-
-        if (!runningScripts.isEmpty()) {
-            int maximumTimeMilliseconds = 3000;
-            QTimer::singleShot(maximumTimeMilliseconds,
-                               this, SLOT(qScriptsTimeoutSlot()));
-        }
-
-        if (runningScripts.isEmpty()) {
-            emit closeWindowSignal();
-        } else {
-            emit hideWindowSignal();
-        }
-    }
-
-    void qScriptsTimeoutSlot()
-    {
-        if (!runningScripts.isEmpty()) {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess.kill();
-                }
-            }
-        }
-
         emit closeWindowSignal();
     }
 
 protected:
     bool acceptNavigationRequest(const QUrl &url,
-                                 QWebEnginePage::NavigationType type,
+                                 QWebEnginePage::NavigationType navType,
                                  bool isMainFrame) override;
 
     // ==============================

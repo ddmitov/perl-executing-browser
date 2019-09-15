@@ -37,7 +37,11 @@ select_file.type = 'single-file';
 select_file.receiverFunction = function (fileName) {
   open_file.inputData = fileName;
   clearTestData();
-  peb.startScript('open_file.script');
+
+  var form = document.createElement('form');
+  form.setAttribute('action', 'open_file.script');
+  document.body.appendChild(form);
+  form.submit();
 }
 
 var new_file_name = {};
@@ -54,7 +58,11 @@ select_files.type = 'multiple-files';
 select_files.receiverFunction = function (fileNames) {
   open_files.inputData = fileNames;
   clearTestData();
-  peb.startScript('open_files.script');
+
+  var form = document.createElement('form');
+  form.setAttribute('action', 'open_files.script');
+  document.body.appendChild(form);
+  form.submit();
 }
 
 var select_directory = {};
@@ -62,15 +70,11 @@ select_directory.type = 'directory';
 select_directory.receiverFunction = function (directoryName) {
   open_directory.inputData = directoryName;
   clearTestData();
-  peb.startScript('open_directory.script');
-}
 
-function startPerlInfo() {
-  peb.startScript('perl_info.script');
-}
-
-function startSqlite() {
-  peb.startScript('sqlite.script');
+  var form = document.createElement('form');
+  form.setAttribute('action', 'open_directory.script');
+  document.body.appendChild(form);
+  form.submit();
 }
 
 function clearTestData() {

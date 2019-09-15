@@ -70,48 +70,32 @@ QPage::QPage()
 // Special URLs handling:
 // ==============================
 bool QPage::acceptNavigationRequest(const QUrl &url,
-                                    QWebEnginePage::NavigationType type,
+                                    QWebEnginePage::NavigationType navType,
                                     bool isMainFrame)
 {
-    // Handle filesystem dialogs:
-    if ((url.scheme() == "file") and
-            type == QWebEnginePage::NavigationTypeLinkClicked and
-            url.fileName().contains(".dialog") and
-            isMainFrame == true) {
-        qHandleDialogs(url.fileName().replace(".dialog", ""));
-        return false;
-    }
-
-    // Handle local Perl scripts and functional pseudo filenames:
     if (url.scheme() == "file" and isMainFrame == true) {
-        // Submitting special forms is a method to start local Perl scripts:
-        if (type == QWebEnginePage::NavigationTypeFormSubmitted) {
-            if (url.fileName().contains(".script")) {
-                qHandleScripts(url.fileName().replace(".script", ""));
-                return false;
-            } else {
+        if (navType == QWebEnginePage::NavigationTypeLinkClicked) {
+            // Handle filesystem dialogs:
+            if (url.fileName().contains(".dialog")) {
+                qHandleDialogs(url.fileName().replace(".dialog", ""));
                 return false;
             }
-        }
 
-        if (type == QWebEnginePage::NavigationTypeLinkClicked) {
-            // Clicking special links is
-            // another method to start local Perl scripts:
+            // Handle local Perl scripts after local link is clicked:
             if (url.fileName().contains(".script")) {
                 qHandleScripts(url.fileName().replace(".script", ""));
                 return false;
             }
 
-            // About browser dialog:
-            if (url.fileName() == "about-browser.function") {
+            // About dialog:
+            if (url.fileName() == "about.function") {
                 QFileReader *resourceReader =
                         new QFileReader(QString(":/html/about.html"));
                 QString aboutText = resourceReader->fileContents;
 
                 aboutText.replace("APPLICATION_VERSION",
                                   QApplication::applicationVersion());
-                aboutText.replace("QT_VERSION",
-                                  QT_VERSION_STR);
+                aboutText.replace("QT_VERSION", QT_VERSION_STR, QT_);
 
                 QPixmap icon(32, 32);
                 icon.load(":/icon/camel.png");
@@ -125,12 +109,13 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
 
                 return false;
             }
+        }
 
-            // About Qt dialog:
-            if (url.fileName() == "about-qt.function") {
-                QApplication::aboutQt();
-                return false;
-            }
+        // Handle local Perl scripts after local form is submitted:
+        if (navType == QWebEnginePage::NavigationTypeFormSubmitted and
+                url.fileName().contains(".script")) {
+            qHandleScripts(url.fileName().replace(".script", ""));
+            return false;
         }
     }
 

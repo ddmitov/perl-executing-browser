@@ -57,8 +57,8 @@ QPage::QPage()
                      this, SLOT(qPageLoadedSlot(bool)));
 
     // Signal and slot for closing window from JavaScript:
-    QObject::connect(this, SIGNAL(windowCloseRequested()),
-                     this, SLOT(qCloseAllScriptsSlot()));
+//    QObject::connect(this, SIGNAL(windowCloseRequested()),
+//                     this, SLOT(qCloseAllScriptsSlot()));
 
     // Default dialog and context menu labels:
     okLabel = "Ok";

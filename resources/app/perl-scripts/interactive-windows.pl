@@ -29,7 +29,8 @@ eval{
 };
 
 # Temporary file:
-my $tempfile_handle = File::Temp->new(UNLINK => 0);
+my $tempfile_handle = File::Temp->new();
+$tempfile_handle->unlink_on_destroy(1);
 my $tempfile = $tempfile_handle->filename;
 
 # Set the event loop:
@@ -46,6 +47,7 @@ my $timer = AnyEvent->timer(
         open $tempfile_handle, '<', $tempfile;
         $data = <$tempfile_handle>;
         close $tempfile_handle;
+        unlink $tempfile;
       } or do {
         1;
       }
@@ -95,11 +97,10 @@ sub get_input {
   return $input;
 }
 
-# This function is called when PEB is closed by user or unexpectedly crashes and
+# This function is called when PEB unexpectedly crashes and
 # script loses its STDOUT stream.
 # It must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!
 sub shutdown_procedure {
-  unlink $tempfile;
   exit(0);
 }

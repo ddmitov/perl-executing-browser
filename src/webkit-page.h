@@ -26,7 +26,6 @@
 #include <QMessageBox>
 #include <QNetworkReply>
 #include <QRegularExpression>
-#include <QTimer>
 #include <QUrl>
 #include <QWebElement>
 #include <QWebFrame>
@@ -45,7 +44,6 @@ class QPage : public QWebPage
 
 signals:
     void pageLoadedSignal();
-    void hideWindowSignal();
     void closeWindowSignal();
 
 public slots:
@@ -372,6 +370,7 @@ public slots:
             if (!runningScripts.isEmpty()){
                 qCloseAllScriptsSlot();
             } else {
+                closeRequested = true;
                 emit closeWindowSignal();
             }
         }
@@ -379,56 +378,18 @@ public slots:
 
     void qCloseAllScriptsSlot()
     {
+        QHash<QString, QScriptHandler*>::iterator iterator;
+        for (iterator = runningScripts.begin();
+             iterator != runningScripts.end();
+             ++iterator) {
+            QScriptHandler *handler = iterator.value();
+
+            if (handler->scriptProcess.isOpen()) {
+                handler->scriptProcess.kill();
+            }
+        }
+
         closeRequested = true;
-
-        if (!runningScripts.isEmpty()) {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess
-                            .closeReadChannel(QProcess::StandardOutput);
-                    handler->scriptProcess
-                            .closeReadChannel(QProcess::StandardError);
-                }
-
-                if (!handler->scriptProcess.isOpen()) {
-                    runningScripts.remove(iterator.key());
-                }
-            }
-        }
-
-        if (!runningScripts.isEmpty()) {
-            int maximumTimeMilliseconds = 3000;
-            QTimer::singleShot(maximumTimeMilliseconds,
-                               this, SLOT(qScriptsTimeoutSlot()));
-        }
-
-        if (runningScripts.isEmpty()) {
-            emit closeWindowSignal();
-        } else {
-            emit hideWindowSignal();
-        }
-    }
-
-    void qScriptsTimeoutSlot()
-    {
-        if (!runningScripts.isEmpty()) {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess.kill();
-                }
-            }
-        }
-
         emit closeWindowSignal();
     }
 
@@ -438,46 +399,35 @@ protected:
     // ==============================
     bool acceptNavigationRequest(QWebFrame *frame,
                                  const QNetworkRequest &request,
-                                 QWebPage::NavigationType navigationType)
+                                 QWebPage::NavigationType navType)
     {
         Q_UNUSED(frame);
 
-        // Handle filesystem dialogs:
-        if (request.url().scheme() == "file" and
-                navigationType == QWebPage::NavigationTypeLinkClicked and
-                request.url().fileName().contains(".dialog")) {
-            qHandleDialogs(request.url().fileName().replace(".dialog", ""));
-            return false;
-        }
-
-        // Handle local Perl scripts and functional pseudo filenames:
         if (request.url().scheme() == "file") {
-            // Submitting special forms is a method to start local Perl scripts:
-            if (navigationType == QWebPage::NavigationTypeFormSubmitted and
-                    request.url().fileName().contains(".script")) {
-                qHandleScripts(request.url().fileName().replace(".script", ""));
-                return false;
-            }
+            if (navType == QWebPage::NavigationTypeLinkClicked) {
+                // Handle filesystem dialogs:
+                if (request.url().fileName().contains(".dialog")) {
+                    qHandleDialogs(request.url().fileName()
+                                   .replace(".dialog", ""));
+                    return false;
+                }
 
-            if (navigationType == QWebPage::NavigationTypeLinkClicked) {
-                // Clicking special links is
-                // another method to start local Perl scripts:
+                // Handle local Perl scripts after local link is clicked:
                 if (request.url().fileName().contains(".script")) {
                     qHandleScripts(request.url().fileName()
                                    .replace(".script", ""));
                     return false;
                 }
 
-                // About browser dialog:
-                if (request.url().fileName() == "about-browser.function") {
+                // About dialog:
+                if (request.url().fileName() == "about.function") {
                     QFileReader *resourceReader =
                             new QFileReader(QString(":/html/about.html"));
                     QString aboutText = resourceReader->fileContents;
 
                     aboutText.replace("APPLICATION_VERSION",
                                       QApplication::applicationVersion());
-                    aboutText.replace("QT_VERSION",
-                                      QT_VERSION_STR);
+                    aboutText.replace("QT_VERSION", QT_VERSION_STR);
 
                     QPixmap icon(32, 32);
                     icon.load(":/icon/camel.png");
@@ -491,18 +441,17 @@ protected:
 
                     return false;
                 }
+            }
 
-                // About Qt dialog:
-                if (request.url().fileName() == "about-qt.function") {
-                    QApplication::aboutQt();
-                    return false;
-                }
+            // Handle local Perl scripts after local form is submitted:
+            if (navType == QWebPage::NavigationTypeFormSubmitted and
+                    request.url().fileName().contains(".script")) {
+                qHandleScripts(request.url().fileName().replace(".script", ""));
+                return false;
             }
         }
 
-        return QWebPage::acceptNavigationRequest(frame,
-                                                 request,
-                                                 navigationType);
+        return QWebPage::acceptNavigationRequest(frame, request, navType);
     }
 
     // ==============================

@@ -25,13 +25,6 @@ peb.getScriptSettings = function(scriptSettings) {
   }
 }
 
-peb.startScript = function(scriptSettings) {
-  var form = document.createElement('form');
-  form.setAttribute('action', scriptSettings);
-  document.body.appendChild(form);
-  form.submit();
-}
-
 peb.checkUserInputBeforeClose = function() {
   var textEntered = false;
   var close = true;

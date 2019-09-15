@@ -144,14 +144,6 @@ public slots:
     }
 
     // ==============================
-    // Hide window:
-    // ==============================
-    void qHideWindowSlot()
-    {
-        this->parentWidget()->hide();
-    }
-
-    // ==============================
     // Close window:
     // ==============================
     void qCloseWindowSlot()

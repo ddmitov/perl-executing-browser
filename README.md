@@ -21,7 +21,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Runtime Requirements](./doc/REQUIREMENTS.md#runtime-requirements)
 * [CONSTANTS](./doc/CONSTANTS.md)
   * [Files and Folders](./doc/CONSTANTS.md#files-and-folders)
-  * [Functional Pseudo Filenames](./doc/CONSTANTS.md#functional-pseudo-filenames)
+  * [Functional Pseudo Filename](./doc/CONSTANTS.md#functional-pseudo-filename)
 * [SETTINGS](./doc/SETTINGS.md)
   * [Application Filename](./doc/SETTINGS.md#application-filename)
   * [HTML Page API](./doc/SETTINGS.md#html-page-api)
@@ -68,8 +68,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * **4.** Write a ``{PEB_executable_directory}/resources/app/index.html`` with  
   a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you want to use.  
-  Local Perl scripts can be called from your HTML page by one of the [three possible methods](./doc/SETTINGS.md#perl-scripts-api).  
-  [Selecting files or folders with their full paths](./doc/SETTINGS.md#selecting-files-and-folders) is also possible.
+  Start local Perl scripts by [clicking a link or submitting a form to a special URL](./doc/SETTINGS.md#perl-scripts-api).  
+  [Select files or folders with their full paths by clicking a link to a special URL](./doc/SETTINGS.md#selecting-files-and-folders).
 
 ## Design Objectives
 

@@ -60,29 +60,21 @@ The ``pebSettings`` JavaScript object may have the following properties:
 
 Every Perl script run by PEB has a JavaScript settings object with an arbitrary name and fixed object properties. The name of the JavaScript settings object with a ``.script`` extension forms a pseudo link used to start the Perl script.  
 
-There are three methods to start a local Perl script:  
+There are two methods to start a local Perl script:  
 
-* **Clicking a link to a script pseudo link:**  
+* **Clicking a link to a pseudo link:**  
 
   ```html
   <a href="test.script">Start Perl script</a>
   ```
 
-* **Submitting a form to a script pseudo link:**  
+* **Submitting a form to a pseudo link:**  
 
   ```html
   <form action="test.script">
     <input type="submit" value="Start Perl script">
   </form>
   ```
-
-* **Calling a JavaScript function with a script pseudo link:**  
-
-  ```javascript
-  peb.startScript('test.script');
-  ```
-
-  This method creates an invisible form and submits it to the script pseudo link.  
 
 An example of a JavaScript settings object for a Perl script run by PEB:  
 
@@ -148,13 +140,12 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 ## Interactive Perl Scripts
 
-Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN or in a temporary file for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has an uniquely named JavaScript settings object.  
+Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN or in a temporary file for a bidirectional connection with PEB. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has a JavaScript settings object with an unique name.  
 
 A PEB interactive Perl script should have the following features:
 
 * **No buffering**  
   PEB interactive scripts should run with no output buffering preventing output before the script has ended.
-
   Output buffering could be disabled using the following code:
 
   ```perl
@@ -164,8 +155,7 @@ A PEB interactive Perl script should have the following features:
   ```
 
 * **Failsafe print**  
-  Failsafe print is necessary for a graceful shutdown of Perl scripts on normal PEB exit and when PEB unexpectedly crashes. When the close button is pressed, PEB closes the STDOUT and STDERR channels of all running Perl scripts and within 3 seconds they must detect their inability to print messages and exit or any unresponsive scripts will be killed.
-
+  Failsafe print is necessary to shut down PEB Perl scripts when PEB unexpectedly crashes.
   Failsafe print could be implemented using the following code:
 
   ```perl
