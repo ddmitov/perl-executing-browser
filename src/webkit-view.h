@@ -34,9 +34,6 @@ class QViewWidget : public QWebView
 {
     Q_OBJECT
 
-signals:
-    void startWindowClosingSignal();
-
 public slots:
     // ==============================
     // Actions taken after page is loaded:
@@ -141,6 +138,14 @@ public slots:
         inspector->setPage(QViewWidget::page());
         inspector->setGeometry(qApp->desktop()->availableGeometry());
         inspector->showMaximized();
+    }
+
+    // ==============================
+    // Hide window:
+    // ==============================
+    void qHideWindowSlot()
+    {
+        this->parentWidget()->hide();
     }
 
     // ==============================

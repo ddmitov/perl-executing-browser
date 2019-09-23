@@ -60,6 +60,10 @@ my $timer = AnyEvent->timer(
       1;
     };
 
+    if ($user_input =~ "peb-exit") {
+      shutdown_procedure();
+    }
+
     my $time;
 
     if ($mode =~ "unix-epoch") {

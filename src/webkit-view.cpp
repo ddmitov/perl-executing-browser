@@ -46,8 +46,8 @@ QViewWidget::QViewWidget()
                      this, SLOT(qPageLoadedSlot()));
 
     // Signals and slots for closing windows:
-    QObject::connect(this, SIGNAL(startWindowClosingSignal()),
-                     mainPage, SLOT(qStartWindowClosingSlot()));
+    QObject::connect(mainPage, SIGNAL(hideWindowSignal()),
+                     this, SLOT(qHideWindowSlot()));
 
     QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
                      this, SLOT(qCloseWindowSlot()));

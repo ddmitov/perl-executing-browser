@@ -34,9 +34,6 @@ class QViewWidget : public QWebEngineView
 {
     Q_OBJECT
 
-signals:
-    void startWindowClosingSignal();
-
 public slots:
     // ==============================
     // Action taken after page is loaded:
@@ -136,6 +133,14 @@ public slots:
     void qSelectAllAction()
     {
         QViewWidget::triggerPageAction(QWebEnginePage::SelectAll);
+    }
+
+    // ==============================
+    // Hide window:
+    // ==============================
+    void qHideWindowSlot()
+    {
+        this->parentWidget()->hide();
     }
 
     // ==============================

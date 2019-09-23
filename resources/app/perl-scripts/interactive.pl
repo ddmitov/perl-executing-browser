@@ -35,6 +35,10 @@ my $input = AnyEvent->io(
 
     my $input = get_input($stdin);
     $user_input  = decode('UTF-8', $input->{user_input});
+
+    if ($user_input =~ "peb-exit") {
+      shutdown_procedure();
+    }
   }
 );
 

@@ -52,10 +52,6 @@ QPage::QPage()
     QObject::connect(this, SIGNAL(loadFinished(bool)),
                      this, SLOT(qPageLoadedSlot(bool)));
 
-    // Signal and slot for closing window from JavaScript:
-    QObject::connect(this, SIGNAL(windowCloseRequested()),
-                     this, SLOT(qCloseAllScriptsSlot()));
-
     // Default dialog and context menu labels:
     okLabel = "Ok";
     cancelLabel = "Cancel";
@@ -95,7 +91,7 @@ bool QPage::acceptNavigationRequest(const QUrl &url,
 
                 aboutText.replace("APPLICATION_VERSION",
                                   QApplication::applicationVersion());
-                aboutText.replace("QT_VERSION", QT_VERSION_STR, QT_);
+                aboutText.replace("QT_VERSION", QT_VERSION_STR);
 
                 QPixmap icon(32, 32);
                 icon.load(":/icon/camel.png");

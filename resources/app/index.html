@@ -9,7 +9,7 @@
     <script>
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+      pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
       pebSettings.cutLabel = '- Cut -';
       pebSettings.copyLabel = '- Copy -';
       pebSettings.pasteLabel = '- Paste -';
@@ -21,17 +21,18 @@
       pebSettings.closeConfirmation =
         'Text was entered in a form and it is going to be lost!\n' +
         'Are you sure you want to close the application?';
+      pebSettings.onExitScripts = ['interactive_one', 'interactive_two'];
 
       // PEB settings objects for auto-started Perl interactive scripts:
       var interactive_one = {};
       interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
 
       interactive_one.inputData = function() {
-        var input = {}
-        input.mode = "unix-epoch";
-        input.user_input = document.getElementById("interactive-one-input").value;
+        var data = {}
+        data.mode = "unix-epoch";
+        data.user_input = document.getElementById("interactive-one-input").value;
         $('#form-one').trigger('reset');
-        return JSON.stringify(input);
+        return JSON.stringify(data);
       }
 
       interactive_one.stdoutFunction = function (stdout) {
@@ -46,15 +47,22 @@
         target.innerHTML = html;
       }
 
+      interactive_one.exitData = function() {
+        var data = {}
+        data.mode = "unix-epoch";
+        data.user_input = "peb-exit";
+        return JSON.stringify(data);
+      }
+
       var interactive_two = {};
       interactive_two.scriptRelativePath = 'perl-scripts/interactive.pl';
 
       interactive_two.inputData = function() {
-        var input = {}
-        input.mode = "local-time";
-        input.user_input = document.getElementById("interactive-two-input").value;
-        $('#form-one').trigger('reset');
-        return JSON.stringify(input);
+        var data = {}
+        data.mode = "local-time";
+        data.user_input = document.getElementById("interactive-two-input").value;
+        $('#form-two').trigger('reset');
+        return JSON.stringify(data);
       }
 
       interactive_two.stdoutFunction = function (stdout) {
@@ -67,6 +75,13 @@
           html = output.time;
         };
         target.innerHTML = html;
+      }
+
+      interactive_two.exitData = function() {
+        var data = {}
+        data.mode = "unix-epoch";
+        data.user_input = "peb-exit";
+        return JSON.stringify(data);
       }
     </script>
 
@@ -132,10 +147,12 @@
                 <li>
                   <a href="javascript:location.reload();">Reload</a>
                 </li>
+
+                <li>
+                  <a href="https://www.google.com/">Google</a>
+                </li>
               </ul>
             </li>
-
-            <li><a href="https://www.google.com/">Google</a></li>
 
             <li><a href="about.function">About</a></li>
           </ul>

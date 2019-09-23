@@ -9,7 +9,7 @@
     <script>
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+      pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
       pebSettings.cutLabel = '- Cut -';
       pebSettings.copyLabel = '- Copy -';
       pebSettings.pasteLabel = '- Paste -';
@@ -21,6 +21,7 @@
       pebSettings.closeConfirmation =
         'Text was entered in a form and it is going to be lost!\n' +
         'Are you sure you want to close the application?';
+      pebSettings.onExitScripts = ['messenger_one', 'messenger_two'];
 
       // PEB settings objects for auto-started Perl interactive scripts:
       var messenger_one = {};
@@ -34,6 +35,11 @@
         return JSON.stringify(messenger_one.message);
       }
 
+      messenger_one.exitData = function() {
+        messenger_one.message.user_input = "peb-exit";
+        return JSON.stringify(messenger_one.message);
+      }
+
       var messenger_two = {};
       messenger_two.scriptRelativePath = 'perl-scripts/messenger.pl';
       messenger_two.message = {};
@@ -42,6 +48,11 @@
         messenger_two.message.user_input =
           document.getElementById("interactive-two-input").value;
         $('#form-two').trigger('reset');
+        return JSON.stringify(messenger_two.message);
+      }
+
+      messenger_two.exitData = function() {
+        messenger_two.message.user_input = "peb-exit";
         return JSON.stringify(messenger_two.message);
       }
 
@@ -156,10 +167,12 @@
                 <li>
                   <a href="javascript:location.reload();">Reload</a>
                 </li>
+
+                <li>
+                  <a href="https://www.google.com/">Google</a>
+                </li>
               </ul>
             </li>
-
-            <li><a href="https://www.google.com/">Google</a></li>
 
             <li><a href="about.function">About</a></li>
           </ul>

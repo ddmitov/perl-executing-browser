@@ -25,6 +25,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QRegularExpression>
+#include <QTimer>
 #include <QUrl>
 #include <QWebEnginePage>
 
@@ -41,6 +42,7 @@ class QPage : public QWebEnginePage
 
 signals:
     void pageLoadedSignal();
+    void hideWindowSignal();
     void closeWindowSignal();
 
 public slots:
@@ -93,14 +95,17 @@ public slots:
         if (!settingsJsonDocument.isEmpty()) {
             QJsonObject settingsJsonObject = settingsJsonDocument.object();
 
-            // Get auto-start scripts:
-            QJsonArray autoStartScripts =
-                    settingsJsonObject["autoStartScripts"].toArray();
+            // Get onStart scripts:
+            QJsonArray onStartScripts =
+                    settingsJsonObject["onStartScripts"].toArray();
 
-            foreach (const QJsonValue &value, autoStartScripts) {
+            foreach (const QJsonValue &value, onStartScripts) {
                 QString autoStartScript = value.toString();
                 qHandleScripts(autoStartScript);
             }
+
+            // Get onExit scripts:
+            onExitScripts = settingsJsonObject["onExitScripts"].toArray();
 
             // Get dialog and context menu labels:
             if (settingsJsonObject["okLabel"].toString().length() > 0) {
@@ -167,7 +172,6 @@ public slots:
     void qReadDialogSettings(QJsonObject dialogJsonObject)
     {
         QString id = dialogJsonObject["id"].toString();
-
         QString type = dialogJsonObject["type"].toString();
 
         QFileDialog inodesDialog (qApp->activeWindow());
@@ -279,8 +283,13 @@ public slots:
     void qFeedScript(QJsonObject scriptJsonObject)
     {
         QString scriptInput;
-        if (scriptJsonObject["scriptInput"].toString().length() > 0) {
+
+        if (closeRequested == false) {
             scriptInput = scriptJsonObject["scriptInput"].toString();
+        }
+
+        if (closeRequested == true) {
+            scriptInput = scriptJsonObject["exitCommand"].toString();
         }
 
         if (scriptInput.length() > 0) {
@@ -364,18 +373,38 @@ public slots:
 
     void qCloseAllScriptsSlot()
     {
-        QHash<QString, QScriptHandler*>::iterator iterator;
-        for (iterator = runningScripts.begin();
-             iterator != runningScripts.end();
-             ++iterator) {
-            QScriptHandler *handler = iterator.value();
+        closeRequested = true;
+        emit hideWindowSignal();
 
-            if (handler->scriptProcess.isOpen()) {
-                handler->scriptProcess.kill();
+        if (runningScripts.isEmpty()) {
+            emit closeWindowSignal();
+        } else {
+            foreach (const QJsonValue &value, onExitScripts) {
+                QString onExitScript = value.toString();
+                qHandleScripts(onExitScript);
+            }
+
+            int maximumTimeMilliseconds = 3000;
+            QTimer::singleShot(maximumTimeMilliseconds,
+                               this, SLOT(qScriptsTimeoutSlot()));
+        }
+    }
+
+    void qScriptsTimeoutSlot()
+    {
+        if (!runningScripts.isEmpty()) {
+            QHash<QString, QScriptHandler*>::iterator iterator;
+            for (iterator = runningScripts.begin();
+                 iterator != runningScripts.end();
+                 ++iterator) {
+                QScriptHandler *handler = iterator.value();
+
+                if (handler->scriptProcess.isOpen()) {
+                    handler->scriptProcess.kill();
+                }
             }
         }
 
-        closeRequested = true;
         emit closeWindowSignal();
     }
 
@@ -452,11 +481,14 @@ private:
     QString yesLabel;
     QString noLabel;
 
+    QHash<QString, QScriptHandler*> runningScripts;
+
     bool closeRequested;
+    QJsonArray onExitScripts;
 
 public:
     QPage();
-    QHash<QString, QScriptHandler*> runningScripts;
+
 };
 
 #endif // PAGE_H

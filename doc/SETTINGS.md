@@ -10,7 +10,7 @@ All local HTML page settings are stored in a single JavaScript object named ``pe
 
 ```javascript
 var pebSettings = {};
-pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
+pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
 pebSettings.cutLabel = "Custom Cut Label";
 pebSettings.copyLabel = "Custom Copy Label";
 pebSettings.pasteLabel = "Custom Paste Label";
@@ -22,11 +22,12 @@ pebSettings.noLabel = "Custom No Label";
 pebSettings.closeConfirmation =
   'Text was entered in a form and it is going to be lost!\n' +
   'Are you sure you want to close the window?';
+pebSettings.onExitScripts = ['interactive_one', 'interactive_two'];
 ```
 
 The ``pebSettings`` JavaScript object may have the following properties:
 
-* **autoStartScripts**  
+* **onStartScripts**  
   ``Array`` of Perl scripts that are started immediately after a local page is loaded  
 
 * **cutLabel**  
@@ -54,7 +55,10 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``String`` displayed as a label for the 'No' button on JavaScript Confirm popup box.
 
 * **closeConfirmation**  
-  ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB shuts down all running Perl scripts and exits.
+  ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB shuts down all running Perl scripts and exits.  
+
+* **onExitScripts**  
+  ``Array`` of Perl scripts that are invoked before application exit  
 
 ## Perl Scripts API
 
@@ -114,7 +118,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   ```
 
   Please note that many Perl scripts do not give their STDOUT data in a single shot.  
-  If several chunks of output have to be combined, this should also be done at JavaScript level:  
+  If several chunks of output have to be combined, this should be done at JavaScript level:  
 
   ```javascript
   var accumulatedOutput;
@@ -137,6 +141,11 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
     return data;
   }
   ```
+
+* **exitData**  
+  ``String`` or ``Function`` supplying script exit command as its return value  
+  ``exitData`` is written on script STDIN.  
+
 
 ## Interactive Perl Scripts
 
