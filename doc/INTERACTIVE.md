@@ -4,7 +4,7 @@ PEB interactive Perl scripts are able to receive user input multiple times after
 
 ## Requirements for Interactive Perl Scripts
 
-* **Event Loop**
+* **Event Loop**  
   Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN or in a temporary file for a bidirectional connection with PEB. ``AnyEvent`` is a popular Perl framework for building different types of event loops.
 
 * **No Buffering**  
