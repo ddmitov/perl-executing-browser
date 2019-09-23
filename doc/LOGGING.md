@@ -3,20 +3,19 @@
 PEB has unified logging of Perl and JavaScript errors in the JavaScript console.  
 All you need to read Perl errors is to open the JavaScript console.  
 
-## Using the JavaScript Console on QtWebkit Builds
+* To view the JavaScript console on QtWebkit builds  
+  use the keyboard shortcut <kbd>Ctrl</kbd> + <kbd>I</kbd>  
+  to open the ``QWebInspector`` and go to the ``Console`` tab.
 
-Start the ``QWebInspector`` using the keyboard shortcut <kbd>Ctrl</kbd> + <kbd>I</kbd> and go to the ``Console`` tab.  
+* To view the JavaScript console on QtWebEngine builds  
+  start PEB with the following command-line argument supplying an arbitrary private port:
 
-## Using the JavaScript Console on QtWebEngine Builds
+  ```bash
+  peb --remote-debugging-port=8080
+  ```
 
-Start PEB with the following command-line argument supplying an arbitrary private port:
+  and open the local URL with the supplied port using another browser  
 
-```bash
-peb --remote-debugging-port=8080
-```
+  ``http://localhost:8080``
 
-and open the following URL using another browser:
-
-``http://localhost:8080``
-
-to access the ``QtWebEngine Developer Tools``, then go to the ``Console`` tab.  
+  to access the ``QtWebEngine Developer Tools``, then go to the ``Console`` tab.

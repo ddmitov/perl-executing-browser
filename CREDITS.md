@@ -74,23 +74,18 @@ https://wiki.qt.io/Open_Web_Page_in_QWebView
 
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file  
 https://forum.qt.io/topic/551/get-filename-without-extension  
-https://forum.qt.io/topic/45982/solved-is-there-a-problem-with-the-following-non-blocking-sleep-function  
 https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute  
 
-http://www.qtcentre.org/threads/25880-QWebView-prints-PDF-file-OK-with-QPrintDialog-only  
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  
 http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout  
 http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()  
 http://www.qtcentre.org/threads/10661-QByteArray-to-QString  
-http://www.qtcentre.org/threads/28302-Passing-Command-line-arguments-to-a-Qt-application-in-linux  
-http://www.qtcentre.org/threads/22298-QMessageBox-Controlling-the-width  
 http://www.qtcentre.org/threads/29104-QMake-DEFINES  
 http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit  
 
 https://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage  
 https://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
 https://stackoverflow.com/questions/8026101/correct-way-to-quit-a-qt-program  
-https://stackoverflow.com/questions/8122094/qtwebkit-printing-issue-no-images-on-printed-page  
 https://stackoverflow.com/questions/12571895/save-open-dialog-localization-in-qt  
 https://stackoverflow.com/questions/6955281/how-to-stop-qhttp-qtwebkit-from-caching-pages  
 https://stackoverflow.com/questions/3211771/how-to-convert-int-to-qstring  
@@ -104,7 +99,6 @@ https://stackoverflow.com/questions/7228826/how-can-i-convert-qvariant-to-qstrin
 https://stackoverflow.com/questions/2580934/how-to-specify-different-debug-release-output-directories-in-qmake-pro-file  
 https://stackoverflow.com/questions/3348711/add-a-define-to-qmake-with-a-value  
 https://stackoverflow.com/questions/4515602/how-to-get-executable-name-in-qt  
-https://stackoverflow.com/questions/2781119/how-to-get-the-current-timestamp-in-qt  
 https://stackoverflow.com/questions/19505063/qt-javascript-execution-slow-unless-i-log-to-the-console  
 https://stackoverflow.com/questions/15864689/qmake-pre-build-step-before-any-compilation  
 https://stackoverflow.com/questions/17480984/qt-how-do-i-handle-the-event-of-the-user-pressing-the-x-close-button  
@@ -142,7 +136,6 @@ https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"
 https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
 https://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
 
-https://stackoverflow.com/questions/1725097/how-can-i-disable-terminal-polling-for-cpan-used-from-crontab  
 https://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 https://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
 https://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
@@ -151,7 +144,6 @@ https://stackoverflow.com/questions/229357/what-is-the-best-way-in-perl-to-copy-
 
 https://perlmaven.com/manipulating-perl-arrays  
 https://perlmaven.com/how-to-sort-a-hash-in-perl  
-https://perlmaven.com/recursive-subroutines  
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
 
