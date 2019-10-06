@@ -1,6 +1,3 @@
-body {
-  padding-top: 65px;
-}
 
 pre {
   margin: 4px;
@@ -9,20 +6,12 @@ pre {
   font-family: sans-serif;
 }
 
-.navbar .navbar-header {
-  text-align: center;
-  vertical-align: middle;
+.btn {
+  margin-top: 20px;
 }
 
-.navbar .navbar-nav {
-  display: inline-block;
-  float: center;
-}
-
-.navbar-toggle {
-  float: center;
-  margin: 10px;
-  vertical-align: middle;
+.tests {
+  margin-top: 20px;
 }
 
 .introduction {

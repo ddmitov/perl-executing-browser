@@ -167,13 +167,8 @@ http://youmightnotneedjquery.com/
 
 ## Bootstrap
 
-https://getbootstrap.com/  
-https://getbootstrap.com/components/#dropdowns  
-https://getbootstrap.com/docs/3.3/examples/navbar-fixed-top/  
-
-http://bootswatch.com/  
-http://www.tutorialrepublic.com/twitter-bootstrap-tutorial/bootstrap-dropdowns.php  
-https://stackoverflow.com/questions/9051200/twitter-bootstrap-dropdown-menu  
+https://getbootstrap.com/docs/4.0/components/buttons/  
+https://bootswatch.com/  
 
 ## Markdown
 

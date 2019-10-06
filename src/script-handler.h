@@ -52,11 +52,13 @@ public slots:
         emit scriptFinishedSignal(scriptId);
     }
 
+private:
+    QString scriptFullFilePath;
+
 public:
     QScriptHandler(QJsonObject);
     QProcess scriptProcess;
     QString scriptId;
-    QString scriptFullFilePath;
 };
 
 #endif // SCRIPT_HANDLER_H

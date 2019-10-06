@@ -1,8 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>html/about.html</file>
-        <file>html/error.html</file>
         <file>icon/camel.png</file>
         <file>peb.js</file>
+        <file>error.html</file>
     </qresource>
 </RCC>

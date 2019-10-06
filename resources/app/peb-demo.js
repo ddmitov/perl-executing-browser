@@ -96,3 +96,28 @@ function displayTestResult(id, stdout) {
     existingElement.innerHTML = existingElement.innerHTML + stdout;
   }
 }
+
+// About dialog:
+function about() {
+  alert(
+    "Browser version 1.0.0\n"+
+    "Qt version 5.5.1\n\n"+
+
+    "This program is free software;\n"+
+    "you can redistribute it and/or modify it under\n"+
+    "the terms of the GNU Lesser General Public License,\n"+
+    "as published by the Free Software Foundation;\n"+
+    "either version 3 of the License,\n"+
+    "or (at your option) any later version.\n\n"+
+
+    "This program is distributed\n"+
+    "in the hope that it will be useful,\n"+
+    "but WITHOUT ANY WARRANTY;\n"+
+    "without even the implied warranty of\n"+
+    "MERCHANTABILITY or\n"+
+    "FITNESS FOR A PARTICULAR PURPOSE.\n\n"+
+
+    "Dimitar D. Mitov, 2013 - 2019\n"+
+    "Valcho Nedelchev, 2014 - 2016"
+  );
+}

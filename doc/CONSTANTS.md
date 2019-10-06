@@ -47,7 +47,3 @@ A typical ``{PEB_executable_directory}`` looks like this:
 
     If this file is found during application startup, it is used as the icon of the application and all dialog boxes.  
     If this file is not found, the default icon embedded in the resources of the browser binary is used.
-
-## About URL
-
-* **About dialog:** ``about.function``

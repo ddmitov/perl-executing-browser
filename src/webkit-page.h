@@ -447,29 +447,6 @@ protected:
                                    .replace(".script", ""));
                     return false;
                 }
-
-                // About dialog:
-                if (request.url().fileName() == "about.function") {
-                    QFileReader *resourceReader =
-                            new QFileReader(QString(":/html/about.html"));
-                    QString aboutText = resourceReader->fileContents;
-
-                    aboutText.replace("APPLICATION_VERSION",
-                                      QApplication::applicationVersion());
-                    aboutText.replace("QT_VERSION", QT_VERSION_STR);
-
-                    QPixmap icon(32, 32);
-                    icon.load(":/icon/camel.png");
-
-                    QMessageBox aboutBox;
-                    aboutBox.setWindowTitle ("About PEB");
-                    aboutBox.setIconPixmap(icon);
-                    aboutBox.setText(aboutText);
-                    aboutBox.setDefaultButton (QMessageBox::Ok);
-                    aboutBox.exec();
-
-                    return false;
-                }
             }
 
             // Handle local Perl scripts after local form is submitted:
