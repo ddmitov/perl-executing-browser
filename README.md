@@ -21,7 +21,6 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Runtime Requirements](./doc/REQUIREMENTS.md#runtime-requirements)
 * [CONSTANTS](./doc/CONSTANTS.md)
   * [Files and Folders](./doc/CONSTANTS.md#files-and-folders)
-  * [About URL](./doc/CONSTANTS.md#about-url)
 * [SETTINGS](./doc/SETTINGS.md)
   * [Application Filename](./doc/SETTINGS.md#application-filename)
   * [Global Settings API](./doc/SETTINGS.md#global-settings-api)
@@ -107,9 +106,10 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Limitations
 
-* Only single-page applications are supported with no pop-up windows and no Perl scripting inside frames.
-* No files can be downloaded.
-* Printing is not supported.
+* No pop-up windows
+* No Perl scripting inside frames
+* No file download
+* No printing
 
 ## History
 

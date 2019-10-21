@@ -68,14 +68,21 @@ public slots:
             emit pageLoadedSignal();
 
             // Log basic program information on the JavaScript console:
+            QString applicationVersion =
+                    "peb.browser_version = '" +
+                    qApp->applicationVersion().toLatin1() + "';";
+            QPage::runJavaScript(applicationVersion);
+
+            QString qtVersion =
+                    "peb.qt_version = '" + QString(QT_VERSION_STR) + "';";
+            QPage::runJavaScript(qtVersion);
+
             QString applicationVersionMessage =
-                    "console.log('Application version: " +
-                    qApp->applicationVersion().toLatin1() + "');";
+                    "console.log('Browser version: ' + peb.browser_version);";
             QPage::runJavaScript(applicationVersionMessage);
 
             QString qtVersionMessage =
-                    "console.log('Qt version: " +
-                    QString(QT_VERSION_STR) + "');";
+                    "console.log('Qt version: ' + peb.qt_version);";
             QPage::runJavaScript(qtVersionMessage);
 
             QString perlInterpreterMessage =

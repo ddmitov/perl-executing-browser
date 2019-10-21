@@ -100,8 +100,8 @@ function displayTestResult(id, stdout) {
 // About dialog:
 function about() {
   alert(
-    "Browser version 1.0.0\n"+
-    "Qt version 5.5.1\n\n"+
+    "Browser version: " + peb.browser_version + "\n"+
+    "Qt version: " + peb.qt_version + "\n\n"+
 
     "This program is free software;\n"+
     "you can redistribute it and/or modify it under\n"+

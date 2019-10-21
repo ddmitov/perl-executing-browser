@@ -24,6 +24,57 @@
       pebSettings.onExitScripts = ['messenger_one', 'messenger_two'];
 
       // PEB settings objects for auto-started Perl interactive scripts:
+      var interactive_one = {};
+      interactive_one.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
+
+      interactive_one.inputData = function() {
+        var input = {};
+        input.mode = "unix-epoch";
+        return JSON.stringify(input);
+      }
+
+      interactive_one.stdoutFunction = function (stdout) {
+        var target = document.getElementById('instance-one-output');
+        stdout = stdout.replace(/\\/g, "\\\\");
+        var output = JSON.parse(stdout);
+        var html;
+        messenger_one.message.tempfile = output.tempfile;
+        if(("user_input" in output)) {
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
+        };
+      }
+
+      var interactive_two = {};
+      interactive_two.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
+
+      interactive_two.inputData = function() {
+        var input = {};
+        input.mode = "local-time";
+        return JSON.stringify(input);
+      }
+
+      interactive_two.stdoutFunction = function (stdout) {
+        var target = document.getElementById('instance-two-output');
+        stdout = stdout.replace(/\\/g, "\\\\");
+        var output = JSON.parse(stdout);
+        var html;
+        messenger_two.message.tempfile = output.tempfile;
+        if(("user_input" in output)) {
+          if (output.user_input != undefined) {
+            html = output.time + '<br>' + output.user_input;
+          } else {
+            html = output.time;
+          }
+          target.innerHTML = html;
+        };
+      }
+
+      // PEB settings objects for Perl helper scripts:
       var messenger_one = {};
       messenger_one.scriptRelativePath = 'perl-scripts/messenger.pl';
       messenger_one.message = {};
@@ -54,54 +105,6 @@
       messenger_two.exitData = function() {
         messenger_two.message.user_input = "peb-exit";
         return JSON.stringify(messenger_two.message);
-      }
-
-      var interactive_one = {};
-      interactive_one.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
-
-      interactive_one.inputData = function() {
-        var input = {};
-        input.mode = "unix-epoch";
-        return JSON.stringify(input);
-      }
-
-      interactive_one.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-one-output');
-        var output = JSON.parse(stdout);
-        var html;
-        messenger_one.message.tempfile = output.tempfile;
-        if(("user_input" in output)) {
-          if (output.user_input != undefined) {
-            html = output.time + '<br>' + output.user_input;
-          } else {
-            html = output.time;
-          }
-          target.innerHTML = html;
-        };
-      }
-
-      var interactive_two = {};
-      interactive_two.scriptRelativePath = 'perl-scripts/interactive-windows.pl';
-
-      interactive_two.inputData = function() {
-        var input = {};
-        input.mode = "local-time";
-        return JSON.stringify(input);
-      }
-
-      interactive_two.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-two-output');
-        var output = JSON.parse(stdout);
-        var html;
-        messenger_two.message.tempfile = output.tempfile;
-        if(("user_input" in output)) {
-          if (output.user_input != undefined) {
-            html = output.time + '<br>' + output.user_input;
-          } else {
-            html = output.time;
-          }
-          target.innerHTML = html;
-        };
       }
     </script>
 
