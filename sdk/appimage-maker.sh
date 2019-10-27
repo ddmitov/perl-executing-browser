@@ -35,17 +35,19 @@ if [ $mode == "none" ]; then
   exit 1
 fi
 
-# If no PEB binary is found, it is compiled from source:
-if [ ! -e "$(pwd)/peb" ]; then
-  cd "$(pwd)/src" || exit
+# PEB binary is always compiled from sources:
+cd "$(pwd)/src" || exit
 
-  qmake -qt=qt5
-  make
+rm -rf tmp
+rm -f .qmake.stash
+rm -f Makefile
 
-  cd .. || exit
-fi
+qmake -qt=qt5
+make
 
-# If no 'linuxdeployqt' is found, it is downloaded from web:
+cd .. || exit
+
+# If no 'linuxdeployqt' is found, it is downloaded from the web:
 linuxdeployqt="linuxdeployqt-continuous-$(arch).AppImage"
 
 if [ ! -x "$linuxdeployqt" ]; then
@@ -77,6 +79,9 @@ if [ $mode == "no-resources" ]; then
   cp "$(pwd)/CREDITS.md" "$(pwd)/peb.app/CREDITS.md"
   cp "$(pwd)/LICENSE.md" "$(pwd)/peb.app/LICENSE.md"
   cp "$(pwd)/README.md" "$(pwd)/peb.app/README.md"
+
+  # Version:
+  export VERSION="1.0.0"
 
   # AppImage creation:
   "$(pwd)/$linuxdeployqt" "--appimage-extract"
@@ -117,7 +122,7 @@ if [ $mode == "include-resources" ]; then
   # AppImage metadata file:
   if [ -e "$(pwd)/resources/app/appimage/$appimage_name.appdata.xml" ]; then
     mkdir -p "$(pwd)/$appimage_name.app/usr/share/metainfo"
-    cp -f "$(pwd)/resources/app/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
+    cp -f "$(pwd)/resources/app/appimage/$appimage_name.appdata.xml" "$(pwd)/$appimage_name.app/usr/share/metainfo/$appimage_name.appdata.xml"
   fi
 
   # Documentation:
@@ -126,39 +131,15 @@ if [ $mode == "include-resources" ]; then
   cp "$(pwd)/LICENSE.md" "$(pwd)/$appimage_name.app/LICENSE.md"
   cp "$(pwd)/README.md" "$(pwd)/$appimage_name.app/README.md"
 
-  # Copying the contents of the 'resources' directory
-  # without its 'perl' subdirectory:
-  mkdir "$(pwd)/$appimage_name.app/resources/"
-
-  declare -a RESOURCES
-  RESOURCES=("$(ls --ignore=perl "$(pwd)"/resources)")
-
-  for RESOURCE in "${RESOURCES[@]}"; do
-  	cp -r "$(pwd)/resources/${RESOURCE}" "$(pwd)/$appimage_name.app/resources/${RESOURCE}";
-  done
-
-  # Relocatable Perl packing:
-  relocatable_perl="$(pwd)/resources/perl/bin/perl"
-  compactor_script="$(pwd)/sdk/compactor.pl"
-
-  if [ -e "$relocatable_perl" ]; then
-    printf "\\nGoing to compact the relocatable Perl for this copy of Perl Executing Browser.\\n"
-    "$relocatable_perl" "$compactor_script" "--appimage=$appimage_name"
-  else
-    printf "\\nRelocatable Perl is not found for this copy of Perl Executing Browser.\\n"
-  fi
+  # Resources:
+  cp -r "$(pwd)/resources" "$(pwd)/$appimage_name.app/resources"
 
   # File cleaning:
   rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.desktop"
   rm -f "$(pwd)/$appimage_name.app/resources/app/$appimage_name.appdata.xml"
 
-  # File cleaning for the 'peb-demo' package:
-  if [ "$appimage_name" == "peb-demo" ]; then
-    export VERSION="1.0.0"
-    rm -f "$(pwd)/$appimage_name.app/resources/app/index-windows.html"
-    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/messenger.pl"
-    rm -f "$(pwd)/$appimage_name.app/resources/app/perl-scripts/interactive-windows.pl"
-  fi
+  # Version:
+  export VERSION="1.0.0"
 
   # AppImage creation:
   "$(pwd)/$linuxdeployqt" "--appimage-extract"

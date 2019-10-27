@@ -2,13 +2,9 @@
 
 ## Compile-Time Requirements
 
-The only Linux and Mac compile-time requirement of PEB is a Qt development bundle version 5.2 or any later version.  
+The only Linux and Mac compile-time requirement of PEB is a Qt development bundle version 5.2 or higher.  
 
-Compiling PEB on Windows is subject to the following restrictions:  
-
-* PEB source code is not MSVC-compatible and PEB can not be linked against ``QtWebEngine``.
-* Windows builds of PEB can only be compiled by a GCC-based MinGW Qt using the ``QtWebKit`` web engine.
-* ``QtWebKit`` can be added to MinGW Qt versions 5.6.x or higher from the [repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases).
+PEB on Windows can be compiled only with a GCC-based MinGW Qt versions 5.2 to 5.6.
 
 Compiled and tested successfully using:
 
@@ -27,29 +23,11 @@ qmake -qt=qt5
 make
 ```
 
-Please note that PEB builds using the standard ``QtWebKit`` web engine are single-process applications consuming less memory than PEB builds using the multiprocess ``QtWebEngine``.  
+Please note that PEB builds using the standard ``QtWebKit`` web engine are single-process applications and they consume less memory than PEB builds using the multiprocess ``QtWebEngine``.  
 
 ## Compile-Time Settings
 
 PEB compile-time settings can be changed by editing the ``src/peb.pro`` project file according to the following instructions.  
-
-* Updated QtWebKit  
-  To use ``QtWebKit`` or ``QtWebEngine`` depending on the Qt version, which is the default setting:  
-
-  ```QMake
-  ANNULEN_QTWEBKIT = 0
-  ```
-
-  The default web engine for Qt versions up to 5.5.x is ``QtWebKit``.  
-  The default web engine for Qt versions 5.6.x or higher is ``QtWebEngine``.
-
-  To use [an updated QtWebKit from the repository of Konstantin Tokarev (annulen)](https://github.com/annulen/webkit/releases) with a Qt version 5.6.x or higher:
-
-  ```QMake
-  ANNULEN_QTWEBKIT = 1
-  ```
-
-  Setting ``ANNULEN_QTWEBKIT`` to ``1`` has no effect on Qt versions 5.5.x or lower.  
 
 * Mac Bundle  
   To make a bundle-less binary, which is the default setting:  

@@ -2,17 +2,13 @@
 
 ## PEB AppImage Maker
 
-PEB or any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
+PEB and any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
 
 * packing a Perl application together with a PEB executable, Qt libraries and a relocatable Perl distribution:  
 
   ```bash
   ./appimage-maker.sh --include-resources
   ```
-
-  In this case, the PEB AppImage Maker invokes the [Perl Distribution Compactor](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/compactor.pl), which finds all dependencies of all Perl scripts in the ``{PEB_executable_directory}/resources/app`` directory and copies only the necessary Perl modules.
-
-  Perl Distribution Compactor depends on [Module::ScanDeps](https://metacpan.org/pod/Module::ScanDeps) and [File::Copy::Recursive](https://metacpan.org/pod/File::Copy::Recursive) CPAN modules, which are included in the ``{PEB_executable_directory}/sdk/lib`` directory.
 
 * packing only a PEB executable and its Qt libraries:  
 
@@ -32,7 +28,7 @@ The PEB AppImage Maker script must be started from the ``{PEB_executable_directo
 ``{PEB_executable_directory}/resources/app/appimage/{application_name}.appdata.xml``  
 
 ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
-is mandatory for any PEB-based application which will be packed by the PEB AppImage Maker.  
+is mandatory for any PEB-based application which is to be packed by the PEB AppImage Maker.  
 A minimal example of а ``.desktop`` file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
 ``Icon=app`` in the ``.desktop`` file must not be changed for the proper display of the application icon.  
 All registered categories in a ``.desktop`` file are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  

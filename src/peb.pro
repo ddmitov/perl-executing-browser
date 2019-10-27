@@ -14,34 +14,20 @@
 # https://github.com/ddmitov/perl-executing-browser
 
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires Qt 5.")
+    error ("Perl Executing Browser requires minimal Qt version 5.2.")
+}
+
+lessThan (QT_MINOR_VERSION, 2) {
+    error ("Perl Executing Browser requires minimal Qt version 5.2.")
+}
+
+win32 {
+    greaterThan (QT_MINOR_VERSION, 5) {
+        error ("Perl Executing Browser for Windows requires MinGW Qt versions 5.2 - 5.5")
+    }
 }
 
 greaterThan (QT_MAJOR_VERSION, 4) {
-    ##########################################################
-    # ANNULEN QTWEBKIT
-    # Updated QtWebKit headers and libraries for
-    # Qt versions 5.6.x or higher can be downloaded from:
-    # https://github.com/annulen/webkit/releases
-
-    # To use QtWebKit or QtWebEngine depending on the Qt version,
-    # which is the default setting:
-    # ANNULEN_QTWEBKIT = 0
-    # QtWebKit is the default web engine for Qt versions up to 5.5.x and
-    # QtWebEngine is the default web engine for Qt versions 5.6.x or higher
-
-    # To use an updated QtWebKit version from
-    # the repository of Konstantin Tokarev (annulen) with
-    # a Qt version 5.6.x or higher:
-    # ANNULEN_QTWEBKIT = 1
-
-    # This setting has no effect on Qt versions 5.5 or lower.
-    ##########################################################
-
-    ANNULEN_QTWEBKIT = 0
-
-    DEFINES += "ANNULEN_QTWEBKIT=$$ANNULEN_QTWEBKIT"
-
     ##########################################################
     # MAC BUNDLE
 
@@ -88,24 +74,7 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        equals (ANNULEN_QTWEBKIT, 0) {
-            QT += widgets webenginewidgets
-        }
-
-        equals (ANNULEN_QTWEBKIT, 1) {
-            QT += widgets webkitwidgets
-        }
-    }
-
-    # Printing support:
-    lessThan (QT_MINOR_VERSION, 6) {
-        QT += printsupport
-    }
-
-    greaterThan (QT_MINOR_VERSION, 5) {
-        equals (ANNULEN_QTWEBKIT, 1) {
-            QT += printsupport
-        }
+        QT += widgets webenginewidgets
     }
 
     lessThan (QT_MINOR_VERSION, 6) {
@@ -128,43 +97,22 @@ greaterThan (QT_MAJOR_VERSION, 4) {
     }
 
     greaterThan (QT_MINOR_VERSION, 5) {
-        equals (ANNULEN_QTWEBKIT, 0) {
-            # Source files:
-            SOURCES += \
-                main.cpp \
-                file-reader.cpp \
-                main-window.cpp \
-                script-handler.cpp \
-                webengine-page.cpp \
-                webengine-view.cpp
+        # Source files:
+        SOURCES += \
+            main.cpp \
+            file-reader.cpp \
+            main-window.cpp \
+            script-handler.cpp \
+            webengine-page.cpp \
+            webengine-view.cpp
 
-            # Header files:
-            HEADERS += \
-                file-reader.h \
-                script-handler.h \
-                webengine-main-window.h \
-                webengine-page.h \
-                webengine-view.h
-        }
-
-        equals (ANNULEN_QTWEBKIT, 1) {
-            # Source files:
-            SOURCES += \
-                main.cpp \
-                file-reader.cpp \
-                main-window.cpp \
-                script-handler.cpp \
-                webkit-page.cpp \
-                webkit-view.cpp
-
-            # Header files:
-            HEADERS += \
-                file-reader.h \
-                script-handler.h \
-                webkit-main-window.h \
-                webkit-page.h \
-                webkit-view.h
-        }
+        # Header files:
+        HEADERS += \
+            file-reader.h \
+            script-handler.h \
+            webengine-main-window.h \
+            webengine-page.h \
+            webengine-view.h
     }
 
     # Resources:

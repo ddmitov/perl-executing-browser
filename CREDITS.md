@@ -44,14 +44,10 @@ https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
 https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 https://github.com/NixOS/nixpkgs/issues/16327  
-https://github.com/annulen/webkit  
 
-https://doc.qt.io/archives/4.6/webkit-fancybrowser-mainwindow-cpp.html  
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
 https://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
-https://doc.qt.io/qt-4.8/qwebframe.html  
 https://doc.qt.io/qt-4.8/signalsandslots.html  
-https://doc.qt.io/qt-4.8/qfileinfo.html  
 https://doc.qt.io/qt-4.8/qwebinspector.html  
 https://doc.qt.io/qt-4.8/qinputdialog.html  
 https://doc.qt.io/qt-5/qtglobal.html  
@@ -124,23 +120,14 @@ https://github.com/skaji/relocatable-perl
 http://strawberryperl.com/  
 
 https://perldoc.perl.org/Encode.html  
-https://perldoc.perl.org/File/Basename.html  
-https://perldoc.perl.org/File/Path.html  
-
-https://metacpan.org/pod/File::Copy::Recursive  
-https://metacpan.org/pod/Module::ScanDeps  
-
-https://www.perl.com/article/37/2013/8/18/Catch-and-Handle-Signals-in-Perl/  
+https://perldoc.perl.org/File/Temp.html  
 
 https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
 https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
-https://www.perlmonks.org/?node_id=982572 "ScanDeps usage"  
 
 https://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 https://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
 https://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
-https://stackoverflow.com/questions/787899/how-do-i-use-a-perl-module-from-a-relative-location  
-https://stackoverflow.com/questions/229357/what-is-the-best-way-in-perl-to-copy-files-into-a-yet-to-be-created-directory-tr  
 
 https://perlmaven.com/manipulating-perl-arrays  
 https://perlmaven.com/how-to-sort-a-hash-in-perl  
