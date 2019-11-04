@@ -1,26 +1,10 @@
 # Perl Executing Browser - AppImage Support
 
-## PEB AppImage Maker
+## PEB AppImager
 
-PEB and any PEB-based application can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script, which has two modes of operation:  
+Any PEB-based application with a PEB executable, Qt libraries and a relocatable Perl distribution can be easily packed as a 64-bit single-file Linux [AppImage](https://appimage.org/) executable by the [PEB AppImager](https://github.com/ddmitov/perl-executing-browser/blob/master/appimager.sh) script, which uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build an AppImage.  
 
-* packing a Perl application together with a PEB executable, Qt libraries and a relocatable Perl distribution:  
-
-  ```bash
-  ./appimage-maker.sh --include-resources
-  ```
-
-* packing only a PEB executable and its Qt libraries:  
-
-  ```bash
-  ./appimage-maker.sh --no-resources
-  ```
-
-  In this case, a PEB executable from an AppImage will try to find its application files and folders in the directory of the AppImage.  
-
-In both modes of operation, the PEB AppImage uses the [linuxdeployqt](https://github.com/probonopd/linuxdeployqt/releases/) tool to detect all Qt dependencies of PEB and build the final image.  
-
-The PEB AppImage Maker script must be started from the ``{PEB_executable_directory}/sdk`` directory.  
+The PEB AppImager must be started from the ``{PEB_executable_directory}``.
 
 ## PEB AppImage Configuration Files
 
@@ -28,51 +12,31 @@ The PEB AppImage Maker script must be started from the ``{PEB_executable_directo
 ``{PEB_executable_directory}/resources/app/appimage/{application_name}.appdata.xml``  
 
 ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
-is mandatory for any PEB-based application which is to be packed by the PEB AppImage Maker.  
-A minimal example of а ``.desktop`` file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.desktop).  
+is mandatory for any PEB-based application which is to be packed by the PEB AppImager.  
+A minimal example of а ``.desktop`` file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/appimage/peb-demo.desktop).  
 ``Icon=app`` in the ``.desktop`` file must not be changed for the proper display of the application icon.  
 All registered categories in a ``.desktop`` file are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
 Any ``.desktop`` file can be validated using the ``desktop-file-validate`` tool from the  ``desktop-file-utils`` package in all major Linux distributions.  
 
-The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream ``.appdata.xml`` files for PEB-based applications. An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/peb-demo.appdata.xml). An AppStream file is not mandatory, but is highly recommended.  
+The [AppStream Generator](http://output.jsbin.com/qoqukof) of [probonopd](https://github.com/probonopd) is the recommended tool for generating AppStream ``.appdata.xml`` files for PEB-based applications. An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/appimage/peb-demo.appdata.xml). An AppStream file is not mandatory, but is highly recommended.  
 
-Both PEB AppImage configuration files are put on their places in the AppImage directory tree structure by the [PEB AppImage Maker](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/appimage-maker.sh) script.  
+Both PEB AppImage configuration files are put on their places in the AppImage directory tree structure by the [PEB AppImager](https://github.com/ddmitov/perl-executing-browser/blob/master/appimager.sh) script.  
 
 ## PEB AppImage Builder Docker Container
 
 An easy building environment for PEB AppImage executables is the [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
-To build it, type the following command in the PEB project root directory (the directory of the README.md):  
+To start it, type the following commands in the ``{PEB_executable_directory}``:  
 
 ```bash
 sudo docker build -t peb-appimage-builder .
-```
-
-To start the PEB AppImage Builder Docker Container, type the following command in the PEB project root directory:  
-
-```bash
 sudo docker container run --rm -it -v $(pwd):/opt --user $(id -u):$(id -g) peb-appimage-builder
 ```
 
 When PEB AppImage Builder Docker Container is running, type:
 
 ```bash
-cd /opt/sdk
+cd /opt/ && ./appimager.sh && exit
 ```
-
-To start the PEB AppImage Maker, type either:
-
-```bash
-./appimage-maker.sh --no-resources
-```
-
-or
-
-```bash
-./appimage-maker.sh --include-resources
-```
-
-To stop the PEB AppImage Builder Docker Container when AppImage building is complete:  
-<kbd>Ctrl</kbd> + <kbd>D</kbd>
 
 ## AppImageHub
 

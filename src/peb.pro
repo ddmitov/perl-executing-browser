@@ -28,33 +28,14 @@ win32 {
 }
 
 greaterThan (QT_MAJOR_VERSION, 4) {
-    ##########################################################
-    # MAC BUNDLE
-
-    # To make a bundle-less binary:
-    # BUNDLE = 0
-    # CONFIG -= app_bundle
-    # By default bundle-less binary is compiled.
-
-    # To make a bundled binary (peb.app):
-    # BUNDLE = 1
-    # CONFIG += app_bundle
-    ##########################################################
-
     macx {
-        BUNDLE = 0
         CONFIG -= app_bundle
-
-        DEFINES += "BUNDLE=$$BUNDLE"
-
-        equals (BUNDLE, 0) {
-            message ("PEB is configured without Mac OSX bundle support.")
-        }
-        equals (BUNDLE, 1) {
-            message ("PEB is configured with Mac OSX bundle support.")
-        }
-
         ICON = resources/icons/camel.icns
+    }
+
+    win32 {
+        OTHER_FILES += resources/peb.rc resources/icon/camel.ico
+        RC_FILE = resources/peb.rc
     }
 
     # Binary basics:
@@ -117,10 +98,6 @@ greaterThan (QT_MAJOR_VERSION, 4) {
 
     # Resources:
     RESOURCES += resources/peb.qrc
-    win32 {
-        OTHER_FILES += resources/peb.rc resources/icon/camel.ico
-        RC_FILE = resources/peb.rc
-    }
 
     # Destination directory for the compiled binary:
     DESTDIR = $$PWD/../

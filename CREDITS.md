@@ -25,12 +25,6 @@ karaman, sisvenvet and all other members of Hackafe, the hackerspace of Plovdiv,
 for being welcoming host of the first public presentation of Perl Executing Browser  
 on the 2nd of March 2014 and for their helpful proposals.  
 
-Thanks to Roderich Schupp and all contributors of the Module::ScanDeps CPAN module.
-https://metacpan.org/pod/Module::ScanDeps  
-
-Thanks to Daniel Muey and all contributors of the File::Copy::Recursive CPAN module.
-https://metacpan.org/pod/File::Copy::Recursive  
-
 Thanks to [probonopd](https://github.com/probonopd) for his  
 knowledgeable instructions and patient cooperation  
 in the preparation and testing of Perl Executing Browser AppImages  
@@ -74,7 +68,6 @@ https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute
 
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  
 http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout  
-http://www.qtcentre.org/threads/29363-Problem-with-QDir-cdUp()  
 http://www.qtcentre.org/threads/10661-QByteArray-to-QString  
 http://www.qtcentre.org/threads/29104-QMake-DEFINES  
 http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit  
@@ -172,9 +165,6 @@ https://meta.stackexchange.com/questions/70356/key-stroke-combination-markdown
 
 ## Bash
 
-http://tldp.org/LDP/abs/html/fto.html  
-http://tldp.org/LDP/abs/html/functions.html  
-
 https://www.shellcheck.net/  
 
 https://stackoverflow.com/questions/13210880/replace-one-substring-for-another-string-in-shell-script  
@@ -182,14 +172,9 @@ https://stackoverflow.com/questions/4181703/how-to-concatenate-string-variables-
 https://stackoverflow.com/questions/638975/how-do-i-tell-if-a-regular-file-does-not-exist-in-bash  
 https://stackoverflow.com/questions/10319652/check-if-a-file-is-executable  
 https://stackoverflow.com/questions/10376206/what-is-the-preferred-bash-shebang  
-https://stackoverflow.com/questions/192249/how-do-i-parse-command-line-arguments-in-bash  
 https://stackoverflow.com/questions/2664740/extract-file-basename-without-path-and-extension-in-bash  
 
-https://unix.stackexchange.com/questions/312280/split-string-by-delimiter-and-get-n-th-element  
 https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-architecture  
-
-https://www.cyberciti.biz/faq/unix-linux-bsd-appleosx-bash-assign-variable-command-output/  
-https://www.tutorialspoint.com/unix/unix-regular-expressions.htm  
 
 ## AppImage
 

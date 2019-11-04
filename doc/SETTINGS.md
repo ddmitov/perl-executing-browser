@@ -2,7 +2,7 @@
 
 ## Application Filename
 
-The executable binary file of the browser, ``peb``, ``peb.app``, ``peb.dmg`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run.
+The executable binary file of the browser, ``peb`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run.
 
 ## Global Settings API
 

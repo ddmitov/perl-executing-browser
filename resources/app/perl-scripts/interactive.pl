@@ -6,8 +6,15 @@ use POSIX qw(strftime);
 use Encode qw(decode);
 use English;
 
-use AnyEvent;
 use JSON::PP;
+
+if (eval("require AnyEvent;")) {
+  require AnyEvent;
+  AnyEvent->import();
+} else {
+  print "AnyEvent module is missing in this Perl distribution.";
+  exit 1;
+}
 
 # Disable output buffering:
 $OUTPUT_AUTOFLUSH = 1;

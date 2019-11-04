@@ -24,13 +24,7 @@
 #endif
 
 #if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
-#if ANNULEN_QTWEBKIT == 0
 #include "webengine-main-window.h"
-#endif
-
-#if ANNULEN_QTWEBKIT == 1
-#include "webkit-main-window.h"
-#endif
 #endif
 
 // ==============================
@@ -54,48 +48,12 @@ int main(int argc, char **argv)
     // Directory of the browser executable:
     // ==============================
     QDir executableDirectory = application.applicationDirPath();
-
-#ifdef Q_OS_MAC
-    if (BUNDLE == 1) {
-        executableDirectory.cdUp();
-        executableDirectory.cdUp();
-    }
-#endif
-
     QString browserDirectory = executableDirectory.absolutePath().toLatin1();
-
-#ifdef Q_OS_LINUX
-    QString appImageDirectory;
-    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
-
-    if (appImageEnvVariable.length() > 0) {
-        appImageDirectory =
-                QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
-    }
-#endif
 
     // ==============================
     // Resources directory:
     // ==============================
-    QString resourcesDirectory;
-
-#ifndef Q_OS_LINUX
-    resourcesDirectory = browserDirectory + "/resources";
-#endif
-
-#ifdef Q_OS_LINUX
-    if (appImageDirectory.length() == 0) {
-        resourcesDirectory = browserDirectory + "/resources";
-    }
-
-    if (appImageDirectory.length() > 0) {
-        if (QDir(browserDirectory + "/resources").exists()) {
-            resourcesDirectory = browserDirectory + "/resources";
-        } else {
-            resourcesDirectory = appImageDirectory + "/resources";
-        }
-    }
-#endif
+    QString resourcesDirectory = browserDirectory + "/resources";
 
     // ==============================
     // Perl interpreter:
@@ -118,7 +76,7 @@ int main(int argc, char **argv)
     if (QFile(relocatablePerlInterpreterFullPath).exists()) {
         perlInterpreter = relocatablePerlInterpreterFullPath;
     } else {
-        // Perl on PATH is used if no private Perl interpreter is found:
+        // Perl on PATH is used if no portable Perl interpreter is found:
         perlInterpreter = perlExecutable;
     }
 
@@ -168,13 +126,11 @@ int main(int argc, char **argv)
                      SLOT(setMainWindowTitleSlot(QString)));
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    if (ANNULEN_QTWEBKIT == 0) {
-        // Signal and slot for QtWebEngine fullscreen signal:
-        QObject::connect(mainWindow.webViewWidget->page(),
-                         SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
-                         &mainWindow,
-                         SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
-    }
+    // Signal and slot for QtWebEngine fullscreen signal:
+    QObject::connect(mainWindow.webViewWidget->page(),
+                     SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
+                     &mainWindow,
+                     SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
 #endif
 
     // Signal and slot for closing the main window:

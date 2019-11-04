@@ -2,7 +2,7 @@
 
 ## Files and Folders
 
-PEB is created to work from any directory without installation and all paths used by PEB are relative to the directory of the PEB executable, labeled as ``{PEB_executable_directory}`` within this documentation. ``{PEB_executable_directory}`` may contain a C++ PEB executable or a Linux [AppImage](https://appimage.org/) with a PEB executable and its Qt libraries all packed in a single file. All names of PEB files and folders are hard-coded in C++ code and they are case-sensitive.  
+PEB is created to work from any directory without installation and all paths used by PEB are relative to the directory of the PEB executable, labeled as ``{PEB_executable_directory}`` within this documentation. All names of PEB files and folders are hard-coded in C++ code.  
 
 A typical ``{PEB_executable_directory}`` looks like this:
 
