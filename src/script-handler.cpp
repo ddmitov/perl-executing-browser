@@ -28,7 +28,7 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     scriptId = scriptJsonObject["id"].toString();
 
     scriptFullFilePath =
-            qApp->property("application").toString() + "/" +
+            qApp->property("appDir").toString() + "/" +
             scriptJsonObject["scriptRelativePath"].toString();
 
     // Signals and slots for local Perl scripts:
@@ -42,6 +42,8 @@ QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
                      SIGNAL(finished(int, QProcess::ExitStatus)),
                      this,
                      SLOT(qScriptFinishedSlot()));
+
+    scriptProcess.setWorkingDirectory(qApp->property("appDir").toString());
 
     scriptProcess.start((qApp->property("perlInterpreter").toString()),
                         QStringList() << scriptFullFilePath,

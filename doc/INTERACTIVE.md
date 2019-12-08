@@ -32,10 +32,10 @@ PEB interactive Perl scripts are able to receive user input multiple times after
 
 ## Examples of Interactive Perl Scripts
 
-The [index.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) demonstrates how to start automatically one Perl interactive script based on STDIN input in two instances.  
+The [index.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) demonstrates how to start automatically one Perl interactive script using STDIN input in two instances.  
 
-The [interactive.pl script of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) is an example of a Perl interactive script based on STDIN input.
+The [interactive.pl script of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) is an example of a Perl interactive script using STDIN input.
 
-The [index-windows.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index-windows.html) demonstrates how to start automatically one Perl interactive script based on temporary files in two instances.  
+The [index-windows.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index-windows.html) demonstrates how to start automatically one Perl interactive script using a temporary file in two instances.  
 
-The [interactive-windows.pl script of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-windows.pl) is an example of a Perl interactive script based on temporary files.
+The [interactive-windows.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-windows.pl) script of the demo package is an example of a Perl interactive script using a temporary file. This script creates a temporary file on startup and sends back to PEB its full path. PEB sends data to the interactive script by forwarding this path and a message text to the STDIN of a helper script, [messenger.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/messenger.pl). The helper script writes all data received from PEB in the temporary file. The interactive script checks periodically its temporary file for any new messages.

@@ -19,13 +19,7 @@
 #include <QTextCodec>
 #include <QtGlobal>
 
-#if QT_VERSION < QT_VERSION_CHECK(5, 6, 0)
 #include "webkit-main-window.h"
-#endif
-
-#if QT_VERSION > QT_VERSION_CHECK(5, 5, 0)
-#include "webengine-main-window.h"
-#endif
 
 // ==============================
 // MAIN APPLICATION DEFINITION:
@@ -37,7 +31,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application version:
     // ==============================
-    application.setApplicationVersion("1.0.0");
+    application.setApplicationVersion("1.1.0");
 
     // ==============================
     // UTF-8 encoding application-wide:
@@ -50,49 +44,29 @@ int main(int argc, char **argv)
     QDir executableDirectory = application.applicationDirPath();
     QString browserDirectory = executableDirectory.absolutePath().toLatin1();
 
-    // ==============================
-    // Resources directory:
-    // ==============================
-    QString resourcesDirectory = browserDirectory + "/resources";
+#ifdef Q_OS_LINUX
+    QString appImageDirectory;
+    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
 
-    // ==============================
-    // Perl interpreter:
-    // ==============================
-    QString perlExecutable;
-
-#ifndef Q_OS_WIN
-    perlExecutable = "perl";
-#endif
-
-#ifdef Q_OS_WIN
-    perlExecutable = "wperl.exe";
-#endif
-
-    QString perlInterpreter;
-
-    QString relocatablePerlInterpreterFullPath =
-                resourcesDirectory + "/perl/bin/" + perlExecutable;
-
-    if (QFile(relocatablePerlInterpreterFullPath).exists()) {
-        perlInterpreter = relocatablePerlInterpreterFullPath;
-    } else {
-        // Perl on PATH is used if no portable Perl interpreter is found:
-        perlInterpreter = perlExecutable;
+    if (appImageEnvVariable.length() > 0) {
+        appImageDirectory =
+                QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
+        browserDirectory = appImageDirectory;
     }
+#endif
 
-    application.setProperty("perlInterpreter", perlInterpreter);
+    application.setProperty("browserDir", browserDirectory);
 
     // ==============================
     // Application directory:
     // ==============================
-    QString applicationDirName = resourcesDirectory + "/app";
-
-    application.setProperty("application", applicationDirName);
+    QString applicationDirName = browserDirectory + "/resources/app";
+    application.setProperty("appDir", applicationDirName);
 
     // ==============================
     // Application icon:
     // ==============================
-    QString iconPathName = resourcesDirectory + "/app.png";
+    QString iconPathName = applicationDirName + "/app.png";
 
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
@@ -100,8 +74,7 @@ int main(int argc, char **argv)
         icon.load(iconPathName);
         QApplication::setWindowIcon(icon);
     } else {
-        // Set the embedded default icon
-        // in case no external icon file is found:
+        // Set the embedded default icon in case no external icon file is found:
         icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
@@ -125,14 +98,6 @@ int main(int argc, char **argv)
                      &mainWindow,
                      SLOT(setMainWindowTitleSlot(QString)));
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-    // Signal and slot for QtWebEngine fullscreen signal:
-    QObject::connect(mainWindow.webViewWidget->page(),
-                     SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
-                     &mainWindow,
-                     SLOT(qGoFullscreen(QWebEngineFullScreenRequest)));
-#endif
-
     // Signal and slot for closing the main window:
     QObject::connect(&mainWindow,
                      SIGNAL(startMainWindowClosingSignal()),
@@ -151,8 +116,7 @@ int main(int argc, char **argv)
     }
 
     if (!startPageFile.exists()) {
-        mainWindow.qDisplayErrorSlot(
-                    QString("No start page is found."));
+        mainWindow.qDisplayErrorSlot(QString("No start page is found."));
     }
 
     return application.exec();

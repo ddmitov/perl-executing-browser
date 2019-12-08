@@ -6,10 +6,11 @@ The executable binary file of the browser, ``peb`` or ``peb.exe`` by default, ca
 
 ## Global Settings API
 
-All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts are started automatically, default labels are used for all context menus and JavaScript pop-up boxes, no warning is displayed for unsaved data in local HTML forms and no graceful shutdown of interactive Perl scripts is possible.
+All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts can be started.
 
 ```javascript
 var pebSettings = {};
+pebSettings.perlInterpreter = 'perl/bin/perl';
 pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
 pebSettings.cutLabel = "Custom Cut Label";
 pebSettings.copyLabel = "Custom Copy Label";
@@ -22,10 +23,16 @@ pebSettings.noLabel = "Custom No Label";
 pebSettings.closeConfirmation =
   'Text was entered in a form and it is going to be lost!\n' +
   'Are you sure you want to close the window?';
-pebSettings.onExitScripts = ['interactive_one', 'interactive_two'];
+pebSettings.onExitScripts = ['messenger_one', 'messenger_two'];
 ```
 
 The ``pebSettings`` JavaScript object may have the following properties:
+
+* **perlInterpreter**  
+  ``String`` for the relative path of a Perl interpreter used by PEB  
+  The relative path of a Perl interpreter is converted to a full path using the  
+  ``{PEB_executable_directory}/resources/app`` as a root folder.  
+  If a relocatable Perl interpreter is not configured, PEB will use the first Perl interpreter on PATH.  
 
 * **onStartScripts**  
   ``Array`` of Perl scripts that are started immediately after a local page is loaded  

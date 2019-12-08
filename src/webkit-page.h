@@ -91,11 +91,6 @@ public slots:
                 QString qtVersionMessage =
                         "console.log('Qt version: ' + peb.qt_version);";
                 mainFrame()->evaluateJavaScript(qtVersionMessage);
-
-                QString perlInterpreterMessage =
-                        "console.log('Perl interpreter: " +
-                        qApp->property("perlInterpreter").toString() + "');";
-                mainFrame()->evaluateJavaScript(perlInterpreterMessage);
             }
         }
     }
@@ -110,6 +105,23 @@ public slots:
 
         if (!settingsJsonDocument.isEmpty()) {
             QJsonObject settingsJsonObject = settingsJsonDocument.object();
+
+            // Get Perl interpreter:
+            QString perlInterpreter;
+            QString perlInterpreterSetting =
+                    settingsJsonObject["perlInterpreter"].toString();
+
+            if (perlInterpreterSetting.length() > 0) {
+                perlInterpreter =
+                        qApp->property("appDir").toString() + '/' +
+                        settingsJsonObject["perlInterpreter"].toString();
+            }
+
+            if (perlInterpreterSetting.length() == 0) {
+                perlInterpreter = "perl";
+            }
+
+            qApp->setProperty("perlInterpreter", perlInterpreter);
 
             // Get onStart scripts:
             QJsonArray onStartScripts =
@@ -192,10 +204,7 @@ public slots:
         QFileDialog inodesDialog (qApp->activeWindow());
         inodesDialog.setWindowModality(Qt::WindowModal);
         inodesDialog.setViewMode(QFileDialog::Detail);
-
-#ifdef Q_OS_WIN
-        inodesDialog.setOption(QFileDialog::DontUseNativeDialog);
-#endif
+        inodesDialog.setDirectory(qApp->property("browserDir").toString());
 
         if (type == "single-file") {
             inodesDialog.setFileMode(QFileDialog::AnyFile);
@@ -294,21 +303,26 @@ public slots:
 
     void qFeedScript(QJsonObject scriptJsonObject)
     {
-        QString scriptInput;
-
         if (closeRequested == false) {
-            scriptInput = scriptJsonObject["scriptInput"].toString();
+            QString scriptInput = scriptJsonObject["scriptInput"].toString();
+
+            if (scriptInput.length() > 0) {
+                QScriptHandler *handler =
+                        runningScripts.value(scriptJsonObject["id"].toString());
+                if (handler->scriptProcess.isOpen()) {
+                    handler->scriptProcess.write(scriptInput.toUtf8());
+                    handler->scriptProcess.write(QString("\n").toLatin1());
+                }
+            }
         }
 
         if (closeRequested == true) {
-            scriptInput = scriptJsonObject["exitCommand"].toString();
-        }
+            QString exitData = scriptJsonObject["exitCommand"].toString();
 
-        if (scriptInput.length() > 0) {
             QScriptHandler *handler =
                     runningScripts.value(scriptJsonObject["id"].toString());
             if (handler->scriptProcess.isOpen()) {
-                handler->scriptProcess.write(scriptInput.toUtf8());
+                handler->scriptProcess.write(exitData.toUtf8());
                 handler->scriptProcess.write(QString("\n").toLatin1());
             }
         }

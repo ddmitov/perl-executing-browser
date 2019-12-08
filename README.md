@@ -10,30 +10,28 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 
 ## Contents
 
-* [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
 * [Features](#features)
 * [Security](#security)
 * [Limitations](#limitations)
-* [REQUIREMENTS](./doc/REQUIREMENTS.md)
+* REQUIREMENTS
   * [Compile-Time Requirements](./doc/REQUIREMENTS.md#compile-time-requirements)
   * [Runtime Requirements](./doc/REQUIREMENTS.md#runtime-requirements)
-* [CONSTANTS](./doc/CONSTANTS.md)
-  * [Files and Folders](./doc/CONSTANTS.md#files-and-folders)
-* [SETTINGS](./doc/SETTINGS.md)
+* [Files and Folders](./doc/FILES.md)
+* SETTINGS
   * [Application Filename](./doc/SETTINGS.md#application-filename)
   * [Global Settings API](./doc/SETTINGS.md#global-settings-api)
   * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
   * [Files and Folders Dialogs API](./doc/SETTINGS.md#files-and-folders-dialogs-api)
-* [INTERACTIVE PERL SCRIPTS](./doc/INTERACTIVE.md)
+* INTERACTIVE PERL SCRIPTS
   * [Requirements for Interactive Perl Scripts](./doc/INTERACTIVE.md#requirements-for-interactive-perl-scripts)
   * [Examples of Interactive Perl Scripts](./doc/INTERACTIVE.md#examples-of-interactive-perl-scripts)
-* [APPIMAGE SUPPORT](./doc/APPIMAGE.md)
+* APPIMAGE SUPPORT
   * [PEB AppImager](./doc/APPIMAGE.md#peb-appimager)
   * [PEB AppImage Configuration Files](./doc/APPIMAGE.md#peb-appimage-configuration-files)
   * [PEB AppImage Builder Docker Container](./doc/APPIMAGE.md#peb-appimage-builder-docker-container)
   * [AppImageHub](./doc/APPIMAGE.md#appimagehub)
-* [Logging](./doc/LOGGING.md)
+* [Logging](#logging)
 * [History](#history)
 * [License](./LICENSE.md)
 * [Thanks and Credits](./CREDITS.md)
@@ -42,37 +40,6 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",  
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY" and "OPTIONAL"  
 in the documentation of this project are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
-
-## Quick Start
-
-* **1.** [Download PEB](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
-  Linux 64-bit single-file [AppImage](https://appimage.org/) executable and  
-  Windows 32-bit zipped executable with its Qt libraries are available.  
-
-* **2.** [Select your Perl distribution](./doc/REQUIREMENTS.md#runtime-requirements).  
-  You can choose between a relocatable Perl distribution and the first Perl on PATH.  
-  Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) or  
-  Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) PortableZIP distributions are available by third-party vendors.  
-
-  Place your relocatable Perl distribution in:  
-  ``{PEB_executable_directory}/resources/perl``  
-  Your relocatable Perl interpreter must be:  
-  ``{PEB_executable_directory}/resources/perl/bin/perl`` on a Linux or Mac macine or  
-  ``{PEB_executable_directory}/resources/perl/bin/wperl.exe`` on a Windows macine.  
-
-* **3.** Write your Perl application reading user input on STDIN:
-
-  ```perl
-  my $input = <STDIN>;
-  chomp $input;
-  ```
-
-  By default the working directory of all PEB Perl scripts is the directory of the PEB binary.  
-
-* **4.** Write a ``{PEB_executable_directory}/resources/app/index.html`` with  
-  a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you want to use.  
-  Start local Perl scripts by [clicking a link or submitting a form to a special URL](./doc/SETTINGS.md#perl-scripts-api).  
-  [Select files or folders with their full paths by clicking a link to a special URL](./doc/SETTINGS.md#selecting-files-and-folders).
 
 ## Design Objectives
 
@@ -92,7 +59,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Optional labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
-* [Optional icon for the main window and all dialog boxes](./doc/CONSTANTS.md#icon)
+* [Optional icon for the main window and all dialog boxes](./doc/FILES.md#icon)
 
 ## Security
 
@@ -109,6 +76,11 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * No Perl scripting inside frames
 * No file download
 * No printing
+
+## Logging
+
+PEB has unified logging of JavaScript and Perl errors in the JavaScript console.  
+Press <kbd>Ctrl</kbd> + <kbd>I</kbd> to open the ``QWebInspector`` and go to the ``Console`` tab.
 
 ## History
 

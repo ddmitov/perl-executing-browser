@@ -1,4 +1,4 @@
-# Perl Executing Browser Project File
+# Perl Executing Browser
 
 # This program is free software;
 # you can redistribute it and/or modify it under the terms of the
@@ -14,96 +14,60 @@
 # https://github.com/ddmitov/perl-executing-browser
 
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires minimal Qt version 5.2.")
+    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
 }
 
 lessThan (QT_MINOR_VERSION, 2) {
-    error ("Perl Executing Browser requires minimal Qt version 5.2.")
+    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
+}
+
+greaterThan (QT_MINOR_VERSION, 5) {
+    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
 }
 
 win32 {
-    greaterThan (QT_MINOR_VERSION, 5) {
-        error ("Perl Executing Browser for Windows requires MinGW Qt versions 5.2 - 5.5")
-    }
+    OTHER_FILES += resources/peb.rc resources/icon/camel.ico
+    RC_FILE = resources/peb.rc
 }
 
-greaterThan (QT_MAJOR_VERSION, 4) {
-    macx {
-        CONFIG -= app_bundle
-        ICON = resources/icons/camel.icns
-    }
+# Binary basics:
+CONFIG += release
+TEMPLATE = app
+TARGET = peb
 
-    win32 {
-        OTHER_FILES += resources/peb.rc resources/icon/camel.ico
-        RC_FILE = resources/peb.rc
-    }
+# Network support:
+QT += network
 
-    # Binary basics:
-    CONFIG += release
-    TEMPLATE = app
-    TARGET = peb
+# HTTPS support:
+CONFIG += openssl-linked
 
-    # Network support:
-    QT += network
+# HTML engine:
+QT += widgets webkitwidgets
 
-    # HTTPS support:
-    CONFIG += openssl-linked
+# Source files:
+SOURCES += \
+    main.cpp \
+    file-reader.cpp \
+    main-window.cpp \
+    script-handler.cpp \
+    webkit-page.cpp \
+    webkit-view.cpp
 
-    # HTML engine:
-    lessThan (QT_MINOR_VERSION, 6) {
-        QT += widgets webkitwidgets
-    }
+# Header files:
+HEADERS += \
+    file-reader.h \
+    script-handler.h \
+    webkit-main-window.h \
+    webkit-page.h \
+    webkit-view.h
 
-    greaterThan (QT_MINOR_VERSION, 5) {
-        QT += widgets webenginewidgets
-    }
+# Resources:
+RESOURCES += resources/peb.qrc
 
-    lessThan (QT_MINOR_VERSION, 6) {
-        # Source files:
-        SOURCES += \
-            main.cpp \
-            file-reader.cpp \
-            main-window.cpp \
-            script-handler.cpp \
-            webkit-page.cpp \
-            webkit-view.cpp
+# Destination directory for the compiled binary:
+DESTDIR = $$PWD/../
 
-        # Header files:
-        HEADERS += \
-            file-reader.h \
-            script-handler.h \
-            webkit-main-window.h \
-            webkit-page.h \
-            webkit-view.h
-    }
-
-    greaterThan (QT_MINOR_VERSION, 5) {
-        # Source files:
-        SOURCES += \
-            main.cpp \
-            file-reader.cpp \
-            main-window.cpp \
-            script-handler.cpp \
-            webengine-page.cpp \
-            webengine-view.cpp
-
-        # Header files:
-        HEADERS += \
-            file-reader.h \
-            script-handler.h \
-            webengine-main-window.h \
-            webengine-page.h \
-            webengine-view.h
-    }
-
-    # Resources:
-    RESOURCES += resources/peb.qrc
-
-    # Destination directory for the compiled binary:
-    DESTDIR = $$PWD/../
-
-    # Temporary folder:
-    MOC_DIR = tmp
-    OBJECTS_DIR = tmp
-    RCC_DIR = tmp
-}
+# Temporary folder:
+MOC_DIR = tmp
+OBJECTS_DIR = tmp
+RCC_DIR = tmp

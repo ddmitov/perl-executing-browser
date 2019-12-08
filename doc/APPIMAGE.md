@@ -25,7 +25,7 @@ Both PEB AppImage configuration files are put on their places in the AppImage di
 ## PEB AppImage Builder Docker Container
 
 An easy building environment for PEB AppImage executables is the [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
-To start it, type the following commands in the ``{PEB_executable_directory}``:  
+To start it, run the following commands in the ``{PEB_executable_directory}``:  
 
 ```bash
 sudo docker build -t peb-appimage-builder .
@@ -35,7 +35,7 @@ sudo docker container run --rm -it -v $(pwd):/opt --user $(id -u):$(id -g) peb-a
 When PEB AppImage Builder Docker Container is running, type:
 
 ```bash
-cd /opt/ && ./appimager.sh && exit
+cd /opt/src && qmake -qt=qt5 && make && cd .. && export VERSION="1.1.0" && ./appimager.sh && exit
 ```
 
 ## AppImageHub

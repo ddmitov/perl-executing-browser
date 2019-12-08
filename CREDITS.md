@@ -35,8 +35,6 @@ wouldn't be created without his assistance.
 ## Qt
 
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
-https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.cpp  
-https://github.com/OtterBrowser/otter-browser/blob/master/src/modules/backends/web/qtwebengine/QtWebEnginePage.h  
 https://github.com/NixOS/nixpkgs/issues/16327  
 
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
@@ -50,14 +48,7 @@ https://doc.qt.io/qt-5/qhash.html
 https://doc.qt.io/qt-5/qhash-iterator.html  
 https://doc.qt.io/qt-5/qdesktopwidget.html  
 https://doc.qt.io/archives/qt-5.5/qwebview.html  
-https://doc.qt.io/qt-5/qtwebenginewidgets-qtwebkitportingguide.html  
-https://doc.qt.io/qt-5/qwebenginepage.html#runJavaScript  
-https://doc.qt.io/qt-5/qwebenginepage.html#fullScreenRequested  
-https://doc.qt.io/qt-5/qwebenginepage.html#windowCloseRequested  
-https://doc.qt.io/qt-5/qtwebengine-webenginewidgets-simplebrowser-example.html#adding-context-menu-items  
-https://doc.qt.io/qt-5/qwebenginefullscreenrequest.html  
 https://doc.qt.io/qt-5/qprocess.html#terminate  
-https://doc.qt.io/qt-5.11/qtwebengine-debugging.html  
 
 https://wiki.qt.io/Qt_Coding_Style  
 https://wiki.qt.io/Open_Web_Page_in_QWebView  
@@ -124,6 +115,7 @@ https://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in
 
 https://perlmaven.com/manipulating-perl-arrays  
 https://perlmaven.com/how-to-sort-a-hash-in-perl  
+https://perlmaven.com/sqlite-in-memory  
 
 http://lauraliparulo.altervista.org/first-steps-in-sqlite-and-perl/  
 
@@ -189,10 +181,6 @@ https://github.com/AppImage/AppImageKit/wiki/FUSE
 https://medium.com/redbubble/running-a-docker-container-as-a-non-root-user-7d2e00f8ee15  
 https://docs.docker.com/engine/reference/builder/  
 https://vsupalov.com/exit-docker-container/  
-
-## Mac
-
-http://leonid.shevtsov.me/en/how-to-create-icns-icons-for-os-x  
 
 ## Git and GitHub
 

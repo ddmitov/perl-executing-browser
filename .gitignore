@@ -1,6 +1,6 @@
 archive/
 build-peb-*/
-resources/perl
+resources/app/perl
 src/tmp
 
 .qmake.stash
@@ -11,8 +11,6 @@ peb.pro.*
 peb
 peb.exe
 *.AppImage
-
-test.db
 
 backup
 upgit
