@@ -1,9 +1,5 @@
 # Perl Executing Browser - Settings
 
-## Application Filename
-
-The executable binary file of the browser, ``peb`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run.
-
 ## Global Settings API
 
 All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts can be started.
@@ -11,7 +7,7 @@ All global PEB settings are stored in a single JavaScript object named ``pebSett
 ```javascript
 var pebSettings = {};
 pebSettings.perlInterpreter = 'perl/bin/perl';
-pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
+pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
 pebSettings.cutLabel = "Custom Cut Label";
 pebSettings.copyLabel = "Custom Copy Label";
 pebSettings.pasteLabel = "Custom Paste Label";
@@ -23,7 +19,6 @@ pebSettings.noLabel = "Custom No Label";
 pebSettings.closeConfirmation =
   'Text was entered in a form and it is going to be lost!\n' +
   'Are you sure you want to close the window?';
-pebSettings.onExitScripts = ['messenger_one', 'messenger_two'];
 ```
 
 The ``pebSettings`` JavaScript object may have the following properties:
@@ -34,7 +29,7 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``{PEB_executable_directory}/resources/app`` as a root folder.  
   If a relocatable Perl interpreter is not configured, PEB will use the first Perl interpreter on PATH.  
 
-* **onStartScripts**  
+* **autoStartScripts**  
   ``Array`` of Perl scripts that are started immediately after a local page is loaded  
 
 * **cutLabel**  
@@ -63,9 +58,6 @@ The ``pebSettings`` JavaScript object may have the following properties:
 
 * **closeConfirmation**  
   ``String`` displayed in a JavaScript Confirm popup box when the close button is pressed, but unsaved data in local HTML forms is detected. If no ``closeConfirmation`` object property is found, PEB shuts down all running Perl scripts and exits.  
-
-* **onExitScripts**  
-  ``Array`` of Perl scripts that are invoked before application exit  
 
 ## Perl Scripts API
 
@@ -138,7 +130,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 * **inputData**  
   ``String`` or ``Function`` supplying user data as its return value  
-  ``inputData`` is written on script STDIN.  
+  ``inputData`` is written on script STDIN or in temporary file.  
 
   ``inputData`` function with no dependencies:  
 
@@ -151,7 +143,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 * **exitData**  
   ``String`` or ``Function`` supplying script exit command as its return value  
-  ``exitData`` is written on script STDIN.  
+  ``exitData`` is written on script STDIN or in temporary file.  
 
 ## Files and Folders Dialogs API
 

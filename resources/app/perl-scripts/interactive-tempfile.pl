@@ -29,7 +29,7 @@ use JSON::PP;
 $OUTPUT_AUTOFLUSH = 1;
 
 # Global defaults:
-my $mode = "unix-epoch";
+my $mode = "unix_epoch";
 my $user_input = "";
 
 # Detect mode from initial STDIN:
@@ -43,10 +43,15 @@ eval{
   1;
 };
 
-# Temporary file:
+# Send the full pathname of the temporary file:
 my $tempfile_handle = File::Temp->new();
 $tempfile_handle->unlink_on_destroy(1);
 my $tempfile = $tempfile_handle->filename;
+
+my $tempfile_output = {tempfile => "$tempfile"};
+
+my $tempfile_output_json = JSON::PP->new->utf8->encode($tempfile_output);
+print $tempfile_output_json or shutdown_procedure();
 
 # Set the event loop:
 my $event_loop = AnyEvent->condvar;
@@ -57,6 +62,10 @@ my $timer = AnyEvent->timer(
   cb => sub {
     my $data;
 
+    # Open tempfile, if it exists,
+    # read it, if it is readable,
+    # delete it to prevent any garbage left in case of a crash
+    # and continue without errors if tempfile is missing or corrupted:
     if (-e $tempfile) {
       eval{
         open $tempfile_handle, '<', $tempfile;
@@ -75,23 +84,22 @@ my $timer = AnyEvent->timer(
       1;
     };
 
-    if ($user_input =~ "peb-exit") {
+    if ($user_input =~ "exit") {
       shutdown_procedure();
     }
 
     my $time;
 
-    if ($mode =~ "unix-epoch") {
+    if ($mode =~ "unix_epoch") {
       $time = "Seconds from the Unix epoch: ".time;
     }
 
-    if ($mode =~ "local-time") {
+    if ($mode =~ "local_time") {
       my $time_string = strftime('%d %B %Y %H:%M:%S', localtime);
       $time = "Local date and time: ".$time_string;
     }
 
     my $output = {
-      tempfile => "$tempfile",
       time => $time,
       user_input => $user_input
     };
@@ -108,6 +116,7 @@ sub get_input {
   my ($data) = @_;
   my $json_object = new JSON::PP;
   my $input;
+  # Do not give errors if JSON data is corrupted:
   eval{
     $input = $json_object->decode($data);
   } or do {
@@ -116,7 +125,7 @@ sub get_input {
   return $input;
 }
 
-# This function is called when PEB unexpectedly crashes and
+# This function is called if PEB unexpectedly crashes and
 # script loses its STDOUT stream.
 # It must not be named 'shutdown' -
 # this is a reserved name for a Perl prototype function!

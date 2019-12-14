@@ -1,6 +1,6 @@
 # Perl Executing Browser - Interactive Perl Scripts
 
-PEB interactive Perl scripts are able to receive user input multiple times after the script is started by waiting for new data coming either on STDIN or in a temporary file. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has a JavaScript settings object with an unique name.
+PEB interactive Perl scripts are able to receive user input multiple times after the script is started by waiting for new data on STDIN or in a temporary file. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has a JavaScript settings object with an unique name.
 
 ## Requirements for Interactive Perl Scripts
 
@@ -32,10 +32,14 @@ PEB interactive Perl scripts are able to receive user input multiple times after
 
 ## Examples of Interactive Perl Scripts
 
-The [index.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) demonstrates how to start automatically one Perl interactive script using STDIN input in two instances.  
+The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file of the demo package demonstrates how to start automatically one Perl interactive script in two instances.  
 
-The [interactive.pl script of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) is an example of a Perl interactive script using STDIN input.
+The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) script of the demo package is an example of a Perl interactive script using STDIN input.
 
-The [index-windows.htm of the demo package](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index-windows.html) demonstrates how to start automatically one Perl interactive script using a temporary file in two instances.  
+The [interactive-tempfile.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-tempfile.pl) script of the demo package is an example of a Perl interactive script using a temporary file. This script creates a temporary file on startup and sends to PEB its full path in the following JSON format:  
 
-The [interactive-windows.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-windows.pl) script of the demo package is an example of a Perl interactive script using a temporary file. This script creates a temporary file on startup and sends back to PEB its full path. PEB sends data to the interactive script by forwarding this path and a message text to the STDIN of a helper script, [messenger.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/messenger.pl). The helper script writes all data received from PEB in the temporary file. The interactive script checks periodically its temporary file for any new messages.
+```json
+{"tempfile":"/path/to/tempfile"}
+```
+
+PEB sends data to the script by writing in its temporary file and the script checks periodically its temporary file for new messages.

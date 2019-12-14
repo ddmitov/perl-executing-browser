@@ -26,7 +26,7 @@ https://github.com/ddmitov/perl-executing-browser
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
       pebSettings.perlInterpreter = 'perl/bin/perl';
-      pebSettings.onStartScripts = ['interactive_one', 'interactive_two'];
+      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
       pebSettings.cutLabel = '- Cut -';
       pebSettings.copyLabel = '- Copy -';
       pebSettings.pasteLabel = '- Paste -';
@@ -38,15 +38,14 @@ https://github.com/ddmitov/perl-executing-browser
       pebSettings.closeConfirmation =
         'Text was entered in a form and it is going to be lost!\n' +
         'Are you sure you want to close the application?';
-      pebSettings.onExitScripts = ['interactive_one', 'interactive_two'];
 
       // PEB settings objects for auto-started Perl interactive scripts:
       var interactive_one = {};
-      interactive_one.scriptRelativePath = 'perl-scripts/interactive.pl';
+      interactive_one.scriptRelativePath = 'perl-scripts/interactive-tempfile.pl';
 
       interactive_one.inputData = function() {
         var data = {}
-        data.mode = "unix-epoch";
+        data.mode = "unix_epoch";
         data.user_input = document.getElementById("interactive-one-input").value;
         $('#form-one').trigger('reset');
         return JSON.stringify(data);
@@ -66,17 +65,16 @@ https://github.com/ddmitov/perl-executing-browser
 
       interactive_one.exitData = function() {
         var data = {}
-        data.mode = "unix-epoch";
-        data.user_input = "peb-exit";
+        data.user_input = "exit";
         return JSON.stringify(data);
       }
 
       var interactive_two = {};
-      interactive_two.scriptRelativePath = 'perl-scripts/interactive.pl';
+      interactive_two.scriptRelativePath = 'perl-scripts/interactive-tempfile.pl';
 
       interactive_two.inputData = function() {
         var data = {}
-        data.mode = "local-time";
+        data.mode = "local_time";
         data.user_input = document.getElementById("interactive-two-input").value;
         $('#form-two').trigger('reset');
         return JSON.stringify(data);
@@ -96,8 +94,7 @@ https://github.com/ddmitov/perl-executing-browser
 
       interactive_two.exitData = function() {
         var data = {}
-        data.mode = "unix-epoch";
-        data.user_input = "peb-exit";
+        data.user_input = "exit";
         return JSON.stringify(data);
       }
     </script>

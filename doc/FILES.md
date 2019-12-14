@@ -1,6 +1,14 @@
 # Perl Executing Browser - Files and Folders
 
-PEB is created to work from any directory without installation and all paths used by PEB are relative to the directory of the PEB executable, labeled as ``{PEB_executable_directory}`` within this documentation. Only one folder and two file names are hard-coded in C++ code for compatibility with the [Electron](http://electron.atom.io/) framework.  
+PEB is created to work from any directory without installation and all file paths used by PEB are relative to the directory of the PEB executable, labeled as ``{PEB_executable_directory}`` within this documentation.
+
+## Application Executable
+
+The executable binary file of the browser, ``peb`` or ``peb.exe`` by default, can be renamed with no restrictions or additional adjustments. It can take the name of the PEB-based application it is going to run.
+
+## Application Files and Folders
+
+The following PEB files and folders are hard-coded in C++ code for faster application startup. The PEB application directory is compatible with the application directory of the [Electron](http://electron.atom.io/) framework.  
 
 A minimal ``{PEB_executable_directory}`` looks like this:
 
