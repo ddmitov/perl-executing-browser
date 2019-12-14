@@ -32,13 +32,14 @@ PEB interactive Perl scripts are able to receive user input multiple times after
 
 ## Examples of Interactive Perl Scripts
 
-The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file of the demo package demonstrates how to start automatically one Perl interactive script in two instances.  
+The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file demonstrates how to start automatically one Perl interactive script in two instances.  
 
-The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) script of the demo package is an example of a Perl interactive script using STDIN input.
+The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) is a Perl interactive script using STDIN input.
 
-The [interactive-tempfile.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-tempfile.pl) script of the demo package is an example of a Perl interactive script using a temporary file. This script creates a temporary file on startup and sends to PEB its full path in the following JSON format:  
+The [interactive-tempfile.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-tempfile.pl) is a Perl interactive script using a temporary file.  
+This script creates a temporary file on startup and sends to PEB its full path in the following JSON format:  
 
-```json
+```javascript
 {"tempfile":"/path/to/tempfile"}
 ```
 
