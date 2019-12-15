@@ -49,7 +49,7 @@ my $input = AnyEvent->io(
     chomp $stdin;
 
     my $input = get_input($stdin);
-    $user_input  = decode('UTF-8', $input->{user_input});
+    $user_input = decode('UTF-8', $input->{user_input});
 
     if ($user_input =~ "exit") {
       shutdown_procedure();

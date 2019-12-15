@@ -30,6 +30,13 @@ PEB interactive Perl scripts are able to receive user input multiple times after
   }
   ```
 
+* **Temporary File Full Path Message**
+  Every interactive script using temporary file must send the full path of its temporary file to PEB using the following simple JSON message:  
+
+  ```javascript
+  {"tempfile":"/path/to/tempfile"}
+  ```
+
 ## Examples of Interactive Perl Scripts
 
 The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/index.html) file demonstrates how to start automatically one Perl interactive script in two instances.  
@@ -37,10 +44,6 @@ The [index.htm](https://github.com/ddmitov/perl-executing-browser/blob/master/re
 The [interactive.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive.pl) is a Perl interactive script using STDIN input.
 
 The [interactive-tempfile.pl](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/perl-scripts/interactive-tempfile.pl) is a Perl interactive script using a temporary file.  
-This script creates a temporary file on startup and sends to PEB its full path in the following JSON format:  
-
-```javascript
-{"tempfile":"/path/to/tempfile"}
-```
-
-PEB sends data to the script by writing in its temporary file and the script checks periodically its temporary file for new messages.
+* This script creates a temporary file on startup and sends its full path to PEB.  
+* PEB sends data to the script by writing in its temporary file.  
+* The script checks periodically its temporary file for any new messages.

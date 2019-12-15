@@ -23,10 +23,30 @@ https://github.com/ddmitov/perl-executing-browser
     <meta charset="utf-8">
 
     <script>
+    // Change file paths according to the operating suystem:
+    var operating_system = '';
+    var perl_interpreter = '';
+    var interactive_script = '';
+
+    if (navigator.userAgent.indexOf('Linux') != -1) {
+      operating_system = 'Linux'
+      perl_interpreter = 'perl/bin/perl';
+      interactive_script = 'perl-scripts/interactive.pl';
+    }
+
+    if (navigator.userAgent.indexOf('Win') != -1) {
+      operating_system = 'Windows'
+      perl_interpreter = 'perl/perl/bin/wperl.exe';
+      interactive_script = 'perl-scripts/interactive-tempfile.pl';
+    }
+
+    console.log('Operating system: ' + operating_system)
+    console.log('Perl interpreter: ' + perl_interpreter)
+    console.log('Interactive script: ' + interactive_script)
+
       // PEB page settings:
       var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-      pebSettings.perlInterpreter = 'perl/bin/perl';
-      // pebSettings.perlInterpreter = 'perl/perl/bin/wperl.exe';
+      pebSettings.perlInterpreter = perl_interpreter;
       pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
       pebSettings.cutLabel = '- Cut -';
       pebSettings.copyLabel = '- Copy -';
@@ -42,7 +62,7 @@ https://github.com/ddmitov/perl-executing-browser
 
       // PEB settings objects for auto-started Perl interactive scripts:
       var interactive_one = {};
-      interactive_one.scriptRelativePath = 'perl-scripts/interactive-tempfile.pl';
+      interactive_one.scriptRelativePath = interactive_script;
 
       interactive_one.inputData = function() {
         var data = {}
@@ -56,7 +76,7 @@ https://github.com/ddmitov/perl-executing-browser
         var target = document.getElementById('instance-one-output');
         var output = JSON.parse(stdout);
         var html;
-        if(("user_input" in output)) {
+        if ("user_input" in output) {
           html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;
@@ -71,7 +91,7 @@ https://github.com/ddmitov/perl-executing-browser
       }
 
       var interactive_two = {};
-      interactive_two.scriptRelativePath = 'perl-scripts/interactive-tempfile.pl';
+      interactive_two.scriptRelativePath = interactive_script;
 
       interactive_two.inputData = function() {
         var data = {}
@@ -85,7 +105,7 @@ https://github.com/ddmitov/perl-executing-browser
         var target = document.getElementById('instance-two-output');
         var output = JSON.parse(stdout);
         var html;
-        if(("user_input" in output)) {
+        if ("user_input" in output) {
           html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;

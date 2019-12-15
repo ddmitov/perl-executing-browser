@@ -35,7 +35,6 @@ wouldn't be created without his assistance.
 ## Qt
 
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
-https://github.com/NixOS/nixpkgs/issues/16327  
 
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
 https://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
@@ -55,7 +54,6 @@ https://wiki.qt.io/Open_Web_Page_in_QWebView
 
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file  
 https://forum.qt.io/topic/551/get-filename-without-extension  
-https://forum.qt.io/topic/3314/qwebelement-set-and-get-attribute  
 
 http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  
 http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout  
@@ -91,6 +89,7 @@ https://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-
 https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
 https://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c  
 https://stackoverflow.com/questions/9641807/qdir-mkdir-with-absolutepath  
+https://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt  
 
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
 http://webkit.sed.hu/content/disabling-cache  
@@ -136,6 +135,8 @@ https://stackoverflow.com/questions/42053775/getting-error-form-submission-cance
 
 https://jquery.com/  
 http://youmightnotneedjquery.com/  
+
+https://www.geeksforgeeks.org/detect-the-operating-system-of-user-using-javascript/  
 
 ## Bootstrap
 
