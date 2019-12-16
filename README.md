@@ -85,7 +85,7 @@ Press <kbd>Ctrl</kbd> + <kbd>I</kbd> to open the ``QWebInspector`` and go to the
 
 ## History
 
-PEB was started in 2013 by Dimitar D. Mitov as a simple GUI for personal database applications.
+PEB was started in 2013 by Dimitar D. Mitov as a simple user interface for personal database applications.
 
 ## [Thanks and Credits](CREDITS.md)
 

@@ -30,8 +30,8 @@ PEB interactive Perl scripts are able to receive user input multiple times after
   }
   ```
 
-* **Temporary File Full Path Message**
-  Every interactive script using temporary file must send the full path of its temporary file to PEB using the following simple JSON message:  
+* **Temporary File Full Path Message**  
+  Once started, every interactive Pel script using temporary file must send on STDOUT the full path of its temporary file in the following JSON message:  
 
   ```javascript
   {"tempfile":"/path/to/tempfile"}
