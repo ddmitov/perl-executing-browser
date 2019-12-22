@@ -33,6 +33,7 @@
 #include <QWebPage>
 
 #include "file-reader.h"
+#include "file-writer.h"
 #include "script-handler.h"
 
 // ==============================
@@ -343,12 +344,7 @@ public slots:
 
     void qWriteInScriptTempFile(QString tempFileFullPath, QString scriptInput)
     {
-        QFile file(tempFileFullPath);
-        if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-            QTextStream fileStream(&file);
-            fileStream << scriptInput <<endl;
-            file.close();
-        }
+        QFileWriter(tempFileFullPath, scriptInput);
     }
 
     void qDisplayScriptOutputSlot(QString id, QString output)

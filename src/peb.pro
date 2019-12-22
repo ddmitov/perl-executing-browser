@@ -48,6 +48,7 @@ QT += widgets webkitwidgets
 SOURCES += \
     main.cpp \
     file-reader.cpp \
+    file-writer.cpp \
     main-window.cpp \
     script-handler.cpp \
     webkit-page.cpp \
@@ -56,6 +57,7 @@ SOURCES += \
 # Header files:
 HEADERS += \
     file-reader.h \
+    file-writer.h \
     script-handler.h \
     webkit-main-window.h \
     webkit-page.h \

@@ -73,8 +73,9 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Limitations
 
-* No pop-up windows
 * No Perl scripting inside frames
+* Limited HTML5 support
+* No pop-up windows
 * No file download
 * No printing
 
