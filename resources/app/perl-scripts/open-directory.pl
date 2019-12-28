@@ -21,23 +21,20 @@ use warnings;
 my $directory_name = <STDIN>;
 chomp $directory_name;
 
-my @files;
+my $files;
+my $subdirectories;
 
 traverse ($directory_name);
 
-print "Listing all files in $directory_name:<br>";
-
-foreach my $file (@files) {
-  print "$file<br>";
-}
-
-my $number_of_files = scalar @files;
-print "$number_of_files files<br>";
+print "Selected directory: $directory_name<br>";
+print "Subdirectories: $subdirectories<br>";
+print "Files: $files<br>";
 
 sub traverse {
   my ($entry) = @_;
 
   return if not -d $entry;
+
   opendir (my $directory_handle, $entry) or die $!;
   while (my $subentry = readdir $directory_handle) {
     next if $subentry eq '.' or $subentry eq '..';
@@ -45,11 +42,16 @@ sub traverse {
     my $full_path = $entry."/".$subentry;
 
     if (-f $full_path) {
-      push @files, $full_path;
+      $files++;
+    }
+
+    if (-d $full_path) {
+      $subdirectories++;
     }
 
     traverse ("$entry/$subentry");
   }
+
   close $directory_handle;
 
   return;
