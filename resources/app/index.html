@@ -74,13 +74,21 @@ https://github.com/ddmitov/perl-executing-browser
 
       interactive_one.stdoutFunction = function (stdout) {
         var target = document.getElementById('instance-one-output');
-        var output = JSON.parse(stdout);
+
+        var output = null;
+        try {
+          output = JSON.parse(stdout);
+        } catch(exception) {
+          return null;
+        }
+
         var html;
         if ("user_input" in output) {
           html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;
         };
+
         target.innerHTML = html;
       }
 
@@ -103,13 +111,21 @@ https://github.com/ddmitov/perl-executing-browser
 
       interactive_two.stdoutFunction = function (stdout) {
         var target = document.getElementById('instance-two-output');
-        var output = JSON.parse(stdout);
+
+        var output = null;
+        try {
+          output = JSON.parse(stdout);
+        } catch(exception) {
+          return null;
+        }
+
         var html;
         if ("user_input" in output) {
           html = output.time + '<br>' + output.user_input;
         } else {
           html = output.time;
         };
+
         target.innerHTML = html;
       }
 

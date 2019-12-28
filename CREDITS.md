@@ -132,6 +132,8 @@ https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-wi
 https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
 https://stackoverflow.com/questions/11478324/syntaxerror-unexpected-eof-when-evaluating-javascript-in-ios-uiwebview  
 https://stackoverflow.com/questions/42053775/getting-error-form-submission-canceled-because-the-form-is-not-connected  
+https://stackoverflow.com/questions/4467044/proper-way-to-catch-exception-from-json-parse  
+https://stackoverflow.com/questions/29797946/handling-bad-json-parse-in-node-safely  
 
 https://jquery.com/  
 http://youmightnotneedjquery.com/  
