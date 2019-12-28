@@ -10,6 +10,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 
 ## Contents
 
+* [Quick Start](#quick-start)
 * [Design Objectives](#design-objectives)
 * [Features](#features)
 * [Security](#security)
@@ -41,6 +42,60 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",  
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY" and "OPTIONAL"  
 in the documentation of this project are to be interpreted as described in [RFC 2119](https://www.ietf.org/rfc/rfc2119.txt).  
+
+## Quick Start
+
+* **1.** [Download the PEB Demo Application](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
+  64-bit Linux single-file [AppImage](https://appimage.org/) executable and  
+  32-bit Windows self-extracting ZIP archive are available.  
+  They include everything you need to start developing PEB-based applications.
+
+* **2.** Unpack:
+
+  64-bit Linux:
+  ```bash
+  peb-demo-xx.AppImage --appimage-extract
+  ```
+
+  Windows:
+  Unzip using any Windows unzip utility.
+
+* **3.** Optionally install any CPAN modules you may need:
+
+  64-bit Linux - from the extracted ``peb-demo`` directory:
+  ```bash
+  cd resources/app/perl/bin
+  ./perl ./cpanm YourModule
+  ```
+
+  Windows - from the extracted ``peb-demo`` directory:
+  ```batchfile
+  cd resources\app\perl
+  .\portableshell.bat
+  cpanm YourModule
+  ```
+
+* **4.** Write your Perl application reading user input on STDIN:
+
+  ```perl
+  my $input = <STDIN>;
+  chomp $input;
+  ```
+
+* **5.** Write a ``{PEB_executable_directory}/resources/app/index.html`` with  
+  a [settings JavaScript object](./doc/SETTINGS.md#perl-scripts-api) for every Perl script you want to use.  
+  Start local Perl scripts by [clicking a link or submitting a form to a special URL](./doc/SETTINGS.md#perl-scripts-api).  
+  [Select files or folders with their full paths by clicking a link to a special URL](./doc/SETTINGS.md#selecting-files-and-folders).
+
+* **6.** Optionally pack your application:
+
+  64-bit Linux - from the extracted ``peb-demo`` directory:
+  ```bash
+  ./appimager.sh
+  ```
+
+  Windows:
+  Zip your PEB-based application using any Windows zip utility.
 
 ## Design Objectives
 
