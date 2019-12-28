@@ -32,6 +32,12 @@ open_directory.stdoutFunction = function (stdout) {
   displayTestResult('open-directory', stdout);
 }
 
+var create_file = {};
+create_file.scriptRelativePath = 'perl-scripts/create-file.pl';
+create_file.stdoutFunction = function (stdout) {
+  displayTestResult('new-file', stdout);
+}
+
 var perl_info = {};
 perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
 perl_info.stdoutFunction = function (stdout) {
@@ -59,13 +65,16 @@ select_file.receiverFunction = function (fileName) {
   form.submit();
 }
 
-var new_file_name = {};
-new_file_name.type = 'new-file-name';
-new_file_name.receiverFunction = function (fileName) {
+var new_file = {};
+new_file.type = 'new-file-name';
+new_file.receiverFunction = function (fileName) {
+  create_file.inputData = fileName;
   clearTestData();
-  var pre = document.createElement("pre");
-  pre.innerHTML = 'New file name: ' + fileName;
-  document.getElementById('tests').appendChild(pre);
+
+  var form = document.createElement('form');
+  form.setAttribute('action', 'create_file.script');
+  document.body.appendChild(form);
+  form.submit();
 }
 
 var select_files = {};
