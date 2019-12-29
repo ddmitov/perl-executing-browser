@@ -26,6 +26,7 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
   * [Files and Folders Dialogs API](./doc/SETTINGS.md#files-and-folders-dialogs-api)
 * INTERACTIVE PERL SCRIPTS
+  * [PEB Interactive Perl Scripts](./doc/INTERACTIVE.md#peb-interactive-perl-scripts)
   * [Requirements for Interactive Perl Scripts](./doc/INTERACTIVE.md#requirements-for-interactive-perl-scripts)
   * [Examples of Interactive Perl Scripts](./doc/INTERACTIVE.md#examples-of-interactive-perl-scripts)
 * APPIMAGE SUPPORT

@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     // ==============================
     // Application version:
     // ==============================
-    application.setApplicationVersion("1.1.0");
+    application.setApplicationVersion("1.1.1");
 
     // ==============================
     // UTF-8 encoding application-wide:
@@ -60,7 +60,8 @@ int main(int argc, char **argv)
     // ==============================
     // Application directory:
     // ==============================
-    QString applicationDirName = browserDirectory + "/resources/app";
+    QString applicationDirName =
+            executableDirectory.absolutePath().toLatin1() + "/resources/app";
     application.setProperty("appDir", applicationDirName);
 
     // ==============================

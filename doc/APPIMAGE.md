@@ -35,7 +35,7 @@ sudo docker container run --rm -it -v $(pwd):/opt --user $(id -u):$(id -g) peb-a
 When PEB AppImage Builder Docker Container is running, type:
 
 ```bash
-cd /opt/src && qmake -qt=qt5 && make && cd .. && export VERSION="1.1.0" && ./appimager.sh && exit
+cd /opt/src && qmake -qt=qt5 && make && cd .. && export VERSION="1.1.1" && ./appimager.sh && exit
 ```
 
 ## AppImageHub

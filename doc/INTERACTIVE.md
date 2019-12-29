@@ -1,6 +1,8 @@
 # Perl Executing Browser - Interactive Perl Scripts
 
-PEB interactive Perl scripts are able to receive user input multiple times after the script is started by waiting for new data on STDIN or in a temporary file. Many interactive scripts can be started simultaneously in one PEB instance. One script may be started in many instances, provided that each of them has a JavaScript settings object with an unique name.
+## PEB Interactive Perl Scripts
+
+PEB interactive Perl scripts are able to receive user input multiple times after the script is started by waiting for new data on STDIN or in a temporary file. Many interactive scripts can be started simultaneously by one PEB instance. One script may be started in many instances, provided that each of them has a JavaScript settings object with an unique name.
 
 ## Requirements for Interactive Perl Scripts
 
