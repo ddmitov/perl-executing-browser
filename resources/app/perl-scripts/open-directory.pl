@@ -21,8 +21,8 @@ use warnings;
 my $directory_name = <STDIN>;
 chomp $directory_name;
 
-my $files;
-my $subdirectories;
+my $files = 0;
+my $subdirectories = 0;
 
 traverse ($directory_name);
 

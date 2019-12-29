@@ -54,17 +54,17 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
   64-bit Linux:
   ```bash
-  peb-demo-xx.AppImage --appimage-extract
+  ./peb-demo-*.AppImage --appimage-extract
   ```
 
-  Windows:
+  Windows:  
   Unzip using any Windows unzip utility.
 
 * **3.** Optionally install any CPAN modules you may need:
 
-  64-bit Linux - from the extracted ``peb-demo`` directory:
+  64-bit Linux:
   ```bash
-  cd resources/app/perl/bin
+  cd squashfs-root/resources/app/perl/bin
   ./perl ./cpanm YourModule
   ```
 
@@ -87,14 +87,17 @@ in the documentation of this project are to be interpreted as described in [RFC 
   Start local Perl scripts by [clicking a link or submitting a form to a special URL](./doc/SETTINGS.md#perl-scripts-api).  
   [Select files or folders with their full paths by clicking a link to a special URL](./doc/SETTINGS.md#selecting-files-and-folders).
 
-* **6.** Optionally pack your application:
+* **6.** Optionally change the [PEB AppImage configuration files](./doc/APPIMAGE.md#peb-appimage-configuration-files).
 
-  64-bit Linux - from the extracted ``peb-demo`` directory:
+* **7.** Optionally pack your application:
+
+  64-bit Linux - from the extracted ``squashfs-root`` directory:
   ```bash
-  ./appimager.sh
+  export VERSION="X.X.X" && ./appimager.sh
   ```
+  The resulting AppImage will be produced in the ``squashfs-root`` directory.  
 
-  Windows:
+  Windows:  
   Zip your PEB-based application using any Windows zip utility.
 
 ## Design Objectives
