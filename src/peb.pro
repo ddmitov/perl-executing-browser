@@ -14,15 +14,11 @@
 # https://github.com/ddmitov/perl-executing-browser
 
 lessThan (QT_MAJOR_VERSION, 5) {
-    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
+    error ("Perl Executing Browser requires Qt versions 5.2 or higher")
 }
 
 lessThan (QT_MINOR_VERSION, 2) {
-    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
-}
-
-greaterThan (QT_MINOR_VERSION, 5) {
-    error ("Perl Executing Browser requires Qt versions 5.2 - 5.5")
+    error ("Perl Executing Browser requires Qt versions 5.2 or higher")
 }
 
 win32 {

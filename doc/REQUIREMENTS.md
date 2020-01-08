@@ -2,8 +2,10 @@
 
 ## Compile-Time Requirements
 
-The only Linux compile-time requirement of PEB is a Qt development bundle versions 5.2 to 5.5.  
-The only Windows compile-time requirement of PEB is a GCC-based MinGW Qt development bundle versions 5.2 to 5.5.
+* Qt development bundle version 5.2 to or higher  
+* ``QtWebKit`` library and headers  
+
+PEB for Windows must be compiled by a GCC-based MinGW Qt development bundle.  
 
 Compiled and tested successfully using:
 
@@ -12,6 +14,7 @@ Compiled and tested successfully using:
 * [Qt 5.3.0](http://download.qt.io/archive/qt/5.3/5.3.0/) on 64-bit Lubuntu 14.10
 * [Qt 5.4.1](http://download.qt.io/archive/qt/5.4/5.4.1/) on 64-bit Lubuntu 15.04
 * [Qt 5.5.1](http://download.qt.io/archive/qt/5.5/5.5.1/) on 64-bit Lubuntu 15.04/16.04 and 64-bit Windows 10
+* [Qt 5.9.5](http://download.qt.io/archive/qt/5.9/5.9.5/) on 64-bit Lubuntu 18.04.3  
 
 To compile PEB run the following commands in the root directory of the PEB project:
 
