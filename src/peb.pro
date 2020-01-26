@@ -31,6 +31,8 @@ CONFIG += release
 TEMPLATE = app
 TARGET = peb
 
+QMAKE_LFLAGS += -no-pie
+
 # Network support:
 QT += network
 

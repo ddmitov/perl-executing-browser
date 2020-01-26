@@ -90,6 +90,7 @@ https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument
 https://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c  
 https://stackoverflow.com/questions/9641807/qdir-mkdir-with-absolutepath  
 https://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt  
+https://stackoverflow.com/questions/45329372/ubuntu-recognizes-executable-as-shared-library-and-wont-run-it-by-clicking  
 
 http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
 http://webkit.sed.hu/content/disabling-cache  
