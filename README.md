@@ -160,5 +160,5 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 
 ## Authors
 
-Dimitar D. Mitov, 2013 - 2019  
+Dimitar D. Mitov, 2013 - 2020  
 Valcho Nedelchev, 2014 - 2016  
