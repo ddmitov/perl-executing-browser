@@ -48,7 +48,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * **1.** [Download the PEB Demo Application](https://github.com/ddmitov/perl-executing-browser/releases/latest).  
   64-bit Linux single-file [AppImage](https://appimage.org/) executable and  
-  32-bit Windows self-extracting ZIP archive are available.  
+  32-bit Windows ZIP archive are available.  
   They include everything you need to start developing PEB-based applications.
 
 * **2.** Unpack:
