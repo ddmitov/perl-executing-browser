@@ -8,7 +8,7 @@
 
 PEB for Windows must be compiled by a GCC-based MinGW Qt development bundle.  
 
-Compiled and tested successfully using [Qt 5.2.0](https://download.qt.io/new_archive/qt/5.2/5.2.0/), [5.2.1](https://download.qt.io/new_archive/qt/5.2/5.2.1/), [5.3.0](https://download.qt.io/new_archive/qt/5.3/5.3.0/), [5.4.1](https://download.qt.io/new_archive/qt/5.4/5.4.1/), [5.5.1](https://download.qt.io/new_archive/qt/5.5/5.5.1/).  
+Compiled and tested successfully using Qt [5.2.0](https://download.qt.io/new_archive/qt/5.2/5.2.0/), [5.2.1](https://download.qt.io/new_archive/qt/5.2/5.2.1/), [5.3.0](https://download.qt.io/new_archive/qt/5.3/5.3.0/), [5.4.1](https://download.qt.io/new_archive/qt/5.4/5.4.1/), [5.5.1](https://download.qt.io/new_archive/qt/5.5/5.5.1/).  
 
 To compile PEB run the following commands in the root directory of the PEB project:
 
