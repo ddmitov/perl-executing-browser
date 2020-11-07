@@ -25,7 +25,7 @@ make
   * Qt5Gui  
   * Qt5Network  
   * Qt5Widgets  
-* QtWebKit library:
+* QtWebKit libraries:
   * Qt5WebKit  
   * Qt5WebKitWidgets  
 

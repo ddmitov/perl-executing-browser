@@ -10,8 +10,7 @@ PEB interactive Perl scripts are able to receive user input multiple times after
   Each PEB interactive Perl script must have its own event loop waiting constantly for new data on STDIN or in a temporary file. ``AnyEvent`` is a popular Perl framework for building different types of event loops.
 
 * **No Buffering**  
-  PEB interactive scripts must run without output buffering, which may prevent output before the script has ended.
-  Output buffering can be disabled using the following code:
+  PEB interactive scripts must run without output buffering, which may prevent output before the script has ended. Output buffering can be disabled using the following code:
 
   ```perl
   use English;
@@ -20,7 +19,7 @@ PEB interactive Perl scripts are able to receive user input multiple times after
   ```
 
 * **Failsafe Print**  
-  Failsafe print is necessary to shut down PEB Perl scripts if PEB unexpectedly crashes.
+  Failsafe print is necessary to shut down PEB interactive Perl scripts if PEB unexpectedly crashes.
   Failsafe print can be implemented using the following code:
 
   ```perl

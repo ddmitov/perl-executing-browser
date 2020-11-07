@@ -113,7 +113,7 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * [PEB can be started from any folder without installation procedure.](./doc/CONSTANTS.md#files-and-folders)
 * [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
-* [Event-driven interactive Perl scripts can be repeatedly fed with data.](./doc/SETTINGS.md#interactive-perl-scripts)
+* [Event-driven interactive Perl scripts can be repeatedly fed with data.](./doc/INTERACTIVE.md)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
