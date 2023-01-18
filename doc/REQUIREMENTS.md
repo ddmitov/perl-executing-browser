@@ -33,6 +33,6 @@ make
 
   Tested with:  
   Linux 64-bit [Relocatable Perl](https://github.com/skaji/relocatable-perl) versions 5.24.1, 5.26.1  
-  Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) Portable versions [5.12.2.0](http://strawberryperl.com/download/5.12.2.0/strawberry-perl-5.12.2.0-portable.zip), [5.16.1.1](http://strawberryperl.com/download/5.16.1.1/strawberry-perl-5.16.1.1-64bit-portable.zip), [5.20.2.1](), [5.30.0.1](http://strawberryperl.com/download/5.20.2.1/strawberry-perl-5.20.2.1-64bit-portable.zip)  
+  Windows 32-bit [Strawberry Perl](http://strawberryperl.com/) Portable versions 5.12.2.0, 5.16.1.1, 5.20.2.1, 5.30.0.1  
 
   PEB will use the first Perl on PATH if a relocatable Perl distribution is not available.
