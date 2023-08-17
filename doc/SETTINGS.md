@@ -68,13 +68,13 @@ There are two methods to start a local Perl script:
 * **Clicking a pseudo link:**  
 
   ```html
-  <a href="test.script">Start Perl script</a>
+  <a href="example.script">Start Perl script</a>
   ```
 
 * **Submitting a form to a pseudo link:**  
 
   ```html
-  <form action="test.script">
+  <form action="example.script">
     <input type="submit" value="Start Perl script">
   </form>
   ```
@@ -82,9 +82,9 @@ There are two methods to start a local Perl script:
 An example of a JavaScript settings object for a Perl script run by PEB:  
 
 ```javascript
-var perl_script = {};
-perl_script.scriptRelativePath = 'perl/test.pl';
-perl_script.stdoutFunction = function (stdout) {
+var example = {};
+example.scriptRelativePath = 'perl/test.pl';
+example.stdoutFunction = function (stdout) {
   var container = document.getElementById('tests');
   container.innerText = stdout;
 }
@@ -101,7 +101,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   *This object property is mandatory.*  
 
   ```javascript
-  perl_script.script = "relative/path/to/script.pl";
+  example.script = "relative/path/to/script.pl";
   ```
 
 * **stdoutFunction**  
@@ -111,7 +111,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   An example of an immediate STDOUT data display without accumulation:
 
   ```javascript
-  perl_script.stdoutFunction = function (stdout) {
+  example.stdoutFunction = function (stdout) {
     document.getElementById("DOM-element-id").textContent = stdout;
   };
   ```
@@ -122,7 +122,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   ```javascript
   var accumulatedOutput;
 
-  perl_script.stdoutFunction = function (stdout) {
+  example.stdoutFunction = function (stdout) {
     accumulatedOutput = accumulatedOutput + stdout;
     document.getElementById("DOM-element-id").textContent = accumulatedOutput;
   };
@@ -135,7 +135,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   ``inputData`` function with no dependencies:  
 
   ```javascript
-  perl_script.inputData = function () {
+  example.inputData = function () {
     var data = document.getElementById("input-box-id").value;
     return data;
   }
