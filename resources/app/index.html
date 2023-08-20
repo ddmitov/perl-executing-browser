@@ -11,7 +11,7 @@ This program is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY;
 without even the implied warranty of MERCHANTABILITY or
 FITNESS FOR A PARTICULAR PURPOSE.
-Dimitar D. Mitov, 2013 - 2020
+Dimitar D. Mitov, 2013 - 2020, 2023
 Valcho Nedelchev, 2014 - 2016
 https://github.com/ddmitov/perl-executing-browser
 -->
@@ -23,124 +23,20 @@ https://github.com/ddmitov/perl-executing-browser
     <meta charset="utf-8">
 
     <script>
-    // Change file paths according to the operating suystem:
-    var operating_system = '';
-    var perl_interpreter = '';
-    var interactive_script = '';
+      // PEB settings:
+      var pebSettings = {};
 
-    if (navigator.userAgent.indexOf('Linux') != -1) {
-      operating_system = 'Linux'
-      perl_interpreter = 'perl/bin/perl';
-      interactive_script = 'perl-scripts/interactive.pl';
-    }
-
-    if (navigator.userAgent.indexOf('Win') != -1) {
-      operating_system = 'Windows'
-      perl_interpreter = 'perl/perl/bin/wperl.exe';
-      interactive_script = 'perl-scripts/interactive-tempfile.pl';
-    }
-
-    console.log('Operating system: ' + operating_system)
-    console.log('Perl interpreter: ' + perl_interpreter)
-    console.log('Interactive script: ' + interactive_script)
-
-      // PEB page settings:
-      var pebSettings = {}; // 'pebSettings' object name is hard-coded.
-      pebSettings.perlInterpreter = perl_interpreter;
-      pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
-      pebSettings.cutLabel = '- Cut -';
-      pebSettings.copyLabel = '- Copy -';
-      pebSettings.pasteLabel = '- Paste -';
-      pebSettings.selectAllLabel = '- Select All -';
-      pebSettings.okLabel = 'OK';
-      pebSettings.cancelLabel = 'CANCEL';
-      pebSettings.yesLabel = 'YES';
-      pebSettings.noLabel = 'NO';
-      pebSettings.closeConfirmation =
-        'Text was entered in a form and it is going to be lost!\n' +
-        'Are you sure you want to close the application?';
-
-      // PEB settings objects for auto-started Perl interactive scripts:
-      var interactive_one = {};
-      interactive_one.scriptRelativePath = interactive_script;
-
-      interactive_one.inputData = function() {
-        var data = {}
-        data.mode = "unix_epoch";
-        data.user_input = document.getElementById("interactive-one-input").value;
-        $('#form-one').trigger('reset');
-        return JSON.stringify(data);
+      if (navigator.userAgent.indexOf('Linux') != -1) {
+        pebSettings.perlInterpreter = 'perl/bin/perl';
       }
 
-      interactive_one.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-one-output');
-
-        var output = null;
-        try {
-          output = JSON.parse(stdout);
-        } catch(exception) {
-          return null;
-        }
-
-        var html;
-        if ("user_input" in output) {
-          html = output.time + '<br>' + output.user_input;
-        } else {
-          html = output.time;
-        };
-
-        target.innerHTML = html;
-      }
-
-      interactive_one.exitData = function() {
-        var data = {}
-        data.user_input = "exit";
-        return JSON.stringify(data);
-      }
-
-      var interactive_two = {};
-      interactive_two.scriptRelativePath = interactive_script;
-
-      interactive_two.inputData = function() {
-        var data = {}
-        data.mode = "local_time";
-        data.user_input = document.getElementById("interactive-two-input").value;
-        $('#form-two').trigger('reset');
-        return JSON.stringify(data);
-      }
-
-      interactive_two.stdoutFunction = function (stdout) {
-        var target = document.getElementById('instance-two-output');
-
-        var output = null;
-        try {
-          output = JSON.parse(stdout);
-        } catch(exception) {
-          return null;
-        }
-
-        var html;
-        if ("user_input" in output) {
-          html = output.time + '<br>' + output.user_input;
-        } else {
-          html = output.time;
-        };
-
-        target.innerHTML = html;
-      }
-
-      interactive_two.exitData = function() {
-        var data = {}
-        data.user_input = "exit";
-        return JSON.stringify(data);
+      if (navigator.userAgent.indexOf('Win') != -1) {
+        pebSettings.perlInterpreter = 'perl/perl/bin/wperl.exe';
       }
     </script>
 
-    <script src="jquery/jquery-1.12.4.min.js"></script>
-    <script src="bootstrap/js/bootstrap.js"></script>
     <script src="peb-demo.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="bootstrap/css/bootstrap.css" media="all">
     <link rel="stylesheet" type="text/css" href="bootstrap/css/darkly-theme.css" media="all">
     <link rel="stylesheet" type="text/css" href="peb-demo.css" media="all">
   </head>
@@ -148,77 +44,34 @@ https://github.com/ddmitov/perl-executing-browser
   <body>
     <div class="container">
 
-      <div class="row">
-        <a class="btn btn-primary" href="select_file.dialog" role="button">Open File</a>
-        <a class="btn btn-primary" href="new_file.dialog" role="button">New File</a>
-        <a class="btn btn-primary" href="select_files.dialog">Open Multiple Files</a>
-        <a class="btn btn-primary" href="select_directory.dialog">Open Directory</a>
-      </div>
-
-      <div class="row">
-        <a class="btn btn-primary" href="perl_info.script">Perl Basic Information</a>
-        <a class="btn btn-primary" href="sqlite.script">SQLite Test</a>
-        <a class="btn btn-primary" href="javascript:clearTestData();">Clear Test Data</a>
-        <a class="btn btn-primary" href="https://duckduckgo.com/html">DuckDuckGo</a>
-        <a class="btn btn-primary" href="javascript:about();" role="button">About</a>
-      </div>
-
-      <div id="tests" class="tests"></div>
-
       <h2>Perl Executing Browser</h2>
 
       <div class="row">
         <div class="col-lg-12 introduction">
-          Perl Executing Browser (PEB) is an HTML5 user interface for Perl 5 desktop applications.
-          It is a C++ Qt 5 application running local Perl 5 scripts as child processes without server.
+          Perl Executing Browser (PEB) is an HTML user interface for Perl 5 desktop applications.
+          It is a C++ Qt 5 application running local Perl scripts as child processes without server.
           Inspired by Electron and NW.js, PEB is another reuse of web technologies in
           desktop applications with Perl doing the heavy lifting instead of Node.js.
         </div>
       </div>
 
-      <h3>Interactive Script Demo</h3>
-
       <div class="row">
-        <div class="col-xs-12 form-group">
-          <form action="interactive_one.script" id="form-one">
-            <div class="input-group">
-              <input type="text" id="interactive-one-input" name="input" class="form-control"
-                placeholder="Press Enter to send data to the first interactive script instance">
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-one').trigger('reset');">Reset
-              </span>
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-one').trigger('submit');">Send
-              </span>
-            </div>
-          </form>
-        </div>
-
-        <div id="instance-one-output" class="interactive-output">&nbsp;</div>
+        <a class="btn btn-primary" href="select_file.dialog" role="button">Open File</a>
+        <a class="btn btn-primary" href="new_filename.dialog" role="button">New File</a>
+        <a class="btn btn-primary" href="select_files.dialog">Open Multiple Files</a>
+        <a class="btn btn-primary" href="select_directory.dialog">Open Directory</a>
       </div>
 
       <div class="row">
-        <div class="col-xs-12 form-group">
-          <form action="interactive_two.script" id="form-two">
-            <div class="input-group">
-              <input type="text" id="interactive-two-input" name="input" class="form-control"
-                placeholder="Press Enter to send data to the second interactive script instance">
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-two').trigger('reset');">Reset
-              </span>
-
-              <span class="input-group-addon btn btn-primary"
-                onclick="javascript:$('#form-two').trigger('submit');">Send
-              </span>
-            </div>
-          </form>
-        </div>
-
-        <div id="instance-two-output" class="interactive-output">&nbsp;</div>
+        <a class="btn btn-primary" id="perl-info-button" href="perl_info.script">Perl Basic Information</a>
+        <a class="btn btn-primary" id="sqlite-button" href="sqlite.script">SQLite Test</a>
       </div>
+
+      <div id="perl-info-output" class="tests"></div>
+
+      <div id="sqlite-output" class="tests"></div>
+
+      <div id="filesystem-tests" class="tests"></div>
     </div>
   </body>
 

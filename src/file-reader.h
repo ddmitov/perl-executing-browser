@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -24,11 +24,13 @@
 // FILE READER CLASS DEFINITION:
 // Usefull for both files inside binary resources and files on disk
 // ==============================
+
 class QFileReader : public QObject
 {
     Q_OBJECT
 
 public:
+
     explicit QFileReader(QString filePath);
     QString fileContents;
 };

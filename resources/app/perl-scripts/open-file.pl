@@ -18,7 +18,7 @@
 use strict;
 use warnings;
 
-my $directory_name = <STDIN>;
-chomp $directory_name;
+my $input = <STDIN>;
+chomp $input;
 
-print "Selected directory: $directory_name";
+print "Selected file: $input";

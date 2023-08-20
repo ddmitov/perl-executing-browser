@@ -22,22 +22,6 @@ An example AppStream file is available [here](https://github.com/ddmitov/perl-ex
 
 Both PEB AppImage configuration files are put on their places in the AppImage directory tree structure by the [PEB AppImager](https://github.com/ddmitov/perl-executing-browser/blob/master/appimager.sh) script.  
 
-## PEB AppImage Builder Docker Container
-
-An easy building environment for PEB AppImage executables is the [PEB AppImage Builder Docker Container](https://github.com/ddmitov/perl-executing-browser/blob/master/sdk/Dockerfile).  
-To start it, run the following commands in the ``{PEB_executable_directory}``:  
-
-```bash
-sudo docker build -t peb-appimage-builder .
-sudo docker container run --rm -it -v $(pwd):/opt --user $(id -u):$(id -g) peb-appimage-builder
-```
-
-When PEB AppImage Builder Docker Container is running, type:
-
-```bash
-cd /opt/src && qmake -qt=qt5 && make && cd .. && export VERSION="1.1.1" && ./appimager.sh && exit
-```
-
 ## AppImageHub
 
 Perl Executing Browser is also listed at the [AppImageHub](https://appimage.github.io/perl-executing-browser/).  

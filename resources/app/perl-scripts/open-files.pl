@@ -11,7 +11,7 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020
+# Dimitar D. Mitov, 2013 - 2020, 2023
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
@@ -23,13 +23,5 @@ chomp $input;
 
 my @files = split(/;/, $input);
 
-my $number_of_lines;
-
-foreach my $file (@files) {
-  open my $filehandle, '<', $file or warn "Unable to open $!";
-  my @file_contents = <$filehandle>;
-  close $filehandle;
-
-  my $number_of_lines = scalar(@file_contents);
-  print "File: $file Lines: $number_of_lines<br>";
-}
+my $number_of_files = scalar(@files);
+print "Number of selected files: $number_of_files";

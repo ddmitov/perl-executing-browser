@@ -2,12 +2,11 @@
 
 ## Global Settings API
 
-All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, no Perl scripts can be started.
+All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, the Perl interpreter for all scripts will be the first Perl interpreter on PATH.
 
 ```javascript
 var pebSettings = {};
 pebSettings.perlInterpreter = 'perl/bin/perl';
-pebSettings.autoStartScripts = ['interactive_one', 'interactive_two'];
 pebSettings.cutLabel = "Custom Cut Label";
 pebSettings.copyLabel = "Custom Copy Label";
 pebSettings.pasteLabel = "Custom Paste Label";
@@ -29,9 +28,6 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``{PEB_executable_directory}/resources/app`` as a root folder.  
   If a relocatable Perl interpreter is not configured, PEB will use the first Perl interpreter on PATH.  
 
-* **autoStartScripts**  
-  ``Array`` of Perl scripts that are started immediately after a local page is loaded  
-
 * **cutLabel**  
   ``String`` displayed as a label for the 'Cut' action on context menus.
 
@@ -42,7 +38,7 @@ The ``pebSettings`` JavaScript object may have the following properties:
   ``String`` displayed as a label for the 'Paste' action on context menus.
 
 * **selectAllLabel**  
-  ``String`` displayed as a label for the 'Select All' action on context menus.
+  ``String`` displayed as a label for the 'Select can be startedAll' action on context menus.
 
 * **okLabel**  
   ``String`` displayed as a label for the 'Ok' button on JavaScript Alert and Prompt popup boxes.
@@ -130,7 +126,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 * **inputData**  
   ``String`` or ``Function`` supplying user data as its return value  
-  ``inputData`` is written on script STDIN or in temporary file.  
+  ``inputData`` is written on script STDIN.  
 
   ``inputData`` function with no dependencies:  
 
@@ -143,7 +139,7 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
 
 * **exitData**  
   ``String`` or ``Function`` supplying script exit command as its return value  
-  ``exitData`` is written on script STDIN or in temporary file.  
+  ``exitData`` is written on script STDIN.  
 
 ## Files and Folders Dialogs API
 

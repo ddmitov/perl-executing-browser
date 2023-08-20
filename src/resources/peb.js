@@ -9,7 +9,7 @@
 // but WITHOUT ANY WARRANTY;
 // without even the implied warranty of MERCHANTABILITY or
 // FITNESS FOR A PARTICULAR PURPOSE.
-// Dimitar D. Mitov, 2013 - 2020
+// Dimitar D. Mitov, 2013 - 2020, 2023
 // Valcho Nedelchev, 2014 - 2016
 // https://github.com/ddmitov/perl-executing-browser
 

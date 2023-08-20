@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -30,14 +30,17 @@
 // VIEW CLASS DEFINITION:
 // (QTWEBKIT VERSION)
 // ==============================
+
 class QViewWidget : public QWebView
 {
     Q_OBJECT
 
 public slots:
+
     // ==============================
-    // Actions taken after page is loaded:
+    // Actions taken on page load:
     // ==============================
+
     void qPageLoadedSlot()
     {
         setWindowTitle(QViewWidget::title());
@@ -46,66 +49,65 @@ public slots:
     // ==============================
     // Context menu:
     // ==============================
+
     void contextMenuEvent(QContextMenuEvent *event)
     {
-        if (mainPage->mainFrame()->url().scheme() != "file") {
-            page()->action(QWebPage::CopyImageToClipboard)->setVisible(false);
-            page()->action(QWebPage::DownloadImageToDisk)->setVisible(false);
-            page()->action(QWebPage::DownloadLinkToDisk)->setVisible(false);
-            page()->action(QWebPage::OpenFrameInNewWindow)->setVisible(false);
-            page()->action(QWebPage::OpenImageInNewWindow)->setVisible(false);
-            page()->action(QWebPage::OpenLinkInNewWindow)->setVisible(false);
-            page()->action(QWebPage::OpenLinkInThisWindow)->setVisible(false);
-            page()->action(QWebPage::OpenLink)->setVisible(false);
+        QWebHitTestResult contextMenuTest =
+            mainPage->mainFrame()->hitTestContent(event->pos());
 
-            QMenu *menu = QWebView::page()->createStandardContextMenu();
-            menu->popup(event->globalPos());
+        if (!contextMenuTest.isContentEditable() and
+            contextMenuTest.isContentSelected()) {
+            QMenu menu;
+
+            QAction *copyAct =
+                menu.addAction(qApp->property("copyLabel").toString());
+
+            QObject::connect(copyAct,
+                             SIGNAL(triggered()),
+                             this,
+                             SLOT(qCopyAction()));
+
+            menu.exec(mapToGlobal(event->pos()));
+            this->focusWidget();
         }
 
-        if (mainPage->mainFrame()->url().scheme() == "file") {
-            QWebHitTestResult contextMenuTest =
-                    mainPage->mainFrame()->hitTestContent(event->pos());
+        if (contextMenuTest.isContentEditable()) {
+            QMenu menu;
 
-            if (!contextMenuTest.isContentEditable() and
-                    contextMenuTest.isContentSelected()) {
-                QMenu menu;
+            QAction *cutAct =
+                menu.addAction(qApp->property("cutLabel").toString());
 
-                QAction *copyAct =
-                        menu.addAction(qApp->property("copyLabel").toString());
-                QObject::connect(copyAct, SIGNAL(triggered()),
-                                 this, SLOT(qCopyAction()));
+            QObject::connect(cutAct,
+                             SIGNAL(triggered()),
+                             this,
+                             SLOT(qCutAction()));
 
-                menu.exec(mapToGlobal(event->pos()));
-                this->focusWidget();
-            }
+            QAction *copyAct =
+                menu.addAction(qApp->property("copyLabel").toString());
 
-            if (contextMenuTest.isContentEditable()) {
-                QMenu menu;
+            QObject::connect(copyAct,
+                             SIGNAL(triggered()),
+                             this,
+                             SLOT(qCopyAction()));
 
-                QAction *cutAct =
-                        menu.addAction(qApp->property("cutLabel").toString());
-                QObject::connect(cutAct, SIGNAL(triggered()),
-                                 this, SLOT(qCutAction()));
+            QAction *pasteAct =
+                menu.addAction(qApp->property("pasteLabel").toString());
 
-                QAction *copyAct =
-                        menu.addAction(qApp->property("copyLabel").toString());
-                QObject::connect(copyAct, SIGNAL(triggered()),
-                                 this, SLOT(qCopyAction()));
+            QObject::connect(pasteAct,
+                             SIGNAL(triggered()),
+                             this,
+                             SLOT(qPasteAction()));
 
-                QAction *pasteAct =
-                        menu.addAction(qApp->property("pasteLabel").toString());
-                QObject::connect(pasteAct, SIGNAL(triggered()),
-                                 this, SLOT(qPasteAction()));
+            QAction *selectAllAct =
+                menu.addAction(qApp->property("selectAllLabel").toString());
 
-                QAction *selectAllAct =
-                        menu.addAction(
-                            qApp->property("selectAllLabel").toString());
-                QObject::connect(selectAllAct, SIGNAL(triggered()),
-                                 this, SLOT(qSelectAllAction()));
+            QObject::connect(selectAllAct,
+                             SIGNAL(triggered()),
+                             this,
+                             SLOT(qSelectAllAction()));
 
-                menu.exec(mapToGlobal(event->pos()));
-                this->focusWidget();
-            }
+            menu.exec(mapToGlobal(event->pos()));
+            this->focusWidget();
         }
     }
 
@@ -132,25 +134,20 @@ public slots:
     // ==============================
     // QWebInspector window:
     // ==============================
+
     void qStartQWebInspector()
     {
         QWebInspector *inspector = new QWebInspector;
+
         inspector->setPage(QViewWidget::page());
         inspector->setGeometry(qApp->desktop()->availableGeometry());
         inspector->showMaximized();
     }
 
     // ==============================
-    // Hide window:
-    // ==============================
-    void qHideWindowSlot()
-    {
-        this->parentWidget()->hide();
-    }
-
-    // ==============================
     // Close window:
     // ==============================
+
     void qCloseWindowSlot()
     {
         qApp->setProperty("windowCloseRequested", true);
@@ -158,9 +155,11 @@ public slots:
     }
 
 public:
+
     QViewWidget();
 
 private:
+
     QPage *mainPage;
 };
 

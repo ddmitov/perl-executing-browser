@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -24,74 +24,61 @@
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QMessageBox>
-#include <QNetworkReply>
 #include <QRegularExpression>
-#include <QTimer>
 #include <QUrl>
 #include <QWebElement>
 #include <QWebFrame>
 #include <QWebPage>
 
 #include "file-reader.h"
-#include "file-writer.h"
 #include "script-handler.h"
 
 // ==============================
 // WEB PAGE CLASS DEFINITION:
-// (QTWEBKIT VERSION)
 // ==============================
+
 class QPage : public QWebPage
 {
     Q_OBJECT
 
 signals:
+
     void pageLoadedSignal();
-    void hideWindowSignal();
     void closeWindowSignal();
 
 public slots:
+
+    // ==============================
+    // Page initialization:
+    // ==============================
+
     void qPageLoadedSlot(bool ok)
     {
         if (ok) {
             if (QPage::mainFrame()->url().scheme() == "file") {
-                // Inject all browser-specific Javascript:
+                // Inject PEB-specific Javascript:
                 QFileReader *resourceReader =
-                        new QFileReader(QString(":/peb.js"));
+                    new QFileReader(QString(":/peb.js"));
+
                 QString pebJavaScript = resourceReader->fileContents;
 
                 mainFrame()->evaluateJavaScript(pebJavaScript);
 
                 // Start getting the page settings:
-                QVariant result = mainFrame()->
-                        evaluateJavaScript("peb.getPageSettings()");
+                QVariant result =
+                    mainFrame()->evaluateJavaScript("peb.getPageSettings()");
+
                 qGetPageSettings(result);
 
                 // Get the title of the page for use in dialog boxes:
                 QWebElement titleDomElement =
-                        QPage::currentFrame()->documentElement()
-                        .findFirst("title");
+                    QPage::currentFrame()->documentElement()
+                    .findFirst("title");
+
                 title = titleDomElement.toInnerXml();
 
                 // Send signal to the html-viewing class that a page is loaded:
                 emit pageLoadedSignal();
-
-                // Log basic program information on the JavaScript console:
-                QString applicationVersion =
-                        "peb.browser_version = '" +
-                        qApp->applicationVersion().toLatin1() + "';";
-                mainFrame()->evaluateJavaScript(applicationVersion);
-
-                QString qtVersion =
-                        "peb.qt_version = '" + QString(QT_VERSION_STR) + "';";
-                mainFrame()->evaluateJavaScript(qtVersion);
-
-                QString applicationVersionMessage =
-                        "console.log('Browser version: ' + peb.browser_version);";
-                mainFrame()->evaluateJavaScript(applicationVersionMessage);
-
-                QString qtVersionMessage =
-                        "console.log('Qt version: ' + peb.qt_version);";
-                mainFrame()->evaluateJavaScript(qtVersionMessage);
             }
         }
     }
@@ -102,7 +89,11 @@ public slots:
 
     void qGetPageSettings(QVariant settingsJsResult) {
         QJsonDocument settingsJsonDocument =
-                QJsonDocument::fromJson(settingsJsResult.toString().toUtf8());
+            QJsonDocument::fromJson(settingsJsResult.toString().toUtf8());
+
+        if (settingsJsonDocument.isEmpty()) {
+            qApp->setProperty("perlInterpreter", "perl");
+        }
 
         if (!settingsJsonDocument.isEmpty()) {
             QJsonObject settingsJsonObject = settingsJsonDocument.object();
@@ -110,12 +101,13 @@ public slots:
             // Get Perl interpreter:
             QString perlInterpreter;
             QString perlInterpreterSetting =
-                    settingsJsonObject["perlInterpreter"].toString();
+                settingsJsonObject["perlInterpreter"].toString();
 
             if (perlInterpreterSetting.length() > 0) {
                 perlInterpreter =
-                        qApp->property("appDir").toString() + '/' +
-                        settingsJsonObject["perlInterpreter"].toString();
+                    qApp->property("appDir").toString()
+                    + '/'
+                    + settingsJsonObject["perlInterpreter"].toString();
             }
 
             if (perlInterpreterSetting.length() == 0) {
@@ -123,15 +115,6 @@ public slots:
             }
 
             qApp->setProperty("perlInterpreter", perlInterpreter);
-
-            // Get all autostarting scripts:
-            QJsonArray autoStartScripts =
-                    settingsJsonObject["autoStartScripts"].toArray();
-
-            foreach (const QJsonValue &value, autoStartScripts) {
-                QString autoStartScript = value.toString();
-                qHandleScript(autoStartScript);
-            }
 
             // Get dialog and context menu labels:
             if (settingsJsonObject["okLabel"].toString().length() > 0) {
@@ -167,8 +150,8 @@ public slots:
 
             if (settingsJsonObject["selectAllLabel"].toString().length() > 0) {
                 qApp->setProperty(
-                            "selectAllLabel",
-                            settingsJsonObject["selectAllLabel"].toString());
+                    "selectAllLabel",
+                    settingsJsonObject["selectAllLabel"].toString());
             }
         }
     }
@@ -176,19 +159,22 @@ public slots:
     // ==============================
     // Filesystem dialogs:
     // ==============================
+
     void qHandleDialogs(QString dialogObjectName)
     {
         if (QPage::mainFrame()->url().scheme() == "file") {
             QVariant dialogSettings =
-                    mainFrame()->evaluateJavaScript(
-                        "peb.getDialogSettings(" + dialogObjectName + ")");
+                mainFrame()->evaluateJavaScript("peb.getDialogSettings("
+                                                + dialogObjectName
+                                                + ")");
 
             QJsonDocument dialogJsonDocument =
-                    QJsonDocument::fromJson(dialogSettings.toString().toUtf8());
+                QJsonDocument::fromJson(dialogSettings.toString().toUtf8());
 
             if (!dialogJsonDocument.isEmpty()) {
                 QJsonObject dialogJsonObject = dialogJsonDocument.object();
                 dialogJsonObject["id"] = dialogObjectName;
+
                 qReadDialogSettings(dialogJsonObject);
             }
         }
@@ -199,7 +185,8 @@ public slots:
         QString id = dialogJsonObject["id"].toString();
         QString type = dialogJsonObject["type"].toString();
 
-        QFileDialog inodesDialog (qApp->activeWindow());
+        QFileDialog inodesDialog(qApp->activeWindow());
+
         inodesDialog.setWindowModality(Qt::WindowModal);
         inodesDialog.setViewMode(QFileDialog::Detail);
         inodesDialog.setDirectory(qApp->property("browserDir").toString());
@@ -221,6 +208,7 @@ public slots:
         }
 
         QStringList selectedInodes;
+
         if (inodesDialog.exec()) {
             selectedInodes = inodesDialog.selectedFiles();
         }
@@ -230,14 +218,16 @@ public slots:
 
         if (!selectedInodes.isEmpty()) {
             QString inodesFormatted;
+
             foreach (QString userSelectedInode, selectedInodes) {
                 inodesFormatted.append(userSelectedInode);
                 inodesFormatted.append(";");
             }
+
             inodesFormatted.replace(QRegularExpression(";$"), "");
 
             QString outputInsertionJavaScript =
-                    id + ".receiverFunction('" + inodesFormatted + "'); null";
+                id + ".receiverFunction('" + inodesFormatted + "'); null";
 
             mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
         }
@@ -246,182 +236,80 @@ public slots:
     // ==============================
     // Perl scripts:
     // ==============================
-    void qHandleScript(QString scriptObjectName)
+
+    void qStartScript(QString scriptObjectName)
     {
-        if (QPage::mainFrame()->url().scheme() == "file") {
-            QVariant scriptSettings =
-                    mainFrame()->evaluateJavaScript(
-                        "peb.getScriptSettings(" + scriptObjectName + ")");
+        QVariant scriptSettings =
+            mainFrame()->evaluateJavaScript(
+                "peb.getScriptSettings(" + scriptObjectName + ")");
 
-            QJsonDocument scriptJsonDocument =
-                    QJsonDocument::fromJson(scriptSettings.toString().toUtf8());
+        QJsonDocument scriptJsonDocument =
+            QJsonDocument::fromJson(scriptSettings.toString().toUtf8());
 
-            if (!scriptJsonDocument.isEmpty()) {
-                QJsonObject scriptJsonObject = scriptJsonDocument.object();
-                scriptJsonObject["id"] = scriptObjectName;
-                qScriptStartedCheck(scriptJsonObject);
-            }
-        }
-    }
+        if (!scriptJsonDocument.isEmpty()) {
+            QJsonObject scriptJsonObject = scriptJsonDocument.object();
 
-    void qScriptStartedCheck(QJsonObject scriptJsonObject)
-    {
-        // Start the script if it is not yet started:
-        if (!runningScripts.contains(scriptJsonObject["id"].toString())) {
-            qStartScript(scriptJsonObject);
-        }
+            QScriptHandler *scriptHandler = 
+                new QScriptHandler(scriptJsonObject);
 
-        // Feed the script with data if it is already started:
-        if (runningScripts.contains(scriptJsonObject["id"].toString())) {
-            qFeedScript(scriptJsonObject);
-        }
-    }
+            scriptHandler->id = scriptObjectName;
 
-    void qStartScript(QJsonObject scriptJsonObject)
-    {
-        QScriptHandler *scriptHandler = new QScriptHandler(scriptJsonObject);
+            QObject::connect(scriptHandler,
+                             SIGNAL(displayScriptOutputSignal(QString,
+                                                              QString)),
+                             this,
+                             SLOT(qDisplayScriptOutputSlot(QString,
+                                                           QString)));
 
-        QObject::connect(scriptHandler,
-                         SIGNAL(displayScriptOutputSignal(QString,
-                                                          QString)),
-                         this,
-                         SLOT(qDisplayScriptOutputSlot(QString,
-                                                       QString)));
+            QObject::connect(scriptHandler,
+                             SIGNAL(displayScriptErrorsSignal(QString)),
+                             this,
+                             SLOT(qDisplayScriptErrorsSlot(QString)));
 
-        QObject::connect(scriptHandler,
-                         SIGNAL(displayScriptErrorsSignal(QString)),
-                         this,
-                         SLOT(qDisplayScriptErrorsSlot(QString)));
-
-        QObject::connect(scriptHandler, SIGNAL(scriptFinishedSignal(QString)),
-                         this, SLOT(qScriptFinishedSlot(QString)));
-
-        runningScripts.insert(scriptJsonObject["id"].toString(), scriptHandler);
-    }
-
-    void qFeedScript(QJsonObject scriptJsonObject)
-    {
-        QString tempFileFullPath =
-                temporaryFiles.value(scriptJsonObject["id"].toString());
-
-        if (closeRequested == false) {
             QString scriptInput = scriptJsonObject["scriptInput"].toString();
 
             if (scriptInput.length() > 0) {
-                if (tempFileFullPath.length() == 0) {
-                    qWriteOnScriptStdin(scriptJsonObject, scriptInput);
-                }
-
-                if (tempFileFullPath.length() > 0) {
-                    qWriteInScriptTempFile(tempFileFullPath, scriptInput);
+                if (scriptHandler->process.isOpen()) {
+                    scriptHandler->process.write(scriptInput.toUtf8());
+                    scriptHandler->process.write(QString("\n").toLatin1());
                 }
             }
         }
-
-        if (closeRequested == true) {
-            QString exitCommand = scriptJsonObject["exitCommand"].toString();
-
-            if (tempFileFullPath.length() == 0) {
-                qWriteOnScriptStdin(scriptJsonObject, exitCommand);
-            }
-
-            if (tempFileFullPath.length() > 0) {
-                qWriteInScriptTempFile(tempFileFullPath, exitCommand);
-            }
-        }
-    }
-
-    void qWriteOnScriptStdin(QJsonObject scriptJsonObject, QString scriptInput)
-    {
-        QScriptHandler *handler =
-                runningScripts.value(scriptJsonObject["id"]
-                .toString());
-        if (handler->scriptProcess.isOpen()) {
-            handler->scriptProcess.write(scriptInput.toUtf8());
-            handler->scriptProcess.write(QString("\n").toLatin1());
-        }
-    }
-
-    void qWriteInScriptTempFile(QString tempFileFullPath, QString scriptInput)
-    {
-        QFileWriter(tempFileFullPath, scriptInput);
     }
 
     void qDisplayScriptOutputSlot(QString id, QString output)
     {
-        if (QPage::mainFrame()->url().scheme() == "file") {
-            QString outputInsertionJavaScript =
-                    id + ".stdoutFunction('" + output + "'); null";
+        QString outputInsertionJavaScript =
+            id + ".stdoutFunction('" + output + "'); null";
 
-            mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
-
-            if (output.contains("tempfile")) {
-                QJsonDocument tempFileJsonDocument =
-                        QJsonDocument::fromJson(output.toUtf8());
-                QJsonObject tempFileJsonObject = tempFileJsonDocument.object();
-                QString tempFileFullPath =
-                        tempFileJsonObject["tempfile"].toString();
-
-                QFileInfo tempFileInfo(tempFileFullPath);
-                if (tempFileInfo.isFile()) {
-                    temporaryFiles.insert(id, tempFileFullPath);
-                }
-            }
-        }
+        mainFrame()->evaluateJavaScript(outputInsertionJavaScript);
     }
 
     void qDisplayScriptErrorsSlot(QString errors)
     {
-        if (QPage::mainFrame()->url().scheme() == "file") {
-            if (errors.length() > 0) {
-                errors.replace("\"", "\\\"");
-                errors.replace("\'", "\\'");
-                errors.replace("\n", "\\n");
-                errors.replace("\r", "");
+        if (errors.length() > 0) {
+            errors.replace("\"", "\\\"");
+            errors.replace("\'", "\\'");
+            errors.replace("\n", "\\n");
+            errors.replace("\r", "");
 
-                QString perlScriptErrorsMessage =
-                        "console.debug('" + errors + "'); null";
+            QString perlScriptErrorsMessage =
+                "console.debug('" + errors + "'); null";
 
-                mainFrame()->evaluateJavaScript(perlScriptErrorsMessage);
-            }
-        }
-    }
-
-    void qScriptFinishedSlot(QString id)
-    {
-        runningScripts.remove(id);
-
-        if (closeRequested == true and runningScripts.isEmpty()) {
-            emit closeWindowSignal();
+            mainFrame()->evaluateJavaScript(perlScriptErrorsMessage);
         }
     }
 
     // ==============================
-    // SSL errors:
+    // Page-closing routine:
     // ==============================
-    void qSslErrorsSlot(QNetworkReply *reply, const QList<QSslError> &errors)
-    {
-        Q_UNUSED(errors);
-        reply->ignoreSslErrors();
-    }
 
-    // ==============================
-    // Page-closing routines:
-    // ==============================
-    void qStartWindowClosingSlot()
+    void qCloseWindowSlot()
     {
-        if (QPage::mainFrame()->url().scheme() == "file") {
-            QVariant jsResult =
-                    mainFrame()->evaluateJavaScript(
-                        "peb.checkUserInputBeforeClose()");
-            qCloseWindow(jsResult);
-        } else {
-            qCloseAllScriptsSlot();
-        }
-    }
+        QVariant jsResult =
+            mainFrame()->evaluateJavaScript(
+                "peb.checkUserInputBeforeClose()");
 
-    void qCloseWindow(QVariant jsResult)
-    {
         bool jsCloseDecision = true;
 
         if (jsResult.toByteArray().length() > 0) {
@@ -429,136 +317,93 @@ public slots:
         }
 
         if (jsCloseDecision == true) {
-            if (!runningScripts.isEmpty()){
-                qCloseAllScriptsSlot();
-            } else {
-                closeRequested = true;
-                emit closeWindowSignal();
-            }
-        }
-    }
-
-    void qCloseAllScriptsSlot()
-    {
-        closeRequested = true;
-        emit hideWindowSignal();
-
-        if (runningScripts.isEmpty()) {
             emit closeWindowSignal();
-        } else {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-
-                QString scriptObjectName = iterator.key();
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    qHandleScript(scriptObjectName);
-                }
-            }
-
-            int maximumTimeMilliseconds = 3000;
-            QTimer::singleShot(maximumTimeMilliseconds,
-                               this, SLOT(qScriptsTimeoutSlot()));
         }
-    }
-
-    void qScriptsTimeoutSlot()
-    {
-        if (!runningScripts.isEmpty()) {
-            QHash<QString, QScriptHandler*>::iterator iterator;
-            for (iterator = runningScripts.begin();
-                 iterator != runningScripts.end();
-                 ++iterator) {
-                QScriptHandler *handler = iterator.value();
-
-                if (handler->scriptProcess.isOpen()) {
-                    handler->scriptProcess.kill();
-                }
-            }
-        }
-
-        emit closeWindowSignal();
     }
 
 protected:
+
     // ==============================
     // Special URLs:
     // ==============================
+
     bool acceptNavigationRequest(QWebFrame *frame,
                                  const QNetworkRequest &request,
-                                 QWebPage::NavigationType navType)
+                                 QWebPage::NavigationType navigationType)
     {
         Q_UNUSED(frame);
 
-        if (request.url().scheme() == "file") {
-            if (navType == QWebPage::NavigationTypeLinkClicked) {
-                // Handle filesystem dialogs:
-                if (request.url().fileName().contains(".dialog")) {
-                    qHandleDialogs(request.url().fileName()
-                                   .replace(".dialog", ""));
-                    return false;
-                }
+        // No access to web pages:
+        if (request.url().scheme() != "file") {
+            return false;
+        }
 
-                // Handle local Perl scripts after local link is clicked:
-                if (request.url().fileName().contains(".script")) {
-                    qHandleScript(request.url().fileName()
-                                   .replace(".script", ""));
-                    return false;
-                }
+        if (navigationType == QWebPage::NavigationTypeLinkClicked) {
+            // Handle filesystem dialogs:
+            if (request.url().fileName().contains(".dialog")) {
+                qHandleDialogs(request.url()
+                               .fileName()
+                               .replace(".dialog", ""));
+
+                return false;
             }
 
-            // Handle local Perl scripts after local form is submitted:
-            if (navType == QWebPage::NavigationTypeFormSubmitted and
-                    request.url().fileName().contains(".script")) {
-                qHandleScript(request.url().fileName().replace(".script", ""));
+            // Handle Perl scripts after link is clicked:
+            if (request.url().fileName().contains(".script")) {
+                qStartScript(request.url().fileName().replace(".script", ""));
+
                 return false;
             }
         }
 
-        return QWebPage::acceptNavigationRequest(frame, request, navType);
+        // Handle Perl scripts after form is submitted:
+        if (navigationType == QWebPage::NavigationTypeFormSubmitted and
+            request.url().fileName().contains(".script")) {
+            qStartScript(request.url().fileName().replace(".script", ""));
+
+            return false;
+        }
+
+        return QWebPage::acceptNavigationRequest(frame,
+                                                 request,
+                                                 navigationType);
     }
 
     // ==============================
-    // JavaScript Alert:
+    // JavaScript Dialogs:
     // ==============================
     virtual void javaScriptAlert(QWebFrame *frame, const QString &msg)
     {
         Q_UNUSED(frame);
 
-        QMessageBox javaScriptAlertMessageBox (qApp->activeWindow());
-        javaScriptAlertMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptAlertMessageBox.setWindowTitle(title);
-        javaScriptAlertMessageBox.setText(msg);
-        javaScriptAlertMessageBox.setButtonText(QMessageBox::Ok, okLabel);
-        javaScriptAlertMessageBox.setDefaultButton(QMessageBox::Ok);
-        javaScriptAlertMessageBox.exec();
+        QMessageBox alertMessage(qApp->activeWindow());
+
+        alertMessage.setWindowModality(Qt::WindowModal);
+        alertMessage.setWindowTitle(title);
+        alertMessage.setText(msg);
+        alertMessage.setButtonText(QMessageBox::Ok, okLabel);
+        alertMessage.setDefaultButton(QMessageBox::Ok);
+
+        alertMessage.exec();
     }
 
-    // ==============================
-    // JavaScript Confirm:
-    // ==============================
     virtual bool javaScriptConfirm(QWebFrame *frame, const QString &msg)
     {
         Q_UNUSED(frame);
 
-        QMessageBox javaScriptConfirmMessageBox (qApp->activeWindow());
-        javaScriptConfirmMessageBox.setWindowModality(Qt::WindowModal);
-        javaScriptConfirmMessageBox.setWindowTitle(title);
-        javaScriptConfirmMessageBox.setText(msg);
-        javaScriptConfirmMessageBox
-                .setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-        javaScriptConfirmMessageBox.setDefaultButton(QMessageBox::No);
-        javaScriptConfirmMessageBox.setButtonText(QMessageBox::Yes, yesLabel);
-        javaScriptConfirmMessageBox.setButtonText(QMessageBox::No, noLabel);
-        return QMessageBox::Yes == javaScriptConfirmMessageBox.exec();
+        QMessageBox confirmMessage(qApp->activeWindow());
+
+        confirmMessage.setWindowModality(Qt::WindowModal);
+        confirmMessage.setWindowTitle(title);
+        confirmMessage.setText(msg);
+        confirmMessage.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
+        confirmMessage.setDefaultButton(QMessageBox::No);
+        confirmMessage.setButtonText(QMessageBox::Yes, yesLabel);
+        confirmMessage.setButtonText(QMessageBox::No, noLabel);
+
+        return QMessageBox::Yes == confirmMessage.exec();
     }
 
-    // ==============================
-    // JavaScript Prompt:
-    // ==============================
     virtual bool javaScriptPrompt(QWebFrame *frame,
                                   const QString &msg,
                                   const QString &defaultValue,
@@ -566,27 +411,28 @@ protected:
     {
         Q_UNUSED(frame);
 
-        bool ok = false;
+        bool okPressed = false;
 
-        QInputDialog dialog;
-        dialog.setModal(true);
-        dialog.setWindowTitle(title);
-        dialog.setLabelText(msg);
-        dialog.setInputMode(QInputDialog::TextInput);
-        dialog.setTextValue(defaultValue);
-        dialog.setOkButtonText(okLabel);
-        dialog.setCancelButtonText(cancelLabel);
+        QInputDialog prompt;
+        prompt.setModal(true);
+        prompt.setWindowTitle(title);
+        prompt.setLabelText(msg);
+        prompt.setInputMode(QInputDialog::TextInput);
+        prompt.setTextValue(defaultValue);
+        prompt.setOkButtonText(okLabel);
+        prompt.setCancelButtonText(cancelLabel);
 
-        if (dialog.exec() == QDialog::Accepted) {
-            *result = dialog.textValue();
-            ok = true;
-            return ok;
+        if (prompt.exec() == QDialog::Accepted) {
+            *result = prompt.textValue();
+            okPressed = true;
+            return okPressed;
         }
 
-        return ok;
+        return okPressed;
     }
 
 private:
+
     QString title;
 
     QString okLabel;
@@ -594,14 +440,9 @@ private:
     QString yesLabel;
     QString noLabel;
 
-    QHash<QString, QScriptHandler*> runningScripts;
-    QHash<QString, QString> temporaryFiles;
-
-    bool closeRequested;
-
 public:
-    QPage();
 
+    QPage();
 };
 
 #endif // PAGE_H

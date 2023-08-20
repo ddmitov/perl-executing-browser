@@ -11,7 +11,7 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020
+# Dimitar D. Mitov, 2013 - 2020, 2023
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
@@ -21,8 +21,4 @@ use warnings;
 my $filename = <STDIN>;
 chomp $filename;
 
-open my $filehandle, '>>', $filename or warn "Unable to create $!";
-print $filehandle "Pel Executing Browser Demo Test File";
-close $filehandle;
-
-print "$filename is successfully created.";
+print "Selected new filename: $filename";

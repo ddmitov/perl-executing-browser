@@ -10,27 +10,19 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
-
-#include <QNetworkAccessManager>
-#include <QNetworkCookieJar>
-#include <QNetworkProxyFactory>
 
 #include "webkit-page.h"
 
 // ==============================
 // LOCAL PAGE CLASS CONSTRUCTOR:
-// (QTWEBKIT VERSION)
 // ==============================
 QPage::QPage()
     : QWebPage(0)
 {
-    // QWebPage settings:
-    QNetworkProxyFactory::setUseSystemConfiguration(true);
-
     QWebSettings::globalSettings()->
             setDefaultTextEncoding(QString("utf-8"));
 
@@ -38,6 +30,10 @@ QPage::QPage()
             setAttribute(QWebSettings::JavaEnabled, false);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptCanOpenWindows, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, false);
+    QWebSettings::globalSettings()->
+            setAttribute(QWebSettings::PluginsEnabled, false);
 
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::AutoLoadImages, true);
@@ -45,23 +41,16 @@ QPage::QPage()
             setAttribute(QWebSettings::DeveloperExtrasEnabled, true);
     QWebSettings::globalSettings()->
             setAttribute(QWebSettings::JavascriptEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::LocalContentCanAccessRemoteUrls, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::PluginsEnabled, true);
-    QWebSettings::globalSettings()->
-            setAttribute(QWebSettings::XSSAuditingEnabled, true);
 
     // Signal and slot for actions taken after page is loaded:
-    QObject::connect(this, SIGNAL(loadFinished(bool)),
-                     this, SLOT(qPageLoadedSlot(bool)));
+    QObject::connect(this,
+                     SIGNAL(loadFinished(bool)),
+                     this,
+                     SLOT(qPageLoadedSlot(bool)));
 
     // Default dialog and context menu labels:
     okLabel = "Ok";
     cancelLabel = "Cancel";
     yesLabel = "Yes";
     noLabel = "No";
-
-    // Close requested indicator:
-    closeRequested = false;
 }

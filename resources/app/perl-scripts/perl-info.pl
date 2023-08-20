@@ -11,7 +11,7 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020
+# Dimitar D. Mitov, 2013 - 2020, 2023
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
@@ -23,7 +23,9 @@ use English;
 my $cwd = cwd();
 
 print "Perl $PERL_VERSION<br>";
-print "Working Directory: $cwd<br><br>";
+print "Working Directory: $cwd<br>";
+
+print "<br>";
 
 print "\@INC Array:<br>";
 print join "<br>", @INC;

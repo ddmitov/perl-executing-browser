@@ -9,7 +9,7 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020
+# Dimitar D. Mitov, 2013 - 2020, 2023
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
@@ -33,12 +33,6 @@ TARGET = peb
 
 QMAKE_LFLAGS += -no-pie
 
-# Network support:
-QT += network
-
-# HTTPS support:
-CONFIG += openssl-linked
-
 # HTML engine:
 QT += widgets webkitwidgets
 
@@ -46,7 +40,6 @@ QT += widgets webkitwidgets
 SOURCES += \
     main.cpp \
     file-reader.cpp \
-    file-writer.cpp \
     main-window.cpp \
     script-handler.cpp \
     webkit-page.cpp \
@@ -55,7 +48,6 @@ SOURCES += \
 # Header files:
 HEADERS += \
     file-reader.h \
-    file-writer.h \
     script-handler.h \
     webkit-main-window.h \
     webkit-page.h \

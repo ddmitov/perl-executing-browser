@@ -23,7 +23,6 @@ make
 * Base Qt5 libraries:
   * Qt5Core  
   * Qt5Gui  
-  * Qt5Network  
   * Qt5Widgets  
 * QtWebKit libraries:
   * Qt5WebKit  

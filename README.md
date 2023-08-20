@@ -3,7 +3,7 @@
 [![GitHub Version](https://img.shields.io/github/release/ddmitov/perl-executing-browser.svg)](https://github.com/ddmitov/perl-executing-browser/releases)
 [![GitHub License](http://img.shields.io/badge/License-LGPL%20v3-blue.svg)](./LICENSE.md)  
 
-Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www.perl.org/) desktop applications. It is a C++ [Qt 5](https://www.qt.io/) application running local Perl 5 scripts as child processes without server. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
+Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.perl.org/) desktop applications. It is a C++ [Qt 5](https://www.qt.io/) application running local Perl scripts as child processes without server. Inspired by [Electron](http://electron.atom.io/) and [NW.js](http://nwjs.io/), PEB is another reuse of web technologies in desktop applications with Perl doing the heavy lifting instead of [Node.js](https://nodejs.org/en/).
 
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
@@ -24,10 +24,6 @@ Perl Executing Browser (PEB) is an HTML5 user interface for [Perl 5](https://www
   * [Global Settings API](./doc/SETTINGS.md#global-settings-api)
   * [Perl Scripts API](./doc/SETTINGS.md#perl-scripts-api)
   * [Files and Folders Dialogs API](./doc/SETTINGS.md#files-and-folders-dialogs-api)
-* INTERACTIVE PERL SCRIPTS
-  * [PEB Interactive Perl Scripts](./doc/INTERACTIVE.md#peb-interactive-perl-scripts)
-  * [Requirements for Interactive Perl Scripts](./doc/INTERACTIVE.md#requirements-for-interactive-perl-scripts)
-  * [Examples of Interactive Perl Scripts](./doc/INTERACTIVE.md#examples-of-interactive-perl-scripts)
 * APPIMAGE SUPPORT
   * [PEB AppImager](./doc/APPIMAGE.md#peb-appimager)
   * [PEB AppImage Configuration Files](./doc/APPIMAGE.md#peb-appimage-configuration-files)
@@ -105,14 +101,14 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
 * **2. Fast and zero-installation software**  
 * **3. Cross-platform availability**  
-* **4. Secure solution with no server**  
+* **4. Secure solution with no server process**  
 * **5. Maximal reuse of existing web technologies and standards**
 
 ## Features
 
 * [PEB can be started from any folder without installation procedure.](./doc/CONSTANTS.md#files-and-folders)
+* No limitation on how long a Perl script can run.
 * [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
-* [Event-driven interactive Perl scripts can be repeatedly fed with data.](./doc/INTERACTIVE.md)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
 * [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
 * [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
@@ -123,19 +119,17 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ## Security
 
 * PEB does not need administrative privileges or installation procedure.
-* PEB does not need and does not implement any server.
-* Local Perl 5 scripts are executed with no sandbox and they have access to full file paths.
-* Calling local Perl scripts from web pages is blocked.
-* Files or folders can not be selected with their full paths from web pages.
-* Cross-site scripting is disabled.
+* PEB does not need and does not implement any server process.
+* PEB can not open web pages. 
+* PEB Perl scripts are executed locally with no sandbox.
 
 ## Limitations
 
+* No access to web pages
 * No Perl scripting inside frames
-* Limited HTML5 support
 * No pop-up windows
-* No file downloads
 * No printing
+* Limited HTML5 support
 
 ## Logging
 
@@ -159,5 +153,5 @@ without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 
 ## Authors
 
-Dimitar D. Mitov, 2013 - 2020  
+Dimitar D. Mitov, 2013 - 2020, 2023  
 Valcho Nedelchev, 2014 - 2016  

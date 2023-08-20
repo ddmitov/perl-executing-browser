@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -22,30 +22,28 @@
 // ==============================
 // SCRIPT HANDLER CONSTRUCTOR:
 // ==============================
+
 QScriptHandler::QScriptHandler(QJsonObject scriptJsonObject)
     : QObject(0)
 {
-    scriptId = scriptJsonObject["id"].toString();
-
     scriptFullFilePath =
-            qApp->property("appDir").toString() + "/" +
-            scriptJsonObject["scriptRelativePath"].toString();
+        qApp->property("appDir").toString()
+        + "/"
+        + scriptJsonObject["scriptRelativePath"].toString();
 
-    // Signals and slots for local Perl scripts:
-    QObject::connect(&scriptProcess, SIGNAL(readyReadStandardOutput()),
-                     this, SLOT(qScriptOutputSlot()));
-
-    QObject::connect(&scriptProcess, SIGNAL(readyReadStandardError()),
-                     this, SLOT(qScriptErrorsSlot()));
-
-    QObject::connect(&scriptProcess,
-                     SIGNAL(finished(int, QProcess::ExitStatus)),
+    QObject::connect(&process,
+                     SIGNAL(readyReadStandardOutput()),
                      this,
-                     SLOT(qScriptFinishedSlot()));
+                     SLOT(qScriptOutputSlot()));
 
-    scriptProcess.setWorkingDirectory(qApp->property("appDir").toString());
+    QObject::connect(&process,
+                     SIGNAL(readyReadStandardError()),
+                     this,
+                     SLOT(qScriptErrorsSlot()));
 
-    scriptProcess.start((qApp->property("perlInterpreter").toString()),
-                        QStringList() << scriptFullFilePath,
-                        QProcess::Unbuffered | QProcess::ReadWrite);
+    process.setWorkingDirectory(qApp->property("appDir").toString());
+
+    process.start((qApp->property("perlInterpreter").toString()),
+                  QStringList() << scriptFullFilePath,
+                  QProcess::Unbuffered | QProcess::ReadWrite);
 }

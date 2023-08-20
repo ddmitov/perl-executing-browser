@@ -37,10 +37,6 @@ wouldn't be created without his assistance.
 https://github.com/richmoore/qt-examples/tree/master/sitespecificbrowser  
 
 https://doc.qt.io/archives/qt-5.5/qwebpage.html#windowCloseRequested  
-https://doc.qt.io/qt-4.8/qmake-advanced-usage.html  
-https://doc.qt.io/qt-4.8/signalsandslots.html  
-https://doc.qt.io/qt-4.8/qwebinspector.html  
-https://doc.qt.io/qt-4.8/qinputdialog.html  
 https://doc.qt.io/qt-5/qtglobal.html  
 https://doc.qt.io/qt-5/qmake-test-function-reference.html#packagesexist-packages  
 https://doc.qt.io/qt-5/qhash.html  
@@ -54,12 +50,6 @@ https://wiki.qt.io/Open_Web_Page_in_QWebView
 
 https://forum.qt.io/topic/18879/relative-path-on-qmake-pro-file  
 https://forum.qt.io/topic/551/get-filename-without-extension  
-
-http://www.qtcentre.org/threads/46016-Place-QMessageBox-on-middle-of-screen  
-http://www.qtcentre.org/threads/18146-String-operations-printing-to-stdout  
-http://www.qtcentre.org/threads/10661-QByteArray-to-QString  
-http://www.qtcentre.org/threads/29104-QMake-DEFINES  
-http://www.qtcentre.org/threads/48238-Call-a-JavaScript-function-from-C-using-QtWebkit  
 
 https://stackoverflow.com/questions/10666998/qwebkit-display-local-webpage  
 https://stackoverflow.com/questions/7402576/how-to-get-current-working-directory-in-a-qt-application  
@@ -87,13 +77,9 @@ https://stackoverflow.com/questions/17680207/qhash-iterator-example-no-match-for
 https://stackoverflow.com/questions/23174393/parse-jsonarray  
 https://stackoverflow.com/questions/24899558/how-to-check-qt-version-to-include-different-header  
 https://stackoverflow.com/questions/19822211/qt-parsing-json-using-qjsondocument-qjsonobject-qjsonarray  
-https://stackoverflow.com/questions/2241808/checking-if-a-folder-exists-and-creating-folders-in-qt-c  
-https://stackoverflow.com/questions/9641807/qdir-mkdir-with-absolutepath  
 https://stackoverflow.com/questions/4916193/creating-writing-into-a-new-file-in-qt  
 https://stackoverflow.com/questions/45329372/ubuntu-recognizes-executable-as-shared-library-and-wont-run-it-by-clicking  
 
-http://www.java2s.com/Code/Cpp/Qt/CheckfileexistanceandfilenamewithQFile.htm  
-http://webkit.sed.hu/content/disabling-cache  
 https://unix.stackexchange.com/questions/116254/how-do-i-change-which-version-of-qt-is-used-for-qmake  
 https://www.developpez.net/forums/d1549582/c-cpp/bibliotheques/qt/moteurs-web/runjavascript-fonction-lambda-plante/  
 
@@ -103,13 +89,6 @@ https://perlbrew.pl/
 https://github.com/skaji/relocatable-perl  
 http://strawberryperl.com/  
 
-https://perldoc.perl.org/Encode.html  
-https://perldoc.perl.org/File/Temp.html  
-
-https://www.perlmonks.org/bare/?node_id=768448 "Permanently sort a hash"  
-https://www.perlmonks.org/?node_id=27443 "Checking to see if a particular Module is installed"  
-
-https://stackoverflow.com/questions/4510550/using-perl-how-do-i-decode-or-create-those-encodings-on-the-web  
 https://stackoverflow.com/questions/5741101/easy-way-to-print-perl-array-with-a-little-formatting  
 https://stackoverflow.com/questions/15210532/use-utf8-gives-me-wide-character-in-print  
 
@@ -127,16 +106,10 @@ https://www.w3schools.com/jsref/met_form_submit.asp
 
 https://stackoverflow.com/questions/2214066/get-list-of-all-input-objects-using-javascript-without-accessing-a-form-obj  
 https://stackoverflow.com/questions/8963693/how-to-create-json-string-in-javascript  
-https://stackoverflow.com/questions/8003089/dynamically-create-and-submit-form  
-https://stackoverflow.com/questions/6964927/how-to-create-a-form-dynamically-via-javascript  
-https://stackoverflow.com/questions/16452699/how-to-reset-a-form-using-jquery-with-reset-method  
 https://stackoverflow.com/questions/3955229/remove-all-child-elements-of-a-dom-node-in-javascript  
-https://stackoverflow.com/questions/11478324/syntaxerror-unexpected-eof-when-evaluating-javascript-in-ios-uiwebview  
-https://stackoverflow.com/questions/42053775/getting-error-form-submission-canceled-because-the-form-is-not-connected  
 https://stackoverflow.com/questions/4467044/proper-way-to-catch-exception-from-json-parse  
 https://stackoverflow.com/questions/29797946/handling-bad-json-parse-in-node-safely  
 
-https://jquery.com/  
 http://youmightnotneedjquery.com/  
 
 https://www.geeksforgeeks.org/detect-the-operating-system-of-user-using-javascript/  
@@ -177,21 +150,3 @@ https://unix.stackexchange.com/questions/12453/how-to-determine-linux-kernel-arc
 https://standards.freedesktop.org/menu-spec/latest/apa.html  
 https://github.com/probonopd/linuxdeployqt  
 https://unix.stackexchange.com/questions/156892/how-to-validate-verify-desktop-files  
-
-## Docker Containers
-
-https://perlmaven.com/dancer-in-docker  
-https://github.com/AppImage/AppImageKit/wiki/FUSE  
-https://medium.com/redbubble/running-a-docker-container-as-a-non-root-user-7d2e00f8ee15  
-https://docs.docker.com/engine/reference/builder/  
-https://vsupalov.com/exit-docker-container/  
-
-## Git and GitHub
-
-https://github.com/github/linguist#overrides  
-https://stackoverflow.com/questions/927358/how-do-i-undo-the-most-recent-commits-in-git  
-
-## Travis CI
-
-https://docs.travis-ci.com/user/reference/xenial/  
-https://stackoverflow.com/questions/25737062/travis-ci-for-a-qt5-project  

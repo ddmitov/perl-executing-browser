@@ -1,4 +1,4 @@
-build-peb-*/
+build-peb-*
 resources/app/perl
 squashfs-root
 src/tmp

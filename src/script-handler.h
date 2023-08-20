@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -24,41 +24,39 @@
 // ==============================
 // SCRIPT HANDLER:
 // ==============================
+
 class QScriptHandler : public QObject
 {
     Q_OBJECT
 
 signals:
-    void displayScriptOutputSignal(QString scriptId, QString output);
+
+    void displayScriptOutputSignal(QString id, QString output);
     void displayScriptErrorsSignal(QString errors);
-    void scriptFinishedSignal(QString scriptId);
 
 public slots:
+
     void qScriptOutputSlot()
     {
-        QString scriptOutput = scriptProcess.readAllStandardOutput();
-        emit displayScriptOutputSignal(scriptId, scriptOutput);
+        QString scriptOutput = process.readAllStandardOutput();
+        emit displayScriptOutputSignal(this->id, scriptOutput);
     }
 
     void qScriptErrorsSlot()
     {
-        QString scriptErrors = scriptProcess.readAllStandardError();
+        QString scriptErrors = process.readAllStandardError();
         emit displayScriptErrorsSignal(scriptErrors);
     }
 
-    void qScriptFinishedSlot()
-    {
-        scriptProcess.close();
-        emit scriptFinishedSignal(scriptId);
-    }
-
 private:
+
     QString scriptFullFilePath;
 
 public:
+
     QScriptHandler(QJsonObject);
-    QProcess scriptProcess;
-    QString scriptId;
+    QProcess process;
+    QString id;
 };
 
 #endif // SCRIPT_HANDLER_H

@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -23,6 +23,7 @@
 // VIEW CLASS CONSTRUCTOR:
 // (QTWEBKIT VERSION)
 // ==============================
+
 QViewWidget::QViewWidget()
     : QWebView(0)
 {
@@ -34,24 +35,28 @@ QViewWidget::QViewWidget()
 
     // Keyboard shortcut:
     QShortcut *qWebInspestorShortcut =
-            new QShortcut(QKeySequence("Ctrl+I"), this);
-    QObject::connect(qWebInspestorShortcut, SIGNAL(activated()),
-                     this, SLOT(qStartQWebInspector()));
+        new QShortcut(QKeySequence("Ctrl+I"), this);
+
+    QObject::connect(qWebInspestorShortcut,
+                     SIGNAL(activated()),
+                     this,
+                     SLOT(qStartQWebInspector()));
 
     // Starting of a QPage instance:
     mainPage = new QPage();
 
-    // Signal and slot for changing window title:
-    QObject::connect(mainPage, SIGNAL(pageLoadedSignal()),
-                     this, SLOT(qPageLoadedSlot()));
+    // Signal and slot for changing the window title:
+    QObject::connect(mainPage,
+                     SIGNAL(pageLoadedSignal()),
+                     this,
+                     SLOT(qPageLoadedSlot()));
 
-    // Signals and slots for closing windows:
-    QObject::connect(mainPage, SIGNAL(hideWindowSignal()),
-                     this, SLOT(qHideWindowSlot()));
+    // Signal and slot for closing the window:
+    QObject::connect(mainPage,
+                     SIGNAL(closeWindowSignal()),
+                     this,
+                     SLOT(qCloseWindowSlot()));
 
-    QObject::connect(mainPage, SIGNAL(closeWindowSignal()),
-                     this, SLOT(qCloseWindowSlot()));
-
-    // Installing of the started QPage instance:
+    // Installation of the started QPage instance:
     setPage(mainPage);
 }
