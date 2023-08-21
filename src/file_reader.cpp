@@ -10,7 +10,7 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
@@ -18,18 +18,22 @@
 #include <QFile>
 #include <QTextStream>
 
-#include "file-writer.h"
+#include "file_reader.h"
 
 // ==============================
 // FILE READER CONSTRUCTOR:
+// Usefull for both files inside binary resources and files on disk
 // ==============================
-QFileWriter::QFileWriter(QString filePath, QString fileContents)
+
+QFileReader::QFileReader(QString filePath)
     : QObject(0)
 {
-  QFile file(filePath);
-  if (file.open(QIODevice::ReadWrite | QIODevice::Text)) {
-      QTextStream fileStream(&file);
-      fileStream << fileContents <<endl;
-      file.close();
-  }
+    QString fileName(filePath);
+    QFile file(fileName);
+
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+    QTextStream fileStream(&file);
+    fileContents = fileStream.readAll();
+    file.close();
 }

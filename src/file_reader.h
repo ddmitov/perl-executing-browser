@@ -10,25 +10,29 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020
+ Dimitar D. Mitov, 2013 - 2020, 2023
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef FILE_WRITER_H
-#define FILE_WRITER_H
+#ifndef FILE_READER_H
+#define FILE_READER_H
 
 #include <QObject>
 
 // ==============================
-// FILE WRITER CLASS DEFINITION:
+// FILE READER CLASS DEFINITION:
+// Usefull for both files inside binary resources and files on disk
 // ==============================
-class QFileWriter : public QObject
+
+class QFileReader : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit QFileWriter(QString filePath, QString fileContents);
+
+    explicit QFileReader(QString filePath);
+    QString fileContents;
 };
 
-#endif // FILE_WRITER_H
+#endif // FILE_READER_H

@@ -19,7 +19,7 @@
 #include <QTextCodec>
 #include <QtGlobal>
 
-#include "webkit-main-window.h"
+#include "webkit_main_window.h"
 
 // ==============================
 // APPLICATION DEFINITION:
@@ -27,49 +27,41 @@
 
 int main(int argc, char **argv)
 {
+    // UTF-8 encoding application-wide:
+    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
+
+    // Avoid invalid local Qt styles and the following error:
+    // QApplication: invalid style override passed, ignoring it.
+    qputenv("QT_STYLE_OVERRIDE", 0);
+
+    // Application initialization:
     QApplication application(argc, argv);
 
     application.setApplicationVersion("1.1.1");
 
-    // ==============================
-    // UTF-8 encoding application-wide:
-    // ==============================
-
-    QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
-
-    // ==============================
     // Directory of the PEB executable:
-    // ==============================
-
     QDir executableDirectory = application.applicationDirPath();
     QString browserDirectory = executableDirectory.absolutePath().toLatin1();
 
 #ifdef Q_OS_LINUX
-    QString appImageDirectory;
     QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
 
     if (appImageEnvVariable.length() > 0) {
-        appImageDirectory =
-                QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
-        browserDirectory = appImageDirectory;
+        browserDirectory =
+            QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
     }
 #endif
 
     application.setProperty("browserDir", browserDirectory);
 
-    // ==============================
-    // Application directory:
-    // ==============================
-
+    // Directory of the application PEB is going to run:
     QString applicationDirName =
         executableDirectory.absolutePath().toLatin1() + "/resources/app";
 
     application.setProperty("appDir", applicationDirName);
 
-    // ==============================
     // Application icon:
-    // ==============================
-
+    // Set the embedded default icon if no external icon file is found:
     QString iconPathName = applicationDirName + "/app.png";
 
     QPixmap icon(32, 32);
@@ -79,17 +71,13 @@ int main(int argc, char **argv)
         icon.load(iconPathName);
         QApplication::setWindowIcon(icon);
     } else {
-        // Set the embedded default icon if no external icon file is found:
         icon.load(":/icon/camel.png");
         QApplication::setWindowIcon(icon);
     }
 
-    // ==============================
     // Main window:
-    // ==============================
-
     QMainBrowserWindow mainWindow;
-    mainWindow.setWindowIcon(icon);
+
     mainWindow.setCentralWidget(mainWindow.webViewWidget);
 
     // Application property used when closing the browser window is requested:
@@ -105,16 +93,13 @@ int main(int argc, char **argv)
                      mainWindow.webViewWidget->page(),
                      SLOT(qCloseWindowSlot()));
 
-    // ==============================
     // Start page:
-    // ==============================
-
     QString startPageFilePath = applicationDirName + "/index.html";
     QFile startPageFile(startPageFilePath);
 
     if (startPageFile.exists()) {
         mainWindow.webViewWidget->setUrl(
-                    QUrl::fromLocalFile(startPageFilePath));
+            QUrl::fromLocalFile(startPageFilePath));
     }
 
     if (!startPageFile.exists()) {

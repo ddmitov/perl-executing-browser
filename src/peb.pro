@@ -26,7 +26,6 @@ win32 {
     RC_FILE = resources/peb.rc
 }
 
-# Binary basics:
 CONFIG += release
 TEMPLATE = app
 TARGET = peb
@@ -39,19 +38,19 @@ QT += widgets webkitwidgets
 # Source files:
 SOURCES += \
     main.cpp \
-    file-reader.cpp \
-    main-window.cpp \
-    script-handler.cpp \
-    webkit-page.cpp \
-    webkit-view.cpp
+    file_reader.cpp \
+    main_window.cpp \
+    script_handler.cpp \
+    webkit_page.cpp \
+    webkit_view.cpp
 
 # Header files:
 HEADERS += \
-    file-reader.h \
-    script-handler.h \
-    webkit-main-window.h \
-    webkit-page.h \
-    webkit-view.h
+    file_reader.h \
+    script_handler.h \
+    webkit_main_window.h \
+    webkit_page.h \
+    webkit_view.h
 
 # Resources:
 RESOURCES += resources/peb.qrc

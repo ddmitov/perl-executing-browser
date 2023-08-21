@@ -15,7 +15,7 @@
 
 // Settings objects for Perl scripts:
 var perl_info = {};
-perl_info.scriptRelativePath = 'perl-scripts/perl-info.pl';
+perl_info.scriptRelativePath = 'perl_scripts/perl_info.pl';
 perl_info.stdoutFunction = function (stdout) {
   var newElement = document.createElement("pre");
   newElement.innerHTML = stdout;
@@ -24,7 +24,7 @@ perl_info.stdoutFunction = function (stdout) {
 }
 
 var sqlite = {};
-sqlite.scriptRelativePath = 'perl-scripts/sqlite.pl';
+sqlite.scriptRelativePath = 'perl_scripts/sqlite.pl';
 sqlite.stdoutFunction = function (stdout) {
   var newElement = document.createElement("pre");
   newElement.innerHTML = stdout;
@@ -33,25 +33,25 @@ sqlite.stdoutFunction = function (stdout) {
 }
 
 var open_file = {};
-open_file.scriptRelativePath = 'perl-scripts/open-file.pl';
+open_file.scriptRelativePath = 'perl_scripts/open_file.pl';
 open_file.stdoutFunction = function (stdout) {
   displayTestResult('open-file', stdout);
 }
 
 var new_file = {};
-new_file.scriptRelativePath = 'perl-scripts/new-file.pl';
+new_file.scriptRelativePath = 'perl_scripts/new_file.pl';
 new_file.stdoutFunction = function (stdout) {
   displayTestResult('new-file', stdout);
 }
 
 var open_files = {};
-open_files.scriptRelativePath = 'perl-scripts/open-files.pl';
+open_files.scriptRelativePath = 'perl_scripts/open_files.pl';
 open_files.stdoutFunction = function (stdout) {
   displayTestResult('open-files', stdout);
 }
 
 var open_directory = {};
-open_directory.scriptRelativePath = 'perl-scripts/open-directory.pl';
+open_directory.scriptRelativePath = 'perl_scripts/open_directory.pl';
 open_directory.stdoutFunction = function (stdout) {
   displayTestResult('open-directory', stdout);
 }
