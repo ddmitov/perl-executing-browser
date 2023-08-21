@@ -27,7 +27,6 @@ Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.
 * APPIMAGE SUPPORT
   * [PEB AppImager](./doc/APPIMAGE.md#peb-appimager)
   * [PEB AppImage Configuration Files](./doc/APPIMAGE.md#peb-appimage-configuration-files)
-  * [PEB AppImage Builder Docker Container](./doc/APPIMAGE.md#peb-appimage-builder-docker-container)
   * [AppImageHub](./doc/APPIMAGE.md#appimagehub)
 * [Logging](#logging)
 * [History](#history)

@@ -2,7 +2,9 @@
 
 ## Global Settings API
 
-All global PEB settings are stored in a single JavaScript object named ``pebSettings``. This name is mandatory and hard-coded in C++ code. If ``pebSettings`` JavaScript object is not found, the Perl interpreter for all scripts will be the first Perl interpreter on PATH.
+All global PEB settings are stored in a single JavaScript object named ``pebSettings``.  
+This name is mandatory and it is hard-coded in C++ code.  
+If ``pebSettings`` JavaScript object is not found, the PEB Perl interpreter is the first Perl interpreter on PATH.
 
 ```javascript
 var pebSettings = {};
