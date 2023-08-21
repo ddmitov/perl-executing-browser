@@ -13,9 +13,13 @@ The PEB AppImager must be started from the ``{PEB_executable_directory}``.
 
 ``{PEB_executable_directory}/resources/app/{application_name}.desktop``  
 is mandatory for any PEB-based application which is to be packed by the PEB AppImager.  
+
 A minimal example of а ``.desktop`` file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/appimage/peb-demo.desktop).  
+
 ``Icon=app`` in the ``.desktop`` file must not be changed for the proper display of the application icon.  
+
 All registered categories in a ``.desktop`` file are available [here](https://standards.freedesktop.org/menu-spec/latest/apa.html).  
+
 Any ``.desktop`` file can be validated using the ``desktop-file-validate`` tool from the  ``desktop-file-utils`` package in all major Linux distributions.  
 
 An example AppStream file is available [here](https://github.com/ddmitov/perl-executing-browser/blob/master/resources/app/appimage/peb-demo.appdata.xml). An AppStream file is not mandatory, but is highly recommended.  
