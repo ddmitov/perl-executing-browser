@@ -139,10 +139,6 @@ A JavaScript settings object for a Perl script run by PEB has the following prop
   }
   ```
 
-* **exitData**  
-  ``String`` or ``Function`` supplying script exit command as its return value  
-  ``exitData`` is written on script STDIN.  
-
 ## Files and Folders Dialogs API
 
 Selecting files or folders with their full paths is performed by clicking a pseudo link composed of the name of a JavaScript settings object and a ``.dialog`` extension.  
