@@ -2,9 +2,9 @@
 
 ## Compile-Time Requirements
 
-* Qt development bundle versions 5.2 - 5.5  
+* Qt development bundle versions 5.2 - 5.5
   
-* ``QtWebKit`` library and headers  
+* QtWebKit library and headers  
 
 PEB for Windows must be compiled by a GCC-based MinGW Qt development bundle.  
 

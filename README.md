@@ -30,8 +30,8 @@ Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.
   * [AppImageHub](./doc/APPIMAGE.md#appimagehub)
 * [Logging](#logging)
 * [History](#history)
-* [License](./LICENSE.md)
 * [Thanks and Credits](./CREDITS.md)
+* [License](./LICENSE.md)
 * [Authors](#authors)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",  
@@ -97,8 +97,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 ## Design Objectives
 
-* **1. Easy and beautiful graphical user interface for Perl 5 desktop applications**  
-* **2. Fast and zero-installation software**  
+* **1. Easy graphical user interface for Perl 5 desktop applications**  
+* **2. Zero-installation software**  
 * **3. Cross-platform availability**  
 * **4. Secure solution with no server process**  
 * **5. Maximal reuse of existing web technologies and standards**
@@ -107,13 +107,13 @@ in the documentation of this project are to be interpreted as described in [RFC 
 
 * [PEB can be started from any folder without installation procedure.](./doc/CONSTANTS.md#files-and-folders)
 * No limitation on how long a Perl script can run.
-* [Perl script output is seamlessly inserted in a nice HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
+* [Perl script output is seamlessly inserted in an HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
-* [Single file or multiple files, new filename, existing or new directory can be selected by user.](./doc/SETTINGS.md#selecting-files-and-folders)  
-* [Unified logging of Perl and JavaScript errors in the JavaScript console](./doc/LOGGING.md)  
+* [Select files and folders.](./doc/SETTINGS.md#selecting-files-and-folders)  
+* [Logging of Perl errors in the JavaScript console](#logging)  
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
-* [Optional labels for all JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
-* [Optional icon for the main window and all dialog boxes](./doc/FILES.md#icon)
+* [Optional labels for the JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
+* [Optional icon](./doc/FILES.md#icon)
 
 ## Security
 
