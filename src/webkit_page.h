@@ -293,10 +293,10 @@ public slots:
             errors.replace("\n", "\\n");
             errors.replace("\r", "");
 
-            QString perlScriptErrorsMessage =
-                "console.debug('" + errors + "'); null";
+            QString perlScriptErrorMessage =
+                "console.error('" + errors + "'); null";
 
-            mainFrame()->evaluateJavaScript(perlScriptErrorsMessage);
+            mainFrame()->evaluateJavaScript(perlScriptErrorMessage);
         }
     }
 
