@@ -109,8 +109,8 @@ in the documentation of this project are to be interpreted as described in [RFC 
 * No limitation on how long a Perl script can run.
 * [Perl script output is seamlessly inserted in an HTML user interface.](./doc/SETTINGS.md#perl-scripts-api)
 * [Any version of Perl 5 can be used.](./doc/REQUIREMENTS.md#runtime-requirements)
-* [Select files and folders.](./doc/SETTINGS.md#selecting-files-and-folders)  
-* [Logging of Perl errors in the JavaScript console](#logging)  
+* [Select files and folders.](./doc/SETTINGS.md#selecting-files-and-folders)
+* [Logging of Perl errors in the JavaScript console](#logging)
 * [Optional warning for unsaved data in HTML forms](./doc/SETTINGS.md#html-page-api)
 * [Optional labels for the JavaScript popup boxes and context menus](./doc/SETTINGS.md#html-page-api)
 * [Optional icon](./doc/FILES.md#icon)
