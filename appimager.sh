@@ -40,8 +40,8 @@ fi
 cp -f "$package_desktop_file" "$(pwd)/$appimage_name.app/$appimage_name.desktop"
 
 # AppImage icon:
-if [ -e "$(pwd)/resources/app/app.png" ]; then
-  cp -f "$(pwd)/resources/app/app.png" "$(pwd)/$appimage_name.app/app.png"
+if [ -e "$(pwd)/resources/app/appimage/app.png" ]; then
+  cp -f "$(pwd)/resources/app/appimage/app.png" "$(pwd)/$appimage_name.app/app.png"
 fi
 
 # AppImage metadata file:
