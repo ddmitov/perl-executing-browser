@@ -7,6 +7,14 @@ Perl Executing Browser (PEB) is an HTML user interface for [Perl 5](https://www.
 
 ![PEB Screenshot](https://github.com/ddmitov/perl-executing-browser/raw/master/doc/screenshot.png "PEB Screenshot")  
 
+## 2024 Note
+
+At the time of writing this note, the WebKit rendering engine used by PEB to display HTML user interfaces is rather old and the corresponding QtWebKit library is unsupported for a number of years. Although PEB does not load any web content, using QtWebKit now may be problematic even for displaying local HTML content based on the latest standards. This is the reason for developing a new version of PEB based on the Blink rendering engine - the [Perl Executing Browser QtWebEngine](https://github.com/ddmitov/perl-executing-browser-qtwebengine).  
+  
+Due to the specifics of the QtWebEngine library, Perl Executing Browser QtWebEngine has the following differences compared to the original version of PEB:  
+* Perl Executing Browser QtWebEngine can not be packed as an AppImage and has to be installed before use  
+* No support for Windows  
+
 ## Contents
 
 * [Quick Start](#quick-start)
