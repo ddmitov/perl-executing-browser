@@ -1,5 +1,5 @@
 ﻿/*
- Perl Executing Browser
+ Perl Executing Browser QtWebEngine
 
  This program is free software;
  you can redistribute it and/or modify it under the terms of the
@@ -10,59 +10,55 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020, 2023
+ Dimitar D. Mitov, 2013 - 2024
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#include <QtWidgets/QApplication>
+#include <QApplication>
 #include <QTextCodec>
 #include <QtGlobal>
 
-#include "webkit_main_window.h"
+#include "window.h"
 
 // ==============================
-// APPLICATION DEFINITION:
+// APPLICATION DEFINITION
 // ==============================
-
 int main(int argc, char **argv)
 {
+    QApplication application(argc, argv);
+
+    application.setApplicationName("Perl Executing Browser");
+    application.setApplicationVersion("2.0.0");
+
     // UTF-8 encoding application-wide:
     QTextCodec::setCodecForLocale(QTextCodec::codecForName("UTF8"));
 
-    // Avoid invalid local Qt styles and the following error:
-    // QApplication: invalid style override passed, ignoring it.
-    qputenv("QT_STYLE_OVERRIDE", 0);
+    // Command-line argument:
+    const QStringList arguments = QCoreApplication::arguments();
 
-    // Application initialization:
-    QApplication application(argc, argv);
+    // Application directory:
+    QString applicationDirectoryPath;
 
-    application.setApplicationVersion("1.1.1");
+    if (arguments.length() > 1) {
+        QFileInfo applicationDirectoryArgument(arguments.at(1));
 
-    // Directory of the PEB executable:
-    QDir executableDirectory = application.applicationDirPath();
-    QString browserDirectory = executableDirectory.absolutePath().toLatin1();
+        if (applicationDirectoryArgument.isRelative()){
+            applicationDirectoryPath = QDir::currentPath() + "/app";
+        }
 
-#ifdef Q_OS_LINUX
-    QByteArray appImageEnvVariable = qgetenv("APPIMAGE");
+        if (!applicationDirectoryArgument.isRelative()){
+            applicationDirectoryPath = arguments.at(1);
+        }
 
-    if (appImageEnvVariable.length() > 0) {
-        browserDirectory =
-            QFileInfo(QString::fromLatin1(appImageEnvVariable)).path();
+    } else {
+        applicationDirectoryPath = QDir::currentPath() + "/app";
     }
-#endif
 
-    application.setProperty("browserDir", browserDirectory);
-
-    // Directory of the application PEB is going to run:
-    QString applicationDirName =
-        executableDirectory.absolutePath().toLatin1() + "/resources/app";
-
-    application.setProperty("appDir", applicationDirName);
+    application.setProperty("appDir", applicationDirectoryPath);
 
     // Application icon:
-    // Set the embedded default icon if no external icon file is found:
-    QString iconPathName = applicationDirName + "/app.png";
+    QString iconPathName = applicationDirectoryPath + "/app.png";
 
     QPixmap icon(32, 32);
     QFile iconFile(iconPathName);
@@ -71,40 +67,33 @@ int main(int argc, char **argv)
         icon.load(iconPathName);
         QApplication::setWindowIcon(icon);
     } else {
-        icon.load(":/icon/camel.png");
-        QApplication::setWindowIcon(icon);
+        // Use the embedded default icon if no external icon file is found:
+        icon.load(":/camel.png");
+
+        application.setWindowIcon(icon);
     }
 
-    // Main window:
-    QMainBrowserWindow mainWindow;
-
-    mainWindow.setCentralWidget(mainWindow.webViewWidget);
-
-    // Application property used when closing the browser window is requested:
-    qApp->setProperty("windowCloseRequested", false);
-
-    QObject::connect(mainWindow.webViewWidget,
-                     SIGNAL(titleChanged(QString)),
-                     &mainWindow,
-                     SLOT(setMainWindowTitleSlot(QString)));
-
-    QObject::connect(&mainWindow,
-                     SIGNAL(startMainWindowClosingSignal()),
-                     mainWindow.webViewWidget->page(),
-                     SLOT(qCloseWindowSlot()));
-
     // Start page:
-    QString startPageFilePath = applicationDirName + "/index.html";
+    QString startPageFilePath = applicationDirectoryPath + "/index.html";
     QFile startPageFile(startPageFilePath);
 
     if (startPageFile.exists()) {
-        mainWindow.webViewWidget->setUrl(
-            QUrl::fromLocalFile(startPageFilePath));
+        QMainBrowserWindow mainWindow;
+
+        mainWindow.mainViewWidget->setUrl(
+            QUrl::fromLocalFile(startPageFilePath)
+        );
+
+        return application.exec();
     }
 
     if (!startPageFile.exists()) {
-        mainWindow.qDisplayErrorSlot(QString("No start page is found."));
-    }
+        QMessageBox msgBox;
 
-    return application.exec();
+        msgBox.setWindowTitle("Perl Executing Browser");
+        msgBox.setText("No Perl Executing Browser start page is found.");
+        msgBox.exec();
+
+        application.exit();
+    }
 }

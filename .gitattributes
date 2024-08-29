@@ -1,3 +1,2 @@
 src/resources/icon/* linguist-vendored
-resources/app/appimage/app.png linguist-vendored
-resources/app/bootstrap/*.css linguist-vendored
+app/bootstrap/*.css linguist-vendored

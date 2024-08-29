@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Perl Executing Browser Demo
+# Perl Executing Browser QtWebEngine Demo
 
 # This program is free software;
 # you can redistribute it and/or modify it under the terms of the
@@ -11,17 +11,21 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020, 2023
+# Dimitar D. Mitov, 2013 - 2024
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
 use strict;
 use warnings;
+use Cwd;
+use English;
 
-my $input = <STDIN>;
-chomp $input;
+my $cwd = cwd();
 
-my @files = split(/;/, $input);
+print "Perl $PERL_VERSION<br>";
+print "Working Directory: $cwd<br>";
 
-my $number_of_files = scalar(@files);
-print "Number of selected files: $number_of_files";
+print "<br>";
+
+print "\@INC Array:<br>";
+print join "<br>", @INC;

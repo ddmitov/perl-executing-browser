@@ -1,6 +1,3 @@
-build-peb-*
-resources/app/perl
-squashfs-root
 src/tmp
 
 .qmake.stash
@@ -8,9 +5,9 @@ src/tmp
 Makefile
 peb.pro.*
 
+*.deb
+
 peb
-peb.exe
-*.AppImage
 
 backup
 upgit

@@ -1,0 +1,10 @@
+Section: misc
+Priority: optional
+Homepage: <https://github.com/ddmitov/perl-executing-browser>
+Package: peb
+Version: 2.0.0
+Maintainer: Ubuntu Developers <ubuntu-devel-discuss@lists.ubuntu.com>
+Depends: libqt5webengine5 (>= 5.9), perl
+Architecture: amd64
+Description: Perl Executing Browser
+  Perl Executing Browser is an HTML user interface for Perl 5 desktop applications.

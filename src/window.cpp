@@ -1,5 +1,5 @@
 /*
- Perl Executing Browser
+ Perl Executing Browser QtWebEngine
 
  This program is free software;
  you can redistribute it and/or modify it under the terms of the
@@ -10,30 +10,29 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020, 2023
+ Dimitar D. Mitov, 2013 - 2024
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#include <QFile>
-#include <QTextStream>
-
-#include "file_reader.h"
+#include "window.h"
 
 // ==============================
-// FILE READER CONSTRUCTOR:
-// Usefull for both files inside binary resources and files on disk
+// MAIN WINDOW CLASS CONSTRUCTOR
 // ==============================
-
-QFileReader::QFileReader(QString filePath)
-    : QObject(0)
+QMainBrowserWindow::QMainBrowserWindow(QWidget *parent)
+    : QMainWindow(parent)
 {
-    QString fileName(filePath);
-    QFile file(fileName);
+    mainViewWidget = new QViewWidget();
 
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    setCentralWidget(mainViewWidget);
+    showMaximized();
 
-    QTextStream fileStream(&file);
-    fileContents = fileStream.readAll();
-    file.close();
+    // Signal and slot for setting the title of the main window:
+    QObject::connect(
+        this->mainViewWidget,
+        SIGNAL(titleChanged(QString)),
+        this,
+        SLOT(qSetMainWindowTitleSlot(QString))
+    );
 }

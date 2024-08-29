@@ -1,5 +1,5 @@
 /*
- Perl Executing Browser
+ Perl Executing Browser QtWebEngine
 
  This program is free software;
  you can redistribute it and/or modify it under the terms of the
@@ -10,29 +10,20 @@
  but WITHOUT ANY WARRANTY;
  without even the implied warranty of MERCHANTABILITY or
  FITNESS FOR A PARTICULAR PURPOSE.
- Dimitar D. Mitov, 2013 - 2020, 2023
+ Dimitar D. Mitov, 2013 - 2024
  Valcho Nedelchev, 2014 - 2016
  https://github.com/ddmitov/perl-executing-browser
 */
 
-#ifndef FILE_READER_H
-#define FILE_READER_H
-
-#include <QObject>
+#include <view.h>
 
 // ==============================
-// FILE READER CLASS DEFINITION:
-// Usefull for both files inside binary resources and files on disk
+// VIEW CLASS CONSTRUCTOR
 // ==============================
-
-class QFileReader : public QObject
+QViewWidget::QViewWidget()
+    : QWebEngineView(0)
 {
-    Q_OBJECT
+    mainPage = new QPage();
 
-public:
-
-    explicit QFileReader(QString filePath);
-    QString fileContents;
-};
-
-#endif // FILE_READER_H
+    setPage(mainPage);
+}

@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-# Perl Executing Browser Demo
+# Perl Executing Browser QtWebEngine Demo
 
 # This program is free software;
 # you can redistribute it and/or modify it under the terms of the
@@ -11,14 +11,14 @@
 # but WITHOUT ANY WARRANTY;
 # without even the implied warranty of MERCHANTABILITY or
 # FITNESS FOR A PARTICULAR PURPOSE.
-# Dimitar D. Mitov, 2013 - 2020, 2023
+# Dimitar D. Mitov, 2013 - 2024
 # Valcho Nedelchev, 2014 - 2016
 # https://github.com/ddmitov/perl-executing-browser
 
 use strict;
 use warnings;
 
-my $directory_name = <STDIN>;
-chomp $directory_name;
+my $input = <STDIN>;
+chomp $input;
 
-print "Selected directory: $directory_name";
+print "Selected file: $input";
