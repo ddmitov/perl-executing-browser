@@ -19,7 +19,7 @@ It is a C++ [Qt 5](https://www.qt.io/) program running local Perl scripts as chi
 * [History](#history)
 * [Thanks and Credits](./CREDITS.md)
 * [License](./LICENSE.md)
-* [Author](#author)
+* [Authors](#authors)
 
 The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",  
 "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY" and "OPTIONAL"  
@@ -118,6 +118,7 @@ either version 3 of the License, or (at your option) any later version.
 This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY;  
 without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
-## Author
+## Authors
 
-Dimitar D. Mitov, 2018 - 2019, 2023
+Dimitar D. Mitov, 2013 - 2024  
+Valcho Nedelchev, 2014 - 2016  
