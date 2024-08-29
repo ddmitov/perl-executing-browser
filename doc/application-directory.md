@@ -1,4 +1,4 @@
-# Perl Executing Browser QtWebEngine - Application Directory
+# Perl Executing Browser - Application Directory
 
 PEB is created to work from any directory and all file paths used by PEB are relative to the PEB Application Directory.  
 

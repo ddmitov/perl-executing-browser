@@ -1,4 +1,4 @@
-# Perl Executing Browser QtWebEngine - Perl Scripts API
+# Perl Executing Browser - Perl Scripts API
 
 Every Perl script run by PEB must have a JavaScript configuration object with an arbitrary object name and fixed-name object properties. The name of the JavaScript configuration object with a ``.script`` extension forms a pseudo link used to start the corresponding Perl script.  
 
