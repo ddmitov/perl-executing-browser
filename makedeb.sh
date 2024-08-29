@@ -24,4 +24,4 @@ if [ ! -e "$(pwd)/peb" ]; then
 fi
 
 # DEB file generation:
-dpkg-deb --build --root-owner-group deb peb-qtwebengine-1.0.0-x86_64.deb
+dpkg-deb --build --root-owner-group deb peb-2.0.0-x86_64.deb
