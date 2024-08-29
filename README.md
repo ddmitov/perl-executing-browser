@@ -105,8 +105,7 @@ PEB has unified logging of all JavaScript and Perl errors in the command-line co
 
 ## History
 
-PEB was started in 2013 as a simple user interface for personal database applications.  
-PEB QtWebEngine became a separate application in 2018.
+PEB was started in 2013 as a simple user interface for personal database applications.
 
 ## [Thanks and Credits](./CREDITS.md)
 
