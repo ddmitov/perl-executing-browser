@@ -44,7 +44,6 @@ in the documentation of this project are to be interpreted as described in [RFC 
 ### Compile-Time Requirements
 
 * Qt development bundle versions 5.9 - 5.15
-
 * QtWebEngine headers and libraries
 
 Run the following commands in the root directory of the PEB project to compile PEB:
@@ -57,10 +56,8 @@ make
 
 ### Runtime Requirements
 
-* QtWebEngine 5.9 - 5.12 runtime libraries
-
+* QtWebEngine 5.9 - 5.15 runtime libraries
 * Perl 5 - any Linux [relocatable](https://github.com/skaji/relocatable-perl) or standard Perl distribution
-
   PEB will use the first Perl on PATH if a relocatable Perl distribution is not available.
 
 ## Security
@@ -85,14 +82,14 @@ make
 
 ## Ubuntu Package
 
-PEB can be packed as an Ubuntu .deb package using the included ``makedeb.sh`` script.  
-PEB can be installed from an Ubuntu .deb package using the command:  
+PEB can be packed as an Ubuntu .deb package and installed using the following commands:  
 
 ```bash
+./makedeb.sh
 sudo dpkg -i peb-*-x86_64.deb
 ```
 
-When PEB is installed system-wide, it can be used as a runtime for PEB-based applications. In this scenario PEB must be started with a PEB Application Directory as its only command-line argument:  
+After installation, PEB becomes a runtime for PEB-based applications and must be started with a PEB Application Directory as its only command-line argument:  
 
 ```bash
 peb /full/path/to/application-directory
