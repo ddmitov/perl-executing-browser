@@ -57,8 +57,8 @@ make
 ### Runtime Requirements
 
 * QtWebEngine 5.9 - 5.15 runtime libraries
-* Perl 5 - any Linux [relocatable](https://github.com/skaji/relocatable-perl) or standard Perl distribution
-  PEB will use the first Perl on PATH if a relocatable Perl distribution is not available.
+* Perl 5 - any Linux Perl distribution  
+  PEB will use the first Perl on PATH if a full path to a Perl interpreter is not set.
 
 ## Security
 
