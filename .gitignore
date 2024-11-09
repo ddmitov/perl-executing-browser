@@ -1,3 +1,4 @@
+src/build
 src/tmp
 
 .qmake.stash
